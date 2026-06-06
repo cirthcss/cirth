@@ -24,7 +24,7 @@ const themeColors = [
   "zinc",
 ];
 
-const tempScssFoldername = path.join(__dirname, "../.pico");
+const tempScssFoldername = path.join(__dirname, "../.cirth");
 const cssFoldername = path.join(__dirname, "../css");
 
 // Create a folder if it doesn't exist
@@ -53,13 +53,13 @@ themeColors.forEach((themeColor, colorIndex) => {
   // All the versions to generate
   const versions = [
     {
-      name: "pico",
+      name: "cirth",
       content: `@use "../scss" with (
         $theme-color: "${themeColor}"
       );`,
     },
     {
-      name: "pico.classless",
+      name: "cirth.classless",
       content: `@use "../scss" with (
         $theme-color: "${themeColor}",
         $enable-semantic-container: true,
@@ -67,7 +67,7 @@ themeColors.forEach((themeColor, colorIndex) => {
       );`,
     },
     {
-      name: "pico.fluid.classless",
+      name: "cirth.fluid.classless",
       content: `@use "../scss" with (
         $theme-color: "${themeColor}", 
         $enable-semantic-container: true, 
@@ -76,29 +76,29 @@ themeColors.forEach((themeColor, colorIndex) => {
       );`,
     },
     {
-      name: "pico.conditional",
+      name: "cirth.conditional",
       content: `@use "../scss" with (
         $theme-color: "${themeColor}",
-        $parent-selector: ".pico"
+        $parent-selector: ".cirth"
       );`,
     },
     {
-      name: "pico.classless.conditional",
+      name: "cirth.classless.conditional",
       content: `@use "../scss" with (
         $theme-color: "${themeColor}",
         $enable-semantic-container: true,
         $enable-classes: false,
-        $parent-selector: ".pico"
+        $parent-selector: ".cirth"
       );`,
     },
     {
-      name: "pico.fluid.classless.conditional",
+      name: "cirth.fluid.classless.conditional",
       content: `@use "../scss" with (
         $theme-color: "${themeColor}", 
         $enable-semantic-container: true, 
         $enable-viewport: false, 
         $enable-classes: false,
-        $parent-selector: ".pico"
+        $parent-selector: ".cirth"
       );`,
     },
   ];
@@ -107,7 +107,7 @@ themeColors.forEach((themeColor, colorIndex) => {
     const progress = Math.round((index / length) * 100);
     const bar = "■".repeat(progress / 10);
     const empty = "□".repeat(10 - progress / 10);
-    process.stdout.write(`[@picocss/pico] ✨ ${bar}${empty} ${color}\r`);
+    process.stdout.write(`[@cirth/cirth] ✨ ${bar}${empty} ${color}\r`);
   };
 
   // Loop through the versions
@@ -133,9 +133,11 @@ themeColors.forEach((themeColor, colorIndex) => {
     // Write the file
     fs.writeFileSync(path.join(cssFoldername, `${version.name}.${themeColor}.css`), result.css);
 
-    // Clear the console
-    process.stdout.clearLine();
-    process.stdout.cursorTo(0);
+    // Clear the console when running in an interactive terminal.
+    if (process.stdout.clearLine && process.stdout.cursorTo) {
+      process.stdout.clearLine();
+      process.stdout.cursorTo(0);
+    }
   });
 });
 

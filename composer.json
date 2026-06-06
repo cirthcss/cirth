@@ -1,6 +1,6 @@
 {
-  "name": "picocss/pico",
-  "description": "Minimal CSS Framework for semantic HTML.",
+  "name": "cirth/cirth",
+  "description": "Semantic-first CSS Framework for production-ready interfaces",
   "keywords": [
     "css",
     "css-framework",
@@ -14,17 +14,15 @@
     "scss-framework",
     "semantic"
   ],
-  "homepage": "https://picocss.com",
+  "homepage": "https://github.com/ricpastori/cirth",
   "authors": [
     {
-      "name": "Lucas Larroche",
-      "email": "lucas@larroche.com",
-      "homepage": "https://lucaslarroche.com",
+      "name": "Riccardo Pastori",
       "role": "Developer"
     }
   ],
   "support": {
-    "issues": "https://github.com/picocss/pico/issues/"
+    "issues": "https://github.com/ricpastori/cirth/issues/"
   },
   "license": "MIT"
 }

@@ -1,9 +1,9 @@
 @use "sass:map";
-@use "../../settings" as pico-settings;
+@use "../../settings" as cirth-settings;
 
 // Prefix for CSS variables
-$css-var-prefix: "--pico-" !default; // Must start with "--"
-$css-class-prefix: "pico-" !default;
+$css-var-prefix: "--cirth-" !default; // Must start with "--"
+$css-class-prefix: "cirth-" !default;
 
 // Palette
 $palette: () !default;

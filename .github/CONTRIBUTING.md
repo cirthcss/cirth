@@ -1,22 +1,20 @@
-# Contributing to Pico
+# Contributing to Cirth
 
-Thanks for your interest in contributing to Pico CSS! Please take a moment to review this document before submitting a [bug report](https://github.com/picocss/pico/issues) or a [pull request](https://github.com/picocss/pico/pulls).
+Thanks for your interest in contributing to Cirth. The repository is still moving toward a stable internal organization, so community contribution workflows are intentionally limited for now.
 
 ## Bug reports
 
-The [issue tracker]((https://github.com/picocss/pico/issues)) is the preferred channel for bug reports, but please respect the following restrictions:
-- Please do not use the issue tracker for personal support requests. [Open a question in our discussion forums](https://github.com/picocss/pico/discussions/categories/help) instead.
-- Please do not use the issue tracker for feature requests.  Instead, use our discussion forums to [suggest any ideas](https://github.com/picocss/pico/discussions/categories/ideas) you have.
+The [issue tracker](https://github.com/ricpastori/cirth/issues) is the only public support and feedback channel currently enabled.
+
+Before opening a bug report, please search for existing or closed issues. Include a reduced reproduction when possible.
+
+Feature requests can be opened as issues, but they may be deferred until the repository structure and public API are more stable.
 
 ## Pull requests
 
-Good pull requests, patches, improvements, and new features are a fantastic help.
+Pull requests are welcome when they are focused and easy to review, but there is not yet a dedicated community development branch.
 
 **Please ask before starting work on any significant new features.**
-We recommend that you first [suggest your feature idea in our discussion forums](https://github.com/picocss/pico/discussions/categories/ideas).
+Open an issue first for substantial changes, new APIs, or broad refactors.
 
-[`dev`](https://github.com/picocss/pico/tree/dev) branch is open for pull requests on `v2`.
-
-[`v1-dev`](https://github.com/picocss/pico/tree/v1-dev) branch is open to pull requests on `v1`.
-
-**Do not edit [`/css`](https://github.com/picocss/pico/tree/master/css) files directly.** Edit the source files in [`/scss`](https://github.com/picocss/pico/tree/master/scss), then recompile the [`/css`](https://github.com/picocss/pico/tree/master/css) files with `yarn build`.
+**Do not edit [`/css`](https://github.com/ricpastori/cirth/tree/master/css) files directly.** Edit the source files in [`/scss`](https://github.com/ricpastori/cirth/tree/master/scss), then recompile the [`/css`](https://github.com/ricpastori/cirth/tree/master/css) files with `yarn build`.
