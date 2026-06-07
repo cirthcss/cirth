@@ -1,20 +1,46 @@
 # Contributing to Cirth
 
-Thanks for your interest in contributing to Cirth. The repository is still moving toward a stable internal organization, so community contribution workflows are intentionally limited for now.
+Thanks for your interest in contributing to Cirth.
 
-## Bug reports
+The repository is still moving toward a stable internal organization, so the
+contribution workflow is intentionally simple for now. Contributions do not need
+to be limited to bug fixes, but larger changes should start with an issue so the
+direction can be discussed before implementation.
 
-The [issue tracker](https://github.com/ricpastori/cirth/issues) is the only public support and feedback channel currently enabled.
+## Issues
 
-Before opening a bug report, please search for existing or closed issues. Include a reduced reproduction when possible.
+The [issue tracker](https://github.com/cirthcss/cirth/issues) is the primary
+public support and feedback channel currently enabled.
 
-Feature requests can be opened as issues, but they may be deferred until the repository structure and public API are more stable.
+Before opening an issue, please search for existing or closed issues. For bug
+reports, include a reduced reproduction when possible.
 
-## Pull requests
+Issues are also welcome for documentation improvements, tooling questions, API
+proposals, utility class review, component ideas, and theme cleanup.
 
-Pull requests are welcome when they are focused and easy to review, but there is not yet a dedicated community development branch.
+## Pull Requests
 
-**Please ask before starting work on any significant new features.**
-Open an issue first for substantial changes, new APIs, or broad refactors.
+Pull requests are welcome when they are focused and easy to review.
 
-**Do not edit [`/css`](https://github.com/ricpastori/cirth/tree/master/css) files directly.** Edit the source files in [`/scss`](https://github.com/ricpastori/cirth/tree/master/scss), then recompile the [`/css`](https://github.com/ricpastori/cirth/tree/master/css) files with `yarn build`.
+Please open an issue first for substantial changes, new public APIs, broad
+refactors, or anything that changes the project direction.
+
+## Working Locally
+
+Cirth uses npm as the package manager.
+
+```sh
+npm install
+npm run build
+```
+
+Source files live in `src/`. Generated CSS output lives in `dist/`.
+
+For now, keep `dist/` updated when changing source files:
+
+```sh
+npm run build
+```
+
+The project will decide later when generated output should stop being committed
+and move fully to CI, release artifacts, or package publishing.

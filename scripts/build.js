@@ -29,7 +29,7 @@ const getScssEntries = (foldername) => {
 };
 
 const run = (label, command, args) => {
-	console.log(`[@cirth/cirth] ${label}`);
+	console.log(`[@cirthcss/cirth] ${label}`);
 
 	const result = spawnSync(command, args, {
 		cwd: projectRoot,
@@ -49,7 +49,7 @@ const run = (label, command, args) => {
 
 // Use the Sass Embedded API directly so the build does not depend on an ambiguous sass CLI binary.
 const compileCss = () => {
-	console.log("[@cirth/cirth] Compile");
+	console.log("[@cirthcss/cirth] Compile");
 
 	getScssEntries(sourceFolder).forEach((source) => {
 		const relativeSource = path.relative(sourceFolder, source);
@@ -67,7 +67,7 @@ const compileCss = () => {
 	});
 };
 
-console.log("\x1b[96m[@cirth/cirth] Start\x1b[0m");
+console.log("\x1b[96m[@cirthcss/cirth] Start\x1b[0m");
 
 // Keep this order: every generated CSS file should pass through Lightning CSS before minification.
 run("Format", getBinary("prettier"), [
@@ -88,4 +88,4 @@ run("Minify", process.execPath, [
 	"--minify",
 ]);
 
-console.log("\x1b[32m[@cirth/cirth] Done\x1b[0m");
+console.log("\x1b[32m[@cirthcss/cirth] Done\x1b[0m");

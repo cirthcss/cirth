@@ -112,7 +112,7 @@ if (!fs.existsSync(sourceFoldername)) {
 	process.exit(1);
 }
 
-console.log("[@cirth/cirth] Watching src/");
+console.log("[@cirthcss/cirth] Watching src/");
 lastSnapshot = getSnapshot();
 pollTimer = setInterval(pollScss, pollInterval);
 runBuild();

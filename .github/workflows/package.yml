@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   package:
-    name: Build package artifacts
+    name: Build release artifacts
     runs-on: ubuntu-latest
 
     steps:
@@ -33,11 +33,14 @@ jobs:
       - name: Pack npm package
         run: npm pack
 
+      - name: Pack dist archive
+        run: tar -czf "cirth-dist-${GITHUB_REF_NAME:-manual}.tar.gz" dist
+
       - name: Upload dist artifact
         uses: actions/upload-artifact@v4
         with:
           name: cirth-dist
-          path: dist/
+          path: cirth-dist-*.tar.gz
           if-no-files-found: error
           retention-days: 30
 
@@ -48,3 +51,12 @@ jobs:
           path: "*.tgz"
           if-no-files-found: error
           retention-days: 30
+
+      - name: Create GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            cirth-dist-*.tar.gz
+            *.tgz
+          generate_release_notes: true

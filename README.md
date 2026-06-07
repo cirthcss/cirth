@@ -122,6 +122,24 @@ Available base builds include:
 Theme-specific builds are also available in `dist/`, for example
 `dist/cirth.slate.min.css` and `dist/cirth.classless.slate.min.css`.
 
+Once `v0.1.0` is released, the default build can also be loaded from jsDelivr
+through the GitHub tag:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/cirthcss/cirth@v0.1.0/dist/cirth.min.css">
+```
+
+After the package is published to npm, it can be installed or loaded from npm
+CDNs:
+
+```sh
+npm install @cirthcss/cirth
+```
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.1.0/dist/cirth.min.css">
+```
+
 For local development, install dependencies with npm and rebuild the CSS:
 
 ```sh
@@ -264,7 +282,9 @@ GitHub Actions currently provide:
   to date.
 - `Package`, which runs on version tags and manual dispatch. It builds CSS,
   creates the npm package tarball, and uploads both `dist/` and the package as
-  workflow artifacts. It does not publish automatically.
+  workflow artifacts. On tags, it also creates a GitHub Release.
+- `Publish npm`, which runs manually and publishes the package to npm when the
+  repository has a valid `NPM_TOKEN` secret.
 
 ## Roadmap
 
@@ -286,6 +306,7 @@ and components remain separate decisions.
 - [x] Add Prettier and Stylelint conventions for SCSS.
 - [x] Document the current dependency and build policy in `package-use.md`.
 - [x] Add GitHub Actions for CI and package artifacts.
+- [x] Add a manual npm publish workflow.
 
 ### Repository and contributions
 

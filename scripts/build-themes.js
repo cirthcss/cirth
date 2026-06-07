@@ -100,7 +100,7 @@ themeColors.forEach((themeColor, colorIndex) => {
 		const progress = Math.round((index / length) * 100);
 		const bar = "■".repeat(progress / 10);
 		const empty = "□".repeat(10 - progress / 10);
-		process.stdout.write(`[@cirth/cirth] ✨ ${bar}${empty} ${color}\r`);
+		process.stdout.write(`[@cirthcss/cirth] ✨ ${bar}${empty} ${color}\r`);
 	};
 
 	versions.forEach((version) => {

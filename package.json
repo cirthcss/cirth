@@ -1,5 +1,5 @@
 {
-	"name": "@cirth/cirth",
+	"name": "@cirthcss/cirth",
 	"version": "0.1.0",
 	"description": "Semantic-first CSS framework for production-ready interfaces",
 	"author": "Riccardo Pastori",
@@ -11,9 +11,11 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/ricpastori/cirth.git"
+		"url": "git+https://github.com/cirthcss/cirth.git"
 	},
+	"homepage": "https://github.com/cirthcss/cirth#readme",
 	"publishConfig": {
+		"access": "public",
 		"tag": "next"
 	},
 	"keywords": [
@@ -31,7 +33,7 @@
 		"semantic-html"
 	],
 	"bugs": {
-		"url": "https://github.com/ricpastori/cirth/issues"
+		"url": "https://github.com/cirthcss/cirth/issues"
 	},
 	"scripts": {
 		"build": "node scripts/build.js",
