@@ -19,34 +19,27 @@ It styles standard HTML elements by default, then uses classes only where native
 
 ## Installation
 
-This repository currently ships built CSS files in `css/`. Use the local build artifacts directly.
+This repository currently ships built CSS files in `dist/`. Use the local build artifacts directly.
 
 ```html
-<link rel="stylesheet" href="css/cirth.min.css">
+<link rel="stylesheet" href="dist/cirth.min.css">
 ```
 
 Available base builds include:
 
-- `css/cirth.min.css`
-- `css/cirth.classless.min.css`
-- `css/cirth.fluid.classless.min.css`
-- `css/cirth.conditional.min.css`
-- `css/cirth.colors.min.css`
+- `dist/cirth.min.css`
+- `dist/cirth.classless.min.css`
+- `dist/cirth.fluid.classless.min.css`
+- `dist/cirth.conditional.min.css`
+- `dist/cirth.colors.min.css`
 
-Theme-specific builds are also available in `css/`, for example `css/cirth.slate.min.css` and `css/cirth.classless.slate.min.css`.
+Theme-specific builds are also available in `dist/`, for example `dist/cirth.slate.min.css` and `dist/cirth.classless.slate.min.css`.
 
 For local development, install dependencies and rebuild the CSS:
 
 ```sh
 npm install
 npm run build
-```
-
-Or with Yarn:
-
-```sh
-yarn install
-yarn build
 ```
 
 To rebuild when SCSS files change:
@@ -66,7 +59,7 @@ Cirth is designed around ordinary HTML. Start with semantic structure, then add 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light dark">
-    <link rel="stylesheet" href="css/cirth.min.css">
+    <link rel="stylesheet" href="dist/cirth.min.css">
     <title>Cirth example</title>
   </head>
   <body>
@@ -92,7 +85,7 @@ Cirth is designed around ordinary HTML. Start with semantic structure, then add 
 The classless builds style `body > header`, `body > main`, and `body > footer` as page containers, so they can be useful when you want even less markup:
 
 ```html
-<link rel="stylesheet" href="css/cirth.classless.min.css">
+<link rel="stylesheet" href="dist/cirth.classless.min.css">
 ```
 
 ## Customization With CSS Variables
@@ -112,7 +105,7 @@ The CSS variable prefix is `--cirth-`.
 }
 ```
 
-Common variables include typography, color, spacing, borders, form controls, grid gaps, and color scheme values. The generated CSS in `css/cirth.css` is the most reliable reference for the currently available variables.
+Common variables include typography, color, spacing, borders, form controls, grid gaps, and color scheme values. The generated CSS in `dist/cirth.css` is the most reliable reference for the currently available variables.
 
 ## Layout Primitives
 
@@ -149,13 +142,13 @@ SCSS is used as build infrastructure. The public API should remain usable from p
 
 Key source entry points:
 
-- `scss/cirth.scss`
-- `scss/cirth.classless.scss`
-- `scss/cirth.fluid.classless.scss`
-- `scss/cirth.conditional.scss`
-- `scss/cirth.colors.scss`
+- `src/cirth.scss`
+- `src/cirth.classless.scss`
+- `src/cirth.fluid.classless.scss`
+- `src/cirth.conditional.scss`
+- `src/cirth.colors.scss`
 
-Build scripts in `package.json` compile SCSS, generate theme variants, run PostCSS, and minify the output:
+Build scripts in `package.json` compile SCSS, generate theme variants, run Lightning CSS transforms, and minify the output:
 
 ```sh
 npm run build

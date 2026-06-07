@@ -1,0 +1,4409 @@
+:root {
+  --cirth-color-red-950: #1c0d06;
+  --cirth-color-red-900: #30130a;
+  --cirth-color-red-850: #45150c;
+  --cirth-color-red-800: #5c160d;
+  --cirth-color-red-750: #72170f;
+  --cirth-color-red-700: #861d13;
+  --cirth-color-red-650: #9b2318;
+  --cirth-color-red-600: #af291d;
+  --cirth-color-red-550: #c52f21;
+  --cirth-color-red-500: #d93526;
+  --cirth-color-red-450: #ee402e;
+  --cirth-color-red-400: #f06048;
+  --cirth-color-red-350: #f17961;
+  --cirth-color-red-300: #f38f79;
+  --cirth-color-red-250: #f5a390;
+  --cirth-color-red-200: #f5b7a8;
+  --cirth-color-red-150: #f6cabf;
+  --cirth-color-red-100: #f8dcd6;
+  --cirth-color-red-50: #faeeeb;
+  --cirth-color-red: #c52f21;
+  --cirth-color-pink-950: #25060c;
+  --cirth-color-pink-900: #380916;
+  --cirth-color-pink-850: #4b0c1f;
+  --cirth-color-pink-800: #5f0e28;
+  --cirth-color-pink-750: #740f31;
+  --cirth-color-pink-700: #88143b;
+  --cirth-color-pink-650: #9d1945;
+  --cirth-color-pink-600: #b21e4f;
+  --cirth-color-pink-550: #c72259;
+  --cirth-color-pink-500: #d92662;
+  --cirth-color-pink-450: #f42c6f;
+  --cirth-color-pink-400: #f6547e;
+  --cirth-color-pink-350: #f7708e;
+  --cirth-color-pink-300: #f8889e;
+  --cirth-color-pink-250: #f99eae;
+  --cirth-color-pink-200: #f9b4be;
+  --cirth-color-pink-150: #f9c8ce;
+  --cirth-color-pink-100: #f9dbdf;
+  --cirth-color-pink-50: #fbedef;
+  --cirth-color-pink: #d92662;
+  --cirth-color-fuchsia-950: #230518;
+  --cirth-color-fuchsia-900: #360925;
+  --cirth-color-fuchsia-850: #480b33;
+  --cirth-color-fuchsia-800: #5c0d41;
+  --cirth-color-fuchsia-750: #700e4f;
+  --cirth-color-fuchsia-700: #84135e;
+  --cirth-color-fuchsia-650: #98176d;
+  --cirth-color-fuchsia-600: #ac1c7c;
+  --cirth-color-fuchsia-550: #c1208b;
+  --cirth-color-fuchsia-500: #d9269d;
+  --cirth-color-fuchsia-450: #ed2aac;
+  --cirth-color-fuchsia-400: #f748b7;
+  --cirth-color-fuchsia-350: #f869bf;
+  --cirth-color-fuchsia-300: #f983c7;
+  --cirth-color-fuchsia-250: #fa9acf;
+  --cirth-color-fuchsia-200: #f9b1d8;
+  --cirth-color-fuchsia-150: #f9c6e1;
+  --cirth-color-fuchsia-100: #f9daea;
+  --cirth-color-fuchsia-50: #fbedf4;
+  --cirth-color-fuchsia: #c1208b;
+  --cirth-color-purple-950: #1e0820;
+  --cirth-color-purple-900: #2d0f33;
+  --cirth-color-purple-850: #3d1545;
+  --cirth-color-purple-800: #4d1a57;
+  --cirth-color-purple-750: #5e206b;
+  --cirth-color-purple-700: #6f277d;
+  --cirth-color-purple-650: #802e90;
+  --cirth-color-purple-600: #9236a4;
+  --cirth-color-purple-550: #aa40bf;
+  --cirth-color-purple-500: #b645cd;
+  --cirth-color-purple-450: #c652dc;
+  --cirth-color-purple-400: #cd68e0;
+  --cirth-color-purple-350: #d47de4;
+  --cirth-color-purple-300: #db90e8;
+  --cirth-color-purple-250: #e2a3eb;
+  --cirth-color-purple-200: #e7b6ee;
+  --cirth-color-purple-150: #edc9f1;
+  --cirth-color-purple-100: #f2dcf4;
+  --cirth-color-purple-50: #f8eef9;
+  --cirth-color-purple: #9236a4;
+  --cirth-color-violet-950: #190928;
+  --cirth-color-violet-900: #251140;
+  --cirth-color-violet-850: #321856;
+  --cirth-color-violet-800: #3f1e6d;
+  --cirth-color-violet-750: #4d2585;
+  --cirth-color-violet-700: #5b2d9c;
+  --cirth-color-violet-650: #6935b3;
+  --cirth-color-violet-600: #7540bf;
+  --cirth-color-violet-550: #8352c5;
+  --cirth-color-violet-500: #9062ca;
+  --cirth-color-violet-450: #9b71cf;
+  --cirth-color-violet-400: #a780d4;
+  --cirth-color-violet-350: #b290d9;
+  --cirth-color-violet-300: #bd9fdf;
+  --cirth-color-violet-250: #c9afe4;
+  --cirth-color-violet-200: #d3bfe8;
+  --cirth-color-violet-150: #decfed;
+  --cirth-color-violet-100: #e8dff2;
+  --cirth-color-violet-50: #f3eff7;
+  --cirth-color-violet: #7540bf;
+  --cirth-color-indigo-950: #110b31;
+  --cirth-color-indigo-900: #181546;
+  --cirth-color-indigo-850: #1f1e5e;
+  --cirth-color-indigo-800: #272678;
+  --cirth-color-indigo-750: #2f2f92;
+  --cirth-color-indigo-700: #3838ab;
+  --cirth-color-indigo-650: #4040bf;
+  --cirth-color-indigo-600: #524ed2;
+  --cirth-color-indigo-550: #655cd6;
+  --cirth-color-indigo-500: #7569da;
+  --cirth-color-indigo-450: #8577dd;
+  --cirth-color-indigo-400: #9486e1;
+  --cirth-color-indigo-350: #a294e5;
+  --cirth-color-indigo-300: #b0a3e8;
+  --cirth-color-indigo-250: #bdb2ec;
+  --cirth-color-indigo-200: #cac1ee;
+  --cirth-color-indigo-150: #d8d0f1;
+  --cirth-color-indigo-100: #e5e0f4;
+  --cirth-color-indigo-50: #f2f0f9;
+  --cirth-color-indigo: #524ed2;
+  --cirth-color-blue-950: #080f2d;
+  --cirth-color-blue-900: #0c1a41;
+  --cirth-color-blue-850: #0e2358;
+  --cirth-color-blue-800: #0f2d70;
+  --cirth-color-blue-750: #0f3888;
+  --cirth-color-blue-700: #1343a0;
+  --cirth-color-blue-650: #184eb8;
+  --cirth-color-blue-600: #1d59d0;
+  --cirth-color-blue-550: #2060df;
+  --cirth-color-blue-500: #3c71f7;
+  --cirth-color-blue-450: #5c7ef8;
+  --cirth-color-blue-400: #748bf8;
+  --cirth-color-blue-350: #8999f9;
+  --cirth-color-blue-300: #9ca7fa;
+  --cirth-color-blue-250: #aeb5fb;
+  --cirth-color-blue-200: #bfc3fa;
+  --cirth-color-blue-150: #d0d2fa;
+  --cirth-color-blue-100: #e0e1fa;
+  --cirth-color-blue-50: #f0f0fb;
+  --cirth-color-blue: #2060df;
+  --cirth-color-azure-950: #04121d;
+  --cirth-color-azure-900: #061e2f;
+  --cirth-color-azure-850: #052940;
+  --cirth-color-azure-800: #033452;
+  --cirth-color-azure-750: #014063;
+  --cirth-color-azure-700: #014c75;
+  --cirth-color-azure-650: #015887;
+  --cirth-color-azure-600: #02659a;
+  --cirth-color-azure-550: #0172ad;
+  --cirth-color-azure-500: #017fc0;
+  --cirth-color-azure-450: #018cd4;
+  --cirth-color-azure-400: #029ae8;
+  --cirth-color-azure-350: #01aaff;
+  --cirth-color-azure-300: #51b4ff;
+  --cirth-color-azure-250: #79c0ff;
+  --cirth-color-azure-200: #9bccfd;
+  --cirth-color-azure-150: #b7d9fc;
+  --cirth-color-azure-100: #d1e5fb;
+  --cirth-color-azure-50: #e9f2fc;
+  --cirth-color-azure: #0172ad;
+  --cirth-color-cyan-950: #041413;
+  --cirth-color-cyan-900: #051f1f;
+  --cirth-color-cyan-850: #052b2b;
+  --cirth-color-cyan-800: #043737;
+  --cirth-color-cyan-750: #014343;
+  --cirth-color-cyan-700: #015050;
+  --cirth-color-cyan-650: #025d5d;
+  --cirth-color-cyan-600: #046a6a;
+  --cirth-color-cyan-550: #047878;
+  --cirth-color-cyan-500: #058686;
+  --cirth-color-cyan-450: #059494;
+  --cirth-color-cyan-400: #05a2a2;
+  --cirth-color-cyan-350: #0ab1b1;
+  --cirth-color-cyan-300: #0ac2c2;
+  --cirth-color-cyan-250: #0ccece;
+  --cirth-color-cyan-200: #25dddd;
+  --cirth-color-cyan-150: #3deceb;
+  --cirth-color-cyan-100: #58faf9;
+  --cirth-color-cyan-50: #c3fcfa;
+  --cirth-color-cyan: #047878;
+  --cirth-color-jade-950: #04140c;
+  --cirth-color-jade-900: #052014;
+  --cirth-color-jade-850: #042c1b;
+  --cirth-color-jade-800: #033823;
+  --cirth-color-jade-750: #00452b;
+  --cirth-color-jade-700: #015234;
+  --cirth-color-jade-650: #005f3d;
+  --cirth-color-jade-600: #006d46;
+  --cirth-color-jade-550: #007a50;
+  --cirth-color-jade-500: #00895a;
+  --cirth-color-jade-450: #029764;
+  --cirth-color-jade-400: #00a66e;
+  --cirth-color-jade-350: #00b478;
+  --cirth-color-jade-300: #00c482;
+  --cirth-color-jade-250: #0c8;
+  --cirth-color-jade-200: #21e299;
+  --cirth-color-jade-150: #39f1a6;
+  --cirth-color-jade-100: #70fcba;
+  --cirth-color-jade-50: #cbfce1;
+  --cirth-color-jade: #007a50;
+  --cirth-color-green-950: #0b1305;
+  --cirth-color-green-900: #131f07;
+  --cirth-color-green-850: #152b07;
+  --cirth-color-green-800: #173806;
+  --cirth-color-green-750: #1a4405;
+  --cirth-color-green-700: #205107;
+  --cirth-color-green-650: #265e09;
+  --cirth-color-green-600: #2c6c0c;
+  --cirth-color-green-550: #33790f;
+  --cirth-color-green-500: #398712;
+  --cirth-color-green-450: #409614;
+  --cirth-color-green-400: #47a417;
+  --cirth-color-green-350: #4eb31b;
+  --cirth-color-green-300: #55c21e;
+  --cirth-color-green-250: #5dd121;
+  --cirth-color-green-200: #62d926;
+  --cirth-color-green-150: #77ef3d;
+  --cirth-color-green-100: #95fb62;
+  --cirth-color-green-50: #d7fbc1;
+  --cirth-color-green: #398712;
+  --cirth-color-lime-950: #101203;
+  --cirth-color-lime-900: #191d03;
+  --cirth-color-lime-850: #202902;
+  --cirth-color-lime-800: #273500;
+  --cirth-color-lime-750: #304100;
+  --cirth-color-lime-700: #394d00;
+  --cirth-color-lime-650: #435a00;
+  --cirth-color-lime-600: #4d6600;
+  --cirth-color-lime-550: #577400;
+  --cirth-color-lime-500: #628100;
+  --cirth-color-lime-450: #6c8f00;
+  --cirth-color-lime-400: #779c00;
+  --cirth-color-lime-350: #82ab00;
+  --cirth-color-lime-300: #8eb901;
+  --cirth-color-lime-250: #99c801;
+  --cirth-color-lime-200: #a5d601;
+  --cirth-color-lime-150: #b2e51a;
+  --cirth-color-lime-100: #c1f335;
+  --cirth-color-lime-50: #defc85;
+  --cirth-color-lime: #a5d601;
+  --cirth-color-yellow-950: #141103;
+  --cirth-color-yellow-900: #1f1c02;
+  --cirth-color-yellow-850: #2b2600;
+  --cirth-color-yellow-800: #363100;
+  --cirth-color-yellow-750: #423c00;
+  --cirth-color-yellow-700: #4e4700;
+  --cirth-color-yellow-650: #5b5300;
+  --cirth-color-yellow-600: #685f00;
+  --cirth-color-yellow-550: #756b00;
+  --cirth-color-yellow-500: #827800;
+  --cirth-color-yellow-450: #908501;
+  --cirth-color-yellow-400: #9e9200;
+  --cirth-color-yellow-350: #ad9f00;
+  --cirth-color-yellow-300: #bbac00;
+  --cirth-color-yellow-250: #caba01;
+  --cirth-color-yellow-200: #d9c800;
+  --cirth-color-yellow-150: #e8d600;
+  --cirth-color-yellow-100: #f2df0d;
+  --cirth-color-yellow-50: #fdf1b4;
+  --cirth-color-yellow: #f2df0d;
+  --cirth-color-amber-950: #161003;
+  --cirth-color-amber-900: #231a03;
+  --cirth-color-amber-850: #312302;
+  --cirth-color-amber-800: #3f2d00;
+  --cirth-color-amber-750: #4d3700;
+  --cirth-color-amber-700: #5b4200;
+  --cirth-color-amber-650: #694d00;
+  --cirth-color-amber-600: #785800;
+  --cirth-color-amber-550: #876400;
+  --cirth-color-amber-500: #977000;
+  --cirth-color-amber-450: #a77c00;
+  --cirth-color-amber-400: #b78800;
+  --cirth-color-amber-350: #c79400;
+  --cirth-color-amber-300: #d8a100;
+  --cirth-color-amber-250: #e8ae01;
+  --cirth-color-amber-200: #ffbf00;
+  --cirth-color-amber-150: #fecc63;
+  --cirth-color-amber-100: #fddea6;
+  --cirth-color-amber-50: #fcefd9;
+  --cirth-color-amber: #ffbf00;
+  --cirth-color-pumpkin-950: #180f04;
+  --cirth-color-pumpkin-900: #271805;
+  --cirth-color-pumpkin-850: #372004;
+  --cirth-color-pumpkin-800: #482802;
+  --cirth-color-pumpkin-750: #593100;
+  --cirth-color-pumpkin-700: #693a00;
+  --cirth-color-pumpkin-650: #7a4400;
+  --cirth-color-pumpkin-600: #8b4f00;
+  --cirth-color-pumpkin-550: #9c5900;
+  --cirth-color-pumpkin-500: #ad6400;
+  --cirth-color-pumpkin-450: #bf6e00;
+  --cirth-color-pumpkin-400: #d27a01;
+  --cirth-color-pumpkin-350: #e48500;
+  --cirth-color-pumpkin-300: #ff9500;
+  --cirth-color-pumpkin-250: #ffa23a;
+  --cirth-color-pumpkin-200: #feb670;
+  --cirth-color-pumpkin-150: #fcca9b;
+  --cirth-color-pumpkin-100: #fcdcc1;
+  --cirth-color-pumpkin-50: #fceee3;
+  --cirth-color-pumpkin: #ff9500;
+  --cirth-color-orange-950: #1b0d06;
+  --cirth-color-orange-900: #2d1509;
+  --cirth-color-orange-850: #411a0a;
+  --cirth-color-orange-800: #561e0a;
+  --cirth-color-orange-750: #6b220a;
+  --cirth-color-orange-700: #7f270b;
+  --cirth-color-orange-650: #942d0d;
+  --cirth-color-orange-600: #a83410;
+  --cirth-color-orange-550: #bd3c13;
+  --cirth-color-orange-500: #d24317;
+  --cirth-color-orange-450: #e74b1a;
+  --cirth-color-orange-400: #f45d2c;
+  --cirth-color-orange-350: #f56b3d;
+  --cirth-color-orange-300: #f68e68;
+  --cirth-color-orange-250: #f8a283;
+  --cirth-color-orange-200: #f8b79f;
+  --cirth-color-orange-150: #f8cab9;
+  --cirth-color-orange-100: #f9dcd2;
+  --cirth-color-orange-50: #faeeea;
+  --cirth-color-orange: #d24317;
+  --cirth-color-sand-950: #111110;
+  --cirth-color-sand-900: #1c1b19;
+  --cirth-color-sand-850: #272622;
+  --cirth-color-sand-800: #32302b;
+  --cirth-color-sand-750: #3d3b35;
+  --cirth-color-sand-700: #49463f;
+  --cirth-color-sand-650: #55524a;
+  --cirth-color-sand-600: #615e55;
+  --cirth-color-sand-550: #6e6a60;
+  --cirth-color-sand-500: #7b776b;
+  --cirth-color-sand-450: #888377;
+  --cirth-color-sand-400: #959082;
+  --cirth-color-sand-350: #a39e8f;
+  --cirth-color-sand-300: #b0ab9b;
+  --cirth-color-sand-250: #beb8a7;
+  --cirth-color-sand-200: #ccc6b4;
+  --cirth-color-sand-150: #dad4c2;
+  --cirth-color-sand-100: #e8e2d2;
+  --cirth-color-sand-50: #f2f0ec;
+  --cirth-color-sand: #ccc6b4;
+  --cirth-color-grey-950: #111;
+  --cirth-color-grey-900: #1b1b1b;
+  --cirth-color-grey-850: #262626;
+  --cirth-color-grey-800: #303030;
+  --cirth-color-grey-750: #3b3b3b;
+  --cirth-color-grey-700: #474747;
+  --cirth-color-grey-650: #525252;
+  --cirth-color-grey-600: #5e5e5e;
+  --cirth-color-grey-550: #6a6a6a;
+  --cirth-color-grey-500: #777;
+  --cirth-color-grey-450: gray;
+  --cirth-color-grey-400: #919191;
+  --cirth-color-grey-350: #9e9e9e;
+  --cirth-color-grey-300: #ababab;
+  --cirth-color-grey-250: #b9b9b9;
+  --cirth-color-grey-200: #c6c6c6;
+  --cirth-color-grey-150: #d4d4d4;
+  --cirth-color-grey-100: #e2e2e2;
+  --cirth-color-grey-50: #f1f1f1;
+  --cirth-color-grey: #ababab;
+  --cirth-color-zinc-950: #0f1114;
+  --cirth-color-zinc-900: #191c20;
+  --cirth-color-zinc-850: #23262c;
+  --cirth-color-zinc-800: #2d3138;
+  --cirth-color-zinc-750: #373c44;
+  --cirth-color-zinc-700: #424751;
+  --cirth-color-zinc-650: #4d535e;
+  --cirth-color-zinc-600: #5c6370;
+  --cirth-color-zinc-550: #646b79;
+  --cirth-color-zinc-500: #6f7887;
+  --cirth-color-zinc-450: #7b8495;
+  --cirth-color-zinc-400: #8891a4;
+  --cirth-color-zinc-350: #969eaf;
+  --cirth-color-zinc-300: #a4acba;
+  --cirth-color-zinc-250: #b3b9c5;
+  --cirth-color-zinc-200: #c2c7d0;
+  --cirth-color-zinc-150: #d1d5db;
+  --cirth-color-zinc-100: #e0e3e7;
+  --cirth-color-zinc-50: #f0f1f3;
+  --cirth-color-zinc: #646b79;
+  --cirth-color-slate-950: #0e1118;
+  --cirth-color-slate-900: #181c25;
+  --cirth-color-slate-850: #202632;
+  --cirth-color-slate-800: #2a3140;
+  --cirth-color-slate-750: #333c4e;
+  --cirth-color-slate-700: #3d475c;
+  --cirth-color-slate-650: #48536b;
+  --cirth-color-slate-600: #525f7a;
+  --cirth-color-slate-550: #5d6b89;
+  --cirth-color-slate-500: #687899;
+  --cirth-color-slate-450: #7385a9;
+  --cirth-color-slate-400: #8191b5;
+  --cirth-color-slate-350: #909ebe;
+  --cirth-color-slate-300: #a0acc7;
+  --cirth-color-slate-250: #b0b9d0;
+  --cirth-color-slate-200: #bfc7d9;
+  --cirth-color-slate-150: #cfd5e2;
+  --cirth-color-slate-100: #dfe3eb;
+  --cirth-color-slate-50: #eff1f4;
+  --cirth-color-slate: #525f7a;
+  --cirth-color-light: #fff;
+  --cirth-color-dark: #000;
+}
+
+:host {
+  --cirth-color-red-950: #1c0d06;
+  --cirth-color-red-900: #30130a;
+  --cirth-color-red-850: #45150c;
+  --cirth-color-red-800: #5c160d;
+  --cirth-color-red-750: #72170f;
+  --cirth-color-red-700: #861d13;
+  --cirth-color-red-650: #9b2318;
+  --cirth-color-red-600: #af291d;
+  --cirth-color-red-550: #c52f21;
+  --cirth-color-red-500: #d93526;
+  --cirth-color-red-450: #ee402e;
+  --cirth-color-red-400: #f06048;
+  --cirth-color-red-350: #f17961;
+  --cirth-color-red-300: #f38f79;
+  --cirth-color-red-250: #f5a390;
+  --cirth-color-red-200: #f5b7a8;
+  --cirth-color-red-150: #f6cabf;
+  --cirth-color-red-100: #f8dcd6;
+  --cirth-color-red-50: #faeeeb;
+  --cirth-color-red: #c52f21;
+  --cirth-color-pink-950: #25060c;
+  --cirth-color-pink-900: #380916;
+  --cirth-color-pink-850: #4b0c1f;
+  --cirth-color-pink-800: #5f0e28;
+  --cirth-color-pink-750: #740f31;
+  --cirth-color-pink-700: #88143b;
+  --cirth-color-pink-650: #9d1945;
+  --cirth-color-pink-600: #b21e4f;
+  --cirth-color-pink-550: #c72259;
+  --cirth-color-pink-500: #d92662;
+  --cirth-color-pink-450: #f42c6f;
+  --cirth-color-pink-400: #f6547e;
+  --cirth-color-pink-350: #f7708e;
+  --cirth-color-pink-300: #f8889e;
+  --cirth-color-pink-250: #f99eae;
+  --cirth-color-pink-200: #f9b4be;
+  --cirth-color-pink-150: #f9c8ce;
+  --cirth-color-pink-100: #f9dbdf;
+  --cirth-color-pink-50: #fbedef;
+  --cirth-color-pink: #d92662;
+  --cirth-color-fuchsia-950: #230518;
+  --cirth-color-fuchsia-900: #360925;
+  --cirth-color-fuchsia-850: #480b33;
+  --cirth-color-fuchsia-800: #5c0d41;
+  --cirth-color-fuchsia-750: #700e4f;
+  --cirth-color-fuchsia-700: #84135e;
+  --cirth-color-fuchsia-650: #98176d;
+  --cirth-color-fuchsia-600: #ac1c7c;
+  --cirth-color-fuchsia-550: #c1208b;
+  --cirth-color-fuchsia-500: #d9269d;
+  --cirth-color-fuchsia-450: #ed2aac;
+  --cirth-color-fuchsia-400: #f748b7;
+  --cirth-color-fuchsia-350: #f869bf;
+  --cirth-color-fuchsia-300: #f983c7;
+  --cirth-color-fuchsia-250: #fa9acf;
+  --cirth-color-fuchsia-200: #f9b1d8;
+  --cirth-color-fuchsia-150: #f9c6e1;
+  --cirth-color-fuchsia-100: #f9daea;
+  --cirth-color-fuchsia-50: #fbedf4;
+  --cirth-color-fuchsia: #c1208b;
+  --cirth-color-purple-950: #1e0820;
+  --cirth-color-purple-900: #2d0f33;
+  --cirth-color-purple-850: #3d1545;
+  --cirth-color-purple-800: #4d1a57;
+  --cirth-color-purple-750: #5e206b;
+  --cirth-color-purple-700: #6f277d;
+  --cirth-color-purple-650: #802e90;
+  --cirth-color-purple-600: #9236a4;
+  --cirth-color-purple-550: #aa40bf;
+  --cirth-color-purple-500: #b645cd;
+  --cirth-color-purple-450: #c652dc;
+  --cirth-color-purple-400: #cd68e0;
+  --cirth-color-purple-350: #d47de4;
+  --cirth-color-purple-300: #db90e8;
+  --cirth-color-purple-250: #e2a3eb;
+  --cirth-color-purple-200: #e7b6ee;
+  --cirth-color-purple-150: #edc9f1;
+  --cirth-color-purple-100: #f2dcf4;
+  --cirth-color-purple-50: #f8eef9;
+  --cirth-color-purple: #9236a4;
+  --cirth-color-violet-950: #190928;
+  --cirth-color-violet-900: #251140;
+  --cirth-color-violet-850: #321856;
+  --cirth-color-violet-800: #3f1e6d;
+  --cirth-color-violet-750: #4d2585;
+  --cirth-color-violet-700: #5b2d9c;
+  --cirth-color-violet-650: #6935b3;
+  --cirth-color-violet-600: #7540bf;
+  --cirth-color-violet-550: #8352c5;
+  --cirth-color-violet-500: #9062ca;
+  --cirth-color-violet-450: #9b71cf;
+  --cirth-color-violet-400: #a780d4;
+  --cirth-color-violet-350: #b290d9;
+  --cirth-color-violet-300: #bd9fdf;
+  --cirth-color-violet-250: #c9afe4;
+  --cirth-color-violet-200: #d3bfe8;
+  --cirth-color-violet-150: #decfed;
+  --cirth-color-violet-100: #e8dff2;
+  --cirth-color-violet-50: #f3eff7;
+  --cirth-color-violet: #7540bf;
+  --cirth-color-indigo-950: #110b31;
+  --cirth-color-indigo-900: #181546;
+  --cirth-color-indigo-850: #1f1e5e;
+  --cirth-color-indigo-800: #272678;
+  --cirth-color-indigo-750: #2f2f92;
+  --cirth-color-indigo-700: #3838ab;
+  --cirth-color-indigo-650: #4040bf;
+  --cirth-color-indigo-600: #524ed2;
+  --cirth-color-indigo-550: #655cd6;
+  --cirth-color-indigo-500: #7569da;
+  --cirth-color-indigo-450: #8577dd;
+  --cirth-color-indigo-400: #9486e1;
+  --cirth-color-indigo-350: #a294e5;
+  --cirth-color-indigo-300: #b0a3e8;
+  --cirth-color-indigo-250: #bdb2ec;
+  --cirth-color-indigo-200: #cac1ee;
+  --cirth-color-indigo-150: #d8d0f1;
+  --cirth-color-indigo-100: #e5e0f4;
+  --cirth-color-indigo-50: #f2f0f9;
+  --cirth-color-indigo: #524ed2;
+  --cirth-color-blue-950: #080f2d;
+  --cirth-color-blue-900: #0c1a41;
+  --cirth-color-blue-850: #0e2358;
+  --cirth-color-blue-800: #0f2d70;
+  --cirth-color-blue-750: #0f3888;
+  --cirth-color-blue-700: #1343a0;
+  --cirth-color-blue-650: #184eb8;
+  --cirth-color-blue-600: #1d59d0;
+  --cirth-color-blue-550: #2060df;
+  --cirth-color-blue-500: #3c71f7;
+  --cirth-color-blue-450: #5c7ef8;
+  --cirth-color-blue-400: #748bf8;
+  --cirth-color-blue-350: #8999f9;
+  --cirth-color-blue-300: #9ca7fa;
+  --cirth-color-blue-250: #aeb5fb;
+  --cirth-color-blue-200: #bfc3fa;
+  --cirth-color-blue-150: #d0d2fa;
+  --cirth-color-blue-100: #e0e1fa;
+  --cirth-color-blue-50: #f0f0fb;
+  --cirth-color-blue: #2060df;
+  --cirth-color-azure-950: #04121d;
+  --cirth-color-azure-900: #061e2f;
+  --cirth-color-azure-850: #052940;
+  --cirth-color-azure-800: #033452;
+  --cirth-color-azure-750: #014063;
+  --cirth-color-azure-700: #014c75;
+  --cirth-color-azure-650: #015887;
+  --cirth-color-azure-600: #02659a;
+  --cirth-color-azure-550: #0172ad;
+  --cirth-color-azure-500: #017fc0;
+  --cirth-color-azure-450: #018cd4;
+  --cirth-color-azure-400: #029ae8;
+  --cirth-color-azure-350: #01aaff;
+  --cirth-color-azure-300: #51b4ff;
+  --cirth-color-azure-250: #79c0ff;
+  --cirth-color-azure-200: #9bccfd;
+  --cirth-color-azure-150: #b7d9fc;
+  --cirth-color-azure-100: #d1e5fb;
+  --cirth-color-azure-50: #e9f2fc;
+  --cirth-color-azure: #0172ad;
+  --cirth-color-cyan-950: #041413;
+  --cirth-color-cyan-900: #051f1f;
+  --cirth-color-cyan-850: #052b2b;
+  --cirth-color-cyan-800: #043737;
+  --cirth-color-cyan-750: #014343;
+  --cirth-color-cyan-700: #015050;
+  --cirth-color-cyan-650: #025d5d;
+  --cirth-color-cyan-600: #046a6a;
+  --cirth-color-cyan-550: #047878;
+  --cirth-color-cyan-500: #058686;
+  --cirth-color-cyan-450: #059494;
+  --cirth-color-cyan-400: #05a2a2;
+  --cirth-color-cyan-350: #0ab1b1;
+  --cirth-color-cyan-300: #0ac2c2;
+  --cirth-color-cyan-250: #0ccece;
+  --cirth-color-cyan-200: #25dddd;
+  --cirth-color-cyan-150: #3deceb;
+  --cirth-color-cyan-100: #58faf9;
+  --cirth-color-cyan-50: #c3fcfa;
+  --cirth-color-cyan: #047878;
+  --cirth-color-jade-950: #04140c;
+  --cirth-color-jade-900: #052014;
+  --cirth-color-jade-850: #042c1b;
+  --cirth-color-jade-800: #033823;
+  --cirth-color-jade-750: #00452b;
+  --cirth-color-jade-700: #015234;
+  --cirth-color-jade-650: #005f3d;
+  --cirth-color-jade-600: #006d46;
+  --cirth-color-jade-550: #007a50;
+  --cirth-color-jade-500: #00895a;
+  --cirth-color-jade-450: #029764;
+  --cirth-color-jade-400: #00a66e;
+  --cirth-color-jade-350: #00b478;
+  --cirth-color-jade-300: #00c482;
+  --cirth-color-jade-250: #0c8;
+  --cirth-color-jade-200: #21e299;
+  --cirth-color-jade-150: #39f1a6;
+  --cirth-color-jade-100: #70fcba;
+  --cirth-color-jade-50: #cbfce1;
+  --cirth-color-jade: #007a50;
+  --cirth-color-green-950: #0b1305;
+  --cirth-color-green-900: #131f07;
+  --cirth-color-green-850: #152b07;
+  --cirth-color-green-800: #173806;
+  --cirth-color-green-750: #1a4405;
+  --cirth-color-green-700: #205107;
+  --cirth-color-green-650: #265e09;
+  --cirth-color-green-600: #2c6c0c;
+  --cirth-color-green-550: #33790f;
+  --cirth-color-green-500: #398712;
+  --cirth-color-green-450: #409614;
+  --cirth-color-green-400: #47a417;
+  --cirth-color-green-350: #4eb31b;
+  --cirth-color-green-300: #55c21e;
+  --cirth-color-green-250: #5dd121;
+  --cirth-color-green-200: #62d926;
+  --cirth-color-green-150: #77ef3d;
+  --cirth-color-green-100: #95fb62;
+  --cirth-color-green-50: #d7fbc1;
+  --cirth-color-green: #398712;
+  --cirth-color-lime-950: #101203;
+  --cirth-color-lime-900: #191d03;
+  --cirth-color-lime-850: #202902;
+  --cirth-color-lime-800: #273500;
+  --cirth-color-lime-750: #304100;
+  --cirth-color-lime-700: #394d00;
+  --cirth-color-lime-650: #435a00;
+  --cirth-color-lime-600: #4d6600;
+  --cirth-color-lime-550: #577400;
+  --cirth-color-lime-500: #628100;
+  --cirth-color-lime-450: #6c8f00;
+  --cirth-color-lime-400: #779c00;
+  --cirth-color-lime-350: #82ab00;
+  --cirth-color-lime-300: #8eb901;
+  --cirth-color-lime-250: #99c801;
+  --cirth-color-lime-200: #a5d601;
+  --cirth-color-lime-150: #b2e51a;
+  --cirth-color-lime-100: #c1f335;
+  --cirth-color-lime-50: #defc85;
+  --cirth-color-lime: #a5d601;
+  --cirth-color-yellow-950: #141103;
+  --cirth-color-yellow-900: #1f1c02;
+  --cirth-color-yellow-850: #2b2600;
+  --cirth-color-yellow-800: #363100;
+  --cirth-color-yellow-750: #423c00;
+  --cirth-color-yellow-700: #4e4700;
+  --cirth-color-yellow-650: #5b5300;
+  --cirth-color-yellow-600: #685f00;
+  --cirth-color-yellow-550: #756b00;
+  --cirth-color-yellow-500: #827800;
+  --cirth-color-yellow-450: #908501;
+  --cirth-color-yellow-400: #9e9200;
+  --cirth-color-yellow-350: #ad9f00;
+  --cirth-color-yellow-300: #bbac00;
+  --cirth-color-yellow-250: #caba01;
+  --cirth-color-yellow-200: #d9c800;
+  --cirth-color-yellow-150: #e8d600;
+  --cirth-color-yellow-100: #f2df0d;
+  --cirth-color-yellow-50: #fdf1b4;
+  --cirth-color-yellow: #f2df0d;
+  --cirth-color-amber-950: #161003;
+  --cirth-color-amber-900: #231a03;
+  --cirth-color-amber-850: #312302;
+  --cirth-color-amber-800: #3f2d00;
+  --cirth-color-amber-750: #4d3700;
+  --cirth-color-amber-700: #5b4200;
+  --cirth-color-amber-650: #694d00;
+  --cirth-color-amber-600: #785800;
+  --cirth-color-amber-550: #876400;
+  --cirth-color-amber-500: #977000;
+  --cirth-color-amber-450: #a77c00;
+  --cirth-color-amber-400: #b78800;
+  --cirth-color-amber-350: #c79400;
+  --cirth-color-amber-300: #d8a100;
+  --cirth-color-amber-250: #e8ae01;
+  --cirth-color-amber-200: #ffbf00;
+  --cirth-color-amber-150: #fecc63;
+  --cirth-color-amber-100: #fddea6;
+  --cirth-color-amber-50: #fcefd9;
+  --cirth-color-amber: #ffbf00;
+  --cirth-color-pumpkin-950: #180f04;
+  --cirth-color-pumpkin-900: #271805;
+  --cirth-color-pumpkin-850: #372004;
+  --cirth-color-pumpkin-800: #482802;
+  --cirth-color-pumpkin-750: #593100;
+  --cirth-color-pumpkin-700: #693a00;
+  --cirth-color-pumpkin-650: #7a4400;
+  --cirth-color-pumpkin-600: #8b4f00;
+  --cirth-color-pumpkin-550: #9c5900;
+  --cirth-color-pumpkin-500: #ad6400;
+  --cirth-color-pumpkin-450: #bf6e00;
+  --cirth-color-pumpkin-400: #d27a01;
+  --cirth-color-pumpkin-350: #e48500;
+  --cirth-color-pumpkin-300: #ff9500;
+  --cirth-color-pumpkin-250: #ffa23a;
+  --cirth-color-pumpkin-200: #feb670;
+  --cirth-color-pumpkin-150: #fcca9b;
+  --cirth-color-pumpkin-100: #fcdcc1;
+  --cirth-color-pumpkin-50: #fceee3;
+  --cirth-color-pumpkin: #ff9500;
+  --cirth-color-orange-950: #1b0d06;
+  --cirth-color-orange-900: #2d1509;
+  --cirth-color-orange-850: #411a0a;
+  --cirth-color-orange-800: #561e0a;
+  --cirth-color-orange-750: #6b220a;
+  --cirth-color-orange-700: #7f270b;
+  --cirth-color-orange-650: #942d0d;
+  --cirth-color-orange-600: #a83410;
+  --cirth-color-orange-550: #bd3c13;
+  --cirth-color-orange-500: #d24317;
+  --cirth-color-orange-450: #e74b1a;
+  --cirth-color-orange-400: #f45d2c;
+  --cirth-color-orange-350: #f56b3d;
+  --cirth-color-orange-300: #f68e68;
+  --cirth-color-orange-250: #f8a283;
+  --cirth-color-orange-200: #f8b79f;
+  --cirth-color-orange-150: #f8cab9;
+  --cirth-color-orange-100: #f9dcd2;
+  --cirth-color-orange-50: #faeeea;
+  --cirth-color-orange: #d24317;
+  --cirth-color-sand-950: #111110;
+  --cirth-color-sand-900: #1c1b19;
+  --cirth-color-sand-850: #272622;
+  --cirth-color-sand-800: #32302b;
+  --cirth-color-sand-750: #3d3b35;
+  --cirth-color-sand-700: #49463f;
+  --cirth-color-sand-650: #55524a;
+  --cirth-color-sand-600: #615e55;
+  --cirth-color-sand-550: #6e6a60;
+  --cirth-color-sand-500: #7b776b;
+  --cirth-color-sand-450: #888377;
+  --cirth-color-sand-400: #959082;
+  --cirth-color-sand-350: #a39e8f;
+  --cirth-color-sand-300: #b0ab9b;
+  --cirth-color-sand-250: #beb8a7;
+  --cirth-color-sand-200: #ccc6b4;
+  --cirth-color-sand-150: #dad4c2;
+  --cirth-color-sand-100: #e8e2d2;
+  --cirth-color-sand-50: #f2f0ec;
+  --cirth-color-sand: #ccc6b4;
+  --cirth-color-grey-950: #111;
+  --cirth-color-grey-900: #1b1b1b;
+  --cirth-color-grey-850: #262626;
+  --cirth-color-grey-800: #303030;
+  --cirth-color-grey-750: #3b3b3b;
+  --cirth-color-grey-700: #474747;
+  --cirth-color-grey-650: #525252;
+  --cirth-color-grey-600: #5e5e5e;
+  --cirth-color-grey-550: #6a6a6a;
+  --cirth-color-grey-500: #777;
+  --cirth-color-grey-450: gray;
+  --cirth-color-grey-400: #919191;
+  --cirth-color-grey-350: #9e9e9e;
+  --cirth-color-grey-300: #ababab;
+  --cirth-color-grey-250: #b9b9b9;
+  --cirth-color-grey-200: #c6c6c6;
+  --cirth-color-grey-150: #d4d4d4;
+  --cirth-color-grey-100: #e2e2e2;
+  --cirth-color-grey-50: #f1f1f1;
+  --cirth-color-grey: #ababab;
+  --cirth-color-zinc-950: #0f1114;
+  --cirth-color-zinc-900: #191c20;
+  --cirth-color-zinc-850: #23262c;
+  --cirth-color-zinc-800: #2d3138;
+  --cirth-color-zinc-750: #373c44;
+  --cirth-color-zinc-700: #424751;
+  --cirth-color-zinc-650: #4d535e;
+  --cirth-color-zinc-600: #5c6370;
+  --cirth-color-zinc-550: #646b79;
+  --cirth-color-zinc-500: #6f7887;
+  --cirth-color-zinc-450: #7b8495;
+  --cirth-color-zinc-400: #8891a4;
+  --cirth-color-zinc-350: #969eaf;
+  --cirth-color-zinc-300: #a4acba;
+  --cirth-color-zinc-250: #b3b9c5;
+  --cirth-color-zinc-200: #c2c7d0;
+  --cirth-color-zinc-150: #d1d5db;
+  --cirth-color-zinc-100: #e0e3e7;
+  --cirth-color-zinc-50: #f0f1f3;
+  --cirth-color-zinc: #646b79;
+  --cirth-color-slate-950: #0e1118;
+  --cirth-color-slate-900: #181c25;
+  --cirth-color-slate-850: #202632;
+  --cirth-color-slate-800: #2a3140;
+  --cirth-color-slate-750: #333c4e;
+  --cirth-color-slate-700: #3d475c;
+  --cirth-color-slate-650: #48536b;
+  --cirth-color-slate-600: #525f7a;
+  --cirth-color-slate-550: #5d6b89;
+  --cirth-color-slate-500: #687899;
+  --cirth-color-slate-450: #7385a9;
+  --cirth-color-slate-400: #8191b5;
+  --cirth-color-slate-350: #909ebe;
+  --cirth-color-slate-300: #a0acc7;
+  --cirth-color-slate-250: #b0b9d0;
+  --cirth-color-slate-200: #bfc7d9;
+  --cirth-color-slate-150: #cfd5e2;
+  --cirth-color-slate-100: #dfe3eb;
+  --cirth-color-slate-50: #eff1f4;
+  --cirth-color-slate: #525f7a;
+  --cirth-color-light: #fff;
+  --cirth-color-dark: #000;
+}
+
+.cirth-color-red-950 {
+  color: var(--cirth-color-red-950);
+}
+
+.cirth-color-red-900 {
+  color: var(--cirth-color-red-900);
+}
+
+.cirth-color-red-850 {
+  color: var(--cirth-color-red-850);
+}
+
+.cirth-color-red-800 {
+  color: var(--cirth-color-red-800);
+}
+
+.cirth-color-red-750 {
+  color: var(--cirth-color-red-750);
+}
+
+.cirth-color-red-700 {
+  color: var(--cirth-color-red-700);
+}
+
+.cirth-color-red-650 {
+  color: var(--cirth-color-red-650);
+}
+
+.cirth-color-red-600 {
+  color: var(--cirth-color-red-600);
+}
+
+.cirth-color-red-550 {
+  color: var(--cirth-color-red-550);
+}
+
+.cirth-color-red-500 {
+  color: var(--cirth-color-red-500);
+}
+
+.cirth-color-red-450 {
+  color: var(--cirth-color-red-450);
+}
+
+.cirth-color-red-400 {
+  color: var(--cirth-color-red-400);
+}
+
+.cirth-color-red-350 {
+  color: var(--cirth-color-red-350);
+}
+
+.cirth-color-red-300 {
+  color: var(--cirth-color-red-300);
+}
+
+.cirth-color-red-250 {
+  color: var(--cirth-color-red-250);
+}
+
+.cirth-color-red-200 {
+  color: var(--cirth-color-red-200);
+}
+
+.cirth-color-red-150 {
+  color: var(--cirth-color-red-150);
+}
+
+.cirth-color-red-100 {
+  color: var(--cirth-color-red-100);
+}
+
+.cirth-color-red-50 {
+  color: var(--cirth-color-red-50);
+}
+
+.cirth-color-red {
+  color: var(--cirth-color-red);
+}
+
+.cirth-color-pink-950 {
+  color: var(--cirth-color-pink-950);
+}
+
+.cirth-color-pink-900 {
+  color: var(--cirth-color-pink-900);
+}
+
+.cirth-color-pink-850 {
+  color: var(--cirth-color-pink-850);
+}
+
+.cirth-color-pink-800 {
+  color: var(--cirth-color-pink-800);
+}
+
+.cirth-color-pink-750 {
+  color: var(--cirth-color-pink-750);
+}
+
+.cirth-color-pink-700 {
+  color: var(--cirth-color-pink-700);
+}
+
+.cirth-color-pink-650 {
+  color: var(--cirth-color-pink-650);
+}
+
+.cirth-color-pink-600 {
+  color: var(--cirth-color-pink-600);
+}
+
+.cirth-color-pink-550 {
+  color: var(--cirth-color-pink-550);
+}
+
+.cirth-color-pink-500 {
+  color: var(--cirth-color-pink-500);
+}
+
+.cirth-color-pink-450 {
+  color: var(--cirth-color-pink-450);
+}
+
+.cirth-color-pink-400 {
+  color: var(--cirth-color-pink-400);
+}
+
+.cirth-color-pink-350 {
+  color: var(--cirth-color-pink-350);
+}
+
+.cirth-color-pink-300 {
+  color: var(--cirth-color-pink-300);
+}
+
+.cirth-color-pink-250 {
+  color: var(--cirth-color-pink-250);
+}
+
+.cirth-color-pink-200 {
+  color: var(--cirth-color-pink-200);
+}
+
+.cirth-color-pink-150 {
+  color: var(--cirth-color-pink-150);
+}
+
+.cirth-color-pink-100 {
+  color: var(--cirth-color-pink-100);
+}
+
+.cirth-color-pink-50 {
+  color: var(--cirth-color-pink-50);
+}
+
+.cirth-color-pink {
+  color: var(--cirth-color-pink);
+}
+
+.cirth-color-fuchsia-950 {
+  color: var(--cirth-color-fuchsia-950);
+}
+
+.cirth-color-fuchsia-900 {
+  color: var(--cirth-color-fuchsia-900);
+}
+
+.cirth-color-fuchsia-850 {
+  color: var(--cirth-color-fuchsia-850);
+}
+
+.cirth-color-fuchsia-800 {
+  color: var(--cirth-color-fuchsia-800);
+}
+
+.cirth-color-fuchsia-750 {
+  color: var(--cirth-color-fuchsia-750);
+}
+
+.cirth-color-fuchsia-700 {
+  color: var(--cirth-color-fuchsia-700);
+}
+
+.cirth-color-fuchsia-650 {
+  color: var(--cirth-color-fuchsia-650);
+}
+
+.cirth-color-fuchsia-600 {
+  color: var(--cirth-color-fuchsia-600);
+}
+
+.cirth-color-fuchsia-550 {
+  color: var(--cirth-color-fuchsia-550);
+}
+
+.cirth-color-fuchsia-500 {
+  color: var(--cirth-color-fuchsia-500);
+}
+
+.cirth-color-fuchsia-450 {
+  color: var(--cirth-color-fuchsia-450);
+}
+
+.cirth-color-fuchsia-400 {
+  color: var(--cirth-color-fuchsia-400);
+}
+
+.cirth-color-fuchsia-350 {
+  color: var(--cirth-color-fuchsia-350);
+}
+
+.cirth-color-fuchsia-300 {
+  color: var(--cirth-color-fuchsia-300);
+}
+
+.cirth-color-fuchsia-250 {
+  color: var(--cirth-color-fuchsia-250);
+}
+
+.cirth-color-fuchsia-200 {
+  color: var(--cirth-color-fuchsia-200);
+}
+
+.cirth-color-fuchsia-150 {
+  color: var(--cirth-color-fuchsia-150);
+}
+
+.cirth-color-fuchsia-100 {
+  color: var(--cirth-color-fuchsia-100);
+}
+
+.cirth-color-fuchsia-50 {
+  color: var(--cirth-color-fuchsia-50);
+}
+
+.cirth-color-fuchsia {
+  color: var(--cirth-color-fuchsia);
+}
+
+.cirth-color-purple-950 {
+  color: var(--cirth-color-purple-950);
+}
+
+.cirth-color-purple-900 {
+  color: var(--cirth-color-purple-900);
+}
+
+.cirth-color-purple-850 {
+  color: var(--cirth-color-purple-850);
+}
+
+.cirth-color-purple-800 {
+  color: var(--cirth-color-purple-800);
+}
+
+.cirth-color-purple-750 {
+  color: var(--cirth-color-purple-750);
+}
+
+.cirth-color-purple-700 {
+  color: var(--cirth-color-purple-700);
+}
+
+.cirth-color-purple-650 {
+  color: var(--cirth-color-purple-650);
+}
+
+.cirth-color-purple-600 {
+  color: var(--cirth-color-purple-600);
+}
+
+.cirth-color-purple-550 {
+  color: var(--cirth-color-purple-550);
+}
+
+.cirth-color-purple-500 {
+  color: var(--cirth-color-purple-500);
+}
+
+.cirth-color-purple-450 {
+  color: var(--cirth-color-purple-450);
+}
+
+.cirth-color-purple-400 {
+  color: var(--cirth-color-purple-400);
+}
+
+.cirth-color-purple-350 {
+  color: var(--cirth-color-purple-350);
+}
+
+.cirth-color-purple-300 {
+  color: var(--cirth-color-purple-300);
+}
+
+.cirth-color-purple-250 {
+  color: var(--cirth-color-purple-250);
+}
+
+.cirth-color-purple-200 {
+  color: var(--cirth-color-purple-200);
+}
+
+.cirth-color-purple-150 {
+  color: var(--cirth-color-purple-150);
+}
+
+.cirth-color-purple-100 {
+  color: var(--cirth-color-purple-100);
+}
+
+.cirth-color-purple-50 {
+  color: var(--cirth-color-purple-50);
+}
+
+.cirth-color-purple {
+  color: var(--cirth-color-purple);
+}
+
+.cirth-color-violet-950 {
+  color: var(--cirth-color-violet-950);
+}
+
+.cirth-color-violet-900 {
+  color: var(--cirth-color-violet-900);
+}
+
+.cirth-color-violet-850 {
+  color: var(--cirth-color-violet-850);
+}
+
+.cirth-color-violet-800 {
+  color: var(--cirth-color-violet-800);
+}
+
+.cirth-color-violet-750 {
+  color: var(--cirth-color-violet-750);
+}
+
+.cirth-color-violet-700 {
+  color: var(--cirth-color-violet-700);
+}
+
+.cirth-color-violet-650 {
+  color: var(--cirth-color-violet-650);
+}
+
+.cirth-color-violet-600 {
+  color: var(--cirth-color-violet-600);
+}
+
+.cirth-color-violet-550 {
+  color: var(--cirth-color-violet-550);
+}
+
+.cirth-color-violet-500 {
+  color: var(--cirth-color-violet-500);
+}
+
+.cirth-color-violet-450 {
+  color: var(--cirth-color-violet-450);
+}
+
+.cirth-color-violet-400 {
+  color: var(--cirth-color-violet-400);
+}
+
+.cirth-color-violet-350 {
+  color: var(--cirth-color-violet-350);
+}
+
+.cirth-color-violet-300 {
+  color: var(--cirth-color-violet-300);
+}
+
+.cirth-color-violet-250 {
+  color: var(--cirth-color-violet-250);
+}
+
+.cirth-color-violet-200 {
+  color: var(--cirth-color-violet-200);
+}
+
+.cirth-color-violet-150 {
+  color: var(--cirth-color-violet-150);
+}
+
+.cirth-color-violet-100 {
+  color: var(--cirth-color-violet-100);
+}
+
+.cirth-color-violet-50 {
+  color: var(--cirth-color-violet-50);
+}
+
+.cirth-color-violet {
+  color: var(--cirth-color-violet);
+}
+
+.cirth-color-indigo-950 {
+  color: var(--cirth-color-indigo-950);
+}
+
+.cirth-color-indigo-900 {
+  color: var(--cirth-color-indigo-900);
+}
+
+.cirth-color-indigo-850 {
+  color: var(--cirth-color-indigo-850);
+}
+
+.cirth-color-indigo-800 {
+  color: var(--cirth-color-indigo-800);
+}
+
+.cirth-color-indigo-750 {
+  color: var(--cirth-color-indigo-750);
+}
+
+.cirth-color-indigo-700 {
+  color: var(--cirth-color-indigo-700);
+}
+
+.cirth-color-indigo-650 {
+  color: var(--cirth-color-indigo-650);
+}
+
+.cirth-color-indigo-600 {
+  color: var(--cirth-color-indigo-600);
+}
+
+.cirth-color-indigo-550 {
+  color: var(--cirth-color-indigo-550);
+}
+
+.cirth-color-indigo-500 {
+  color: var(--cirth-color-indigo-500);
+}
+
+.cirth-color-indigo-450 {
+  color: var(--cirth-color-indigo-450);
+}
+
+.cirth-color-indigo-400 {
+  color: var(--cirth-color-indigo-400);
+}
+
+.cirth-color-indigo-350 {
+  color: var(--cirth-color-indigo-350);
+}
+
+.cirth-color-indigo-300 {
+  color: var(--cirth-color-indigo-300);
+}
+
+.cirth-color-indigo-250 {
+  color: var(--cirth-color-indigo-250);
+}
+
+.cirth-color-indigo-200 {
+  color: var(--cirth-color-indigo-200);
+}
+
+.cirth-color-indigo-150 {
+  color: var(--cirth-color-indigo-150);
+}
+
+.cirth-color-indigo-100 {
+  color: var(--cirth-color-indigo-100);
+}
+
+.cirth-color-indigo-50 {
+  color: var(--cirth-color-indigo-50);
+}
+
+.cirth-color-indigo {
+  color: var(--cirth-color-indigo);
+}
+
+.cirth-color-blue-950 {
+  color: var(--cirth-color-blue-950);
+}
+
+.cirth-color-blue-900 {
+  color: var(--cirth-color-blue-900);
+}
+
+.cirth-color-blue-850 {
+  color: var(--cirth-color-blue-850);
+}
+
+.cirth-color-blue-800 {
+  color: var(--cirth-color-blue-800);
+}
+
+.cirth-color-blue-750 {
+  color: var(--cirth-color-blue-750);
+}
+
+.cirth-color-blue-700 {
+  color: var(--cirth-color-blue-700);
+}
+
+.cirth-color-blue-650 {
+  color: var(--cirth-color-blue-650);
+}
+
+.cirth-color-blue-600 {
+  color: var(--cirth-color-blue-600);
+}
+
+.cirth-color-blue-550 {
+  color: var(--cirth-color-blue-550);
+}
+
+.cirth-color-blue-500 {
+  color: var(--cirth-color-blue-500);
+}
+
+.cirth-color-blue-450 {
+  color: var(--cirth-color-blue-450);
+}
+
+.cirth-color-blue-400 {
+  color: var(--cirth-color-blue-400);
+}
+
+.cirth-color-blue-350 {
+  color: var(--cirth-color-blue-350);
+}
+
+.cirth-color-blue-300 {
+  color: var(--cirth-color-blue-300);
+}
+
+.cirth-color-blue-250 {
+  color: var(--cirth-color-blue-250);
+}
+
+.cirth-color-blue-200 {
+  color: var(--cirth-color-blue-200);
+}
+
+.cirth-color-blue-150 {
+  color: var(--cirth-color-blue-150);
+}
+
+.cirth-color-blue-100 {
+  color: var(--cirth-color-blue-100);
+}
+
+.cirth-color-blue-50 {
+  color: var(--cirth-color-blue-50);
+}
+
+.cirth-color-blue {
+  color: var(--cirth-color-blue);
+}
+
+.cirth-color-azure-950 {
+  color: var(--cirth-color-azure-950);
+}
+
+.cirth-color-azure-900 {
+  color: var(--cirth-color-azure-900);
+}
+
+.cirth-color-azure-850 {
+  color: var(--cirth-color-azure-850);
+}
+
+.cirth-color-azure-800 {
+  color: var(--cirth-color-azure-800);
+}
+
+.cirth-color-azure-750 {
+  color: var(--cirth-color-azure-750);
+}
+
+.cirth-color-azure-700 {
+  color: var(--cirth-color-azure-700);
+}
+
+.cirth-color-azure-650 {
+  color: var(--cirth-color-azure-650);
+}
+
+.cirth-color-azure-600 {
+  color: var(--cirth-color-azure-600);
+}
+
+.cirth-color-azure-550 {
+  color: var(--cirth-color-azure-550);
+}
+
+.cirth-color-azure-500 {
+  color: var(--cirth-color-azure-500);
+}
+
+.cirth-color-azure-450 {
+  color: var(--cirth-color-azure-450);
+}
+
+.cirth-color-azure-400 {
+  color: var(--cirth-color-azure-400);
+}
+
+.cirth-color-azure-350 {
+  color: var(--cirth-color-azure-350);
+}
+
+.cirth-color-azure-300 {
+  color: var(--cirth-color-azure-300);
+}
+
+.cirth-color-azure-250 {
+  color: var(--cirth-color-azure-250);
+}
+
+.cirth-color-azure-200 {
+  color: var(--cirth-color-azure-200);
+}
+
+.cirth-color-azure-150 {
+  color: var(--cirth-color-azure-150);
+}
+
+.cirth-color-azure-100 {
+  color: var(--cirth-color-azure-100);
+}
+
+.cirth-color-azure-50 {
+  color: var(--cirth-color-azure-50);
+}
+
+.cirth-color-azure {
+  color: var(--cirth-color-azure);
+}
+
+.cirth-color-cyan-950 {
+  color: var(--cirth-color-cyan-950);
+}
+
+.cirth-color-cyan-900 {
+  color: var(--cirth-color-cyan-900);
+}
+
+.cirth-color-cyan-850 {
+  color: var(--cirth-color-cyan-850);
+}
+
+.cirth-color-cyan-800 {
+  color: var(--cirth-color-cyan-800);
+}
+
+.cirth-color-cyan-750 {
+  color: var(--cirth-color-cyan-750);
+}
+
+.cirth-color-cyan-700 {
+  color: var(--cirth-color-cyan-700);
+}
+
+.cirth-color-cyan-650 {
+  color: var(--cirth-color-cyan-650);
+}
+
+.cirth-color-cyan-600 {
+  color: var(--cirth-color-cyan-600);
+}
+
+.cirth-color-cyan-550 {
+  color: var(--cirth-color-cyan-550);
+}
+
+.cirth-color-cyan-500 {
+  color: var(--cirth-color-cyan-500);
+}
+
+.cirth-color-cyan-450 {
+  color: var(--cirth-color-cyan-450);
+}
+
+.cirth-color-cyan-400 {
+  color: var(--cirth-color-cyan-400);
+}
+
+.cirth-color-cyan-350 {
+  color: var(--cirth-color-cyan-350);
+}
+
+.cirth-color-cyan-300 {
+  color: var(--cirth-color-cyan-300);
+}
+
+.cirth-color-cyan-250 {
+  color: var(--cirth-color-cyan-250);
+}
+
+.cirth-color-cyan-200 {
+  color: var(--cirth-color-cyan-200);
+}
+
+.cirth-color-cyan-150 {
+  color: var(--cirth-color-cyan-150);
+}
+
+.cirth-color-cyan-100 {
+  color: var(--cirth-color-cyan-100);
+}
+
+.cirth-color-cyan-50 {
+  color: var(--cirth-color-cyan-50);
+}
+
+.cirth-color-cyan {
+  color: var(--cirth-color-cyan);
+}
+
+.cirth-color-jade-950 {
+  color: var(--cirth-color-jade-950);
+}
+
+.cirth-color-jade-900 {
+  color: var(--cirth-color-jade-900);
+}
+
+.cirth-color-jade-850 {
+  color: var(--cirth-color-jade-850);
+}
+
+.cirth-color-jade-800 {
+  color: var(--cirth-color-jade-800);
+}
+
+.cirth-color-jade-750 {
+  color: var(--cirth-color-jade-750);
+}
+
+.cirth-color-jade-700 {
+  color: var(--cirth-color-jade-700);
+}
+
+.cirth-color-jade-650 {
+  color: var(--cirth-color-jade-650);
+}
+
+.cirth-color-jade-600 {
+  color: var(--cirth-color-jade-600);
+}
+
+.cirth-color-jade-550 {
+  color: var(--cirth-color-jade-550);
+}
+
+.cirth-color-jade-500 {
+  color: var(--cirth-color-jade-500);
+}
+
+.cirth-color-jade-450 {
+  color: var(--cirth-color-jade-450);
+}
+
+.cirth-color-jade-400 {
+  color: var(--cirth-color-jade-400);
+}
+
+.cirth-color-jade-350 {
+  color: var(--cirth-color-jade-350);
+}
+
+.cirth-color-jade-300 {
+  color: var(--cirth-color-jade-300);
+}
+
+.cirth-color-jade-250 {
+  color: var(--cirth-color-jade-250);
+}
+
+.cirth-color-jade-200 {
+  color: var(--cirth-color-jade-200);
+}
+
+.cirth-color-jade-150 {
+  color: var(--cirth-color-jade-150);
+}
+
+.cirth-color-jade-100 {
+  color: var(--cirth-color-jade-100);
+}
+
+.cirth-color-jade-50 {
+  color: var(--cirth-color-jade-50);
+}
+
+.cirth-color-jade {
+  color: var(--cirth-color-jade);
+}
+
+.cirth-color-green-950 {
+  color: var(--cirth-color-green-950);
+}
+
+.cirth-color-green-900 {
+  color: var(--cirth-color-green-900);
+}
+
+.cirth-color-green-850 {
+  color: var(--cirth-color-green-850);
+}
+
+.cirth-color-green-800 {
+  color: var(--cirth-color-green-800);
+}
+
+.cirth-color-green-750 {
+  color: var(--cirth-color-green-750);
+}
+
+.cirth-color-green-700 {
+  color: var(--cirth-color-green-700);
+}
+
+.cirth-color-green-650 {
+  color: var(--cirth-color-green-650);
+}
+
+.cirth-color-green-600 {
+  color: var(--cirth-color-green-600);
+}
+
+.cirth-color-green-550 {
+  color: var(--cirth-color-green-550);
+}
+
+.cirth-color-green-500 {
+  color: var(--cirth-color-green-500);
+}
+
+.cirth-color-green-450 {
+  color: var(--cirth-color-green-450);
+}
+
+.cirth-color-green-400 {
+  color: var(--cirth-color-green-400);
+}
+
+.cirth-color-green-350 {
+  color: var(--cirth-color-green-350);
+}
+
+.cirth-color-green-300 {
+  color: var(--cirth-color-green-300);
+}
+
+.cirth-color-green-250 {
+  color: var(--cirth-color-green-250);
+}
+
+.cirth-color-green-200 {
+  color: var(--cirth-color-green-200);
+}
+
+.cirth-color-green-150 {
+  color: var(--cirth-color-green-150);
+}
+
+.cirth-color-green-100 {
+  color: var(--cirth-color-green-100);
+}
+
+.cirth-color-green-50 {
+  color: var(--cirth-color-green-50);
+}
+
+.cirth-color-green {
+  color: var(--cirth-color-green);
+}
+
+.cirth-color-lime-950 {
+  color: var(--cirth-color-lime-950);
+}
+
+.cirth-color-lime-900 {
+  color: var(--cirth-color-lime-900);
+}
+
+.cirth-color-lime-850 {
+  color: var(--cirth-color-lime-850);
+}
+
+.cirth-color-lime-800 {
+  color: var(--cirth-color-lime-800);
+}
+
+.cirth-color-lime-750 {
+  color: var(--cirth-color-lime-750);
+}
+
+.cirth-color-lime-700 {
+  color: var(--cirth-color-lime-700);
+}
+
+.cirth-color-lime-650 {
+  color: var(--cirth-color-lime-650);
+}
+
+.cirth-color-lime-600 {
+  color: var(--cirth-color-lime-600);
+}
+
+.cirth-color-lime-550 {
+  color: var(--cirth-color-lime-550);
+}
+
+.cirth-color-lime-500 {
+  color: var(--cirth-color-lime-500);
+}
+
+.cirth-color-lime-450 {
+  color: var(--cirth-color-lime-450);
+}
+
+.cirth-color-lime-400 {
+  color: var(--cirth-color-lime-400);
+}
+
+.cirth-color-lime-350 {
+  color: var(--cirth-color-lime-350);
+}
+
+.cirth-color-lime-300 {
+  color: var(--cirth-color-lime-300);
+}
+
+.cirth-color-lime-250 {
+  color: var(--cirth-color-lime-250);
+}
+
+.cirth-color-lime-200 {
+  color: var(--cirth-color-lime-200);
+}
+
+.cirth-color-lime-150 {
+  color: var(--cirth-color-lime-150);
+}
+
+.cirth-color-lime-100 {
+  color: var(--cirth-color-lime-100);
+}
+
+.cirth-color-lime-50 {
+  color: var(--cirth-color-lime-50);
+}
+
+.cirth-color-lime {
+  color: var(--cirth-color-lime);
+}
+
+.cirth-color-yellow-950 {
+  color: var(--cirth-color-yellow-950);
+}
+
+.cirth-color-yellow-900 {
+  color: var(--cirth-color-yellow-900);
+}
+
+.cirth-color-yellow-850 {
+  color: var(--cirth-color-yellow-850);
+}
+
+.cirth-color-yellow-800 {
+  color: var(--cirth-color-yellow-800);
+}
+
+.cirth-color-yellow-750 {
+  color: var(--cirth-color-yellow-750);
+}
+
+.cirth-color-yellow-700 {
+  color: var(--cirth-color-yellow-700);
+}
+
+.cirth-color-yellow-650 {
+  color: var(--cirth-color-yellow-650);
+}
+
+.cirth-color-yellow-600 {
+  color: var(--cirth-color-yellow-600);
+}
+
+.cirth-color-yellow-550 {
+  color: var(--cirth-color-yellow-550);
+}
+
+.cirth-color-yellow-500 {
+  color: var(--cirth-color-yellow-500);
+}
+
+.cirth-color-yellow-450 {
+  color: var(--cirth-color-yellow-450);
+}
+
+.cirth-color-yellow-400 {
+  color: var(--cirth-color-yellow-400);
+}
+
+.cirth-color-yellow-350 {
+  color: var(--cirth-color-yellow-350);
+}
+
+.cirth-color-yellow-300 {
+  color: var(--cirth-color-yellow-300);
+}
+
+.cirth-color-yellow-250 {
+  color: var(--cirth-color-yellow-250);
+}
+
+.cirth-color-yellow-200 {
+  color: var(--cirth-color-yellow-200);
+}
+
+.cirth-color-yellow-150 {
+  color: var(--cirth-color-yellow-150);
+}
+
+.cirth-color-yellow-100 {
+  color: var(--cirth-color-yellow-100);
+}
+
+.cirth-color-yellow-50 {
+  color: var(--cirth-color-yellow-50);
+}
+
+.cirth-color-yellow {
+  color: var(--cirth-color-yellow);
+}
+
+.cirth-color-amber-950 {
+  color: var(--cirth-color-amber-950);
+}
+
+.cirth-color-amber-900 {
+  color: var(--cirth-color-amber-900);
+}
+
+.cirth-color-amber-850 {
+  color: var(--cirth-color-amber-850);
+}
+
+.cirth-color-amber-800 {
+  color: var(--cirth-color-amber-800);
+}
+
+.cirth-color-amber-750 {
+  color: var(--cirth-color-amber-750);
+}
+
+.cirth-color-amber-700 {
+  color: var(--cirth-color-amber-700);
+}
+
+.cirth-color-amber-650 {
+  color: var(--cirth-color-amber-650);
+}
+
+.cirth-color-amber-600 {
+  color: var(--cirth-color-amber-600);
+}
+
+.cirth-color-amber-550 {
+  color: var(--cirth-color-amber-550);
+}
+
+.cirth-color-amber-500 {
+  color: var(--cirth-color-amber-500);
+}
+
+.cirth-color-amber-450 {
+  color: var(--cirth-color-amber-450);
+}
+
+.cirth-color-amber-400 {
+  color: var(--cirth-color-amber-400);
+}
+
+.cirth-color-amber-350 {
+  color: var(--cirth-color-amber-350);
+}
+
+.cirth-color-amber-300 {
+  color: var(--cirth-color-amber-300);
+}
+
+.cirth-color-amber-250 {
+  color: var(--cirth-color-amber-250);
+}
+
+.cirth-color-amber-200 {
+  color: var(--cirth-color-amber-200);
+}
+
+.cirth-color-amber-150 {
+  color: var(--cirth-color-amber-150);
+}
+
+.cirth-color-amber-100 {
+  color: var(--cirth-color-amber-100);
+}
+
+.cirth-color-amber-50 {
+  color: var(--cirth-color-amber-50);
+}
+
+.cirth-color-amber {
+  color: var(--cirth-color-amber);
+}
+
+.cirth-color-pumpkin-950 {
+  color: var(--cirth-color-pumpkin-950);
+}
+
+.cirth-color-pumpkin-900 {
+  color: var(--cirth-color-pumpkin-900);
+}
+
+.cirth-color-pumpkin-850 {
+  color: var(--cirth-color-pumpkin-850);
+}
+
+.cirth-color-pumpkin-800 {
+  color: var(--cirth-color-pumpkin-800);
+}
+
+.cirth-color-pumpkin-750 {
+  color: var(--cirth-color-pumpkin-750);
+}
+
+.cirth-color-pumpkin-700 {
+  color: var(--cirth-color-pumpkin-700);
+}
+
+.cirth-color-pumpkin-650 {
+  color: var(--cirth-color-pumpkin-650);
+}
+
+.cirth-color-pumpkin-600 {
+  color: var(--cirth-color-pumpkin-600);
+}
+
+.cirth-color-pumpkin-550 {
+  color: var(--cirth-color-pumpkin-550);
+}
+
+.cirth-color-pumpkin-500 {
+  color: var(--cirth-color-pumpkin-500);
+}
+
+.cirth-color-pumpkin-450 {
+  color: var(--cirth-color-pumpkin-450);
+}
+
+.cirth-color-pumpkin-400 {
+  color: var(--cirth-color-pumpkin-400);
+}
+
+.cirth-color-pumpkin-350 {
+  color: var(--cirth-color-pumpkin-350);
+}
+
+.cirth-color-pumpkin-300 {
+  color: var(--cirth-color-pumpkin-300);
+}
+
+.cirth-color-pumpkin-250 {
+  color: var(--cirth-color-pumpkin-250);
+}
+
+.cirth-color-pumpkin-200 {
+  color: var(--cirth-color-pumpkin-200);
+}
+
+.cirth-color-pumpkin-150 {
+  color: var(--cirth-color-pumpkin-150);
+}
+
+.cirth-color-pumpkin-100 {
+  color: var(--cirth-color-pumpkin-100);
+}
+
+.cirth-color-pumpkin-50 {
+  color: var(--cirth-color-pumpkin-50);
+}
+
+.cirth-color-pumpkin {
+  color: var(--cirth-color-pumpkin);
+}
+
+.cirth-color-orange-950 {
+  color: var(--cirth-color-orange-950);
+}
+
+.cirth-color-orange-900 {
+  color: var(--cirth-color-orange-900);
+}
+
+.cirth-color-orange-850 {
+  color: var(--cirth-color-orange-850);
+}
+
+.cirth-color-orange-800 {
+  color: var(--cirth-color-orange-800);
+}
+
+.cirth-color-orange-750 {
+  color: var(--cirth-color-orange-750);
+}
+
+.cirth-color-orange-700 {
+  color: var(--cirth-color-orange-700);
+}
+
+.cirth-color-orange-650 {
+  color: var(--cirth-color-orange-650);
+}
+
+.cirth-color-orange-600 {
+  color: var(--cirth-color-orange-600);
+}
+
+.cirth-color-orange-550 {
+  color: var(--cirth-color-orange-550);
+}
+
+.cirth-color-orange-500 {
+  color: var(--cirth-color-orange-500);
+}
+
+.cirth-color-orange-450 {
+  color: var(--cirth-color-orange-450);
+}
+
+.cirth-color-orange-400 {
+  color: var(--cirth-color-orange-400);
+}
+
+.cirth-color-orange-350 {
+  color: var(--cirth-color-orange-350);
+}
+
+.cirth-color-orange-300 {
+  color: var(--cirth-color-orange-300);
+}
+
+.cirth-color-orange-250 {
+  color: var(--cirth-color-orange-250);
+}
+
+.cirth-color-orange-200 {
+  color: var(--cirth-color-orange-200);
+}
+
+.cirth-color-orange-150 {
+  color: var(--cirth-color-orange-150);
+}
+
+.cirth-color-orange-100 {
+  color: var(--cirth-color-orange-100);
+}
+
+.cirth-color-orange-50 {
+  color: var(--cirth-color-orange-50);
+}
+
+.cirth-color-orange {
+  color: var(--cirth-color-orange);
+}
+
+.cirth-color-sand-950 {
+  color: var(--cirth-color-sand-950);
+}
+
+.cirth-color-sand-900 {
+  color: var(--cirth-color-sand-900);
+}
+
+.cirth-color-sand-850 {
+  color: var(--cirth-color-sand-850);
+}
+
+.cirth-color-sand-800 {
+  color: var(--cirth-color-sand-800);
+}
+
+.cirth-color-sand-750 {
+  color: var(--cirth-color-sand-750);
+}
+
+.cirth-color-sand-700 {
+  color: var(--cirth-color-sand-700);
+}
+
+.cirth-color-sand-650 {
+  color: var(--cirth-color-sand-650);
+}
+
+.cirth-color-sand-600 {
+  color: var(--cirth-color-sand-600);
+}
+
+.cirth-color-sand-550 {
+  color: var(--cirth-color-sand-550);
+}
+
+.cirth-color-sand-500 {
+  color: var(--cirth-color-sand-500);
+}
+
+.cirth-color-sand-450 {
+  color: var(--cirth-color-sand-450);
+}
+
+.cirth-color-sand-400 {
+  color: var(--cirth-color-sand-400);
+}
+
+.cirth-color-sand-350 {
+  color: var(--cirth-color-sand-350);
+}
+
+.cirth-color-sand-300 {
+  color: var(--cirth-color-sand-300);
+}
+
+.cirth-color-sand-250 {
+  color: var(--cirth-color-sand-250);
+}
+
+.cirth-color-sand-200 {
+  color: var(--cirth-color-sand-200);
+}
+
+.cirth-color-sand-150 {
+  color: var(--cirth-color-sand-150);
+}
+
+.cirth-color-sand-100 {
+  color: var(--cirth-color-sand-100);
+}
+
+.cirth-color-sand-50 {
+  color: var(--cirth-color-sand-50);
+}
+
+.cirth-color-sand {
+  color: var(--cirth-color-sand);
+}
+
+.cirth-color-grey-950 {
+  color: var(--cirth-color-grey-950);
+}
+
+.cirth-color-grey-900 {
+  color: var(--cirth-color-grey-900);
+}
+
+.cirth-color-grey-850 {
+  color: var(--cirth-color-grey-850);
+}
+
+.cirth-color-grey-800 {
+  color: var(--cirth-color-grey-800);
+}
+
+.cirth-color-grey-750 {
+  color: var(--cirth-color-grey-750);
+}
+
+.cirth-color-grey-700 {
+  color: var(--cirth-color-grey-700);
+}
+
+.cirth-color-grey-650 {
+  color: var(--cirth-color-grey-650);
+}
+
+.cirth-color-grey-600 {
+  color: var(--cirth-color-grey-600);
+}
+
+.cirth-color-grey-550 {
+  color: var(--cirth-color-grey-550);
+}
+
+.cirth-color-grey-500 {
+  color: var(--cirth-color-grey-500);
+}
+
+.cirth-color-grey-450 {
+  color: var(--cirth-color-grey-450);
+}
+
+.cirth-color-grey-400 {
+  color: var(--cirth-color-grey-400);
+}
+
+.cirth-color-grey-350 {
+  color: var(--cirth-color-grey-350);
+}
+
+.cirth-color-grey-300 {
+  color: var(--cirth-color-grey-300);
+}
+
+.cirth-color-grey-250 {
+  color: var(--cirth-color-grey-250);
+}
+
+.cirth-color-grey-200 {
+  color: var(--cirth-color-grey-200);
+}
+
+.cirth-color-grey-150 {
+  color: var(--cirth-color-grey-150);
+}
+
+.cirth-color-grey-100 {
+  color: var(--cirth-color-grey-100);
+}
+
+.cirth-color-grey-50 {
+  color: var(--cirth-color-grey-50);
+}
+
+.cirth-color-grey {
+  color: var(--cirth-color-grey);
+}
+
+.cirth-color-zinc-950 {
+  color: var(--cirth-color-zinc-950);
+}
+
+.cirth-color-zinc-900 {
+  color: var(--cirth-color-zinc-900);
+}
+
+.cirth-color-zinc-850 {
+  color: var(--cirth-color-zinc-850);
+}
+
+.cirth-color-zinc-800 {
+  color: var(--cirth-color-zinc-800);
+}
+
+.cirth-color-zinc-750 {
+  color: var(--cirth-color-zinc-750);
+}
+
+.cirth-color-zinc-700 {
+  color: var(--cirth-color-zinc-700);
+}
+
+.cirth-color-zinc-650 {
+  color: var(--cirth-color-zinc-650);
+}
+
+.cirth-color-zinc-600 {
+  color: var(--cirth-color-zinc-600);
+}
+
+.cirth-color-zinc-550 {
+  color: var(--cirth-color-zinc-550);
+}
+
+.cirth-color-zinc-500 {
+  color: var(--cirth-color-zinc-500);
+}
+
+.cirth-color-zinc-450 {
+  color: var(--cirth-color-zinc-450);
+}
+
+.cirth-color-zinc-400 {
+  color: var(--cirth-color-zinc-400);
+}
+
+.cirth-color-zinc-350 {
+  color: var(--cirth-color-zinc-350);
+}
+
+.cirth-color-zinc-300 {
+  color: var(--cirth-color-zinc-300);
+}
+
+.cirth-color-zinc-250 {
+  color: var(--cirth-color-zinc-250);
+}
+
+.cirth-color-zinc-200 {
+  color: var(--cirth-color-zinc-200);
+}
+
+.cirth-color-zinc-150 {
+  color: var(--cirth-color-zinc-150);
+}
+
+.cirth-color-zinc-100 {
+  color: var(--cirth-color-zinc-100);
+}
+
+.cirth-color-zinc-50 {
+  color: var(--cirth-color-zinc-50);
+}
+
+.cirth-color-zinc {
+  color: var(--cirth-color-zinc);
+}
+
+.cirth-color-slate-950 {
+  color: var(--cirth-color-slate-950);
+}
+
+.cirth-color-slate-900 {
+  color: var(--cirth-color-slate-900);
+}
+
+.cirth-color-slate-850 {
+  color: var(--cirth-color-slate-850);
+}
+
+.cirth-color-slate-800 {
+  color: var(--cirth-color-slate-800);
+}
+
+.cirth-color-slate-750 {
+  color: var(--cirth-color-slate-750);
+}
+
+.cirth-color-slate-700 {
+  color: var(--cirth-color-slate-700);
+}
+
+.cirth-color-slate-650 {
+  color: var(--cirth-color-slate-650);
+}
+
+.cirth-color-slate-600 {
+  color: var(--cirth-color-slate-600);
+}
+
+.cirth-color-slate-550 {
+  color: var(--cirth-color-slate-550);
+}
+
+.cirth-color-slate-500 {
+  color: var(--cirth-color-slate-500);
+}
+
+.cirth-color-slate-450 {
+  color: var(--cirth-color-slate-450);
+}
+
+.cirth-color-slate-400 {
+  color: var(--cirth-color-slate-400);
+}
+
+.cirth-color-slate-350 {
+  color: var(--cirth-color-slate-350);
+}
+
+.cirth-color-slate-300 {
+  color: var(--cirth-color-slate-300);
+}
+
+.cirth-color-slate-250 {
+  color: var(--cirth-color-slate-250);
+}
+
+.cirth-color-slate-200 {
+  color: var(--cirth-color-slate-200);
+}
+
+.cirth-color-slate-150 {
+  color: var(--cirth-color-slate-150);
+}
+
+.cirth-color-slate-100 {
+  color: var(--cirth-color-slate-100);
+}
+
+.cirth-color-slate-50 {
+  color: var(--cirth-color-slate-50);
+}
+
+.cirth-color-slate {
+  color: var(--cirth-color-slate);
+}
+
+.cirth-background-red-950 {
+  background-color: var(--cirth-color-red-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-red-900 {
+  background-color: var(--cirth-color-red-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-red-850 {
+  background-color: var(--cirth-color-red-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-red-800 {
+  background-color: var(--cirth-color-red-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-red-750 {
+  background-color: var(--cirth-color-red-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-red-700 {
+  background-color: var(--cirth-color-red-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-red-650 {
+  background-color: var(--cirth-color-red-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-red-600 {
+  background-color: var(--cirth-color-red-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-red-550 {
+  background-color: var(--cirth-color-red-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-red-500 {
+  background-color: var(--cirth-color-red-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-red-450 {
+  background-color: var(--cirth-color-red-450);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-red-400 {
+  background-color: var(--cirth-color-red-400);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-red-350 {
+  background-color: var(--cirth-color-red-350);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-red-300 {
+  background-color: var(--cirth-color-red-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-red-250 {
+  background-color: var(--cirth-color-red-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-red-200 {
+  background-color: var(--cirth-color-red-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-red-150 {
+  background-color: var(--cirth-color-red-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-red-100 {
+  background-color: var(--cirth-color-red-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-red-50 {
+  background-color: var(--cirth-color-red-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-red {
+  background-color: var(--cirth-color-red);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pink-950 {
+  background-color: var(--cirth-color-pink-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pink-900 {
+  background-color: var(--cirth-color-pink-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pink-850 {
+  background-color: var(--cirth-color-pink-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pink-800 {
+  background-color: var(--cirth-color-pink-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pink-750 {
+  background-color: var(--cirth-color-pink-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pink-700 {
+  background-color: var(--cirth-color-pink-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pink-650 {
+  background-color: var(--cirth-color-pink-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pink-600 {
+  background-color: var(--cirth-color-pink-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pink-550 {
+  background-color: var(--cirth-color-pink-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pink-500 {
+  background-color: var(--cirth-color-pink-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pink-450 {
+  background-color: var(--cirth-color-pink-450);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pink-400 {
+  background-color: var(--cirth-color-pink-400);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-pink-350 {
+  background-color: var(--cirth-color-pink-350);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-pink-300 {
+  background-color: var(--cirth-color-pink-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-pink-250 {
+  background-color: var(--cirth-color-pink-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-pink-200 {
+  background-color: var(--cirth-color-pink-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-pink-150 {
+  background-color: var(--cirth-color-pink-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-pink-100 {
+  background-color: var(--cirth-color-pink-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-pink-50 {
+  background-color: var(--cirth-color-pink-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-pink {
+  background-color: var(--cirth-color-pink);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-fuchsia-950 {
+  background-color: var(--cirth-color-fuchsia-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-fuchsia-900 {
+  background-color: var(--cirth-color-fuchsia-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-fuchsia-850 {
+  background-color: var(--cirth-color-fuchsia-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-fuchsia-800 {
+  background-color: var(--cirth-color-fuchsia-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-fuchsia-750 {
+  background-color: var(--cirth-color-fuchsia-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-fuchsia-700 {
+  background-color: var(--cirth-color-fuchsia-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-fuchsia-650 {
+  background-color: var(--cirth-color-fuchsia-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-fuchsia-600 {
+  background-color: var(--cirth-color-fuchsia-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-fuchsia-550 {
+  background-color: var(--cirth-color-fuchsia-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-fuchsia-500 {
+  background-color: var(--cirth-color-fuchsia-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-fuchsia-450 {
+  background-color: var(--cirth-color-fuchsia-450);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-fuchsia-400 {
+  background-color: var(--cirth-color-fuchsia-400);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-fuchsia-350 {
+  background-color: var(--cirth-color-fuchsia-350);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-fuchsia-300 {
+  background-color: var(--cirth-color-fuchsia-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-fuchsia-250 {
+  background-color: var(--cirth-color-fuchsia-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-fuchsia-200 {
+  background-color: var(--cirth-color-fuchsia-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-fuchsia-150 {
+  background-color: var(--cirth-color-fuchsia-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-fuchsia-100 {
+  background-color: var(--cirth-color-fuchsia-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-fuchsia-50 {
+  background-color: var(--cirth-color-fuchsia-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-fuchsia {
+  background-color: var(--cirth-color-fuchsia);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-purple-950 {
+  background-color: var(--cirth-color-purple-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-purple-900 {
+  background-color: var(--cirth-color-purple-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-purple-850 {
+  background-color: var(--cirth-color-purple-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-purple-800 {
+  background-color: var(--cirth-color-purple-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-purple-750 {
+  background-color: var(--cirth-color-purple-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-purple-700 {
+  background-color: var(--cirth-color-purple-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-purple-650 {
+  background-color: var(--cirth-color-purple-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-purple-600 {
+  background-color: var(--cirth-color-purple-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-purple-550 {
+  background-color: var(--cirth-color-purple-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-purple-500 {
+  background-color: var(--cirth-color-purple-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-purple-450 {
+  background-color: var(--cirth-color-purple-450);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-purple-400 {
+  background-color: var(--cirth-color-purple-400);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-purple-350 {
+  background-color: var(--cirth-color-purple-350);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-purple-300 {
+  background-color: var(--cirth-color-purple-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-purple-250 {
+  background-color: var(--cirth-color-purple-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-purple-200 {
+  background-color: var(--cirth-color-purple-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-purple-150 {
+  background-color: var(--cirth-color-purple-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-purple-100 {
+  background-color: var(--cirth-color-purple-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-purple-50 {
+  background-color: var(--cirth-color-purple-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-purple {
+  background-color: var(--cirth-color-purple);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-violet-950 {
+  background-color: var(--cirth-color-violet-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-violet-900 {
+  background-color: var(--cirth-color-violet-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-violet-850 {
+  background-color: var(--cirth-color-violet-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-violet-800 {
+  background-color: var(--cirth-color-violet-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-violet-750 {
+  background-color: var(--cirth-color-violet-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-violet-700 {
+  background-color: var(--cirth-color-violet-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-violet-650 {
+  background-color: var(--cirth-color-violet-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-violet-600 {
+  background-color: var(--cirth-color-violet-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-violet-550 {
+  background-color: var(--cirth-color-violet-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-violet-500 {
+  background-color: var(--cirth-color-violet-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-violet-450 {
+  background-color: var(--cirth-color-violet-450);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-violet-400 {
+  background-color: var(--cirth-color-violet-400);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-violet-350 {
+  background-color: var(--cirth-color-violet-350);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-violet-300 {
+  background-color: var(--cirth-color-violet-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-violet-250 {
+  background-color: var(--cirth-color-violet-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-violet-200 {
+  background-color: var(--cirth-color-violet-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-violet-150 {
+  background-color: var(--cirth-color-violet-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-violet-100 {
+  background-color: var(--cirth-color-violet-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-violet-50 {
+  background-color: var(--cirth-color-violet-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-violet {
+  background-color: var(--cirth-color-violet);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-indigo-950 {
+  background-color: var(--cirth-color-indigo-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-indigo-900 {
+  background-color: var(--cirth-color-indigo-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-indigo-850 {
+  background-color: var(--cirth-color-indigo-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-indigo-800 {
+  background-color: var(--cirth-color-indigo-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-indigo-750 {
+  background-color: var(--cirth-color-indigo-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-indigo-700 {
+  background-color: var(--cirth-color-indigo-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-indigo-650 {
+  background-color: var(--cirth-color-indigo-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-indigo-600 {
+  background-color: var(--cirth-color-indigo-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-indigo-550 {
+  background-color: var(--cirth-color-indigo-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-indigo-500 {
+  background-color: var(--cirth-color-indigo-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-indigo-450 {
+  background-color: var(--cirth-color-indigo-450);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-indigo-400 {
+  background-color: var(--cirth-color-indigo-400);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-indigo-350 {
+  background-color: var(--cirth-color-indigo-350);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-indigo-300 {
+  background-color: var(--cirth-color-indigo-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-indigo-250 {
+  background-color: var(--cirth-color-indigo-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-indigo-200 {
+  background-color: var(--cirth-color-indigo-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-indigo-150 {
+  background-color: var(--cirth-color-indigo-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-indigo-100 {
+  background-color: var(--cirth-color-indigo-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-indigo-50 {
+  background-color: var(--cirth-color-indigo-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-indigo {
+  background-color: var(--cirth-color-indigo);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-blue-950 {
+  background-color: var(--cirth-color-blue-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-blue-900 {
+  background-color: var(--cirth-color-blue-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-blue-850 {
+  background-color: var(--cirth-color-blue-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-blue-800 {
+  background-color: var(--cirth-color-blue-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-blue-750 {
+  background-color: var(--cirth-color-blue-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-blue-700 {
+  background-color: var(--cirth-color-blue-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-blue-650 {
+  background-color: var(--cirth-color-blue-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-blue-600 {
+  background-color: var(--cirth-color-blue-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-blue-550 {
+  background-color: var(--cirth-color-blue-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-blue-500 {
+  background-color: var(--cirth-color-blue-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-blue-450 {
+  background-color: var(--cirth-color-blue-450);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-blue-400 {
+  background-color: var(--cirth-color-blue-400);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-blue-350 {
+  background-color: var(--cirth-color-blue-350);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-blue-300 {
+  background-color: var(--cirth-color-blue-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-blue-250 {
+  background-color: var(--cirth-color-blue-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-blue-200 {
+  background-color: var(--cirth-color-blue-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-blue-150 {
+  background-color: var(--cirth-color-blue-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-blue-100 {
+  background-color: var(--cirth-color-blue-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-blue-50 {
+  background-color: var(--cirth-color-blue-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-blue {
+  background-color: var(--cirth-color-blue);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-azure-950 {
+  background-color: var(--cirth-color-azure-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-azure-900 {
+  background-color: var(--cirth-color-azure-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-azure-850 {
+  background-color: var(--cirth-color-azure-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-azure-800 {
+  background-color: var(--cirth-color-azure-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-azure-750 {
+  background-color: var(--cirth-color-azure-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-azure-700 {
+  background-color: var(--cirth-color-azure-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-azure-650 {
+  background-color: var(--cirth-color-azure-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-azure-600 {
+  background-color: var(--cirth-color-azure-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-azure-550 {
+  background-color: var(--cirth-color-azure-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-azure-500 {
+  background-color: var(--cirth-color-azure-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-azure-450 {
+  background-color: var(--cirth-color-azure-450);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-azure-400 {
+  background-color: var(--cirth-color-azure-400);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-azure-350 {
+  background-color: var(--cirth-color-azure-350);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-azure-300 {
+  background-color: var(--cirth-color-azure-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-azure-250 {
+  background-color: var(--cirth-color-azure-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-azure-200 {
+  background-color: var(--cirth-color-azure-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-azure-150 {
+  background-color: var(--cirth-color-azure-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-azure-100 {
+  background-color: var(--cirth-color-azure-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-azure-50 {
+  background-color: var(--cirth-color-azure-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-azure {
+  background-color: var(--cirth-color-azure);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-cyan-950 {
+  background-color: var(--cirth-color-cyan-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-cyan-900 {
+  background-color: var(--cirth-color-cyan-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-cyan-850 {
+  background-color: var(--cirth-color-cyan-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-cyan-800 {
+  background-color: var(--cirth-color-cyan-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-cyan-750 {
+  background-color: var(--cirth-color-cyan-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-cyan-700 {
+  background-color: var(--cirth-color-cyan-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-cyan-650 {
+  background-color: var(--cirth-color-cyan-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-cyan-600 {
+  background-color: var(--cirth-color-cyan-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-cyan-550 {
+  background-color: var(--cirth-color-cyan-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-cyan-500 {
+  background-color: var(--cirth-color-cyan-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-cyan-450 {
+  background-color: var(--cirth-color-cyan-450);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-cyan-400 {
+  background-color: var(--cirth-color-cyan-400);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-cyan-350 {
+  background-color: var(--cirth-color-cyan-350);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-cyan-300 {
+  background-color: var(--cirth-color-cyan-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-cyan-250 {
+  background-color: var(--cirth-color-cyan-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-cyan-200 {
+  background-color: var(--cirth-color-cyan-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-cyan-150 {
+  background-color: var(--cirth-color-cyan-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-cyan-100 {
+  background-color: var(--cirth-color-cyan-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-cyan-50 {
+  background-color: var(--cirth-color-cyan-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-cyan {
+  background-color: var(--cirth-color-cyan);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-jade-950 {
+  background-color: var(--cirth-color-jade-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-jade-900 {
+  background-color: var(--cirth-color-jade-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-jade-850 {
+  background-color: var(--cirth-color-jade-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-jade-800 {
+  background-color: var(--cirth-color-jade-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-jade-750 {
+  background-color: var(--cirth-color-jade-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-jade-700 {
+  background-color: var(--cirth-color-jade-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-jade-650 {
+  background-color: var(--cirth-color-jade-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-jade-600 {
+  background-color: var(--cirth-color-jade-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-jade-550 {
+  background-color: var(--cirth-color-jade-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-jade-500 {
+  background-color: var(--cirth-color-jade-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-jade-450 {
+  background-color: var(--cirth-color-jade-450);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-jade-400 {
+  background-color: var(--cirth-color-jade-400);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-jade-350 {
+  background-color: var(--cirth-color-jade-350);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-jade-300 {
+  background-color: var(--cirth-color-jade-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-jade-250 {
+  background-color: var(--cirth-color-jade-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-jade-200 {
+  background-color: var(--cirth-color-jade-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-jade-150 {
+  background-color: var(--cirth-color-jade-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-jade-100 {
+  background-color: var(--cirth-color-jade-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-jade-50 {
+  background-color: var(--cirth-color-jade-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-jade {
+  background-color: var(--cirth-color-jade);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-green-950 {
+  background-color: var(--cirth-color-green-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-green-900 {
+  background-color: var(--cirth-color-green-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-green-850 {
+  background-color: var(--cirth-color-green-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-green-800 {
+  background-color: var(--cirth-color-green-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-green-750 {
+  background-color: var(--cirth-color-green-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-green-700 {
+  background-color: var(--cirth-color-green-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-green-650 {
+  background-color: var(--cirth-color-green-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-green-600 {
+  background-color: var(--cirth-color-green-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-green-550 {
+  background-color: var(--cirth-color-green-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-green-500 {
+  background-color: var(--cirth-color-green-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-green-450 {
+  background-color: var(--cirth-color-green-450);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-green-400 {
+  background-color: var(--cirth-color-green-400);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-green-350 {
+  background-color: var(--cirth-color-green-350);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-green-300 {
+  background-color: var(--cirth-color-green-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-green-250 {
+  background-color: var(--cirth-color-green-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-green-200 {
+  background-color: var(--cirth-color-green-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-green-150 {
+  background-color: var(--cirth-color-green-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-green-100 {
+  background-color: var(--cirth-color-green-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-green-50 {
+  background-color: var(--cirth-color-green-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-green {
+  background-color: var(--cirth-color-green);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-lime-950 {
+  background-color: var(--cirth-color-lime-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-lime-900 {
+  background-color: var(--cirth-color-lime-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-lime-850 {
+  background-color: var(--cirth-color-lime-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-lime-800 {
+  background-color: var(--cirth-color-lime-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-lime-750 {
+  background-color: var(--cirth-color-lime-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-lime-700 {
+  background-color: var(--cirth-color-lime-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-lime-650 {
+  background-color: var(--cirth-color-lime-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-lime-600 {
+  background-color: var(--cirth-color-lime-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-lime-550 {
+  background-color: var(--cirth-color-lime-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-lime-500 {
+  background-color: var(--cirth-color-lime-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-lime-450 {
+  background-color: var(--cirth-color-lime-450);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-lime-400 {
+  background-color: var(--cirth-color-lime-400);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-lime-350 {
+  background-color: var(--cirth-color-lime-350);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-lime-300 {
+  background-color: var(--cirth-color-lime-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-lime-250 {
+  background-color: var(--cirth-color-lime-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-lime-200 {
+  background-color: var(--cirth-color-lime-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-lime-150 {
+  background-color: var(--cirth-color-lime-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-lime-100 {
+  background-color: var(--cirth-color-lime-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-lime-50 {
+  background-color: var(--cirth-color-lime-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-lime {
+  background-color: var(--cirth-color-lime);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-yellow-950 {
+  background-color: var(--cirth-color-yellow-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-yellow-900 {
+  background-color: var(--cirth-color-yellow-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-yellow-850 {
+  background-color: var(--cirth-color-yellow-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-yellow-800 {
+  background-color: var(--cirth-color-yellow-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-yellow-750 {
+  background-color: var(--cirth-color-yellow-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-yellow-700 {
+  background-color: var(--cirth-color-yellow-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-yellow-650 {
+  background-color: var(--cirth-color-yellow-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-yellow-600 {
+  background-color: var(--cirth-color-yellow-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-yellow-550 {
+  background-color: var(--cirth-color-yellow-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-yellow-500 {
+  background-color: var(--cirth-color-yellow-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-yellow-450 {
+  background-color: var(--cirth-color-yellow-450);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-yellow-400 {
+  background-color: var(--cirth-color-yellow-400);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-yellow-350 {
+  background-color: var(--cirth-color-yellow-350);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-yellow-300 {
+  background-color: var(--cirth-color-yellow-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-yellow-250 {
+  background-color: var(--cirth-color-yellow-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-yellow-200 {
+  background-color: var(--cirth-color-yellow-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-yellow-150 {
+  background-color: var(--cirth-color-yellow-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-yellow-100 {
+  background-color: var(--cirth-color-yellow-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-yellow-50 {
+  background-color: var(--cirth-color-yellow-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-yellow {
+  background-color: var(--cirth-color-yellow);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-amber-950 {
+  background-color: var(--cirth-color-amber-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-amber-900 {
+  background-color: var(--cirth-color-amber-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-amber-850 {
+  background-color: var(--cirth-color-amber-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-amber-800 {
+  background-color: var(--cirth-color-amber-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-amber-750 {
+  background-color: var(--cirth-color-amber-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-amber-700 {
+  background-color: var(--cirth-color-amber-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-amber-650 {
+  background-color: var(--cirth-color-amber-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-amber-600 {
+  background-color: var(--cirth-color-amber-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-amber-550 {
+  background-color: var(--cirth-color-amber-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-amber-500 {
+  background-color: var(--cirth-color-amber-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-amber-450 {
+  background-color: var(--cirth-color-amber-450);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-amber-400 {
+  background-color: var(--cirth-color-amber-400);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-amber-350 {
+  background-color: var(--cirth-color-amber-350);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-amber-300 {
+  background-color: var(--cirth-color-amber-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-amber-250 {
+  background-color: var(--cirth-color-amber-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-amber-200 {
+  background-color: var(--cirth-color-amber-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-amber-150 {
+  background-color: var(--cirth-color-amber-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-amber-100 {
+  background-color: var(--cirth-color-amber-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-amber-50 {
+  background-color: var(--cirth-color-amber-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-amber {
+  background-color: var(--cirth-color-amber);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-pumpkin-950 {
+  background-color: var(--cirth-color-pumpkin-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pumpkin-900 {
+  background-color: var(--cirth-color-pumpkin-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pumpkin-850 {
+  background-color: var(--cirth-color-pumpkin-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pumpkin-800 {
+  background-color: var(--cirth-color-pumpkin-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pumpkin-750 {
+  background-color: var(--cirth-color-pumpkin-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pumpkin-700 {
+  background-color: var(--cirth-color-pumpkin-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pumpkin-650 {
+  background-color: var(--cirth-color-pumpkin-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pumpkin-600 {
+  background-color: var(--cirth-color-pumpkin-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pumpkin-550 {
+  background-color: var(--cirth-color-pumpkin-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pumpkin-500 {
+  background-color: var(--cirth-color-pumpkin-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pumpkin-450 {
+  background-color: var(--cirth-color-pumpkin-450);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-pumpkin-400 {
+  background-color: var(--cirth-color-pumpkin-400);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-pumpkin-350 {
+  background-color: var(--cirth-color-pumpkin-350);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-pumpkin-300 {
+  background-color: var(--cirth-color-pumpkin-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-pumpkin-250 {
+  background-color: var(--cirth-color-pumpkin-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-pumpkin-200 {
+  background-color: var(--cirth-color-pumpkin-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-pumpkin-150 {
+  background-color: var(--cirth-color-pumpkin-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-pumpkin-100 {
+  background-color: var(--cirth-color-pumpkin-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-pumpkin-50 {
+  background-color: var(--cirth-color-pumpkin-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-pumpkin {
+  background-color: var(--cirth-color-pumpkin);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-orange-950 {
+  background-color: var(--cirth-color-orange-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-orange-900 {
+  background-color: var(--cirth-color-orange-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-orange-850 {
+  background-color: var(--cirth-color-orange-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-orange-800 {
+  background-color: var(--cirth-color-orange-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-orange-750 {
+  background-color: var(--cirth-color-orange-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-orange-700 {
+  background-color: var(--cirth-color-orange-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-orange-650 {
+  background-color: var(--cirth-color-orange-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-orange-600 {
+  background-color: var(--cirth-color-orange-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-orange-550 {
+  background-color: var(--cirth-color-orange-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-orange-500 {
+  background-color: var(--cirth-color-orange-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-orange-450 {
+  background-color: var(--cirth-color-orange-450);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-orange-400 {
+  background-color: var(--cirth-color-orange-400);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-orange-350 {
+  background-color: var(--cirth-color-orange-350);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-orange-300 {
+  background-color: var(--cirth-color-orange-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-orange-250 {
+  background-color: var(--cirth-color-orange-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-orange-200 {
+  background-color: var(--cirth-color-orange-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-orange-150 {
+  background-color: var(--cirth-color-orange-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-orange-100 {
+  background-color: var(--cirth-color-orange-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-orange-50 {
+  background-color: var(--cirth-color-orange-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-orange {
+  background-color: var(--cirth-color-orange);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-sand-950 {
+  background-color: var(--cirth-color-sand-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-sand-900 {
+  background-color: var(--cirth-color-sand-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-sand-850 {
+  background-color: var(--cirth-color-sand-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-sand-800 {
+  background-color: var(--cirth-color-sand-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-sand-750 {
+  background-color: var(--cirth-color-sand-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-sand-700 {
+  background-color: var(--cirth-color-sand-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-sand-650 {
+  background-color: var(--cirth-color-sand-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-sand-600 {
+  background-color: var(--cirth-color-sand-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-sand-550 {
+  background-color: var(--cirth-color-sand-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-sand-500 {
+  background-color: var(--cirth-color-sand-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-sand-450 {
+  background-color: var(--cirth-color-sand-450);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-sand-400 {
+  background-color: var(--cirth-color-sand-400);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-sand-350 {
+  background-color: var(--cirth-color-sand-350);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-sand-300 {
+  background-color: var(--cirth-color-sand-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-sand-250 {
+  background-color: var(--cirth-color-sand-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-sand-200 {
+  background-color: var(--cirth-color-sand-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-sand-150 {
+  background-color: var(--cirth-color-sand-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-sand-100 {
+  background-color: var(--cirth-color-sand-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-sand-50 {
+  background-color: var(--cirth-color-sand-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-sand {
+  background-color: var(--cirth-color-sand);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-grey-950 {
+  background-color: var(--cirth-color-grey-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-grey-900 {
+  background-color: var(--cirth-color-grey-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-grey-850 {
+  background-color: var(--cirth-color-grey-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-grey-800 {
+  background-color: var(--cirth-color-grey-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-grey-750 {
+  background-color: var(--cirth-color-grey-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-grey-700 {
+  background-color: var(--cirth-color-grey-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-grey-650 {
+  background-color: var(--cirth-color-grey-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-grey-600 {
+  background-color: var(--cirth-color-grey-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-grey-550 {
+  background-color: var(--cirth-color-grey-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-grey-500 {
+  background-color: var(--cirth-color-grey-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-grey-450 {
+  background-color: var(--cirth-color-grey-450);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-grey-400 {
+  background-color: var(--cirth-color-grey-400);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-grey-350 {
+  background-color: var(--cirth-color-grey-350);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-grey-300 {
+  background-color: var(--cirth-color-grey-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-grey-250 {
+  background-color: var(--cirth-color-grey-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-grey-200 {
+  background-color: var(--cirth-color-grey-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-grey-150 {
+  background-color: var(--cirth-color-grey-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-grey-100 {
+  background-color: var(--cirth-color-grey-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-grey-50 {
+  background-color: var(--cirth-color-grey-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-grey {
+  background-color: var(--cirth-color-grey);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-zinc-950 {
+  background-color: var(--cirth-color-zinc-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-zinc-900 {
+  background-color: var(--cirth-color-zinc-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-zinc-850 {
+  background-color: var(--cirth-color-zinc-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-zinc-800 {
+  background-color: var(--cirth-color-zinc-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-zinc-750 {
+  background-color: var(--cirth-color-zinc-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-zinc-700 {
+  background-color: var(--cirth-color-zinc-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-zinc-650 {
+  background-color: var(--cirth-color-zinc-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-zinc-600 {
+  background-color: var(--cirth-color-zinc-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-zinc-550 {
+  background-color: var(--cirth-color-zinc-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-zinc-500 {
+  background-color: var(--cirth-color-zinc-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-zinc-450 {
+  background-color: var(--cirth-color-zinc-450);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-zinc-400 {
+  background-color: var(--cirth-color-zinc-400);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-zinc-350 {
+  background-color: var(--cirth-color-zinc-350);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-zinc-300 {
+  background-color: var(--cirth-color-zinc-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-zinc-250 {
+  background-color: var(--cirth-color-zinc-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-zinc-200 {
+  background-color: var(--cirth-color-zinc-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-zinc-150 {
+  background-color: var(--cirth-color-zinc-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-zinc-100 {
+  background-color: var(--cirth-color-zinc-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-zinc-50 {
+  background-color: var(--cirth-color-zinc-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-zinc {
+  background-color: var(--cirth-color-zinc);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-slate-950 {
+  background-color: var(--cirth-color-slate-950);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-slate-900 {
+  background-color: var(--cirth-color-slate-900);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-slate-850 {
+  background-color: var(--cirth-color-slate-850);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-slate-800 {
+  background-color: var(--cirth-color-slate-800);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-slate-750 {
+  background-color: var(--cirth-color-slate-750);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-slate-700 {
+  background-color: var(--cirth-color-slate-700);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-slate-650 {
+  background-color: var(--cirth-color-slate-650);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-slate-600 {
+  background-color: var(--cirth-color-slate-600);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-slate-550 {
+  background-color: var(--cirth-color-slate-550);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-slate-500 {
+  background-color: var(--cirth-color-slate-500);
+  color: var(--cirth-color-light);
+}
+
+.cirth-background-slate-450 {
+  background-color: var(--cirth-color-slate-450);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-slate-400 {
+  background-color: var(--cirth-color-slate-400);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-slate-350 {
+  background-color: var(--cirth-color-slate-350);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-slate-300 {
+  background-color: var(--cirth-color-slate-300);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-slate-250 {
+  background-color: var(--cirth-color-slate-250);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-slate-200 {
+  background-color: var(--cirth-color-slate-200);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-slate-150 {
+  background-color: var(--cirth-color-slate-150);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-slate-100 {
+  background-color: var(--cirth-color-slate-100);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-slate-50 {
+  background-color: var(--cirth-color-slate-50);
+  color: var(--cirth-color-dark);
+}
+
+.cirth-background-slate {
+  background-color: var(--cirth-color-slate);
+  color: var(--cirth-color-light);
+}

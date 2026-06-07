@@ -1,9 +1,9 @@
 {
 	"name": "@cirth/cirth",
 	"version": "0.1.0",
-	"description": "Semantic-first CSS Framework for production-ready interfaces",
+	"description": "Semantic-first CSS framework for production-ready interfaces",
 	"author": "Riccardo Pastori",
-	"main": "css/cirth.min.css",
+	"main": "dist/cirth.min.css",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
@@ -13,52 +13,35 @@
 		"tag": "next"
 	},
 	"keywords": [
+		"classless",
 		"css",
 		"css-framework",
+		"custom-properties",
 		"dark-mode",
 		"dark-theme",
 		"lightweight",
 		"minimal",
-		"minimalist",
-		"minimalistic",
+		"modern-css",
 		"native-html",
-		"scss-framework",
-		"semantic"
+		"semantic",
+		"semantic-html"
 	],
 	"bugs": {
 		"url": "https://github.com/ricpastori/cirth/issues"
 	},
 	"scripts": {
-		"✨": "run-s build",
-		"build": "run-s start lint \"build:*\" done --silent",
-		"dev": "nodemon -q --watch scss/ --ext scss --exec 'run-s build'",
-		"lint": "run-s \"lint:*\" --silent",
-		"lint:prettier": "prettier --write --log-level silent 'scss/**/*.scss'",
-		"lint:sort-scss": "postcss --config scss ./scss/**/*.scss --replace",
-		"build:css": "sass --no-source-map --style expanded --no-error-css scss/:css/",
-		"build:themes": "node scripts/build-themes",
-		"build:autoprefix": "postcss --config css --replace css/*.css !css/*.min.css",
-		"build:minify": "cleancss -O1 --with-rebase --batch --batch-suffix .min css/*.css !css/*.min.css",
-		"prelint": "echo '[@cirth/cirth] ✨ Lint'",
-		"prebuild:css": "echo '[@cirth/cirth] ✨ Compile'",
-		"prebuild:themes": "echo '[@cirth/cirth] ✨ Compile themes'",
-		"prebuild:autoprefix": "echo '[@cirth/cirth] ✨ Autoprefix'",
-		"prebuild:minify": "echo '[@cirth/cirth] ✨ Minify'",
-		"start": "echo '\\033[96m[@cirth/cirth] ✨ Start\\033[0m'",
-		"done": "echo '\\033[32m[@cirth/cirth] ✨ Done\\033[0m'"
+		"build": "node scripts/build.js",
+		"dev": "node scripts/watch.js",
+		"format": "prettier --write --log-level silent 'src/**/*.scss'",
+		"lint": "stylelint 'src/**/*.scss'",
+		"lint:fix": "stylelint 'src/**/*.scss' --fix"
 	},
 	"devDependencies": {
-		"autoprefixer": "^10.4.21",
-		"caniuse-lite": "1.0.30001704",
-		"clean-css-cli": "^5.6.3",
-		"css-declaration-sorter": "^7.2.0",
-		"nodemon": "^3.1.9",
-		"npm-run-all": "^4.1.5",
-		"postcss": "^8.5.3",
-		"postcss-cli": "^11.0.1",
-		"postcss-scss": "^4.0.9",
+		"lightningcss-cli": "^1.32.0",
 		"prettier": "^3.5.3",
-		"sass": "^1.85.1"
+		"sass-embedded": "^1.100.0",
+		"stylelint": "^17.13.0",
+		"stylelint-config-standard-scss": "^17.0.0"
 	},
 	"browserslist": [
 		"defaults"
