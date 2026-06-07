@@ -6,7 +6,7 @@ on:
       tag:
         description: npm dist-tag to publish with
         required: true
-        default: next
+        default: latest
 
 permissions:
   contents: read

@@ -2,7 +2,7 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset=".github/logo-dark.svg">
     <source media="(prefers-color-scheme: light)" srcset=".github/logo-light.svg">
-    <img alt="Cirth" src=".github/logo-light.svg" width="96" height="96">
+    <img alt="Cirth" src=".github/logo-light.svg" width="112" height="112">
   </picture>
 </p>
 
@@ -12,125 +12,54 @@
   <strong>Semantic by default. Classes only when needed.</strong>
 </p>
 
-Cirth is a semantic-first CSS framework for building production-ready interfaces
-with clean HTML, modern CSS, and minimal class noise.
+<p align="center">
+  Semantic-first CSS for production-ready interfaces with clean HTML,
+  modern CSS, and minimal class noise.
+</p>
 
-It starts from a simple idea: good HTML should already look and behave like a
-usable interface. Classes are still useful, but they should solve real gaps in
-HTML semantics instead of becoming the main way every element is described.
+<p align="center">
+  <a href="#quickstart">Quickstart</a>
+  ·
+  <a href="#usage">Usage</a>
+  ·
+  <a href="#philosophy">Philosophy</a>
+  ·
+  <a href="#customization">Customization</a>
+  ·
+  <a href="#roadmap">Roadmap</a>
+  ·
+  <a href="#contributing">Contributing</a>
+</p>
 
-## Contents
+<p align="center">
+  <a href="https://github.com/cirthcss/cirth/actions/workflows/ci.yml">
+    <img alt="CI" src="https://github.com/cirthcss/cirth/actions/workflows/ci.yml/badge.svg">
+  </a>
+  <a href="https://github.com/cirthcss/cirth/releases">
+    <img alt="GitHub Release" src="https://img.shields.io/github/v/release/cirthcss/cirth?include_prereleases">
+  </a>
+  <img alt="Status" src="https://img.shields.io/badge/status-early%20stabilization-orange">
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
+</p>
 
-- [Contents](#contents)
-- [Project philosophy](#project-philosophy)
-- [Why this fork exists](#why-this-fork-exists)
-- [Where Cirth is going](#where-cirth-is-going)
-- [Installation](#installation)
-- [Basic usage](#basic-usage)
-- [Customization with CSS variables](#customization-with-css-variables)
-- [Layout primitives](#layout-primitives)
-- [Project structure](#project-structure)
-- [Build and tooling](#build-and-tooling)
-- [Roadmap](#roadmap)
-  - [Completed foundation](#completed-foundation)
-  - [Repository and contributions](#repository-and-contributions)
-  - [Stabilization](#stabilization)
-  - [Layout primitives](#layout-primitives-1)
-  - [Utility classes](#utility-classes)
-  - [Themes](#themes)
-  - [Components](#components)
-- [Origins](#origins)
-- [License](#license)
+## Quickstart
 
-## Project philosophy
+Pick one of the available builds, include it in your page, and write semantic
+HTML.
 
-Cirth is built around semantic HTML first. Standard elements should carry most of
-the structure, meaning, and styling burden before a class is needed.
-
-The framework should stay minimal in markup, not limited in production usage.
-That means Cirth can support real applications, dashboards, forms, documentation,
-and product interfaces without pushing users toward utility-first class soup or
-large component catalogs.
-
-Core principles:
-
-- Style semantic HTML by default.
-- Use classes only where HTML semantics are not enough.
-- Keep class APIs focused on layout primitives, scoped variants, and specific
-  practical needs.
-- Avoid utility-first class soup.
-- Avoid Bootstrap-like component bloat.
-- Keep the public API based on modern CSS and CSS custom properties.
-- Use SCSS as internal build infrastructure, while keeping the public API
-  CSS-first.
-- Prefer clear source organization over automated churn.
-
-## Why this fork exists
-
-Cirth began as a fork because Pico CSS had a strong foundation: semantic HTML,
-low class noise, and a CSS-first customization model.
-
-The fork exists to give that foundation a different direction:
-
-- Make independent API decisions instead of preserving drop-in compatibility
-  forever.
-- Clean up and modernize the repository structure and build pipeline.
-- Fix inherited bugs that still matter for Cirth's own behavior.
-- Keep the semantic-first approach while making the framework more deliberate
-  for production interfaces.
-- Add only the primitives and base components that fit the project's philosophy.
-
-The goal is not to reject the starting point. It is to keep the parts that still
-serve the project and change the parts that make Cirth harder to maintain,
-document, or use in real products.
-
-## Where Cirth is going
-
-Cirth is moving toward a compact, production-ready CSS framework with a stable
-CSS-first public API.
-
-The intended direction is:
-
-- semantic defaults for common HTML elements;
-- a small set of layout primitives;
-- a careful utility layer that remains intentionally limited;
-- lean base components built around semantic HTML and ARIA patterns;
-- predictable customization through CSS custom properties;
-- a smaller build toolchain that contributors can understand quickly.
-
-Cirth should feel quiet and practical: easy to read in markup, easy to override
-in CSS, and restrained enough that projects can build their own product language
-on top of it.
-
-## Installation
-
-This repository currently ships built CSS files in `dist/`. Use the local build
-artifacts directly:
-
-```html
-<link rel="stylesheet" href="dist/cirth.min.css">
-```
-
-Available base builds include:
-
-- `dist/cirth.min.css`
-- `dist/cirth.classless.min.css`
-- `dist/cirth.fluid.classless.min.css`
-- `dist/cirth.conditional.min.css`
-- `dist/cirth.colors.min.css`
-
-Theme-specific builds are also available in `dist/`, for example
-`dist/cirth.slate.min.css` and `dist/cirth.classless.slate.min.css`.
-
-Once `v0.1.0` is released, the default build can also be loaded from jsDelivr
-through the GitHub tag:
+### CDN
 
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/cirthcss/cirth@v0.1.0/dist/cirth.min.css">
 ```
 
-After the package is published to npm, it can be installed or loaded from npm
-CDNs:
+Release archives are available from
+[GitHub Releases](https://github.com/cirthcss/cirth/releases).
+
+### npm
+
+The npm package is prepared as `@cirthcss/cirth`, but it is waiting for the
+first publish with npm 2FA.
 
 ```sh
 npm install @cirthcss/cirth
@@ -140,23 +69,41 @@ npm install @cirthcss/cirth
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.1.0/dist/cirth.min.css">
 ```
 
-For local development, install dependencies with npm and rebuild the CSS:
+### Local Build
 
 ```sh
 npm install
 npm run build
 ```
 
-To rebuild when SCSS files change:
-
-```sh
-npm run dev
+```html
+<link rel="stylesheet" href="dist/cirth.min.css">
 ```
 
-## Basic usage
+Then write ordinary semantic HTML:
 
-Start with semantic structure, then add layout classes only where they clarify
-the interface.
+```html
+<main class="container">
+  <header>
+    <h1>Project dashboard</h1>
+    <p>Review active work and recent changes.</p>
+  </header>
+
+  <section>
+    <h2>Open items</h2>
+    <article>
+      <h3>Release checklist</h3>
+      <p>Confirm build output, documentation, and browser coverage.</p>
+      <button type="button">Review</button>
+    </article>
+  </section>
+</main>
+```
+
+## Usage
+
+Start with semantic HTML. Add classes only when the HTML element cannot express
+the structure by itself.
 
 ```html
 <!doctype html>
@@ -170,35 +117,104 @@ the interface.
   </head>
   <body>
     <main class="container">
-      <header>
-        <h1>Project dashboard</h1>
-        <p>Review active work and recent changes.</p>
-      </header>
+      <nav>
+        <ul>
+          <li><strong>Product</strong></li>
+        </ul>
+        <ul>
+          <li><a href="/docs">Docs</a></li>
+          <li><a href="/account">Account</a></li>
+        </ul>
+      </nav>
 
-      <section>
-        <h2>Open items</h2>
-        <article>
-          <h3>Release checklist</h3>
-          <p>Confirm build output, documentation, and browser coverage.</p>
-          <button type="button">Review</button>
-        </article>
-      </section>
+      <article>
+        <h1>Settings</h1>
+        <form>
+          <label>
+            Email
+            <input type="email" name="email" autocomplete="email">
+          </label>
+          <button type="submit">Save</button>
+        </form>
+      </article>
     </main>
   </body>
 </html>
 ```
 
-The classless builds style `body > header`, `body > main`, and `body > footer`
-as page containers, so they can be useful when you want even less markup:
+### Available Builds
+
+The main generated files are:
+
+| File | Purpose |
+| --- | --- |
+| `dist/cirth.min.css` | Default semantic build. |
+| `dist/cirth.classless.min.css` | Classless build for pages with even less markup. |
+| `dist/cirth.fluid.classless.min.css` | Classless build with fluid page containers. |
+| `dist/cirth.conditional.min.css` | Conditional build for scoped adoption. |
+| `dist/cirth.colors.min.css` | Color utilities and custom property output. |
+
+Theme-specific builds are still present in `dist/`, for example
+`dist/cirth.slate.min.css` and `dist/cirth.classless.slate.min.css`.
+The theme set is planned to be reduced and cleaned up.
+
+### Classless Usage
+
+The classless builds style `body > header`, `body > main`, and
+`body > footer` as page containers. They are useful when you want the smallest
+possible markup surface:
 
 ```html
 <link rel="stylesheet" href="dist/cirth.classless.min.css">
 ```
 
-## Customization with CSS variables
+## Philosophy
 
-The public customization surface is CSS-first. Override CSS custom properties in
-your own stylesheet after loading the framework.
+Cirth is a semantic-first CSS framework. Standard HTML elements should carry
+most of the structure, meaning, and styling burden before a class is needed.
+
+The framework should stay minimal in markup, not limited in production usage.
+It should support real applications, dashboards, forms, documentation, and
+product interfaces without pushing users toward utility-first class soup or a
+large component catalog.
+
+Core principles:
+
+- Style semantic HTML by default.
+- Use classes only where HTML semantics are not enough.
+- Keep class APIs focused on layout primitives, scoped variants, and specific
+  practical needs.
+- Avoid utility-first class soup.
+- Avoid Bootstrap-like component bloat.
+- Keep the public API based on modern CSS and CSS custom properties.
+- Use SCSS as internal build infrastructure while keeping the public API
+  CSS-first.
+- Prefer clear source organization over automated churn.
+
+## Why This Fork Exists
+
+Cirth began as a fork because Pico CSS had a strong foundation: semantic HTML,
+low class noise, and a CSS-first customization model.
+
+The fork exists to give that foundation a different direction:
+
+- Make independent API decisions instead of preserving drop-in compatibility
+  forever.
+- Clean up and modernize the repository structure and build pipeline.
+- Fix inherited bugs that still matter for Cirth's own behavior.
+- Keep the semantic-first approach while making the framework more deliberate
+  for production interfaces.
+- Add only the primitives and base components that fit the project's
+  philosophy.
+
+The goal is not to reject the starting point. It is to keep the parts that
+still serve the project and change the parts that make Cirth harder to
+maintain, document, or use in real products.
+
+## Customization
+
+The public customization surface is CSS-first. Override CSS custom properties
+in your own stylesheet after loading the framework.
 
 The CSS variable prefix is `--cirth-`.
 
@@ -214,12 +230,13 @@ The CSS variable prefix is `--cirth-`.
 ```
 
 Common variables include typography, color, spacing, borders, form controls,
-grid gaps, and color scheme values. The generated CSS in `dist/cirth.css` is the
-most reliable reference for the currently available variables.
+grid gaps, and color scheme values. The generated CSS in `dist/cirth.css` is
+the most reliable reference for the currently available variables.
 
-## Layout primitives
+## Layout Primitives
 
-Cirth keeps classes focused on structural needs that HTML cannot express alone.
+Cirth keeps classes focused on structural needs that HTML cannot express
+alone.
 
 Current layout primitives include:
 
@@ -233,7 +250,7 @@ rather than broad component classes, including `nav`, `article`, `details`,
 `dialog`, `progress`, `[role="group"]`, `[role="search"]`,
 `[aria-busy="true"]`, and `[data-tooltip]`.
 
-## Project structure
+## Project Structure
 
 - `src/` contains the SCSS source.
 - `dist/` contains generated CSS output.
@@ -248,7 +265,7 @@ Key source entry points:
 - `src/cirth.conditional.scss`
 - `src/cirth.colors.scss`
 
-## Build and tooling
+## Build And Tooling
 
 Cirth uses npm as its package manager. Yarn and Composer are not part of the
 current workflow.
@@ -286,45 +303,69 @@ GitHub Actions currently provide:
 - `Publish npm`, which runs manually and publishes the package to npm when the
   repository has a valid `NPM_TOKEN` secret.
 
+## Contributing
+
+The repository is still moving toward a stable internal organization, so the
+contribution workflow is intentionally simple for now.
+
+The issue tracker is the primary public channel currently enabled. Issues are
+welcome for bugs, documentation improvements, tooling questions, API proposals,
+utility class review, component ideas, and theme cleanup.
+
+Pull requests are welcome when they are focused and easy to review. Larger
+changes should start with an issue so the direction can be discussed before
+implementation.
+
+See [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md) for the current
+contribution notes.
+
 ## Roadmap
 
 Cirth is close to a more stable repository shape, but it is still evolving
-incrementally. The plan is to strengthen the project without turning it into a
-different kind of framework.
+incrementally. The goal is to strengthen the framework without turning it into
+a different kind of project.
 
-The roadmap is grouped by area so layout primitives, utility classes, themes,
-and components remain separate decisions.
-
-### Completed foundation
+### Foundation
 
 - [x] Rename the project identity and package metadata around Cirth.
+- [x] Move source files to `src/` and generated output to `dist/`.
 - [x] Remove Yarn and Composer from the active workflow.
 - [x] Reduce Node dependencies and move CSS processing to Lightning CSS.
 - [x] Replace `sass` with `sass-embedded`.
 - [x] Replace `npm-run-all` and `nodemon` with local build/watch scripts.
-- [x] Move source files to `src/` and generated output to `dist/`.
 - [x] Add Prettier and Stylelint conventions for SCSS.
 - [x] Document the current dependency and build policy in `package-use.md`.
+
+### Release And Distribution
+
+- [x] Prepare package metadata for `@cirthcss/cirth`.
 - [x] Add GitHub Actions for CI and package artifacts.
 - [x] Add a manual npm publish workflow.
-
-### Repository and contributions
-
-- [ ] Finalize the repository organization and source/build structure.
-- [ ] Prepare contribution docs and issue/PR workflows once the structure is
-  stable, before all framework work is finished.
-- [ ] Accept contributions beyond bug fixes, including documentation, tests,
-  tooling cleanup, API review, proposals, and implementation work.
+- [x] Create the first GitHub release.
+- [x] Provide a working CDN URL through the GitHub release tag.
+- [ ] Publish the package to npm as `@cirthcss/cirth`.
 - [ ] Decide when generated `dist/` should stop being committed and move fully
   to CI, release artifacts, or package publishing.
+
+### Repository And Contributions
+
+- [x] Add initial contribution notes.
+- [x] Keep the issue tracker as the primary public channel while Discussions
+  are disabled.
+- [ ] Finalize the repository organization and source/build structure.
+- [ ] Add any missing issue or pull request templates after the repo structure
+  settles.
+- [x] Accept contributions beyond bug fixes, including documentation, tests,
+  tooling cleanup, API review, proposals, and implementation work.
 
 ### Stabilization
 
 - [ ] Audit known Pico CSS bugs and fix the ones still relevant to Cirth.
-- [ ] Add focused regression checks where fixed bugs need long-term protection.
+- [ ] Add focused regression checks where fixed bugs need long-term
+  protection.
 - [ ] Stabilize the CSS custom property surface.
 
-### Layout primitives
+### Layout Primitives
 
 - [ ] Review current layout primitives as structural API, including
   `.container`, `.container-fluid`, `.grid`, and `.overflow-auto`.
@@ -333,7 +374,7 @@ and components remain separate decisions.
 - [ ] Document when a layout primitive should be used instead of plain semantic
   HTML.
 
-### Utility classes
+### Utility Classes
 
 - [ ] Define a utility class policy separately from layout primitives.
 - [ ] Keep only a small, intentional set of utilities for real gaps not covered
@@ -343,23 +384,21 @@ and components remain separate decisions.
 
 ### Themes
 
-- [ ] Reduce the current 19 Pico-derived color themes to the default theme plus
+- [ ] Reduce the current Pico-derived color themes to the default theme plus
   three or four maintained example themes.
 - [ ] Treat bundled themes as examples and customization bases, not as an
   exhaustive palette API.
-- [ ] Document CSS variable overrides as the primary path for adapting Cirth to a
-  project's visual language.
+- [ ] Document CSS variable overrides as the primary path for adapting Cirth to
+  a project's visual language.
 - [ ] Review classless, fluid, and conditional builds for long-term
   maintainability.
 
 ### Components
 
-- [ ] Define lean base components built around semantic HTML and ARIA patterns.
+- [ ] Define lean base components built around semantic HTML and ARIA
+  patterns.
 - [ ] Keep component APIs narrow and avoid turning Cirth into a large component
   catalog.
-
-The issue tracker is the primary channel for bugs and concrete proposals while
-the repository organization is still settling.
 
 ## Origins
 
