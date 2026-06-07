@@ -4,6 +4,10 @@
 	"description": "Semantic-first CSS framework for production-ready interfaces",
 	"author": "Riccardo Pastori",
 	"main": "dist/cirth.min.css",
+	"files": [
+		"dist",
+		"src"
+	],
 	"license": "MIT",
 	"repository": {
 		"type": "git",

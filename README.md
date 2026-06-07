@@ -257,6 +257,15 @@ The build pipeline:
 SCSS remains internal build infrastructure. The public API should stay usable
 from plain CSS through compiled stylesheets and CSS custom properties.
 
+GitHub Actions currently provide:
+
+- `CI`, which runs on pushes, pull requests, and manual dispatch. It installs
+  dependencies, lints SCSS, builds CSS, and checks that generated files are up
+  to date.
+- `Package`, which runs on version tags and manual dispatch. It builds CSS,
+  creates the npm package tarball, and uploads both `dist/` and the package as
+  workflow artifacts. It does not publish automatically.
+
 ## Roadmap
 
 Cirth is close to a more stable repository shape, but it is still evolving
@@ -276,6 +285,7 @@ and components remain separate decisions.
 - [x] Move source files to `src/` and generated output to `dist/`.
 - [x] Add Prettier and Stylelint conventions for SCSS.
 - [x] Document the current dependency and build policy in `package-use.md`.
+- [x] Add GitHub Actions for CI and package artifacts.
 
 ### Repository and contributions
 
@@ -284,6 +294,8 @@ and components remain separate decisions.
   stable, before all framework work is finished.
 - [ ] Accept contributions beyond bug fixes, including documentation, tests,
   tooling cleanup, API review, proposals, and implementation work.
+- [ ] Decide when generated `dist/` should stop being committed and move fully
+  to CI, release artifacts, or package publishing.
 
 ### Stabilization
 
