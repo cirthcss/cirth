@@ -343,7 +343,7 @@ a different kind of project.
 - [x] Add a manual npm publish workflow.
 - [x] Create the first GitHub release.
 - [x] Provide a working CDN URL through the GitHub release tag.
-- [ ] Publish the package to npm as `@cirthcss/cirth`.
+- [x] Publish the package to npm as `@cirthcss/cirth`.
 - [ ] Decide when generated `dist/` should stop being committed and move fully
   to CI, release artifacts, or package publishing.
 
@@ -355,7 +355,7 @@ a different kind of project.
 - [ ] Finalize the repository organization and source/build structure.
 - [ ] Add any missing issue or pull request templates after the repo structure
   settles.
-- [x] Accept contributions beyond bug fixes, including documentation, tests,
+- [ ] Accept contributions beyond bug fixes, including documentation, tests,
   tooling cleanup, API review, proposals, and implementation work.
 
 ### Stabilization
