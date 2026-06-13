@@ -255,7 +255,7 @@ rather than broad component classes, including `nav`, `article`, `details`,
 - `src/` contains the SCSS source.
 - `dist/` contains generated CSS output and is not committed to Git.
 - `scripts/` contains the local build and watch scripts.
-- `package-use.md` explains the current tooling choices for contributors.
+- `docs/` contains contributor and maintainer documentation.
 
 Only these top-level source entry points are compiled directly:
 
@@ -267,8 +267,11 @@ Only these top-level source entry points are compiled directly:
 
 ## Build And Tooling
 
-Cirth uses npm as its package manager. Yarn and Composer are not part of the
-current workflow.
+Cirth uses npm as its package manager. Yarn, Composer, pnpm, and Bun are not
+part of the current workflow.
+
+For the detailed build and dependency policy, see
+[`docs/build-tooling.md`](docs/build-tooling.md).
 
 The main scripts are:
 
@@ -310,9 +313,6 @@ GitHub Actions currently provide:
 
 ## Contributing
 
-The repository is still moving toward a stable internal organization, so the
-contribution workflow is intentionally simple for now.
-
 The issue tracker is the primary public channel currently enabled. Issues are
 welcome for bugs, documentation improvements, tooling questions, API proposals,
 utility class review, component ideas, and theme cleanup.
@@ -321,8 +321,13 @@ Pull requests are welcome when they are focused and easy to review. Larger
 changes should start with an issue so the direction can be discussed before
 implementation.
 
-See [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md) for the current
-contribution notes.
+GitHub issue templates are available for bug reports, documentation work, API
+proposals, and tooling changes. Pull requests use a short template with the
+expected summary, change type, notes, and local verification checklist.
+
+See [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md) for the contribution
+workflow and [`docs/build-tooling.md`](docs/build-tooling.md) for the detailed
+build and dependency policy.
 
 ## Roadmap
 
@@ -339,7 +344,8 @@ a different kind of project.
 - [x] Replace `sass` with `sass-embedded`.
 - [x] Replace `npm-run-all` and `nodemon` with local build/watch scripts.
 - [x] Add Prettier and Stylelint conventions for SCSS.
-- [x] Document the current dependency and build policy in `package-use.md`.
+- [x] Document the current dependency and build policy in
+  `docs/build-tooling.md`.
 
 ### Release And Distribution
 
@@ -358,9 +364,9 @@ a different kind of project.
 - [x] Keep the issue tracker as the primary public channel while Discussions
   are disabled.
 - [x] Finalize the repository organization and source/build structure.
-- [ ] Add any missing issue or pull request templates after the repo structure
+- [x] Add any missing issue or pull request templates after the repo structure
   settles.
-- [ ] Accept contributions beyond bug fixes, including documentation, tests,
+- [x] Accept contributions beyond bug fixes, including documentation, tests,
   tooling cleanup, API review, proposals, and implementation work.
 
 ### Stabilization

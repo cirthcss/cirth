@@ -1,54 +1,74 @@
-# Build Tooling and Dependency Guide
+# Build Tooling
 
-This guide explains how Cirth uses its Node tooling, why the dependency set is intentionally small, and what contributors should know before changing the build pipeline.
+This guide explains how Cirth builds its CSS, why the Node dependency set is
+intentionally small, and what contributors should know before changing the
+tooling.
 
-If you are coming from Pico CSS, treat this repository as a related but independent project. Cirth keeps the semantic-first CSS philosophy, but its package setup and build tooling are being simplified around the needs of this codebase.
+For the day-to-day contribution workflow, start with
+[`.github/CONTRIBUTING.md`](../.github/CONTRIBUTING.md). This document is the
+deeper reference for build, package, and dependency decisions.
 
-## Quick Start
+If you are coming from Pico CSS, treat this repository as a related but
+independent project. Cirth keeps the semantic-first CSS philosophy, but its
+package setup and build tooling are intentionally smaller and shaped around
+this codebase.
 
-Install dependencies with npm:
+## Common Commands
+
+Cirth uses npm as the only supported package manager.
 
 ```sh
 npm install
 ```
 
-Build the project:
+Useful commands:
 
 ```sh
 npm run build
-```
-
-Run the local watch mode:
-
-```sh
 npm run dev
-```
-
-Format SCSS sources:
-
-```sh
 npm run format
-```
-
-Lint SCSS sources:
-
-```sh
 npm run lint
+npm run lint:fix
 ```
 
 ## Package Policy
 
 Cirth uses npm as the package manager for the build toolchain.
 
-Do not add Yarn, Composer, or another package manager unless there is a concrete distribution or build need for it. The goal is to keep one clear install path and one lockfile.
+Do not add Yarn, Composer, pnpm, Bun, or another package manager unless there
+is a concrete distribution or build need for it. The goal is to keep one clear
+install path and one lockfile.
 
 Before adding a new dependency, prefer one of these options:
 
 1. Use an existing direct dependency.
 2. Use a small local Node script when the task is project-specific.
-3. Add a package only when it provides a real build capability that would be risky or noisy to maintain locally.
+3. Add a package only when it provides a real build capability that would be
+   risky or noisy to maintain locally.
 
-This is especially important for tooling packages that only orchestrate other commands. Cirth currently keeps that logic inside local scripts.
+This is especially important for tooling packages that only orchestrate other
+commands. Cirth currently keeps that logic inside local scripts.
+
+## Public Package Surface
+
+The npm package ships compiled CSS from `dist/` only.
+
+SCSS files in `src/` are repository source and build infrastructure. They are
+available to contributors, but they are not part of the published package
+surface.
+
+Package metadata points consumers to the default compiled stylesheet:
+
+```json
+{
+  "main": "dist/cirth.min.css",
+  "style": "dist/cirth.min.css",
+  "files": ["dist"]
+}
+```
+
+Customizing Cirth should remain CSS-first through custom properties. Sass can
+still be used internally to generate the compiled stylesheets and variants.
 
 ## Direct Dependencies
 
@@ -68,9 +88,11 @@ The direct development dependencies are intentionally limited:
 
 ### sass-embedded
 
-`sass-embedded` compiles the SCSS source files into CSS.
+`sass-embedded` compiles SCSS source files into CSS.
 
-It is called by `scripts/build.js` through the Sass Embedded Node API. The build script cleans `dist/`, then compiles only top-level `src/cirth*.scss` entry points into matching `.css` files under `dist/`.
+It is called by `scripts/build.js` through the Sass Embedded Node API. The
+build script cleans `dist/`, then compiles only top-level `src/cirth*.scss`
+entry points into matching `.css` files under `dist/`.
 
 ```js
 const sass = require("sass-embedded");
@@ -81,10 +103,9 @@ const result = sass.compile(source, {
 });
 ```
 
-It is also used from `scripts/build-themes.js` through the Sass Embedded Node API to generate theme variants.
-
-SCSS is source and build infrastructure for this repository. The published npm
-package contains compiled CSS output only.
+It is also used from `scripts/build-themes.js` through the Sass Embedded Node
+API to generate theme variants from temporary entry points in the system temp
+directory.
 
 ### lightningcss-cli
 
@@ -97,7 +118,8 @@ node scripts/process-css.js --transform
 node scripts/process-css.js --minify
 ```
 
-`scripts/process-css.js` calls the local `lightningcss` binary for every non-minified file in `dist/`.
+`scripts/process-css.js` calls the local `lightningcss` binary for every
+non-minified file in `dist/`.
 
 In transform mode, it:
 
@@ -124,7 +146,9 @@ It is used by:
 }
 ```
 
-Formatting is intentionally separate from semantic source organization. Prettier handles syntax layout; contributors are responsible for keeping SCSS declarations readable and consistent.
+Formatting is intentionally separate from semantic source organization.
+Prettier handles syntax layout; contributors are responsible for keeping SCSS
+declarations readable and consistent.
 
 ### stylelint
 
@@ -139,7 +163,10 @@ It is used by:
 }
 ```
 
-The configuration lives in `stylelint.config.cjs` and extends `stylelint-config-standard-scss`. The local overrides avoid enforcing naming patterns that would fight the existing Cirth API, CSS custom properties, or selector conventions.
+The configuration lives in `stylelint.config.cjs` and extends
+`stylelint-config-standard-scss`. The local overrides avoid enforcing naming
+patterns that would fight the existing Cirth API, CSS custom properties, or
+selector conventions.
 
 ## Build Flow
 
@@ -167,7 +194,9 @@ That command runs:
 6. Transform compiled CSS with Lightning CSS.
 7. Generate minified CSS with Lightning CSS.
 
-The script exists so the project does not need an orchestration dependency such as `npm-run-all`. Keep the public npm scripts short and stable; put project-specific build logic in `scripts/`.
+The script exists so the project does not need an orchestration dependency such
+as `npm-run-all`. Keep the public npm scripts short and stable; put
+project-specific build logic in `scripts/`.
 
 ## Watch Mode
 
@@ -193,9 +222,12 @@ It:
 - starts one initial build;
 - checks for changes on a short polling interval;
 - debounces rebuilds;
-- avoids concurrent builds by queueing one rebuild when changes arrive during an active build.
+- avoids concurrent builds by queueing one rebuild when changes arrive during
+  an active build.
 
-The watcher uses polling instead of system file watchers. This avoids file-handle limits in this repository while keeping the implementation dependency-free.
+The watcher uses polling instead of system file watchers. This avoids
+file-handle limits in this repository while keeping the implementation
+dependency-free.
 
 ## Generated CSS
 
@@ -217,23 +249,30 @@ Large CSS output changes can be normal when changing the processor, minifier,
 browser targets, or Sass output style. Use the local build, CI package check,
 and release artifacts to verify the generated CSS surface.
 
+CI also runs `npm pack --dry-run` after the build so package contents stay
+aligned with the generated CSS surface.
+
 ## Tools Intentionally Removed
 
 ### npm-run-all
 
 `npm-run-all` is not used.
 
-It was previously useful for sequencing npm scripts with `run-s`. Cirth now uses `scripts/build.js` for that job.
+It was previously useful for sequencing npm scripts with `run-s`. Cirth now
+uses `scripts/build.js` for that job.
 
-Do not reintroduce an orchestration package just to run existing npm scripts in order. Prefer extending `scripts/build.js`.
+Do not reintroduce an orchestration package just to run existing npm scripts in
+order. Prefer extending `scripts/build.js`.
 
 ### nodemon
 
 `nodemon` is not used.
 
-It was previously useful for watching source files and rerunning the build. Cirth now uses `scripts/watch.js`.
+It was previously useful for watching source files and rerunning the build.
+Cirth now uses `scripts/watch.js`.
 
-Do not reintroduce a watcher dependency unless the local script becomes unable to support the project workflow.
+Do not reintroduce a watcher dependency unless the local script becomes unable
+to support the project workflow.
 
 ### PostCSS and Autoprefixer
 
@@ -246,9 +285,11 @@ The following tools were removed from the direct toolchain:
 - `autoprefixer`;
 - `postcss-scss`.
 
-Lightning CSS now handles the compiled CSS transforms and vendor prefixing that used to require PostCSS plus Autoprefixer.
+Lightning CSS now handles the compiled CSS transforms and vendor prefixing that
+used to require PostCSS plus Autoprefixer.
 
-PostCSS can be reconsidered later if the project needs a specific plugin that Lightning CSS does not cover.
+PostCSS can be reconsidered later if the project needs a specific plugin that
+Lightning CSS does not cover.
 
 ### CleanCSS
 
@@ -264,7 +305,8 @@ node scripts/process-css.js --minify
 
 Automatic SCSS declaration sorting is not used.
 
-Declaration order now belongs to the source files and contributor judgment. This avoids churn from automated reordering and keeps the toolchain smaller.
+Declaration order now belongs to the source files and contributor judgment.
+This avoids churn from automated reordering and keeps the toolchain smaller.
 
 ### caniuse-lite
 
@@ -294,9 +336,11 @@ For most build changes, a good verification pass is:
 
 ```sh
 node -c scripts/build.js
+node -c scripts/build-themes.js
 node -c scripts/watch.js
 node -c scripts/process-css.js
 npm run build
+npm pack --dry-run
 ```
 
 If the change affects watch mode, also run:
@@ -305,4 +349,5 @@ If the change affects watch mode, also run:
 npm run dev
 ```
 
-Confirm that the initial build completes and that editing an SCSS file triggers one rebuild.
+Confirm that the initial build completes and that editing an SCSS file triggers
+one rebuild.
