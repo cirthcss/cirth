@@ -24,6 +24,8 @@
   ·
   <a href="#philosophy">Philosophy</a>
   ·
+  <a href="#differences-from-pico-css">Differences</a>
+  ·
   <a href="#customization">Customization</a>
   ·
   <a href="#roadmap">Roadmap</a>
@@ -150,9 +152,8 @@ The main generated files are:
 | --- | --- |
 | `dist/cirth.min.css` | Default semantic build. |
 | `dist/cirth.classless.min.css` | Classless build for pages with even less markup. |
-| `dist/cirth.fluid.classless.min.css` | Classless build with fluid page containers. |
-| `dist/cirth.conditional.min.css` | Conditional build for scoped adoption. |
-| `dist/cirth.colors.min.css` | Color utilities and custom property output. |
+| `dist/cirth.scoped.min.css` | Scoped build for embedding Cirth under `.cirth`. |
+| `dist/cirth.classless.scoped.min.css` | Scoped classless build. |
 
 Theme-specific builds are still present in `dist/`, for example
 `dist/cirth.slate.min.css` and `dist/cirth.classless.slate.min.css`.
@@ -166,6 +167,23 @@ possible markup surface:
 
 ```html
 <link rel="stylesheet" href="dist/cirth.classless.min.css">
+```
+
+### Scoped Usage
+
+The scoped builds style only markup inside a `.cirth` container. They are useful
+when embedding Cirth into an existing page, CMS, widget, or application shell
+where global element selectors would be too broad.
+
+```html
+<link rel="stylesheet" href="dist/cirth.scoped.min.css">
+
+<div class="cirth">
+  <article>
+    <h1>Settings</h1>
+    <button type="button">Save</button>
+  </article>
+</div>
 ```
 
 ## Philosophy
@@ -210,6 +228,34 @@ The fork exists to give that foundation a different direction:
 The goal is not to reject the starting point. It is to keep the parts that
 still serve the project and change the parts that make Cirth harder to
 maintain, document, or use in real products.
+
+## Differences From Pico CSS
+
+Cirth started from Pico CSS, but it is no longer trying to preserve every
+upstream package, build, or API decision. The main differences are:
+
+- The project identity, package metadata, and CSS custom property prefix now
+  belong to Cirth: `@cirthcss/cirth` and `--cirth-`.
+- The public package surface is CSS-only. SCSS remains repository source and
+  build infrastructure, not a published Sass API.
+- The generated build surface is smaller: default, classless, scoped, and
+  scoped classless builds, plus theme variants while the theme system is being
+  reviewed.
+- Scoped builds target a `.cirth` wrapper, including root custom properties,
+  document resets, color schemes, and modal states.
+- Standalone color utility builds and fluid classless builds have been removed
+  from the active build set.
+- Generated `dist/` files are not committed to Git. They are rebuilt locally,
+  in CI, for release artifacts, and for npm publishing.
+- The build toolchain is npm-only and uses local Node scripts,
+  `sass-embedded`, Lightning CSS, Prettier, and Stylelint.
+- Source entry points are limited to top-level `src/cirth*.scss` files. Other
+  SCSS files are internal modules.
+- Contribution docs, build-tooling docs, and issue/PR templates are maintained
+  as part of the repository workflow.
+
+Cirth should be treated as an independent framework with Pico CSS roots, not
+as a permanent drop-in replacement for Pico CSS.
 
 ## Customization
 
@@ -261,9 +307,8 @@ Only these top-level source entry points are compiled directly:
 
 - `src/cirth.scss`
 - `src/cirth.classless.scss`
-- `src/cirth.fluid.classless.scss`
-- `src/cirth.conditional.scss`
-- `src/cirth.colors.scss`
+- `src/cirth.scoped.scss`
+- `src/cirth.classless.scoped.scss`
 
 ## Build And Tooling
 
@@ -331,50 +376,16 @@ build and dependency policy.
 
 ## Roadmap
 
-Cirth is close to a more stable repository shape, but it is still evolving
-incrementally. The goal is to strengthen the framework without turning it into
-a different kind of project.
+Cirth is evolving toward a smaller, more deliberate public API. This roadmap
+tracks the areas that still affect users and contributors.
 
-### Foundation
-
-- [x] Rename the project identity and package metadata around Cirth.
-- [x] Move source files to `src/` and generated output to `dist/`.
-- [x] Remove Yarn and Composer from the active workflow.
-- [x] Reduce Node dependencies and move CSS processing to Lightning CSS.
-- [x] Replace `sass` with `sass-embedded`.
-- [x] Replace `npm-run-all` and `nodemon` with local build/watch scripts.
-- [x] Add Prettier and Stylelint conventions for SCSS.
-- [x] Document the current dependency and build policy in
-  `docs/build-tooling.md`.
-
-### Release And Distribution
-
-- [x] Prepare package metadata for `@cirthcss/cirth`.
-- [x] Add GitHub Actions for CI and package artifacts.
-- [x] Add a manual npm publish workflow.
-- [x] Create the first GitHub release.
-- [x] Provide a working CDN URL through the GitHub release tag.
-- [x] Publish the package to npm as `@cirthcss/cirth`.
-- [x] Decide when generated `dist/` should stop being committed and move fully
-  to CI, release artifacts, or package publishing.
-
-### Repository And Contributions
-
-- [x] Add initial contribution notes.
-- [x] Keep the issue tracker as the primary public channel while Discussions
-  are disabled.
-- [x] Finalize the repository organization and source/build structure.
-- [x] Add any missing issue or pull request templates after the repo structure
-  settles.
-- [x] Accept contributions beyond bug fixes, including documentation, tests,
-  tooling cleanup, API review, proposals, and implementation work.
-
-### Stabilization
+### CSS API
 
 - [ ] Audit known Pico CSS bugs and fix the ones still relevant to Cirth.
 - [ ] Add focused regression checks where fixed bugs need long-term
   protection.
 - [ ] Stabilize the CSS custom property surface.
+- [ ] Review classless and scoped builds for long-term maintainability.
 
 ### Layout Primitives
 
@@ -401,8 +412,6 @@ a different kind of project.
   exhaustive palette API.
 - [ ] Document CSS variable overrides as the primary path for adapting Cirth to
   a project's visual language.
-- [ ] Review classless, fluid, and conditional builds for long-term
-  maintainability.
 
 ### Components
 
@@ -410,6 +419,12 @@ a different kind of project.
   patterns.
 - [ ] Keep component APIs narrow and avoid turning Cirth into a large component
   catalog.
+
+### Documentation
+
+- [ ] Document the supported build variants and when to choose each one.
+- [ ] Add migration notes for users coming from Pico CSS once the public API is
+  stable enough to compare clearly.
 
 ## Origins
 

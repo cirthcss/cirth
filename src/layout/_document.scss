@@ -1,5 +1,6 @@
 @use "sass:map";
 @use "../settings" as *;
+@use "../helpers/selectors";
 
 @if map.get($modules, "layout/document") {
   /**
@@ -14,17 +15,14 @@
 
   // 1. Add border box sizing in all browsers (opinionated)
   // 2. Backgrounds do not repeat by default (opinionated)
-  *,
-  *::before,
-  *::after {
+  @include selectors.universal {
     box-sizing: border-box; // 1
     background-repeat: no-repeat; // 2
   }
 
   // 1. Add text decoration inheritance in all browsers (opinionated)
   // 2. Add vertical alignment inheritance in all browsers (opinionated)
-  ::before,
-  ::after {
+  @include selectors.pseudo-elements {
     text-decoration: inherit; // 1
     vertical-align: inherit; // 2
   }
@@ -34,8 +32,7 @@
   // 3. Use a 4-space tab width in all browsers (opinionated)
   // 4. Remove the grey highlight on links in iOS (opinionated)
   // 5. Prevent adjustments of font size after orientation changes in iOS
-  :where(:root),
-  :where(:host) {
+  @include selectors.document-root {
     -webkit-tap-highlight-color: transparent; // 4
     -webkit-text-size-adjust: 100%; // 5
     text-size-adjust: 100%; // 5

@@ -316,7 +316,7 @@
   {
     // Change the icon color to black for accordion and dropdown .contrast buttons
     @if $enable-classes {
-      #{$parent-selector} details {
+      details {
         summary {
           &[role="button"].contrast:not(.outline) {
             &::after {
@@ -332,7 +332,7 @@
   @if map.get($modules, "components/loading") {
     // Change the icon color to black for .contrast buttons
     @if $enable-classes {
-      #{$parent-selector} [aria-busy="true"]:not(input, select, textarea) {
+      [aria-busy="true"]:not(input, select, textarea) {
         &.contrast:is(
             button,
             [type="submit"],

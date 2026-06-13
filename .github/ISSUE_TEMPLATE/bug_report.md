@@ -26,8 +26,8 @@ Which stylesheet or variant are you using?
 
 - [ ] `cirth.css`
 - [ ] `cirth.classless.css`
-- [ ] `cirth.fluid.classless.css`
-- [ ] `cirth.conditional.css`
+- [ ] `cirth.scoped.css`
+- [ ] `cirth.classless.scoped.css`
 - [ ] Theme variant
 - [ ] Other
 

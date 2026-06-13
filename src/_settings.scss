@@ -40,7 +40,7 @@ $enable-important: true !default;
 
 // Optional parent selector
 // If defined, all HTML tags are wrapped with this selector
-// :root is not wrapped
+// Root-level CSS custom properties are emitted on this selector
 $parent-selector: "" !default;
 
 // Breakpoints, viewports and root font size

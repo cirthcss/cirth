@@ -1,5 +1,6 @@
 @use "sass:map";
 @use "../../settings" as *;
+@use "../../helpers/selectors";
 
 @use "light";
 @use "dark";
@@ -11,31 +12,54 @@
 
   // Light color scheme (Default)
   // Can be forced with data-theme="light"
-  [data-theme="light"],
-  :root:not([data-theme="dark"]),
-  :host(:not([data-theme="dark"])) {
-    @include light.theme;
+  @if $parent-selector == "" {
+    [data-theme="light"],
+    :root:not([data-theme="dark"]),
+    :host(:not([data-theme="dark"])) {
+      @include light.theme;
+    }
+  } @else {
+    #{$parent-selector}[data-theme="light"],
+    #{$parent-selector} [data-theme="light"],
+    #{$parent-selector}:not([data-theme="dark"]) {
+      @include light.theme;
+    }
   }
 
   // Dark color scheme (Auto)
   // Automatically enabled if user has Dark mode enabled
   @media only screen and (prefers-color-scheme: dark) {
-    :root:not([data-theme]),
-    :host(:not([data-theme])) {
-      @include dark.theme;
+    @if $parent-selector == "" {
+      :root:not([data-theme]),
+      :host(:not([data-theme])) {
+        @include dark.theme;
+      }
+    } @else {
+      #{$parent-selector}:not([data-theme]) {
+        @include dark.theme;
+      }
     }
   }
 
   // Dark color scheme (Forced)
   // Enabled if forced with data-theme="dark"
-  [data-theme="dark"] {
-    @include dark.theme;
+  @if $parent-selector == "" {
+    [data-theme="dark"] {
+      @include dark.theme;
+    }
+  } @else {
+    #{$parent-selector}[data-theme="dark"],
+    #{$parent-selector} [data-theme="dark"] {
+      @include dark.theme;
+    }
   }
 
-  #{$parent-selector} progress,
-  #{$parent-selector} [type="checkbox"],
-  #{$parent-selector} [type="radio"],
-  #{$parent-selector} [type="range"] {
-    accent-color: var(#{$css-var-prefix}primary);
+  @include selectors.scope {
+    progress,
+    [type="checkbox"],
+    [type="radio"],
+    [type="range"] {
+      accent-color: var(#{$css-var-prefix}primary);
+    }
   }
 }

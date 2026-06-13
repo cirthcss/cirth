@@ -52,36 +52,17 @@ try {
       );`,
 			},
 			{
-				name: "cirth.fluid.classless",
-				content: `@use "src" with (
-        $theme-color: "${themeColor}", 
-        $enable-semantic-container: true, 
-        $enable-viewport: false, 
-        $enable-classes: false
-      );`,
-			},
-			{
-				name: "cirth.conditional",
+				name: "cirth.scoped",
 				content: `@use "src" with (
         $theme-color: "${themeColor}",
         $parent-selector: ".cirth"
       );`,
 			},
 			{
-				name: "cirth.classless.conditional",
+				name: "cirth.classless.scoped",
 				content: `@use "src" with (
         $theme-color: "${themeColor}",
         $enable-semantic-container: true,
-        $enable-classes: false,
-        $parent-selector: ".cirth"
-      );`,
-			},
-			{
-				name: "cirth.fluid.classless.conditional",
-				content: `@use "src" with (
-        $theme-color: "${themeColor}", 
-        $enable-semantic-container: true, 
-        $enable-viewport: false, 
         $enable-classes: false,
         $parent-selector: ".cirth"
       );`,

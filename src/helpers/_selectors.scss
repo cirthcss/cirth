@@ -1,0 +1,83 @@
+@use "../settings" as *;
+
+@mixin scope {
+  @if $parent-selector == "" {
+    @content;
+  } @else {
+    #{$parent-selector} {
+      @content;
+    }
+  }
+}
+
+@mixin root {
+  @if $parent-selector == "" {
+    :root,
+    :host {
+      @content;
+    }
+  } @else {
+    #{$parent-selector} {
+      @content;
+    }
+  }
+}
+
+@mixin state($selector) {
+  @if $parent-selector == "" {
+    #{$selector} {
+      @content;
+    }
+  } @else {
+    #{$parent-selector}#{$selector},
+    #{$parent-selector} #{$selector} {
+      @content;
+    }
+  }
+}
+
+@mixin document-root {
+  @if $parent-selector == "" {
+    :where(:root),
+    :where(:host) {
+      @content;
+    }
+  } @else {
+    #{$parent-selector} {
+      @content;
+    }
+  }
+}
+
+@mixin universal {
+  @if $parent-selector == "" {
+    *,
+    *::before,
+    *::after {
+      @content;
+    }
+  } @else {
+    #{$parent-selector},
+    #{$parent-selector} *,
+    #{$parent-selector} *::before,
+    #{$parent-selector} *::after {
+      @content;
+    }
+  }
+}
+
+@mixin pseudo-elements {
+  @if $parent-selector == "" {
+    ::before,
+    ::after {
+      @content;
+    }
+  } @else {
+    #{$parent-selector}::before,
+    #{$parent-selector}::after,
+    #{$parent-selector} *::before,
+    #{$parent-selector} *::after {
+      @content;
+    }
+  }
+}

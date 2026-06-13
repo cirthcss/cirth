@@ -1,13 +1,13 @@
 @use "sass:map";
 @use "../settings" as *;
+@use "../helpers/selectors";
 
 @if map.get($modules, "components/modal") {
   /**
    * Modal (<dialog>)
    */
 
-  :root,
-  :host {
+  @include selectors.root {
     #{$css-var-prefix}scrollbar-width: 0px;
   }
 
@@ -120,9 +120,8 @@
     }
   }
 
-  // Utilities
   @if $enable-classes {
-    .modal-is-open {
+    @include selectors.state(".modal-is-open") {
       padding-right: var(#{$css-var-prefix}scrollbar-width, 0px);
       overflow: hidden;
       pointer-events: none;
@@ -139,7 +138,7 @@
   @if $enable-classes and $enable-transitions {
     $animation-duration: 0.2s;
 
-    :where(.modal-is-opening, .modal-is-closing) {
+    @include selectors.state(":where(.modal-is-opening, .modal-is-closing)") {
       dialog,
       dialog > article {
         animation-duration: $animation-duration;
@@ -158,14 +157,16 @@
       }
     }
 
-    .modal-is-closing {
+    @include selectors.state(".modal-is-closing") {
       dialog,
       dialog > article {
         animation-delay: 0s;
         animation-direction: reverse;
       }
     }
+  }
 
+  @if $enable-classes and $enable-transitions {
     @keyframes modal-overlay {
       from {
         backdrop-filter: none;
