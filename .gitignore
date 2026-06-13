@@ -19,8 +19,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Cirth build scratch space
-/.cirth/
+# Generated CSS output
+/dist/
 
 # Local caches
 /.cache/

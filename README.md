@@ -253,11 +253,11 @@ rather than broad component classes, including `nav`, `article`, `details`,
 ## Project Structure
 
 - `src/` contains the SCSS source.
-- `dist/` contains generated CSS output.
+- `dist/` contains generated CSS output and is not committed to Git.
 - `scripts/` contains the local build and watch scripts.
 - `package-use.md` explains the current tooling choices for contributors.
 
-Key source entry points:
+Only these top-level source entry points are compiled directly:
 
 - `src/cirth.scss`
 - `src/cirth.classless.scss`
@@ -284,19 +284,24 @@ The build pipeline:
 
 1. Formats SCSS with Prettier.
 2. Lints SCSS with Stylelint.
-3. Compiles source files with `sass-embedded`.
-4. Generates theme variants.
-5. Runs Lightning CSS transforms.
-6. Generates minified CSS.
+3. Cleans generated CSS from `dist/`.
+4. Compiles top-level `src/cirth*.scss` entry points with `sass-embedded`.
+5. Generates theme variants.
+6. Runs Lightning CSS transforms.
+7. Generates minified CSS.
 
 SCSS remains internal build infrastructure. The public API should stay usable
 from plain CSS through compiled stylesheets and CSS custom properties.
 
+The npm package ships compiled CSS from `dist/` only. SCSS source files remain
+available in the repository for development, but they are not part of the
+published package surface.
+
 GitHub Actions currently provide:
 
 - `CI`, which runs on pushes, pull requests, and manual dispatch. It installs
-  dependencies, lints SCSS, builds CSS, and checks that generated files are up
-  to date.
+  dependencies, lints SCSS, builds CSS, checks the npm package contents, and
+  verifies that tracked files stay clean after the build.
 - `Package`, which runs on version tags and manual dispatch. It builds CSS,
   creates the npm package tarball, and uploads both `dist/` and the package as
   workflow artifacts. On tags, it also creates a GitHub Release.
@@ -344,7 +349,7 @@ a different kind of project.
 - [x] Create the first GitHub release.
 - [x] Provide a working CDN URL through the GitHub release tag.
 - [x] Publish the package to npm as `@cirthcss/cirth`.
-- [ ] Decide when generated `dist/` should stop being committed and move fully
+- [x] Decide when generated `dist/` should stop being committed and move fully
   to CI, release artifacts, or package publishing.
 
 ### Repository And Contributions
@@ -352,7 +357,7 @@ a different kind of project.
 - [x] Add initial contribution notes.
 - [x] Keep the issue tracker as the primary public channel while Discussions
   are disabled.
-- [ ] Finalize the repository organization and source/build structure.
+- [x] Finalize the repository organization and source/build structure.
 - [ ] Add any missing issue or pull request templates after the repo structure
   settles.
 - [ ] Accept contributions beyond bug fixes, including documentation, tests,

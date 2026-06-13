@@ -38,5 +38,8 @@ jobs:
       - name: Build CSS
         run: npm run build
 
-      - name: Check generated files
+      - name: Check package contents
+        run: npm pack --dry-run
+
+      - name: Check tracked files
         run: git diff --exit-code

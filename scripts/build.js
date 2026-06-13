@@ -11,22 +11,18 @@ const outputFolder = path.join(projectRoot, "dist");
 
 const getBinary = (name) => path.join(binFolder, `${name}${binExtension}`);
 
-// Compile only real SCSS entrypoints; partials are pulled in through @use/@forward.
-const getScssEntries = (foldername) => {
-	const entries = [];
-
-	fs.readdirSync(foldername, { withFileTypes: true }).forEach((dirent) => {
-		const filename = path.join(foldername, dirent.name);
-
-		if (dirent.isDirectory()) {
-			entries.push(...getScssEntries(filename));
-		} else if (dirent.isFile() && filename.endsWith(".scss") && !dirent.name.startsWith("_")) {
-			entries.push(filename);
-		}
-	});
-
-	return entries.sort();
-};
+// Compile only public top-level Cirth entrypoints; internals are pulled in through @use/@forward.
+const getScssEntries = () =>
+	fs
+		.readdirSync(sourceFolder, { withFileTypes: true })
+		.filter(
+			(dirent) =>
+				dirent.isFile() &&
+				dirent.name.startsWith("cirth") &&
+				dirent.name.endsWith(".scss"),
+		)
+		.map((dirent) => path.join(sourceFolder, dirent.name))
+		.sort();
 
 const run = (label, command, args) => {
 	console.log(`[@cirthcss/cirth] ${label}`);
@@ -51,11 +47,10 @@ const run = (label, command, args) => {
 const compileCss = () => {
 	console.log("[@cirthcss/cirth] Compile");
 
-	getScssEntries(sourceFolder).forEach((source) => {
-		const relativeSource = path.relative(sourceFolder, source);
+	getScssEntries().forEach((source) => {
 		const output = path.join(
 			outputFolder,
-			relativeSource.replace(/\.scss$/, ".css"),
+			path.basename(source).replace(/\.scss$/, ".css"),
 		);
 		const result = sass.compile(source, {
 			sourceMap: false,
@@ -65,6 +60,12 @@ const compileCss = () => {
 		fs.mkdirSync(path.dirname(output), { recursive: true });
 		fs.writeFileSync(output, result.css);
 	});
+};
+
+const cleanOutput = () => {
+	console.log("[@cirthcss/cirth] Clean");
+	fs.rmSync(outputFolder, { recursive: true, force: true });
+	fs.mkdirSync(outputFolder, { recursive: true });
 };
 
 console.log("\x1b[96m[@cirthcss/cirth] Start\x1b[0m");
@@ -77,6 +78,7 @@ run("Format", getBinary("prettier"), [
 	"src/**/*.scss",
 ]);
 run("Lint", getBinary("stylelint"), ["src/**/*.scss"]);
+cleanOutput();
 compileCss();
 run("Compile themes", process.execPath, [path.join(__dirname, "build-themes.js")]);
 run("Transform CSS", process.execPath, [
