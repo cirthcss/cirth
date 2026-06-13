@@ -45,7 +45,7 @@
 Include one stylesheet and write ordinary semantic HTML.
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/cirthcss/cirth@v0.2.0/dist/cirth.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.2.0/dist/cirth.min.css">
 ```
 
 ```html
