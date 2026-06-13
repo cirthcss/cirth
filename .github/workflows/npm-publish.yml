@@ -1,6 +1,9 @@
 name: Publish npm
 
 on:
+  push:
+    tags:
+      - "v*"
   workflow_dispatch:
     inputs:
       tag:
@@ -35,6 +38,7 @@ jobs:
         run: npm run build
 
       - name: Publish to npm
-        run: npm publish --access public --tag "${{ inputs.tag }}" --provenance
+        run: npm publish --access public --tag "${NPM_DIST_TAG}" --provenance
         env:
+          NPM_DIST_TAG: ${{ github.event.inputs.tag || 'latest' }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

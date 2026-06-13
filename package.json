@@ -1,6 +1,6 @@
 {
 	"name": "@cirthcss/cirth",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Semantic-first CSS framework for production-ready interfaces",
 	"author": "Riccardo Pastori",
 	"main": "dist/cirth.min.css",

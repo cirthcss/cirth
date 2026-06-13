@@ -36,6 +36,16 @@ jobs:
       - name: Pack dist archive
         run: tar -czf "cirth-dist-${GITHUB_REF_NAME:-manual}.tar.gz" dist
 
+      - name: Prepare release notes
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          notes=".github/releases/${GITHUB_REF_NAME}.md"
+          if [ -f "$notes" ]; then
+            cp "$notes" release-notes.md
+          else
+            printf "# %s\n\nSee the generated changelog for included changes.\n" "$GITHUB_REF_NAME" > release-notes.md
+          fi
+
       - name: Upload dist artifact
         uses: actions/upload-artifact@v4
         with:
@@ -56,6 +66,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
+          body_path: release-notes.md
           files: |
             cirth-dist-*.tar.gz
             *.tgz
