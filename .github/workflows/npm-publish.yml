@@ -27,8 +27,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 22
-          cache: npm
+          node-version: 24
+          package-manager-cache: false
           registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
@@ -38,7 +38,6 @@ jobs:
         run: npm run build
 
       - name: Publish to npm
-        run: npm publish --access public --tag "${NPM_DIST_TAG}" --provenance
+        run: npm publish --access public --tag "${NPM_DIST_TAG}"
         env:
           NPM_DIST_TAG: ${{ github.event.inputs.tag || 'latest' }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
