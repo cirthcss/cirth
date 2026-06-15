@@ -70,14 +70,14 @@
     }
 
     // Spacings for form elements and button
-    @if map.get($modules, "content/button") or map.get($modules, "forms/basic")
+    @if map.get($modules, "content/button") or map.get($modules, "forms/basics")
     {
       #{$css-var-prefix}form-element-spacing-vertical: 0.75rem;
       #{$css-var-prefix}form-element-spacing-horizontal: 1rem;
     }
 
     // Font weight for form labels & fieldsets legend
-    @if map.get($modules, "forms/basic") {
+    @if map.get($modules, "forms/basics") {
       #{$css-var-prefix}form-label-font-weight: var(
         #{$css-var-prefix}font-weight
       );
