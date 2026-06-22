@@ -1,7 +1,6 @@
-@use "sass:map";
-@use "../settings" as *;
+@use "../config" as *;
 
-@if map.get($modules, "components/dropdown") and $enable-classes {
+@if $enable-classes {
   /**
    * Dropdown (details.dropdown)
    */
@@ -20,13 +19,13 @@
       &::after {
         display: block;
         width: 1rem;
-        height: calc(1rem * var(#{$css-var-prefix}line-height, 1.5));
+        height: calc(1rem * var(--cirth-line-height, 1.5));
         margin-inline-start: 0.25rem;
         float: right;
         // TODO: find out why we need this magic number (0.2 rem)
         // for the marker to be aligned with the regular select
         transform: rotate(0deg) translateX(0.2rem);
-        background-image: var(#{$css-var-prefix}icon-chevron);
+        background-image: var(--cirth-icon-chevron);
         background-position: right center;
         background-size: 1rem auto;
         background-repeat: no-repeat;
@@ -49,46 +48,41 @@
   #{$parent-selector} details.dropdown > summary:not([role]) {
     height: calc(
       1rem *
-        var(#{$css-var-prefix}line-height) +
-        var(#{$css-var-prefix}form-element-spacing-vertical) *
+        var(--cirth-line-height) +
+        var(--cirth-form-element-spacing-vertical) *
         2 +
-        var(#{$css-var-prefix}border-width) *
+        var(--cirth-border-width) *
         2
     );
-    padding: var(#{$css-var-prefix}form-element-spacing-vertical)
-      var(#{$css-var-prefix}form-element-spacing-horizontal);
-    border: var(#{$css-var-prefix}border-width)
+    padding: var(--cirth-form-element-spacing-vertical)
+      var(--cirth-form-element-spacing-horizontal);
+    border: var(--cirth-border-width)
       solid
-      var(#{$css-var-prefix}form-element-border-color);
-    border-radius: var(#{$css-var-prefix}border-radius);
-    background-color: var(#{$css-var-prefix}form-element-background-color);
-    color: var(#{$css-var-prefix}form-element-placeholder-color);
+      var(--cirth-form-element-border-color);
+    border-radius: var(--cirth-border-radius);
+    background-color: var(--cirth-form-element-background-color);
+    color: var(--cirth-form-element-placeholder-color);
     line-height: inherit;
     cursor: pointer;
     user-select: none;
-
-    @if $enable-transitions {
-      transition:
-        background-color var(#{$css-var-prefix}transition),
-        border-color var(#{$css-var-prefix}transition),
-        color var(#{$css-var-prefix}transition),
-        box-shadow var(#{$css-var-prefix}transition);
-    }
+    transition:
+      background-color var(--cirth-transition),
+      border-color var(--cirth-transition),
+      color var(--cirth-transition),
+      box-shadow var(--cirth-transition);
 
     &:active,
     &:focus {
-      border-color: var(#{$css-var-prefix}form-element-active-border-color);
-      background-color: var(
-        #{$css-var-prefix}form-element-active-background-color
-      );
+      border-color: var(--cirth-form-element-active-border-color);
+      background-color: var(--cirth-form-element-active-background-color);
     }
 
     &:focus {
       box-shadow: 0
         0
         0
-        var(#{$css-var-prefix}outline-width)
-        var(#{$css-var-prefix}form-element-focus-color);
+        var(--cirth-outline-width)
+        var(--cirth-form-element-focus-color);
     }
 
     // Reset focus visible from accordion component
@@ -98,26 +92,26 @@
 
     // Aria-invalid
     &[aria-invalid="false"] {
-      #{$css-var-prefix}form-element-border-color: var(
-        #{$css-var-prefix}form-element-valid-border-color
+      --cirth-form-element-border-color: var(
+        --cirth-form-element-valid-border-color
       );
-      #{$css-var-prefix}form-element-active-border-color: var(
-        #{$css-var-prefix}form-element-valid-focus-color
+      --cirth-form-element-active-border-color: var(
+        --cirth-form-element-valid-focus-color
       );
-      #{$css-var-prefix}form-element-focus-color: var(
-        #{$css-var-prefix}form-element-valid-focus-color
+      --cirth-form-element-focus-color: var(
+        --cirth-form-element-valid-focus-color
       );
     }
 
     &[aria-invalid="true"] {
-      #{$css-var-prefix}form-element-border-color: var(
-        #{$css-var-prefix}form-element-invalid-border-color
+      --cirth-form-element-border-color: var(
+        --cirth-form-element-invalid-border-color
       );
-      #{$css-var-prefix}form-element-active-border-color: var(
-        #{$css-var-prefix}form-element-invalid-focus-color
+      --cirth-form-element-active-border-color: var(
+        --cirth-form-element-invalid-focus-color
       );
-      #{$css-var-prefix}form-element-focus-color: var(
-        #{$css-var-prefix}form-element-invalid-focus-color
+      --cirth-form-element-focus-color: var(
+        --cirth-form-element-invalid-focus-color
       );
     }
   }
@@ -126,7 +120,7 @@
   // ––––––––––––––––––––
   #{$parent-selector} nav details.dropdown {
     display: inline;
-    margin: calc(var(#{$css-var-prefix}nav-element-spacing-vertical) * -1) 0;
+    margin: calc(var(--cirth-nav-element-spacing-vertical) * -1) 0;
 
     > summary {
       &::after {
@@ -136,21 +130,21 @@
       &:not([role]) {
         // Override height
         height: calc(
-          (1rem * var(#{$css-var-prefix}line-height)) +
-            (var(#{$css-var-prefix}nav-link-spacing-vertical) * 2)
+          (1rem * var(--cirth-line-height)) +
+            (var(--cirth-nav-link-spacing-vertical) * 2)
         );
         padding: calc(
-            var(#{$css-var-prefix}nav-link-spacing-vertical) -
-              (var(#{$css-var-prefix}border-width) * 2)
+            var(--cirth-nav-link-spacing-vertical) -
+              (var(--cirth-border-width) * 2)
           )
-          var(#{$css-var-prefix}nav-link-spacing-horizontal);
+          var(--cirth-nav-link-spacing-horizontal);
 
         &:focus-visible {
           box-shadow: 0
             0
             0
-            var(#{$css-var-prefix}outline-width)
-            var(#{$css-var-prefix}primary-focus);
+            var(--cirth-outline-width)
+            var(--cirth-primary-focus);
         }
       }
     }
@@ -167,23 +161,18 @@
     width: 100%;
     min-width: fit-content;
     margin: 0;
-    margin-top: var(#{$css-var-prefix}outline-width);
+    margin-top: var(--cirth-outline-width);
     padding: 0;
-    border: var(#{$css-var-prefix}border-width)
-      solid
-      var(#{$css-var-prefix}dropdown-border-color);
-    border-radius: var(#{$css-var-prefix}border-radius);
-    background-color: var(#{$css-var-prefix}dropdown-background-color);
-    box-shadow: var(#{$css-var-prefix}dropdown-box-shadow);
-    color: var(#{$css-var-prefix}dropdown-color);
+    border: var(--cirth-border-width) solid var(--cirth-dropdown-border-color);
+    border-radius: var(--cirth-border-radius);
+    background-color: var(--cirth-dropdown-background-color);
+    box-shadow: var(--cirth-dropdown-box-shadow);
+    color: var(--cirth-dropdown-color);
     white-space: nowrap;
     opacity: 0;
-
-    @if $enable-transitions {
-      transition:
-        opacity var(#{$css-var-prefix}transition),
-        transform 0s ease-in-out 1s;
-    }
+    transition:
+      opacity var(--cirth-transition),
+      transform 0s ease-in-out 1s;
 
     &[dir="rtl"] {
       right: 0;
@@ -193,35 +182,27 @@
     li {
       width: 100%;
       margin-bottom: 0;
-      padding: calc(var(#{$css-var-prefix}form-element-spacing-vertical) * 0.5)
-        var(#{$css-var-prefix}form-element-spacing-horizontal);
+      padding: calc(var(--cirth-form-element-spacing-vertical) * 0.5)
+        var(--cirth-form-element-spacing-horizontal);
       list-style: none;
 
       &:first-of-type {
-        margin-top: calc(
-          var(#{$css-var-prefix}form-element-spacing-vertical) * 0.5
-        );
+        margin-top: calc(var(--cirth-form-element-spacing-vertical) * 0.5);
       }
 
       &:last-of-type {
-        margin-bottom: calc(
-          var(#{$css-var-prefix}form-element-spacing-vertical) * 0.5
-        );
+        margin-bottom: calc(var(--cirth-form-element-spacing-vertical) * 0.5);
       }
 
       a {
         display: block;
-        margin: calc(
-            var(#{$css-var-prefix}form-element-spacing-vertical) * -0.5
-          )
-          calc(var(#{$css-var-prefix}form-element-spacing-horizontal) * -1);
-        padding: calc(
-            var(#{$css-var-prefix}form-element-spacing-vertical) * 0.5
-          )
-          var(#{$css-var-prefix}form-element-spacing-horizontal);
+        margin: calc(var(--cirth-form-element-spacing-vertical) * -0.5)
+          calc(var(--cirth-form-element-spacing-horizontal) * -1);
+        padding: calc(var(--cirth-form-element-spacing-vertical) * 0.5)
+          var(--cirth-form-element-spacing-horizontal);
         overflow: hidden;
         border-radius: 0;
-        color: var(#{$css-var-prefix}dropdown-color);
+        color: var(--cirth-dropdown-color);
         text-decoration: none;
         text-overflow: ellipsis;
 
@@ -230,9 +211,7 @@
         &:active,
         &:focus-visible,
         &[aria-current]:not([aria-current="false"]) {
-          background-color: var(
-            #{$css-var-prefix}dropdown-hover-background-color
-          );
+          background-color: var(--cirth-dropdown-hover-background-color);
         }
       }
 
@@ -242,9 +221,7 @@
 
       // Not working in Firefox, which doesn't support the `:has()` pseudo-class
       &:has(label):hover {
-        background-color: var(
-          #{$css-var-prefix}dropdown-hover-background-color
-        );
+        background-color: var(--cirth-dropdown-hover-background-color);
       }
     }
   }
@@ -263,12 +240,9 @@
     + ul {
       transform: scaleY(1);
       opacity: 1;
-
-      @if $enable-transitions {
-        transition:
-          opacity var(#{$css-var-prefix}transition),
-          transform 0s ease-in-out 0s;
-      }
+      transition:
+        opacity var(--cirth-transition),
+        transform 0s ease-in-out 0s;
     }
   }
 
@@ -291,6 +265,6 @@
   // Label
   // ––––––––––––––––––––
   #{$parent-selector} label > details.dropdown {
-    margin-top: calc(var(#{$css-var-prefix}spacing) * 0.25);
+    margin-top: calc(var(--cirth-spacing) * 0.25);
   }
 }

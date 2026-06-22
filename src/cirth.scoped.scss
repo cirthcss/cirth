@@ -1,4 +1,5 @@
 // Cirth scoped version
-@use "index" with (
+@use "config" with (
   $parent-selector: ".cirth"
 );
+@use "index";

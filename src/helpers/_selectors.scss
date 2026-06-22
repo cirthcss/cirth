@@ -1,4 +1,4 @@
-@use "../settings" as *;
+@use "../config" as *;
 
 @mixin scope {
   @if $parent-selector == "" {

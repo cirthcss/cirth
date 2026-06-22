@@ -35,37 +35,41 @@ fs.mkdirSync(outputFoldername, { recursive: true });
 
 try {
 	themeColors.forEach((themeColor, colorIndex) => {
-		// Theme CSS is generated from temporary SCSS entrypoints so each file can override Cirth settings.
+		// Theme CSS is generated from temporary SCSS entrypoints so each file can configure its build.
 		const versions = [
 			{
 				name: "cirth",
-				content: `@use "src" with (
+				content: `@use "src/config" with (
         $theme-color: "${themeColor}"
-      );`,
+      );
+      @use "src";`,
 			},
 			{
 				name: "cirth.classless",
-				content: `@use "src" with (
+				content: `@use "src/config" with (
         $theme-color: "${themeColor}",
         $enable-semantic-container: true,
         $enable-classes: false
-      );`,
+      );
+      @use "src";`,
 			},
 			{
 				name: "cirth.scoped",
-				content: `@use "src" with (
+				content: `@use "src/config" with (
         $theme-color: "${themeColor}",
         $parent-selector: ".cirth"
-      );`,
+      );
+      @use "src";`,
 			},
 			{
 				name: "cirth.classless.scoped",
-				content: `@use "src" with (
+				content: `@use "src/config" with (
         $theme-color: "${themeColor}",
         $enable-semantic-container: true,
         $enable-classes: false,
         $parent-selector: ".cirth"
-      );`,
+      );
+      @use "src";`,
 			},
 		];
 

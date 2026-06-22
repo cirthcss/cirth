@@ -11,7 +11,7 @@ const outputFolder = path.join(projectRoot, "dist");
 
 const getBinary = (name) => path.join(binFolder, `${name}${binExtension}`);
 
-// Compile only public top-level Cirth entrypoints; internals are pulled in through @use/@forward.
+// Compile only public top-level Cirth entrypoints; internals are pulled in through @use.
 const getScssEntries = () =>
 	fs
 		.readdirSync(sourceFolder, { withFileTypes: true })
@@ -78,6 +78,9 @@ run("Format", getBinary("prettier"), [
 	"src/**/*.scss",
 ]);
 run("Lint", getBinary("stylelint"), ["src/**/*.scss"]);
+run("Check CSS variables", process.execPath, [
+	path.join(__dirname, "check-css-variables.js"),
+]);
 cleanOutput();
 compileCss();
 run("Compile themes", process.execPath, [path.join(__dirname, "build-themes.js")]);

@@ -1,200 +1,218 @@
-@use "sass:map";
-@use "../settings" as *;
+@use "../config" as *;
 
-@if map.get($modules, "content/typography") {
-  /**
+/**
    * Typography
    */
 
-  // Reboot based on :
-  // - normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css
-  // - sanitize.css v13.0.0 | CC0 1.0 Universal | github.com/csstools/sanitize.css
-  // ––––––––––––––––––––
+// Reboot based on :
 
-  // Add the correct font weight in Chrome, Edge, and Safari
-  #{$parent-selector} b,
-  #{$parent-selector} strong {
-    font-weight: bolder;
-  }
+// - normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css
 
-  // Prevent `sub` and `sup` elements from affecting the line height in all browsers
-  #{$parent-selector} sub,
-  #{$parent-selector} sup {
-    position: relative;
-    font-size: 0.75em;
-    line-height: 0;
-    vertical-align: baseline;
-  }
-  #{$parent-selector} sub {
-    bottom: -0.25em;
-  }
-  #{$parent-selector} sup {
-    top: -0.5em;
-  }
+// - sanitize.css v13.0.0 | CC0 1.0 Universal | github.com/csstools/sanitize.css
 
-  // Cirth
-  // ––––––––––––––––––––
+// ––––––––––––––––––––
 
-  #{$parent-selector} address,
-  #{$parent-selector} blockquote,
-  #{$parent-selector} dl,
-  #{$parent-selector} ol,
-  #{$parent-selector} p,
-  #{$parent-selector} pre,
-  #{$parent-selector} table,
-  #{$parent-selector} ul {
+// Add the correct font weight in Chrome, Edge, and Safari
+
+#{$parent-selector} b,
+#{$parent-selector} strong {
+  font-weight: bolder;
+}
+
+// Prevent `sub` and `sup` elements from affecting the line height in all browsers
+
+#{$parent-selector} sub,
+#{$parent-selector} sup {
+  position: relative;
+  font-size: 0.75em;
+  line-height: 0;
+  vertical-align: baseline;
+}
+
+#{$parent-selector} sub {
+  bottom: -0.25em;
+}
+
+#{$parent-selector} sup {
+  top: -0.5em;
+}
+
+// Cirth
+
+// ––––––––––––––––––––
+
+#{$parent-selector} address,
+#{$parent-selector} blockquote,
+#{$parent-selector} dl,
+#{$parent-selector} ol,
+#{$parent-selector} p,
+#{$parent-selector} pre,
+#{$parent-selector} table,
+#{$parent-selector} ul {
+  margin-top: 0;
+  margin-bottom: var(--cirth-typography-spacing-vertical);
+  color: var(--cirth-color);
+  font-style: normal;
+  font-weight: var(--cirth-font-weight);
+}
+
+// Headings
+
+#{$parent-selector} h1,
+#{$parent-selector} h2,
+#{$parent-selector} h3,
+#{$parent-selector} h4,
+#{$parent-selector} h5,
+#{$parent-selector} h6 {
+  margin-top: 0;
+  margin-bottom: var(--cirth-typography-spacing-vertical);
+  color: var(--cirth-color);
+  font-weight: var(--cirth-font-weight);
+  font-size: var(--cirth-font-size);
+  line-height: var(--cirth-line-height);
+  font-family: var(--cirth-font-family);
+}
+
+#{$parent-selector} h1 {
+  --cirth-color: var(--cirth-h1-color);
+}
+
+#{$parent-selector} h2 {
+  --cirth-color: var(--cirth-h2-color);
+}
+
+#{$parent-selector} h3 {
+  --cirth-color: var(--cirth-h3-color);
+}
+
+#{$parent-selector} h4 {
+  --cirth-color: var(--cirth-h4-color);
+}
+
+#{$parent-selector} h5 {
+  --cirth-color: var(--cirth-h5-color);
+}
+
+#{$parent-selector} h6 {
+  --cirth-color: var(--cirth-h6-color);
+}
+
+// Margin-top for headings after a block
+
+#{$parent-selector}
+  :where(
+    article,
+    address,
+    blockquote,
+    dl,
+    figure,
+    form,
+    ol,
+    p,
+    pre,
+    table,
+    ul
+  ) {
+  ~ :is(h1, h2, h3, h4, h5, h6) {
+    margin-top: var(--cirth-typography-spacing-top);
+  }
+}
+
+// Paragraphs
+
+#{$parent-selector} p {
+  margin-bottom: var(--cirth-typography-spacing-vertical);
+}
+
+// Heading group
+
+#{$parent-selector} hgroup {
+  margin-bottom: var(--cirth-typography-spacing-vertical);
+
+  > * {
     margin-top: 0;
-    margin-bottom: var(#{$css-var-prefix}typography-spacing-vertical);
-    color: var(#{$css-var-prefix}color);
-    font-style: normal;
-    font-weight: var(#{$css-var-prefix}font-weight);
+    margin-bottom: 0;
   }
 
-  // Headings
-  #{$parent-selector} h1,
-  #{$parent-selector} h2,
-  #{$parent-selector} h3,
-  #{$parent-selector} h4,
-  #{$parent-selector} h5,
-  #{$parent-selector} h6 {
-    margin-top: 0;
-    margin-bottom: var(#{$css-var-prefix}typography-spacing-vertical);
-    color: var(#{$css-var-prefix}color);
-    font-weight: var(#{$css-var-prefix}font-weight);
-    font-size: var(#{$css-var-prefix}font-size);
-    line-height: var(#{$css-var-prefix}line-height);
-    font-family: var(#{$css-var-prefix}font-family);
+  > *:not(:first-child):last-child {
+    --cirth-color: var(--cirth-muted-color);
+    --cirth-font-weight: unset;
+    font-size: 1rem;
   }
+}
 
-  #{$parent-selector} h1 {
-    #{$css-var-prefix}color: var(#{$css-var-prefix}h1-color);
-  }
-  #{$parent-selector} h2 {
-    #{$css-var-prefix}color: var(#{$css-var-prefix}h2-color);
-  }
-  #{$parent-selector} h3 {
-    #{$css-var-prefix}color: var(#{$css-var-prefix}h3-color);
-  }
-  #{$parent-selector} h4 {
-    #{$css-var-prefix}color: var(#{$css-var-prefix}h4-color);
-  }
-  #{$parent-selector} h5 {
-    #{$css-var-prefix}color: var(#{$css-var-prefix}h5-color);
-  }
-  #{$parent-selector} h6 {
-    #{$css-var-prefix}color: var(#{$css-var-prefix}h6-color);
-  }
+// Lists
 
-  // Margin-top for headings after a block
-  #{$parent-selector}
-    :where(
-      article,
-      address,
-      blockquote,
-      dl,
-      figure,
-      form,
-      ol,
-      p,
-      pre,
-      table,
-      ul
-    ) {
-    ~ :is(h1, h2, h3, h4, h5, h6) {
-      margin-top: var(#{$css-var-prefix}typography-spacing-top);
-    }
+#{$parent-selector} :where(ol, ul) {
+  li {
+    margin-bottom: calc(var(--cirth-typography-spacing-vertical) * 0.25);
   }
+}
 
-  // Paragraphs
-  #{$parent-selector} p {
-    margin-bottom: var(#{$css-var-prefix}typography-spacing-vertical);
+// Margin-top for nested lists
+
+// 1. Remove the margin on nested lists in Chrome, Edge, IE, and Safari
+
+#{$parent-selector} :where(dl, ol, ul) :where(dl, ol, ul) {
+  margin: 0; // 1
+  margin-top: calc(var(--cirth-typography-spacing-vertical) * 0.25);
+}
+
+#{$parent-selector} ul li {
+  list-style: square;
+}
+
+// Highlighted text
+
+#{$parent-selector} mark {
+  padding: 0.125rem 0.25rem;
+  background-color: var(--cirth-mark-background-color);
+  color: var(--cirth-mark-color);
+  vertical-align: baseline;
+}
+
+// Blockquote
+
+#{$parent-selector} blockquote {
+  display: block;
+  margin: var(--cirth-typography-spacing-vertical) 0;
+  padding: var(--cirth-spacing);
+  border-right: none;
+  border-left: 0.25rem solid var(--cirth-blockquote-border-color);
+  border-inline-start: 0.25rem solid var(--cirth-blockquote-border-color);
+  border-inline-end: none;
+
+  footer {
+    margin-top: calc(var(--cirth-typography-spacing-vertical) * 0.5);
+    color: var(--cirth-blockquote-footer-color);
   }
+}
 
-  // Heading group
-  #{$parent-selector} hgroup {
-    margin-bottom: var(#{$css-var-prefix}typography-spacing-vertical);
+// Abbreviations
 
-    > * {
-      margin-top: 0;
-      margin-bottom: 0;
-    }
+// 1. Remove underline decoration in Chrome, Edge, IE, Opera, and Safari
 
-    > *:not(:first-child):last-child {
-      #{$css-var-prefix}color: var(#{$css-var-prefix}muted-color);
-      #{$css-var-prefix}font-weight: unset;
-      font-size: 1rem;
-    }
-  }
+#{$parent-selector} abbr[title] {
+  border-bottom: 1px dotted;
+  text-decoration: none; // 1
+  cursor: help;
+}
 
-  // Lists
-  #{$parent-selector} :where(ol, ul) {
-    li {
-      margin-bottom: calc(
-        var(#{$css-var-prefix}typography-spacing-vertical) * 0.25
-      );
-    }
-  }
+// Ins
 
-  // Margin-top for nested lists
-  // 1. Remove the margin on nested lists in Chrome, Edge, IE, and Safari
-  #{$parent-selector} :where(dl, ol, ul) :where(dl, ol, ul) {
-    margin: 0; // 1
-    margin-top: calc(var(#{$css-var-prefix}typography-spacing-vertical) * 0.25);
-  }
+#{$parent-selector} ins {
+  color: var(--cirth-ins-color);
+  text-decoration: none;
+}
 
-  #{$parent-selector} ul li {
-    list-style: square;
-  }
+// del
 
-  // Highlighted text
-  #{$parent-selector} mark {
-    padding: 0.125rem 0.25rem;
-    background-color: var(#{$css-var-prefix}mark-background-color);
-    color: var(#{$css-var-prefix}mark-color);
-    vertical-align: baseline;
-  }
+#{$parent-selector} del {
+  color: var(--cirth-del-color);
+}
 
-  // Blockquote
-  #{$parent-selector} blockquote {
-    display: block;
-    margin: var(#{$css-var-prefix}typography-spacing-vertical) 0;
-    padding: var(#{$css-var-prefix}spacing);
-    border-right: none;
-    border-left: 0.25rem solid var(#{$css-var-prefix}blockquote-border-color);
-    border-inline-start: 0.25rem
-      solid
-      var(#{$css-var-prefix}blockquote-border-color);
-    border-inline-end: none;
+// selection
 
-    footer {
-      margin-top: calc(
-        var(#{$css-var-prefix}typography-spacing-vertical) * 0.5
-      );
-      color: var(#{$css-var-prefix}blockquote-footer-color);
-    }
-  }
-
-  // Abbreviations
-  // 1. Remove underline decoration in Chrome, Edge, IE, Opera, and Safari
-  #{$parent-selector} abbr[title] {
-    border-bottom: 1px dotted;
-    text-decoration: none; // 1
-    cursor: help;
-  }
-
-  // Ins
-  #{$parent-selector} ins {
-    color: var(#{$css-var-prefix}ins-color);
-    text-decoration: none;
-  }
-
-  // del
-  #{$parent-selector} del {
-    color: var(#{$css-var-prefix}del-color);
-  }
-
-  // selection
-  #{$parent-selector} ::selection {
-    background-color: var(#{$css-var-prefix}text-selection-color);
-  }
+#{$parent-selector} ::selection {
+  background-color: var(--cirth-text-selection-color);
 }

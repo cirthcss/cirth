@@ -1,65 +1,68 @@
-@use "sass:map";
-@use "../../settings" as *;
+@use "../../config" as *;
 @use "../../helpers/selectors";
 
 @use "light";
 @use "dark";
 
-@if map.get($modules, "themes/default") {
-  /**
+/**
    * Color schemes
    */
 
-  // Light color scheme (Default)
-  // Can be forced with data-theme="light"
-  @if $parent-selector == "" {
-    [data-theme="light"],
-    :root:not([data-theme="dark"]),
-    :host(:not([data-theme="dark"])) {
-      @include light.theme;
-    }
-  } @else {
-    #{$parent-selector}[data-theme="light"],
-    #{$parent-selector} [data-theme="light"],
-    #{$parent-selector}:not([data-theme="dark"]) {
-      @include light.theme;
-    }
-  }
+// Light color scheme (Default)
 
-  // Dark color scheme (Auto)
-  // Automatically enabled if user has Dark mode enabled
-  @media only screen and (prefers-color-scheme: dark) {
-    @if $parent-selector == "" {
-      :root:not([data-theme]),
-      :host(:not([data-theme])) {
-        @include dark.theme;
-      }
-    } @else {
-      #{$parent-selector}:not([data-theme]) {
-        @include dark.theme;
-      }
-    }
-  }
+// Can be forced with data-theme="light"
 
-  // Dark color scheme (Forced)
-  // Enabled if forced with data-theme="dark"
+@if $parent-selector == "" {
+  [data-theme="light"],
+  :root:not([data-theme="dark"]),
+  :host(:not([data-theme="dark"])) {
+    @include light.theme;
+  }
+} @else {
+  #{$parent-selector}[data-theme="light"],
+  #{$parent-selector} [data-theme="light"],
+  #{$parent-selector}:not([data-theme="dark"]) {
+    @include light.theme;
+  }
+}
+
+// Dark color scheme (Auto)
+
+// Automatically enabled if user has Dark mode enabled
+
+@media only screen and (prefers-color-scheme: dark) {
   @if $parent-selector == "" {
-    [data-theme="dark"] {
+    :root:not([data-theme]),
+    :host(:not([data-theme])) {
       @include dark.theme;
     }
   } @else {
-    #{$parent-selector}[data-theme="dark"],
-    #{$parent-selector} [data-theme="dark"] {
+    #{$parent-selector}:not([data-theme]) {
       @include dark.theme;
     }
   }
+}
 
-  @include selectors.scope {
-    progress,
-    [type="checkbox"],
-    [type="radio"],
-    [type="range"] {
-      accent-color: var(#{$css-var-prefix}primary);
-    }
+// Dark color scheme (Forced)
+
+// Enabled if forced with data-theme="dark"
+
+@if $parent-selector == "" {
+  [data-theme="dark"] {
+    @include dark.theme;
+  }
+} @else {
+  #{$parent-selector}[data-theme="dark"],
+  #{$parent-selector} [data-theme="dark"] {
+    @include dark.theme;
+  }
+}
+
+@include selectors.scope {
+  progress,
+  [type="checkbox"],
+  [type="radio"],
+  [type="range"] {
+    accent-color: var(--cirth-primary);
   }
 }

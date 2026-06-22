@@ -1,5 +1,6 @@
 // Cirth classless version
-@use "index" with (
+@use "config" with (
   $enable-semantic-container: true,
   $enable-classes: false
 );
+@use "index";

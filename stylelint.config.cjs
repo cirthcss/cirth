@@ -10,6 +10,7 @@ module.exports = {
 		"comment-empty-line-before": null,
 		"declaration-block-no-redundant-longhand-properties": null,
 		"declaration-empty-line-before": null,
+		"declaration-no-important": true,
 		"keyframe-selector-notation": null,
 		"length-zero-no-unit": null,
 		"rule-empty-line-before": null,

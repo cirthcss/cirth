@@ -37,10 +37,11 @@
 	},
 	"scripts": {
 		"build": "node scripts/build.js",
+		"check:variables": "node scripts/check-css-variables.js",
 		"dev": "node scripts/watch.js",
 		"format": "prettier --write --log-level silent 'src/**/*.scss'",
-		"lint": "stylelint 'src/**/*.scss'",
-		"lint:fix": "stylelint 'src/**/*.scss' --fix"
+		"lint": "stylelint 'src/**/*.scss' && node scripts/check-css-variables.js",
+		"lint:fix": "stylelint 'src/**/*.scss' --fix && node scripts/check-css-variables.js"
 	},
 	"devDependencies": {
 		"lightningcss-cli": "^1.32.0",

@@ -1,7 +1,6 @@
-@use "sass:map";
-@use "../settings" as *;
+@use "../config" as *;
 
-@if map.get($modules, "layout/overflow-auto") and $enable-classes {
+@if $enable-classes {
   /**
    * Overflow auto
    */

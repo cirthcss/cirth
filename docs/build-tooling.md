@@ -70,6 +70,17 @@ Package metadata points consumers to the default compiled stylesheet:
 Customizing Cirth should remain CSS-first through custom properties. Sass can
 still be used internally to generate the compiled stylesheets and variants.
 
+The source configuration is deliberately internal and split by responsibility:
+
+- `src/_config.scss` contains only switches used to generate Cirth's supported
+  build variants;
+- `src/_breakpoints.scss` contains fixed responsive build data;
+- `src/_index.scss` composes the internal modules included in every build.
+
+There is no public Sass settings or module-selection API. Internal modules are
+included directly, while the top-level entry points configure only the variants
+that Cirth publishes.
+
 ## Direct Dependencies
 
 The direct development dependencies are intentionally limited:
@@ -158,15 +169,21 @@ It is used by:
 
 ```json
 {
-  "lint": "stylelint 'src/**/*.scss'",
-  "lint:fix": "stylelint 'src/**/*.scss' --fix"
+  "lint": "stylelint 'src/**/*.scss' && node scripts/check-css-variables.js",
+  "lint:fix": "stylelint 'src/**/*.scss' --fix && node scripts/check-css-variables.js"
 }
 ```
 
 The configuration lives in `stylelint.config.cjs` and extends
 `stylelint-config-standard-scss`. The local overrides avoid enforcing naming
 patterns that would fight the existing Cirth API, CSS custom properties, or
-selector conventions.
+selector conventions. It also rejects `!important`; Cirth resolves cascade
+behavior through selectors and source order instead of forced priority.
+
+`scripts/check-css-variables.js` complements Stylelint with project-specific
+checks for the `--cirth-` prefix, valid custom property names, obsolete Sass
+prefix interpolation, and Sass expressions that require interpolation inside
+custom property values.
 
 ## Build Flow
 
@@ -188,11 +205,12 @@ That command runs:
 
 1. Format SCSS with Prettier.
 2. Lint SCSS with Stylelint.
-3. Clean generated CSS from `dist/`.
-4. Compile top-level `src/cirth*.scss` entry points with `sass-embedded`.
-5. Compile theme CSS with `scripts/build-themes.js`.
-6. Transform compiled CSS with Lightning CSS.
-7. Generate minified CSS with Lightning CSS.
+3. Check CSS custom property usage with `scripts/check-css-variables.js`.
+4. Clean generated CSS from `dist/`.
+5. Compile top-level `src/cirth*.scss` entry points with `sass-embedded`.
+6. Compile theme CSS with `scripts/build-themes.js`.
+7. Transform compiled CSS with Lightning CSS.
+8. Generate minified CSS with Lightning CSS.
 
 The script exists so the project does not need an orchestration dependency such
 as `npm-run-all`. Keep the public npm scripts short and stable; put

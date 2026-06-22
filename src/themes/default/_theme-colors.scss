@@ -1,7 +1,7 @@
 @use "sass:color";
 @use "sass:map";
 @use "../../colors" as *;
-@use "../../settings" as *;
+@use "../../config" as *;
 
 $color-mappings: (
   "amber": (

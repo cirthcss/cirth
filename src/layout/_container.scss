@@ -1,7 +1,8 @@
 @use "sass:map";
-@use "../settings" as *;
+@use "../breakpoints" as *;
+@use "../config" as *;
 
-@if map.get($modules, "layout/container") and $enable-classes {
+@if $enable-classes {
   /**
    * Container
    */
@@ -11,8 +12,8 @@
     width: 100%;
     margin-right: auto;
     margin-left: auto;
-    padding-right: var(#{$css-var-prefix}spacing);
-    padding-left: var(#{$css-var-prefix}spacing);
+    padding-right: var(--cirth-spacing);
+    padding-left: var(--cirth-spacing);
   }
 
   .container {

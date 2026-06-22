@@ -1,52 +1,40 @@
-@use "sass:map";
-@use "../settings" as *;
+@use "../config" as *;
 
-@if map.get($modules, "forms/input-file") {
-  /**
+/**
    * Input type file
    */
 
-  // 1. Hack to display the outline on the focused file selector button
-  //    with the forced overflow hidden on the input[type="file"] element.
-  #{$parent-selector} [type="file"] {
-    #{$css-var-prefix}color: var(#{$css-var-prefix}muted-color);
-    margin-left: calc(var(#{$css-var-prefix}outline-width) * -1); // 1
-    padding: calc(var(#{$css-var-prefix}form-element-spacing-vertical) * 0.5) 0;
-    padding-left: var(#{$css-var-prefix}outline-width); // 1
-    border: 0;
-    border-radius: 0;
-    background: none;
+// 1. Hack to display the outline on the focused file selector button
 
+//    with the forced overflow hidden on the input[type="file"] element.
+
+#{$parent-selector} [type="file"] {
+  --cirth-color: var(--cirth-muted-color);
+  margin-left: calc(var(--cirth-outline-width) * -1); // 1
+  padding: calc(var(--cirth-form-element-spacing-vertical) * 0.5) 0;
+  padding-left: var(--cirth-outline-width); // 1
+  border: 0;
+  border-radius: 0;
+  background: none;
+
+  &::file-selector-button {
+    margin-right: calc(var(--cirth-spacing) / 2);
+    padding: calc(var(--cirth-form-element-spacing-vertical) * 0.5)
+      var(--cirth-form-element-spacing-horizontal);
+  }
+
+  &:is(:hover, :active, :focus) {
     &::file-selector-button {
-      margin-right: calc(var(#{$css-var-prefix}spacing) / 2);
-      padding: calc(var(#{$css-var-prefix}form-element-spacing-vertical) * 0.5)
-        var(#{$css-var-prefix}form-element-spacing-horizontal);
+      --cirth-background-color: var(--cirth-secondary-hover-background);
+      --cirth-border-color: var(--cirth-secondary-hover-border);
     }
+  }
 
-    &:is(:hover, :active, :focus) {
-      &::file-selector-button {
-        #{$css-var-prefix}background-color: var(
-          #{$css-var-prefix}secondary-hover-background
-        );
-        #{$css-var-prefix}border-color: var(
-          #{$css-var-prefix}secondary-hover-border
-        );
-      }
-    }
-
-    &:focus {
-      &::file-selector-button {
-        #{$css-var-prefix}box-shadow:
-          var(
-            #{$css-var-prefix}button-hover-box-shadow,
-            0 0 0 rgba(0, 0, 0, 0)
-          ),
-          0
-            0
-            0
-            var(#{$css-var-prefix}outline-width)
-            var(#{$css-var-prefix}secondary-focus);
-      }
+  &:focus {
+    &::file-selector-button {
+      --cirth-box-shadow:
+        var(--cirth-button-hover-box-shadow, 0 0 0 rgba(0, 0, 0, 0)),
+        0 0 0 var(--cirth-outline-width) var(--cirth-secondary-focus);
     }
   }
 }

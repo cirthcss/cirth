@@ -1,89 +1,73 @@
-@use "sass:map";
-@use "../settings" as *;
+@use "../config" as *;
 
-@if map.get($modules, "content/link") {
-  /**
+/**
    * Link
    */
 
-  #{$parent-selector} :where(a:not([role="button"])),
-  #{$parent-selector} [role="link"] {
-    #{$css-var-prefix}color: var(#{$css-var-prefix}primary);
-    #{$css-var-prefix}background-color: transparent;
-    #{$css-var-prefix}underline: var(#{$css-var-prefix}primary-underline);
-    outline: none;
-    background-color: var(#{$css-var-prefix}background-color); // 1
-    color: var(#{$css-var-prefix}color);
-    text-decoration: var(#{$css-var-prefix}text-decoration);
-    text-decoration-color: var(#{$css-var-prefix}underline);
-    text-underline-offset: 0.125em;
+#{$parent-selector} :where(a:not([role="button"])),
+#{$parent-selector} [role="link"] {
+  --cirth-color: var(--cirth-primary);
+  --cirth-background-color: transparent;
+  --cirth-underline: var(--cirth-primary-underline);
+  outline: none;
+  background-color: var(--cirth-background-color); // 1
+  color: var(--cirth-color);
+  text-decoration: var(--cirth-text-decoration);
+  text-decoration-color: var(--cirth-underline);
+  text-underline-offset: 0.125em;
+  transition:
+    background-color var(--cirth-transition),
+    color var(--cirth-transition),
+    text-decoration var(--cirth-transition),
+    box-shadow var(--cirth-transition);
 
-    @if $enable-transitions {
-      transition:
-        background-color var(#{$css-var-prefix}transition),
-        color var(#{$css-var-prefix}transition),
-        text-decoration var(#{$css-var-prefix}transition),
-        box-shadow var(#{$css-var-prefix}transition);
-    }
+  &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
+    --cirth-color: var(--cirth-primary-hover);
+    --cirth-underline: var(--cirth-primary-hover-underline);
+    --cirth-text-decoration: underline;
+  }
 
-    &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
-      #{$css-var-prefix}color: var(#{$css-var-prefix}primary-hover);
-      #{$css-var-prefix}underline: var(
-        #{$css-var-prefix}primary-hover-underline
-      );
-      #{$css-var-prefix}text-decoration: underline;
-    }
+  &:focus-visible {
+    box-shadow: 0 0 0 var(--cirth-outline-width) var(--cirth-primary-focus);
+  }
 
-    &:focus-visible {
-      box-shadow: 0
-        0
-        0
-        var(#{$css-var-prefix}outline-width)
-        var(#{$css-var-prefix}primary-focus);
-    }
+  @if $enable-classes {
+    // Secondary
+    &.secondary {
+      --cirth-color: var(--cirth-secondary);
+      --cirth-underline: var(--cirth-secondary-underline);
 
-    @if $enable-classes {
-      // Secondary
-      &.secondary {
-        #{$css-var-prefix}color: var(#{$css-var-prefix}secondary);
-        #{$css-var-prefix}underline: var(#{$css-var-prefix}secondary-underline);
-
-        &:is(
-            [aria-current]:not([aria-current="false"]),
-            :hover,
-            :active,
-            :focus
-          ) {
-          #{$css-var-prefix}color: var(#{$css-var-prefix}secondary-hover);
-          #{$css-var-prefix}underline: var(
-            #{$css-var-prefix}secondary-hover-underline
-          );
-        }
+      &:is(
+          [aria-current]:not([aria-current="false"]),
+          :hover,
+          :active,
+          :focus
+        ) {
+        --cirth-color: var(--cirth-secondary-hover);
+        --cirth-underline: var(--cirth-secondary-hover-underline);
       }
+    }
 
-      // Contrast
-      &.contrast {
-        #{$css-var-prefix}color: var(#{$css-var-prefix}contrast);
-        #{$css-var-prefix}underline: var(#{$css-var-prefix}contrast-underline);
+    // Contrast
+    &.contrast {
+      --cirth-color: var(--cirth-contrast);
+      --cirth-underline: var(--cirth-contrast-underline);
 
-        &:is(
-            [aria-current]:not([aria-current="false"]),
-            :hover,
-            :active,
-            :focus
-          ) {
-          #{$css-var-prefix}color: var(#{$css-var-prefix}contrast-hover);
-          #{$css-var-prefix}underline: var(
-            #{$css-var-prefix}contrast-hover-underline
-          );
-        }
+      &:is(
+          [aria-current]:not([aria-current="false"]),
+          :hover,
+          :active,
+          :focus
+        ) {
+        --cirth-color: var(--cirth-contrast-hover);
+        --cirth-underline: var(--cirth-contrast-hover-underline);
       }
     }
   }
+}
 
-  #{$parent-selector} a {
-    &[role="button"] {
-      display: inline-block;
-    }
+#{$parent-selector} a {
+  &[role="button"] {
+    display: inline-block;
   }
 }

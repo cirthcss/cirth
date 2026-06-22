@@ -1,203 +1,175 @@
-@use "sass:map";
-@use "../settings" as *;
+@use "../config" as *;
 
-@if map.get($modules, "forms/checkbox-radio-switch") {
-  /**
+/**
    * Checkboxes, Radios and Switches
    */
 
-  // Labels
-  // Not working in Firefox, which doesn't support the `:has()` pseudo-class
-  #{$parent-selector} label {
-    &:has([type="checkbox"], [type="radio"]) {
-      width: fit-content;
-      cursor: pointer;
-    }
+// Labels
+
+// Not working in Firefox, which doesn't support the `:has()` pseudo-class
+
+#{$parent-selector} label {
+  &:has([type="checkbox"], [type="radio"]) {
+    width: fit-content;
+    cursor: pointer;
+  }
+}
+
+#{$parent-selector} [type="checkbox"],
+#{$parent-selector} [type="radio"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 1.25em;
+  height: 1.25em;
+  margin-top: -0.125em;
+  margin-inline-end: 0.5em;
+  border-width: var(--cirth-border-width);
+  vertical-align: middle;
+  cursor: pointer;
+
+  &::-ms-check {
+    display: none; // unstyle IE checkboxes
   }
 
-  #{$parent-selector} [type="checkbox"],
-  #{$parent-selector} [type="radio"] {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    width: 1.25em;
-    height: 1.25em;
-    margin-top: -0.125em;
-    margin-inline-end: 0.5em;
-    border-width: var(#{$css-var-prefix}border-width);
-    vertical-align: middle;
+  &:checked,
+  &:checked:active,
+  &:checked:focus {
+    --cirth-background-color: var(--cirth-primary-background);
+    --cirth-border-color: var(--cirth-primary-border);
+    background-image: var(--cirth-icon-checkbox);
+    background-position: center;
+    background-size: 0.75em auto;
+    background-repeat: no-repeat;
+  }
+
+  & ~ label {
+    display: inline-block;
+    margin-bottom: 0;
     cursor: pointer;
 
-    &::-ms-check {
-      display: none; // unstyle IE checkboxes
-    }
-
-    &:checked,
-    &:checked:active,
-    &:checked:focus {
-      #{$css-var-prefix}background-color: var(
-        #{$css-var-prefix}primary-background
-      );
-      #{$css-var-prefix}border-color: var(#{$css-var-prefix}primary-border);
-      background-image: var(#{$css-var-prefix}icon-checkbox);
-      background-position: center;
-      background-size: 0.75em auto;
-      background-repeat: no-repeat;
-    }
-
-    & ~ label {
-      display: inline-block;
-      margin-bottom: 0;
-      cursor: pointer;
-
-      &:not(:last-of-type) {
-        margin-inline-end: 1em;
-      }
+    &:not(:last-of-type) {
+      margin-inline-end: 1em;
     }
   }
+}
 
-  // Checkboxes
-  #{$parent-selector} [type="checkbox"] {
-    &:indeterminate {
-      #{$css-var-prefix}background-color: var(
-        #{$css-var-prefix}primary-background
-      );
-      #{$css-var-prefix}border-color: var(#{$css-var-prefix}primary-border);
-      background-image: var(#{$css-var-prefix}icon-minus);
-      background-position: center;
-      background-size: 0.75em auto;
-      background-repeat: no-repeat;
-    }
+// Checkboxes
+
+#{$parent-selector} [type="checkbox"] {
+  &:indeterminate {
+    --cirth-background-color: var(--cirth-primary-background);
+    --cirth-border-color: var(--cirth-primary-border);
+    background-image: var(--cirth-icon-minus);
+    background-position: center;
+    background-size: 0.75em auto;
+    background-repeat: no-repeat;
+  }
+}
+
+// Radios
+
+#{$parent-selector} [type="radio"] {
+  border-radius: 50%;
+
+  &:checked,
+  &:checked:active,
+  &:checked:focus {
+    --cirth-background-color: var(--cirth-primary-inverse);
+    border-width: 0.35em;
+    background-image: none;
+  }
+}
+
+// Switches
+
+#{$parent-selector} [type="checkbox"][role="switch"] {
+  --cirth-background-color: var(--cirth-switch-background-color);
+  --cirth-color: var(--cirth-switch-color);
+
+  // Config
+  $switch-height: 1.25em;
+  $switch-width: 2.25em;
+  $switch-transition: 0.1s ease-in-out;
+
+  // Styles
+  width: $switch-width;
+  height: $switch-height;
+  border: var(--cirth-border-width) solid var(--cirth-border-color);
+  border-radius: $switch-height;
+  background-color: var(--cirth-background-color);
+  line-height: $switch-height;
+
+  &:not([aria-invalid]) {
+    --cirth-border-color: var(--cirth-switch-background-color);
   }
 
-  // Radios
-  #{$parent-selector} [type="radio"] {
+  &:before {
+    display: block;
+    aspect-ratio: 1;
+    height: 100%;
     border-radius: 50%;
+    background-color: var(--cirth-color);
+    box-shadow: var(--cirth-switch-thumb-box-shadow);
+    content: "";
+    transition: margin $switch-transition;
+  }
 
-    &:checked,
-    &:checked:active,
-    &:checked:focus {
-      #{$css-var-prefix}background-color: var(
-        #{$css-var-prefix}primary-inverse
-      );
-      border-width: 0.35em;
-      background-image: none;
+  &:focus {
+    --cirth-background-color: var(--cirth-switch-background-color);
+    --cirth-border-color: var(--cirth-switch-background-color);
+  }
+
+  &:checked {
+    --cirth-background-color: var(--cirth-switch-checked-background-color);
+    --cirth-border-color: var(--cirth-switch-checked-background-color);
+    background-image: none;
+
+    &::before {
+      margin-inline-start: calc(#{$switch-width} - #{$switch-height});
     }
   }
 
-  // Switches
-  #{$parent-selector} [type="checkbox"][role="switch"] {
-    #{$css-var-prefix}background-color: var(
-      #{$css-var-prefix}switch-background-color
-    );
-    #{$css-var-prefix}color: var(#{$css-var-prefix}switch-color);
-
-    // Config
-    $switch-height: 1.25em;
-    $switch-width: 2.25em;
-    $switch-transition: 0.1s ease-in-out;
-
-    // Styles
-    width: $switch-width;
-    height: $switch-height;
-    border: var(#{$css-var-prefix}border-width)
-      solid
-      var(#{$css-var-prefix}border-color);
-    border-radius: $switch-height;
-    background-color: var(#{$css-var-prefix}background-color);
-    line-height: $switch-height;
-
-    &:not([aria-invalid]) {
-      #{$css-var-prefix}border-color: var(
-        #{$css-var-prefix}switch-background-color
-      );
-    }
-
-    &:before {
-      display: block;
-      aspect-ratio: 1;
-      height: 100%;
-      border-radius: 50%;
-      background-color: var(#{$css-var-prefix}color);
-      box-shadow: var(#{$css-var-prefix}switch-thumb-box-shadow);
-      content: "";
-
-      @if $enable-transitions {
-        transition: margin $switch-transition;
-      }
-    }
-
-    &:focus {
-      #{$css-var-prefix}background-color: var(
-        #{$css-var-prefix}switch-background-color
-      );
-      #{$css-var-prefix}border-color: var(
-        #{$css-var-prefix}switch-background-color
-      );
-    }
-
-    &:checked {
-      #{$css-var-prefix}background-color: var(
-        #{$css-var-prefix}switch-checked-background-color
-      );
-      #{$css-var-prefix}border-color: var(
-        #{$css-var-prefix}switch-checked-background-color
-      );
-      background-image: none;
-
-      &::before {
-        margin-inline-start: calc(#{$switch-width} - #{$switch-height});
-      }
-    }
-
-    &[disabled] {
-      #{$css-var-prefix}background-color: var(#{$css-var-prefix}border-color);
-    }
+  &[disabled] {
+    --cirth-background-color: var(--cirth-border-color);
   }
+}
 
-  // Aria-invalid
-  #{$parent-selector} [type="checkbox"],
-  #{$parent-selector} [type="checkbox"][role="switch"] {
-    &[aria-invalid="false"] {
-      &:checked,
-      &:checked:active,
-      &:checked:focus {
-        #{$css-var-prefix}background-color: var(
-          #{$css-var-prefix}form-element-valid-border-color
-        );
-      }
-    }
+// Aria-invalid
+
+#{$parent-selector} [type="checkbox"],
+#{$parent-selector} [type="checkbox"][role="switch"] {
+  &[aria-invalid="false"] {
     &:checked,
     &:checked:active,
     &:checked:focus {
-      &[aria-invalid="true"] {
-        #{$css-var-prefix}background-color: var(
-          #{$css-var-prefix}form-element-invalid-border-color
-        );
-      }
+      --cirth-background-color: var(--cirth-form-element-valid-border-color);
     }
   }
-
-  #{$parent-selector} [type="checkbox"],
-  #{$parent-selector} [type="radio"],
-  #{$parent-selector} [type="checkbox"][role="switch"] {
-    &[aria-invalid="false"] {
-      &:checked,
-      &:checked:active,
-      &:checked:focus {
-        #{$css-var-prefix}border-color: var(
-          #{$css-var-prefix}form-element-valid-border-color
-        );
-      }
+  &:checked,
+  &:checked:active,
+  &:checked:focus {
+    &[aria-invalid="true"] {
+      --cirth-background-color: var(--cirth-form-element-invalid-border-color);
     }
+  }
+}
+
+#{$parent-selector} [type="checkbox"],
+#{$parent-selector} [type="radio"],
+#{$parent-selector} [type="checkbox"][role="switch"] {
+  &[aria-invalid="false"] {
     &:checked,
     &:checked:active,
     &:checked:focus {
-      &[aria-invalid="true"] {
-        #{$css-var-prefix}border-color: var(
-          #{$css-var-prefix}form-element-invalid-border-color
-        );
-      }
+      --cirth-border-color: var(--cirth-form-element-valid-border-color);
+    }
+  }
+  &:checked,
+  &:checked:active,
+  &:checked:focus {
+    &[aria-invalid="true"] {
+      --cirth-border-color: var(--cirth-form-element-invalid-border-color);
     }
   }
 }

@@ -1,15 +1,16 @@
 @use "sass:map";
-@use "../settings" as *;
+@use "../breakpoints" as *;
+@use "../config" as *;
 
-@if map.get($modules, "layout/grid") and $enable-classes {
+@if $enable-classes {
   /**
    * Grid
    * Minimal grid system with auto-layout columns
    */
 
   .grid {
-    grid-column-gap: var(#{$css-var-prefix}grid-column-gap);
-    grid-row-gap: var(#{$css-var-prefix}grid-row-gap);
+    grid-column-gap: var(--cirth-grid-column-gap);
+    grid-row-gap: var(--cirth-grid-row-gap);
     display: grid;
     grid-template-columns: 1fr;
 
