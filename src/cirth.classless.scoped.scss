@@ -1,6 +1,5 @@
 // Cirth scoped classless version
 @use "config" with (
-  $enable-semantic-container: true,
   $enable-classes: false,
   $parent-selector: ".cirth"
 );

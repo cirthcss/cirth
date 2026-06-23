@@ -53,7 +53,7 @@ $container-root-selector: "body";
   > main,
   > footer {
     // <header>, <main>, <footer> as containers
-    @if $enable-semantic-container {
+    @if not $enable-classes {
       $first-breakpoint: true;
       width: 100%;
       margin-right: auto;

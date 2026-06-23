@@ -48,7 +48,6 @@ try {
 				name: "cirth.classless",
 				content: `@use "src/config" with (
         $theme-color: "${themeColor}",
-        $enable-semantic-container: true,
         $enable-classes: false
       );
       @use "src";`,
@@ -65,7 +64,6 @@ try {
 				name: "cirth.classless.scoped",
 				content: `@use "src/config" with (
         $theme-color: "${themeColor}",
-        $enable-semantic-container: true,
         $enable-classes: false,
         $parent-selector: ".cirth"
       );
