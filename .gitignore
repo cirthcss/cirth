@@ -111,3 +111,7 @@ $RECYCLE.BIN/
 *.vi
 \#*\#
 .\#*
+
+# AI assistant files
+/.copilot/
+.claude/
