@@ -18,16 +18,19 @@
     > a {
       &::after {
         display: block;
-        width: 1rem;
-        height: calc(1rem * var(--cirth-line-height, 1.5));
-        margin-inline-start: 0.25rem;
+        width: var(--cirth-size-4);
+        height: calc(
+          var(--cirth-size-4) *
+            var(--cirth-line-height, var(--cirth-line-height-normal))
+        );
+        margin-inline-start: var(--cirth-space-1);
         float: right;
         // TODO: find out why we need this magic number (0.2 rem)
         // for the marker to be aligned with the regular select
         transform: rotate(0deg) translateX(0.2rem);
         background-image: var(--cirth-icon-chevron);
         background-position: right center;
-        background-size: 1rem auto;
+        background-size: var(--cirth-size-4) auto;
         background-repeat: no-repeat;
         content: "";
       }
@@ -47,7 +50,7 @@
   // ––––––––––––––––––––
   #{$parent-selector} details.dropdown > summary:not([role]) {
     height: calc(
-      1rem *
+      var(--cirth-size-4) *
         var(--cirth-line-height) +
         var(--cirth-form-element-spacing-vertical) *
         2 +
@@ -130,7 +133,7 @@
       &:not([role]) {
         // Override height
         height: calc(
-          (1rem * var(--cirth-line-height)) +
+          (var(--cirth-size-4) * var(--cirth-line-height)) +
             (var(--cirth-nav-link-spacing-vertical) * 2)
         );
         padding: calc(
@@ -154,7 +157,7 @@
   // ––––––––––––––––––––
   #{$parent-selector} details.dropdown > summary + ul {
     display: flex;
-    z-index: 99;
+    z-index: var(--cirth-z-index-dropdown);
     position: absolute;
     left: 0;
     flex-direction: column;
@@ -172,7 +175,7 @@
     opacity: 0;
     transition:
       opacity var(--cirth-transition),
-      transform 0s ease-in-out 1s;
+      transform var(--cirth-duration-instant) var(--cirth-ease-in-out) 1s;
 
     &[dir="rtl"] {
       right: 0;
@@ -242,7 +245,10 @@
       opacity: 1;
       transition:
         opacity var(--cirth-transition),
-        transform 0s ease-in-out 0s;
+        transform
+          var(--cirth-duration-instant)
+          var(--cirth-ease-in-out)
+          var(--cirth-duration-instant);
     }
   }
 

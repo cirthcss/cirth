@@ -2,9 +2,8 @@
 @use "../../colors" as *;
 @use "../../config" as *;
 @use "../../helpers/functions";
-@use "theme-colors";
 
-// Default: Dark theme
+// Slate: Dark theme
 @mixin theme {
   color-scheme: dark;
 
@@ -14,29 +13,23 @@
   --cirth-color: #{$zinc-200};
 
   // Text selection color
-  --cirth-text-selection-color: #{theme-colors.get(
-      "text-selection-color",
-      "dark"
-    )};
+  --cirth-text-selection-color: #{rgba($slate-350, 0.1875)};
 
   // Muted colors
   --cirth-muted-color: #{$zinc-450};
   --cirth-muted-border-color: #{$slate-850};
 
   // Primary colors
-  --cirth-primary: #{theme-colors.get("primary", "dark")};
-  --cirth-primary-background: #{theme-colors.get("primary-background", "dark")};
+  --cirth-primary: #{$slate-350};
+  --cirth-primary-background: #{$slate-600};
   --cirth-primary-border: var(--cirth-primary-background);
-  --cirth-primary-underline: #{theme-colors.get("primary-underline", "dark")};
-  --cirth-primary-hover: #{theme-colors.get("primary-hover", "dark")};
-  --cirth-primary-hover-background: #{theme-colors.get(
-      "primary-hover-background",
-      "dark"
-    )};
+  --cirth-primary-underline: #{rgba($slate-350, 0.5)};
+  --cirth-primary-hover: #{$slate-250};
+  --cirth-primary-hover-background: #{$slate-550};
   --cirth-primary-hover-border: var(--cirth-primary-hover-background);
   --cirth-primary-hover-underline: var(--cirth-primary-hover);
-  --cirth-primary-focus: #{theme-colors.get("primary-focus", "dark")};
-  --cirth-primary-inverse: #{theme-colors.get("primary-inverse", "dark")};
+  --cirth-primary-focus: #{rgba($slate-350, 0.375)};
+  --cirth-primary-inverse: #{$white};
 
   // Secondary colors
   --cirth-secondary: #{$zinc-350};
@@ -139,10 +132,7 @@
   --cirth-switch-background-color: #{$slate-750};
   --cirth-switch-checked-background-color: var(--cirth-primary-background);
   --cirth-switch-color: #{$white};
-  --cirth-switch-thumb-box-shadow: #{theme-colors.get(
-      "switch-thumb-box-shadow",
-      "dark"
-    )};
+  --cirth-switch-thumb-box-shadow: 0 0 0 rgba(0, 0, 0, 0);
 
   // Range (input[type="range"])
   --cirth-range-border-color: #{$slate-850};

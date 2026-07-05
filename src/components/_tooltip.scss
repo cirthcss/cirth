@@ -8,7 +8,7 @@
   position: relative;
 
   &:not(a, button, input, [role="button"]) {
-    border-bottom: 1px dotted;
+    border-bottom: var(--cirth-border-width-1) dotted;
     text-decoration: none;
     cursor: help;
   }
@@ -18,11 +18,11 @@
   &::before,
   &::after {
     display: block;
-    z-index: 99;
+    z-index: var(--cirth-z-index-tooltip);
     position: absolute;
     bottom: 100%;
     left: 50%;
-    padding: 0.25rem 0.5rem;
+    padding: var(--cirth-space-1) var(--cirth-space-2);
     overflow: hidden;
     transform: translate(-50%, -0.25rem);
     border-radius: var(--cirth-border-radius);
@@ -31,7 +31,7 @@
     color: var(--cirth-tooltip-color);
     font-style: normal;
     font-weight: var(--cirth-font-weight);
-    font-size: 0.875rem;
+    font-size: var(--cirth-font-size-sm);
     text-decoration: none;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -119,7 +119,7 @@
       &::after {
         --cirth-tooltip-slide-to: translate(-50%, -0.25rem);
         transform: translate(-50%, 0.75rem);
-        animation-duration: 0.2s;
+        animation-duration: var(--cirth-duration-normal);
         animation-fill-mode: forwards;
         animation-name: tooltip-slide;
         opacity: 0;

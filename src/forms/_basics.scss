@@ -25,7 +25,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 #{$parent-selector} select,
 #{$parent-selector} textarea {
   margin: 0; // 2
-  font-size: 1rem; // 1
+  font-size: var(--cirth-font-size-md); // 1
   line-height: var(--cirth-line-height); // 1
   font-family: inherit; // 1
   letter-spacing: inherit; // 2
@@ -144,7 +144,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 #{$parent-selector}
   input:not([type="checkbox"], [type="radio"], [type="range"]) {
   height: calc(
-    (1rem * var(--cirth-line-height)) +
+    (var(--cirth-size-4) * var(--cirth-line-height)) +
       (var(--cirth-form-element-spacing-vertical) * 2) +
       (var(--cirth-border-width) * 2)
   );
@@ -305,15 +305,15 @@ $helper-previous-tags: "input, select, textarea, fieldset";
     ) {
     &[aria-invalid] {
       padding-right: calc(
-        var(--cirth-form-element-spacing-horizontal) + 1.5rem
+        var(--cirth-form-element-spacing-horizontal) + var(--cirth-space-6)
       );
       padding-left: var(--cirth-form-element-spacing-horizontal);
       padding-inline-start: var(--cirth-form-element-spacing-horizontal);
       padding-inline-end: calc(
-        var(--cirth-form-element-spacing-horizontal) + 1.5rem
+        var(--cirth-form-element-spacing-horizontal) + var(--cirth-space-6)
       );
-      background-position: center right 0.75rem;
-      background-size: 1rem auto;
+      background-position: center right var(--cirth-space-3);
+      background-size: var(--cirth-size-4) auto;
       background-repeat: no-repeat;
     }
 
@@ -359,7 +359,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   #{$parent-selector} :where(input, select, textarea) {
     &:not([type="checkbox"], [type="radio"]) {
       &:is([aria-invalid], [aria-invalid="true"], [aria-invalid="false"]) {
-        background-position: center left 0.75rem;
+        background-position: center left var(--cirth-space-3);
       }
     }
   }
@@ -394,15 +394,17 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   }
 
   &:not([multiple], [size]) {
-    padding-right: calc(var(--cirth-form-element-spacing-horizontal) + 1.5rem);
+    padding-right: calc(
+      var(--cirth-form-element-spacing-horizontal) + var(--cirth-space-6)
+    );
     padding-left: var(--cirth-form-element-spacing-horizontal);
     padding-inline-start: var(--cirth-form-element-spacing-horizontal);
     padding-inline-end: calc(
-      var(--cirth-form-element-spacing-horizontal) + 1.5rem
+      var(--cirth-form-element-spacing-horizontal) + var(--cirth-space-6)
     );
     background-image: var(--cirth-icon-chevron);
-    background-position: center right 0.75rem;
-    background-size: 1rem auto;
+    background-position: center right var(--cirth-space-3);
+    background-size: var(--cirth-size-4) auto;
     background-repeat: no-repeat;
   }
 
@@ -419,7 +421,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 [dir="rtl"] {
   #{$parent-selector} select {
     &:not([multiple], [size]) {
-      background-position: center left 0.75rem;
+      background-position: center left var(--cirth-space-3);
     }
   }
 }
@@ -432,12 +434,12 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 
   &[aria-invalid] {
     --cirth-icon-height: calc(
-      1rem * var(--cirth-line-height) +
+      var(--cirth-size-4) * var(--cirth-line-height) +
         var(--cirth-form-element-spacing-vertical) * 2 +
         var(--cirth-border-width) * 2
     );
-    background-position: top right 0.75rem;
-    background-size: 1rem var(--cirth-icon-height);
+    background-position: top right var(--cirth-space-3);
+    background-size: var(--cirth-size-4) var(--cirth-icon-height);
   }
 }
 

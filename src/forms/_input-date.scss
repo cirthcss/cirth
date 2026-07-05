@@ -15,8 +15,8 @@
       [type="time"],
       [type="week"]
     ) {
-    --cirth-icon-position: 0.75rem;
-    --cirth-icon-width: 1rem;
+    --cirth-icon-position: var(--cirth-space-3);
+    --cirth-icon-width: var(--cirth-size-4);
     padding-right: calc(var(--cirth-icon-width) + var(--cirth-icon-position));
     background-image: var(--cirth-icon-date);
     background-position: center right var(--cirth-icon-position);

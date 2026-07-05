@@ -4,7 +4,11 @@
 @use "../../config" as *;
 @use "../../helpers/functions";
 @use "../../helpers/selectors";
-@use "theme-colors";
+
+// Whether the aria-busy loading icon (and other white-stroke icons drawn on
+// top of the primary color) should be inverted for legibility. Themes whose
+// dark-mode primary-inverse is not white configure this to false.
+$loading-icon-inverse: true !default;
 
 /**
    * Styles
@@ -27,24 +31,24 @@ $root-selector: ":root, :host";
     ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
     monospace, var(--cirth-font-family-emoji);
   --cirth-font-family: var(--cirth-font-family-sans-serif);
-  --cirth-line-height: 1.5;
-  --cirth-font-weight: 400;
+  --cirth-line-height: var(--cirth-line-height-normal);
+  --cirth-font-weight: var(--cirth-font-weight-regular);
   --cirth-font-size: 100%;
   --cirth-text-underline-offset: 0.1rem;
 
   // Borders
-  --cirth-border-radius: 0.25rem;
-  --cirth-border-width: 0.0625rem;
-  --cirth-outline-width: 0.125rem;
+  --cirth-border-radius: var(--cirth-radius-sm);
+  --cirth-border-width: var(--cirth-border-width-1);
+  --cirth-outline-width: var(--cirth-outline-width-2);
 
   // Transitions
-  --cirth-transition: 0.2s ease-in-out;
+  --cirth-transition: var(--cirth-duration-normal) var(--cirth-ease-in-out);
 
   // Spacings
-  --cirth-spacing: 1rem;
+  --cirth-spacing: var(--cirth-space-4);
 
   // Spacings for typography elements
-  --cirth-typography-spacing-vertical: 1rem;
+  --cirth-typography-spacing-vertical: var(--cirth-space-4);
 
   // Spacings for body > header, body > main, body > footer, section, article
   --cirth-block-spacing-vertical: var(--cirth-spacing);
@@ -56,8 +60,8 @@ $root-selector: ":root, :host";
   }
 
   // Spacings for form elements and button
-  --cirth-form-element-spacing-vertical: 0.75rem;
-  --cirth-form-element-spacing-horizontal: 1rem;
+  --cirth-form-element-spacing-vertical: var(--cirth-space-3);
+  --cirth-form-element-spacing-horizontal: var(--cirth-space-4);
 
   // Font weight for form labels & fieldsets legend
   --cirth-form-label-font-weight: var(--cirth-font-weight);
@@ -66,17 +70,17 @@ $root-selector: ":root, :host";
   --cirth-group-box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   --cirth-group-box-shadow-focus-with-button: 0 0 0 var(--cirth-outline-width)
     var(--cirth-primary-focus);
-  --cirth-group-box-shadow-focus-with-input: 0 0 0 0.0625rem
+  --cirth-group-box-shadow-focus-with-input: 0 0 0 var(--cirth-border-width-1)
     var(--cirth-form-element-border-color);
 
   // Modal (<dialog>)
   --cirth-modal-overlay-backdrop-filter: blur(0.375rem);
 
   // Spacings for nav component
-  --cirth-nav-element-spacing-vertical: 1rem;
-  --cirth-nav-element-spacing-horizontal: 0.5rem;
-  --cirth-nav-link-spacing-vertical: 0.5rem;
-  --cirth-nav-link-spacing-horizontal: 0.5rem;
+  --cirth-nav-element-spacing-vertical: var(--cirth-space-4);
+  --cirth-nav-element-spacing-horizontal: var(--cirth-space-2);
+  --cirth-nav-link-spacing-vertical: var(--cirth-space-2);
+  --cirth-nav-link-spacing-horizontal: var(--cirth-space-2);
   --cirth-nav-breadcrumb-divider: ">";
 
   // Checkboxes icons
@@ -139,13 +143,13 @@ $root-selector: ":root, :host";
   h4,
   h5,
   h6 {
-    --cirth-font-weight: 700;
+    --cirth-font-weight: var(--cirth-font-weight-bold);
   }
 
   h1 {
-    --cirth-font-size: 2rem;
-    --cirth-line-height: 1.125;
-    --cirth-typography-spacing-top: 3rem;
+    --cirth-font-size: var(--cirth-font-size-5xl);
+    --cirth-line-height: var(--cirth-line-height-tight);
+    --cirth-typography-spacing-top: var(--cirth-space-12);
   }
 
   h2 {
@@ -161,21 +165,21 @@ $root-selector: ":root, :host";
   }
 
   h4 {
-    --cirth-font-size: 1.25rem;
+    --cirth-font-size: var(--cirth-font-size-xl);
     --cirth-line-height: 1.2;
     --cirth-typography-spacing-top: 1.874rem;
   }
 
   h5 {
-    --cirth-font-size: 1.125rem;
+    --cirth-font-size: var(--cirth-font-size-lg);
     --cirth-line-height: 1.225;
     --cirth-typography-spacing-top: 1.6875rem;
   }
 
   h6 {
-    --cirth-font-size: 1rem;
-    --cirth-line-height: 1.25;
-    --cirth-typography-spacing-top: 1.5rem;
+    --cirth-font-size: var(--cirth-font-size-md);
+    --cirth-line-height: var(--cirth-line-height-snug);
+    --cirth-typography-spacing-top: var(--cirth-space-6);
   }
 
   // Table
@@ -183,7 +187,7 @@ $root-selector: ":root, :host";
   tfoot {
     th,
     td {
-      --cirth-font-weight: 600;
+      --cirth-font-weight: var(--cirth-font-weight-semibold);
       --cirth-border-width: 0.1875rem;
     }
   }
@@ -210,17 +214,17 @@ $root-selector: ":root, :host";
       [type="file"]
     ),
   :where(select, textarea) {
-    --cirth-outline-width: 0.0625rem;
+    --cirth-outline-width: var(--cirth-outline-width-1);
   }
 
   [type="search"] {
-    --cirth-border-radius: 5rem;
+    --cirth-border-radius: var(--cirth-radius-pill);
   }
 
   // Checkboxes, Radios and Switches
   [type="checkbox"],
   [type="radio"] {
-    --cirth-border-width: 0.125rem;
+    --cirth-border-width: var(--cirth-border-width-2);
   }
 
   [type="checkbox"][role="switch"] {
@@ -231,13 +235,13 @@ $root-selector: ":root, :host";
   @if $enable-classes {
     details.dropdown {
       summary:not([role="button"]) {
-        --cirth-outline-width: 0.0625rem;
+        --cirth-outline-width: var(--cirth-outline-width-1);
       }
     }
     nav {
       details.dropdown {
         summary:focus-visible {
-          --cirth-outline-width: 0.125rem;
+          --cirth-outline-width: var(--cirth-outline-width-2);
         }
       }
     }
@@ -245,7 +249,7 @@ $root-selector: ":root, :host";
 
   // Group (role="group")
   [role="search"] {
-    --cirth-border-radius: 5rem;
+    --cirth-border-radius: var(--cirth-radius-pill);
   }
 
   [role="search"],
@@ -282,7 +286,7 @@ $root-selector: ":root, :host";
     [type="submit"],
     [type="button"],
     [role="button"] {
-      --cirth-form-element-spacing-horizontal: 2rem;
+      --cirth-form-element-spacing-horizontal: var(--cirth-space-8);
     }
   }
 
@@ -311,7 +315,7 @@ $root-selector: ":root, :host";
     }
     #{$selector} {
       &::before {
-        @if theme-colors.get("primary-inverse", "dark") == $white {
+        @if $loading-icon-inverse {
           filter: brightness(0) invert(1);
         } @else {
           filter: brightness(0) invert(0);

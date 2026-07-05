@@ -137,7 +137,7 @@
   > *:not(:first-child):last-child {
     --cirth-color: var(--cirth-muted-color);
     --cirth-font-weight: unset;
-    font-size: 1rem;
+    font-size: var(--cirth-font-size-md);
   }
 }
 
@@ -178,8 +178,10 @@
   margin: var(--cirth-typography-spacing-vertical) 0;
   padding: var(--cirth-spacing);
   border-right: none;
-  border-left: 0.25rem solid var(--cirth-blockquote-border-color);
-  border-inline-start: 0.25rem solid var(--cirth-blockquote-border-color);
+  border-left: var(--cirth-border-width-4) solid
+    var(--cirth-blockquote-border-color);
+  border-inline-start: var(--cirth-border-width-4) solid
+    var(--cirth-blockquote-border-color);
   border-inline-end: none;
 
   footer {
@@ -193,7 +195,7 @@
 // 1. Remove underline decoration in Chrome, Edge, IE, Opera, and Safari
 
 #{$parent-selector} abbr[title] {
-  border-bottom: 1px dotted;
+  border-bottom: var(--cirth-border-width-1) dotted;
   text-decoration: none; // 1
   cursor: help;
 }

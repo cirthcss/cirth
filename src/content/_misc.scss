@@ -20,7 +20,7 @@
   height: 0; // 2
   margin: var(--cirth-typography-spacing-vertical) 0;
   border: 0;
-  border-top: 1px solid var(--cirth-muted-border-color);
+  border-top: var(--cirth-border-width-1) solid var(--cirth-muted-border-color);
   color: inherit; // 1
 }
 

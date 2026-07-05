@@ -90,7 +90,7 @@
   // Config
   $switch-height: 1.25em;
   $switch-width: 2.25em;
-  $switch-transition: 0.1s ease-in-out;
+  $switch-transition: var(--cirth-duration-fast) var(--cirth-ease-in-out);
 
   // Styles
   width: $switch-width;

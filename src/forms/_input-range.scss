@@ -3,7 +3,7 @@
 // Config
 $height-track: 0.375rem;
 $height-thumb: 1.25rem;
-$border-thumb: 2px;
+$border-thumb: var(--cirth-border-width-2);
 
 // Slider Track
 @mixin slider-track {

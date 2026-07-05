@@ -2,9 +2,8 @@
 @use "../../colors" as *;
 @use "../../config" as *;
 @use "../../helpers/functions";
-@use "theme-colors";
 
-// Default: Light theme
+// Slate: Light theme
 @mixin theme {
   color-scheme: light;
 
@@ -14,29 +13,23 @@
   --cirth-color: #{$zinc-750};
 
   // Text selection color
-  --cirth-text-selection-color: #{theme-colors.get(
-      "text-selection-color",
-      "light"
-    )};
+  --cirth-text-selection-color: #{rgba($slate-400, 0.25)};
 
   // Muted colors
   --cirth-muted-color: #{$zinc-550};
   --cirth-muted-border-color: #{color.mix($slate-100, $slate-50)};
 
   // Primary colors
-  --cirth-primary: #{theme-colors.get("primary", "light")};
-  --cirth-primary-background: #{theme-colors.get("primary-background", "light")};
+  --cirth-primary: #{$slate-550};
+  --cirth-primary-background: #{$slate-600};
   --cirth-primary-border: var(--cirth-primary-background);
-  --cirth-primary-underline: #{theme-colors.get("primary-underline", "light")};
-  --cirth-primary-hover: #{theme-colors.get("primary-hover", "light")};
-  --cirth-primary-hover-background: #{theme-colors.get(
-      "primary-hover-background",
-      "light"
-    )};
+  --cirth-primary-underline: #{rgba($slate-550, 0.5)};
+  --cirth-primary-hover: #{$slate-650};
+  --cirth-primary-hover-background: #{$slate-650};
   --cirth-primary-hover-border: var(--cirth-primary-hover-background);
   --cirth-primary-hover-underline: var(--cirth-primary-hover);
-  --cirth-primary-focus: #{theme-colors.get("primary-focus", "light")};
-  --cirth-primary-inverse: #{theme-colors.get("primary-inverse", "light")};
+  --cirth-primary-focus: #{rgba($slate-400, 0.5)};
+  --cirth-primary-inverse: #{$white};
 
   // Secondary colors
   --cirth-secondary: #{$slate-550};
@@ -135,10 +128,7 @@
   --cirth-switch-background-color: #{$slate-200};
   --cirth-switch-checked-background-color: var(--cirth-primary-background);
   --cirth-switch-color: #{$white};
-  --cirth-switch-thumb-box-shadow: #{theme-colors.get(
-      "switch-thumb-box-shadow",
-      "light"
-    )};
+  --cirth-switch-thumb-box-shadow: 0 0 0 rgba(0, 0, 0, 0);
 
   // Range (input[type="range"])
   --cirth-range-border-color: #{$slate-100};

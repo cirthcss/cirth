@@ -1,0 +1,60 @@
+@use "sass:meta";
+@use "../../config" as *;
+
+/**
+   * Color scheme switching
+   */
+
+// Shared by every theme: each theme passes its own light/dark mixins in,
+// so the data-theme / prefers-color-scheme wiring is written only once.
+@mixin apply($light, $dark) {
+  // Light color scheme (Default)
+
+  // Can be forced with data-theme="light"
+
+  @if $parent-selector == "" {
+    [data-theme="light"],
+    :root:not([data-theme="dark"]),
+    :host(:not([data-theme="dark"])) {
+      @include meta.apply($light);
+    }
+  } @else {
+    #{$parent-selector}[data-theme="light"],
+    #{$parent-selector} [data-theme="light"],
+    #{$parent-selector}:not([data-theme="dark"]) {
+      @include meta.apply($light);
+    }
+  }
+
+  // Dark color scheme (Auto)
+
+  // Automatically enabled if user has Dark mode enabled
+
+  @media only screen and (prefers-color-scheme: dark) {
+    @if $parent-selector == "" {
+      :root:not([data-theme]),
+      :host(:not([data-theme])) {
+        @include meta.apply($dark);
+      }
+    } @else {
+      #{$parent-selector}:not([data-theme]) {
+        @include meta.apply($dark);
+      }
+    }
+  }
+
+  // Dark color scheme (Forced)
+
+  // Enabled if forced with data-theme="dark"
+
+  @if $parent-selector == "" {
+    [data-theme="dark"] {
+      @include meta.apply($dark);
+    }
+  } @else {
+    #{$parent-selector}[data-theme="dark"],
+    #{$parent-selector} [data-theme="dark"] {
+      @include meta.apply($dark);
+    }
+  }
+}

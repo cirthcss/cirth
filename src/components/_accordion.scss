@@ -9,7 +9,7 @@
   margin-bottom: var(--cirth-spacing);
 
   summary {
-    line-height: 1rem;
+    line-height: var(--cirth-size-4);
     list-style-type: none;
     cursor: pointer;
     transition: color var(--cirth-transition);
@@ -34,14 +34,16 @@
     // Marker
     &::after {
       display: block;
-      width: 1rem;
-      height: 1rem;
-      margin-inline-start: calc(var(--cirth-spacing, 1rem) * 0.5);
+      width: var(--cirth-size-4);
+      height: var(--cirth-size-4);
+      margin-inline-start: calc(
+        var(--cirth-spacing, var(--cirth-space-4)) * 0.5
+      );
       float: right;
       transform: rotate(-90deg);
       background-image: var(--cirth-icon-chevron);
       background-position: right center;
-      background-size: 1rem auto;
+      background-size: var(--cirth-size-4) auto;
       background-repeat: no-repeat;
       content: "";
       transition: transform var(--cirth-transition);
@@ -58,7 +60,7 @@
     &:focus-visible {
       &:not([role]) {
         outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
-        outline-offset: calc(var(--cirth-spacing, 1rem) * 0.5);
+        outline-offset: calc(var(--cirth-spacing, var(--cirth-space-4)) * 0.5);
         color: var(--cirth-primary);
       }
     }
@@ -70,7 +72,10 @@
 
       // Marker
       &::after {
-        height: calc(1rem * var(--cirth-line-height, 1.5));
+        height: calc(
+          var(--cirth-size-4) *
+            var(--cirth-line-height, var(--cirth-line-height-normal))
+        );
       }
     }
   }

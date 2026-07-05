@@ -57,7 +57,7 @@
   box-shadow: var(--cirth-box-shadow);
   color: var(--cirth-color);
   font-weight: var(--cirth-font-weight);
-  font-size: 1rem;
+  font-size: var(--cirth-font-size-md);
   line-height: var(--cirth-line-height);
   text-align: center;
   text-decoration: none;
@@ -233,6 +233,6 @@
     [type="reset"],
     [role="button"]
   ) {
-  opacity: 0.5;
+  opacity: var(--cirth-opacity-disabled);
   pointer-events: none;
 }
