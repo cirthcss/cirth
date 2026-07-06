@@ -5,7 +5,7 @@ intentionally small, and what contributors should know before changing the
 tooling.
 
 For the day-to-day contribution workflow, start with
-[`.github/CONTRIBUTING.md`](../.github/CONTRIBUTING.md). This document is the
+[`.github/CONTRIBUTING.md`](https://github.com/cirthcss/cirth/blob/develop/.github/CONTRIBUTING.md). This document is the
 deeper reference for build, package, and dependency decisions.
 
 If you are coming from Pico CSS, treat this repository as a related but

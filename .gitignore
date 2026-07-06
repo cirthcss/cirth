@@ -21,6 +21,9 @@ pnpm-debug.log*
 
 # Generated CSS output
 /dist/
+/docs/.vitepress/theme/generated/
+/docs/.vitepress/cache/
+/docs/.vitepress/dist/
 
 # Local caches
 /.cache/

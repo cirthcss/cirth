@@ -1,0 +1,15 @@
+<!-- In real usage, open with dialog.showModal() from a button's onclick.
+     Position is forced static here only so the preview stays inline. -->
+<dialog open style="position: static; width: 100%; min-width: 0; height: auto; min-height: 0; backdrop-filter: none; background: transparent;">
+  <article>
+    <header>
+      <button aria-label="Close" rel="prev" style="float: right;"></button>
+      <strong>Confirm action</strong>
+    </header>
+    <p>Are you sure you want to delete this item? This cannot be undone.</p>
+    <footer>
+      <button role="button" class="secondary">Cancel</button>
+      <button role="button">Confirm</button>
+    </footer>
+  </article>
+</dialog>

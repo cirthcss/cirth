@@ -24,9 +24,11 @@
   ·
   <a href="#customization">Customization</a>
   ·
-  <a href="#philosophy">Philosophy</a>
+  <a href="#documentation">Documentation</a>
   ·
-  <a href="#roadmap">Roadmap</a>
+  <a href="#browser-support">Browser support</a>
+  ·
+  <a href="#philosophy">Philosophy</a>
 </p>
 
 <p align="center">
@@ -99,7 +101,8 @@ The main generated stylesheets are:
 
 Theme-specific builds are also generated, for example
 `dist/cirth.slate.min.css` and `dist/cirth.classless.slate.min.css`. The theme
-set is still being reviewed and will likely become smaller.
+set is still being reviewed and will likely become smaller. See
+[Colors](docs/colors.md) for the full accent color list.
 
 ### Classless
 
@@ -152,7 +155,78 @@ For scoped builds, put the overrides on the scoped root:
 ```
 
 The generated CSS in `dist/cirth.css` is the most reliable reference for the
-current custom property surface.
+current custom property surface. The [Customization](docs/customization.md)
+page covers the token layers, color groups, and light/dark switching in
+detail.
+
+## Documentation
+
+The full documentation lives in [`docs/`](docs/) as a
+[VitePress](https://vitepress.dev) site with live examples. The site itself
+is styled with Cirth's own default build — the header, sidebar, prose, and
+every demo are ordinary semantic HTML dogfooding the framework.
+
+Run it locally:
+
+```sh
+npm install
+npm run docs:dev
+```
+
+- **Getting started** —
+  [Get Started](docs/get-started.md) ·
+  [Customization](docs/customization.md) ·
+  [Colors](docs/colors.md) ·
+  [About Cirth](docs/about.md)
+- **Layout** —
+  [Document](docs/layout/document.md) ·
+  [Landmarks](docs/layout/landmarks.md) ·
+  [Section](docs/layout/section.md) ·
+  [Container](docs/layout/container.md) ·
+  [Grid](docs/layout/grid.md) ·
+  [Overflow auto](docs/layout/overflow-auto.md)
+- **Content** —
+  [Typography](docs/content/typography.md) ·
+  [Link](docs/content/link.md) ·
+  [Button](docs/content/button.md) ·
+  [Table](docs/content/table.md) ·
+  [Code](docs/content/code.md) ·
+  [Figure](docs/content/figure.md) ·
+  [Embedded content](docs/content/embedded.md) ·
+  [Misc](docs/content/misc.md)
+- **Forms** —
+  [Overview](docs/forms/index.md) ·
+  [Checkbox, radio, switch](docs/forms/checkbox-radio-switch.md) ·
+  [Input color](docs/forms/input-color.md) ·
+  [Input date](docs/forms/input-date.md) ·
+  [Input file](docs/forms/input-file.md) ·
+  [Input range](docs/forms/input-range.md) ·
+  [Input search](docs/forms/input-search.md)
+- **Components** —
+  [Accordion](docs/components/accordion.md) ·
+  [Card](docs/components/card.md) ·
+  [Dropdown](docs/components/dropdown.md) ·
+  [Group](docs/components/group.md) ·
+  [Loading](docs/components/loading.md) ·
+  [Modal](docs/components/modal.md) ·
+  [Nav](docs/components/nav.md) ·
+  [Progress](docs/components/progress.md) ·
+  [Tooltip](docs/components/tooltip.md)
+- **Utilities** —
+  [Accessibility](docs/utilities/accessibility.md) ·
+  [Reduce motion](docs/utilities/reduce-motion.md)
+- **Project** —
+  [Build tooling](docs/build-tooling.md) ·
+  [Contributing](.github/CONTRIBUTING.md)
+
+## Browser Support
+
+Cirth is designed and tested for the latest stable Chrome, Edge, Firefox,
+and Safari releases. The compiled CSS is processed with Lightning CSS
+against the Browserslist [`defaults`](https://browsersl.ist/#q=defaults)
+query (roughly: the last two versions of each major browser, everything
+above 0.5% global usage, and Firefox ESR). No version of Internet Explorer
+is supported.
 
 ## Philosophy
 
@@ -196,11 +270,6 @@ Cirth is still in early stabilization. The main public priorities are:
 - refine layout primitives and decide which utilities should remain;
 - reduce and document the theme set;
 - document the supported build variants and migration notes from Pico CSS.
-
-## Project Docs
-
-- Contribution workflow: [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md)
-- Build and package details: [`docs/build-tooling.md`](docs/build-tooling.md)
 
 ## License
 

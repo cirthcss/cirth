@@ -1,0 +1,319 @@
+/**
+ * Dogfooding: the site is styled by Cirth's real default build (unscoped),
+ * generated from src/ by `node scripts/build-docs.js`. The classless
+ * variant is scoped under `.cirth-classless` for the classless demos only.
+ *
+ * Everything below the imports is docs-shell CSS: page scaffolding and
+ * glue for VitePress's markdown output (code blocks, header anchors).
+ * It leans on Cirth's own custom properties and never restyles what the
+ * framework already styles.
+ */
+@import "./generated/cirth-docs.css";
+@import "./generated/cirth-docs-classless.css";
+
+/* Header */
+.docs-brand {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.docs-brand:hover {
+	text-decoration: none;
+}
+
+.docs-logo-dark,
+[data-theme="dark"] .docs-logo-light {
+	display: none;
+}
+
+[data-theme="dark"] .docs-logo-dark {
+	display: inline;
+}
+
+.docs-theme-toggle {
+	width: 2.25rem;
+	height: 2.25rem;
+	margin-bottom: 0;
+	padding: 0;
+	border: none;
+	line-height: 1;
+}
+
+.docs-theme-icon::before {
+	content: "☀";
+	font-size: 1.125rem;
+}
+
+[data-theme="dark"] .docs-theme-icon::before {
+	content: "☾";
+}
+
+/* Hide secondary nav items on small screens; the sidebar still links
+   everything. */
+@media (max-width: 767px) {
+	.docs-nav-item {
+		display: none;
+	}
+}
+
+/* Home hero + features */
+.docs-hero {
+	padding: calc(var(--cirth-spacing) * 3) 0 var(--cirth-spacing);
+	text-align: center;
+}
+
+.docs-hero hgroup > :first-child {
+	font-size: var(--cirth-font-size-6xl);
+}
+
+.docs-hero-tagline {
+	max-width: 38rem;
+	margin-right: auto;
+	margin-left: auto;
+	color: var(--cirth-muted-color);
+}
+
+.docs-hero-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: calc(var(--cirth-spacing) * 0.5);
+}
+
+.docs-hero-actions [role="button"] {
+	margin-bottom: 0;
+}
+
+.docs-features {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+	gap: var(--cirth-spacing);
+}
+
+.docs-features article {
+	margin-bottom: 0;
+}
+
+.docs-features h3 {
+	font-size: var(--cirth-font-size-lg);
+}
+
+.docs-features p {
+	margin-bottom: 0;
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-sm);
+}
+
+/* Docs layout: sidebar + content */
+.docs-layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: calc(var(--cirth-spacing) * 2);
+	align-items: start;
+}
+
+@media (min-width: 1024px) {
+	.docs-layout {
+		grid-template-columns: 14rem minmax(0, 1fr);
+	}
+
+	.docs-sidebar {
+		position: sticky;
+		top: var(--cirth-spacing);
+		max-height: calc(100vh - var(--cirth-spacing) * 2);
+		overflow-y: auto;
+	}
+}
+
+.docs-sidebar details {
+	margin-bottom: var(--cirth-spacing);
+}
+
+.docs-sidebar summary {
+	font-weight: var(--cirth-font-weight-semibold);
+	font-size: var(--cirth-font-size-sm);
+}
+
+.docs-sidebar nav ul {
+	margin-right: 0;
+	margin-left: 0;
+}
+
+.docs-sidebar nav li {
+	padding: calc(var(--cirth-nav-element-spacing-vertical) * 0.25)
+		calc(var(--cirth-nav-element-spacing-horizontal) * 0.5);
+	font-size: var(--cirth-font-size-sm);
+}
+
+/* Prev / next pagination */
+.docs-prev-next {
+	display: flex;
+	justify-content: space-between;
+	gap: var(--cirth-spacing);
+	margin-top: calc(var(--cirth-spacing) * 3);
+	padding-top: var(--cirth-spacing);
+	border-top: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+}
+
+/* Site footer */
+.docs-footer small {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.375rem;
+	padding-bottom: var(--cirth-spacing);
+	color: var(--cirth-muted-color);
+}
+
+/* Markdown header anchors (VitePress adds .header-anchor links) */
+.header-anchor {
+	margin-left: 0.25em;
+	float: none;
+	opacity: 0;
+	transition: opacity var(--cirth-transition);
+}
+
+:is(h1, h2, h3, h4, h5, h6):hover .header-anchor,
+.header-anchor:focus {
+	opacity: 1;
+}
+
+/* VitePress code blocks. Cirth's own pre/code styling supplies the frame;
+   shiki emits token colors as --shiki-light/--shiki-dark custom properties
+   (no inline color), so plain selectors are enough to wire them to Cirth's
+   data-theme mechanism. */
+div[class*="language-"] {
+	position: relative;
+}
+
+div[class*="language-"] > span.lang {
+	display: none;
+}
+
+.vp-code span {
+	color: var(--shiki-light, inherit);
+	font-style: var(--shiki-light-font-style, inherit);
+	font-weight: var(--shiki-light-font-weight, inherit);
+	text-decoration: var(--shiki-light-text-decoration, inherit);
+}
+
+[data-theme="dark"] .vp-code span {
+	color: var(--shiki-dark, inherit);
+	font-style: var(--shiki-dark-font-style, inherit);
+	font-weight: var(--shiki-dark-font-weight, inherit);
+	text-decoration: var(--shiki-dark-text-decoration, inherit);
+}
+
+/* Copy button emitted with each code block; the click handler lives in
+   Layout.vue. */
+div[class*="language-"] > button.copy {
+	position: absolute;
+	top: 0.5rem;
+	right: 0.5rem;
+	width: 2rem;
+	height: 2rem;
+	margin: 0;
+	padding: 0;
+	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	background-color: var(--cirth-background-color);
+	opacity: 0;
+	cursor: pointer;
+	transition: opacity var(--cirth-transition);
+}
+
+div[class*="language-"]:hover > button.copy,
+div[class*="language-"] > button.copy:focus {
+	opacity: 1;
+}
+
+div[class*="language-"] > button.copy::before {
+	content: "⧉";
+	color: var(--cirth-muted-color);
+	font-size: 0.875rem;
+}
+
+div[class*="language-"] > button.copy.copied::before {
+	content: "✓";
+	color: var(--cirth-ins-color);
+}
+
+/* Live demo frames */
+.docs-demo {
+	margin: 1.5rem 0 2rem;
+	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	border-radius: var(--cirth-radius-lg);
+	overflow: hidden;
+}
+
+.docs-demo-preview {
+	padding: calc(var(--cirth-spacing) * 2) calc(var(--cirth-spacing) * 1.5);
+}
+
+.docs-demo-preview > :last-child {
+	margin-bottom: 0;
+}
+
+.docs-demo-source {
+	margin-bottom: 0;
+	border-top: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	background-color: var(--cirth-code-background-color);
+}
+
+.docs-demo-source summary {
+	padding: 0.5rem 1rem;
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-sm);
+}
+
+.docs-demo-source summary::after {
+	height: calc(var(--cirth-size-4) * var(--cirth-line-height));
+}
+
+.docs-demo-source[open] > summary {
+	margin-bottom: 0;
+}
+
+.docs-demo-source pre {
+	margin: 0;
+	padding: 0 1rem 1rem;
+	border-radius: 0;
+	background: none;
+	font-size: var(--cirth-font-size-sm);
+}
+
+.docs-demo-source code {
+	display: block;
+	padding: 0;
+	background: none;
+	white-space: pre;
+}
+
+/* Color swatch grid, used by the Colors page */
+.docs-colors-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+	gap: 1rem;
+	margin: 1.5rem 0;
+}
+
+.docs-color-swatch {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	border-radius: var(--cirth-radius-md);
+}
+
+.docs-color-swatch-preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 4.5rem;
+}
+
+.docs-color-swatch-label {
+	padding: 0.5rem 0.75rem;
+	font-size: var(--cirth-font-size-sm);
+	text-align: center;
+	text-transform: capitalize;
+}

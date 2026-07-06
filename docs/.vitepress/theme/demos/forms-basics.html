@@ -1,0 +1,23 @@
+<form>
+  <fieldset>
+    <label>
+      Full name
+      <input type="text" name="name" placeholder="Ada Lovelace" autocomplete="name">
+    </label>
+    <label>
+      Role
+      <select name="role" required>
+        <option value="" selected disabled>Select…</option>
+        <option>Engineer</option>
+        <option>Designer</option>
+        <option>Manager</option>
+      </select>
+    </label>
+    <label>
+      Bio
+      <textarea name="bio" placeholder="A short bio"></textarea>
+      <small>Optional, shown on your public profile.</small>
+    </label>
+  </fieldset>
+  <button type="submit">Submit</button>
+</form>
