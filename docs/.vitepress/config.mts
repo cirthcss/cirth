@@ -34,7 +34,7 @@ export default defineConfig({
 			{
 				text: "0.2.0",
 				items: [
-					{ text: "Changelog", link: "https://github.com/cirthcss/cirth/releases" },
+					{ text: "Changelog", link: "https://github.com/cirthcss/cirth/blob/develop/CHANGELOG.md" },
 					{ text: "About Cirth", link: "/about" },
 				],
 			},

@@ -219,7 +219,8 @@ npm run docs:dev
   [Reduce motion](docs/utilities/reduce-motion.md)
 - **Project** —
   [Build tooling](docs/build-tooling.md) ·
-  [Contributing](.github/CONTRIBUTING.md)
+  [Contributing](.github/CONTRIBUTING.md) ·
+  [Changelog](CHANGELOG.md)
 
 ## Browser Support
 
