@@ -19,6 +19,12 @@ npm install @cirthcss/cirth
 import "@cirthcss/cirth/dist/cirth.min.css";
 ```
 
+Every published build also has a shorter `exports` path, for example
+`@cirthcss/cirth/jade`, `@cirthcss/cirth/classless`, or
+`@cirthcss/cirth/jade/classless/scoped` — see
+[Build tooling](/build-tooling#package-exports) for the full map. The
+`dist/*.css` paths keep working alongside them.
+
 The package ships compiled CSS only — `main`/`style` both point at
 `dist/cirth.min.css`. SCSS sources in the repository are internal build
 infrastructure, not a published Sass API.

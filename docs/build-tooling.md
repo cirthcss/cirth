@@ -70,6 +70,42 @@ Package metadata points consumers to the default compiled stylesheet:
 Customizing Cirth should remain CSS-first through custom properties. Sass can
 still be used internally to generate the compiled stylesheets and variants.
 
+## Package Exports
+
+`package.json` also declares an `exports` map with one entry per generated
+build, so bundlers and Node's own resolver can resolve a build without
+knowing the `dist/` filename convention:
+
+```json
+{
+  "exports": {
+    ".": "./dist/cirth.min.css",
+    "./classless": "./dist/cirth.classless.min.css",
+    "./scoped": "./dist/cirth.scoped.min.css",
+    "./classless/scoped": "./dist/cirth.classless.scoped.min.css",
+    "./jade": "./dist/cirth.jade.min.css",
+    "./jade/classless": "./dist/cirth.classless.jade.min.css",
+    "./jade/scoped": "./dist/cirth.scoped.jade.min.css",
+    "./jade/classless/scoped": "./dist/cirth.classless.scoped.jade.min.css",
+    "./slate": "./dist/cirth.slate.min.css",
+    "./slate/classless": "./dist/cirth.classless.slate.min.css",
+    "./slate/scoped": "./dist/cirth.scoped.slate.min.css",
+    "./slate/classless/scoped": "./dist/cirth.classless.scoped.slate.min.css",
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
+  }
+}
+```
+
+Segments compose left to right: theme first (`jade`, `slate`, or the root for
+azure), then `classless`, then `scoped`. The `./dist/*` wildcard is kept so
+existing deep imports (`@cirthcss/cirth/dist/cirth.min.css`, as shown in
+[Get Started](/get-started)) keep resolving unchanged.
+
+When `scripts/build-themes.js` or `scripts/build.js` change which files get
+generated, update this map to match — there is no code that derives it
+automatically.
+
 The source configuration is deliberately internal and split by responsibility:
 
 - `src/_config.scss` contains only switches used to generate Cirth's supported

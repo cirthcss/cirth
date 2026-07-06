@@ -5,6 +5,22 @@
 	"author": "Riccardo Pastori",
 	"main": "dist/cirth.min.css",
 	"style": "dist/cirth.min.css",
+	"exports": {
+		".": "./dist/cirth.min.css",
+		"./classless": "./dist/cirth.classless.min.css",
+		"./scoped": "./dist/cirth.scoped.min.css",
+		"./classless/scoped": "./dist/cirth.classless.scoped.min.css",
+		"./jade": "./dist/cirth.jade.min.css",
+		"./jade/classless": "./dist/cirth.classless.jade.min.css",
+		"./jade/scoped": "./dist/cirth.scoped.jade.min.css",
+		"./jade/classless/scoped": "./dist/cirth.classless.scoped.jade.min.css",
+		"./slate": "./dist/cirth.slate.min.css",
+		"./slate/classless": "./dist/cirth.classless.slate.min.css",
+		"./slate/scoped": "./dist/cirth.scoped.slate.min.css",
+		"./slate/classless/scoped": "./dist/cirth.classless.scoped.slate.min.css",
+		"./dist/*": "./dist/*",
+		"./package.json": "./package.json"
+	},
 	"files": [
 		"dist"
 	],
