@@ -116,5 +116,19 @@ $RECYCLE.BIN/
 .\#*
 
 # AI assistant files
-/.copilot/
+# Local, per-machine assistant state and config, not project configuration.
 .claude/
+/.copilot/
+.cursor/
+.windsurf/
+.continue/
+.codeium/
+.codex/
+.amazonq/
+.cody/
+.clinerules/
+.roo/
+.aider*
+
+# Local working notes
+/TODO.md
