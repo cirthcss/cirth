@@ -32,7 +32,7 @@ export default defineConfig({
 			{ text: "Colors", link: "/colors" },
 			{ text: "Docs", link: "/layout/document" },
 			{
-				text: "0.2.0",
+				text: "0.3.0",
 				items: [
 					{ text: "Changelog", link: "https://github.com/cirthcss/cirth/blob/develop/CHANGELOG.md" },
 					{ text: "About Cirth", link: "/about" },

@@ -8,6 +8,8 @@ Cirth is pre-1.0 and the custom property surface is not yet stable — see the
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-06
+
 ### Added
 
 - VitePress documentation site (`docs/`), styled with Cirth's own default
@@ -21,10 +23,13 @@ Cirth is pre-1.0 and the custom property surface is not yet stable — see the
 
 ### Changed
 
-- Reduced the inherited 20-accent theme set to three maintained themes —
-  azure (default), jade, and slate — each a complete, self-contained theme
-  rather than an accent swap. Cuts the generated build matrix from 80 files
-  to 12.
+- **Breaking:** reduced the inherited 20-accent theme set to three
+  maintained themes — azure (default), jade, and slate — each a complete,
+  self-contained theme rather than an accent swap. The other 17 theme
+  builds (amber, blue, cyan, fuchsia, green, grey, indigo, lime, orange,
+  pink, pumpkin, purple, red, sand, violet, yellow, zinc) are no longer
+  generated or published. Cuts the generated build matrix from 80 files to
+  12 and the published npm tarball from ~19MB to ~3MB unpacked.
 - Made the default theme's Sass structure consistent with jade/slate by
   removing the now-redundant color-mapping indirection
   (`default/_theme-colors.scss`) and inlining azure's values directly. No
@@ -63,6 +68,7 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
-[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.2.0...develop
+[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.3.0...develop
+[0.3.0]: https://github.com/cirthcss/cirth/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/cirthcss/cirth/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/cirthcss/cirth/releases/tag/v0.1.0
