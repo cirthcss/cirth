@@ -42,10 +42,10 @@ part of the public CSS custom property surface — they only exist at build
 time to derive the semantic tokens (`--cirth-primary`,
 `--cirth-primary-hover`, …) baked into each theme's stylesheet.
 
-Jade and Slate are complete, self-contained themes under `src/themes/jade`
-and `src/themes/slate` — not accent swaps of the default theme. Only the
-default theme keeps a color-mapping layer (`src/themes/default/_theme-colors.scss`),
-and it now holds a single entry, `azure`.
+All three themes are complete, self-contained themes under `src/themes/default`,
+`src/themes/jade`, and `src/themes/slate` — none of them is an accent swap of
+another. The azure values are inlined directly in the default theme's
+`_light.scss` / `_dark.scss`; there is no separate color-mapping layer.
 
 ## Roadmap note
 

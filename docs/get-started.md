@@ -47,8 +47,9 @@ Cirth publishes four CSS builds from the same source:
 | `dist/cirth.scoped.min.css` | You're embedding Cirth into an existing page, CMS, or app shell and only want elements inside a `.cirth` wrapper affected. |
 | `dist/cirth.classless.scoped.min.css` | Both: scoped **and** classless. |
 
-Every color theme (see [Colors](/colors)) is published in all four variants,
-for example `dist/cirth.jade.min.css` or `dist/cirth.classless.scoped.slate.min.css`.
+Every color theme (see [Colors](/colors)) — azure (default), jade, and slate —
+is published in all four variants, for example `dist/cirth.jade.min.css` or
+`dist/cirth.classless.scoped.slate.min.css`.
 
 ### Classless
 

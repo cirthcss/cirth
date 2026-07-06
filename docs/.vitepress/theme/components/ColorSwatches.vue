@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Light-mode `--cirth-primary` value for each theme, resolved from
-// src/themes/default/_theme-colors.scss, src/themes/jade/_light.scss, and
+// src/themes/default/_light.scss, src/themes/jade/_light.scss, and
 // src/themes/slate/_light.scss. Swatches only — building the actual
 // per-theme stylesheet is left to `npm run build`, see
 // scripts/build-themes.js.
