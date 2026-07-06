@@ -163,10 +163,12 @@ detail.
 
 ## Documentation
 
-The full documentation lives in [`docs/`](docs/) as a
-[VitePress](https://vitepress.dev) site with live examples. The site itself
-is styled with Cirth's own default build — the header, sidebar, prose, and
-every demo are ordinary semantic HTML dogfooding the framework.
+The full documentation is published at
+[cirthcss.github.io/cirth](https://cirthcss.github.io/cirth/), built from
+[`docs/`](docs/) as a [VitePress](https://vitepress.dev) site with live
+examples. The site itself is styled with Cirth's own default build — the
+header, sidebar, prose, and every demo are ordinary semantic HTML dogfooding
+the framework.
 
 Run it locally:
 

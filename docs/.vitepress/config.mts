@@ -1,16 +1,24 @@
 import { defineConfig } from "vitepress";
 
+// Served at https://cirthcss.github.io/cirth/ by the deploy-docs workflow,
+// which sets GITHUB_PAGES=true. Local dev/preview keep the root base so
+// relative paths still work without a path prefix.
+const base = process.env.GITHUB_PAGES === "true" ? "/cirth/" : "/";
+
 export default defineConfig({
 	title: "Cirth",
 	description: "Semantic-first CSS for production-ready interfaces.",
 	cleanUrls: true,
+	base,
 
 	// Light/dark is handled by Cirth's own data-theme mechanism (see
 	// theme/composables/theme.ts), not by VitePress's appearance switcher.
 	appearance: false,
 
 	head: [
-		["link", { rel: "icon", href: "/favicon.svg" }],
+		// `head` entries render as raw HTML and aren't rewritten for `base`
+		// the way Markdown/theme asset links are, so it's prefixed by hand.
+		["link", { rel: "icon", href: `${base}favicon.svg` }],
 		// Set data-theme before first paint to avoid a light-mode flash.
 		[
 			"script",
