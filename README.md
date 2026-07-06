@@ -29,6 +29,8 @@
   <a href="#browser-support">Browser support</a>
   ·
   <a href="#philosophy">Philosophy</a>
+  ·
+  <a href="#comparison">Comparison</a>
 </p>
 
 <p align="center">
@@ -38,7 +40,7 @@
   <a href="https://github.com/cirthcss/cirth/releases">
     <img alt="GitHub Release" src="https://img.shields.io/github/v/release/cirthcss/cirth?include_prereleases">
   </a>
-  <img alt="Status" src="https://img.shields.io/badge/status-early%20stabilization-orange">
+  <img alt="Status" src="https://img.shields.io/badge/status-active%20development-blue">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
 </p>
 
@@ -100,9 +102,9 @@ The main generated stylesheets are:
 | `dist/cirth.classless.scoped.min.css` | Scoped classless build. |
 
 Theme-specific builds are also generated, for example
-`dist/cirth.slate.min.css` and `dist/cirth.classless.slate.min.css`. The theme
-set is still being reviewed and will likely become smaller. See
-[Colors](docs/colors.md) for the full accent color list.
+`dist/cirth.jade.min.css` and `dist/cirth.classless.slate.min.css`. Cirth
+ships three maintained themes — azure (default), jade, and slate — each with
+light and dark variants. See [Colors](docs/colors.md) for the full list.
 
 ### Classless
 
@@ -241,6 +243,36 @@ Core principles:
 - Avoid utility-first class soup and broad component catalogs.
 - Keep customization based on CSS custom properties.
 
+## Comparison
+
+Cirth, Pico CSS, and Tailwind CSS solve the same broad problem — styling
+HTML — with different trade-offs. This is directional, not a benchmark;
+actual bundle size depends on the utilities or components you end up using
+in every case.
+
+| | Cirth | Pico CSS | Tailwind CSS |
+| --- | --- | --- | --- |
+| Styling model | Semantic HTML first; classes only where semantics run out | Semantic HTML first; classes only where semantics run out | Utility-first; classes on nearly every element |
+| Typical markup | `<button>`, `<article>`, `<nav>` — no `.btn`, `.card` | Same | `<button class="rounded bg-blue-600 px-4 py-2 ...">` |
+| Customization | CSS custom properties, override after loading | CSS custom properties, override after loading | Config file (`tailwind.config.js`) plus utility classes |
+| Build step | None to use the default build; only needed to pick a theme | None to use the default build | Required for any production bundle (JIT/content scanning) |
+| Themes | 3 maintained (azure, jade, slate), light/dark each | ~20 accent colors, light/dark each | None built in; arbitrary via config |
+| Default build, gzip | ~13KB | ~11.5KB | No single default — depends entirely on utilities used |
+| Public Sass API | No — CSS only | Yes | N/A |
+
+**"Classless" Tailwind** setups — writing `@apply` rules against bare
+elements (`h1`, `button`, `article`) instead of adding utility classes to
+markup — get close to Cirth's authoring experience, but that layer is
+something you assemble yourself against Tailwind's utility values. It still
+needs the full Tailwind build pipeline (PostCSS, content scanning, JIT) and
+isn't a published, versioned stylesheet you can link directly. Cirth and
+Pico ship that layer already built, tuned, and versioned.
+
+Cirth is a fork of Pico CSS; the practical difference today is scope. Pico
+maintains a broader theme and utility surface and a public Sass API. Cirth
+trims both in exchange for a smaller, more curated build — see
+[Differences From Pico CSS](#differences-from-pico-css) below for specifics.
+
 ## Differences From Pico CSS
 
 Cirth began as a fork of Pico CSS, but it should be treated as an independent
@@ -258,17 +290,17 @@ The most important user-facing differences are:
   document styles, color schemes, and modal states.
 - Standalone color utility builds and fluid classless builds are not part of
   the public build surface.
-- The inherited theme set is being reduced toward a smaller group of maintained
-  examples.
+- The inherited 20-accent theme set has been reduced to three maintained
+  themes: azure (default), jade, and slate.
 
 ## Roadmap
 
-Cirth is still in early stabilization. The main public priorities are:
+Cirth is under active development, working toward a stable 1.0. The main
+public priorities are:
 
 - stabilize the CSS custom property surface;
 - audit inherited Pico CSS bugs and keep the fixes relevant to Cirth;
 - refine layout primitives and decide which utilities should remain;
-- reduce and document the theme set;
 - document the supported build variants and migration notes from Pico CSS.
 
 ## License
