@@ -3,27 +3,10 @@ const path = require("node:path");
 const fs = require("node:fs");
 const os = require("node:os");
 
-const themeColors = [
-	"amber",
-	"blue",
-	"cyan",
-	"fuchsia",
-	"green",
-	"grey",
-	"indigo",
-	"jade",
-	"lime",
-	"orange",
-	"pink",
-	"pumpkin",
-	"purple",
-	"red",
-	"sand",
-	"slate",
-	"violet",
-	"yellow",
-	"zinc",
-];
+// The default build (azure, no suffix) is compiled by build.js. This script
+// compiles the other two named themes, each a complete theme under
+// src/themes/, not an accent swap of the default theme.
+const themeNames = ["jade", "slate"];
 
 const projectRoot = path.join(__dirname, "..");
 const tempEntryFoldername = fs.mkdtempSync(
@@ -34,20 +17,20 @@ const outputFoldername = path.join(projectRoot, "dist");
 fs.mkdirSync(outputFoldername, { recursive: true });
 
 try {
-	themeColors.forEach((themeColor, colorIndex) => {
+	themeNames.forEach((themeName, themeIndex) => {
 		// Theme CSS is generated from temporary SCSS entrypoints so each file can configure its build.
 		const versions = [
 			{
 				name: "cirth",
 				content: `@use "src/config" with (
-        $theme-color: "${themeColor}"
+        $theme-color: "${themeName}"
       );
       @use "src";`,
 			},
 			{
 				name: "cirth.classless",
 				content: `@use "src/config" with (
-        $theme-color: "${themeColor}",
+        $theme-color: "${themeName}",
         $enable-classes: false
       );
       @use "src";`,
@@ -55,7 +38,7 @@ try {
 			{
 				name: "cirth.scoped",
 				content: `@use "src/config" with (
-        $theme-color: "${themeColor}",
+        $theme-color: "${themeName}",
         $parent-selector: ".cirth"
       );
       @use "src";`,
@@ -63,7 +46,7 @@ try {
 			{
 				name: "cirth.classless.scoped",
 				content: `@use "src/config" with (
-        $theme-color: "${themeColor}",
+        $theme-color: "${themeName}",
         $enable-classes: false,
         $parent-selector: ".cirth"
       );
@@ -71,23 +54,23 @@ try {
 			},
 		];
 
-		const displayAsciiProgress = ({ length, index, color }) => {
+		const displayAsciiProgress = ({ length, index, name }) => {
 			const progress = Math.round((index / length) * 100);
 			const bar = "■".repeat(progress / 10);
 			const empty = "□".repeat(10 - progress / 10);
-			process.stdout.write(`[@cirthcss/cirth] ✨ ${bar}${empty} ${color}\r`);
+			process.stdout.write(`[@cirthcss/cirth] ✨ ${bar}${empty} ${name}\r`);
 		};
 
 		versions.forEach((version) => {
 			displayAsciiProgress({
-				length: themeColors.length,
-				index: colorIndex,
-				color: themeColor.charAt(0).toUpperCase() + themeColor.slice(1),
+				length: themeNames.length,
+				index: themeIndex,
+				name: themeName.charAt(0).toUpperCase() + themeName.slice(1),
 			});
 
 			const tempEntryFilename = path.join(
 				tempEntryFoldername,
-				`${version.name}.${themeColor}.scss`,
+				`${version.name}.${themeName}.scss`,
 			);
 
 			fs.writeFileSync(tempEntryFilename, version.content);
@@ -98,7 +81,7 @@ try {
 			});
 
 			fs.writeFileSync(
-				path.join(outputFoldername, `${version.name}.${themeColor}.css`),
+				path.join(outputFoldername, `${version.name}.${themeName}.css`),
 				result.css,
 			);
 

@@ -78,5 +78,5 @@ top.
 ## Next steps
 
 - [Customization](/customization) — override the CSS custom property surface.
-- [Colors](/colors) — pick one of the 20 accent color builds.
+- [Colors](/colors) — pick one of the three maintained themes.
 - [Layout](/layout/document) — start reading the component reference.

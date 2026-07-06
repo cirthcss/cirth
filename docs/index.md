@@ -38,10 +38,10 @@ features:
       Every color theme ships a light and dark variant, switching
       automatically with <code>prefers-color-scheme</code> or forced via
       <code>data-theme</code>.
-  - title: 20 color themes
+  - title: Three maintained themes
     details: >-
-      Pick an accent color at build time — azure (default), jade, slate,
-      grey, and 16 more — without touching Sass.
+      Pick a theme at build time — azure (default), jade, or slate — each
+      with its own light and dark variant, without touching Sass.
   - title: Small, focused surface
     details: >-
       No JavaScript, no utility-class soup, no component catalog. Layout

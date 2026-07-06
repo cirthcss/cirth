@@ -31,8 +31,8 @@ The most important user-facing differences are:
   document styles, color schemes, and modal states.
 - Standalone color utility builds and fluid classless builds are not part of
   the public build surface.
-- The inherited theme set is being reduced toward a smaller group of
-  maintained examples.
+- The inherited 20-accent theme set has been reduced to three maintained
+  themes — azure (default), jade, and slate — see [Colors](/colors).
 
 ## Roadmap
 
@@ -41,7 +41,6 @@ Cirth is still in early stabilization. The main public priorities are:
 - stabilize the CSS custom property surface;
 - audit inherited Pico CSS bugs and keep the fixes relevant to Cirth;
 - refine layout primitives and decide which utilities should remain;
-- reduce and document the theme set;
 - document the supported build variants and migration notes from Pico CSS.
 
 ## Project docs

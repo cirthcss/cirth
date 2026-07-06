@@ -1,13 +1,8 @@
-@use "../colors" as *;
-@use "default/theme-colors";
-
 // Foundation tokens
 @use "base/foundations";
 
 // Styles
-@use "base/styles" with (
-  $loading-icon-inverse: theme-colors.get("primary-inverse", "dark") == $white
-);
+@use "base/styles";
 
 // Colors schemes
 @use "default/schemes";
