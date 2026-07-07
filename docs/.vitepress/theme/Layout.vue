@@ -62,8 +62,8 @@ const nextPage = computed(() =>
 			<ul>
 				<li>
 					<a :href="withBase('/')" class="contrast docs-brand">
-						<img class="docs-logo docs-logo-light" :src="withBase('/logo.svg')" alt="" width="28" height="28">
-						<img class="docs-logo docs-logo-dark" :src="withBase('/logo-dark.svg')" alt="" width="28" height="28">
+						<img class="docs-logo docs-logo-light" :src="withBase('/logo_mono.svg')" alt="" width="28" height="28">
+						<img class="docs-logo docs-logo-dark" :src="withBase('/logo_mono_dark.svg')" alt="" width="28" height="28">
 						<strong>{{ site.title }}</strong>
 					</a>
 				</li>

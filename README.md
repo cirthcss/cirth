@@ -1,8 +1,8 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset=".github/logo-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset=".github/logo-light.svg">
-    <img alt="Cirth" src=".github/logo-light.svg" width="112" height="112">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/public/logo_brand_dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/public/logo_brand.svg">
+    <img alt="Cirth" src="docs/public/logo_brand.svg" width="112" height="112">
   </picture>
 </p>
 

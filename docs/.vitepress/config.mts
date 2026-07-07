@@ -18,7 +18,7 @@ export default defineConfig({
 	head: [
 		// `head` entries render as raw HTML and aren't rewritten for `base`
 		// the way Markdown/theme asset links are, so it's prefixed by hand.
-		["link", { rel: "icon", href: `${base}favicon.svg` }],
+		["link", { rel: "icon", href: `${base}logo_brand_app.svg` }],
 		// Set data-theme before first paint to avoid a light-mode flash.
 		[
 			"script",
