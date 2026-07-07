@@ -62,6 +62,13 @@ groups, each with a base, hover, focus, and inverse (text-on-color) variant:
 [Link](/content/link)) simply swap which group a `button` or `a` reads its
 `--cirth-background-color`/`--cirth-color` from.
 
+The `cobalt` and `coral` [presets](/colors) build on exactly this: each
+overrides the primary group's variables (light and dark) to swap the
+accent, plus a handful of tokens from other layers — surface neutrals,
+`--cirth-box-shadow`, `--cirth-font-family`, `--cirth-spacing`,
+`--cirth-transition`, and the radius tokens — to show how far a
+restyle can go while still just being custom-property overrides.
+
 ## Light and dark
 
 Every theme ships a light and a dark color scheme, switched through the same

@@ -15,8 +15,7 @@ element — buttons, links, or plain text.
 
 - The spinner is a background SVG (`--cirth-icon-loading`), inverted to
   white on colored buttons unless the theme's `primary-inverse` isn't white
-  (see the `$loading-icon-inverse` build flag in
-  `src/themes/base/_styles.scss`).
+  (see the `$loading-icon-inverse` build flag in `src/theme/_styles.scss`).
 - Non-empty content gets the spinner prefixed with a small gap; empty
   content (like the second button above) centers the spinner alone.
 - On `button`/`[type="submit"]`/`[type="button"]`/`[type="reset"]`/

@@ -22,6 +22,8 @@
   ·
   <a href="#builds">Builds</a>
   ·
+  <a href="#presets">Presets</a>
+  ·
   <a href="#customization">Customization</a>
   ·
   <a href="#documentation">Documentation</a>
@@ -101,10 +103,9 @@ The main generated stylesheets are:
 | `dist/cirth.scoped.min.css` | Scoped build for embedding Cirth under `.cirth`. |
 | `dist/cirth.classless.scoped.min.css` | Scoped classless build. |
 
-Theme-specific builds are also generated, for example
-`dist/cirth.jade.min.css` and `dist/cirth.classless.slate.min.css`. Cirth
-ships three maintained themes — azure (default), jade, and slate — each with
-light and dark variants. See [Colors](docs/colors.md) for the full list.
+All four builds share Cirth's one official theme (azure), with light and
+dark variants. `cobalt` and `coral` are optional presets, not separate theme
+builds — see [Presets](#presets) below and [Colors](docs/colors.md).
 
 ### Classless
 
@@ -130,6 +131,36 @@ when embedding Cirth into an existing page, CMS, widget, or application shell.
   </article>
 </div>
 ```
+
+## Presets
+
+`cobalt` and `coral` are optional presets: stylesheets that override an
+existing set of custom properties (color, shadow, type, spacing, motion) on
+top of the default theme. They're worked examples of restyling the system,
+not independently maintained themes — load one after the main stylesheet.
+
+- **`cobalt`** — corporate: deep navy primary, cool-toned neutrals, a flat
+  shadow, the IBM Plex Sans webfont, denser spacing, snappier motion,
+  square corners.
+- **`coral`** — playful: vivid warm primary, warm-toned neutrals, a soft
+  coral-tinted glow shadow, the Fredoka webfont, looser spacing, bouncy
+  motion, extra-rounded corners.
+
+Each preset's webfont is loaded via `@import` from
+[Bunny Fonts](https://fonts.bunny.net), a no-tracking Google Fonts
+alternative — the one network request Cirth's own files make beyond the
+stylesheet itself.
+
+```html
+<link rel="stylesheet" href="dist/cirth.min.css">
+<link rel="stylesheet" href="presets/cobalt.css">
+```
+
+```js
+import "@cirthcss/cirth/presets/cobalt";
+```
+
+See [Colors](docs/colors.md) for what each preset changes.
 
 ## Customization
 
@@ -258,8 +289,8 @@ in every case.
 | Styling model | Semantic HTML first; classes only where semantics run out | Semantic HTML first; classes only where semantics run out | Utility-first; classes on nearly every element |
 | Typical markup | `<button>`, `<article>`, `<nav>` — no `.btn`, `.card` | Same | `<button class="rounded bg-blue-600 px-4 py-2 ...">` |
 | Customization | CSS custom properties, override after loading | CSS custom properties, override after loading | Config file (`tailwind.config.js`) plus utility classes |
-| Build step | None to use the default build; only needed to pick a theme | None to use the default build | Required for any production bundle (JIT/content scanning) |
-| Themes | 3 maintained (azure, jade, slate), light/dark each | ~20 accent colors, light/dark each | None built in; arbitrary via config |
+| Build step | None — link the default build, or a preset on top | None to use the default build | Required for any production bundle (JIT/content scanning) |
+| Themes | 1 official (azure), light/dark, plus 2 token-override presets (cobalt, coral) | ~20 accent colors, light/dark each | None built in; arbitrary via config |
 | Default build, gzip | ~13KB | ~11.5KB | No single default — depends entirely on utilities used |
 | Public Sass API | No — CSS only | Yes | N/A |
 
@@ -293,8 +324,9 @@ The most important user-facing differences are:
   document styles, color schemes, and modal states.
 - Standalone color utility builds and fluid classless builds are not part of
   the public build surface.
-- The inherited 20-accent theme set has been reduced to three maintained
-  themes: azure (default), jade, and slate.
+- The inherited 20-accent theme set has been reduced to a single official
+  theme (azure); `cobalt` and `coral` are optional token-override presets,
+  not separately maintained themes.
 
 ## Roadmap
 

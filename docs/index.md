@@ -35,13 +35,14 @@ features:
       scoped build that only styles inside a <code>.cirth</code> container.
   - title: Light and dark out of the box
     details: >-
-      Every color theme ships a light and dark variant, switching
+      The default theme ships a light and dark variant, switching
       automatically with <code>prefers-color-scheme</code> or forced via
       <code>data-theme</code>.
-  - title: Three maintained themes
+  - title: One theme, optional presets
     details: >-
-      Pick a theme at build time — azure (default), jade, or slate — each
-      with its own light and dark variant, without touching Sass.
+      Azure is the single official theme. <code>cobalt</code> (corporate)
+      and <code>coral</code> (playful) are optional token-override presets
+      you load after it — no Sass required.
   - title: Small, focused surface
     details: >-
       No JavaScript, no utility-class soup, no component catalog. Layout

@@ -1,0 +1,92 @@
+// Cobalt preset
+// ––––––––––––––––––––
+// A demonstrative token-override recipe, not a self-contained theme: a
+// corporate look — deep navy primary accent, cool-toned neutrals, a crisp
+// flat shadow, denser spacing, snappier motion, a webfont, and square
+// corners. Import it after the main Cirth stylesheet — it only overrides
+// existing custom properties and reuses the theme's light/dark switching
+// logic.
+@use "sass:color";
+@use "../helpers/selectors";
+
+// Self-hosted-equivalent, GDPR-compliant webfont CDN (no tracking, unlike
+// Google Fonts) — only the static weights this preset's font stack uses:
+// body text (400), table headers (600), and headings (700).
+// display=swap avoids invisible text while the font downloads.
+@import "https://fonts.bunny.net/css?family=ibm-plex-sans:400,600,700&display=swap";
+
+// Cobalt
+$cobalt-900: oklch(22% 0.07 258deg);
+$cobalt-850: oklch(26% 0.08 258deg);
+$cobalt-800: oklch(30% 0.085 258deg);
+$cobalt-750: oklch(34% 0.09 258deg);
+$cobalt-600: oklch(46% 0.095 258deg);
+$cobalt-550: oklch(52% 0.1 258deg);
+$cobalt-400: oklch(64% 0.09 258deg);
+
+@mixin light {
+  // Surface: cool-toned neutrals instead of the default's neutral scale
+  --cirth-muted-color: oklch(50% 0.02 258deg);
+  --cirth-muted-border-color: oklch(88% 0.015 258deg);
+  --cirth-text-selection-color: #{color.change($cobalt-600, $alpha: 0.25)};
+
+  // Primary
+  --cirth-primary: #{$cobalt-800};
+  --cirth-primary-background: #{$cobalt-800};
+  --cirth-primary-underline: #{color.change($cobalt-800, $alpha: 0.5)};
+  --cirth-primary-hover: #{$cobalt-900};
+  --cirth-primary-hover-background: #{$cobalt-850};
+  --cirth-primary-focus: #{color.change($cobalt-600, $alpha: 0.5)};
+
+  // Shadow: a crisp 1px outline instead of a soft blur — flatter, more formal
+  --cirth-box-shadow: 0 0 0 0.0625rem #{color.change($cobalt-800, $alpha: 0.14)};
+}
+
+@mixin dark {
+  --cirth-muted-color: oklch(65% 0.02 258deg);
+  --cirth-muted-border-color: oklch(30% 0.02 258deg);
+  --cirth-text-selection-color: #{color.change($cobalt-550, $alpha: 0.1875)};
+
+  // Primary
+  --cirth-primary: #{$cobalt-550};
+  --cirth-primary-background: #{$cobalt-800};
+  --cirth-primary-underline: #{color.change($cobalt-550, $alpha: 0.5)};
+  --cirth-primary-hover: #{$cobalt-400};
+  --cirth-primary-hover-background: #{$cobalt-750};
+  --cirth-primary-focus: #{color.change($cobalt-550, $alpha: 0.375)};
+
+  // Shadow
+  --cirth-box-shadow: 0 0 0 0.0625rem #{color.change($cobalt-400, $alpha: 0.2)};
+}
+
+// Presets are always compiled unscoped, so the light/dark switching here is
+// hardcoded to :root/:host rather than going through the theme's
+// $parent-selector-aware helper — one less thing a standalone preset needs.
+[data-theme="light"],
+:root:not([data-theme="dark"]),
+:host(:not([data-theme="dark"])) {
+  @include light;
+}
+
+@media only screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme]),
+  :host(:not([data-theme])) {
+    @include dark;
+  }
+}
+
+[data-theme="dark"] {
+  @include dark;
+}
+
+// Scheme-independent system feel: square corners, a business-like webfont,
+// denser spacing, and snappier motion. Each overrides one token that every
+// consuming component already reads, so nothing here duplicates
+// component-level styles.
+@include selectors.root {
+  --cirth-border-radius: 0;
+  --cirth-radius-pill: 0;
+  --cirth-font-family: "IBM Plex Sans", system-ui, sans-serif;
+  --cirth-spacing: var(--cirth-space-3);
+  --cirth-transition: var(--cirth-duration-fast) var(--cirth-ease-out);
+}

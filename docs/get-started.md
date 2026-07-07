@@ -20,8 +20,8 @@ import "@cirthcss/cirth/dist/cirth.min.css";
 ```
 
 Every published build also has a shorter `exports` path, for example
-`@cirthcss/cirth/jade`, `@cirthcss/cirth/classless`, or
-`@cirthcss/cirth/jade/classless/scoped` — see
+`@cirthcss/cirth/classless`, `@cirthcss/cirth/scoped`, or
+`@cirthcss/cirth/presets/cobalt` — see
 [Build tooling](/build-tooling#package-exports) for the full map. The
 `dist/*.css` paths keep working alongside them.
 
@@ -47,9 +47,10 @@ Cirth publishes four CSS builds from the same source:
 | `dist/cirth.scoped.min.css` | You're embedding Cirth into an existing page, CMS, or app shell and only want elements inside a `.cirth` wrapper affected. |
 | `dist/cirth.classless.scoped.min.css` | Both: scoped **and** classless. |
 
-Every color theme (see [Colors](/colors)) — azure (default), jade, and slate —
-is published in all four variants, for example `dist/cirth.jade.min.css` or
-`dist/cirth.classless.scoped.slate.min.css`.
+All four builds share the same official azure theme. `cobalt` and `coral`
+(see [Colors](/colors)) are optional presets — stylesheets that override an
+existing set of custom properties (color, shadow, type, spacing, motion) —
+loaded after any of the four builds above, for example `presets/cobalt.css`.
 
 ### Classless
 
@@ -85,5 +86,5 @@ top.
 ## Next steps
 
 - [Customization](/customization) — override the CSS custom property surface.
-- [Colors](/colors) — pick one of the three maintained themes.
+- [Colors](/colors) — the default theme, plus the `cobalt`/`coral` presets.
 - [Layout](/layout/document) — start reading the component reference.

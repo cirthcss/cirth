@@ -1,12 +1,15 @@
 @use "sass:meta";
-@use "../../config" as *;
+@use "../config" as *;
+@use "../helpers/selectors";
+
+@use "light";
+@use "dark";
 
 /**
    * Color scheme switching
    */
 
-// Shared by every theme: each theme passes its own light/dark mixins in,
-// so the data-theme / prefers-color-scheme wiring is written only once.
+// Applies a light and a dark mixin through the data-theme / prefers-color-scheme wiring.
 @mixin apply($light, $dark) {
   // Light color scheme (Default)
 
@@ -56,5 +59,23 @@
     #{$parent-selector} [data-theme="dark"] {
       @include meta.apply($dark);
     }
+  }
+}
+
+/**
+   * Color schemes
+   */
+
+@include apply(
+  meta.get-mixin("theme", $module: "light"),
+  meta.get-mixin("theme", $module: "dark")
+);
+
+@include selectors.scope {
+  progress,
+  [type="checkbox"],
+  [type="radio"],
+  [type="range"] {
+    accent-color: var(--cirth-primary);
   }
 }

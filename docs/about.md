@@ -31,8 +31,10 @@ The most important user-facing differences are:
   document styles, color schemes, and modal states.
 - Standalone color utility builds and fluid classless builds are not part of
   the public build surface.
-- The inherited 20-accent theme set has been reduced to three maintained
-  themes — azure (default), jade, and slate — see [Colors](/colors).
+- The inherited 20-accent theme set has been reduced to a single official
+  theme (azure), with `cobalt` (corporate) and `coral` (playful) published
+  as optional token-override presets rather than full themes — see
+  [Colors](/colors).
 
 ## Roadmap
 

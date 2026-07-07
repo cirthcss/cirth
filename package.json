@@ -10,19 +10,15 @@
 		"./classless": "./dist/cirth.classless.min.css",
 		"./scoped": "./dist/cirth.scoped.min.css",
 		"./classless/scoped": "./dist/cirth.classless.scoped.min.css",
-		"./jade": "./dist/cirth.jade.min.css",
-		"./jade/classless": "./dist/cirth.classless.jade.min.css",
-		"./jade/scoped": "./dist/cirth.scoped.jade.min.css",
-		"./jade/classless/scoped": "./dist/cirth.classless.scoped.jade.min.css",
-		"./slate": "./dist/cirth.slate.min.css",
-		"./slate/classless": "./dist/cirth.classless.slate.min.css",
-		"./slate/scoped": "./dist/cirth.scoped.slate.min.css",
-		"./slate/classless/scoped": "./dist/cirth.classless.scoped.slate.min.css",
+		"./presets/coral": "./presets/coral.css",
+		"./presets/cobalt": "./presets/cobalt.css",
+		"./presets/*": "./presets/*",
 		"./dist/*": "./dist/*",
 		"./package.json": "./package.json"
 	},
 	"files": [
-		"dist"
+		"dist",
+		"presets"
 	],
 	"license": "MIT",
 	"repository": {
@@ -56,8 +52,8 @@
 		"check:variables": "node scripts/check-css-variables.js",
 		"dev": "node scripts/watch.js",
 		"format": "prettier --write --log-level silent 'src/**/*.scss'",
-		"lint": "stylelint 'src/**/*.scss' && node scripts/check-css-variables.js && node scripts/check-theme-docs.js",
-		"lint:fix": "stylelint 'src/**/*.scss' --fix && node scripts/check-css-variables.js && node scripts/check-theme-docs.js",
+		"lint": "stylelint 'src/**/*.scss' && node scripts/check-css-variables.js",
+		"lint:fix": "stylelint 'src/**/*.scss' --fix && node scripts/check-css-variables.js",
 		"docs:assets": "node scripts/build-docs.js",
 		"docs:dev": "npm run docs:assets && vitepress dev docs",
 		"docs:build": "npm run docs:assets && vitepress build docs",
@@ -72,6 +68,10 @@
 		"vitepress": "^1.6.4"
 	},
 	"browserslist": [
-		"defaults"
+		"Chrome >= 111",
+		"Edge >= 111",
+		"Firefox >= 113",
+		"Safari >= 15.4",
+		"iOS >= 15.4"
 	]
 }

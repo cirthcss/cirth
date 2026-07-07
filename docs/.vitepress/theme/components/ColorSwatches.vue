@@ -1,13 +1,12 @@
 <script setup lang="ts">
-// Light-mode `--cirth-primary` value for each theme, resolved from
-// src/themes/default/_light.scss, src/themes/jade/_light.scss, and
-// src/themes/slate/_light.scss. Swatches only — building the actual
-// per-theme stylesheet is left to `npm run build`, see
-// scripts/build-themes.js.
+// Light-mode `--cirth-primary` value for the default theme and each preset,
+// resolved from src/theme/_light.scss and src/presets/cobalt.scss /
+// coral.scss. Swatches only — building the actual stylesheets is left to
+// `npm run build`, see scripts/build-presets.js.
 const colors = [
-	{ name: "azure", hex: "#0172ad", note: "default" },
-	{ name: "jade", hex: "#007a50" },
-	{ name: "slate", hex: "#5d6b89" },
+	{ name: "azure", hex: "#2671a3", note: "default theme" },
+	{ name: "cobalt", hex: "#0f2d57", note: "preset" },
+	{ name: "coral", hex: "#c0401f", note: "preset" },
 ];
 </script>
 

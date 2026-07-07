@@ -83,7 +83,9 @@ run("Check CSS variables", process.execPath, [
 ]);
 cleanOutput();
 compileCss();
-run("Compile themes", process.execPath, [path.join(__dirname, "build-themes.js")]);
+run("Compile presets", process.execPath, [
+	path.join(__dirname, "build-presets.js"),
+]);
 run("Transform CSS", process.execPath, [
 	path.join(__dirname, "process-css.js"),
 	"--transform",

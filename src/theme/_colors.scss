@@ -1,0 +1,139 @@
+// Color scales
+// ––––––––––––––––––––
+// Every oklch() literal consumed by the theme's light/dark schemes (and by
+// _styles.scss for its inline icons), consolidated in one place instead of
+// being redeclared separately wherever they're used.
+// All five scales below (neutral + the four status/accent hues) share one
+// 19-step lightness ladder — 950 (darkest) down to 50 (lightest), evenly
+// spaced from 18% to 96% — so picking a step is the same exercise
+// regardless of which family you're in, and there are no gaps: every
+// family defines every step.
+// Chroma is derived, not hand-picked, and follows from what each family is
+// for: $neutral-* holds chroma to a small, symmetric bell that peaks at
+// the 500 step and returns to 0 at the extremes — enough to read as a
+// deliberate cool gray, not enough to compete with content color.
+// $azure-*, $error-*, $success-*, $warning-* are each pinned to one fixed
+// hue, then set to 85% of that hue's own maximum in-gamut sRGB chroma at
+// every lightness step. Because the sRGB gamut boundary shape differs per
+// hue (e.g. red-orange's ceiling peaks earlier, at a darker lightness,
+// than green's does), the four scales don't hit peak saturation at the
+// same step — that's the gamut speaking, not an inconsistency. What stays
+// consistent is the method: every step of every scale sits at the same
+// fraction of what's actually displayable.
+// Status colors (error, success, warning) are named for the role they
+// play, not the hue they happen to be — $error-500 is what most people
+// would call "red", but naming it that way would hide why it's actually
+// used (invalid form state, deleted/removed text). $azure and $neutral
+// are named for what they visually are (brand accent; cool gray) since
+// neither is tied to a single semantic role.
+
+// B&W
+$black: oklch(0% 0 0deg);
+$white: oklch(100% 0 0deg);
+
+// Neutral
+$neutral-950: oklch(18% 0 264deg);
+$neutral-900: oklch(22.3% 0.006 264deg);
+$neutral-850: oklch(26.7% 0.011 264deg);
+$neutral-800: oklch(31% 0.016 264deg);
+$neutral-750: oklch(35.3% 0.021 264deg);
+$neutral-700: oklch(39.7% 0.025 264deg);
+$neutral-650: oklch(44% 0.028 264deg);
+$neutral-600: oklch(48.3% 0.03 264deg);
+$neutral-550: oklch(52.7% 0.032 264deg);
+$neutral-500: oklch(57% 0.032 264deg);
+$neutral-450: oklch(61.3% 0.032 264deg);
+$neutral-400: oklch(65.7% 0.03 264deg);
+$neutral-350: oklch(70% 0.028 264deg);
+$neutral-300: oklch(74.3% 0.025 264deg);
+$neutral-250: oklch(78.7% 0.021 264deg);
+$neutral-200: oklch(83% 0.016 264deg);
+$neutral-150: oklch(87.3% 0.011 264deg);
+$neutral-100: oklch(91.7% 0.006 264deg);
+$neutral-50: oklch(96% 0 264deg);
+
+// Azure (primary brand accent)
+$azure-950: oklch(18% 0.037 242deg);
+$azure-900: oklch(22.3% 0.046 242deg);
+$azure-850: oklch(26.7% 0.054 242deg);
+$azure-800: oklch(31% 0.063 242deg);
+$azure-750: oklch(35.3% 0.071 242deg);
+$azure-700: oklch(39.7% 0.08 242deg);
+$azure-650: oklch(44% 0.089 242deg);
+$azure-600: oklch(48.3% 0.098 242deg);
+$azure-550: oklch(52.7% 0.106 242deg);
+$azure-500: oklch(57% 0.115 242deg);
+$azure-450: oklch(61.3% 0.124 242deg);
+$azure-400: oklch(65.7% 0.133 242deg);
+$azure-350: oklch(70% 0.141 242deg);
+$azure-300: oklch(74.3% 0.124 242deg);
+$azure-250: oklch(78.7% 0.101 242deg);
+$azure-200: oklch(83% 0.079 242deg);
+$azure-150: oklch(87.3% 0.058 242deg);
+$azure-100: oklch(91.7% 0.038 242deg);
+$azure-50: oklch(96% 0.018 242deg);
+
+// Error (invalid form state, deleted/removed text)
+$error-950: oklch(18% 0.063 29.73deg);
+$error-900: oklch(22.3% 0.078 29.73deg);
+$error-850: oklch(26.7% 0.092 29.73deg);
+$error-800: oklch(31% 0.107 29.73deg);
+$error-750: oklch(35.3% 0.122 29.73deg);
+$error-700: oklch(39.7% 0.137 29.73deg);
+$error-650: oklch(44% 0.151 29.73deg);
+$error-600: oklch(48.3% 0.166 29.73deg);
+$error-550: oklch(52.7% 0.181 29.73deg);
+$error-500: oklch(57% 0.196 29.73deg);
+$error-450: oklch(61.3% 0.211 29.73deg);
+$error-400: oklch(65.7% 0.196 29.73deg);
+$error-350: oklch(70% 0.163 29.73deg);
+$error-300: oklch(74.3% 0.133 29.73deg);
+$error-250: oklch(78.7% 0.106 29.73deg);
+$error-200: oklch(83% 0.081 29.73deg);
+$error-150: oklch(87.3% 0.058 29.73deg);
+$error-100: oklch(91.7% 0.036 29.73deg);
+$error-50: oklch(96% 0.017 29.73deg);
+
+// Success (valid form state, inserted/added text)
+$success-950: oklch(18% 0.035 160.59deg);
+$success-900: oklch(22.3% 0.043 160.59deg);
+$success-850: oklch(26.7% 0.051 160.59deg);
+$success-800: oklch(31% 0.059 160.59deg);
+$success-750: oklch(35.3% 0.067 160.59deg);
+$success-700: oklch(39.7% 0.076 160.59deg);
+$success-650: oklch(44% 0.084 160.59deg);
+$success-600: oklch(48.3% 0.092 160.59deg);
+$success-550: oklch(52.7% 0.1 160.59deg);
+$success-500: oklch(57% 0.109 160.59deg);
+$success-450: oklch(61.3% 0.117 160.59deg);
+$success-400: oklch(65.7% 0.125 160.59deg);
+$success-350: oklch(70% 0.133 160.59deg);
+$success-300: oklch(74.3% 0.142 160.59deg);
+$success-250: oklch(78.7% 0.15 160.59deg);
+$success-200: oklch(83% 0.158 160.59deg);
+$success-150: oklch(87.3% 0.166 160.59deg);
+$success-100: oklch(91.7% 0.113 160.59deg);
+$success-50: oklch(96% 0.051 160.59deg);
+
+// Warning (replaces the old decorative "amber"; used for the <mark>
+// highlight, the one place Cirth needed an attention color before there
+// was a proper warning scale to give it)
+$warning-950: oklch(18% 0.033 78deg);
+$warning-900: oklch(22.3% 0.04 78deg);
+$warning-850: oklch(26.7% 0.048 78deg);
+$warning-800: oklch(31% 0.055 78deg);
+$warning-750: oklch(35.3% 0.063 78deg);
+$warning-700: oklch(39.7% 0.07 78deg);
+$warning-650: oklch(44% 0.078 78deg);
+$warning-600: oklch(48.3% 0.086 78deg);
+$warning-550: oklch(52.7% 0.093 78deg);
+$warning-500: oklch(57% 0.101 78deg);
+$warning-450: oklch(61.3% 0.109 78deg);
+$warning-400: oklch(65.7% 0.116 78deg);
+$warning-350: oklch(70% 0.124 78deg);
+$warning-300: oklch(74.3% 0.132 78deg);
+$warning-250: oklch(78.7% 0.139 78deg);
+$warning-200: oklch(83% 0.134 78deg);
+$warning-150: oklch(87.3% 0.098 78deg);
+$warning-100: oklch(91.7% 0.063 78deg);
+$warning-50: oklch(96% 0.029 78deg);

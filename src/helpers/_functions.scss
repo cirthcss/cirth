@@ -1,18 +1,34 @@
 @use "sass:color";
+@use "sass:math";
 @use "sass:string";
 
-// Display color as RGB
+// Display color as RGB (kept in the legacy rgb() form so it's safe to embed,
+// unencoded, inside data-URI SVGs — oklch()'s "%" would otherwise be
+// misread as a URL percent-escape)
 @function display-rgb($color) {
   @return string.unquote(
-    "rgb(" + color.channel($color, "red") + ", " +
-      color.channel($color, "green") + ", " + color.channel($color, "blue") +
-      ")"
+    "rgb(" + math.round(color.channel($color, "red", $space: rgb)) + ", " +
+      math.round(color.channel($color, "green", $space: rgb)) + ", " +
+      math.round(color.channel($color, "blue", $space: rgb)) + ")"
+  );
+}
+
+// Pair a compile-time color with a runtime alpha (e.g. a CSS custom
+// property). color.change() requires $alpha to be a literal number, so it
+// can't take a var() — this builds the oklch() CSS function directly
+// instead of asking Sass to resolve the alpha channel.
+@function with-var-alpha($color, $alpha) {
+  @return string.unquote(
+    "oklch(" + color.channel($color, "lightness", $space: oklch) + " " +
+      color.channel($color, "chroma", $space: oklch) + " " +
+      color.channel($color, "hue", $space: oklch) + " / " + $alpha + ")"
   );
 }
 
 // Generate a shadow layer
 @function shadow-layer($elevation, $blur, $opacity, $color) {
-  @return #{($elevation * 0.5)} #{$elevation} #{$blur} #{rgba($color, $opacity)};
+  @return #{($elevation * 0.5)} #{$elevation} #{$blur}
+    #{color.change($color, $alpha: $opacity)};
 }
 
 // Generate a shadow with 7 layers
@@ -57,5 +73,6 @@
       $box-shadow-opacity,
       $color
     ),
-    0 0 0 0.0625rem #{rgba($color, ($box-shadow-opacity * 0.25))};
+    0 0 0 0.0625rem
+      #{color.change($color, $alpha: ($box-shadow-opacity * 0.25))};
 }

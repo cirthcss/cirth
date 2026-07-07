@@ -1,5 +1,3 @@
-@use "sass:meta";
-@use "config" as *;
 @use "helpers/copyright";
 
 // Layout
@@ -44,16 +42,9 @@
 @use "utilities/accessibility"; // -ms-touch-action, aria-*
 @use "utilities/reduce-motion"; // prefers-reduced-motion
 
-// Theming
-// $theme-color selects which theme partial to load. "azure" (the
-// default) and any future default-theme accent fall through to
-// themes/default; "jade" and "slate" are complete, self-contained
-// themes, not accent swaps of the default theme. Custom properties are
-// order-independent, so loading the theme last does not change behavior.
-@if $theme-color == "jade" {
-  @include meta.load-css("themes/jade");
-} @else if $theme-color == "slate" {
-  @include meta.load-css("themes/slate");
-} @else {
-  @include meta.load-css("themes/default");
-}
+// Theme
+// src/theme/ is the single source of Cirth's official design tokens.
+// Alternate accents (see src/presets/) are published as separate
+// stylesheets that only override CSS custom properties, meant to be
+// loaded after this one — they are not alternate builds of this file.
+@use "theme";

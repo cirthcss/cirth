@@ -1,0 +1,99 @@
+// Coral preset
+// ––––––––––––––––––––
+// A demonstrative token-override recipe, not a self-contained theme: a
+// playful look — a vivid warm primary accent, warm-toned neutrals, a soft
+// coral-tinted glow shadow with a matching button lift, looser spacing,
+// bouncy motion, a rounded webfont, and extra-rounded corners. Import it
+// after the main Cirth stylesheet — it only overrides existing custom
+// properties and reuses the theme's light/dark switching logic and shadow
+// helper.
+@use "sass:color";
+@use "../helpers/functions";
+@use "../helpers/selectors";
+
+// Self-hosted-equivalent, GDPR-compliant webfont CDN (no tracking, unlike
+// Google Fonts) — only the static weights this preset's font stack uses:
+// body text (400), table headers (600), and headings (700).
+// display=swap avoids invisible text while the font downloads.
+@import "https://fonts.bunny.net/css?family=fredoka:400,600,700&display=swap";
+
+// Coral
+$coral-650: oklch(45% 0.15 35deg);
+$coral-600: oklch(50% 0.16 35deg);
+$coral-550: oklch(55% 0.17 35deg);
+$coral-500: oklch(60% 0.18 35deg);
+$coral-400: oklch(65% 0.17 35deg);
+$coral-350: oklch(68% 0.16 35deg);
+$coral-250: oklch(80% 0.1 35deg);
+
+@mixin light {
+  // Surface: warm-toned neutrals instead of the default's cool neutral scale
+  --cirth-muted-color: oklch(52% 0.02 35deg);
+  --cirth-muted-border-color: oklch(88% 0.02 35deg);
+  --cirth-text-selection-color: #{color.change($coral-400, $alpha: 0.25)};
+
+  // Primary
+  --cirth-primary: #{$coral-550};
+  --cirth-primary-background: #{$coral-550};
+  --cirth-primary-underline: #{color.change($coral-550, $alpha: 0.5)};
+  --cirth-primary-hover: #{$coral-650};
+  --cirth-primary-hover-background: #{$coral-600};
+  --cirth-primary-focus: #{color.change($coral-400, $alpha: 0.5)};
+
+  // Shadow: a soft coral-tinted glow (reusing the same shadow generator the
+  // theme itself uses, just recolored), with a matching lift on button hover
+  --cirth-box-shadow: #{functions.shadow($coral-400)};
+  --cirth-button-hover-box-shadow: 0 0.5rem 1rem
+    #{color.change($coral-400, $alpha: 0.35)};
+}
+
+@mixin dark {
+  --cirth-muted-color: oklch(66% 0.02 35deg);
+  --cirth-muted-border-color: oklch(30% 0.025 35deg);
+  --cirth-text-selection-color: #{color.change($coral-350, $alpha: 0.1875)};
+
+  // Primary
+  --cirth-primary: #{$coral-350};
+  --cirth-primary-background: #{$coral-550};
+  --cirth-primary-underline: #{color.change($coral-350, $alpha: 0.5)};
+  --cirth-primary-hover: #{$coral-250};
+  --cirth-primary-hover-background: #{$coral-500};
+  --cirth-primary-focus: #{color.change($coral-350, $alpha: 0.375)};
+
+  // Shadow
+  --cirth-box-shadow: #{functions.shadow($coral-350)};
+  --cirth-button-hover-box-shadow: 0 0.5rem 1rem
+    #{color.change($coral-250, $alpha: 0.4)};
+}
+
+// Presets are always compiled unscoped, so the light/dark switching here is
+// hardcoded to :root/:host rather than going through the theme's
+// $parent-selector-aware helper — one less thing a standalone preset needs.
+[data-theme="light"],
+:root:not([data-theme="dark"]),
+:host(:not([data-theme="dark"])) {
+  @include light;
+}
+
+@media only screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme]),
+  :host(:not([data-theme])) {
+    @include dark;
+  }
+}
+
+[data-theme="dark"] {
+  @include dark;
+}
+
+// Scheme-independent system feel: extra-rounded corners, a rounded
+// webfont, looser spacing, and bouncy motion. Each overrides one token
+// that every consuming component already reads, so nothing here
+// duplicates component-level styles.
+@include selectors.root {
+  --cirth-border-radius: var(--cirth-radius-2xl);
+  --cirth-font-family: "Fredoka", system-ui, sans-serif;
+  --cirth-spacing: var(--cirth-space-5);
+  --cirth-transition: var(--cirth-duration-slow)
+    cubic-bezier(0.34, 1.56, 0.64, 1);
+}
