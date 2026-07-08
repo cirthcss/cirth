@@ -14,23 +14,9 @@ $loading-icon-inverse: true !default;
    * Styles
    */
 
-$root-selector: ":root, :host";
-
-@if $parent-selector != "" {
-  $root-selector: $parent-selector;
-}
-
-#{$root-selector} {
+@include selectors.root {
   // Typography
-  --cirth-font-family-emoji:
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --cirth-font-family-sans-serif:
-    system-ui, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, Helvetica, Arial,
-    "Helvetica Neue", sans-serif, var(--cirth-font-family-emoji);
-  --cirth-font-family-monospace:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
-    monospace, var(--cirth-font-family-emoji);
-  --cirth-font-family: var(--cirth-font-family-sans-serif);
+  --cirth-font-family: var(--cirth-font-family-sans);
   --cirth-line-height: var(--cirth-line-height-normal);
   --cirth-font-weight: var(--cirth-font-weight-regular);
   --cirth-font-size: 100%;
@@ -103,11 +89,13 @@ $root-selector: ":root, :host";
   // Loading icon (animated)
   // Inspired by https://codepen.io/aleksander351/pen/KzgKPo
   --cirth-icon-loading: url("data:image/svg+xml,%3Csvg fill='none' height='24' width='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' %3E%3Cstyle%3E g %7B animation: rotate 2s linear infinite; transform-origin: center center; %7D circle %7B stroke-dasharray: 75,100; stroke-dashoffset: -5; animation: dash 1.5s ease-in-out infinite; stroke-linecap: round; %7D @keyframes rotate %7B 0%25 %7B transform: rotate(0deg); %7D 100%25 %7B transform: rotate(360deg); %7D %7D @keyframes dash %7B 0%25 %7B stroke-dasharray: 1,100; stroke-dashoffset: 0; %7D 50%25 %7B stroke-dasharray: 44.5,100; stroke-dashoffset: -17.5; %7D 100%25 %7B stroke-dasharray: 44.5,100; stroke-dashoffset: -62; %7D %7D %3C/style%3E%3Cg%3E%3Ccircle cx='12' cy='12' r='10' fill='none' stroke='#{functions.display-rgb($neutral-400)}' stroke-width='4' /%3E%3C/g%3E%3C/svg%3E");
+}
 
-  // Responsive root font size
-  @each $key, $values in $breakpoints {
-    @if $values {
-      @media (min-width: map.get($values, "breakpoint")) {
+// Responsive root font size
+@each $key, $values in $breakpoints {
+  @if $values {
+    @media (min-width: map.get($values, "breakpoint")) {
+      @include selectors.root {
         --cirth-font-size: #{map.get($values, "root-font-size")};
       }
     }
@@ -197,7 +185,7 @@ $root-selector: ":root, :host";
   code,
   kbd,
   samp {
-    --cirth-font-family: var(--cirth-font-family-monospace);
+    --cirth-font-family: var(--cirth-font-family-mono);
   }
 
   kbd {

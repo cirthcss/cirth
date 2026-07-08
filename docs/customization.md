@@ -37,8 +37,8 @@ touch:
 
 1. **Foundation tokens** — raw scales that rarely need overriding directly:
    `--cirth-space-*`, `--cirth-size-*`, `--cirth-radius-*`,
-   `--cirth-font-size-*`, `--cirth-font-weight-*`, `--cirth-line-height-*`,
-   `--cirth-shadow-*`, `--cirth-duration-*`, `--cirth-ease-*`.
+   `--cirth-font-family-*`, `--cirth-font-size-*`, `--cirth-font-weight-*`,
+   `--cirth-line-height-*`, `--cirth-duration-*`, `--cirth-ease-*`.
 2. **Semantic tokens** — what components actually consume, and what you
    should override: `--cirth-primary`, `--cirth-spacing`,
    `--cirth-border-radius`, `--cirth-form-element-border-color`,

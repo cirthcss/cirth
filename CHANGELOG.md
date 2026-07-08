@@ -10,6 +10,27 @@ Cirth is pre-1.0 and the custom property surface is not yet stable — see the
 
 ### Changed
 
+- **Breaking:** unified the two parallel font-family token sets into one.
+  `src/theme/_foundations.scss` is now the single source for every font
+  stack: `--cirth-font-family-emoji`, `-sans` (which now embeds the emoji
+  fallback directly), `-serif`, `-mono`, and `-display`. The duplicate
+  legacy names Cirth inherited from Pico — `--cirth-font-family-sans-serif`,
+  `--cirth-font-family-monospace` — and the intermediate
+  `--cirth-font-family-ui` are gone; `--cirth-font-family` now reads
+  `var(--cirth-font-family-sans)` and code elements read
+  `var(--cirth-font-family-mono)`. If you overrode one of the removed
+  names, override the short-suffix token instead.
+
+### Removed
+
+- **Breaking:** dropped the never-consumed `--cirth-shadow-*` scale
+  (`-none`/`-xs`…`-xl`/`-inner`) and the `--cirth-letter-spacing-*` scale
+  (whose `tight` and `normal` steps were both `0`). No component ever read
+  them; shadows are driven by the semantic `--cirth-box-shadow` /
+  `--cirth-card-box-shadow` / `--cirth-dropdown-box-shadow` tokens, which
+  are unchanged. Publishing unwired tokens as API would have made them
+  breaking to remove after 1.0.
+
 - **Breaking:** renamed the primary brand accent scale from `$azure-*` to
   `$amber-*` and repointed every lightness step at the brand mark's own hue
   (69.35deg), recomputed with the same 85%-of-max-in-gamut-chroma method
