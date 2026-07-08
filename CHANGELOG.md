@@ -20,6 +20,9 @@ Cirth is pre-1.0 and the custom property surface is not yet stable — see the
   `var(--cirth-font-family-sans)` and code elements read
   `var(--cirth-font-family-mono)`. If you overrode one of the removed
   names, override the short-suffix token instead.
+- Documented how `data-theme` differs between builds: unscoped builds honor
+  the attribute on any ancestor, scoped builds only on the `.cirth` element
+  itself or inside it (see Customization → Light and dark).
 
 ### Removed
 

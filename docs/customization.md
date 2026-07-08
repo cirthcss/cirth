@@ -88,6 +88,25 @@ This site uses that same attribute: the theme toggle in the nav bar sets
 everything — chrome, prose, and live examples — switches scheme through the
 framework's own mechanism.
 
+### `data-theme` in scoped builds
+
+The two builds intentionally differ in *where* they look for the attribute:
+
+- **Unscoped builds** respond to `data-theme` on any ancestor — conventionally
+  `<html>`, but any wrapper element works, and different subtrees can force
+  different schemes.
+- **Scoped builds** only look at the `.cirth` element itself (or elements
+  inside it). A `data-theme` on an ancestor *outside* the scope — e.g.
+  `<html data-theme="dark">` around a `.cirth` widget — has no effect,
+  because every generated selector is anchored to `.cirth`.
+
+If you embed a scoped Cirth widget in a host page that manages its own
+dark mode, mirror the host's theme onto the wrapper:
+
+```html
+<div class="cirth" data-theme="dark">…</div>
+```
+
 ## Spacing and typography
 
 - `--cirth-spacing` drives most component padding/margins; it defaults to
