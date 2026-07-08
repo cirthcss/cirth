@@ -50,7 +50,8 @@ Cirth publishes four CSS builds from the same source:
 All four builds share the same official amber theme. `cobalt` and `coral`
 (see [Colors](/colors)) are optional presets — stylesheets that override an
 existing set of custom properties (color, shadow, type, spacing, motion) —
-loaded after any of the four builds above, for example `presets/cobalt.css`.
+loaded after any of the four builds above, for example
+`dist/presets/cobalt.min.css`.
 
 ### Classless
 

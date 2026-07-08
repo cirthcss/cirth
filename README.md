@@ -140,20 +140,18 @@ top of the default theme. They're worked examples of restyling the system,
 not independently maintained themes — load one after the main stylesheet.
 
 - **`cobalt`** — corporate: deep navy primary, cool-toned neutrals, a flat
-  shadow, the IBM Plex Sans webfont, denser spacing, snappier motion,
-  square corners.
+  shadow, a business-like Arial/Helvetica font stack, denser spacing,
+  snappier motion, square corners.
 - **`coral`** — playful: vivid warm primary, warm-toned neutrals, a soft
-  coral-tinted glow shadow, the Fredoka webfont, looser spacing, bouncy
-  motion, extra-rounded corners.
+  coral-tinted glow shadow, a friendly Trebuchet MS font stack, looser
+  spacing, bouncy motion, extra-rounded corners.
 
-Each preset's webfont is loaded via `@import` from
-[Bunny Fonts](https://fonts.bunny.net), a no-tracking Google Fonts
-alternative — the one network request Cirth's own files make beyond the
-stylesheet itself.
+Like the default theme, presets stick to fonts that ship with every major
+OS — no `@import`, no webfont, zero network requests.
 
 ```html
 <link rel="stylesheet" href="dist/cirth.min.css">
-<link rel="stylesheet" href="presets/cobalt.css">
+<link rel="stylesheet" href="dist/presets/cobalt.min.css">
 ```
 
 ```js

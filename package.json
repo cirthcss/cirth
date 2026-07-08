@@ -10,15 +10,14 @@
 		"./classless": "./dist/cirth.classless.min.css",
 		"./scoped": "./dist/cirth.scoped.min.css",
 		"./classless/scoped": "./dist/cirth.classless.scoped.min.css",
-		"./presets/coral": "./presets/coral.css",
-		"./presets/cobalt": "./presets/cobalt.css",
-		"./presets/*": "./presets/*",
+		"./presets/coral": "./dist/presets/coral.min.css",
+		"./presets/cobalt": "./dist/presets/cobalt.min.css",
+		"./presets/*": "./dist/presets/*",
 		"./dist/*": "./dist/*",
 		"./package.json": "./package.json"
 	},
 	"files": [
-		"dist",
-		"presets"
+		"dist"
 	],
 	"license": "MIT",
 	"repository": {

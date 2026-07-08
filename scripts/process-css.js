@@ -2,10 +2,11 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 
-// Presets (src/presets/) are plain custom-property overrides, published
-// unminified alongside the main dist/ build — only dist/ gets a minified pass.
+// Presets (src/presets/) are plain custom-property overrides compiled into
+// dist/presets/ and treated exactly like the rest of dist/: transformed by
+// Lightning CSS, then minified.
 const distFoldername = path.join(__dirname, "../dist");
-const presetsFoldername = path.join(__dirname, "../presets");
+const presetsFoldername = path.join(__dirname, "../dist/presets");
 const lightningcssBinary = path.join(
 	__dirname,
 	"../node_modules/.bin",
@@ -75,6 +76,10 @@ if (mode === "--transform") {
 	}
 } else if (mode === "--minify") {
 	minifyFolder(distFoldername);
+
+	if (fs.existsSync(presetsFoldername)) {
+		minifyFolder(presetsFoldername);
+	}
 } else {
 	console.error("Usage: node scripts/process-css --transform|--minify");
 	process.exit(1);

@@ -2,18 +2,13 @@
 // ––––––––––––––––––––
 // A demonstrative token-override recipe, not a self-contained theme: a
 // corporate look — deep navy primary accent, cool-toned neutrals, a crisp
-// flat shadow, denser spacing, snappier motion, a webfont, and square
-// corners. Import it after the main Cirth stylesheet — it only overrides
-// existing custom properties and reuses the theme's light/dark switching
-// logic.
+// flat shadow, denser spacing, snappier motion, a business-like system
+// font, and square corners. Import it after the main Cirth stylesheet —
+// it only overrides existing custom properties and reuses the theme's
+// light/dark switching logic. No @import, no webfont: like the default
+// theme, presets make zero network requests.
 @use "sass:color";
 @use "../helpers/selectors";
-
-// Self-hosted-equivalent, GDPR-compliant webfont CDN (no tracking, unlike
-// Google Fonts) — only the static weights this preset's font stack uses:
-// body text (400), table headers (600), and headings (700).
-// display=swap avoids invisible text while the font downloads.
-@import "https://fonts.bunny.net/css?family=ibm-plex-sans:400,600,700&display=swap";
 
 // Cobalt
 $cobalt-900: oklch(22% 0.07 258deg);
@@ -79,14 +74,17 @@ $cobalt-400: oklch(64% 0.09 258deg);
   @include dark;
 }
 
-// Scheme-independent system feel: square corners, a business-like webfont,
-// denser spacing, and snappier motion. Each overrides one token that every
-// consuming component already reads, so nothing here duplicates
-// component-level styles.
+// Scheme-independent system feel: square corners, a neutral grotesque font
+// stack that ships with every major OS, denser spacing, and snappier
+// motion. Each overrides one token that every consuming component already
+// reads, so nothing here duplicates component-level styles.
 @include selectors.root {
   --cirth-border-radius: 0;
   --cirth-radius-pill: 0;
-  --cirth-font-family: "IBM Plex Sans", system-ui, sans-serif;
+  --cirth-font-family:
+    Arial, "Helvetica Neue", Helvetica, sans-serif,
+    var(--cirth-font-family-emoji);
+  --cirth-font-family-display: var(--cirth-font-family);
   --cirth-spacing: var(--cirth-space-3);
   --cirth-transition: var(--cirth-duration-fast) var(--cirth-ease-out);
 }

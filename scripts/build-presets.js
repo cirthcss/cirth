@@ -4,7 +4,7 @@ const fs = require("node:fs");
 
 const projectRoot = path.join(__dirname, "..");
 const presetsSourceFolder = path.join(projectRoot, "src/presets");
-const outputFolder = path.join(projectRoot, "presets");
+const outputFolder = path.join(projectRoot, "dist/presets");
 
 // Presets are plain custom-property overrides (see src/presets/), so each
 // one compiles standalone with no build-time configuration to inject.

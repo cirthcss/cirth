@@ -47,7 +47,7 @@ Cirth is pre-1.0 and the custom property surface is not yet stable — see the
   are untouched — still `--cirth-font-family` (sans by default) — so this
   is a heading-only typographic accent, still zero network requests.
   `cobalt` and `coral` each now also set `--cirth-font-family-display` to
-  their own webfont, so their headings stay on-brand instead of falling
+  their own font stack, so their headings stay on-brand instead of falling
   back to the new default serif.
 - Redesigned the docs homepage around the new mark: a dark hero and footer
   (scoped with `data-theme="dark"`, so they reuse Cirth's own dark tokens
@@ -57,26 +57,32 @@ Cirth is pre-1.0 and the custom property surface is not yet stable — see the
   theme's own tokens plus a CSS radial-gradient wash of the primary color.
 - **Breaking:** `jade` and `slate` are no longer full, independently built
   themes. Cirth now ships a single official theme (amber) plus two optional
-  presets — stylesheets under `presets/` that override an existing set of
-  CSS custom properties, meant to be loaded after the main stylesheet:
+  presets — stylesheets under `dist/presets/` that override an existing set
+  of CSS custom properties, meant to be loaded after the main stylesheet:
   - `cobalt` (replacing `slate`) — corporate: deep navy primary,
-    cool-toned neutrals, a crisp flat shadow, the IBM Plex Sans webfont,
-    denser spacing, snappier motion, and square corners
-    (`--cirth-border-radius` / `--cirth-radius-pill` set to `0`).
+    cool-toned neutrals, a crisp flat shadow, a business-like
+    Arial/Helvetica font stack, denser spacing, snappier motion, and square
+    corners (`--cirth-border-radius` / `--cirth-radius-pill` set to `0`).
   - `coral` (replacing `jade`) — playful: vivid warm primary, warm-toned
     neutrals, a soft coral-tinted glow shadow with a matching button-hover
-    lift, the Fredoka webfont, looser spacing, bouncy motion, and
-    extra-rounded corners (`--cirth-border-radius` set to
+    lift, a friendly Trebuchet MS font stack, looser spacing, bouncy
+    motion, and extra-rounded corners (`--cirth-border-radius` set to
     `--cirth-radius-2xl`).
 
   Removed the per-theme build matrix (`dist/cirth.jade.min.css`,
   `dist/cirth.classless.scoped.slate.min.css`, ...) and
   `scripts/build-themes.js` in favor of `scripts/build-presets.js`.
-- Each preset now `@import`s its webfont from [Bunny Fonts](https://fonts.bunny.net)
-  (a no-tracking Google Fonts alternative), with `display=swap` so text
-  isn't invisible while the font downloads. This is a deliberate, preset-only
-  exception to Cirth otherwise making no network requests of its own — the
-  main theme stays dependency-free.
+  Like the default theme, presets stick to fonts that ship with every major
+  OS — no `@import`, no webfont — so nothing in Cirth makes a network
+  request beyond the stylesheets themselves.
+- Preset output moved into the main build folder: `dist/presets/*.css`
+  instead of a separate top-level `presets/` directory, and presets now go
+  through the same Lightning CSS transform and minify passes as every other
+  build (so `dist/presets/cobalt.min.css` exists too). The
+  `@cirthcss/cirth/presets/cobalt` / `.../presets/coral` export subpaths
+  keep working and now resolve to the minified files; only deep paths that
+  spelled out the old location (e.g. a CDN URL ending in
+  `/presets/cobalt.css`) need updating to `/dist/presets/cobalt.min.css`.
 - **Breaking:** flattened `src/themes/base/` and `src/themes/default/` into
   a single `src/theme/` directory — the one place that now defines Cirth's
   official design tokens (foundation scales, semantic tokens, light/dark

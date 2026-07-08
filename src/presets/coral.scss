@@ -3,19 +3,14 @@
 // A demonstrative token-override recipe, not a self-contained theme: a
 // playful look — a vivid warm primary accent, warm-toned neutrals, a soft
 // coral-tinted glow shadow with a matching button lift, looser spacing,
-// bouncy motion, a rounded webfont, and extra-rounded corners. Import it
-// after the main Cirth stylesheet — it only overrides existing custom
-// properties and reuses the theme's light/dark switching logic and shadow
-// helper.
+// bouncy motion, a friendly system font, and extra-rounded corners.
+// Import it after the main Cirth stylesheet — it only overrides existing
+// custom properties and reuses the theme's light/dark switching logic and
+// shadow helper. No @import, no webfont: like the default theme, presets
+// make zero network requests.
 @use "sass:color";
 @use "../helpers/functions";
 @use "../helpers/selectors";
-
-// Self-hosted-equivalent, GDPR-compliant webfont CDN (no tracking, unlike
-// Google Fonts) — only the static weights this preset's font stack uses:
-// body text (400), table headers (600), and headings (700).
-// display=swap avoids invisible text while the font downloads.
-@import "https://fonts.bunny.net/css?family=fredoka:400,600,700&display=swap";
 
 // Coral
 $coral-650: oklch(45% 0.15 35deg);
@@ -86,13 +81,16 @@ $coral-250: oklch(80% 0.1 35deg);
   @include dark;
 }
 
-// Scheme-independent system feel: extra-rounded corners, a rounded
-// webfont, looser spacing, and bouncy motion. Each overrides one token
-// that every consuming component already reads, so nothing here
-// duplicates component-level styles.
+// Scheme-independent system feel: extra-rounded corners, a rounded,
+// friendly font stack that ships with every major OS, looser spacing, and
+// bouncy motion. Each overrides one token that every consuming component
+// already reads, so nothing here duplicates component-level styles.
 @include selectors.root {
   --cirth-border-radius: var(--cirth-radius-2xl);
-  --cirth-font-family: "Fredoka", system-ui, sans-serif;
+  --cirth-font-family:
+    "Trebuchet MS", "Segoe UI", Verdana, sans-serif,
+    var(--cirth-font-family-emoji);
+  --cirth-font-family-display: var(--cirth-font-family);
   --cirth-spacing: var(--cirth-space-5);
   --cirth-transition: var(--cirth-duration-slow)
     cubic-bezier(0.34, 1.56, 0.64, 1);

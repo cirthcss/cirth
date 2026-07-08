@@ -11,19 +11,17 @@ light/dark switching logic are duplicated.
 <ColorSwatches />
 
 - **`cobalt`** — a corporate look: a deep navy primary accent, cool-toned
-  neutrals, a crisp flat shadow (no blur), the IBM Plex Sans webfont,
-  denser spacing, snappier motion, and square corners.
+  neutrals, a crisp flat shadow (no blur), a business-like Arial/Helvetica
+  font stack, denser spacing, snappier motion, and square corners.
 - **`coral`** — a playful look: a vivid warm primary accent, warm-toned
   neutrals, a soft coral-tinted glow shadow with a matching button-hover
-  lift, the Fredoka webfont, looser spacing, bouncy motion, and
-  extra-rounded corners.
+  lift, a friendly Trebuchet MS font stack, looser spacing, bouncy motion,
+  and extra-rounded corners.
 
-Both presets `@import` their webfont from [Bunny Fonts](https://fonts.bunny.net)
-(a GDPR-compliant, no-tracking alternative to Google Fonts) — the only part
-of Cirth that makes a network request beyond the stylesheet itself. If you
-need to avoid that, don't load the preset's font import: copy the rest of
-the preset's overrides and point `--cirth-font-family` at a font you
-self-host instead.
+Like the default theme, presets use font stacks that ship with every major
+OS — no `@import`, no webfont, zero network requests beyond the stylesheet
+itself. To use a custom font, load it yourself (self-hosted or from a CDN
+you trust) and point `--cirth-font-family` at it after the preset.
 
 ## Using a preset
 
@@ -33,7 +31,7 @@ default, classless, or scoped builds:
 
 ```html
 <link rel="stylesheet" href="dist/cirth.min.css">
-<link rel="stylesheet" href="presets/cobalt.css">
+<link rel="stylesheet" href="dist/presets/cobalt.min.css">
 ```
 
 ```css
