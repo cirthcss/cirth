@@ -131,6 +131,33 @@ export default defineConfig({
 
 		socialLinks: [{ icon: "github", link: "https://github.com/cirthcss/cirth" }],
 
+		footerLinks: [
+			{
+				title: "Docs",
+				items: [
+					{ text: "Get Started", link: "/get-started" },
+					{ text: "Customization", link: "/customization" },
+					{ text: "Colors", link: "/colors" },
+					{ text: "Components", link: "/components/card" },
+				],
+			},
+			{
+				title: "Community",
+				items: [
+					{ text: "GitHub", link: "https://github.com/cirthcss/cirth" },
+					{ text: "Issues", link: "https://github.com/cirthcss/cirth/issues" },
+				],
+			},
+			{
+				title: "Resources",
+				items: [
+					{ text: "Changelog", link: "https://github.com/cirthcss/cirth/blob/develop/CHANGELOG.md" },
+					{ text: "About Cirth", link: "/about" },
+					{ text: "Build tooling", link: "/build-tooling" },
+				],
+			},
+		],
+
 		footer: {
 			message: "Released under the MIT License.",
 			copyright: "Copyright © 2025-present Riccardo Pastori",

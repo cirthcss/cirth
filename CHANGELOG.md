@@ -25,6 +25,12 @@ Cirth is pre-1.0 and the custom property surface is not yet stable — see the
   `cobalt` and `coral` each now also set `--cirth-font-family-display` to
   their own webfont, so their headings stay on-brand instead of falling
   back to the new default serif.
+- Redesigned the docs homepage around the new mark: a dark hero and footer
+  (scoped with `data-theme="dark"`, so they reuse Cirth's own dark tokens
+  instead of hardcoding colors), an eyebrow label, a real stats row (build
+  size, zero JS, built-in color schemes, license), small stroke icons on
+  each feature card, and a three-column footer. No new images — just the
+  theme's own tokens plus a CSS radial-gradient wash of the primary color.
 - **Breaking:** `jade` and `slate` are no longer full, independently built
   themes. Cirth now ships a single official theme (amber) plus two optional
   presets — stylesheets under `presets/` that override an existing set of
