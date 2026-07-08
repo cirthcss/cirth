@@ -12,7 +12,7 @@
 // for: $neutral-* holds chroma to a small, symmetric bell that peaks at
 // the 500 step and returns to 0 at the extremes — enough to read as a
 // deliberate cool gray, not enough to compete with content color.
-// $azure-*, $error-*, $success-*, $warning-* are each pinned to one fixed
+// $amber-*, $error-*, $success-*, $warning-* are each pinned to one fixed
 // hue, then set to 85% of that hue's own maximum in-gamut sRGB chroma at
 // every lightness step. Because the sRGB gamut boundary shape differs per
 // hue (e.g. red-orange's ceiling peaks earlier, at a darker lightness,
@@ -23,9 +23,10 @@
 // Status colors (error, success, warning) are named for the role they
 // play, not the hue they happen to be — $error-500 is what most people
 // would call "red", but naming it that way would hide why it's actually
-// used (invalid form state, deleted/removed text). $azure and $neutral
+// used (invalid form state, deleted/removed text). $amber and $neutral
 // are named for what they visually are (brand accent; cool gray) since
-// neither is tied to a single semantic role.
+// neither is tied to a single semantic role. $amber's hue (69.35deg) is
+// lifted directly from the brand mark, not picked independently of it.
 
 // B&W
 $black: oklch(0% 0 0deg);
@@ -52,26 +53,26 @@ $neutral-150: oklch(87.3% 0.011 264deg);
 $neutral-100: oklch(91.7% 0.006 264deg);
 $neutral-50: oklch(96% 0 264deg);
 
-// Azure (primary brand accent)
-$azure-950: oklch(18% 0.037 242deg);
-$azure-900: oklch(22.3% 0.046 242deg);
-$azure-850: oklch(26.7% 0.054 242deg);
-$azure-800: oklch(31% 0.063 242deg);
-$azure-750: oklch(35.3% 0.071 242deg);
-$azure-700: oklch(39.7% 0.08 242deg);
-$azure-650: oklch(44% 0.089 242deg);
-$azure-600: oklch(48.3% 0.098 242deg);
-$azure-550: oklch(52.7% 0.106 242deg);
-$azure-500: oklch(57% 0.115 242deg);
-$azure-450: oklch(61.3% 0.124 242deg);
-$azure-400: oklch(65.7% 0.133 242deg);
-$azure-350: oklch(70% 0.141 242deg);
-$azure-300: oklch(74.3% 0.124 242deg);
-$azure-250: oklch(78.7% 0.101 242deg);
-$azure-200: oklch(83% 0.079 242deg);
-$azure-150: oklch(87.3% 0.058 242deg);
-$azure-100: oklch(91.7% 0.038 242deg);
-$azure-50: oklch(96% 0.018 242deg);
+// Amber (primary brand accent)
+$amber-950: oklch(18% 0.033 69.35deg);
+$amber-900: oklch(22.3% 0.041 69.35deg);
+$amber-850: oklch(26.7% 0.049 69.35deg);
+$amber-800: oklch(31% 0.057 69.35deg);
+$amber-750: oklch(35.3% 0.065 69.35deg);
+$amber-700: oklch(39.7% 0.073 69.35deg);
+$amber-650: oklch(44% 0.081 69.35deg);
+$amber-600: oklch(48.3% 0.089 69.35deg);
+$amber-550: oklch(52.7% 0.097 69.35deg);
+$amber-500: oklch(57% 0.105 69.35deg);
+$amber-450: oklch(61.3% 0.113 69.35deg);
+$amber-400: oklch(65.7% 0.121 69.35deg);
+$amber-350: oklch(70% 0.129 69.35deg);
+$amber-300: oklch(74.3% 0.137 69.35deg);
+$amber-250: oklch(78.7% 0.146 69.35deg);
+$amber-200: oklch(83% 0.113 69.35deg);
+$amber-150: oklch(87.3% 0.082 69.35deg);
+$amber-100: oklch(91.7% 0.052 69.35deg);
+$amber-50: oklch(96% 0.024 69.35deg);
 
 // Error (invalid form state, deleted/removed text)
 $error-950: oklch(18% 0.063 29.73deg);

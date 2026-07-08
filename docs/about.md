@@ -32,7 +32,7 @@ The most important user-facing differences are:
 - Standalone color utility builds and fluid classless builds are not part of
   the public build surface.
 - The inherited 20-accent theme set has been reduced to a single official
-  theme (azure), with `cobalt` (corporate) and `coral` (playful) published
+  theme (amber), with `cobalt` (corporate) and `coral` (playful) published
   as optional token-override presets rather than full themes — see
   [Colors](/colors).
 

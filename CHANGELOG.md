@@ -10,8 +10,23 @@ Cirth is pre-1.0 and the custom property surface is not yet stable — see the
 
 ### Changed
 
+- **Breaking:** renamed the primary brand accent scale from `$azure-*` to
+  `$amber-*` and repointed every lightness step at the brand mark's own hue
+  (69.35deg), recomputed with the same 85%-of-max-in-gamut-chroma method
+  already used for the other accent scales — so the theme's primary color
+  and the logo are the same color by construction. `--cirth-primary` and
+  friends keep their names; only the underlying Sass scale and the theme's
+  name changed, from azure to amber.
+- Pointed the previously unused `--cirth-font-family-display` token at
+  `--cirth-font-family-serif` and switched headings (`h1`–`h6`) to read it
+  instead of `--cirth-font-family`. Body text, buttons, and form elements
+  are untouched — still `--cirth-font-family` (sans by default) — so this
+  is a heading-only typographic accent, still zero network requests.
+  `cobalt` and `coral` each now also set `--cirth-font-family-display` to
+  their own webfont, so their headings stay on-brand instead of falling
+  back to the new default serif.
 - **Breaking:** `jade` and `slate` are no longer full, independently built
-  themes. Cirth now ships a single official theme (azure) plus two optional
+  themes. Cirth now ships a single official theme (amber) plus two optional
   presets — stylesheets under `presets/` that override an existing set of
   CSS custom properties, meant to be loaded after the main stylesheet:
   - `cobalt` (replacing `slate`) — corporate: deep navy primary,
@@ -46,7 +61,7 @@ Cirth is pre-1.0 and the custom property surface is not yet stable — see the
   Renamed the scales used for status colors from their hue ($red-500,
   $jade-450, $amber-100/50) to the role they actually play ($error-*,
   $success-*, $warning-*), and gave error/success/warning the same
-  eight-step ladder as `$azure-*` instead of one or two hardcoded shades.
+  eight-step ladder as `$amber-*` instead of one or two hardcoded shades.
 - **Fixed:** invalid/valid form borders, form validation icons, and
   `<ins>`/`<del>` text were rendering the wrong hue (purple/magenta instead
   of red, blue/cyan instead of green) in the compiled CSS. The cause:

@@ -17,22 +17,22 @@
   --cirth-color: #{$neutral-200};
 
   // Text selection color
-  --cirth-text-selection-color: #{color.change($azure-350, $alpha: 0.1875)};
+  --cirth-text-selection-color: #{color.change($amber-350, $alpha: 0.1875)};
 
   // Muted colors
   --cirth-muted-color: #{$neutral-450};
   --cirth-muted-border-color: #{$neutral-850};
 
   // Primary colors
-  --cirth-primary: #{$azure-350};
-  --cirth-primary-background: #{$azure-550};
+  --cirth-primary: #{$amber-350};
+  --cirth-primary-background: #{$amber-550};
   --cirth-primary-border: var(--cirth-primary-background);
-  --cirth-primary-underline: #{color.change($azure-350, $alpha: 0.5)};
-  --cirth-primary-hover: #{$azure-250};
-  --cirth-primary-hover-background: #{$azure-500};
+  --cirth-primary-underline: #{color.change($amber-350, $alpha: 0.5)};
+  --cirth-primary-hover: #{$amber-250};
+  --cirth-primary-hover-background: #{$amber-500};
   --cirth-primary-hover-border: var(--cirth-primary-hover-background);
   --cirth-primary-hover-underline: var(--cirth-primary-hover);
-  --cirth-primary-focus: #{color.change($azure-350, $alpha: 0.375)};
+  --cirth-primary-focus: #{color.change($amber-350, $alpha: 0.375)};
   --cirth-primary-inverse: #{$white};
 
   // Secondary colors

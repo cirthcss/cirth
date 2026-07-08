@@ -93,7 +93,7 @@ knowing the `dist/` filename convention:
 ```
 
 The `.`/`classless`/`scoped` entries compose the four structural build
-variants, all sharing the one official (azure) theme. `./presets/cobalt` and
+variants, all sharing the one official (amber) theme. `./presets/cobalt` and
 `./presets/coral` are separate, optional stylesheets — token-override
 presets, not alternate builds — meant to be loaded after any of the four.
 The `./dist/*` and `./presets/*` wildcards are kept so existing deep imports

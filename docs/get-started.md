@@ -47,7 +47,7 @@ Cirth publishes four CSS builds from the same source:
 | `dist/cirth.scoped.min.css` | You're embedding Cirth into an existing page, CMS, or app shell and only want elements inside a `.cirth` wrapper affected. |
 | `dist/cirth.classless.scoped.min.css` | Both: scoped **and** classless. |
 
-All four builds share the same official azure theme. `cobalt` and `coral`
+All four builds share the same official amber theme. `cobalt` and `coral`
 (see [Colors](/colors)) are optional presets — stylesheets that override an
 existing set of custom properties (color, shadow, type, spacing, motion) —
 loaded after any of the four builds above, for example `presets/cobalt.css`.

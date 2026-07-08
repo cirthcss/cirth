@@ -103,7 +103,7 @@ The main generated stylesheets are:
 | `dist/cirth.scoped.min.css` | Scoped build for embedding Cirth under `.cirth`. |
 | `dist/cirth.classless.scoped.min.css` | Scoped classless build. |
 
-All four builds share Cirth's one official theme (azure), with light and
+All four builds share Cirth's one official theme (amber), with light and
 dark variants. `cobalt` and `coral` are optional presets, not separate theme
 builds — see [Presets](#presets) below and [Colors](docs/colors.md).
 
@@ -290,7 +290,7 @@ in every case.
 | Typical markup | `<button>`, `<article>`, `<nav>` — no `.btn`, `.card` | Same | `<button class="rounded bg-blue-600 px-4 py-2 ...">` |
 | Customization | CSS custom properties, override after loading | CSS custom properties, override after loading | Config file (`tailwind.config.js`) plus utility classes |
 | Build step | None — link the default build, or a preset on top | None to use the default build | Required for any production bundle (JIT/content scanning) |
-| Themes | 1 official (azure), light/dark, plus 2 token-override presets (cobalt, coral) | ~20 accent colors, light/dark each | None built in; arbitrary via config |
+| Themes | 1 official (amber), light/dark, plus 2 token-override presets (cobalt, coral) | ~20 accent colors, light/dark each | None built in; arbitrary via config |
 | Default build, gzip | ~13KB | ~11.5KB | No single default — depends entirely on utilities used |
 | Public Sass API | No — CSS only | Yes | N/A |
 
@@ -325,7 +325,7 @@ The most important user-facing differences are:
 - Standalone color utility builds and fluid classless builds are not part of
   the public build surface.
 - The inherited 20-accent theme set has been reduced to a single official
-  theme (azure); `cobalt` and `coral` are optional token-override presets,
+  theme (amber); `cobalt` and `coral` are optional token-override presets,
   not separately maintained themes.
 
 ## Roadmap

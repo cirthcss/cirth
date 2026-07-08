@@ -1,6 +1,6 @@
 # Colors
 
-Cirth has one official theme — azure — with hand-tuned light and dark
+Cirth has one official theme — amber — with hand-tuned light and dark
 variants. `cobalt` and `coral` are optional **presets**: stylesheets that
 override an existing set of CSS custom properties on top of the default
 theme. They're worked examples of how far a customization can reasonably
@@ -62,10 +62,10 @@ Sass variables aren't part of the public CSS custom property surface — they
 only exist at build time to derive the semantic tokens (`--cirth-primary`,
 `--cirth-primary-hover`, …) baked into the compiled stylesheet.
 
-Scales are named for what they visually are (`$azure-*` the brand accent,
+Scales are named for what they visually are (`$amber-*` the brand accent,
 `$neutral-*` the cool gray) except the status colors, which are named for
 the role they play instead of their hue: `$error-*`, `$success-*`, and
-`$warning-*` — not `$red-*`, `$jade-*`, `$amber-*` — because that's what
+`$warning-*` — not `$red-*`, `$jade-*`, `$gold-*` — because that's what
 they actually mean everywhere they're used (invalid/valid form state,
 deleted/inserted text, the `<mark>` highlight).
 
@@ -74,7 +74,7 @@ All five scales share one 19-step lightness ladder, 950 (darkest) to 50
 defines every step, and picking one is the same exercise regardless of
 which family you're in. Chroma is derived rather than hand-picked:
 `$neutral-*` holds a small, symmetric chroma bell peaking at the 500 step;
-each accent scale (`$azure-*`, `$error-*`, `$success-*`, `$warning-*`) is
+each accent scale (`$amber-*`, `$error-*`, `$success-*`, `$warning-*`) is
 pinned to one fixed hue and set to a constant 85% of that hue's own
 maximum in-gamut sRGB chroma at every step. The four accent scales don't
 peak at the same step — sRGB's gamut boundary shape differs per hue, e.g.
@@ -82,6 +82,10 @@ red-orange's ceiling sits at a darker lightness than green's — but every
 step of every scale sits at the same fraction of what's actually
 displayable, so the shape difference is the gamut talking, not an
 inconsistency between families.
+
+`$amber-*`'s hue (69.35deg) isn't an arbitrary pick — it's lifted directly
+from the brand mark, so the theme's primary accent and the logo are the
+same color by construction rather than by manual matching.
 
 `cobalt` and `coral` (`src/presets/`) declare only the `oklch()` literals
 their overridden tokens need — they don't duplicate the theme's full
