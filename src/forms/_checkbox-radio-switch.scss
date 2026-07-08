@@ -20,8 +20,10 @@
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  width: 1.25em;
-  height: 1.25em;
+  // 1.5em = 24px at the default root font size: the WCAG 2.5.8 (AA)
+  // minimum target size, without relying on the adjacent label
+  width: 1.5em;
+  height: 1.5em;
   margin-top: -0.125em;
   margin-inline-end: 0.5em;
   border-width: var(--cirth-border-width);
@@ -39,7 +41,7 @@
     --cirth-border-color: var(--cirth-primary-border);
     background-image: var(--cirth-icon-checkbox);
     background-position: center;
-    background-size: 0.75em auto;
+    background-size: 0.9em auto;
     background-repeat: no-repeat;
   }
 
@@ -62,7 +64,7 @@
     --cirth-border-color: var(--cirth-primary-border);
     background-image: var(--cirth-icon-minus);
     background-position: center;
-    background-size: 0.75em auto;
+    background-size: 0.9em auto;
     background-repeat: no-repeat;
   }
 }
@@ -76,7 +78,7 @@
   &:checked:active,
   &:checked:focus {
     --cirth-background-color: var(--cirth-primary-inverse);
-    border-width: 0.35em;
+    border-width: 0.42em;
     background-image: none;
   }
 }
@@ -88,8 +90,10 @@
   --cirth-color: var(--cirth-switch-color);
 
   // Config
-  $switch-height: 1.25em;
-  $switch-width: 2.25em;
+  // 1.5em tall = 24px at the default root font size (WCAG 2.5.8 minimum
+  // target size); width keeps the original 1.8:1 track proportion
+  $switch-height: 1.5em;
+  $switch-width: 2.7em;
   $switch-transition: var(--cirth-duration-fast) var(--cirth-ease-in-out);
 
   // Styles

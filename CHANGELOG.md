@@ -23,6 +23,39 @@ Cirth is pre-1.0 and the custom property surface is not yet stable — see the
 - Documented how `data-theme` differs between builds: unscoped builds honor
   the attribute on any ancestor, scoped builds only on the `.cirth` element
   itself or inside it (see Customization → Light and dark).
+- **WCAG 2.2 AA pass** across both schemes and both presets (every ratio
+  verified mathematically from the oklch sources):
+  - Focus rings now composite to >= 3:1 against the page background
+    (1.4.11): the `--cirth-*-focus` alphas went from 0.25–0.5 up to
+    0.5–0.75, and cobalt/coral's focus tokens were re-derived the same way.
+  - Focus survives Windows High Contrast: every box-shadow-based focus ring
+    now also sets a transparent `outline`, which forced-colors mode repaints
+    with a system color (previously `outline: none` + stripped box-shadow
+    left keyboard focus invisible there).
+  - Buttons show their focus ring on `:focus-visible` instead of `:focus`,
+    matching links — no more ring on mouse click.
+  - Form element borders meet 3:1 against both the field and the page
+    (1.4.11): light `$neutral-150` → `$neutral-400`, dark `$neutral-800` →
+    `$neutral-550`; the light valid-state border moved `$success-400` →
+    `$success-450` for the same reason. Checkbox/radio borders follow along
+    since they read the same token.
+  - Switch off-state track now meets 3:1 against the page background:
+    light `$neutral-200` → `$neutral-450`, dark `$neutral-750` →
+    `$neutral-550`.
+  - Dark progress bar is `$amber-450` instead of the primary background:
+    amber-550 only reached 2.8:1 against the neutral-850 track. The
+    progress track also gained a delimiting border (new
+    `--cirth-progress-border-color` token) so the component's extent
+    meets 3:1 against the page while the track fill stays subtle.
+  - Checkboxes, radios, and switches grew from 1.25em to 1.5em tall (24px
+    at the default root size — the WCAG 2.5.8 minimum target size);
+    the switch keeps its 1.8:1 proportion at 2.7em wide.
+  - `cobalt` dark: `--cirth-primary` moved from `$cobalt-550` (3.3:1 as
+    link text — a 1.4.3 failure) to `$cobalt-400` (5.4:1), with a new
+    `$cobalt-300` hover step.
+  - Documented the tooltip pattern's accessibility limits (keyboard
+    reachability, screen readers, Esc dismissal — WCAG 1.4.13) and when to
+    reach for a JS/Popover-API tooltip instead.
 
 ### Removed
 

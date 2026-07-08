@@ -80,11 +80,15 @@
     --cirth-color: var(--cirth-primary-inverse);
   }
 
-  &:focus,
-  &:is([aria-current]:not([aria-current="false"])):focus {
+  &:focus-visible,
+  &:is([aria-current]:not([aria-current="false"])):focus-visible {
     --cirth-box-shadow:
       var(--cirth-button-hover-box-shadow, 0 0 0 rgba(0, 0, 0, 0)),
       0 0 0 var(--cirth-outline-width) var(--cirth-primary-focus);
+    // Invisible in normal rendering, but forced-colors mode strips
+    // box-shadow and repaints transparent outlines with a system color —
+    // without this, keyboard focus disappears in Windows High Contrast.
+    outline: var(--cirth-outline-width) solid transparent;
   }
 }
 
@@ -113,8 +117,8 @@
       --cirth-color: var(--cirth-secondary-inverse);
     }
 
-    &:focus,
-    &:is([aria-current]:not([aria-current="false"])):focus {
+    &:focus-visible,
+    &:is([aria-current]:not([aria-current="false"])):focus-visible {
       --cirth-box-shadow:
         var(--cirth-button-hover-box-shadow, 0 0 0 rgba(0, 0, 0, 0)),
         0 0 0 var(--cirth-outline-width) var(--cirth-secondary-focus);
@@ -134,8 +138,8 @@
       --cirth-color: var(--cirth-contrast-inverse);
     }
 
-    &:focus,
-    &:is([aria-current]:not([aria-current="false"])):focus {
+    &:focus-visible,
+    &:is([aria-current]:not([aria-current="false"])):focus-visible {
       --cirth-box-shadow:
         var(--cirth-button-hover-box-shadow, 0 0 0 rgba(0, 0, 0, 0)),
         0 0 0 var(--cirth-outline-width) var(--cirth-contrast-focus);
@@ -206,7 +210,7 @@
       --cirth-color: var(--cirth-secondary-inverse);
     }
 
-    &:focus {
+    &:focus-visible {
       --cirth-box-shadow:
         var(--cirth-button-hover-box-shadow, 0 0 0 rgba(0, 0, 0, 0)),
         0 0 0 var(--cirth-outline-width) var(--cirth-secondary-focus);

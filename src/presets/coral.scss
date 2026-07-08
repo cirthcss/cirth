@@ -33,7 +33,8 @@ $coral-250: oklch(80% 0.1 35deg);
   --cirth-primary-underline: #{color.change($coral-550, $alpha: 0.5)};
   --cirth-primary-hover: #{$coral-650};
   --cirth-primary-hover-background: #{$coral-600};
-  --cirth-primary-focus: #{color.change($coral-400, $alpha: 0.5)};
+  // Composites to >= 3:1 against white (WCAG 1.4.11 for focus indicators)
+  --cirth-primary-focus: #{color.change($coral-550, $alpha: 0.7)};
 
   // Shadow: a soft coral-tinted glow (reusing the same shadow generator the
   // theme itself uses, just recolored), with a matching lift on button hover
@@ -53,7 +54,8 @@ $coral-250: oklch(80% 0.1 35deg);
   --cirth-primary-underline: #{color.change($coral-350, $alpha: 0.5)};
   --cirth-primary-hover: #{$coral-250};
   --cirth-primary-hover-background: #{$coral-500};
-  --cirth-primary-focus: #{color.change($coral-350, $alpha: 0.375)};
+  // Composites to >= 3:1 against the dark background (WCAG 1.4.11)
+  --cirth-primary-focus: #{color.change($coral-350, $alpha: 0.7)};
 
   // Shadow
   --cirth-box-shadow: #{functions.shadow($coral-350)};

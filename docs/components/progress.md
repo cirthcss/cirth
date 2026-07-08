@@ -14,7 +14,12 @@ colors, including an animated indeterminate state.
 ## Behavior
 
 - Track: `--cirth-progress-background-color`; value/bar:
-  `--cirth-progress-color` (defaults to `--cirth-primary-background`).
+  `--cirth-progress-color` (defaults to `--cirth-primary-background` in
+  light mode; dark mode uses a lighter amber step so the bar keeps a 3:1
+  contrast against the track).
+- Border: `--cirth-progress-border-color` outlines the track so the
+  component's extent stays perceivable against the page background
+  (WCAG 1.4.11) — the track fill itself is deliberately subtle.
 - Cross-browser: the native appearance is reset and re-implemented via
   `::-webkit-progress-bar`/`::-webkit-progress-value` and
   `::-moz-progress-bar` so track/value colors stay consistent across

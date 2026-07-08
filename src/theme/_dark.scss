@@ -32,7 +32,9 @@
   --cirth-primary-hover-background: #{$amber-500};
   --cirth-primary-hover-border: var(--cirth-primary-hover-background);
   --cirth-primary-hover-underline: var(--cirth-primary-hover);
-  --cirth-primary-focus: #{color.change($amber-350, $alpha: 0.375)};
+  // Focus rings composite to >= 3:1 against the page background (WCAG
+  // 1.4.11 as applied to focus indicators) — don't lower these alphas.
+  --cirth-primary-focus: #{color.change($amber-350, $alpha: 0.7)};
   --cirth-primary-inverse: #{$white};
 
   // Secondary colors
@@ -44,7 +46,7 @@
   --cirth-secondary-hover-background: #{$neutral-550};
   --cirth-secondary-hover-border: var(--cirth-secondary-hover-background);
   --cirth-secondary-hover-underline: var(--cirth-secondary-hover);
-  --cirth-secondary-focus: #{color.change($neutral-350, $alpha: 0.25)};
+  --cirth-secondary-focus: #{color.change($neutral-350, $alpha: 0.7)};
   --cirth-secondary-inverse: #{$white};
 
   // Contrast colors
@@ -56,7 +58,7 @@
   --cirth-contrast-hover-background: #{$white};
   --cirth-contrast-hover-border: var(--cirth-contrast-hover-background);
   --cirth-contrast-hover-underline: var(--cirth-contrast-hover);
-  --cirth-contrast-focus: #{color.change($neutral-150, $alpha: 0.25)};
+  --cirth-contrast-focus: #{color.change($neutral-150, $alpha: 0.5)};
   --cirth-contrast-inverse: #{$black};
 
   // Box shadow
@@ -116,7 +118,8 @@
       $method: oklch
     )};
   --cirth-form-element-selected-background-color: #{$neutral-800};
-  --cirth-form-element-border-color: #{$neutral-800};
+  // >= 3:1 against both the field and the page background (WCAG 1.4.11)
+  --cirth-form-element-border-color: #{$neutral-550};
   --cirth-form-element-color: #{$neutral-100};
   --cirth-form-element-placeholder-color: #{$neutral-400};
   --cirth-form-element-active-background-color: #{color.mix(
@@ -140,7 +143,9 @@
   );
 
   // Switch (input[type="checkbox"][role="switch"])
-  --cirth-switch-background-color: #{$neutral-750};
+  // Unchecked track needs >= 3:1 against the page background so the
+  // control's off state stays perceivable (WCAG 1.4.11)
+  --cirth-switch-background-color: #{$neutral-550};
   --cirth-switch-checked-background-color: var(--cirth-primary-background);
   --cirth-switch-color: #{$white};
   --cirth-switch-thumb-box-shadow: 0 0 0 rgba(0, 0, 0, 0);
@@ -188,8 +193,12 @@
     )};
 
   // Progress
+  // The bar is a step lighter than the primary background here: amber-550
+  // only reaches 2.8:1 against the neutral-850 track (WCAG 1.4.11 wants
+  // 3:1). The border marks the track's extent at >= 3:1 against the page.
   --cirth-progress-background-color: #{$neutral-850};
-  --cirth-progress-color: var(--cirth-primary-background);
+  --cirth-progress-border-color: #{$neutral-550};
+  --cirth-progress-color: #{$amber-450};
 
   // Tooltip ([data-tooltip])
   --cirth-tooltip-background-color: var(--cirth-contrast-background);

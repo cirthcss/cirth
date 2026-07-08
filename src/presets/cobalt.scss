@@ -18,6 +18,7 @@ $cobalt-750: oklch(34% 0.09 258deg);
 $cobalt-600: oklch(46% 0.095 258deg);
 $cobalt-550: oklch(52% 0.1 258deg);
 $cobalt-400: oklch(64% 0.09 258deg);
+$cobalt-300: oklch(72% 0.075 258deg);
 
 @mixin light {
   // Surface: cool-toned neutrals instead of the default's neutral scale
@@ -31,7 +32,8 @@ $cobalt-400: oklch(64% 0.09 258deg);
   --cirth-primary-underline: #{color.change($cobalt-800, $alpha: 0.5)};
   --cirth-primary-hover: #{$cobalt-900};
   --cirth-primary-hover-background: #{$cobalt-850};
-  --cirth-primary-focus: #{color.change($cobalt-600, $alpha: 0.5)};
+  // Composites to >= 3:1 against white (WCAG 1.4.11 for focus indicators)
+  --cirth-primary-focus: #{color.change($cobalt-600, $alpha: 0.7)};
 
   // Shadow: a crisp 1px outline instead of a soft blur — flatter, more formal
   --cirth-box-shadow: 0 0 0 0.0625rem #{color.change($cobalt-800, $alpha: 0.14)};
@@ -43,12 +45,15 @@ $cobalt-400: oklch(64% 0.09 258deg);
   --cirth-text-selection-color: #{color.change($cobalt-550, $alpha: 0.1875)};
 
   // Primary
-  --cirth-primary: #{$cobalt-550};
+  // cobalt-400, not -550: as link text on the dark background, -550 only
+  // reaches 3.3:1 — below the 4.5:1 WCAG 1.4.3 requires for text
+  --cirth-primary: #{$cobalt-400};
   --cirth-primary-background: #{$cobalt-800};
-  --cirth-primary-underline: #{color.change($cobalt-550, $alpha: 0.5)};
-  --cirth-primary-hover: #{$cobalt-400};
+  --cirth-primary-underline: #{color.change($cobalt-400, $alpha: 0.5)};
+  --cirth-primary-hover: #{$cobalt-300};
   --cirth-primary-hover-background: #{$cobalt-750};
-  --cirth-primary-focus: #{color.change($cobalt-550, $alpha: 0.375)};
+  // Composites to >= 3:1 against the dark background (WCAG 1.4.11)
+  --cirth-primary-focus: #{color.change($cobalt-400, $alpha: 0.7)};
 
   // Shadow
   --cirth-box-shadow: 0 0 0 0.0625rem #{color.change($cobalt-400, $alpha: 0.2)};

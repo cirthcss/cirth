@@ -88,9 +88,11 @@
         var(--cirth-form-element-focus-color);
     }
 
-    // Reset focus visible from accordion component
+    // Reset the accordion's visible outline: the box-shadow ring above is
+    // the indicator here. Kept transparent instead of none so forced-colors
+    // mode (which strips box-shadow) still paints a system-color ring.
     &:focus-visible {
-      outline: none;
+      outline: var(--cirth-outline-width) solid transparent;
     }
 
     // Aria-invalid

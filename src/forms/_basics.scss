@@ -265,6 +265,10 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   &:focus {
     --cirth-box-shadow: 0 0 0 var(--cirth-outline-width)
       var(--cirth-form-element-focus-color);
+    // Invisible in normal rendering, but forced-colors mode strips
+    // box-shadow and repaints transparent outlines with a system color —
+    // without this, keyboard focus disappears in Windows High Contrast.
+    outline: var(--cirth-outline-width) solid transparent;
   }
 }
 

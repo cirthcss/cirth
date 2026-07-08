@@ -32,7 +32,9 @@
   --cirth-primary-hover-background: #{$amber-600};
   --cirth-primary-hover-border: var(--cirth-primary-hover-background);
   --cirth-primary-hover-underline: var(--cirth-primary-hover);
-  --cirth-primary-focus: #{color.change($amber-400, $alpha: 0.5)};
+  // Focus rings composite to >= 3:1 against the page background (WCAG
+  // 1.4.11 as applied to focus indicators) — don't lower these alphas.
+  --cirth-primary-focus: #{color.change($amber-550, $alpha: 0.75)};
   --cirth-primary-inverse: #{$white};
 
   // Secondary colors
@@ -44,7 +46,7 @@
   --cirth-secondary-hover-background: #{$neutral-650};
   --cirth-secondary-hover-border: var(--cirth-secondary-hover-background);
   --cirth-secondary-hover-underline: var(--cirth-secondary-hover);
-  --cirth-secondary-focus: #{color.change($neutral-550, $alpha: 0.25)};
+  --cirth-secondary-focus: #{color.change($neutral-600, $alpha: 0.7)};
   --cirth-secondary-inverse: #{$white};
 
   // Contrast colors
@@ -56,7 +58,7 @@
   --cirth-contrast-hover-background: #{$black};
   --cirth-contrast-hover-border: var(--cirth-contrast-hover-background);
   --cirth-contrast-hover-underline: var(--cirth-secondary-hover);
-  --cirth-contrast-focus: #{color.change($neutral-550, $alpha: 0.25)};
+  --cirth-contrast-focus: #{color.change($neutral-600, $alpha: 0.7)};
   --cirth-contrast-inverse: #{$white};
 
   // Box shadow
@@ -119,7 +121,8 @@
       $method: oklch
     )};
   --cirth-form-element-selected-background-color: #{$neutral-100};
-  --cirth-form-element-border-color: #{$neutral-150};
+  // >= 3:1 against both the field and the page background (WCAG 1.4.11)
+  --cirth-form-element-border-color: #{$neutral-400};
   --cirth-form-element-color: #{$neutral-850};
   --cirth-form-element-placeholder-color: var(--cirth-muted-color);
   --cirth-form-element-active-background-color: #{$white};
@@ -131,14 +134,16 @@
   --cirth-form-element-invalid-focus-color: var(
     --cirth-form-element-invalid-active-border-color
   );
-  --cirth-form-element-valid-border-color: #{$success-400};
+  --cirth-form-element-valid-border-color: #{$success-450};
   --cirth-form-element-valid-active-border-color: #{$success-550};
   --cirth-form-element-valid-focus-color: var(
     --cirth-form-element-valid-active-border-color
   );
 
   // Switch (input[type="checkbox"][role="switch"])
-  --cirth-switch-background-color: #{$neutral-200};
+  // Unchecked track needs >= 3:1 against the page background so the
+  // control's off state stays perceivable (WCAG 1.4.11)
+  --cirth-switch-background-color: #{$neutral-450};
   --cirth-switch-checked-background-color: var(--cirth-primary-background);
   --cirth-switch-color: #{$white};
   --cirth-switch-thumb-box-shadow: 0 0 0 rgba(0, 0, 0, 0);
@@ -186,7 +191,10 @@
     )};
 
   // Progress
+  // The border marks the track's extent at >= 3:1 against the page
+  // background (WCAG 1.4.11); the track itself stays subtle
   --cirth-progress-background-color: #{$neutral-100};
+  --cirth-progress-border-color: #{$neutral-400};
   --cirth-progress-color: var(--cirth-primary-background);
 
   // Tooltip ([data-tooltip])
