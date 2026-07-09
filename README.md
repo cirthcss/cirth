@@ -1,20 +1,21 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/public/logo_brand_dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="docs/public/logo_brand.svg">
-    <img alt="Cirth" src="docs/public/logo_brand.svg" width="112" height="112">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/public/logo_brand_app_dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/public/logo_brand_app.svg">
+    <img alt="Cirth" src="docs/public/logo_brand_app.svg" width="120" height="120">
   </picture>
 </p>
 
 <h1 align="center">Cirth</h1>
 
 <p align="center">
-  <strong>Semantic by default. Classes only when needed.</strong>
+  <strong>Write HTML. It's already styled.</strong>
 </p>
 
 <p align="center">
-  Semantic-first CSS for production-ready interfaces with clean HTML,
-  modern CSS, and minimal class noise.
+  Semantic-first CSS where standard elements carry the styling: nav,
+  article, button, table. Classes exist only for the few things HTML can't
+  say.
 </p>
 
 <p align="center">
@@ -28,11 +29,11 @@
   ·
   <a href="#documentation">Documentation</a>
   ·
+  <a href="#contributing">Contributing</a>
+  ·
   <a href="#browser-support">Browser support</a>
   ·
   <a href="#philosophy">Philosophy</a>
-  ·
-  <a href="#comparison">Comparison</a>
 </p>
 
 <p align="center">
@@ -249,18 +250,48 @@ npm run docs:dev
   [Accessibility](docs/utilities/accessibility.md) ·
   [Reduce motion](docs/utilities/reduce-motion.md)
 - **Project** —
-  [Build tooling](docs/build-tooling.md) ·
-  [Contributing](.github/CONTRIBUTING.md) ·
+  [Examples](docs/examples.md) ·
+  [Contributions](docs/contributions.md) ·
+  [Brand](docs/brand.md) ·
   [Changelog](CHANGELOG.md)
+
+## Contributing
+
+Start with [Contributions](docs/contributions.md). It explains the local
+setup, the source layout, the package exports, and the project constraints
+that matter most when changing Cirth.
+
+For pull requests, issue triage, and the exact collaboration workflow, read
+[`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md). If your change touches
+the visual identity, check [Brand](docs/brand.md) first; if it changes the
+public package surface, update [CHANGELOG.md](CHANGELOG.md) in the same
+branch.
+
+Useful local checks before opening a PR:
+
+```sh
+npm run build
+npm run docs:build
+npm pack --dry-run
+```
 
 ## Browser Support
 
 Cirth is designed and tested for the latest stable Chrome, Edge, Firefox,
 and Safari releases. The compiled CSS is processed with Lightning CSS
-against the Browserslist [`defaults`](https://browsersl.ist/#q=defaults)
-query (roughly: the last two versions of each major browser, everything
-above 0.5% global usage, and Firefox ESR). No version of Internet Explorer
-is supported.
+against this Browserslist target:
+
+```json
+[
+  "Chrome >= 111",
+  "Edge >= 111",
+  "Firefox >= 113",
+  "Safari >= 15.4",
+  "iOS >= 15.4"
+]
+```
+
+No version of Internet Explorer is supported.
 
 ## Philosophy
 
@@ -274,67 +305,6 @@ Core principles:
 - Keep layout primitives small and structural.
 - Avoid utility-first class soup and broad component catalogs.
 - Keep customization based on CSS custom properties.
-
-## Comparison
-
-Cirth, Pico CSS, and Tailwind CSS solve the same broad problem — styling
-HTML — with different trade-offs. This is directional, not a benchmark;
-actual bundle size depends on the utilities or components you end up using
-in every case.
-
-| | Cirth | Pico CSS | Tailwind CSS |
-| --- | --- | --- | --- |
-| Styling model | Semantic HTML first; classes only where semantics run out | Semantic HTML first; classes only where semantics run out | Utility-first; classes on nearly every element |
-| Typical markup | `<button>`, `<article>`, `<nav>` — no `.btn`, `.card` | Same | `<button class="rounded bg-blue-600 px-4 py-2 ...">` |
-| Customization | CSS custom properties, override after loading | CSS custom properties, override after loading | Config file (`tailwind.config.js`) plus utility classes |
-| Build step | None — link the default build, or a preset on top | None to use the default build | Required for any production bundle (JIT/content scanning) |
-| Themes | 1 official (amber), light/dark, plus 2 token-override presets (cobalt, coral) | ~20 accent colors, light/dark each | None built in; arbitrary via config |
-| Default build, gzip | ~13KB | ~11.5KB | No single default — depends entirely on utilities used |
-| Public Sass API | No — CSS only | Yes | N/A |
-
-**"Classless" Tailwind** setups — writing `@apply` rules against bare
-elements (`h1`, `button`, `article`) instead of adding utility classes to
-markup — get close to Cirth's authoring experience, but that layer is
-something you assemble yourself against Tailwind's utility values. It still
-needs the full Tailwind build pipeline (PostCSS, content scanning, JIT) and
-isn't a published, versioned stylesheet you can link directly. Cirth and
-Pico ship that layer already built, tuned, and versioned.
-
-Cirth is a fork of Pico CSS; the practical difference today is scope. Pico
-maintains a broader theme and utility surface and a public Sass API. Cirth
-trims both in exchange for a smaller, more curated build — see
-[Differences From Pico CSS](#differences-from-pico-css) below for specifics.
-
-## Differences From Pico CSS
-
-Cirth began as a fork of Pico CSS, but it should be treated as an independent
-framework rather than a promise of permanent drop-in compatibility.
-
-The most important user-facing differences are:
-
-- Cirth uses the `@cirthcss/cirth` package name and the `--cirth-` CSS custom
-  property prefix.
-- The published package is CSS-only; SCSS is repository source, not a public
-  Sass API.
-- The active build set is focused on default, classless, scoped, and scoped
-  classless CSS.
-- Scoped builds target a `.cirth` wrapper, including custom properties,
-  document styles, color schemes, and modal states.
-- Standalone color utility builds and fluid classless builds are not part of
-  the public build surface.
-- The inherited 20-accent theme set has been reduced to a single official
-  theme (amber); `cobalt` and `coral` are optional token-override presets,
-  not separately maintained themes.
-
-## Roadmap
-
-Cirth is under active development, working toward a stable 1.0. The main
-public priorities are:
-
-- stabilize the CSS custom property surface;
-- audit inherited Pico CSS bugs and keep the fixes relevant to Cirth;
-- refine layout primitives and decide which utilities should remain;
-- document the supported build variants and migration notes from Pico CSS.
 
 ## License
 

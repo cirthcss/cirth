@@ -95,9 +95,10 @@ Cirth targets browsers with native `oklch()` support (see the `browserslist`
 field in `package.json`), so the compiled CSS ships `oklch()` as-is rather
 than a downleveled `hex` / `lab()` fallback.
 
-## Roadmap note
+## Theme history
 
 Cirth previously inherited a 20-color accent theme set from Pico CSS, then
 briefly maintained three full themes (azure, jade, slate). That has been
 reduced further to a single official theme plus two token-override presets,
-`cobalt` and `coral` — see the [project roadmap](/about#roadmap).
+`cobalt` and `coral`; see [About Cirth](/about) for the project philosophy
+and [Contributions](/contributions) before proposing color-system changes.
