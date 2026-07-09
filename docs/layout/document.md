@@ -27,9 +27,10 @@ scoped root, for the scoped build) and to every element universally.
 }
 ```
 
-- `--cirth-font-size` grows slightly at each responsive breakpoint (`sm`
-  through `xxl`, see `src/_breakpoints.scss`), so type and `rem`-based spacing
-  scale gently with viewport width.
+- `--cirth-font-size` is a fixed `100%` at every breakpoint: `rem`-based
+  sizes (body text, 44px controls) don't drift with viewport width. Display
+  type scales fluidly on its own, via `clamp()` in the per-heading
+  `--cirth-font-size` values.
 - Words break instead of overflowing (`overflow-wrap: break-word`), tabs are
   4 spaces wide, and the iOS tap-highlight and orientation-change font
   resizing are disabled.

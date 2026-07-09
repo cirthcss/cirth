@@ -1,5 +1,3 @@
-@use "sass:map";
-@use "../breakpoints" as *;
 @use "../config" as *;
 @use "../helpers/functions";
 @use "../helpers/selectors";
@@ -20,15 +18,29 @@ $loading-icon-inverse: true !default;
   --cirth-line-height: var(--cirth-line-height-normal);
   --cirth-font-weight: var(--cirth-font-weight-regular);
   --cirth-font-size: 100%;
-  --cirth-text-underline-offset: 0.1rem;
+  --cirth-text-underline-offset: 0.15em;
 
   // Borders
-  --cirth-border-radius: var(--cirth-radius-sm);
+  // --cirth-border-radius stays the single knob presets and users override;
+  // the per-component radii below are derived from it (var() substitutes at
+  // the root, so a preset that zeroes the knob zeroes these too): containers
+  // get a softer radius than the controls inside them, while small inline
+  // elements (checkboxes, code) are capped so they never read as circles.
+  --cirth-border-radius: var(--cirth-radius-lg);
+  --cirth-card-border-radius: calc(var(--cirth-border-radius) * 1.5);
+  --cirth-checkbox-border-radius: min(
+    var(--cirth-border-radius),
+    var(--cirth-radius-sm)
+  );
+  --cirth-code-border-radius: min(
+    var(--cirth-border-radius),
+    var(--cirth-radius-sm)
+  );
   --cirth-border-width: var(--cirth-border-width-1);
   --cirth-outline-width: var(--cirth-outline-width-2);
 
   // Transitions
-  --cirth-transition: var(--cirth-duration-normal) var(--cirth-ease-in-out);
+  --cirth-transition: var(--cirth-duration-normal) var(--cirth-ease-out);
 
   // Spacings
   --cirth-spacing: var(--cirth-space-4);
@@ -46,7 +58,12 @@ $loading-icon-inverse: true !default;
   }
 
   // Spacings for form elements and button
-  --cirth-form-element-spacing-vertical: var(--cirth-space-3);
+  // Controls are exactly 2.75rem (44px) tall — the WCAG 2.5.5 target size,
+  // and a hard product requirement — built from on-scale values: 1rem text
+  // at the relaxed line-height (1.625 → 26px, set on controls below) plus
+  // 2 × 0.5rem padding plus 2 × 1px border. Changing either token here or
+  // the control line-height breaks that height.
+  --cirth-form-element-spacing-vertical: var(--cirth-space-2);
   --cirth-form-element-spacing-horizontal: var(--cirth-space-4);
 
   // Font weight for form labels & fieldsets legend
@@ -91,17 +108,6 @@ $loading-icon-inverse: true !default;
   --cirth-icon-loading: url("data:image/svg+xml,%3Csvg fill='none' height='24' width='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' %3E%3Cstyle%3E g %7B animation: rotate 2s linear infinite; transform-origin: center center; %7D circle %7B stroke-dasharray: 75,100; stroke-dashoffset: -5; animation: dash 1.5s ease-in-out infinite; stroke-linecap: round; %7D @keyframes rotate %7B 0%25 %7B transform: rotate(0deg); %7D 100%25 %7B transform: rotate(360deg); %7D %7D @keyframes dash %7B 0%25 %7B stroke-dasharray: 1,100; stroke-dashoffset: 0; %7D 50%25 %7B stroke-dasharray: 44.5,100; stroke-dashoffset: -17.5; %7D 100%25 %7B stroke-dasharray: 44.5,100; stroke-dashoffset: -62; %7D %7D %3C/style%3E%3Cg%3E%3Ccircle cx='12' cy='12' r='10' fill='none' stroke='#{functions.display-rgb($neutral-400)}' stroke-width='4' /%3E%3C/g%3E%3C/svg%3E");
 }
 
-// Responsive root font size
-@each $key, $values in $breakpoints {
-  @if $values {
-    @media (min-width: map.get($values, "breakpoint")) {
-      @include selectors.root {
-        --cirth-font-size: #{map.get($values, "root-font-size")};
-      }
-    }
-  }
-}
-
 @include selectors.scope {
   // Responsive spacings
 
@@ -125,49 +131,67 @@ $loading-icon-inverse: true !default;
   }
 
   // Headings
+  // Sizes are fluid (clamp on viewport width) now that the root font size
+  // no longer grows per breakpoint: display type keeps its presence on
+  // large screens while body text and control heights stay fixed.
   h1,
   h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  h3 {
     --cirth-font-weight: var(--cirth-font-weight-bold);
   }
 
+  h4,
+  h5,
+  h6 {
+    --cirth-font-weight: var(--cirth-font-weight-semibold);
+  }
+
   h1 {
-    --cirth-font-size: var(--cirth-font-size-5xl);
+    --cirth-font-size: clamp(2rem, 1.55rem + 1.8vw, 2.75rem);
     --cirth-line-height: var(--cirth-line-height-tight);
+    --cirth-letter-spacing: var(--cirth-letter-spacing-tight);
     --cirth-typography-spacing-top: var(--cirth-space-12);
   }
 
   h2 {
-    --cirth-font-size: 1.75rem;
+    --cirth-font-size: clamp(1.5rem, 1.3rem + 1vw, 2rem);
     --cirth-line-height: 1.15;
-    --cirth-typography-spacing-top: 2.625rem;
+    --cirth-letter-spacing: var(--cirth-letter-spacing-tight);
+    --cirth-typography-spacing-top: var(--cirth-space-12);
   }
 
   h3 {
-    --cirth-font-size: 1.5rem;
-    --cirth-line-height: 1.175;
-    --cirth-typography-spacing-top: 2.25rem;
+    --cirth-font-size: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+    --cirth-line-height: 1.2;
+    --cirth-letter-spacing: var(--cirth-letter-spacing-snug);
+    --cirth-typography-spacing-top: var(--cirth-space-10);
   }
 
   h4 {
     --cirth-font-size: var(--cirth-font-size-xl);
-    --cirth-line-height: 1.2;
-    --cirth-typography-spacing-top: 1.874rem;
+    --cirth-line-height: var(--cirth-line-height-snug);
+    --cirth-typography-spacing-top: var(--cirth-space-8);
   }
 
   h5 {
     --cirth-font-size: var(--cirth-font-size-lg);
-    --cirth-line-height: 1.225;
-    --cirth-typography-spacing-top: 1.6875rem;
+    --cirth-line-height: var(--cirth-line-height-snug);
+    --cirth-typography-spacing-top: var(--cirth-space-8);
   }
 
   h6 {
     --cirth-font-size: var(--cirth-font-size-md);
     --cirth-line-height: var(--cirth-line-height-snug);
-    --cirth-typography-spacing-top: var(--cirth-space-6);
+    --cirth-typography-spacing-top: var(--cirth-space-8);
+  }
+
+  // Card (<article>)
+  // Containers get a softer radius and more generous padding than the
+  // controls that sit inside them
+  article {
+    --cirth-border-radius: var(--cirth-card-border-radius);
+    --cirth-block-spacing-vertical: var(--cirth-space-6);
+    --cirth-block-spacing-horizontal: var(--cirth-space-6);
   }
 
   // Table
@@ -188,11 +212,21 @@ $loading-icon-inverse: true !default;
     --cirth-font-family: var(--cirth-font-family-mono);
   }
 
+  // Inline code sits inside a line of text: a tighter radius than the
+  // control default keeps it reading as text, not as a chip
+  code,
+  kbd,
+  samp {
+    --cirth-border-radius: var(--cirth-code-border-radius);
+  }
+
   kbd {
     --cirth-font-weight: bolder;
   }
 
   // Inputs and Selects
+  // The relaxed line-height is part of the 44px control-height math — see
+  // the form-element spacing tokens above
   input:not(
       [type="submit"],
       [type="button"],
@@ -203,16 +237,43 @@ $loading-icon-inverse: true !default;
     ),
   :where(select, textarea) {
     --cirth-outline-width: var(--cirth-outline-width-1);
+    --cirth-line-height: var(--cirth-line-height-relaxed);
   }
 
   [type="search"] {
     --cirth-border-radius: var(--cirth-radius-pill);
   }
 
+  // Buttons
+  // The relaxed line-height is part of the 44px control-height math — see
+  // the form-element spacing tokens above
+  button,
+  [type="submit"],
+  [type="reset"],
+  [type="button"],
+  [role="button"] {
+    --cirth-font-weight: var(--cirth-font-weight-semibold);
+    --cirth-line-height: var(--cirth-line-height-relaxed);
+    --cirth-form-element-spacing-horizontal: var(--cirth-space-5);
+  }
+
+  // The file input only gets the line-height (for its ::file-selector-button,
+  // which inherits custom properties from the input) — not the button font
+  // weight, which would also embolden the filename text
+  [type="file"] {
+    --cirth-line-height: var(--cirth-line-height-relaxed);
+  }
+
   // Checkboxes, Radios and Switches
   [type="checkbox"],
   [type="radio"] {
     --cirth-border-width: var(--cirth-border-width-2);
+  }
+
+  // A 1.5em box at the full control radius would read as a circle —
+  // keep checkboxes visibly square-cornered
+  [type="checkbox"] {
+    --cirth-border-radius: var(--cirth-checkbox-border-radius);
   }
 
   [type="checkbox"][role="switch"] {

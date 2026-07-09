@@ -45,6 +45,11 @@
   --cirth-font-weight-semibold: 600;
   --cirth-font-weight-bold: 700;
 
+  // Letter spacing
+  // Negative tracking for display sizes only — body text stays at normal
+  --cirth-letter-spacing-tight: -0.02em;
+  --cirth-letter-spacing-snug: -0.01em;
+
   // Line heights
   --cirth-line-height-none: 1;
   --cirth-line-height-tight: 1.125;

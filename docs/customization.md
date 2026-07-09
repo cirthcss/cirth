@@ -116,9 +116,10 @@ dark mode, mirror the host's theme onto the wrapper:
 - `--cirth-typography-spacing-vertical` controls the space below paragraphs,
   lists, and other text blocks; `--cirth-typography-spacing-top` (set per
   heading level) controls the space *above* a heading that follows a block.
-- Root font size increases slightly at each responsive breakpoint (`sm`
-  through `xxl`), so `rem`-based spacing scales gently with viewport width
-  without any additional media queries in your own CSS.
+- Root font size is fixed at `100%` across all breakpoints, so body text
+  and interactive controls (44px tall by default) stay stable at every
+  viewport width. Headings scale fluidly instead, via `clamp()` on their
+  per-level `--cirth-font-size`.
 
 ## What's not customizable through variables
 

@@ -16,7 +16,7 @@
   > footer {
     margin-right: calc(var(--cirth-block-spacing-horizontal) * -1);
     margin-left: calc(var(--cirth-block-spacing-horizontal) * -1);
-    padding: calc(var(--cirth-block-spacing-vertical) * 0.66)
+    padding: calc(var(--cirth-block-spacing-vertical) - var(--cirth-space-2))
       var(--cirth-block-spacing-horizontal);
     background-color: var(--cirth-card-sectioning-background-color);
   }

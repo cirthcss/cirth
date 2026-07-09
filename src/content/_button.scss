@@ -80,6 +80,12 @@
     --cirth-color: var(--cirth-primary-inverse);
   }
 
+  // Pressed feedback: a static 1px offset (not a transition), so it stays
+  // crisp and is equally valid under prefers-reduced-motion
+  &:active {
+    transform: translateY(0.0625rem);
+  }
+
   &:focus-visible,
   &:is([aria-current]:not([aria-current="false"])):focus-visible {
     --cirth-box-shadow:

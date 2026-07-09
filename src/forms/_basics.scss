@@ -165,7 +165,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 #{$parent-selector} label,
 #{$parent-selector} fieldset legend {
   display: block;
-  margin-bottom: calc(var(--cirth-spacing) * 0.375);
+  margin-bottom: calc(var(--cirth-spacing) * 0.5);
   color: var(--cirth-color);
   font-weight: var(--cirth-form-label-font-weight, var(--cirth-font-weight));
 }

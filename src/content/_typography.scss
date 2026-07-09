@@ -56,6 +56,12 @@
   font-weight: var(--cirth-font-weight);
 }
 
+// Avoid single orphaned words on the last line of a paragraph
+
+#{$parent-selector} p {
+  text-wrap: pretty;
+}
+
 // Headings
 
 #{$parent-selector} h1,
@@ -71,6 +77,8 @@
   font-size: var(--cirth-font-size);
   line-height: var(--cirth-line-height);
   font-family: var(--cirth-font-family-display);
+  letter-spacing: var(--cirth-letter-spacing, normal);
+  text-wrap: balance;
 }
 
 #{$parent-selector} h1 {
@@ -165,7 +173,7 @@
 // Highlighted text
 
 #{$parent-selector} mark {
-  padding: 0.125rem 0.25rem;
+  padding: 0 var(--cirth-space-1);
   background-color: var(--cirth-mark-background-color);
   color: var(--cirth-mark-color);
   vertical-align: baseline;

@@ -10,6 +10,48 @@ Cirth is pre-1.0 and the custom property surface is not yet stable — see the
 
 ### Changed
 
+- **Design modernization pass** (visual only — the WCAG 2.2 AA work below
+  is untouched: no color, contrast, or focus-ring change):
+  - **Breaking:** the responsive root-font-size escalation (100% → 131.25%
+    across breakpoints, inherited from Pico) is gone; `--cirth-font-size`
+    is a fixed `100%`. Headings scale fluidly via `clamp()` instead, so
+    display type keeps its presence on large screens while body text and
+    control heights stay stable. The `root-font-size` keys were removed
+    from `$breakpoints`.
+  - Buttons and text inputs are now exactly **44px tall** at the default
+    font size (WCAG 2.5.5 target size), built entirely from on-scale
+    tokens: `--cirth-form-element-spacing-vertical` is `--cirth-space-2`
+    (0.5rem) and controls use the relaxed line-height (1.625 → 26px text
+    box), so 26 + 2×8 + 2×1 = 44. Because the root font no longer scales,
+    that height holds at every viewport width.
+  - Airier vertical rhythm between text sections: the space above a
+    heading that follows a block (`--cirth-typography-spacing-top`) went
+    up one scale step per level — h2 `space-10` → `space-12` (3rem),
+    h3 `space-8` → `space-10` (2.5rem), h4–h6 `space-6`/`space-8` →
+    `space-8` (2rem).
+  - **Spacing-scale audit**: every spacing value in the library now lands
+    on the `--cirth-space-*` scale (0.25rem steps to 1.5, 0.5 steps to 3,
+    then whole rems). Snapped: heading `--cirth-typography-spacing-top`
+    values (now space-10/8/6 for h2–h6), label margins, inline code and
+    `<mark>` padding, the search input's icon offsets (now derived from
+    `--cirth-form-element-spacing-horizontal`), and card header/footer
+    padding (now `block-spacing − space-2`).
+  - Radii now vary with depth instead of being uniform: the default
+    `--cirth-border-radius` went from `4px` to `8px` (buttons, inputs),
+    cards/modals use `12px`, and checkboxes and inline code stay at `4px`.
+    The new per-component radii (`--cirth-card-border-radius`,
+    `--cirth-checkbox-border-radius`, `--cirth-code-border-radius`) are
+    derived from `--cirth-border-radius`, which stays the single knob:
+    cobalt's `0` still squares everything, coral's `--cirth-radius-2xl`
+    still rounds everything proportionally.
+  - Typography: negative letter-spacing on `h1`–`h3` (new
+    `--cirth-letter-spacing-tight`/`-snug` tokens), `text-wrap: balance`
+    on headings and `text-wrap: pretty` on paragraphs, `h4`–`h6` dropped
+    from bold to semibold, tables render numbers with `tabular-nums`.
+  - Buttons: semibold label, slightly wider horizontal padding
+    (`--cirth-space-5`), and a static 1px pressed offset on `:active`.
+  - Motion: the shared `--cirth-transition` easing moved from `ease-in-out`
+    to `ease-out`; cards get `--cirth-space-6` padding.
 - **Breaking:** unified the two parallel font-family token sets into one.
   `src/theme/_foundations.scss` is now the single source for every font
   stack: `--cirth-font-family-emoji`, `-sans` (which now embeds the emoji
