@@ -3,13 +3,17 @@
 All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-Cirth is pre-1.0 and the custom property surface is not yet stable — see the
-[roadmap](README.md#roadmap).
+Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-07-10
+
 ### Changed
 
+- Refreshed the README around the new brand mark and current project
+  direction: removed the comparison, Pico-differences, and roadmap sections;
+  added contribution guidance and updated project links.
 - **Design modernization pass** (visual only — the WCAG 2.2 AA work below
   is untouched: no color, contrast, or focus-ring change):
   - **Breaking:** the responsive root-font-size escalation (100% → 131.25%
@@ -260,7 +264,8 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
-[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.3.0...develop
+[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.4.0...master
+[0.4.0]: https://github.com/cirthcss/cirth/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/cirthcss/cirth/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/cirthcss/cirth/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/cirthcss/cirth/releases/tag/v0.1.0
