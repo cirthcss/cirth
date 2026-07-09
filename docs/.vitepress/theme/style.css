@@ -32,21 +32,25 @@
 }
 
 .docs-theme-toggle {
-	width: 2.25rem;
-	height: 2.25rem;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.5rem;
+	height: 2.5rem;
 	margin-bottom: 0;
 	padding: 0;
 	border: none;
 	line-height: 1;
 }
 
-.docs-theme-icon::before {
-	content: "☀";
-	font-size: 1.125rem;
+/* Phosphor sun/moon: show the icon for the active scheme */
+.docs-theme-icon-moon,
+[data-theme="dark"] .docs-theme-icon-sun {
+	display: none;
 }
 
-[data-theme="dark"] .docs-theme-icon::before {
-	content: "☾";
+[data-theme="dark"] .docs-theme-icon-moon {
+	display: inline;
 }
 
 /* Hide secondary nav items on small screens; the sidebar still links
@@ -84,8 +88,29 @@
 
 .docs-hero {
 	position: relative;
-	padding: calc(var(--cirth-spacing) * 3) 0 var(--cirth-spacing);
-	text-align: center;
+	display: grid;
+	gap: calc(var(--cirth-spacing) * 2.5);
+	align-items: center;
+	padding: calc(var(--cirth-spacing) * 3) 0 calc(var(--cirth-spacing) * 3);
+}
+
+@media (min-width: 1024px) {
+	.docs-hero {
+		grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+		padding-top: calc(var(--cirth-spacing) * 4);
+		padding-bottom: calc(var(--cirth-spacing) * 4);
+	}
+}
+
+.docs-hero-mark {
+	display: block;
+	width: 4.5rem;
+	height: 4.5rem;
+	margin-bottom: var(--cirth-spacing);
+}
+
+.docs-hero-copy hgroup > :first-child {
+	font-size: clamp(2.75rem, 2rem + 3vw, 4rem);
 }
 
 .docs-hero-eyebrow {
@@ -97,26 +122,259 @@
 	text-transform: uppercase;
 }
 
-.docs-hero hgroup > :first-child {
-	font-size: var(--cirth-font-size-6xl);
-}
-
 .docs-hero-tagline {
-	max-width: 38rem;
-	margin-right: auto;
-	margin-left: auto;
+	max-width: 34rem;
 	color: var(--cirth-muted-color);
 }
 
 .docs-hero-actions {
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: center;
 	gap: calc(var(--cirth-spacing) * 0.5);
 }
 
 .docs-hero-actions [role="button"] {
 	margin-bottom: 0;
+}
+
+/* Hero demo: typed markup on the left half, live render on the right */
+.home-demo {
+	display: grid;
+	overflow: hidden;
+	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	border-radius: var(--cirth-card-border-radius);
+	background-color: var(--cirth-code-background-color);
+}
+
+@media (min-width: 576px) {
+	.home-demo {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	}
+}
+
+.home-demo-code {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.home-demo-code-bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--cirth-spacing);
+	padding: calc(var(--cirth-spacing) * 0.5) var(--cirth-spacing);
+	border-bottom: var(--cirth-border-width) solid
+		var(--cirth-muted-border-color);
+}
+
+.home-demo-filename {
+	color: var(--cirth-muted-color);
+	font-family: var(--cirth-font-family-mono);
+	font-size: var(--cirth-font-size-xs);
+}
+
+.home-demo-replay {
+	width: auto;
+	margin-bottom: 0;
+	padding: 0.25rem 0.5rem;
+	font-size: var(--cirth-font-size-xs);
+}
+
+.home-demo-code pre {
+	flex: 1;
+	min-height: 21rem;
+	margin: 0;
+	padding: var(--cirth-spacing);
+	border-radius: 0;
+	background: none;
+	font-size: var(--cirth-font-size-xs);
+	line-height: var(--cirth-line-height-relaxed);
+}
+
+.home-demo-cursor {
+	display: inline-block;
+	width: 0.5em;
+	height: 1.1em;
+	background-color: var(--cirth-primary);
+	vertical-align: text-bottom;
+	animation: home-demo-blink 1s steps(2) infinite;
+}
+
+@keyframes home-demo-blink {
+	50% {
+		opacity: 0;
+	}
+}
+
+.home-demo-preview {
+	display: flex;
+	align-items: center;
+	padding: var(--cirth-spacing);
+	border-top: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	background-color: var(--cirth-background-color);
+}
+
+@media (min-width: 576px) {
+	.home-demo-preview {
+		border-top: none;
+		border-left: var(--cirth-border-width) solid
+			var(--cirth-muted-border-color);
+	}
+}
+
+.home-demo-preview article {
+	width: 100%;
+	margin-bottom: 0;
+}
+
+.home-demo-preview button {
+	margin-bottom: 0;
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* Homepage section headers */
+.docs-section-header {
+	max-width: 38rem;
+	margin: 0 auto calc(var(--cirth-spacing) * 2);
+	text-align: center;
+}
+
+.docs-section-header h2 {
+	margin-bottom: calc(var(--cirth-spacing) * 0.5);
+}
+
+.docs-eyebrow {
+	margin-bottom: calc(var(--cirth-spacing) * 0.5);
+	color: var(--cirth-primary);
+	font-weight: var(--cirth-font-weight-semibold);
+	font-size: var(--cirth-font-size-sm);
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+.docs-section-lede {
+	color: var(--cirth-muted-color);
+}
+
+/* Comparison: the same control, utility-first vs Cirth */
+.docs-compare {
+	margin: calc(var(--cirth-spacing) * 4) 0;
+}
+
+.docs-compare-grid {
+	display: grid;
+	gap: var(--cirth-spacing);
+	align-items: stretch;
+}
+
+@media (min-width: 768px) {
+	.docs-compare-grid {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	}
+}
+
+.docs-compare-side {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+.docs-compare-side > header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin: 0;
+	padding: calc(var(--cirth-spacing) * 0.75) var(--cirth-spacing);
+	border-bottom: var(--cirth-border-width) solid
+		var(--cirth-muted-border-color);
+	background-color: var(--cirth-card-sectioning-background-color);
+	font-weight: var(--cirth-font-weight-semibold);
+	font-size: var(--cirth-font-size-sm);
+}
+
+.docs-compare-count {
+	color: var(--cirth-muted-color);
+	font-family: var(--cirth-font-family-mono);
+	font-weight: var(--cirth-font-weight-regular);
+	font-size: var(--cirth-font-size-xs);
+}
+
+.docs-compare-side pre {
+	flex: 1;
+	margin: 0;
+	padding: var(--cirth-spacing);
+	border-radius: 0;
+	background: none;
+	font-size: var(--cirth-font-size-xs);
+	line-height: var(--cirth-line-height-relaxed);
+}
+
+.docs-compare-render {
+	margin: 0;
+	padding: var(--cirth-spacing);
+	border-top: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+}
+
+.docs-compare-render button {
+	width: auto;
+	margin-bottom: 0;
+}
+
+.docs-compare-note {
+	max-width: 38rem;
+	margin: calc(var(--cirth-spacing) * 1.5) auto 0;
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-sm);
+	text-align: center;
+}
+
+/* Closing brand panel. The negative bottom margin swallows <main>'s own
+   bottom padding so the panel runs flush into the dark footer. */
+.docs-closing {
+	margin-top: calc(var(--cirth-spacing) * 4);
+	margin-bottom: calc(var(--cirth-block-spacing-vertical) * -1);
+	padding: calc(var(--cirth-spacing) * 3) 0;
+	background-color: var(--cirth-background-color);
+	color: var(--cirth-color);
+	text-align: center;
+}
+
+.docs-closing-mark {
+	display: block;
+	margin: 0 auto var(--cirth-spacing);
+}
+
+.docs-closing-text {
+	max-width: 36rem;
+	margin: 0 auto var(--cirth-spacing);
+	font-family: var(--cirth-font-family-display);
+	font-size: var(--cirth-font-size-xl);
+	line-height: var(--cirth-line-height-snug);
+	text-wrap: balance;
+}
+
+.docs-closing .docs-hero-actions {
+	justify-content: center;
+}
+
+/* When the home closing panel ends <main>, the dark footer should follow
+   it seamlessly instead of leaving a light seam. */
+main:has(.docs-closing) + .docs-footer {
+	margin-top: 0;
 }
 
 .docs-stats {
@@ -133,7 +391,7 @@
 .docs-stat {
 	display: flex;
 	flex-direction: column;
-	gap: 0.125rem;
+	gap: 0.25rem;
 }
 
 .docs-stat-value {
@@ -148,12 +406,28 @@
 }
 
 .docs-features {
+	margin: calc(var(--cirth-spacing) * 4) 0;
+}
+
+/* Six cards: 1 column on mobile, 2x3 on tablet, 3x2 on desktop */
+.docs-features-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
 	gap: var(--cirth-spacing);
 }
 
-.docs-features article {
+@media (min-width: 576px) {
+	.docs-features-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 1024px) {
+	.docs-features-grid {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+.docs-features-grid article {
 	margin-bottom: 0;
 }
 
@@ -169,22 +443,31 @@
 	color: var(--cirth-primary);
 }
 
-.docs-feature-icon svg {
-	width: 1.25rem;
-	height: 1.25rem;
+/* Homepage sections breathe more at the sides than doc pages do */
+.docs-home .container {
+	padding-right: calc(var(--cirth-spacing) * 1.5);
+	padding-left: calc(var(--cirth-spacing) * 1.5);
 }
 
-.docs-features h3 {
+@media (min-width: 1024px) {
+	.docs-home .container {
+		padding-right: calc(var(--cirth-spacing) * 3);
+		padding-left: calc(var(--cirth-spacing) * 3);
+	}
+}
+
+.docs-features-grid h3 {
 	font-size: var(--cirth-font-size-lg);
 }
 
-.docs-features p {
+.docs-features-grid p {
 	margin-bottom: 0;
 	color: var(--cirth-muted-color);
 	font-size: var(--cirth-font-size-sm);
 }
 
-/* Docs layout: sidebar + content */
+/* Docs layout: sidebar + content, plus a page outline column on wide
+   screens (Laravel-docs style) */
 .docs-layout {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);
@@ -205,6 +488,159 @@
 	}
 }
 
+@media (min-width: 1280px) {
+	.docs-layout {
+		grid-template-columns: 14rem minmax(0, 1fr) 14rem;
+		gap: calc(var(--cirth-spacing) * 3);
+	}
+}
+
+/* Docs prose: airier than the framework default, and capped at a
+   comfortable measure */
+.docs-content {
+	--cirth-line-height: var(--cirth-line-height-relaxed);
+	--cirth-typography-spacing-vertical: var(--cirth-space-5);
+	max-width: 50rem;
+	min-width: 0;
+}
+
+/* Chapter separators: each h2 opens a new section */
+.docs-content h2 {
+	padding-top: var(--cirth-space-8);
+	border-top: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+}
+
+/* Page outline, top variant (small screens): a plain list, no scroll-spy.
+   It's a <nav>, which Cirth lays out horizontally by default — force the
+   nav and its list back to block flow. */
+.docs-toc-top,
+.docs-toc-top ul {
+	display: block;
+}
+
+.docs-toc-top {
+	margin-bottom: calc(var(--cirth-spacing) * 2);
+	padding: var(--cirth-spacing) calc(var(--cirth-spacing) * 1.5);
+	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	border-radius: var(--cirth-border-radius);
+}
+
+@media (min-width: 1280px) {
+	.docs-toc-top {
+		display: none;
+	}
+}
+
+/* Page outline, aside variant (wide screens): sticky, scroll-spy */
+.docs-toc {
+	display: none;
+}
+
+@media (min-width: 1280px) {
+	.docs-toc {
+		display: block;
+		position: sticky;
+		top: var(--cirth-spacing);
+		max-height: calc(100vh - var(--cirth-spacing) * 2);
+		overflow-y: auto;
+	}
+}
+
+.docs-toc strong,
+.docs-toc-top strong {
+	display: block;
+	margin-bottom: calc(var(--cirth-spacing) * 0.5);
+	font-size: var(--cirth-font-size-sm);
+}
+
+/* Cirth's nav styles give lists and links negative margins (meant for
+   horizontal navs); inside the outline columns they push content out of
+   the clipping box and cut it off on the left. The `nav`-qualified
+   selectors match the framework's specificity so these resets win. */
+.docs-toc nav ul,
+nav.docs-toc-top ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.docs-toc li,
+.docs-toc-top li {
+	display: block;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.docs-toc nav li a,
+nav.docs-toc-top li a {
+	margin: 0;
+}
+
+/* Level-3 entries indent inside the list; in the aside the indent lives
+   on the link text so the left rail stays continuous */
+.docs-toc-top .docs-toc-level-3 {
+	padding-inline-start: var(--cirth-space-4);
+}
+
+.docs-toc .docs-toc-level-3 a {
+	padding-left: calc(var(--cirth-space-3) + var(--cirth-space-4));
+}
+
+.docs-toc-top a {
+	display: inline-block;
+	padding: calc(var(--cirth-spacing) * 0.25) 0;
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-sm);
+	text-decoration: none;
+}
+
+.docs-toc-top a:hover {
+	color: var(--cirth-primary);
+	text-decoration: underline;
+}
+
+/* Aside outline: a continuous muted rail on the list; the active entry
+   gets an amber bar over the rail and steps up to full text color
+   (Laravel-docs style — the highlight is the bar, not the text color) */
+.docs-toc nav > ul {
+	border-left: var(--cirth-border-width-2) solid
+		var(--cirth-muted-border-color);
+}
+
+.docs-toc a {
+	position: relative;
+	display: block;
+	padding: calc(var(--cirth-spacing) * 0.25) 0
+		calc(var(--cirth-spacing) * 0.25) var(--cirth-space-3);
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-sm);
+	text-decoration: none;
+	transition: color var(--cirth-transition);
+}
+
+.docs-toc a:hover {
+	color: var(--cirth-contrast);
+}
+
+.docs-toc a.docs-toc-active {
+	color: var(--cirth-contrast);
+	font-weight: var(--cirth-font-weight-semibold);
+}
+
+.docs-toc a.docs-toc-active::before,
+.docs-sidebar nav a[aria-current="page"]::before {
+	content: "";
+	position: absolute;
+	top: var(--cirth-space-1);
+	bottom: var(--cirth-space-1);
+	left: calc(var(--cirth-border-width-2) * -1);
+	width: var(--cirth-space-1);
+	border-radius: var(--cirth-radius-pill);
+	background-color: var(--cirth-primary);
+}
+
+/* Sidebar: same rail-and-bar language as the outline */
 .docs-sidebar details {
 	margin-bottom: var(--cirth-spacing);
 }
@@ -215,14 +651,38 @@
 }
 
 .docs-sidebar nav ul {
-	margin-right: 0;
-	margin-left: 0;
+	margin: 0;
+	padding: 0;
+	border-left: var(--cirth-border-width-2) solid
+		var(--cirth-muted-border-color);
+	list-style: none;
 }
 
 .docs-sidebar nav li {
-	padding: calc(var(--cirth-nav-element-spacing-vertical) * 0.25)
-		calc(var(--cirth-nav-element-spacing-horizontal) * 0.5);
+	display: block;
+	margin: 0;
+	padding: 0;
 	font-size: var(--cirth-font-size-sm);
+}
+
+.docs-sidebar nav li a {
+	position: relative;
+	display: block;
+	margin: 0;
+	padding: calc(var(--cirth-spacing) * 0.25) 0
+		calc(var(--cirth-spacing) * 0.25) var(--cirth-space-3);
+	color: var(--cirth-muted-color);
+	text-decoration: none;
+	transition: color var(--cirth-transition);
+}
+
+.docs-sidebar nav li a:hover {
+	color: var(--cirth-contrast);
+}
+
+.docs-sidebar nav a[aria-current="page"] {
+	color: var(--cirth-contrast);
+	font-weight: var(--cirth-font-weight-semibold);
 }
 
 /* Prev / next pagination */
@@ -248,11 +708,16 @@
 }
 
 .docs-footer-top {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-between;
+	display: grid;
 	gap: calc(var(--cirth-spacing) * 2);
 	padding-bottom: calc(var(--cirth-spacing) * 2);
+}
+
+@media (min-width: 768px) {
+	.docs-footer-top {
+		grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+		gap: calc(var(--cirth-spacing) * 4);
+	}
 }
 
 .docs-footer-brand {
@@ -261,16 +726,48 @@
 	gap: 0.5rem;
 	color: var(--cirth-color);
 	font-family: var(--cirth-font-family-display);
+	font-size: var(--cirth-font-size-lg);
 }
 
 .docs-footer-brand:hover {
 	text-decoration: none;
 }
 
-.docs-footer-columns {
+.docs-footer-tagline {
+	margin: var(--cirth-spacing) 0 calc(var(--cirth-spacing) * 0.5);
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-sm);
+}
+
+.docs-footer-credit {
+	margin-bottom: var(--cirth-spacing);
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-sm);
+}
+
+.docs-footer-social {
 	display: flex;
-	flex-wrap: wrap;
-	gap: calc(var(--cirth-spacing) * 3);
+	gap: var(--cirth-spacing);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.docs-footer-social li {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.docs-footer-social a {
+	font-size: var(--cirth-font-size-sm);
+}
+
+/* Link columns spread across the remaining width */
+.docs-footer-columns {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+	gap: calc(var(--cirth-spacing) * 2);
 }
 
 .docs-footer-column strong {
@@ -286,7 +783,7 @@
 }
 
 .docs-footer-column li {
-	margin-bottom: calc(var(--cirth-spacing) * 0.375);
+	margin-bottom: calc(var(--cirth-spacing) * 0.5);
 }
 
 .docs-footer-column a {
@@ -297,7 +794,7 @@
 .docs-footer small {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.375rem;
+	gap: 0.5rem;
 	padding-bottom: var(--cirth-spacing);
 	color: var(--cirth-muted-color);
 }
@@ -316,9 +813,8 @@
 }
 
 /* VitePress code blocks. Cirth's own pre/code styling supplies the frame;
-   shiki emits token colors as --shiki-light/--shiki-dark custom properties
-   (no inline color), so plain selectors are enough to wire them to Cirth's
-   data-theme mechanism. */
+   token colors come from highlight.js classes (see markdown.highlight in
+   config.mts), themed here for both schemes. */
 div[class*="language-"] {
 	position: relative;
 }
@@ -327,18 +823,111 @@ div[class*="language-"] > span.lang {
 	display: none;
 }
 
-.vp-code span {
-	color: var(--shiki-light, inherit);
-	font-style: var(--shiki-light-font-style, inherit);
-	font-weight: var(--shiki-light-font-weight, inherit);
-	text-decoration: var(--shiki-light-text-decoration, inherit);
+/* Highlight.js theme — light. GitHub-derived hues, adjusted to sit with
+   Cirth's amber/neutral palette. */
+.hljs-comment,
+.hljs-quote {
+	color: var(--cirth-muted-color);
+	font-style: italic;
 }
 
-[data-theme="dark"] .vp-code span {
-	color: var(--shiki-dark, inherit);
-	font-style: var(--shiki-dark-font-style, inherit);
-	font-weight: var(--shiki-dark-font-weight, inherit);
-	text-decoration: var(--shiki-dark-text-decoration, inherit);
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-doctag,
+.hljs-template-tag,
+.hljs-deletion {
+	color: #c2413b;
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-meta .hljs-string {
+	color: #274f8f;
+}
+
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.function_,
+.hljs-section,
+.hljs-selector-class,
+.hljs-selector-id,
+.hljs-selector-pseudo {
+	color: #6b40b6;
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-number,
+.hljs-literal,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-built_in,
+.hljs-type,
+.hljs-meta {
+	color: #1d5fb4;
+}
+
+.hljs-name,
+.hljs-tag .hljs-name {
+	color: #2a7d43;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: var(--cirth-font-weight-bold);
+}
+
+/* Highlight.js theme — dark */
+[data-theme="dark"] .hljs-keyword,
+[data-theme="dark"] .hljs-selector-tag,
+[data-theme="dark"] .hljs-doctag,
+[data-theme="dark"] .hljs-template-tag,
+[data-theme="dark"] .hljs-deletion {
+	color: #ff8d84;
+}
+
+[data-theme="dark"] .hljs-string,
+[data-theme="dark"] .hljs-regexp,
+[data-theme="dark"] .hljs-addition,
+[data-theme="dark"] .hljs-meta .hljs-string {
+	color: #a8d3ff;
+}
+
+[data-theme="dark"] .hljs-title,
+[data-theme="dark"] .hljs-title.class_,
+[data-theme="dark"] .hljs-title.function_,
+[data-theme="dark"] .hljs-section,
+[data-theme="dark"] .hljs-selector-class,
+[data-theme="dark"] .hljs-selector-id,
+[data-theme="dark"] .hljs-selector-pseudo {
+	color: #d5b1ff;
+}
+
+[data-theme="dark"] .hljs-attr,
+[data-theme="dark"] .hljs-attribute,
+[data-theme="dark"] .hljs-variable,
+[data-theme="dark"] .hljs-template-variable,
+[data-theme="dark"] .hljs-number,
+[data-theme="dark"] .hljs-literal,
+[data-theme="dark"] .hljs-symbol,
+[data-theme="dark"] .hljs-bullet,
+[data-theme="dark"] .hljs-link,
+[data-theme="dark"] .hljs-built_in,
+[data-theme="dark"] .hljs-type,
+[data-theme="dark"] .hljs-meta {
+	color: #83c2ff;
+}
+
+[data-theme="dark"] .hljs-name,
+[data-theme="dark"] .hljs-tag .hljs-name {
+	color: #86e39b;
 }
 
 /* Copy button emitted with each code block; the click handler lives in
@@ -423,6 +1012,53 @@ div[class*="language-"] > button.copy.copied::before {
 	padding: 0;
 	background: none;
 	white-space: pre;
+}
+
+/* Brand page: logo variant tiles. Each tile carries its own data-theme so
+   the light/dark variants render on their true backgrounds regardless of
+   the site toggle. Fixed (not auto-fill) columns: the markup lists the
+   three light variants before the three dark ones, and a fixed 3-column
+   grid is what turns that order into a light row over a dark row. */
+.docs-brand-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--cirth-spacing);
+	margin: 1.5rem 0;
+}
+
+@media (min-width: 576px) {
+	.docs-brand-grid {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+.docs-brand-tile {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--cirth-spacing);
+	margin: 0;
+	padding: calc(var(--cirth-spacing) * 1.5) var(--cirth-spacing);
+	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	border-radius: var(--cirth-border-radius);
+	background-color: var(--cirth-background-color);
+}
+
+.docs-brand-tile figcaption {
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-sm);
+}
+
+.docs-brand-downloads {
+	display: flex;
+	gap: calc(var(--cirth-spacing) * 0.5);
+	margin: 0;
+}
+
+.docs-brand-downloads [role="button"] {
+	margin-bottom: 0;
+	padding: 0.25rem 0.75rem;
+	font-size: var(--cirth-font-size-xs);
 }
 
 /* Color swatch grid, used by the Colors page */

@@ -22,7 +22,7 @@ import "@cirthcss/cirth/dist/cirth.min.css";
 Every published build also has a shorter `exports` path, for example
 `@cirthcss/cirth/classless`, `@cirthcss/cirth/scoped`, or
 `@cirthcss/cirth/presets/cobalt` — see
-[Build tooling](/build-tooling#package-exports) for the full map. The
+[Contributions](/contributions#package-exports) for the full map. The
 `dist/*.css` paths keep working alongside them.
 
 The package ships compiled CSS only — `main`/`style` both point at

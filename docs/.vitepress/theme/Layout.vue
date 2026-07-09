@@ -1,21 +1,28 @@
 <script setup lang="ts">
+import {
+	PhCode,
+	PhFaders,
+	PhLightning,
+	PhMoon,
+	PhShieldCheck,
+	PhStackSimple,
+	PhSun,
+} from "@phosphor-icons/vue";
 import { Content, useData, useRoute, withBase } from "vitepress";
-import { computed, onMounted } from "vue";
+import { computed, nextTick, onMounted, ref, watch, type Component } from "vue";
+import HomeDemo from "./components/HomeDemo.vue";
 import { useCirthTheme } from "./composables/theme";
 
-// Minimal stroke icons for the homepage feature grid. Inlined rather than
-// imported so the docs site stays a plain static build with no icon
-// package dependency; each one is deliberately tiny (feather-icon style).
-const featureIcons: Record<string, string> = {
-	code: '<polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline>',
-	sliders:
-		'<line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line>',
-	layers:
-		'<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline>',
-	moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>',
-	package:
-		'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line>',
-	shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>',
+// Site iconography comes from Phosphor Icons (https://phosphoricons.com),
+// imported per-icon so only the ones used here end up in the bundle. The
+// frontmatter keeps short slugs; this map resolves them to components.
+const featureIcons: Record<string, Component> = {
+	code: PhCode,
+	sliders: PhFaders,
+	layers: PhStackSimple,
+	moon: PhMoon,
+	zap: PhLightning,
+	shield: PhShieldCheck,
 };
 
 const { site, theme, page, frontmatter } = useData();
@@ -53,6 +60,61 @@ const footerLinks = computed(() => theme.value.footerLinks ?? []);
 
 const normalize = (link: string) => withBase(link).replace(/\.html$/, "");
 const isActive = (link?: string) => !!link && normalize(link) === route.path;
+
+// Only the sidebar group containing the current page starts open
+const groupHasActive = (group: { items?: { link?: string }[] }) =>
+	(group.items ?? []).some((item) => isActive(item.link));
+
+// Per-page outline ("On this page"). Headers come from the markdown
+// pipeline (config.mts enables level 2–3 extraction), so the list is
+// server-rendered; only the scroll-spy highlight is client-side. The
+// plugin nests h3s under their h2 as `children` — flatten for rendering.
+interface PageHeader {
+	level: number;
+	title: string;
+	slug: string;
+	children?: PageHeader[];
+}
+
+const flattenHeaders = (headers: PageHeader[]): PageHeader[] =>
+	headers.flatMap((header) => [
+		header,
+		...flattenHeaders(header.children ?? []),
+	]);
+
+const pageHeaders = computed(() =>
+	flattenHeaders(page.value.headers ?? []).filter(
+		(header) => header.level === 2 || header.level === 3,
+	),
+);
+const activeSlug = ref("");
+
+const updateActiveSlug = () => {
+	const headings = Array.from(
+		document.querySelectorAll<HTMLElement>(".docs-content :is(h2, h3)[id]"),
+	);
+	let current = "";
+	for (const heading of headings) {
+		// 96px offset: the heading counts as "reached" slightly before it
+		// touches the top edge, matching where the eye lands after a jump.
+		if (heading.getBoundingClientRect().top <= 96) current = heading.id;
+		else break;
+	}
+	activeSlug.value = current || (headings[0]?.id ?? "");
+};
+
+onMounted(() => {
+	window.addEventListener("scroll", updateActiveSlug, { passive: true });
+	updateActiveSlug();
+});
+
+watch(
+	() => route.path,
+	async () => {
+		await nextTick();
+		updateActiveSlug();
+	},
+);
 
 const flatPages = computed(() =>
 	sidebar.value
@@ -103,14 +165,15 @@ const nextPage = computed(() =>
 				</li>
 				<li>
 					<button type="button" class="outline contrast docs-theme-toggle" aria-label="Toggle color scheme" @click="toggle">
-						<span class="docs-theme-icon" aria-hidden="true"></span>
+						<PhSun class="docs-theme-icon-sun" :size="18" aria-hidden="true" />
+						<PhMoon class="docs-theme-icon-moon" :size="18" aria-hidden="true" />
 					</button>
 				</li>
 			</ul>
 		</nav>
 	</header>
 
-	<main>
+	<main :class="{ 'docs-home': isHome }">
 		<template v-if="page.isNotFound">
 			<section class="container docs-hero">
 				<hgroup>
@@ -124,23 +187,33 @@ const nextPage = computed(() =>
 		<template v-else-if="isHome">
 			<section class="docs-hero-panel" data-theme="dark">
 				<div class="container docs-hero">
-					<p v-if="frontmatter.hero.eyebrow" class="docs-hero-eyebrow">{{ frontmatter.hero.eyebrow }}</p>
-					<hgroup>
-						<h1>{{ frontmatter.hero.name }}</h1>
-						<p>{{ frontmatter.hero.text }}</p>
-					</hgroup>
-					<p class="docs-hero-tagline">{{ frontmatter.hero.tagline }}</p>
-					<p class="docs-hero-actions">
-						<a
-							v-for="action in frontmatter.hero.actions"
-							:key="action.text"
-							:href="action.link.startsWith('http') ? action.link : normalize(action.link)"
-							role="button"
-							:class="action.theme === 'brand' ? undefined : 'outline secondary'"
+					<div class="docs-hero-copy">
+						<img
+							class="docs-hero-mark"
+							:src="withBase('/logo_brand_dark.svg')"
+							alt=""
+							width="72"
+							height="72"
 						>
-							{{ action.text }}
-						</a>
-					</p>
+						<p v-if="frontmatter.hero.eyebrow" class="docs-hero-eyebrow">{{ frontmatter.hero.eyebrow }}</p>
+						<hgroup>
+							<h1>{{ frontmatter.hero.name }}</h1>
+							<p>{{ frontmatter.hero.text }}</p>
+						</hgroup>
+						<p class="docs-hero-tagline">{{ frontmatter.hero.tagline }}</p>
+						<p class="docs-hero-actions">
+							<a
+								v-for="action in frontmatter.hero.actions"
+								:key="action.text"
+								:href="action.link.startsWith('http') ? action.link : normalize(action.link)"
+								role="button"
+								:class="action.theme === 'brand' ? undefined : 'outline secondary'"
+							>
+								{{ action.text }}
+							</a>
+						</p>
+					</div>
+					<HomeDemo class="docs-hero-demo" />
 				</div>
 			</section>
 			<div class="container">
@@ -150,25 +223,77 @@ const nextPage = computed(() =>
 						<span class="docs-stat-label">{{ stat.label }}</span>
 					</div>
 				</section>
+
+				<section v-if="frontmatter.comparison" class="docs-compare">
+					<header class="docs-section-header">
+						<p class="docs-eyebrow">{{ frontmatter.comparison.eyebrow }}</p>
+						<h2>{{ frontmatter.comparison.title }}</h2>
+						<p class="docs-section-lede">{{ frontmatter.comparison.lede }}</p>
+					</header>
+					<div class="docs-compare-grid">
+						<article
+							v-for="side in frontmatter.comparison.sides"
+							:key="side.label"
+							class="docs-compare-side"
+						>
+							<header>
+								<span>{{ side.label }}</span>
+								<span class="docs-compare-count">{{ side.count }}</span>
+							</header>
+							<pre><code v-text="side.code" /></pre>
+						</article>
+					</div>
+					<p class="docs-compare-note">{{ frontmatter.comparison.note }}</p>
+				</section>
+
 				<section class="docs-features">
-					<article v-for="feature in frontmatter.features" :key="feature.title">
-						<!-- eslint-disable-next-line vue/no-v-html -->
-						<span v-if="feature.icon" class="docs-feature-icon" aria-hidden="true">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" v-html="featureIcons[feature.icon]"></svg>
-						</span>
-						<h3>{{ feature.title }}</h3>
-						<!-- eslint-disable-next-line vue/no-v-html -->
-						<p v-html="feature.details" />
-					</article>
+					<header class="docs-section-header">
+						<p class="docs-eyebrow">{{ frontmatter.featuresEyebrow }}</p>
+						<h2>{{ frontmatter.featuresTitle }}</h2>
+					</header>
+					<div class="docs-features-grid">
+						<article v-for="feature in frontmatter.features" :key="feature.title">
+							<span v-if="feature.icon" class="docs-feature-icon" aria-hidden="true">
+								<component :is="featureIcons[feature.icon]" :size="20" />
+							</span>
+							<h3>{{ feature.title }}</h3>
+							<!-- eslint-disable-next-line vue/no-v-html -->
+							<p v-html="feature.details" />
+						</article>
+					</div>
 				</section>
 			</div>
+
+			<section v-if="frontmatter.closing" class="docs-closing" data-theme="dark">
+				<div class="container">
+					<img
+						class="docs-closing-mark"
+						:src="withBase('/logo_mono_dark.svg')"
+						alt=""
+						width="40"
+						height="40"
+					>
+					<p class="docs-closing-text">{{ frontmatter.closing.text }}</p>
+					<p class="docs-hero-actions">
+						<a
+							v-for="action in frontmatter.closing.actions"
+							:key="action.text"
+							:href="normalize(action.link)"
+							role="button"
+							class="outline secondary"
+						>
+							{{ action.text }}
+						</a>
+					</p>
+				</div>
+			</section>
 		</template>
 
 		<template v-else>
 			<div class="container docs-layout">
 				<aside class="docs-sidebar">
 					<nav aria-label="docs navigation">
-						<details v-for="group in sidebar" :key="group.text" :open="!group.collapsed">
+						<details v-for="group in sidebar" :key="group.text" :open="groupHasActive(group)">
 							<summary>{{ group.text }}</summary>
 							<ul>
 								<li v-for="item in group.items" :key="item.link">
@@ -181,6 +306,14 @@ const nextPage = computed(() =>
 					</nav>
 				</aside>
 				<div class="docs-content">
+					<nav v-if="pageHeaders.length > 1" class="docs-toc-top" aria-label="On this page">
+						<strong>On this page</strong>
+						<ul>
+							<li v-for="header in pageHeaders" :key="header.slug" :class="`docs-toc-level-${header.level}`">
+								<a :href="`#${header.slug}`">{{ header.title }}</a>
+							</li>
+						</ul>
+					</nav>
 					<Content />
 					<footer v-if="prevPage || nextPage" class="docs-prev-next">
 						<a v-if="prevPage" :href="normalize(prevPage.link)" class="secondary">← {{ prevPage.text }}</a>
@@ -188,6 +321,22 @@ const nextPage = computed(() =>
 						<a v-if="nextPage" :href="normalize(nextPage.link)" class="secondary">{{ nextPage.text }} →</a>
 					</footer>
 				</div>
+				<aside v-if="pageHeaders.length > 1" class="docs-toc">
+					<nav aria-label="On this page">
+						<strong>On this page</strong>
+						<ul>
+							<li v-for="header in pageHeaders" :key="header.slug" :class="`docs-toc-level-${header.level}`">
+								<a
+									:href="`#${header.slug}`"
+									:class="{ 'docs-toc-active': activeSlug === header.slug }"
+									:aria-current="activeSlug === header.slug ? 'true' : undefined"
+								>
+									{{ header.title }}
+								</a>
+							</li>
+						</ul>
+					</nav>
+				</aside>
 			</div>
 		</template>
 	</main>
@@ -195,10 +344,21 @@ const nextPage = computed(() =>
 	<footer class="docs-footer" data-theme="dark">
 		<div class="container">
 			<div class="docs-footer-top">
-				<a :href="withBase('/')" class="docs-brand docs-footer-brand">
-					<img class="docs-logo" :src="withBase('/logo_mono_dark.svg')" alt="" width="24" height="24">
-					<strong>{{ site.title }}</strong>
-				</a>
+				<div class="docs-footer-brand-block">
+					<a :href="withBase('/')" class="docs-brand docs-footer-brand">
+						<img class="docs-logo" :src="withBase('/logo_brand_dark.svg')" alt="" width="28" height="28">
+						<strong>{{ site.title }}</strong>
+					</a>
+					<p class="docs-footer-credit">
+						Designed and built by Riccardo Pastori, with help from the
+						<a href="https://github.com/cirthcss/cirth/graphs/contributors" target="_blank" rel="noreferrer">contributors</a>.
+					</p>
+					<ul class="docs-footer-social">
+						<li><a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub</a></li>
+						<li><a href="https://www.npmjs.com/package/@cirthcss/cirth" target="_blank" rel="noreferrer">npm</a></li>
+						<li><a href="https://github.com/cirthcss/cirth/blob/develop/CHANGELOG.md" target="_blank" rel="noreferrer">Changelog</a></li>
+					</ul>
+				</div>
 				<div class="docs-footer-columns">
 					<div v-for="group in footerLinks" :key="group.title" class="docs-footer-column">
 						<strong>{{ group.title }}</strong>

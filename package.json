@@ -59,6 +59,8 @@
 		"docs:preview": "vitepress preview docs"
 	},
 	"devDependencies": {
+		"@phosphor-icons/vue": "^2.2.1",
+		"highlight.js": "^11.11.1",
 		"lightningcss-cli": "^1.32.0",
 		"prettier": "^3.5.3",
 		"sass-embedded": "^1.100.0",

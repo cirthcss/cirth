@@ -2,32 +2,63 @@
 layout: home
 
 hero:
-  eyebrow: Lightweight · Semantic · Customizable
+  eyebrow: Semantic-first CSS
   name: Cirth
-  text: Semantic by default. Classes only when needed.
+  text: Write HTML. It's already styled.
   tagline: >-
-    Semantic-first CSS for production-ready interfaces with clean HTML,
-    modern CSS, and minimal class noise.
+    Standard elements carry the styling — nav, article, button, table.
+    Classes exist only for the few things HTML can't say. No JavaScript,
+    no build step, ~13KB gzipped.
   actions:
     - theme: brand
       text: Get Started
       link: /get-started
     - theme: alt
-      text: Customization
-      link: /customization
-    - theme: alt
-      text: GitHub
-      link: https://github.com/cirthcss/cirth
+      text: Examples
+      link: /examples
 
 stats:
   - value: ~13KB
     label: Default build, gzipped
   - value: "0"
     label: Lines of JavaScript
-  - value: Light + Dark
-    label: Built-in color schemes
-  - value: MIT
-    label: Open source license
+  - value: AA
+    label: WCAG 2.2 compliance
+
+comparison:
+  eyebrow: The trade-off
+  title: One button, two ways to write it
+  lede: >-
+    Utility-first frameworks style through class recipes, repeated at every
+    call site. Cirth styles the element itself and keeps customization in
+    CSS custom properties — the markup stays yours.
+  sides:
+    - label: Utility-first
+      count: 16 classes
+      code: |-
+        <button class="inline-flex items-center
+          justify-center rounded-lg bg-amber-600
+          px-5 py-2.5 text-base font-semibold
+          text-white shadow-sm hover:bg-amber-700
+          focus-visible:outline-2
+          focus-visible:outline-offset-2
+          focus-visible:outline-amber-600
+          disabled:opacity-50">
+          Save changes
+        </button>
+    - label: Cirth
+      count: 0 classes
+      code: |-
+        <button>
+          Save changes
+        </button>
+  note: >-
+    Both render the same button — hover, focus ring, disabled state, dark
+    mode, and the 44px target size. In Cirth they're part of the element,
+    and restyling is one token — not a find-and-replace.
+
+featuresEyebrow: What's in the box
+featuresTitle: Small surface, finished defaults
 
 features:
   - icon: code
@@ -37,11 +68,11 @@ features:
       <code>button</code>, <code>table</code>, <code>details</code> — carry
       the styling. Add a class only where HTML semantics run out.
   - icon: sliders
-    title: CSS custom properties
+    title: Fully customizable theme
     details: >-
-      Every color, spacing, radius, and font is a <code>--cirth-</code>
-      custom property. Override them after loading the framework; no build
-      step required.
+      Every color, spacing, radius, font, and shadow is one of hundreds of
+      <code>--cirth-</code> custom properties. Override them after loading
+      the framework and the whole theme follows — no build step, no Sass.
   - icon: layers
     title: Classless & scoped builds
     details: >-
@@ -53,15 +84,27 @@ features:
       The default theme ships a light and dark variant, switching
       automatically with <code>prefers-color-scheme</code> or forced via
       <code>data-theme</code>.
-  - icon: package
-    title: One theme, optional presets
+  - icon: zap
+    title: Interactive without JavaScript
     details: >-
-      Amber is the single official theme. <code>cobalt</code> (corporate)
-      and <code>coral</code> (playful) are optional token-override presets
-      you load after it — no Sass required.
+      Accordions, dropdowns, and modals build on native elements —
+      <code>details</code> and <code>dialog</code> — and their built-in
+      behavior. Nothing to initialize, nothing to break.
   - icon: shield
-    title: Small, focused surface
+    title: Accessible by default
     details: >-
-      No JavaScript, no utility-class soup, no component catalog. Layout
-      primitives, forms, and a small set of components — nothing else.
+      WCAG 2.2 AA contrast, visible focus rings that survive Windows High
+      Contrast, 44px touch targets, and <code>prefers-reduced-motion</code>
+      support — verified in the source, not bolted on.
+
+closing:
+  text: >-
+    Cirth takes its name from a runic alphabet designed for carving —
+    strokes reduced to what the material allows. This framework applies
+    the same discipline to CSS.
+  actions:
+    - text: About Cirth
+      link: /about
+    - text: Brand
+      link: /brand
 ---

@@ -1,3 +1,4 @@
+import hljs from "highlight.js";
 import { defineConfig } from "vitepress";
 
 // Served at https://cirthcss.github.io/cirth/ by the deploy-docs workflow,
@@ -15,10 +16,47 @@ export default defineConfig({
 	// theme/composables/theme.ts), not by VitePress's appearance switcher.
 	appearance: false,
 
+	markdown: {
+		// Populate page.headers so the theme can render the per-page
+		// "On this page" outline (see Layout.vue).
+		headers: { level: [2, 3] },
+		// Highlight.js at build time instead of VitePress's bundled shiki:
+		// it emits theme-agnostic token classes (.hljs-*) that the docs
+		// shell colors with Cirth's own light/dark palette in style.css.
+		highlight: (str, lang) => {
+			if (lang && hljs.getLanguage(lang)) {
+				return hljs.highlight(str, {
+					language: lang,
+					ignoreIllegals: true,
+				}).value;
+			}
+			return "";
+		},
+	},
+
 	head: [
 		// `head` entries render as raw HTML and aren't rewritten for `base`
 		// the way Markdown/theme asset links are, so it's prefixed by hand.
+		// The icon-tile variants of the brand mark serve as favicon; the
+		// media-scoped pair matches the browser UI's own scheme, with the
+		// first entry as fallback for browsers that ignore `media`.
 		["link", { rel: "icon", href: `${base}logo_brand_app.svg` }],
+		[
+			"link",
+			{
+				rel: "icon",
+				href: `${base}logo_brand_app.svg`,
+				media: "(prefers-color-scheme: light)",
+			},
+		],
+		[
+			"link",
+			{
+				rel: "icon",
+				href: `${base}logo_brand_app_dark.svg`,
+				media: "(prefers-color-scheme: dark)",
+			},
+		],
 		// Set data-theme before first paint to avoid a light-mode flash.
 		[
 			"script",
@@ -35,17 +73,8 @@ export default defineConfig({
 
 	themeConfig: {
 		nav: [
-			{ text: "Get Started", link: "/get-started" },
-			{ text: "Customization", link: "/customization" },
-			{ text: "Colors", link: "/colors" },
-			{ text: "Docs", link: "/layout/document" },
-			{
-				text: "0.3.0",
-				items: [
-					{ text: "Changelog", link: "https://github.com/cirthcss/cirth/blob/develop/CHANGELOG.md" },
-					{ text: "About Cirth", link: "/about" },
-				],
-			},
+			{ text: "Docs", link: "/get-started" },
+			{ text: "Examples", link: "/examples" },
 		],
 
 		sidebar: {
@@ -124,7 +153,11 @@ export default defineConfig({
 				{
 					text: "Project",
 					collapsed: true,
-					items: [{ text: "Build tooling", link: "/build-tooling" }],
+					items: [
+						{ text: "Examples", link: "/examples" },
+						{ text: "Contributions", link: "/contributions" },
+						{ text: "Brand", link: "/brand" },
+					],
 				},
 			],
 		},
@@ -142,18 +175,19 @@ export default defineConfig({
 				],
 			},
 			{
+				title: "Project",
+				items: [
+					{ text: "About Cirth", link: "/about" },
+					{ text: "Brand", link: "/brand" },
+					{ text: "Examples", link: "/examples" },
+					{ text: "Contributions", link: "/contributions" },
+				],
+			},
+			{
 				title: "Community",
 				items: [
 					{ text: "GitHub", link: "https://github.com/cirthcss/cirth" },
 					{ text: "Issues", link: "https://github.com/cirthcss/cirth/issues" },
-				],
-			},
-			{
-				title: "Resources",
-				items: [
-					{ text: "Changelog", link: "https://github.com/cirthcss/cirth/blob/develop/CHANGELOG.md" },
-					{ text: "About Cirth", link: "/about" },
-					{ text: "Build tooling", link: "/build-tooling" },
 				],
 			},
 		],

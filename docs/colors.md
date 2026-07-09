@@ -40,7 +40,7 @@ default, classless, or scoped builds:
 ```
 
 Presets are generated from `src/presets/` by `scripts/build-presets.js`
-during `npm run build`; see [Build tooling](/build-tooling) for how it works.
+during `npm run build`; see [Contributions](/contributions) for how the build works.
 
 ## Picking a different primary without a preset
 
