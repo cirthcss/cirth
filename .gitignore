@@ -117,18 +117,24 @@ $RECYCLE.BIN/
 
 # AI assistant files
 # Local, per-machine assistant state and config, not project configuration.
-.claude/
+/.claude/
 /.copilot/
-.cursor/
-.windsurf/
-.continue/
-.codeium/
-.codex/
-.amazonq/
-.cody/
-.clinerules/
-.roo/
-.aider*
+/.cursor/
+/.cursorrules
+/.windsurf/
+/.windsurfrules
+/.continue/
+/.codeium/
+/.codex/
+/.amazonq/
+/.cody/
+/.clinerules
+/.roo/
+/.aider*
+
+# Local prompt-engineering harness for Claude Code / Codex prompts — dev
+# tooling, not part of the published project. See .agent-harness/README.md.
+/.agent-harness/
 
 # Local working notes
 /TODO.md
