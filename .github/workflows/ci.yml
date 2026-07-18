@@ -38,6 +38,9 @@ jobs:
       - name: Build CSS
         run: npm run build
 
+      - name: Check CSS size budget
+        run: npm run check:size
+
       - name: Build docs
         run: npm run docs:build
 

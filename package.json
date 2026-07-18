@@ -53,6 +53,7 @@
 		"build": "node scripts/build.js",
 		"check:variables": "node scripts/check-css-variables.js",
 		"check:doc-links": "node scripts/check-doc-links.js",
+		"check:size": "node scripts/check-css-size.js",
 		"dev": "node scripts/watch.js",
 		"format": "prettier --write --log-level silent 'src/**/*.scss'",
 		"lint": "stylelint 'src/**/*.scss' && node scripts/check-css-variables.js && node scripts/check-doc-links.js",
