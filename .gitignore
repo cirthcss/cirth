@@ -24,6 +24,7 @@ pnpm-debug.log*
 /docs/.vitepress/theme/generated/
 /docs/.vitepress/cache/
 /docs/.vitepress/dist/
+/docs/.vitepress/.temp/
 
 # Local caches
 /.cache/
