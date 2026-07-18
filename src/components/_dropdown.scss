@@ -25,9 +25,21 @@
         );
         margin-inline-start: var(--cirth-space-1);
         float: right;
-        // TODO: find out why we need this magic number (0.2 rem)
-        // for the marker to be aligned with the regular select
-        transform: rotate(0deg) translateX(0.2rem);
+        // The float pins the marker at the content edge, i.e. the trigger's
+        // horizontal padding away from its border — but a regular <select>
+        // paints its chevron at --cirth-space-3 from the border (see
+        // forms/_basics.scss). The translate bridges exactly that
+        // difference, so the chevron lands at --cirth-space-3 from the edge
+        // for any trigger padding. (Inherited Pico hardcoded 0.2rem here —
+        // an eyeballed approximation of this 0.25rem gap.)
+        transform: rotate(0deg)
+          translateX(
+            calc(
+              var(--cirth-form-element-spacing-horizontal) - var(
+                  --cirth-space-3
+                )
+            )
+          );
         background-image: var(--cirth-icon-chevron);
         background-position: right center;
         background-size: var(--cirth-size-4) auto;
