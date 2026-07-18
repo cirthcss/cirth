@@ -356,7 +356,7 @@ const nextPage = computed(() =>
 					<ul class="docs-footer-social">
 						<li><a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub</a></li>
 						<li><a href="https://www.npmjs.com/package/@cirthcss/cirth" target="_blank" rel="noreferrer">npm</a></li>
-						<li><a href="https://github.com/cirthcss/cirth/blob/develop/CHANGELOG.md" target="_blank" rel="noreferrer">Changelog</a></li>
+						<li><a href="https://github.com/cirthcss/cirth/blob/master/CHANGELOG.md" target="_blank" rel="noreferrer">Changelog</a></li>
 					</ul>
 				</div>
 				<div class="docs-footer-columns">

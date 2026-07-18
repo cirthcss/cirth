@@ -52,10 +52,11 @@
 	"scripts": {
 		"build": "node scripts/build.js",
 		"check:variables": "node scripts/check-css-variables.js",
+		"check:doc-links": "node scripts/check-doc-links.js",
 		"dev": "node scripts/watch.js",
 		"format": "prettier --write --log-level silent 'src/**/*.scss'",
-		"lint": "stylelint 'src/**/*.scss' && node scripts/check-css-variables.js",
-		"lint:fix": "stylelint 'src/**/*.scss' --fix && node scripts/check-css-variables.js",
+		"lint": "stylelint 'src/**/*.scss' && node scripts/check-css-variables.js && node scripts/check-doc-links.js",
+		"lint:fix": "stylelint 'src/**/*.scss' --fix && node scripts/check-css-variables.js && node scripts/check-doc-links.js",
 		"docs:assets": "node scripts/build-docs.js",
 		"docs:dev": "npm run docs:assets && vitepress dev docs",
 		"docs:build": "npm run docs:assets && vitepress build docs",
