@@ -4,7 +4,7 @@ Cirth is developed in the open at
 [github.com/cirthcss/cirth](https://github.com/cirthcss/cirth).
 Bug reports, accessibility findings, and focused pull requests are all
 welcome. The full workflow lives in
-[`.github/CONTRIBUTING.md`](https://github.com/cirthcss/cirth/blob/develop/.github/CONTRIBUTING.md);
+[`.github/CONTRIBUTING.md`](https://github.com/cirthcss/cirth/blob/master/.github/CONTRIBUTING.md);
 this page is the practical summary.
 
 ## Getting set up
@@ -80,5 +80,5 @@ tarball (`npm pack`) before opening the PR.
 ## License
 
 Contributions are accepted under the project's
-[MIT License](https://github.com/cirthcss/cirth/blob/develop/LICENSE.md).
+[MIT License](https://github.com/cirthcss/cirth/blob/master/LICENSE.md).
 Documentation contributions fall under the same terms.

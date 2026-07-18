@@ -64,7 +64,7 @@ is what lasts.
 
 Every variant is downloadable above as SVG (preferred) or PNG; the full
 set also lives in
-[`docs/public/`](https://github.com/cirthcss/cirth/tree/develop/docs/public).
+[`docs/public/`](https://github.com/cirthcss/cirth/tree/master/docs/public).
 
 Use the **brand** (amber) mark wherever color is available, matching the
 variant to the background. Use **mono** in single-color contexts — print,

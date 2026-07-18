@@ -81,4 +81,4 @@ compatibility. The most important user-facing differences:
 ## Project
 
 - Contributing: [Contributions](/contributions)
-- License: [MIT](https://github.com/cirthcss/cirth/blob/develop/LICENSE.md)
+- License: [MIT](https://github.com/cirthcss/cirth/blob/master/LICENSE.md)

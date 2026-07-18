@@ -6,8 +6,8 @@ Contributions do not need to be limited to bug fixes. Documentation,
 regression tests, tooling cleanup, API review, proposals, and focused
 implementation work are welcome.
 
-For build-tooling details and dependency policy, see
-[`docs/build-tooling.md`](../docs/build-tooling.md).
+For build setup, the source layout, and the package exports map, see
+[`docs/contributions.md`](../docs/contributions.md).
 
 ## Issues
 
