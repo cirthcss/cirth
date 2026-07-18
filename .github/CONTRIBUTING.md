@@ -44,7 +44,8 @@ Before opening a pull request, make sure:
 ## Working Locally
 
 Cirth uses npm as the package manager. Yarn, Composer, pnpm, and Bun are not
-part of the current workflow.
+part of the current workflow. Node.js 24.18 (current LTS) is what CI and the
+release workflows run on; `.nvmrc` pins it for `nvm use`.
 
 ```sh
 npm install

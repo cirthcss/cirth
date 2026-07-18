@@ -9,7 +9,9 @@ this page is the practical summary.
 
 ## Getting set up
 
-npm is the only supported package manager — one install path, one lockfile:
+npm is the only supported package manager — one install path, one lockfile.
+Node.js 24.18 (current LTS) is the version CI and the release workflows run
+on; `.nvmrc` pins it for local use with `nvm use`.
 
 ```sh
 git clone https://github.com/cirthcss/cirth.git
