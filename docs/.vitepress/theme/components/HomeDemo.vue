@@ -1,10 +1,11 @@
 <script setup lang="ts">
 // Homepage signature: plain semantic HTML is typed on the left and the
-// rendered result materializes on the right, one element at a time.
-// The full final state is server-rendered, so no-JS visitors, search
-// engines, and screen readers always get the complete content; the
-// animation is a purely visual layer applied after mount, and skipped
-// entirely under prefers-reduced-motion.
+// rendered result materializes on the right, one element at a time. The
+// animation runs as an endless cycle — type forward, hold, delete
+// backward, hold, repeat. The full final state is server-rendered, so
+// no-JS visitors, search engines, and screen readers always get the
+// complete content; the animation is a purely visual layer applied after
+// mount, and skipped entirely under prefers-reduced-motion.
 import { onBeforeUnmount, onMounted, ref } from "vue";
 
 interface Segment {
@@ -44,9 +45,25 @@ const segments: Segment[] = [
 const fullSource = segments.map((segment) => segment.src).join("");
 const finalSnapshot = segments[segments.length - 1].snapshot;
 
+// Cumulative typed length at which each segment is complete; used to step
+// the preview back while deleting.
+const segmentEnds: number[] = [];
+segments.reduce((acc, segment) => {
+	const end = acc + segment.src.length;
+	segmentEnds.push(end);
+	return end;
+}, 0);
+
+const TYPE_MS = 18;
+const NEWLINE_MS = 60;
+const SEGMENT_RENDER_MS = 240;
+const HOLD_FULL_MS = 3500;
+const DELETE_MS = 9;
+const HOLD_EMPTY_MS = 900;
+
 const typed = ref(fullSource);
 const preview = ref(finalSnapshot);
-const playing = ref(false);
+const animated = ref(false);
 let timers: ReturnType<typeof setTimeout>[] = [];
 
 const clearTimers = () => {
@@ -54,29 +71,49 @@ const clearTimers = () => {
 	timers = [];
 };
 
-const play = () => {
+// One full cycle: type each segment (rendering its preview as it lands),
+// hold the finished page, delete backward (the preview un-building the
+// same way), hold the blank pane, then schedule the next cycle.
+const cycle = () => {
 	clearTimers();
-	playing.value = true;
 	typed.value = "";
 	preview.value = "";
-	let charDelay = 0;
-	for (const [index, segment] of segments.entries()) {
+	let at = 0;
+
+	for (const segment of segments) {
 		for (const char of segment.src) {
-			charDelay += char === "\n" ? 60 : 18;
+			at += char === "\n" ? NEWLINE_MS : TYPE_MS;
 			timers.push(
 				setTimeout(() => {
 					typed.value += char;
-				}, charDelay),
+				}, at),
 			);
 		}
-		charDelay += 240;
+		at += SEGMENT_RENDER_MS;
 		timers.push(
 			setTimeout(() => {
 				preview.value = segment.snapshot;
-				if (index === segments.length - 1) playing.value = false;
-			}, charDelay),
+			}, at),
 		);
 	}
+
+	at += HOLD_FULL_MS;
+
+	for (let length = fullSource.length - 1; length >= 0; length--) {
+		at += DELETE_MS;
+		const sliceTo = length;
+		timers.push(
+			setTimeout(() => {
+				typed.value = fullSource.slice(0, sliceTo);
+				const partial = segmentEnds.findIndex((end) => sliceTo < end);
+				preview.value =
+					partial <= 0 ? "" : segments[partial - 1].snapshot;
+			}, at),
+		);
+	}
+
+	at += HOLD_EMPTY_MS;
+	timers.push(setTimeout(cycle, at));
 };
 
 onMounted(() => {
@@ -84,7 +121,8 @@ onMounted(() => {
 		"(prefers-reduced-motion: reduce)",
 	).matches;
 	if (!reduceMotion) {
-		timers.push(setTimeout(play, 600));
+		animated.value = true;
+		timers.push(setTimeout(cycle, 600));
 	}
 });
 
@@ -99,16 +137,8 @@ onBeforeUnmount(clearTimers);
 		<div class="home-demo-code" data-theme="dark">
 			<div class="home-demo-code-bar">
 				<span class="home-demo-filename">index.html — no classes</span>
-				<button
-					type="button"
-					class="outline secondary home-demo-replay"
-					:disabled="playing"
-					@click="play"
-				>
-					Replay
-				</button>
 			</div>
-			<pre aria-hidden="true"><code>{{ typed }}<span v-if="playing" class="home-demo-cursor"></span></code></pre>
+			<pre aria-hidden="true"><code>{{ typed }}<span v-if="animated" class="home-demo-cursor"></span></code></pre>
 			<!-- Full source for assistive tech and no-JS, independent of the
 			     visual typing state above. -->
 			<pre class="visually-hidden"><code>{{ fullSource }}</code></pre>
