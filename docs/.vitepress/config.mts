@@ -20,6 +20,14 @@ export default defineConfig({
 		// Populate page.headers so the theme can render the per-page
 		// "On this page" outline (see Layout.vue).
 		headers: { level: [2, 3] },
+		// Code blocks scroll horizontally, so they must be reachable with
+		// the keyboard (axe: scrollable-region-focusable).
+		config(md) {
+			const fence = md.renderer.rules.fence;
+			if (!fence) return;
+			md.renderer.rules.fence = (...args) =>
+				fence(...args).replace("<pre", '<pre tabindex="0"');
+		},
 		// Highlight.js at build time instead of VitePress's bundled shiki:
 		// it emits theme-agnostic token classes (.hljs-*) that the docs
 		// shell colors with Cirth's own light/dark palette in style.css.

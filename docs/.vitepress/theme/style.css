@@ -280,16 +280,23 @@
 	margin-bottom: 0;
 }
 
+/* `!important` so element-specific styles (e.g. `.home-demo-code pre`)
+   can't reopen the box; `overflow: clip` forbids scrolling outright, so
+   the clipped box doesn't count as a scrollable region needing keyboard
+   access (`hidden` is the fallback below the browserslist floor,
+   Safari < 16). */
 .visually-hidden {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	margin: -1px;
-	padding: 0;
-	overflow: hidden;
-	clip: rect(0, 0, 0, 0);
-	white-space: nowrap;
-	border: 0;
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	min-height: 0 !important;
+	margin: -1px !important;
+	padding: 0 !important;
+	overflow: hidden !important;
+	overflow: clip !important;
+	clip: rect(0, 0, 0, 0) !important;
+	white-space: nowrap !important;
+	border: 0 !important;
 }
 
 /* Homepage section headers */
@@ -359,6 +366,12 @@
 	font-family: var(--cirth-font-family-mono);
 	font-weight: var(--cirth-font-weight-regular);
 	font-size: var(--cirth-font-size-xs);
+}
+
+/* Dark muted (neutral-450) is 4.46:1 on the sectioning background — a
+   hair under AA; neutral-400 clears it at 5.3:1. */
+[data-theme="dark"] .docs-compare-count {
+	color: oklch(65.7% 0.03 264deg);
 }
 
 .docs-compare-side pre {
@@ -876,6 +889,12 @@ div[class*="language-"] {
 	position: relative;
 }
 
+/* Code blocks carry tabindex="0" (they scroll horizontally, so keyboard
+   users must be able to reach them); give that focus a visible ring. */
+pre:focus-visible {
+	outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
+}
+
 div[class*="language-"] > span.lang {
 	display: none;
 }
@@ -942,6 +961,13 @@ div[class*="language-"] > span.lang {
 }
 
 /* Highlight.js theme — dark */
+/* Dark muted (neutral-450) is 4.46:1 on the code background — a hair
+   under AA; neutral-400 clears it at 5.3:1. */
+[data-theme="dark"] .hljs-comment,
+[data-theme="dark"] .hljs-quote {
+	color: oklch(65.7% 0.03 264deg);
+}
+
 [data-theme="dark"] .hljs-keyword,
 [data-theme="dark"] .hljs-selector-tag,
 [data-theme="dark"] .hljs-doctag,

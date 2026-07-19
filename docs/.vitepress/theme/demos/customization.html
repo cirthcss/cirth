@@ -1,4 +1,25 @@
-<div style="--cirth-primary: #e11d48; --cirth-primary-background: #e11d48; --cirth-primary-border: #e11d48; --cirth-primary-hover: #be123c; --cirth-primary-hover-background: #be123c; --cirth-primary-hover-border: #be123c; --cirth-primary-focus: rgba(225, 29, 72, 0.35); --cirth-border-radius: 9999px;">
+<style>
+  .demo-brand {
+    --cirth-primary: #e11d48;
+    --cirth-primary-background: #e11d48;
+    --cirth-primary-border: #e11d48;
+    --cirth-primary-hover: #be123c;
+    --cirth-primary-hover-background: #be123c;
+    --cirth-primary-hover-border: #be123c;
+    --cirth-primary-focus: rgba(225, 29, 72, 0.35);
+    --cirth-border-radius: 9999px;
+  }
+
+  /* A custom accent needs a lighter variant where it renders as text on
+     dark surfaces, or it loses WCAG AA contrast. Solid buttons keep the
+     base color: their text is the inverse token, not the accent. */
+  [data-theme="dark"] .demo-brand {
+    --cirth-primary: #f43f5e;
+    --cirth-primary-hover: #fb7185;
+    --cirth-primary-focus: rgba(244, 63, 94, 0.45);
+  }
+</style>
+<div class="demo-brand">
   <button type="button">Custom primary</button>
   <button type="button" class="outline">Outline</button>
   <p><a href="#">A link picks up the same override.</a></p>

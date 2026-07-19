@@ -54,7 +54,7 @@ const classlessTheme = computed(() => {
 		/>
 		<details class="docs-demo-source">
 			<summary>Show HTML</summary>
-			<pre><code v-text="html" /></pre>
+			<pre tabindex="0"><code v-text="html" /></pre>
 		</details>
 	</div>
 </template>
