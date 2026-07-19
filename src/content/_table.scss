@@ -53,7 +53,7 @@
 
 // Striped
 
-@if enable-classes {
+@if $enable-classes {
   #{$parent-selector} table {
     &.striped {
       tbody tr:nth-child(odd) th,

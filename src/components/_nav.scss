@@ -10,7 +10,7 @@
 
 // Prevent VoiceOver from ignoring list semantics in Safari (opinionated)
 
-:where(nav li)::before {
+#{$parent-selector} :where(nav li)::before {
   float: left;
   content: "\200B";
 }

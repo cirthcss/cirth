@@ -155,7 +155,7 @@
   // Outline (primary)
   #{$parent-selector}
     :is(button, [type="submit"], [type="button"], [role="button"]).outline,
-  [type="reset"].outline {
+  #{$parent-selector} [type="reset"].outline {
     --cirth-background-color: transparent;
     --cirth-color: var(--cirth-primary);
     --cirth-border-color: var(--cirth-primary);
@@ -175,7 +175,7 @@
       [type="button"],
       [role="button"]
     ).outline.secondary,
-  [type="reset"].outline {
+  #{$parent-selector} [type="reset"].outline {
     --cirth-color: var(--cirth-secondary);
     --cirth-border-color: var(--cirth-secondary);
 
