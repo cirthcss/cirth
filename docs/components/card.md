@@ -1,7 +1,7 @@
 # Card
 
-Any `<article>` is a card: padded, with a background, box-shadow, and
-optional `header`/`footer` sections — no `.card` class.
+Any `<article>` is a card: padded, with a background, box shadow, and
+optional `header`/`footer` sections, with no `.card` class.
 
 <Demo src="card" />
 
@@ -15,12 +15,12 @@ optional `header`/`footer` sections — no `.card` class.
 
 ## Behavior
 
-- Background: `--cirth-card-background-color`; shadow:
+* Background: `--cirth-card-background-color`; shadow:
   `--cirth-card-box-shadow` (defaults to `--cirth-box-shadow`); radius:
   `--cirth-border-radius`.
-- A direct `header`/`footer` bleeds to the card's edges (negative margin
+* A direct `header`/`footer` bleeds to the card's edges (negative margin
   cancels the card's own horizontal padding) and gets its own background,
   `--cirth-card-sectioning-background-color`, plus a border separating it
   from the body (`--cirth-card-border-color`).
-- Cards stack with `--cirth-block-spacing-vertical` between them, matching
+* Cards stack with `--cirth-block-spacing-vertical` between them, matching
   [Section](/layout/section) rhythm.

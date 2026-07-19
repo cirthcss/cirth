@@ -1,7 +1,7 @@
 # Input search
 
-`[type="search"]` gets a search icon and, in the default (class-enabled)
-build, a fully rounded (`--cirth-radius-pill`) shape.
+`[type="search"]` gets a search icon and, in the default build with classes
+enabled, a fully rounded (`--cirth-radius-pill`) shape.
 
 <Demo src="input-search" />
 

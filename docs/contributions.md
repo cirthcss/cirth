@@ -9,7 +9,7 @@ this page is the practical summary.
 
 ## Getting set up
 
-npm is the only supported package manager — one install path, one lockfile.
+npm is the only supported package manager: one install path, one lockfile.
 Node.js 24.18 (current LTS) is the version CI and the release workflows run
 on; `.nvmrc` pins it for local use with `nvm use`.
 
@@ -31,15 +31,15 @@ npm run docs:dev   # run this docs site locally
 
 ## Where things live
 
-- `src/` — SCSS source. Repository infrastructure, **not** a public Sass
+* `src/` contains SCSS source. It is repository infrastructure, **not** a public Sass
   API: the npm package ships compiled CSS from `dist/` only, and
-  customization stays CSS-first through `--cirth-` custom properties.
-- `src/theme/` — design tokens: color scales, foundations, and the
+  customization stays CSS first through `--cirth-` custom properties.
+* `src/theme/` contains design tokens: color scales, foundations, and the
   light/dark schemes. Most visual changes start here, not in components.
-- `src/presets/` — `cobalt` and `coral`, token-override presets published
+* `src/presets/` contains `cobalt` and `coral`, token override presets published
   alongside the default build.
-- `docs/` — this site (VitePress), styled by Cirth's own build.
-- `scripts/` — local Node build scripts. Prefer extending these over
+* `docs/` contains this site (VitePress), styled by Cirth's own build.
+* `scripts/` contains local Node build scripts. Prefer extending these over
   adding tooling dependencies; a new package needs to provide a real build
   capability that would be risky to maintain locally.
 
@@ -66,17 +66,17 @@ tarball (`npm pack`) before opening the PR.
 
 ## What makes a good contribution
 
-- **Keep the surface small.** New components need a strong case; new
+* **Keep the surface small.** New components need a strong case; new
   utility classes need a stronger one. If native HTML can express it,
   style the element instead.
-- **Don't regress the accessibility floor.** Contrast ratios, focus
+* **Don't regress the accessibility floor.** Contrast ratios, focus
   visibility, and the 44px control height are verified properties of the
-  source — a PR that trades them away for aesthetics won't land.
-- **Stay on the spacing scale.** Spacing values are `--cirth-space-*`
+  source; a PR that trades them away for aesthetics won't land.
+* **Stay on the spacing scale.** Spacing values are `--cirth-space-*`
   tokens (0.25rem steps to 1.5, 0.5 steps to 3, then whole rems). If a
   value isn't on the scale, that's a design smell worth flagging.
-- **Match the CSS-first philosophy.** Runtime customization through custom
-  properties beats compile-time switches; compile-time switches beat new
+* **Match the CSS first philosophy.** Runtime customization through custom
+  properties beats switches decided at compile time; those switches beat new
   build variants.
 
 ## License

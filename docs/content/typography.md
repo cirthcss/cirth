@@ -1,6 +1,6 @@
 # Typography
 
-Headings, paragraphs, lists, and inline text elements are styled directly —
+Headings, paragraphs, lists, and inline text elements are styled directly;
 no typography classes exist in Cirth.
 
 <Demo src="typography" />
@@ -16,7 +16,7 @@ no typography classes exist in Cirth.
 </p>
 <blockquote>
   "…"
-  <footer>— <cite>Source</cite></footer>
+  <footer><cite>Source</cite></footer>
 </blockquote>
 ```
 
@@ -25,7 +25,7 @@ no typography classes exist in Cirth.
 Each heading level (`h1`–`h6`) has its own font size, line height, color
 token (`--cirth-h1-color` through `--cirth-h6-color`), and top spacing
 (`--cirth-typography-spacing-top`) applied only when the heading follows a
-block element — so a heading at the very top of a container doesn't get
+block element, so a heading at the very top of a container doesn't get
 extra space above it.
 
 ## `hgroup`
@@ -36,8 +36,8 @@ one) is demoted visually: muted color, regular weight, `--cirth-font-size-md`.
 ## Lists
 
 `ul`/`ol` items get a small bottom margin; nested lists lose their own
-top-level margin and get a quarter-spacing top margin instead, to avoid
-doubled-up spacing. `ul` uses square bullets.
+top level margin and get a quarter spacing top margin instead, to avoid
+duplicated spacing. `ul` uses square bullets.
 
 ## Blockquote
 
@@ -47,9 +47,9 @@ A left border (right border in `[dir="rtl"]`) in
 
 ## Inline elements
 
-- `mark` — background/color from `--cirth-mark-background-color` /
+* `mark`: background/color from `--cirth-mark-background-color` /
   `--cirth-mark-color`.
-- `ins` / `del` — colored via `--cirth-ins-color` / `--cirth-del-color`
+* `ins` / `del`: colored via `--cirth-ins-color` / `--cirth-del-color`
   (the same tokens used for valid/invalid form feedback).
-- `abbr[title]` — dotted underline, `cursor: help`.
-- `::selection` — background from `--cirth-text-selection-color`.
+* `abbr[title]`: dotted underline, `cursor: help`.
+* `::selection`: background from `--cirth-text-selection-color`.

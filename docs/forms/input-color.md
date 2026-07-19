@@ -11,4 +11,4 @@ radius, without changing its behavior.
 
 Only the swatch wrapper padding and the swatch's own border/radius are
 touched (`::-webkit-color-swatch`, `::-moz-color-swatch`, and their wrapper
-pseudo-elements) — the native color picker itself is untouched.
+pseudo elements). The native color picker itself is untouched.

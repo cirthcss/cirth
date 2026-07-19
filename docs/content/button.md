@@ -2,7 +2,7 @@
 
 `button`, `[type="submit"]`, `[type="reset"]`, `[type="button"]`,
 `[role="button"]`, and a file input's `::file-selector-button` all share the
-same button styling — no `.btn` class required.
+same button styling, with no `.btn` class required.
 
 <Demo src="buttons" />
 
@@ -34,12 +34,12 @@ there's no way to add `.secondary` to them.
 
 ## States
 
-- `:hover` / `:active` / `:focus` / `[aria-current]` switch to the
-  `-hover-background` / `-hover-border` tokens.
-- `:focus` additionally layers a focus ring in `--cirth-primary-focus` (or
+* `:hover` / `:active` / `:focus` / `[aria-current]` switch to the
+  hover background and hover border tokens.
+* `:focus` additionally layers a focus ring in `--cirth-primary-focus` (or
   the matching `-focus` token for the active color group) on top of the
-  hover box-shadow.
-- `[disabled]` drops opacity to `--cirth-opacity-disabled` and disables
+  hover shadow.
+* `[disabled]` drops opacity to `--cirth-opacity-disabled` and disables
   pointer events.
-- Combine with [Loading](/components/loading) (`aria-busy="true"`) to show a
+* Combine with [Loading](/components/loading) (`aria-busy="true"`) to show a
   spinner and disable interaction while a button's action is pending.

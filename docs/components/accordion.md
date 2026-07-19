@@ -1,7 +1,7 @@
 # Accordion
 
 The native `<details>`/`<summary>` pair is styled as a collapsible accordion
-item — no JavaScript, no ARIA widget required.
+item, with no JavaScript and no ARIA widget required.
 
 <Demo src="accordion" />
 
@@ -18,13 +18,13 @@ item — no JavaScript, no ARIA widget required.
 
 ## Behavior
 
-- The default disclosure triangle/marker is removed and replaced with a
+* The default disclosure triangle/marker is removed and replaced with a
   chevron icon (`--cirth-icon-chevron`) that rotates 90° when open.
-- `summary` color: `--cirth-accordion-close-summary-color` when closed,
+* `summary` color: `--cirth-accordion-close-summary-color` when closed,
   `--cirth-accordion-open-summary-color` when open (and not focused),
   `--cirth-accordion-active-summary-color` on hover/focus.
-- `summary[role="button"]` (a `details` used as a button-triggered
-  accordion) becomes full width, left-aligned, with its own marker sizing.
+* `summary[role="button"]` (a `details` used as an accordion triggered by a
+  button) becomes full width, aligned left, with its own marker sizing.
 
-`details.dropdown` is a related but distinct pattern — see
+`details.dropdown` is a related but distinct pattern; see
 [Dropdown](/components/dropdown).

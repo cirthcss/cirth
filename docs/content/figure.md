@@ -1,6 +1,6 @@
 # Figure
 
-`figure`/`figcaption` wrap any content — commonly a table or image — with an
+`figure`/`figcaption` wrap any content, commonly a table or image, with an
 optional caption underneath.
 
 <Demo src="figure" />

@@ -55,15 +55,15 @@ Nesting `nav` inside `aside` switches every list and list item to
 
 ## Behavior
 
-- Two lists inside one `nav` are pushed to opposite ends
-  (`justify-content: space-between`) — the common "brand left, links right"
+* Two lists inside one `nav` are pushed to opposite ends
+  (`justify-content: space-between`), the common "brand left, links right"
   header pattern.
-- `li` padding is `--cirth-nav-element-spacing-vertical`/`-horizontal`; a
+* `li` padding is `--cirth-nav-element-spacing-vertical`/`-horizontal`; a
   link inside gets its own smaller `--cirth-nav-link-spacing-*` padding so
   the clickable/hover area is slightly larger than the visible text.
-- Buttons, `[role="button"]`, and form controls placed inside a nav `li`
+* Buttons, `[role="button"]`, and form controls placed inside a nav `li`
   adapt their padding to match the nav's link rhythm instead of their usual
   button/form spacing.
-- A [dropdown](/components/dropdown) nested in a nav item collapses its own
-  vertical margin so it lines up with sibling links — see that page's
+* A [dropdown](/components/dropdown) nested in a nav item collapses its own
+  vertical margin so it lines up with sibling links; see that page's
   "Inside a nav" example.

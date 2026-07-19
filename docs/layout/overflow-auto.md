@@ -1,8 +1,7 @@
 # Overflow auto
 
 `.overflow-auto` adds a scroll container around content that's wider than its
-parent — most commonly a wide table — instead of letting it overflow the
-page.
+parent, most commonly a wide table, instead of letting it overflow the page.
 
 <Demo src="overflow-auto" />
 
@@ -13,4 +12,4 @@ page.
 ```
 
 It's a single declaration (`overflow: auto`), available only in the default
-(class-enabled) build.
+build with classes enabled.

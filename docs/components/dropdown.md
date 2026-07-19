@@ -1,7 +1,8 @@
 # Dropdown
 
 `<details class="dropdown">` turns a disclosure element into a dropdown
-menu or a custom select-like control. Default build only — `.dropdown`
+menu or a custom control that behaves like a select. Default build only:
+`.dropdown`
 requires classes.
 
 <Demo src="dropdown" />
@@ -43,16 +44,15 @@ an account/actions menu in a header bar:
 
 ## Behavior
 
-- The `summary` gets a chevron marker (`--cirth-icon-chevron`); the `ul`
+* The `summary` gets a chevron marker (`--cirth-icon-chevron`); the `ul`
   right after it becomes the absolutely positioned menu, hidden
   (`opacity: 0`) until the `details` is `[open]`.
-- When `summary` has no `role` attribute, it's additionally styled like a
-  form select (border, background, placeholder color) — this is the
+* When `summary` has no `role` attribute, it's additionally styled like a
+  form select (border, background, placeholder color). This is the
   "custom select" pattern, useful when you need option content `.dropdown`
   can't express as a native `<select>`.
-- Menu items get hover/focus/active/`aria-current` background from
-  `--cirth-dropdown-hover-background-color`; the menu itself uses
-  `--cirth-dropdown-background-color`, `-border-color`, `-box-shadow`,
-  `-color`.
-- `aria-invalid="true"`/`"false"` on the `summary` recolor it the same way as
+* Menu items get hover/focus/active/`aria-current` background from
+  `--cirth-dropdown-hover-background-color`; the menu itself uses background,
+  border, shadow, and color tokens from the dropdown group.
+* `aria-invalid="true"`/`"false"` on the `summary` recolor it the same way as
   a form field.

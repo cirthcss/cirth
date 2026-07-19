@@ -21,11 +21,11 @@ import "@cirthcss/cirth/dist/cirth.min.css";
 
 Every published build also has a shorter `exports` path, for example
 `@cirthcss/cirth/classless`, `@cirthcss/cirth/scoped`, or
-`@cirthcss/cirth/presets/cobalt` — see
+`@cirthcss/cirth/presets/cobalt`; see
 [Contributions](/contributions#package-exports) for the full map. The
 `dist/*.css` paths keep working alongside them.
 
-The package ships compiled CSS only — `main`/`style` both point at
+The package ships compiled CSS only. `main` and `style` both point at
 `dist/cirth.min.css`. SCSS sources in the repository are internal build
 infrastructure, not a published Sass API.
 
@@ -33,7 +33,7 @@ infrastructure, not a published Sass API.
 
 <Demo src="quickstart" />
 
-No classes were added above beyond `.container` — `<nav>`, `<article>`,
+No classes were added above beyond `.container`: `<nav>`, `<article>`,
 `<form>`, `<label>`, and `<button>` are styled directly.
 
 ## Which build do I need?
@@ -48,9 +48,9 @@ Cirth publishes four CSS builds from the same source:
 | `dist/cirth.classless.scoped.min.css` | Both: scoped **and** classless. |
 
 All four builds share the same official amber theme. `cobalt` and `coral`
-(see [Colors](/colors)) are optional presets — stylesheets that override an
-existing set of custom properties (color, shadow, type, spacing, motion) —
-loaded after any of the four builds above, for example
+(see [Colors](/colors)) are optional presets: stylesheets that override an
+existing set of custom properties (color, shadow, type, spacing, motion).
+Load them after any of the four builds above, for example
 `dist/presets/cobalt.min.css`.
 
 ### Classless
@@ -63,8 +63,8 @@ loaded after any of the four builds above, for example
 
 ### Scoped
 
-Useful when embedding Cirth into an existing page, CMS, widget, or app shell —
-only descendants of `.cirth` are styled.
+Useful when embedding Cirth into an existing page, CMS, widget, or app shell,
+where only descendants of `.cirth` should be styled.
 
 ```html
 <link rel="stylesheet" href="dist/cirth.scoped.min.css">
@@ -79,13 +79,13 @@ only descendants of `.cirth` are styled.
 
 <Demo src="scoped" />
 
-This documentation site is itself styled by Cirth's default build — the
+This documentation site is itself styled by Cirth's default build. The
 header nav, the sidebar, the prose you're reading, and every live example
-are ordinary semantic HTML with no docs-specific component framework on
+are ordinary semantic HTML with no documentation specific component framework on
 top.
 
 ## Next steps
 
-- [Customization](/customization) — override the CSS custom property surface.
-- [Colors](/colors) — the default theme, plus the `cobalt`/`coral` presets.
-- [Layout](/layout/document) — start reading the component reference.
+* [Customization](/customization): override the CSS custom property surface.
+* [Colors](/colors): the default theme, plus the `cobalt`/`coral` presets.
+* [Layout](/layout/document): start reading the component reference.

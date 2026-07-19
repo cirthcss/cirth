@@ -24,16 +24,16 @@ alternating row backgrounds.
 <table class="striped">…</table>
 ```
 
-`.striped` is only available in the default (class-enabled) build.
+`.striped` is only available in the default build with classes enabled.
 
 ## Behavior
 
-- `border-collapse: collapse`, full width, left-aligned cells
+* `border-collapse: collapse`, full width, left aligned cells
   (`text-align: start`, so it flips correctly in `[dir="rtl"]`).
-- Cell padding is `calc(var(--cirth-spacing) / 2) var(--cirth-spacing)`, with
+* Cell padding is `calc(var(--cirth-spacing) / 2) var(--cirth-spacing)`, with
   a bottom border in `--cirth-table-border-color`.
-- `tfoot` cells get a top border instead of a bottom one.
-- `thead`/`tfoot` cells are bolder (`--cirth-font-weight-semibold`) with a
+* `tfoot` cells get a top border instead of a bottom one.
+* `thead`/`tfoot` cells are bolder (`--cirth-font-weight-semibold`) with a
   thicker border.
-- Wrap a wide table in [`.overflow-auto`](/layout/overflow-auto) to scroll
+* Wrap a wide table in [`.overflow-auto`](/layout/overflow-auto) to scroll
   instead of overflowing the page.

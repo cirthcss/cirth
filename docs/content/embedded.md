@@ -1,7 +1,7 @@
 # Embedded content
 
 `audio`, `canvas`, `iframe`, `img`, `svg`, and `video` get a small set of
-consistency fixes — most importantly, responsive images by default.
+consistency fixes, most importantly responsive images by default.
 
 <Demo src="embedded" />
 
@@ -12,11 +12,11 @@ consistency fixes — most importantly, responsive images by default.
 
 ## Behavior
 
-- `img` is `max-width: 100%; height: auto` — responsive without a class, and
+* `img` is `max-width: 100%; height: auto`, responsive without a class, and
   never overflows its container.
-- `audio`, `canvas`, `iframe`, `img`, `svg`, `video` are vertically
-  middle-aligned, which avoids the small inline-baseline gap browsers add by
+* `audio`, `canvas`, `iframe`, `img`, `svg`, `video` are vertically
+  middle aligned, which avoids the small inline baseline gap browsers add by
   default.
-- `iframe` has no border by default.
-- `svg` without an explicit `fill` inherits `currentColor`, so an icon SVG
+* `iframe` has no border by default.
+* `svg` without an explicit `fill` inherits `currentColor`, so an icon SVG
   follows the surrounding text color unless it sets its own fill.

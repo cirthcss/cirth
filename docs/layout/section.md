@@ -17,4 +17,4 @@ elements, with no class required.
 ```
 
 The margin is `--cirth-block-spacing-vertical` (defaults to `--cirth-spacing`,
-`1rem`) — override that token to change spacing between sections site-wide.
+`1rem`). Override that token to change spacing between sections across the site.
