@@ -14,10 +14,15 @@ Node.js 24.18 (current LTS) is the version CI and the release workflows run
 on; `.nvmrc` pins it for local use with `nvm use`.
 
 ```sh
+git lfs install    # once per machine — visual test baselines are Git LFS objects
 git clone https://github.com/cirthcss/cirth.git
 cd cirth
 npm install
 ```
+
+If you cloned before installing [Git LFS](https://git-lfs.com), the
+screenshot baselines under `tests/__screenshots__/` are small pointer
+files instead of images; `git lfs pull` fetches the real ones.
 
 The commands you'll actually use:
 
@@ -39,9 +44,11 @@ npm run docs:dev   # run this docs site locally
 * `src/presets/` contains `cobalt` and `coral`, token override presets published
   alongside the default build.
 * `docs/` contains this site (VitePress), styled by Cirth's own build.
-* `scripts/` contains local Node build scripts. Prefer extending these over
-  adding tooling dependencies; a new package needs to provide a real build
-  capability that would be risky to maintain locally.
+* `scripts/` contains local Node build and check scripts. Prefer extending
+  these over adding tooling dependencies; a new package needs to provide a
+  real build capability that would be risky to maintain locally.
+* `tests/` contains the visual regression suite and its screenshot
+  baselines (stored in Git LFS).
 
 ## Package exports
 
@@ -63,6 +70,83 @@ the `dist/` filename convention:
 A `./dist/*` wildcard keeps existing deep imports resolving. If you add a
 build variant, add its export path and verify it resolves from a packed
 tarball (`npm pack`) before opening the PR.
+
+## Quality gates
+
+The properties this site advertises — the size, the WCAG AA compliance,
+what each build variant does and doesn't contain — are not checked by
+review attention. Each one is enforced by an automated check that runs
+in CI on every push, and the same checks run locally:
+
+```sh
+npm run lint          # stylelint + custom property audit + doc links
+npm run build         # compile src/ to dist/
+npm run check:dist    # structural invariants of the 12 dist files
+npm run check:size    # ≤ 14 KiB gzipped per root bundle
+npm run docs:build    # build this site (input for the two checks below)
+npm run check:a11y    # axe WCAG A/AA audit of every docs page
+npm run check:visual  # screenshot diff of every docs page
+```
+
+The two browser-based checks need a Playwright Chromium once:
+`npx playwright install chromium`.
+
+### Dist invariants — `check:dist`
+
+Runs mechanical assertions over every file in `dist/` right after the
+build, so the contracts of each build variant can't erode silently:
+
+* every build re-parses with Lightning CSS and is non-empty;
+* classless builds emit **no class selectors** (the `.cirth` wrapper is
+  the single exception in the scoped variant);
+* scoped builds keep **every rule inside the `.cirth` subtree** — no
+  selector can style markup that didn't opt in;
+* presets only set custom properties on theme roots, never rules.
+
+### Accessibility — `check:a11y`
+
+Runs [axe-core](https://github.com/dequelabs/axe-core) with the
+WCAG 2.x A/AA rule set against every page of the built docs site, in
+both light and dark schemes. Since the component demos live on these
+pages, this continuously re-verifies the framework's own AA claim, not
+just the site around it.
+
+The check fails on any violation not listed in
+`scripts/a11y-baseline.json`. That baseline exists so an intentionally
+accepted finding can be recorded explicitly — but it is empty, and the
+goal is to keep it that way: fix violations rather than baseline them.
+
+### Visual regression — `check:visual`
+
+Playwright screenshots every docs page — full page, light and dark, at
+1440 px and 390 px — and compares each against a committed baseline in
+`tests/__screenshots__/`. Any unexplained pixel difference fails the
+check; the docs demos make this double as visual coverage of every
+component.
+
+Two things to know about the baselines:
+
+* **They are per-platform.** System font rendering differs between
+  operating systems, so macOS runs compare against the `*-darwin` sets
+  and CI compares against the `*-linux` sets. You never edit the Linux
+  sets by hand — see below.
+* **They live in Git LFS**, so the repository history stays small while
+  the images stay versioned.
+
+When your change **intentionally** alters how something renders:
+
+1. regenerate your platform's baselines —
+   `npm run check:visual:update`;
+2. delete the Linux sets — `rm -r tests/__screenshots__/*-linux`;
+3. commit both together with the change, and say in the PR what changed
+   visually and why.
+
+On push, the `update-visual-baselines` workflow notices the missing
+Linux sets, regenerates them on a CI runner, and commits them back to
+the branch as `github-actions[bot]`. Review that commit's images like
+any other diff. If `check:visual` fails and you *didn't* intend a
+visual change, that's the check working — fix the regression instead of
+updating baselines.
 
 ## What makes a good contribution
 
