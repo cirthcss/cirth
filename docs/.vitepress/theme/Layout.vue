@@ -1,29 +1,9 @@
 <script setup lang="ts">
-import {
-	PhCode,
-	PhFaders,
-	PhLightning,
-	PhMoon,
-	PhShieldCheck,
-	PhStackSimple,
-	PhSun,
-} from "@phosphor-icons/vue";
+import { PhMoon, PhSun } from "@phosphor-icons/vue";
 import { Content, useData, useRoute, withBase } from "vitepress";
-import { computed, nextTick, onMounted, ref, watch, type Component } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import HomeDemo from "./components/HomeDemo.vue";
 import { useCirthTheme } from "./composables/theme";
-
-// Site iconography comes from Phosphor Icons (https://phosphoricons.com),
-// imported per-icon so only the ones used here end up in the bundle. The
-// frontmatter keeps short slugs; this map resolves them to components.
-const featureIcons: Record<string, Component> = {
-	code: PhCode,
-	sliders: PhFaders,
-	layers: PhStackSimple,
-	moon: PhMoon,
-	zap: PhLightning,
-	shield: PhShieldCheck,
-};
 
 const { site, theme, page, frontmatter } = useData();
 const route = useRoute();
@@ -140,8 +120,8 @@ const nextPage = computed(() =>
 			<ul>
 				<li>
 					<a :href="withBase('/')" class="contrast docs-brand">
-						<img class="docs-logo docs-logo-light" :src="withBase('/logo_mono.svg')" alt="" width="28" height="28">
-						<img class="docs-logo docs-logo-dark" :src="withBase('/logo_mono_dark.svg')" alt="" width="28" height="28">
+						<img class="docs-logo docs-logo-light" :src="withBase('/logo_brand.svg')" alt="" width="28" height="28">
+						<img class="docs-logo docs-logo-dark" :src="withBase('/logo_brand_dark.svg')" alt="" width="28" height="28">
 						<strong>{{ site.title }}</strong>
 					</a>
 				</li>
@@ -185,19 +165,16 @@ const nextPage = computed(() =>
 		</template>
 
 		<template v-else-if="isHome">
-			<section class="docs-hero-panel" data-theme="dark">
+			<section class="docs-hero-panel">
 				<div class="container docs-hero">
 					<div class="docs-hero-copy">
-						<img
-							class="docs-hero-mark"
-							:src="withBase('/logo_brand_dark.svg')"
-							alt=""
-							width="72"
-							height="72"
-						>
 						<p v-if="frontmatter.hero.eyebrow" class="docs-hero-eyebrow">{{ frontmatter.hero.eyebrow }}</p>
 						<hgroup>
-							<h1>{{ frontmatter.hero.name }}</h1>
+							<h1 class="docs-hero-title">
+								<img class="docs-hero-mark docs-logo-light" :src="withBase('/logo_brand.svg')" alt="" width="52" height="52">
+								<img class="docs-hero-mark docs-logo-dark" :src="withBase('/logo_brand_dark.svg')" alt="" width="52" height="52">
+								<span>{{ frontmatter.hero.name }}</span>
+							</h1>
 							<p>{{ frontmatter.hero.text }}</p>
 						</hgroup>
 						<p class="docs-hero-tagline">{{ frontmatter.hero.tagline }}</p>
@@ -251,23 +228,27 @@ const nextPage = computed(() =>
 						<p class="docs-eyebrow">{{ frontmatter.featuresEyebrow }}</p>
 						<h2>{{ frontmatter.featuresTitle }}</h2>
 					</header>
-					<div class="docs-features-grid">
-						<article v-for="feature in frontmatter.features" :key="feature.title">
-							<span v-if="feature.icon" class="docs-feature-icon" aria-hidden="true">
-								<component :is="featureIcons[feature.icon]" :size="20" />
-							</span>
-							<h3>{{ feature.title }}</h3>
+					<dl class="docs-features-list">
+						<div v-for="feature in frontmatter.features" :key="feature.title" class="docs-feature">
+							<dt>{{ feature.title }}</dt>
 							<!-- eslint-disable-next-line vue/no-v-html -->
-							<p v-html="feature.details" />
-						</article>
-					</div>
+							<dd v-html="feature.details" />
+						</div>
+					</dl>
 				</section>
 			</div>
 
-			<section v-if="frontmatter.closing" class="docs-closing" data-theme="dark">
+			<section v-if="frontmatter.closing" class="docs-closing">
 				<div class="container">
 					<img
-						class="docs-closing-mark"
+						class="docs-closing-mark docs-logo-light"
+						:src="withBase('/logo_mono.svg')"
+						alt=""
+						width="40"
+						height="40"
+					>
+					<img
+						class="docs-closing-mark docs-logo-dark"
 						:src="withBase('/logo_mono_dark.svg')"
 						alt=""
 						width="40"
@@ -341,12 +322,13 @@ const nextPage = computed(() =>
 		</template>
 	</main>
 
-	<footer class="docs-footer" data-theme="dark">
+	<footer class="docs-footer">
 		<div class="container">
 			<div class="docs-footer-top">
 				<div class="docs-footer-brand-block">
 					<a :href="withBase('/')" class="docs-brand docs-footer-brand">
-						<img class="docs-logo" :src="withBase('/logo_brand_dark.svg')" alt="" width="28" height="28">
+						<img class="docs-logo docs-logo-light" :src="withBase('/logo_brand.svg')" alt="" width="28" height="28">
+						<img class="docs-logo docs-logo-dark" :src="withBase('/logo_brand_dark.svg')" alt="" width="28" height="28">
 						<strong>{{ site.title }}</strong>
 					</a>
 					<p class="docs-footer-credit">

@@ -93,7 +93,10 @@ onBeforeUnmount(clearTimers);
 
 <template>
 	<div class="home-demo" aria-label="Live example: semantic HTML rendered by Cirth">
-		<div class="home-demo-code">
+		<!-- The code pane is "the stone": it keeps Cirth's dark scheme in both
+		     site themes, so the markup always reads as carved into dark
+		     material while the rendered page sits on the site canvas. -->
+		<div class="home-demo-code" data-theme="dark">
 			<div class="home-demo-code-bar">
 				<span class="home-demo-filename">index.html — no classes</span>
 				<button
@@ -110,6 +113,8 @@ onBeforeUnmount(clearTimers);
 			     visual typing state above. -->
 			<pre class="visually-hidden"><code>{{ fullSource }}</code></pre>
 		</div>
+		<!-- The rendered result is "the sheet": the inner <article> is a real
+		     Cirth card, overlapping the stone panel. -->
 		<!-- eslint-disable-next-line vue/no-v-html -->
 		<div class="home-demo-preview" v-html="preview" />
 	</div>

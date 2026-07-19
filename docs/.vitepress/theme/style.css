@@ -11,6 +11,57 @@
 @import "./generated/cirth-docs.css";
 @import "./generated/cirth-docs-classless.css";
 
+/* Canvas: one continuous surface per scheme ("carta unica"). Light is warm
+   paper — white pulled faintly toward the brand hue (69.35deg), far short
+   of cream — so white cards read as sheets lying on it. Dark reuses the
+   framework's own background token untouched. The carved-stroke mask is
+   the site's signature marker: an angular peak with a center stem, drawn
+   from the logo's stroke vocabulary, painted via mask so it inherits any
+   color. */
+:root {
+	--docs-canvas: oklch(97.4% 0.008 69.35deg);
+	--docs-glow: 9%;
+	--docs-stroke-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 15 8 1.5 14.5 15M8 6v9' fill='none' stroke='%23000' stroke-width='2'/%3E%3C/svg%3E");
+
+	/* The brand mark itself (docs/public/logo_mono.svg), inlined so it can
+	   be painted through a mask in any color without a network request. */
+	--docs-emblem-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M260.64%20247.055V66L397.724%20193.816L345.132%20194.032L144.678%20400.521H108.036L260.64%20247.055Z'/%3E%3Cpath d='M339.097%20400.521H163.862L251.156%20311.071L339.097%20400.521Z'/%3E%3Cpath d='M260.64%20301.587L334.571%20376.34V284.99L372.29%20246.839H404.191L385.438%20208.904H350.09L260.64%20301.587Z'/%3E%3Cpath d='M377.125%20262.143H391.474L416.476%20300.725V446L349.227%20377.889V290.594L377.125%20262.143Z'/%3E%3Cpath d='M201.429%20137.87L220.79%20157.232L176.591%20201.431L231.326%20256.165L206.94%20280.551L152.205%20225.817L114.103%20263.919L76%20225.817L140.595%20161.222L201.429%20137.87Z'/%3E%3C/svg%3E");
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		--docs-canvas: var(--cirth-background-color);
+		--docs-glow: 24%;
+	}
+}
+
+:root[data-theme="dark"] {
+	--docs-canvas: var(--cirth-background-color);
+	--docs-glow: 24%;
+}
+
+body {
+	background-color: var(--docs-canvas);
+}
+
+/* The shared carved marker: sized in em so it scales with its host */
+.docs-eyebrow::before,
+.docs-hero-eyebrow::before,
+.docs-feature dt::before {
+	content: "";
+	display: inline-block;
+	width: 0.65em;
+	height: 0.65em;
+	background-color: var(--cirth-primary);
+	vertical-align: -0.06em;
+	-webkit-mask: var(--docs-stroke-mask) no-repeat center / contain;
+	mask: var(--docs-stroke-mask) no-repeat center / contain;
+}
+
+.docs-eyebrow::before {
+	margin-right: 0.5em;
+}
+
 /* Header */
 .docs-brand {
 	display: inline-flex;
@@ -63,24 +114,25 @@
 
 /* Home hero + features */
 
-/* Full-bleed dark brand panel; `data-theme="dark"` on the section (set in
-   Layout.vue) scopes Cirth's own dark color-scheme tokens to it, so the
-   panel stays dark regardless of the site's light/dark toggle instead of
-   hardcoding colors here. */
+/* The hero sits directly on the canvas — no band of its own. */
 .docs-hero-panel {
 	position: relative;
-	overflow: hidden;
-	background-color: var(--cirth-background-color);
 }
 
-/* Ember glow: a soft radial wash of the primary color, not a lit scene. */
+/* Ember glow: a soft radial wash of the primary color, not a lit scene.
+   Strength comes from --docs-glow: faint on paper, fuller on the dark
+   canvas. */
 .docs-hero-panel::before {
 	content: "";
 	position: absolute;
 	inset: 0;
 	background: radial-gradient(
 		ellipse 60% 70% at 85% 0%,
-		color-mix(in oklch, var(--cirth-primary-background) 30%, transparent),
+		color-mix(
+			in oklch,
+			var(--cirth-primary-background) var(--docs-glow),
+			transparent
+		),
 		transparent 70%
 	);
 	pointer-events: none;
@@ -102,11 +154,17 @@
 	}
 }
 
+/* Wordmark lockup (see docs/brand.md): the mark sits at cap height to the
+   left of the name, scaling with the type instead of floating above it. */
+.docs-hero-title {
+	display: flex;
+	align-items: center;
+	gap: 0.3em;
+}
+
 .docs-hero-mark {
-	display: block;
-	width: 4.5rem;
-	height: 4.5rem;
-	margin-bottom: var(--cirth-spacing);
+	width: 0.82em;
+	height: 0.82em;
 }
 
 .docs-hero-copy hgroup > :first-child {
@@ -114,6 +172,9 @@
 }
 
 .docs-hero-eyebrow {
+	display: flex;
+	align-items: center;
+	gap: 0.6em;
 	margin-bottom: calc(var(--cirth-spacing) * 0.5);
 	color: var(--cirth-primary);
 	font-weight: var(--cirth-font-weight-semibold);
@@ -137,25 +198,53 @@
 	margin-bottom: 0;
 }
 
-/* Hero demo: typed markup on the left half, live render on the right */
+/* Hero demo — stone and sheet. The code pane ("the stone", scoped to
+   Cirth's dark scheme in HomeDemo.vue) carries the typed markup; the
+   rendered result is a real Cirth card ("the sheet") that overlaps the
+   stone and stands on the site canvas: markup carved into the material,
+   page lying on the desk. */
 .home-demo {
 	display: grid;
-	overflow: hidden;
-	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-	border-radius: var(--cirth-card-border-radius);
-	background-color: var(--cirth-code-background-color);
 }
 
 @media (min-width: 576px) {
 	.home-demo {
-		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		grid-template-columns: repeat(12, minmax(0, 1fr));
+		align-items: center;
 	}
 }
 
 .home-demo-code {
 	display: flex;
+	position: relative;
 	flex-direction: column;
 	min-width: 0;
+	overflow: hidden;
+	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	border-radius: var(--cirth-card-border-radius);
+	background-color: var(--cirth-background-color);
+	box-shadow: var(--cirth-card-box-shadow);
+}
+
+@media (min-width: 576px) {
+	.home-demo-code {
+		grid-area: 1 / 1 / 2 / 9;
+	}
+}
+
+/* Tone-on-tone emblem, faintly carved into the stone's lower corner */
+.home-demo-code::after {
+	content: "";
+	position: absolute;
+	right: -3rem;
+	bottom: -3rem;
+	width: 15rem;
+	height: 15rem;
+	background-color: var(--cirth-contrast);
+	opacity: 0.05;
+	-webkit-mask: var(--docs-emblem-mask) no-repeat center / contain;
+	mask: var(--docs-emblem-mask) no-repeat center / contain;
+	pointer-events: none;
 }
 
 .home-demo-code-bar {
@@ -190,6 +279,15 @@
 	background: none;
 	font-size: var(--cirth-font-size-xs);
 	line-height: var(--cirth-line-height-relaxed);
+	/* Long typed lines wrap instead of clipping under the sheet */
+	white-space: pre-wrap;
+}
+
+@media (min-width: 576px) {
+	/* Keep the typed text clear of the overlapping sheet */
+	.home-demo-code pre {
+		padding-right: calc(var(--cirth-spacing) * 3);
+	}
 }
 
 .home-demo-cursor {
@@ -207,25 +305,25 @@
 	}
 }
 
+/* The sheet: the rendered <article> is a real Cirth card standing on the
+   canvas, overlapping the stone by one grid column. On small screens it
+   stacks below and pulls up over the stone's bottom edge instead. */
 .home-demo-preview {
-	display: flex;
-	align-items: center;
-	padding: var(--cirth-spacing);
-	border-top: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-	background-color: var(--cirth-background-color);
+	z-index: 1;
+	margin: calc(var(--cirth-spacing) * -1.5) var(--cirth-spacing) 0;
 }
 
 @media (min-width: 576px) {
 	.home-demo-preview {
-		border-top: none;
-		border-left: var(--cirth-border-width) solid
-			var(--cirth-muted-border-color);
+		grid-area: 1 / 8 / 2 / 13;
+		margin: 0;
 	}
 }
 
 .home-demo-preview article {
 	width: 100%;
-	margin-bottom: 0;
+	margin: 0;
+	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
 .home-demo-preview button {
@@ -342,20 +440,18 @@
 	text-align: center;
 }
 
-/* Closing brand panel. The negative bottom margin swallows <main>'s own
-   bottom padding so the panel runs flush into the dark footer. */
+/* Closing: the name story, set as a colophon on the canvas itself — no
+   band of its own. */
 .docs-closing {
 	margin-top: calc(var(--cirth-spacing) * 4);
-	margin-bottom: calc(var(--cirth-block-spacing-vertical) * -1);
-	padding: calc(var(--cirth-spacing) * 3) 0;
-	background-color: var(--cirth-background-color);
-	color: var(--cirth-color);
+	padding: calc(var(--cirth-spacing) * 2) 0;
 	text-align: center;
 }
 
+/* Inline (not block) so the .docs-logo-light/dark visibility rules keep
+   working; the centered section centers it as inline content. */
 .docs-closing-mark {
-	display: block;
-	margin: 0 auto var(--cirth-spacing);
+	margin-bottom: var(--cirth-spacing);
 }
 
 .docs-closing-text {
@@ -371,12 +467,8 @@
 	justify-content: center;
 }
 
-/* When the home closing panel ends <main>, the dark footer should follow
-   it seamlessly instead of leaving a light seam. */
-main:has(.docs-closing) + .docs-footer {
-	margin-top: 0;
-}
 
+/* Stat band: a white sheet on the paper canvas */
 .docs-stats {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
@@ -384,7 +476,9 @@ main:has(.docs-closing) + .docs-footer {
 	margin: calc(var(--cirth-spacing) * 2) 0;
 	padding: calc(var(--cirth-spacing) * 1.5);
 	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-	border-radius: var(--cirth-radius-lg);
+	border-radius: var(--cirth-card-border-radius);
+	background-color: var(--cirth-card-background-color);
+	box-shadow: var(--cirth-card-box-shadow);
 	text-align: center;
 }
 
@@ -409,38 +503,42 @@ main:has(.docs-closing) + .docs-footer {
 	margin: calc(var(--cirth-spacing) * 4) 0;
 }
 
-/* Six cards: 1 column on mobile, 2x3 on tablet, 3x2 on desktop */
-.docs-features-grid {
+/* Features as a structural definition list — no icon tiles, no card
+   soup. Each entry opens with the carved marker; the description indents
+   to the title's text so the markers form a quiet left rhythm. */
+.docs-features-list {
 	display: grid;
-	gap: var(--cirth-spacing);
+	gap: calc(var(--cirth-spacing) * 1.75) calc(var(--cirth-spacing) * 3);
+	margin: 0;
 }
 
-@media (min-width: 576px) {
-	.docs-features-grid {
+@media (min-width: 768px) {
+	.docs-features-list {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
 
-@media (min-width: 1024px) {
-	.docs-features-grid {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-	}
+.docs-feature {
+	margin: 0;
 }
 
-.docs-features-grid article {
-	margin-bottom: 0;
+.docs-feature dt {
+	margin-bottom: calc(var(--cirth-spacing) * 0.25);
+	font-weight: var(--cirth-font-weight-semibold);
+	font-size: var(--cirth-font-size-lg);
 }
 
-.docs-feature-icon {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 2.5rem;
-	height: 2.5rem;
-	margin-bottom: calc(var(--cirth-spacing) * 0.5);
-	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-	border-radius: var(--cirth-radius-lg);
-	color: var(--cirth-primary);
+/* Fixed sizes here (not em) so the dd indent below lines up exactly */
+.docs-feature dt::before {
+	width: 0.7rem;
+	height: 0.7rem;
+	margin-right: 0.6rem;
+}
+
+.docs-feature dd {
+	margin-inline-start: 1.3rem;
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-sm);
 }
 
 /* Homepage sections breathe more at the sides than doc pages do */
@@ -695,12 +793,11 @@ nav.docs-toc-top li a {
 	border-top: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
-/* Site footer: always dark, like the hero panel — `data-theme="dark"` on
-   the element (set in Layout.vue) scopes Cirth's dark tokens to it. */
+/* Site footer: on the canvas like everything else, separated by a
+   hairline — one continuous surface per scheme. */
 .docs-footer {
 	margin-top: calc(var(--cirth-spacing) * 4);
-	background-color: var(--cirth-background-color);
-	color: var(--cirth-color);
+	border-top: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
 .docs-footer .container {
@@ -784,6 +881,7 @@ nav.docs-toc-top li a {
 
 .docs-footer-column li {
 	margin-bottom: calc(var(--cirth-spacing) * 0.5);
+	list-style: none;
 }
 
 .docs-footer-column a {
@@ -963,12 +1061,13 @@ div[class*="language-"] > button.copy.copied::before {
 	color: var(--cirth-ins-color);
 }
 
-/* Live demo frames */
+/* Live demo frames: white sheets on the paper canvas */
 .docs-demo {
 	margin: 1.5rem 0 2rem;
 	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 	border-radius: var(--cirth-radius-lg);
 	overflow: hidden;
+	background-color: var(--cirth-card-background-color);
 }
 
 .docs-demo-preview {
