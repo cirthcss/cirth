@@ -1,0 +1,92 @@
+# Generates and commits the Linux visual-regression baselines that CI
+# compares against (screenshot baselines are platform-specific and live
+# in Git LFS — see playwright.config.js). Two triggers:
+#
+# - push: bootstraps automatically whenever no Linux baselines are
+#   committed on the branch. To force a refresh after a deliberate
+#   visual change, delete tests/__screenshots__/*-linux in the same
+#   commit and this workflow regenerates them.
+# - workflow_dispatch: regenerates unconditionally (available once this
+#   file is on the default branch).
+#
+# The commit is pushed back to the same branch as github-actions[bot].
+# Pushes made with the workflow token do not retrigger workflows, so
+# this cannot loop.
+name: Update visual baselines
+
+on:
+  push:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: visual-baselines-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  update:
+    name: Regenerate Linux baselines
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          lfs: true
+
+      - name: Decide whether to regenerate
+        id: presence
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          elif ls tests/__screenshots__ 2>/dev/null | grep -q -- '-linux$'; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Linux baselines present — nothing to bootstrap."
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Node.js
+        if: steps.presence.outputs.run == 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24.18"
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.presence.outputs.run == 'true'
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        if: steps.presence.outputs.run == 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Build CSS
+        if: steps.presence.outputs.run == 'true'
+        run: npm run build
+
+      - name: Build docs
+        if: steps.presence.outputs.run == 'true'
+        run: npm run docs:build
+
+      - name: Regenerate baselines
+        if: steps.presence.outputs.run == 'true'
+        run: npx playwright test --update-snapshots
+
+      - name: Commit and push baselines
+        if: steps.presence.outputs.run == 'true'
+        run: |
+          git lfs install --local
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/__screenshots__
+          if git diff --cached --quiet; then
+            echo "Baselines unchanged — nothing to commit."
+          else
+            git commit -m "test: regenerate Linux visual baselines"
+            git push origin "HEAD:${{ github.ref_name }}"
+          fi

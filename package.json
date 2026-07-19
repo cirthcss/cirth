@@ -51,9 +51,13 @@
 	},
 	"scripts": {
 		"build": "node scripts/build.js",
+		"check:a11y": "node scripts/check-a11y.js",
+		"check:dist": "node scripts/check-dist.js",
 		"check:variables": "node scripts/check-css-variables.js",
 		"check:doc-links": "node scripts/check-doc-links.js",
 		"check:size": "node scripts/check-css-size.js",
+		"check:visual": "playwright test",
+		"check:visual:update": "playwright test --update-snapshots",
 		"dev": "node scripts/watch.js",
 		"format": "prettier --write --log-level silent 'src/**/*.scss'",
 		"lint": "stylelint 'src/**/*.scss' && node scripts/check-css-variables.js && node scripts/check-doc-links.js",
@@ -64,9 +68,14 @@
 		"docs:preview": "vitepress preview docs"
 	},
 	"devDependencies": {
+		"@axe-core/playwright": "^4.12.1",
 		"@phosphor-icons/vue": "^2.2.1",
+		"@playwright/test": "^1.61.1",
 		"highlight.js": "^11.11.1",
 		"lightningcss-cli": "^1.32.0",
+		"playwright": "^1.61.1",
+		"postcss": "^8.5.20",
+		"postcss-selector-parser": "^7.1.4",
 		"prettier": "^3.5.3",
 		"sass-embedded": "^1.100.0",
 		"stylelint": "^17.13.0",

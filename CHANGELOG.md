@@ -7,6 +7,52 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Scoped builds no longer leak rules outside `.cirth`.** Five selector
+  groups rendered unscoped in `cirth.scoped.css` /
+  `cirth.classless.scoped.css` and could style markup outside the
+  opt-in subtree: `.container`/`.container-fluid`, `.grid` (and its
+  children), the `:where(nav li)::before` list-semantics reboot, and the
+  `[type="reset"].outline` members of the outline button groups.
+- **Classless builds no longer ship the `.striped` table class.** A
+  missing `$` in `_table.scss` (`@if enable-classes` — a truthy string,
+  not the flag) emitted the striped-table rules in every build.
+
+### Added
+
+- **Build smoke tests** (`scripts/check-dist.js`, `npm run check:dist`,
+  in CI after the build): all 12 dist files re-parse with Lightning CSS
+  and are non-empty; classless builds emit no class selectors (the
+  `.cirth` wrapper excepted in the scoped variant); scoped builds keep
+  every rule inside the `.cirth` subtree; presets touch only custom
+  properties on theme roots. The scoping and classless leaks above are
+  what its first run caught.
+- **Visual regression testing** (`tests/visual.spec.js`,
+  `npm run check:visual`): Playwright screenshot-diff of every built
+  docs page — full-page, light and dark, at 1440px and 390px (164
+  shots) — against per-platform baselines in `tests/__screenshots__/`
+  (font rendering differs between macOS and Linux, so each platform
+  compares against its own set; regenerate deliberately with
+  `npm run check:visual:update`). The docs demos double as visual
+  coverage of every component. Baselines are stored in Git LFS; the
+  Linux set CI compares against is generated and committed
+  automatically by the new `update-visual-baselines` workflow whenever
+  it is missing from a pushed branch (delete
+  `tests/__screenshots__/*-linux` to force a refresh after a
+  deliberate visual change). CI fetches only the Linux LFS objects,
+  cached by content, so steady-state runs consume no LFS bandwidth.
+- **Accessibility audit in CI** (`scripts/check-a11y.js`,
+  `npm run check:a11y`): axe-core (WCAG 2.x A/AA rules) over every
+  built docs page in both color schemes via Playwright, failing on any
+  violation not in the committed baseline
+  (`scripts/a11y-baseline.json`) — which starts, and currently stays,
+  empty: the 26 violations the first run found were all fixed (code
+  blocks made keyboard-focusable with a visible focus ring, the empty
+  loading-demo button labeled, dark-scheme contrast raised for code
+  comments and the homepage compare counters, and the customization
+  demo's custom accent given a dark-scheme variant that keeps AA).
+
 ### Changed
 
 - **Light theme canvas is now warm paper, and cards are sheets.** The
