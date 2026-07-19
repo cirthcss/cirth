@@ -138,20 +138,30 @@ body {
 	pointer-events: none;
 }
 
+/* Vertical hero: centered copy with the demo composition below it */
 .docs-hero {
 	position: relative;
 	display: grid;
-	gap: calc(var(--cirth-spacing) * 2.5);
-	align-items: center;
-	padding: calc(var(--cirth-spacing) * 3) 0 calc(var(--cirth-spacing) * 3);
+	gap: calc(var(--cirth-spacing) * 3);
+	justify-items: center;
+	padding: calc(var(--cirth-spacing) * 3.5) 0 calc(var(--cirth-spacing) * 4);
+	text-align: center;
 }
 
 @media (min-width: 1024px) {
 	.docs-hero {
-		grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-		padding-top: calc(var(--cirth-spacing) * 4);
-		padding-bottom: calc(var(--cirth-spacing) * 4);
+		padding-top: calc(var(--cirth-spacing) * 5);
 	}
+}
+
+.docs-hero-copy {
+	max-width: 44rem;
+}
+
+.docs-hero-demo {
+	width: 100%;
+	max-width: 60rem;
+	text-align: left;
 }
 
 /* Wordmark lockup (see docs/brand.md): the mark sits at cap height to the
@@ -159,6 +169,7 @@ body {
 .docs-hero-title {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	gap: 0.3em;
 }
 
@@ -168,12 +179,13 @@ body {
 }
 
 .docs-hero-copy hgroup > :first-child {
-	font-size: clamp(2.75rem, 2rem + 3vw, 4rem);
+	font-size: clamp(3rem, 2rem + 4vw, 4.75rem);
 }
 
 .docs-hero-eyebrow {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	gap: 0.6em;
 	margin-bottom: calc(var(--cirth-spacing) * 0.5);
 	color: var(--cirth-primary);
@@ -184,13 +196,16 @@ body {
 }
 
 .docs-hero-tagline {
-	max-width: 34rem;
+	max-width: 36rem;
+	margin-right: auto;
+	margin-left: auto;
 	color: var(--cirth-muted-color);
 }
 
 .docs-hero-actions {
 	display: flex;
 	flex-wrap: wrap;
+	justify-content: center;
 	gap: calc(var(--cirth-spacing) * 0.5);
 }
 
@@ -208,9 +223,13 @@ body {
 }
 
 @media (min-width: 576px) {
+	/* Fixed height: the composition must not move or resize while the
+	   typing animation adds elements — the stone sets the height, and the
+	   sheet grows inside it around its own center. */
 	.home-demo {
 		grid-template-columns: repeat(12, minmax(0, 1fr));
 		align-items: center;
+		height: 28rem;
 	}
 }
 
@@ -229,6 +248,7 @@ body {
 @media (min-width: 576px) {
 	.home-demo-code {
 		grid-area: 1 / 1 / 2 / 9;
+		height: 100%;
 	}
 }
 
@@ -284,9 +304,12 @@ body {
 }
 
 @media (min-width: 576px) {
-	/* Keep the typed text clear of the overlapping sheet */
+	/* Keep the typed text clear of the overlapping sheet; scroll rather
+	   than grow if content ever exceeds the fixed height */
 	.home-demo-code pre {
+		min-height: 0;
 		padding-right: calc(var(--cirth-spacing) * 3);
+		overflow-y: auto;
 	}
 }
 
@@ -345,7 +368,7 @@ body {
 /* Homepage section headers */
 .docs-section-header {
 	max-width: 38rem;
-	margin: 0 auto calc(var(--cirth-spacing) * 2);
+	margin: 0 auto calc(var(--cirth-spacing) * 3);
 	text-align: center;
 }
 
@@ -368,7 +391,7 @@ body {
 
 /* Comparison: the same control, utility-first vs Cirth */
 .docs-compare {
-	margin: calc(var(--cirth-spacing) * 4) 0;
+	margin: calc(var(--cirth-spacing) * 6) 0;
 }
 
 .docs-compare-grid {
@@ -443,7 +466,7 @@ body {
 /* Closing: the name story, set as a colophon on the canvas itself — no
    band of its own. */
 .docs-closing {
-	margin-top: calc(var(--cirth-spacing) * 4);
+	margin-top: calc(var(--cirth-spacing) * 6);
 	padding: calc(var(--cirth-spacing) * 2) 0;
 	text-align: center;
 }
@@ -468,17 +491,12 @@ body {
 }
 
 
-/* Stat band: a white sheet on the paper canvas */
+/* Stat band: three individual sheets on the canvas */
 .docs-stats {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
 	gap: var(--cirth-spacing);
-	margin: calc(var(--cirth-spacing) * 2) 0;
-	padding: calc(var(--cirth-spacing) * 1.5);
-	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-	border-radius: var(--cirth-card-border-radius);
-	background-color: var(--cirth-card-background-color);
-	box-shadow: var(--cirth-card-box-shadow);
+	margin: calc(var(--cirth-spacing) * 3) 0;
 	text-align: center;
 }
 
@@ -486,6 +504,11 @@ body {
 	display: flex;
 	flex-direction: column;
 	gap: 0.25rem;
+	padding: calc(var(--cirth-spacing) * 1.5) var(--cirth-spacing);
+	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	border-radius: var(--cirth-card-border-radius);
+	background-color: var(--cirth-card-background-color);
+	box-shadow: var(--cirth-card-box-shadow);
 }
 
 .docs-stat-value {
@@ -500,7 +523,7 @@ body {
 }
 
 .docs-features {
-	margin: calc(var(--cirth-spacing) * 4) 0;
+	margin: calc(var(--cirth-spacing) * 6) 0;
 }
 
 /* Features as a structural definition list — no icon tiles, no card
@@ -543,14 +566,15 @@ body {
 
 /* Homepage sections breathe more at the sides than doc pages do */
 .docs-home .container {
-	padding-right: calc(var(--cirth-spacing) * 1.5);
-	padding-left: calc(var(--cirth-spacing) * 1.5);
+	padding-right: calc(var(--cirth-spacing) * 2);
+	padding-left: calc(var(--cirth-spacing) * 2);
 }
 
 @media (min-width: 1024px) {
 	.docs-home .container {
-		padding-right: calc(var(--cirth-spacing) * 3);
-		padding-left: calc(var(--cirth-spacing) * 3);
+		max-width: 76rem;
+		padding-right: calc(var(--cirth-spacing) * 5);
+		padding-left: calc(var(--cirth-spacing) * 5);
 	}
 }
 
@@ -600,6 +624,17 @@ body {
 	--cirth-typography-spacing-vertical: var(--cirth-space-5);
 	max-width: 50rem;
 	min-width: 0;
+}
+
+/* Reference-manual scale for the page title (Sigwork-style): a large
+   serif display over the lede, before the first chapter rule. */
+.docs-content h1 {
+	font-size: clamp(2.75rem, 2.25rem + 1.5vw, 3.5rem);
+}
+
+/* Code blocks and demo frames breathe a little more vertically */
+.docs-content div[class*="language-"] {
+	margin-block: 2rem;
 }
 
 /* Chapter separators: each h2 opens a new section */
@@ -743,9 +778,13 @@ nav.docs-toc-top li a {
 	margin-bottom: var(--cirth-spacing);
 }
 
+/* Sigwork-style group labels: small caps-feel, muted, letterspaced */
 .docs-sidebar summary {
+	color: var(--cirth-muted-color);
 	font-weight: var(--cirth-font-weight-semibold);
-	font-size: var(--cirth-font-size-sm);
+	font-size: var(--cirth-font-size-xs);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
 }
 
 .docs-sidebar nav ul {
@@ -1063,7 +1102,7 @@ div[class*="language-"] > button.copy.copied::before {
 
 /* Live demo frames: white sheets on the paper canvas */
 .docs-demo {
-	margin: 1.5rem 0 2rem;
+	margin: 2rem 0 2.5rem;
 	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 	border-radius: var(--cirth-radius-lg);
 	overflow: hidden;
