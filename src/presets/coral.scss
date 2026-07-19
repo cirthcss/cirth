@@ -22,6 +22,11 @@ $coral-350: oklch(68% 0.16 35deg);
 $coral-250: oklch(80% 0.1 35deg);
 
 @mixin light {
+  // Canvas: the default theme's paper concept in coral's own hue — a
+  // blush near-white page with white sheets (cards) on it
+  --cirth-background-color: oklch(97.4% 0.008 35deg);
+  --cirth-card-background-color: oklch(100% 0 0deg);
+
   // Surface: warm-toned neutrals instead of the default's cool neutral scale
   --cirth-muted-color: oklch(52% 0.02 35deg);
   --cirth-muted-border-color: oklch(88% 0.02 35deg);
@@ -33,8 +38,9 @@ $coral-250: oklch(80% 0.1 35deg);
   --cirth-primary-underline: #{color.change($coral-550, $alpha: 0.5)};
   --cirth-primary-hover: #{$coral-650};
   --cirth-primary-hover-background: #{$coral-600};
-  // Composites to >= 3:1 against white (WCAG 1.4.11 for focus indicators)
-  --cirth-primary-focus: #{color.change($coral-550, $alpha: 0.7)};
+  // Composites to >= 3:1 against the blush paper canvas (WCAG 1.4.11 for
+  // focus indicators) — 0.75, not 0.7: on paper 0.7 lands at 2.99:1
+  --cirth-primary-focus: #{color.change($coral-550, $alpha: 0.75)};
 
   // Shadow: a soft coral-tinted glow (reusing the same shadow generator the
   // theme itself uses, just recolored), with a matching lift on button hover

@@ -195,10 +195,10 @@ const nextPage = computed(() =>
 			</section>
 			<div class="container">
 				<section v-if="frontmatter.stats" class="docs-stats">
-					<div v-for="stat in frontmatter.stats" :key="stat.label" class="docs-stat">
+					<article v-for="stat in frontmatter.stats" :key="stat.label" class="docs-stat">
 						<strong class="docs-stat-value">{{ stat.value }}</strong>
 						<span class="docs-stat-label">{{ stat.label }}</span>
-					</div>
+					</article>
 				</section>
 
 				<section v-if="frontmatter.comparison" class="docs-compare">

@@ -11,15 +11,13 @@
 @import "./generated/cirth-docs.css";
 @import "./generated/cirth-docs-classless.css";
 
-/* Canvas: one continuous surface per scheme ("carta unica"). Light is warm
-   paper — white pulled faintly toward the brand hue (69.35deg), far short
-   of cream — so white cards read as sheets lying on it. Dark reuses the
-   framework's own background token untouched. The carved-stroke mask is
-   the site's signature marker: an angular peak with a center stem, drawn
-   from the logo's stroke vocabulary, painted via mask so it inherits any
-   color. */
+/* The canvas itself (warm paper in light, near-black in dark) is the
+   framework's own --cirth-background-color — nothing to override here.
+   The carved-stroke mask is the site's signature marker: an angular peak
+   with a center stem, drawn from the logo's stroke vocabulary, painted
+   via mask so it inherits any color. --docs-glow sets the hero's ember
+   wash strength per scheme. */
 :root {
-	--docs-canvas: oklch(97.4% 0.008 69.35deg);
 	--docs-glow: 9%;
 	--docs-stroke-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 15 8 1.5 14.5 15M8 6v9' fill='none' stroke='%23000' stroke-width='2'/%3E%3C/svg%3E");
 
@@ -30,18 +28,12 @@
 
 @media (prefers-color-scheme: dark) {
 	:root:not([data-theme="light"]) {
-		--docs-canvas: var(--cirth-background-color);
 		--docs-glow: 24%;
 	}
 }
 
 :root[data-theme="dark"] {
-	--docs-canvas: var(--cirth-background-color);
 	--docs-glow: 24%;
-}
-
-body {
-	background-color: var(--docs-canvas);
 }
 
 /* The shared carved marker: sized in em so it scales with its host */
@@ -491,7 +483,8 @@ body {
 }
 
 
-/* Stat band: three individual sheets on the canvas */
+/* Stat band: three real Cirth cards (<article>) on the canvas — the
+   card styling itself is entirely the framework's */
 .docs-stats {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
@@ -504,11 +497,7 @@ body {
 	display: flex;
 	flex-direction: column;
 	gap: 0.25rem;
-	padding: calc(var(--cirth-spacing) * 1.5) var(--cirth-spacing);
-	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-	border-radius: var(--cirth-card-border-radius);
-	background-color: var(--cirth-card-background-color);
-	box-shadow: var(--cirth-card-box-shadow);
+	margin: 0;
 }
 
 .docs-stat-value {
@@ -624,12 +613,6 @@ body {
 	--cirth-typography-spacing-vertical: var(--cirth-space-5);
 	max-width: 50rem;
 	min-width: 0;
-}
-
-/* Reference-manual scale for the page title (Sigwork-style): a large
-   serif display over the lede, before the first chapter rule. */
-.docs-content h1 {
-	font-size: clamp(2.75rem, 2.25rem + 1.5vw, 3.5rem);
 }
 
 /* Code blocks and demo frames breathe a little more vertically */

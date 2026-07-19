@@ -7,6 +7,29 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Changed
+
+- **Light theme canvas is now warm paper, and cards are sheets.** The
+  light `--cirth-background-color` moved from pure white to `$paper`
+  (`oklch(97.4% 0.008 69.35deg)` — white pulled faintly toward the brand
+  hue), and `--cirth-card-background-color` is now true white instead of
+  aliasing the page background, so an `<article>` reads as a sheet lying
+  on the page. The docs site previously created this look with
+  site-local overrides; it now comes from the framework itself.
+  - WCAG AA re-verified against the new canvas: all text tokens hold
+    ≥ 4.5:1 and focus rings/switch tracks hold ≥ 3:1 on paper. Two
+    non-text tokens needed one darker scale step to keep their 3:1
+    claim: `--cirth-form-element-border-color` and
+    `--cirth-progress-border-color` moved from `$neutral-400` (2.92:1 on
+    paper) to `$neutral-450` (3.47:1).
+  - Presets carry the same canvas concept in their own hue: `cobalt`
+    gets a cool near-white page, `coral` a blush one, both with white
+    cards. Coral's light `--cirth-primary-focus` alpha rose 0.7 → 0.75
+    (0.7 composites to 2.99:1 on its paper).
+- **Larger display scale for `h1`**: `clamp(2rem, …, 2.75rem)` →
+  `clamp(2.25rem, 1.7rem + 2.2vw, 3.5rem)` — the page title is a
+  reference-manual display moment, matching the docs redesign.
+
 ## [0.4.0] - 2026-07-10
 
 ### Changed

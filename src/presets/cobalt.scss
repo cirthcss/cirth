@@ -21,6 +21,11 @@ $cobalt-400: oklch(64% 0.09 258deg);
 $cobalt-300: oklch(72% 0.075 258deg);
 
 @mixin light {
+  // Canvas: the default theme's paper concept in cobalt's own hue — a
+  // cool near-white page with white sheets (cards) on it
+  --cirth-background-color: oklch(97.4% 0.004 258deg);
+  --cirth-card-background-color: oklch(100% 0 0deg);
+
   // Surface: cool-toned neutrals instead of the default's neutral scale
   --cirth-muted-color: oklch(50% 0.02 258deg);
   --cirth-muted-border-color: oklch(88% 0.015 258deg);
@@ -32,7 +37,8 @@ $cobalt-300: oklch(72% 0.075 258deg);
   --cirth-primary-underline: #{color.change($cobalt-800, $alpha: 0.5)};
   --cirth-primary-hover: #{$cobalt-900};
   --cirth-primary-hover-background: #{$cobalt-850};
-  // Composites to >= 3:1 against white (WCAG 1.4.11 for focus indicators)
+  // Composites to >= 3:1 against the cool paper canvas (WCAG 1.4.11 for
+  // focus indicators)
   --cirth-primary-focus: #{color.change($cobalt-600, $alpha: 0.7)};
 
   // Shadow: a crisp 1px outline instead of a soft blur — flatter, more formal

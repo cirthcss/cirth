@@ -7,7 +7,7 @@
 @mixin theme {
   color-scheme: light;
 
-  --cirth-background-color: #{$white};
+  --cirth-background-color: #{$paper};
 
   // Text color
   --cirth-color: #{$neutral-750};
@@ -121,8 +121,9 @@
       $method: oklch
     )};
   --cirth-form-element-selected-background-color: #{$neutral-100};
-  // >= 3:1 against both the field and the page background (WCAG 1.4.11)
-  --cirth-form-element-border-color: #{$neutral-400};
+  // >= 3:1 against both the field and the page background (WCAG 1.4.11).
+  // 450, not 400: on the paper canvas the 400 step drops to 2.92:1.
+  --cirth-form-element-border-color: #{$neutral-450};
   --cirth-form-element-color: #{$neutral-850};
   --cirth-form-element-placeholder-color: var(--cirth-muted-color);
   --cirth-form-element-active-background-color: #{$white};
@@ -162,7 +163,9 @@
   --cirth-accordion-open-summary-color: var(--cirth-muted-color);
 
   // Card (<article>)
-  --cirth-card-background-color: var(--cirth-background-color);
+  // White, not the background token: on the paper canvas a card is a
+  // sheet — the one surface brighter than the page.
+  --cirth-card-background-color: #{$white};
   --cirth-card-border-color: var(--cirth-muted-border-color);
   --cirth-card-box-shadow: var(--cirth-box-shadow);
   --cirth-card-sectioning-background-color: #{color.mix(
@@ -192,9 +195,10 @@
 
   // Progress
   // The border marks the track's extent at >= 3:1 against the page
-  // background (WCAG 1.4.11); the track itself stays subtle
+  // background (WCAG 1.4.11); the track itself stays subtle.
+  // 450, not 400: on the paper canvas the 400 step drops to 2.92:1.
   --cirth-progress-background-color: #{$neutral-100};
-  --cirth-progress-border-color: #{$neutral-400};
+  --cirth-progress-border-color: #{$neutral-450};
   --cirth-progress-color: var(--cirth-primary-background);
 
   // Tooltip ([data-tooltip])

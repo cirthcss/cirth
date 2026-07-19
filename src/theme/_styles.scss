@@ -147,7 +147,8 @@ $loading-icon-inverse: true !default;
   }
 
   h1 {
-    --cirth-font-size: clamp(2rem, 1.55rem + 1.8vw, 2.75rem);
+    // Reference-manual scale: the page title is a display moment
+    --cirth-font-size: clamp(2.25rem, 1.7rem + 2.2vw, 3.5rem);
     --cirth-line-height: var(--cirth-line-height-tight);
     --cirth-letter-spacing: var(--cirth-letter-spacing-tight);
     --cirth-typography-spacing-top: var(--cirth-space-12);
