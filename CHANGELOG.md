@@ -38,12 +38,16 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   compares against its own set; regenerate deliberately with
   `npm run check:visual:update`). The docs demos double as visual
   coverage of every component. Baselines are stored in Git LFS; the
-  Linux set CI compares against is generated and committed
-  automatically by the new `update-visual-baselines` workflow whenever
-  it is missing from a pushed branch (delete
-  `tests/__screenshots__/*-linux` to force a refresh after a
-  deliberate visual change). CI fetches only the Linux LFS objects,
-  cached by content, so steady-state runs consume no LFS bandwidth.
+  Linux set CI compares against is regenerated and, if anything
+  differs, committed automatically by the new `update-visual-baselines`
+  workflow on every push that could affect rendering — self-healing
+  both a first-time bootstrap and a partial change, no manual baseline
+  deletion needed. That commit lands as a separate, later push, so
+  `check:visual` in CI can fail against a not-yet-updated Linux
+  baseline on the same push as a deliberate visual change; the
+  follow-up bot commit resolves it. CI fetches only the Linux LFS
+  objects, cached by content, so steady-state runs consume no LFS
+  bandwidth.
 - **Accessibility audit in CI** (`scripts/check-a11y.js`,
   `npm run check:a11y`): axe-core (WCAG 2.x A/AA rules) over every
   built docs page in both color schemes via Playwright, failing on any

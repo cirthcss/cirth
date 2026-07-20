@@ -137,15 +137,22 @@ When your change **intentionally** alters how something renders:
 
 1. regenerate your platform's baselines —
    `npm run check:visual:update`;
-2. delete the Linux sets — `rm -r tests/__screenshots__/*-linux`;
-3. commit both together with the change, and say in the PR what changed
-   visually and why.
+2. commit them with the change, and say in the PR what changed visually
+   and why.
 
-On push, the `update-visual-baselines` workflow notices the missing
-Linux sets, regenerates them on a CI runner, and commits them back to
-the branch as `github-actions[bot]`. Review that commit's images like
-any other diff. If `check:visual` fails and you *didn't* intend a
-visual change, that's the check working — fix the regression instead of
+You don't need to touch the Linux sets. On every push that could affect
+rendering, the `update-visual-baselines` workflow regenerates them on a
+CI runner and, if anything actually differs, commits them back to the
+branch as `github-actions[bot]` — this self-heals both a first-time
+bootstrap and a partial change (only the pages your PR touched drift).
+Review that commit's images like any other diff.
+
+That commit lands as a separate, later push, so **`check:visual` in the
+same CI run as your content change can fail against the not-yet-updated
+Linux baseline** — this is expected for a visual change, not a
+regression. Re-run the check (or wait for the bot commit and push again)
+once it lands. If `check:visual` fails and you *didn't* intend a visual
+change, that's the check working — fix the regression instead of
 updating baselines.
 
 ## What makes a good contribution
