@@ -2,13 +2,14 @@ const fs = require("node:fs");
 const http = require("node:http");
 const path = require("node:path");
 
-// Shared access to the built docs site (docs/.vitepress/dist) for the
-// checks that audit it (check-a11y.js, tests/visual.spec.js): page
-// enumeration and a dependency-free static server. VitePress builds
-// with cleanUrls, so extensionless requests fall back to `<path>.html`.
+// Shared access to the built docs site (docs/dist) for the checks that
+// audit it (check-a11y.js, tests/visual.spec.js): page enumeration and a
+// dependency-free static server. Astro builds with trailingSlash:
+// "always", emitting `<path>/index.html`, so extensionless requests
+// resolve the same way a real static host would.
 
 const projectRoot = path.join(__dirname, "../..");
-const docsDist = path.join(projectRoot, "docs/.vitepress/dist");
+const docsDist = path.join(projectRoot, "docs/dist");
 
 const assertDocsBuilt = (label) => {
 	if (!fs.existsSync(path.join(docsDist, "index.html"))) {
@@ -23,7 +24,7 @@ const listPages = (dir = docsDist, prefix = "") => {
 	for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
 		const relative = path.posix.join(prefix, entry.name);
 		if (entry.isDirectory()) {
-			if (entry.name !== "assets") {
+			if (entry.name !== "_astro") {
 				pages.push(...listPages(path.join(dir, entry.name), relative));
 			}
 		} else if (

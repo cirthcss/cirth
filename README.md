@@ -106,7 +106,7 @@ The main generated stylesheets are:
 
 All four builds share Cirth's one official theme (amber), with light and
 dark variants. `cobalt` and `coral` are optional presets, not separate theme
-builds — see [Presets](#presets) below and [Colors](docs/colors.md).
+builds — see [Presets](#presets) below and [Colors](docs/src/pages/colors.mdx).
 
 ### Classless
 
@@ -159,7 +159,7 @@ OS — no `@import`, no webfont, zero network requests.
 import "@cirthcss/cirth/presets/cobalt";
 ```
 
-See [Colors](docs/colors.md) for what each preset changes.
+See [Colors](docs/src/pages/colors.mdx) for what each preset changes.
 
 ## Customization
 
@@ -187,7 +187,7 @@ For scoped builds, put the overrides on the scoped root:
 ```
 
 The generated CSS in `dist/cirth.css` is the most reliable reference for the
-current custom property surface. The [Customization](docs/customization.md)
+current custom property surface. The [Customization](docs/src/pages/customization.mdx)
 page covers the token layers, color groups, and light/dark switching in
 detail.
 
@@ -195,7 +195,7 @@ detail.
 
 The full documentation is published at
 [cirthcss.github.io/cirth](https://cirthcss.github.io/cirth/), built from
-[`docs/`](docs/) as a [VitePress](https://vitepress.dev) site with live
+[`docs/`](docs/) as an [Astro](https://astro.build) site with live
 examples. The site itself is styled with Cirth's own default build — the
 header, sidebar, prose, and every demo are ordinary semantic HTML dogfooding
 the framework.
@@ -208,62 +208,62 @@ npm run docs:dev
 ```
 
 - **Getting started** —
-  [Get Started](docs/get-started.md) ·
-  [Customization](docs/customization.md) ·
-  [Colors](docs/colors.md) ·
-  [About Cirth](docs/about.md)
+  [Get Started](docs/src/pages/get-started.mdx) ·
+  [Customization](docs/src/pages/customization.mdx) ·
+  [Colors](docs/src/pages/colors.mdx) ·
+  [About Cirth](docs/src/pages/about.mdx)
 - **Layout** —
-  [Document](docs/layout/document.md) ·
-  [Landmarks](docs/layout/landmarks.md) ·
-  [Section](docs/layout/section.md) ·
-  [Container](docs/layout/container.md) ·
-  [Grid](docs/layout/grid.md) ·
-  [Overflow auto](docs/layout/overflow-auto.md)
+  [Document](docs/src/pages/layout/document.mdx) ·
+  [Landmarks](docs/src/pages/layout/landmarks.mdx) ·
+  [Section](docs/src/pages/layout/section.mdx) ·
+  [Container](docs/src/pages/layout/container.mdx) ·
+  [Grid](docs/src/pages/layout/grid.mdx) ·
+  [Overflow auto](docs/src/pages/layout/overflow-auto.mdx)
 - **Content** —
-  [Typography](docs/content/typography.md) ·
-  [Link](docs/content/link.md) ·
-  [Button](docs/content/button.md) ·
-  [Table](docs/content/table.md) ·
-  [Code](docs/content/code.md) ·
-  [Figure](docs/content/figure.md) ·
-  [Embedded content](docs/content/embedded.md) ·
-  [Misc](docs/content/misc.md)
+  [Typography](docs/src/pages/content/typography.mdx) ·
+  [Link](docs/src/pages/content/link.mdx) ·
+  [Button](docs/src/pages/content/button.mdx) ·
+  [Table](docs/src/pages/content/table.mdx) ·
+  [Code](docs/src/pages/content/code.mdx) ·
+  [Figure](docs/src/pages/content/figure.mdx) ·
+  [Embedded content](docs/src/pages/content/embedded.mdx) ·
+  [Misc](docs/src/pages/content/misc.mdx)
 - **Forms** —
-  [Overview](docs/forms/index.md) ·
-  [Checkbox, radio, switch](docs/forms/checkbox-radio-switch.md) ·
-  [Input color](docs/forms/input-color.md) ·
-  [Input date](docs/forms/input-date.md) ·
-  [Input file](docs/forms/input-file.md) ·
-  [Input range](docs/forms/input-range.md) ·
-  [Input search](docs/forms/input-search.md)
+  [Overview](docs/src/pages/forms/index.mdx) ·
+  [Checkbox, radio, switch](docs/src/pages/forms/checkbox-radio-switch.mdx) ·
+  [Input color](docs/src/pages/forms/input-color.mdx) ·
+  [Input date](docs/src/pages/forms/input-date.mdx) ·
+  [Input file](docs/src/pages/forms/input-file.mdx) ·
+  [Input range](docs/src/pages/forms/input-range.mdx) ·
+  [Input search](docs/src/pages/forms/input-search.mdx)
 - **Components** —
-  [Accordion](docs/components/accordion.md) ·
-  [Card](docs/components/card.md) ·
-  [Dropdown](docs/components/dropdown.md) ·
-  [Group](docs/components/group.md) ·
-  [Loading](docs/components/loading.md) ·
-  [Modal](docs/components/modal.md) ·
-  [Nav](docs/components/nav.md) ·
-  [Progress](docs/components/progress.md) ·
-  [Tooltip](docs/components/tooltip.md)
+  [Accordion](docs/src/pages/components/accordion.mdx) ·
+  [Card](docs/src/pages/components/card.mdx) ·
+  [Dropdown](docs/src/pages/components/dropdown.mdx) ·
+  [Group](docs/src/pages/components/group.mdx) ·
+  [Loading](docs/src/pages/components/loading.mdx) ·
+  [Modal](docs/src/pages/components/modal.mdx) ·
+  [Nav](docs/src/pages/components/nav.mdx) ·
+  [Progress](docs/src/pages/components/progress.mdx) ·
+  [Tooltip](docs/src/pages/components/tooltip.mdx)
 - **Utilities** —
-  [Accessibility](docs/utilities/accessibility.md) ·
-  [Reduce motion](docs/utilities/reduce-motion.md)
+  [Accessibility](docs/src/pages/utilities/accessibility.mdx) ·
+  [Reduce motion](docs/src/pages/utilities/reduce-motion.mdx)
 - **Project** —
-  [Examples](docs/examples.md) ·
-  [Contributions](docs/contributions.md) ·
-  [Brand](docs/brand.md) ·
+  [Examples](docs/src/pages/examples.mdx) ·
+  [Contributions](docs/src/pages/contributions.mdx) ·
+  [Brand](docs/src/pages/brand.mdx) ·
   [Changelog](CHANGELOG.md)
 
 ## Contributing
 
-Start with [Contributions](docs/contributions.md). It explains the local
+Start with [Contributions](docs/src/pages/contributions.mdx). It explains the local
 setup, the source layout, the package exports, and the project constraints
 that matter most when changing Cirth.
 
 For pull requests, issue triage, and the exact collaboration workflow, read
 [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md). If your change touches
-the visual identity, check [Brand](docs/brand.md) first; if it changes the
+the visual identity, check [Brand](docs/src/pages/brand.mdx) first; if it changes the
 public package surface, update [CHANGELOG.md](CHANGELOG.md) in the same
 branch.
 

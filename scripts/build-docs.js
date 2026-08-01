@@ -24,10 +24,7 @@ const variants = [
 ];
 
 const projectRoot = path.join(__dirname, "..");
-const outputFoldername = path.join(
-	projectRoot,
-	"docs/.vitepress/theme/generated",
-);
+const outputFoldername = path.join(projectRoot, "docs/src/styles/generated");
 const tempEntryFoldername = fs.mkdtempSync(
 	path.join(os.tmpdir(), "cirth-docs-"),
 );

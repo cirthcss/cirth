@@ -11,11 +11,12 @@ const excludedDirnames = new Set([
 	"dist",
 	"cache",
 	".temp",
+	".astro",
 	".agent-harness",
 	".claude",
 ]);
 
-const trackedFileExtensions = new Set([".md", ".vue", ".ts", ".mts"]);
+const trackedFileExtensions = new Set([".md", ".mdx", ".astro", ".tsx", ".ts", ".mts"]);
 
 const getTrackedFiles = (folder) =>
 	fs
@@ -45,25 +46,26 @@ const repoRefPattern =
 const semverTagPattern = /^v\d+\.\d+\.\d+$/;
 
 // Check B — every relative markdown link ([text](target)) in a hand-written
-// .md file must resolve to a real file. Two conventions coexist:
+// .md/.mdx file must resolve to a real file. Two conventions coexist:
 // - README.md, CHANGELOG.md, and .github/**/*.md use plain repo-relative
 //   file paths (docs/colors.md, ../LICENSE.md, .github/CONTRIBUTING.md).
-// - docs/**/*.md use VitePress root-relative page routes (/colors,
-//   /forms/, no .md extension), resolved against docs/ instead.
+// - docs/src/pages/**/*.mdx use Astro root-relative page routes (/colors,
+//   /forms/, no extension), resolved against docs/src/pages/ instead.
 const markdownLinkPattern = /(?<!!)\[[^\]]*\]\(([^)]+)\)/g;
 
 const resolveDocRoute = (targetPath) => {
 	const withoutFragment = targetPath.split("#")[0].split("?")[0];
+	const pagesRoot = path.join(projectRoot, "docs/src/pages");
 
-	if (withoutFragment === "" || withoutFragment === "/") {
-		return path.join(projectRoot, "docs/index.md");
-	}
+	const candidates =
+		withoutFragment === "" || withoutFragment === "/"
+			? ["index.mdx", "index.md"]
+			: withoutFragment.endsWith("/")
+				? [`${withoutFragment}index.mdx`, `${withoutFragment}index.md`]
+				: [`${withoutFragment}.mdx`, `${withoutFragment}.md`];
 
-	if (withoutFragment.endsWith("/")) {
-		return path.join(projectRoot, "docs", `${withoutFragment}index.md`);
-	}
-
-	return path.join(projectRoot, "docs", `${withoutFragment}.md`);
+	const resolved = candidates.map((candidate) => path.join(pagesRoot, candidate));
+	return resolved.find((candidate) => fs.existsSync(candidate)) ?? resolved[0];
 };
 
 const resolveRelativeFile = (fromFile, targetPath) => {
@@ -86,11 +88,11 @@ getTrackedFiles(projectRoot).forEach((filename) => {
 		}
 	}
 
-	if (path.extname(filename) !== ".md") {
+	if (![".md", ".mdx"].includes(path.extname(filename))) {
 		return;
 	}
 
-	const isDocsPage = relativeFilename.startsWith(`docs${path.sep}`);
+	const isDocsPage = relativeFilename.startsWith(`docs${path.sep}src${path.sep}pages${path.sep}`);
 
 	for (const match of source.matchAll(markdownLinkPattern)) {
 		const target = match[1].trim();

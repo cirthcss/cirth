@@ -1,0 +1,68 @@
+---
+import ThemeToggle from "./ThemeToggle";
+import Icon from "./Icon.astro";
+import { nav, siteTitle, socialLinks } from "../lib/nav";
+
+const github = socialLinks.find((social) => social.icon === "github")?.link;
+
+// Normalize a nav-config link (root-relative, no trailing .html) against
+// this build's `base`, then compare to the current URL to mark the active
+// item — same rule Layout.vue used with VitePress's `withBase`.
+const withBase = (link: string) =>
+	link.startsWith("http") ? link : `${import.meta.env.BASE_URL}${link.replace(/^\//, "")}`;
+const currentPath = Astro.url.pathname;
+const isActive = (link?: string) => !!link && withBase(link) === currentPath;
+---
+
+<header class="container docs-header">
+	<nav aria-label="main navigation">
+		<ul>
+			<li>
+				<a href={withBase("/")} class="contrast docs-brand">
+					<img class="docs-logo docs-logo-light" src={withBase("/logo_brand.svg")} alt="" width="36" height="36" />
+					<img class="docs-logo docs-logo-dark" src={withBase("/logo_brand_dark.svg")} alt="" width="36" height="36" />
+					<strong>{siteTitle}</strong>
+				</a>
+			</li>
+		</ul>
+		<ul>
+			{
+				nav.map((item) => (
+					<li class="docs-nav-item">
+						{item.link ? (
+							<a href={withBase(item.link)} aria-current={isActive(item.link) ? "page" : undefined}>
+								{item.text}
+							</a>
+						) : (
+							<details class="dropdown">
+								<summary>{item.text}</summary>
+								<ul dir="rtl">
+									{(item.items ?? []).map((sub) => (
+										<li dir="ltr">
+											<a href={sub.link.startsWith("http") ? sub.link : withBase(sub.link)}>{sub.text}</a>
+										</li>
+									))}
+								</ul>
+							</details>
+						)}
+					</li>
+				))
+			}
+			{
+				github && (
+					<li class="docs-nav-item">
+						<a href={github} target="_blank" rel="noreferrer">
+							GitHub
+						</a>
+					</li>
+				)
+			}
+			<li>
+				<ThemeToggle client:load>
+					<Icon name="sun" size={18} class="docs-theme-icon-sun" />
+					<Icon name="moon" size={18} class="docs-theme-icon-moon" />
+				</ThemeToggle>
+			</li>
+		</ul>
+	</nav>
+</header>

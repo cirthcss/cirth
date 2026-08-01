@@ -9,6 +9,15 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Changed
 
+- **Docs site rebuilt on Astro instead of VitePress.** No change to the
+  published CSS package — this is docs-site infrastructure only. Same
+  content, same "carta e incisione" branding, same dogfooded CSS shell;
+  the site now ships near-zero client JS (Astro's islands hydrate only
+  the two genuinely interactive bits — the dark-mode toggle and the
+  homepage's typing demo — instead of hydrating the whole page as a
+  Vue SPA). Content moved from `docs/**/*.md` to `docs/src/pages/**/*.mdx`
+  (routes unchanged); contributor-facing links in `README.md` and
+  `.github/CONTRIBUTING.md` updated to match.
 - **RTL support: physical direction properties migrated to logical
   properties.** Every `margin-left`/`padding-right`/`border-left`-style
   declaration in `src/` now uses the logical equivalent
