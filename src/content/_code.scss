@@ -80,3 +80,13 @@
   color: var(--cirth-code-kbd-color);
   vertical-align: baseline;
 }
+
+// var — a variable within running text: monospace and italic like code,
+// but without the chip background (upstream #696)
+
+#{$parent-selector} var {
+  color: var(--cirth-code-color);
+  font-style: italic;
+  font-size: 0.875em;
+  font-family: var(--cirth-font-family);
+}

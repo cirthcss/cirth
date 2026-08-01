@@ -227,8 +227,14 @@
         }
       }
 
+      // Same row treatment as links: the clickable area fills the whole
+      // row, not just the label's text box (upstream #691)
       label {
-        width: 100%;
+        display: block;
+        margin: calc(var(--cirth-form-element-spacing-vertical) * -0.5)
+          calc(var(--cirth-form-element-spacing-horizontal) * -1);
+        padding: calc(var(--cirth-form-element-spacing-vertical) * 0.5)
+          var(--cirth-form-element-spacing-horizontal);
       }
 
       // Not working in Firefox, which doesn't support the `:has()` pseudo-class

@@ -68,8 +68,10 @@
       ) {
       --cirth-group-box-shadow: var(--cirth-group-box-shadow-focus-with-button);
 
-      input:not([type="checkbox"], [type="radio"]),
-      select {
+      // [aria-invalid] siblings keep their state border — hiding it while
+      // the button has focus dropped the invalid signal (upstream #536)
+      input:not([type="checkbox"], [type="radio"], [aria-invalid]),
+      select:not([aria-invalid]) {
         border-color: transparent;
       }
     }

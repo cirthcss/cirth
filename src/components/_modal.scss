@@ -40,7 +40,10 @@
     }
 
     width: 100%;
+    // dvh tracks mobile Safari's collapsing URL bar, so the footer stays
+    // reachable (upstream #514); the vh line is the older-browser fallback
     max-height: calc(100vh - var(--cirth-spacing) * 2);
+    max-height: calc(100dvh - var(--cirth-spacing) * 2);
     margin: var(--cirth-spacing);
     overflow: auto;
 

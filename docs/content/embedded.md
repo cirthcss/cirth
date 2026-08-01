@@ -13,7 +13,9 @@ consistency fixes, most importantly responsive images by default.
 ## Behavior
 
 * `img` is `max-width: 100%; height: auto`, responsive without a class, and
-  never overflows its container.
+  never overflows its container. An explicit `height` attribute given as the
+  only dimension is respected; with both attributes present, `height: auto`
+  preserves the attribute-derived aspect ratio on downscale.
 * `audio`, `canvas`, `iframe`, `img`, `svg`, `video` are vertically
   middle aligned, which avoids the small inline baseline gap browsers add by
   default.

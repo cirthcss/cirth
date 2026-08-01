@@ -18,6 +18,12 @@
     padding: calc(var(--cirth-block-spacing-vertical) - var(--cirth-space-2))
       var(--cirth-block-spacing-horizontal);
     background-color: var(--cirth-card-sectioning-background-color);
+
+    // The last child's own bottom margin would stack on the section
+    // padding (upstream #611); the modal already resets this
+    > :last-child {
+      margin-bottom: 0;
+    }
   }
 
   > header {

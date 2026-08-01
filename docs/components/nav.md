@@ -20,8 +20,8 @@ extra classes.
 ## Breadcrumb
 
 `nav[aria-label="breadcrumb"]` adds a divider (`--cirth-nav-breadcrumb-divider`,
-`>` by default, mirrored to `\` in `[dir="rtl"]`) between items and disables
-pointer events on the current page:
+`>` by default — a bidi-mirrored glyph, so `[dir="rtl"]` flips it to `<`
+natively) between items and disables pointer events on the current page:
 
 <Demo src="nav-breadcrumb" />
 

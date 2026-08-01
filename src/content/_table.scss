@@ -29,11 +29,14 @@
 
 // Cells
 
+// Cells stay transparent so tables inherit the surface they sit on —
+// painting var(--cirth-background-color) here showed the *page* background
+// inside cards (upstream #497)
+
 #{$parent-selector} th,
 #{$parent-selector} td {
   padding: calc(var(--cirth-spacing) / 2) var(--cirth-spacing);
   border-bottom: var(--cirth-border-width) solid var(--cirth-table-border-color);
-  background-color: var(--cirth-background-color);
   color: var(--cirth-color);
   font-weight: var(--cirth-font-weight);
   font-variant-numeric: tabular-nums;

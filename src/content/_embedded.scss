@@ -44,8 +44,15 @@
 
 #{$parent-selector} img {
   max-width: 100%; // 2
-  height: auto; // 2
   border-style: none; // 1
+
+  // 2 — except when an explicit height attribute is the only dimension
+  // given: that stays in effect (upstream #513). With both attributes
+  // present, height: auto is what preserves the attr-derived aspect-ratio
+  // on responsive downscale.
+  &:where(:not([height]), [width][height]) {
+    height: auto;
+  }
 }
 
 // Change the fill color to match the text color in all browsers (opinionated)

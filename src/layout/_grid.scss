@@ -23,5 +23,21 @@
     & > * {
       min-width: 0; // HACK for children in overflow
     }
+
+    // Form controls carry a stacking margin-bottom; inside a grid the
+    // row-gap already provides that rhythm and the two would stack,
+    // misaligning wrapped rows (upstream #738)
+    &
+      > :where(
+        button,
+        [type="submit"],
+        [type="reset"],
+        [role="button"],
+        input:not([type="checkbox"], [type="radio"]),
+        select,
+        textarea
+      ) {
+      margin-bottom: 0;
+    }
   }
 }

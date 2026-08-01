@@ -28,8 +28,41 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   `data-placement="left"/"right"` intentionally stays physical — the
   attribute names a physical side.
 
+### Added
+
+- **`<var>` is styled** (upstream #696): italic monospace in the code
+  color, without the inline-code chip background.
+
 ### Fixed
 
+- **Table cells no longer paint the page background** (upstream #497):
+  `th`/`td` are transparent and inherit the surface they sit on — a
+  table inside a card no longer shows paper-colored cells on the white
+  sheet.
+- **`--cirth-text-underline-offset` works again** (upstream #531): the
+  hardcoded `0.125em` on links is gone; links inherit the token
+  (`0.15em`) like the rest of the document.
+- **Modal content can reach the bottom of mobile viewports** (upstream
+  #514): `max-height` now uses `100dvh` (with the `100vh` fallback), so
+  mobile Safari's collapsing URL bar no longer hides the footer.
+- **`<a role="button">` aligns correctly inside `nav`** (upstream #568):
+  it no longer picks up the link rule's negative margins on top of the
+  button padding rule.
+- **Group inputs keep their `aria-invalid` border while a sibling
+  button has focus** (upstream #536).
+- **Card `header`/`footer` reset their last child's bottom margin**
+  (upstream #611), matching the modal's existing behavior — no more
+  extra space under a button in a card footer.
+- **Form controls placed directly in a `.grid` no longer double-space
+  rows** (upstream #738): their stacking `margin-bottom` is dropped in
+  favor of the grid's `row-gap`.
+- **An explicit `img height` attribute is respected** (upstream #513)
+  when it's the only dimension given; with both attributes present,
+  `height: auto` keeps preserving the attribute-derived aspect ratio on
+  responsive downscale.
+- **Dropdown `<label>` items fill their row** (upstream #691): labels
+  get the same row treatment as links, so the clickable area matches
+  the visual row.
 - **Blockquote no longer draws a border on both sides in RTL**
   (upstream #650): the physical `border-left` fallback that coexisted
   with `border-inline-start` is gone.
