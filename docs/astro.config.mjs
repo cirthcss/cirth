@@ -1,7 +1,6 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
-import preact from "@astrojs/preact";
 import rehypeHighlight from "rehype-highlight";
 
 // Served at https://cirthcss.github.io/cirth/ by the deploy-docs workflow,
@@ -46,7 +45,7 @@ export default defineConfig({
 	base,
 	trailingSlash: "always",
 	output: "static",
-	integrations: [preact(), mdx({ syntaxHighlight: false, rehypePlugins })],
+	integrations: [mdx({ syntaxHighlight: false, rehypePlugins })],
 	markdown: {
 		syntaxHighlight: false,
 		rehypePlugins,

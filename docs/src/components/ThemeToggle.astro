@@ -1,0 +1,20 @@
+---
+import Icon from "./Icon.astro";
+---
+
+<button type="button" class="outline contrast docs-theme-toggle" aria-label="Toggle color scheme">
+	<Icon name="sun" size={18} class="docs-theme-icon-sun" />
+	<Icon name="moon" size={18} class="docs-theme-icon-moon" />
+</button>
+
+<script>
+	// Which icon is visible is driven entirely by CSS
+	// ([data-theme="dark"] .docs-theme-icon-*, see styles/style.css) — this
+	// script is only the click handler, no framework needed for a toggle.
+	document.querySelector(".docs-theme-toggle")?.addEventListener("click", () => {
+		const next =
+			document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+		document.documentElement.setAttribute("data-theme", next);
+		localStorage.setItem("cirth-theme", next);
+	});
+</script>

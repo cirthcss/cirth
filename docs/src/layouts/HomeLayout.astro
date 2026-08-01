@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
-import HomeDemo from "../components/HomeDemo";
+import HomeDemo from "../components/HomeDemo.astro";
 import Icon from "../components/Icon.astro";
 
 interface Action {
@@ -64,7 +64,7 @@ const withBase = (link: string) => `${base}${link.replace(/^\//, "")}`;
 						}
 					</p>
 				</div>
-				<HomeDemo client:load />
+				<HomeDemo />
 			</div>
 		</section>
 

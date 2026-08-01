@@ -68,9 +68,7 @@
 		"docs:preview": "astro preview --root docs"
 	},
 	"devDependencies": {
-		"@astrojs/markdown-remark": "^7.2.2",
 		"@astrojs/mdx": "^7.0.5",
-		"@astrojs/preact": "^6.0.2",
 		"@axe-core/playwright": "^4.12.1",
 		"@playwright/test": "^1.61.1",
 		"astro": "^7.1.6",
@@ -79,7 +77,6 @@
 		"playwright": "^1.61.1",
 		"postcss": "^8.5.20",
 		"postcss-selector-parser": "^7.1.4",
-		"preact": "^10.29.8",
 		"prettier": "^3.5.3",
 		"rehype-highlight": "^7.0.2",
 		"sass-embedded": "^1.100.0",
