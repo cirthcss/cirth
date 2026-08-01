@@ -36,10 +36,12 @@
     list-style: none;
 
     &:first-of-type {
-      margin-left: calc(var(--cirth-nav-element-spacing-horizontal) * -1);
+      margin-inline-start: calc(
+        var(--cirth-nav-element-spacing-horizontal) * -1
+      );
     }
     &:last-of-type {
-      margin-right: calc(var(--cirth-nav-element-spacing-horizontal) * -1);
+      margin-inline-end: calc(var(--cirth-nav-element-spacing-horizontal) * -1);
     }
   }
 
@@ -69,9 +71,8 @@
     input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]),
     select {
       height: auto;
-      margin-right: inherit;
+      margin-inline: inherit;
       margin-bottom: 0;
-      margin-left: inherit;
       padding: calc(
           var(--cirth-nav-link-spacing-vertical) -
             (var(--cirth-border-width) * 2)
@@ -147,18 +148,7 @@
   }
 }
 
-// Breadcrumb RTL
-
-[dir="rtl"] {
-  #{$parent-selector} nav {
-    &[aria-label="breadcrumb"] {
-      & ul li {
-        &:not(:last-child) {
-          ::after {
-            content: "\\";
-          }
-        }
-      }
-    }
-  }
-}
+// Breadcrumb RTL: no override needed — the default ">" divider has the
+// Unicode Bidi_Mirrored property, so RTL rendering mirrors it to "<" on
+// its own. (The inherited Pico rule targeted ` ::after` as a descendant —
+// it never matched the divider — and hardcoded a "\" on top of it.)

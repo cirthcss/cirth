@@ -7,6 +7,54 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Changed
+
+- **RTL support: physical direction properties migrated to logical
+  properties.** Every `margin-left`/`padding-right`/`border-left`-style
+  declaration in `src/` now uses the logical equivalent
+  (`margin-inline`, `padding-inline-end`, `border-inline-start`,
+  `inset-inline-start`, `border-start-start-radius` and friends,
+  `text-align: start`/`end`) across container, landmarks, table,
+  blockquote, forms (basics, date, file), card, group, nav, modal,
+  dropdown, and accordion. Properties with no logical form inside the
+  Browserslist floor — `float`, directional `background-position`, and
+  the dropdown marker's `translateX` — are mirrored under `[dir="rtl"]`
+  overrides instead (`float: inline-end` needs Chrome 118; the floor is
+  Chrome 111). LTR rendering is pixel-identical: the full visual
+  regression suite (164 screenshots) passes unchanged against
+  pre-migration baselines. RTL verified on a hand-checked smoke page
+  (breadcrumb, blockquote, card, table, form controls including
+  validation icons, group, dropdown, accordion, modal). Tooltip
+  `data-placement="left"/"right"` intentionally stays physical — the
+  attribute names a physical side.
+
+### Fixed
+
+- **Blockquote no longer draws a border on both sides in RTL**
+  (upstream #650): the physical `border-left` fallback that coexisted
+  with `border-inline-start` is gone.
+- **Breadcrumb divider now mirrors in RTL** (upstream #734): the
+  inherited rule targeted `::after` with a descendant combinator (it
+  never
+  matched the divider) and hardcoded a `\` on top of it. Removed
+  entirely — the default `>` divider has the Unicode Bidi_Mirrored
+  property, so RTL rendering flips it to `<` on its own.
+- **Modal mirrors in RTL** (upstream #661): the close control's
+  `float: right` gets a `[dir="rtl"]` override, the footer uses
+  `text-align: end`, and header/footer spacings are logical.
+- **Dropdown mirrors in RTL** (upstream #671): the submenu anchors with
+  `inset-inline-start: 0` (which also covers the old `ul[dir="rtl"]`
+  special case, now removed) and the trigger marker's float, chevron
+  position, and translate compensation flip under `[dir="rtl"]`.
+- **Group corner rounding mirrors in RTL** (upstream #591): first/last
+  child radii (including the `[role="search"]` pill) use logical corner
+  properties.
+- **Textarea validation icon in RTL** now sits at the top corner
+  (`top left`) instead of inheriting the generic `center left`
+  override meant for single-line inputs.
+- **Date/time input calendar icon mirrors to the left in RTL** (it
+  stayed on the right before, overlapping the text).
+
 ## [0.5.0] - 2026-07-19
 
 ### Fixed

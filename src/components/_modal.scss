@@ -63,21 +63,21 @@
 
       #{$close-selector} {
         margin: 0;
-        margin-left: var(--cirth-spacing);
+        margin-inline-start: var(--cirth-spacing);
         padding: 0;
         float: right;
       }
     }
 
     > footer {
-      text-align: right;
+      text-align: end;
 
       button,
       [role="button"] {
         margin-bottom: 0;
 
         &:not(:first-of-type) {
-          margin-left: calc(var(--cirth-spacing) * 0.5);
+          margin-inline-start: calc(var(--cirth-spacing) * 0.5);
         }
       }
     }
@@ -89,7 +89,7 @@
       height: var(--cirth-size-4);
       margin-top: calc(var(--cirth-spacing) * -1);
       margin-bottom: var(--cirth-spacing);
-      margin-left: auto;
+      margin-inline-start: auto;
       border: none;
       background-image: var(--cirth-icon-close);
       background-position: center;
@@ -117,9 +117,25 @@
   }
 }
 
+// The close control floats toward the end of the header; float has no
+// logical values within the Browserslist floor (Chrome 111), so mirror it.
+[dir="rtl"] {
+  #{$parent-selector} dialog > article > header {
+    :is(a, button)[rel="prev"] {
+      float: left;
+    }
+
+    @if $enable-classes {
+      .close {
+        float: left;
+      }
+    }
+  }
+}
+
 @if $enable-classes {
   @include selectors.state(".modal-is-open") {
-    padding-right: var(--cirth-scrollbar-width, 0px);
+    padding-inline-end: var(--cirth-scrollbar-width, 0px);
     overflow: hidden;
     pointer-events: none;
     touch-action: none;

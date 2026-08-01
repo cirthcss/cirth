@@ -10,10 +10,8 @@
   #{$parent-selector} .container,
   #{$parent-selector} .container-fluid {
     width: 100%;
-    margin-right: auto;
-    margin-left: auto;
-    padding-right: var(--cirth-spacing);
-    padding-left: var(--cirth-spacing);
+    margin-inline: auto;
+    padding-inline: var(--cirth-spacing);
   }
 
   #{$parent-selector} .container {
@@ -24,8 +22,7 @@
           max-width: map.get($values, "viewport");
           @if $first-breakpoint {
             $first-breakpoint: false;
-            padding-right: 0;
-            padding-left: 0;
+            padding-inline: 0;
           }
         }
       }

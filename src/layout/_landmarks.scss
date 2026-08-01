@@ -56,8 +56,7 @@ $container-root-selector: "body";
     @if not $enable-classes {
       $first-breakpoint: true;
       width: 100%;
-      margin-right: auto;
-      margin-left: auto;
+      margin-inline: auto;
       padding: var(--cirth-block-spacing-vertical)
         var(--cirth-block-spacing-horizontal);
       @each $key, $values in $breakpoints {
@@ -66,8 +65,7 @@ $container-root-selector: "body";
             max-width: map.get($values, "viewport");
             @if $first-breakpoint {
               $first-breakpoint: false;
-              padding-right: 0;
-              padding-left: 0;
+              padding-inline: 0;
             }
           }
         }

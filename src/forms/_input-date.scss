@@ -17,7 +17,9 @@
     ) {
     --cirth-icon-position: var(--cirth-space-3);
     --cirth-icon-width: var(--cirth-size-4);
-    padding-right: calc(var(--cirth-icon-width) + var(--cirth-icon-position));
+    padding-inline-end: calc(
+      var(--cirth-icon-width) + var(--cirth-icon-position)
+    );
     background-image: var(--cirth-icon-date);
     background-position: center right var(--cirth-icon-position);
     background-size: var(--cirth-icon-width) auto;
@@ -39,8 +41,8 @@
 #{$parent-selector} [type="week"] {
   &::-webkit-calendar-picker-indicator {
     width: var(--cirth-icon-width);
-    margin-right: calc(var(--cirth-icon-width) * -1);
-    margin-left: var(--cirth-icon-position);
+    margin-inline-start: var(--cirth-icon-position);
+    margin-inline-end: calc(var(--cirth-icon-width) * -1);
     opacity: 0;
   }
 }
@@ -53,7 +55,7 @@
   #{$parent-selector} [type="month"],
   #{$parent-selector} [type="time"],
   #{$parent-selector} [type="week"] {
-    padding-right: var(--cirth-form-element-spacing-horizontal);
+    padding-inline-end: var(--cirth-form-element-spacing-horizontal);
     background-image: none;
   }
 }
@@ -67,5 +69,6 @@
     [type="time"],
     [type="week"]
   ) {
+  background-position: center left var(--cirth-icon-position);
   text-align: right;
 }

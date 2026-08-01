@@ -68,7 +68,7 @@
     // Type button
     &[role="button"] {
       width: 100%;
-      text-align: left;
+      text-align: start;
 
       // Marker
       &::after {
@@ -101,8 +101,6 @@
 [dir="rtl"] {
   #{$parent-selector} details {
     summary {
-      text-align: right;
-
       &::after {
         float: left;
         background-position: left center;
