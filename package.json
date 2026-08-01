@@ -73,11 +73,11 @@
 		"@playwright/test": "^1.61.1",
 		"astro": "^7.1.6",
 		"lightningcss-cli": "^1.32.0",
+		"lowlight": "^3.3.0",
 		"playwright": "^1.61.1",
 		"postcss": "^8.5.20",
 		"postcss-selector-parser": "^7.1.4",
 		"prettier": "^3.5.3",
-		"rehype-highlight": "^7.0.2",
 		"sass-embedded": "^1.100.0",
 		"stylelint": "^17.13.0",
 		"stylelint-config-standard-scss": "^17.0.0"

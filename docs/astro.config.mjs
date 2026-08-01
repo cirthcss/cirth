@@ -1,7 +1,7 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
-import rehypeHighlight from "rehype-highlight";
+import { rehypeCode } from "./src/lib/rehype-code.mjs";
 
 // Served at https://cirthcss.github.io/cirth/ by the deploy-docs workflow,
 // which sets GITHUB_PAGES=true. Local dev/preview keep the root base so
@@ -10,10 +10,11 @@ import rehypeHighlight from "rehype-highlight";
 const base = process.env.GITHUB_PAGES === "true" ? "/cirth/" : "/";
 
 // Astro's built-in Sätteri processor (Shiki-based syntax highlighting) is
-// swapped for highlight.js via a rehype plugin, so code blocks emit the
-// same theme-agnostic .hljs-* token classes the docs shell (style.css) has
-// always colored — Shiki emits its own inline styles instead, which
-// style.css doesn't target.
+// swapped for a local highlighter (src/lib/rehype-code.mjs, built directly
+// on `lowlight`/highlight.js) so code blocks emit the same theme-agnostic
+// .hljs-* token classes the docs shell (style.css) has always colored —
+// Shiki emits its own inline styles instead, which style.css doesn't
+// target.
 //
 // Deliberately using the markdown.rehypePlugins/syntaxHighlight shape here
 // instead of the newer `markdown.processor: unified({...})` API: the new
@@ -25,7 +26,7 @@ const base = process.env.GITHUB_PAGES === "true" ? "/cirth/" : "/";
 // but verified working end to end, including on .mdx pages; revisit if a
 // future Astro release documents the MDX-inheritance path more precisely.
 const rehypePlugins = [
-	[rehypeHighlight, { ignoreMissing: true }],
+	rehypeCode,
 	// Code blocks scroll horizontally, so they must be reachable with the
 	// keyboard (axe: scrollable-region-focusable) — same rule the old
 	// markdown-it fence override enforced.
