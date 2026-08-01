@@ -38,3 +38,7 @@ at both ends:
   `-focus-with-input`.
 * A focused button's own shadow is suppressed in favor of the group's,
   so the ring doesn't double up.
+* A `small` inside the group drops below the row as full-width helper
+  text, wherever it sits in the markup, keeping the usual muted helper
+  style; the control before a trailing `small` keeps the group's end
+  rounding (squared in Firefox < 121, which lacks `:has()`).

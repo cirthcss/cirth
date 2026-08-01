@@ -8,6 +8,7 @@
 #{$parent-selector} [role="group"] {
   display: inline-flex;
   position: relative;
+  flex-wrap: wrap;
   width: 100%;
   margin-bottom: var(--cirth-spacing);
   border-radius: var(--cirth-border-radius);
@@ -15,12 +16,31 @@
   vertical-align: middle;
   transition: box-shadow var(--cirth-transition);
 
+  // Helper text inside the group drops below the row as a full-width line
+  // instead of joining it as a squeezed flex column (upstream #700, #540);
+  // order pins it under the controls wherever it sits in the markup
+  > small {
+    flex: 0 0 100%;
+    order: 1;
+    margin-top: calc(var(--cirth-spacing) * 0.25);
+    margin-bottom: 0;
+  }
+
   > *,
   input:not([type="checkbox"], [type="radio"]),
   select {
     position: relative;
     flex: 1 1 auto;
     margin-bottom: 0;
+
+    // Fields are width: 100% globally, which as flex-basis: auto would
+    // claim a whole wrapped line for themselves now that the group wraps.
+    // Basis 0 lets them sit beside content-sized buttons, and the dominant
+    // grow factor hands them virtually all the free space — while groups
+    // made of buttons alone still share the row evenly (grow 1 each).
+    &:is(input, select, textarea) {
+      flex: 99 1 0%;
+    }
 
     &:not(:first-child) {
       margin-inline-start: 0;
@@ -36,6 +56,14 @@
     &:focus {
       z-index: 2;
     }
+  }
+
+  // A trailing helper makes the control before it the visual row end, so
+  // that control keeps its end radii. (:has() misses Firefox < 121, which
+  // degrades to squared corners there — cosmetic only.)
+  > :has(+ small:last-child) {
+    border-start-end-radius: var(--cirth-border-radius);
+    border-end-end-radius: var(--cirth-border-radius);
   }
 
   button,
@@ -116,5 +144,11 @@
       border-start-end-radius: var(--cirth-radius-pill);
       border-end-end-radius: var(--cirth-radius-pill);
     }
+  }
+
+  // Same trailing-helper compensation as above, with the pill radius
+  > :has(+ small:last-child) {
+    border-start-end-radius: var(--cirth-radius-pill);
+    border-end-end-radius: var(--cirth-radius-pill);
   }
 }

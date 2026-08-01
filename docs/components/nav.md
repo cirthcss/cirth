@@ -64,6 +64,9 @@ Nesting `nav` inside `aside` switches every list and list item to
 * Buttons, `[role="button"]`, and form controls placed inside a nav `li`
   adapt their padding to match the nav's link rhythm instead of their usual
   button/form spacing.
+* A [group](/components/group) (`[role="group"]`/`[role="search"]`) inside
+  a nav item sizes to its content and drops its stacking margin, sitting on
+  the nav's rhythm like any other item.
 * A [dropdown](/components/dropdown) nested in a nav item collapses its own
   vertical margin so it lines up with sibling links; see that page's
   "Inside a nav" example.

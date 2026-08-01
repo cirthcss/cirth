@@ -3,11 +3,6 @@
 @use "../helpers/selectors";
 @use "colors" as *;
 
-// Whether the aria-busy loading icon (and other white-stroke icons drawn on
-// top of the primary color) should be inverted for legibility. Themes whose
-// dark-mode primary-inverse is not white configure this to false.
-$loading-icon-inverse: true !default;
-
 /**
    * Styles
    */
@@ -352,24 +347,6 @@ $loading-icon-inverse: true !default;
       #{$selector} {
         &::after {
           filter: brightness(0) invert(1);
-        }
-      }
-    }
-  }
-
-  // Loading icon (animated)
-  // Change the icon color to white for buttons
-  [aria-busy="true"]:not(input, select, textarea) {
-    $selector: '&:is(button, [type="submit"], [type="button"], [type="reset"], [role="button"])';
-    @if $enable-classes {
-      $selector: "#{$selector}:not(.outline)";
-    }
-    #{$selector} {
-      &::before {
-        @if $loading-icon-inverse {
-          filter: brightness(0) invert(1);
-        } @else {
-          filter: brightness(0) invert(0);
         }
       }
     }

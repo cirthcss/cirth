@@ -27,11 +27,31 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   validation icons, group, dropdown, accordion, modal). Tooltip
   `data-placement="left"/"right"` intentionally stays physical — the
   attribute names a physical side.
+- **The loading spinner always matches the text color** (upstream
+  #643): it's now the icon SVG applied as a mask over `currentColor`
+  instead of a background image with a baked-in stroke color, so it
+  adapts to every button variant, colored surface, and color scheme —
+  including `.contrast` buttons in dark mode, where the old
+  white-forcing `filter` inversion was exactly wrong. Forced-colors
+  mode paints it in a system color. The now-obsolete
+  `$loading-icon-inverse` build flag is removed.
 
 ### Added
 
 - **`<var>` is styled** (upstream #696): italic monospace in the code
   color, without the inline-code chip background.
+- **Busy button-like inputs show the spinner** (upstream #693):
+  `<input type="submit"/"button"/"reset">` can't render
+  pseudo-elements, so `aria-busy="true"` paints the spinner as a
+  background icon at the line start (mirrored in RTL).
+- **Helper `<small>` works inside groups** (upstream #700, #540): a
+  `small` inside `[role="group"]`/`[role="search"]` drops below the
+  row as a full-width muted helper line instead of joining it as a
+  squeezed column, wherever it sits in the markup; the control before
+  a trailing `small` keeps the group's end rounding (squared in
+  Firefox < 121, which lacks `:has()`).
+- **Groups work inside `nav`** (upstream #699): they size to their
+  content and drop the stacking margin, sitting on the nav's rhythm.
 
 ### Fixed
 

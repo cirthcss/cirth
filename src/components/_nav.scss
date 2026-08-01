@@ -67,6 +67,14 @@
       }
     }
 
+    // Button groups size to their content and drop the stacking margin,
+    // so they sit on the nav's rhythm like any other item (upstream #699)
+    [role="group"],
+    [role="search"] {
+      width: auto;
+      margin-bottom: 0;
+    }
+
     // Minimal support for buttons and forms elements
     button,
     [role="button"],
