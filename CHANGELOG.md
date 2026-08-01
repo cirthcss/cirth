@@ -7,6 +7,8 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-08-02
+
 ### Changed
 
 - **Docs site rebuilt on Astro instead of VitePress.** No change to the
@@ -449,7 +451,8 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
-[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.5.0...master
+[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.6.0...master
+[0.6.0]: https://github.com/cirthcss/cirth/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/cirthcss/cirth/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/cirthcss/cirth/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/cirthcss/cirth/compare/v0.2.0...v0.3.0
