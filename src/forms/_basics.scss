@@ -31,43 +31,10 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   letter-spacing: inherit; // 2
 }
 
-// Show the overflow in IE.
-
-#{$parent-selector} input {
-  overflow: visible;
-}
-
-// Remove the inheritance of text transform in Edge, Firefox, and IE
-
-#{$parent-selector} select {
-  text-transform: none;
-}
-
-// 1. Correct the text wrapping in Edge and IE
-
-// 2. Correct the color inheritance from `fieldset` elements in IE
-
-// 3. Remove the padding so developers are not caught out when they zero out
-
+// Remove the padding so developers are not caught out when they zero out
 // `fieldset` elements in all browsers
 
 #{$parent-selector} legend {
-  max-width: 100%; // 1
-  padding: 0; // 3
-  color: inherit; // 2
-  white-space: normal; // 1
-}
-
-// 1. Remove the default vertical scrollbar in IE
-
-#{$parent-selector} textarea {
-  overflow: auto; // 1
-}
-
-// Remove the padding in IE 10
-
-#{$parent-selector} [type="checkbox"],
-#{$parent-selector} [type="radio"] {
   padding: 0;
 }
 
@@ -97,34 +64,15 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 
 // 2. Change font properties to `inherit` in Safari
 
-#{$parent-selector} ::-webkit-file-upload-button {
+#{$parent-selector} ::file-selector-button {
   -webkit-appearance: button; // 1
   font: inherit; // 2
-}
-
-// Remove the inner border and padding of focus outlines in Firefox
-
-#{$parent-selector} ::-moz-focus-inner {
-  padding: 0;
-  border-style: none;
-}
-
-//  Remove the focus outline in Firefox
-
-#{$parent-selector} :-moz-focusring {
-  outline: none;
 }
 
 // Remove the additional :invalid styles in Firefox
 
 #{$parent-selector} :-moz-ui-invalid {
   box-shadow: none;
-}
-
-// Change the inconsistent appearance in IE (opinionated)
-
-#{$parent-selector} ::-ms-expand {
-  display: none;
 }
 
 // Remove the border and padding in all browsers (opinionated)
@@ -374,11 +322,11 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 }
 
 // Placeholder
+// Firefox lowers placeholder opacity by default; set it back to 1 so the
+// muted color above is the only fading applied.
 
 #{$parent-selector} input::placeholder,
-#{$parent-selector} input::-webkit-input-placeholder,
 #{$parent-selector} textarea::placeholder,
-#{$parent-selector} textarea::-webkit-input-placeholder,
 #{$parent-selector} select:invalid {
   color: var(--cirth-form-element-placeholder-color);
   opacity: 1;
@@ -395,12 +343,6 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 // Select
 
 #{$parent-selector} select {
-  // Unstyle the caret on `<select>`s in IE10+.
-  &::-ms-expand {
-    border: 0;
-    background-color: transparent;
-  }
-
   &:not([multiple], [size]) {
     padding-inline: var(--cirth-form-element-spacing-horizontal)
       calc(var(--cirth-form-element-spacing-horizontal) + var(--cirth-space-6));

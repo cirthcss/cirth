@@ -24,15 +24,10 @@
   color: inherit; // 1
 }
 
-// Add the correct display in IE 10+
+// Hide [hidden] elements, but not those revealed by find-in-page
+// (`hidden="until-found"`, Chrome/Edge 102+) — a blanket `display: none`
+// would disable that browser feature entirely.
 
-#{$parent-selector} [hidden],
-#{$parent-selector} template {
+#{$parent-selector} [hidden]:where(:not([hidden="until-found"])) {
   display: none;
-}
-
-// Add the correct display in IE 9-
-
-#{$parent-selector} canvas {
-  display: inline-block;
 }

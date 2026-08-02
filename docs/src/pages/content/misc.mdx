@@ -6,7 +6,7 @@ import Demo from "../../components/Demo.astro";
 
 # Misc
 
-A small set of remaining resets: `hr`, `[hidden]`, `template`, and `canvas`.
+A small set of remaining resets: `hr` and `[hidden]`.
 
 <Demo src="misc" />
 
@@ -18,6 +18,6 @@ A small set of remaining resets: `hr`, `[hidden]`, `template`, and `canvas`.
 
 * `hr`: a single top border in `--cirth-muted-border-color`, with vertical
   margin from `--cirth-typography-spacing-vertical`.
-* `[hidden]` and `template`: always `display: none`, for older browsers
-  that don't implement this natively.
-* `canvas`: `display: inline-block`, for IE9 and below.
+* `[hidden]`: `display: none`, except `hidden="until-found"` — Chrome/Edge's
+  find-in-page-revealed hidden state is deliberately left alone rather than
+  overridden.

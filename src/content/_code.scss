@@ -33,7 +33,6 @@
 // Prevent overflow of the container in all browsers (opinionated)
 
 #{$parent-selector} pre {
-  -ms-overflow-style: scrollbar;
   overflow: auto;
 }
 

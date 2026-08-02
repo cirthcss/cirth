@@ -16,11 +16,8 @@
 
 // 2. Remove the margin on controls in Safari
 
-// 3. Show the overflow in Edge
-
 #{$parent-selector} button {
   margin: 0; // 2
-  overflow: visible; // 3
   font-family: inherit; // 1
   text-transform: none; // 1
 }

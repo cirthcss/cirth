@@ -1,0 +1,13 @@
+@use "../config" as *;
+
+@if $enable-classes {
+  /**
+   * Truncate
+   */
+
+  #{$parent-selector} .truncate {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}

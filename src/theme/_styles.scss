@@ -121,8 +121,16 @@
 
   // Typography
   // Small
+  // `--cirth-font-size` was set here but never consumed as `font-size` on
+  // this selector, so `<small>` silently fell back to the browser's
+  // `smaller` keyword (~83%) instead of this token's 0.875em — close
+  // enough that it went unnoticed, but the token is the intended, themeable
+  // value (normalize's own `small { font-size: 80% }` would have been no
+  // more correct, just as unconsumed).
   small {
     --cirth-font-size: 0.875em;
+
+    font-size: var(--cirth-font-size);
   }
 
   // Headings

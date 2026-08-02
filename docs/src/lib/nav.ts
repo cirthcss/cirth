@@ -86,6 +86,8 @@ export const sidebar: SidebarGroup[] = [
 		items: [
 			{ text: "Accessibility", link: "/utilities/accessibility" },
 			{ text: "Reduce motion", link: "/utilities/reduce-motion" },
+			{ text: "Screen-reader only", link: "/utilities/sr-only" },
+			{ text: "Truncate", link: "/utilities/truncate" },
 		],
 	},
 	{

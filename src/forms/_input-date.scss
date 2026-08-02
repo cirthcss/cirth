@@ -33,6 +33,18 @@
   }
 }
 
+// iOS Safari centers the date/time text and pads the field's internal
+// segments regardless of `dir`/`text-align`; align both to the field's
+// own text direction instead.
+
+#{$parent-selector} ::-webkit-date-and-time-value {
+  text-align: inherit;
+}
+
+#{$parent-selector} ::-webkit-datetime-edit {
+  padding-block: 0;
+}
+
 // Calendar picker
 
 #{$parent-selector} [type="date"],

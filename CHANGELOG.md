@@ -7,6 +7,74 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+Reset modernization & structural utilities: from a source-level comparison
+of the reboot layer against modern-normalize v3.0.1 and Tailwind Preflight
+v4 — Cirth's reboot descended from normalize v8 (2018) + sanitize v13
+(2021), years past the Browserslist floor those resets still patch for.
+
+### Added
+
+- **`.sr-only`** utility: visually hides content while keeping it in the
+  accessibility tree (`position: absolute`, 1×1px, `clip-path:
+  inset(50%)`, `overflow: hidden`, `white-space: nowrap`). Pairs with
+  **`.sr-only-focusable`**, which reveals the element on
+  `:focus`/`:focus-within` for skip-link patterns. Classes build only.
+- **`.truncate`** utility: single-line `overflow: hidden` +
+  `text-overflow: ellipsis` + `white-space: nowrap`. Classes build only.
+
+### Fixed
+
+- **`[hidden]` no longer breaks `hidden="until-found"`**: the reboot's
+  blanket `display: none` disabled Chrome/Edge's find-in-page-revealed
+  hidden state; now scoped with `:where(:not([hidden="until-found"]))`.
+  The `template` selector was dropped from the same rule — UA
+  stylesheets already handle it.
+- **`::placeholder { opacity: 1 }`**: Firefox was lowering placeholder
+  opacity on top of the already-muted color, double-fading it versus
+  Chrome. The dead `::-webkit-input-placeholder` legacy alias was
+  dropped alongside it.
+- **Firefox focus outline restored on unstyled controls**: removed the
+  inherited `:-moz-focusring { outline: none }` +
+  `::-moz-focus-inner` padding hack, which was silently killing Firefox
+  focus indication on anything Cirth doesn't restyle. The border-radius
+  bug the hack originally worked around is long dead.
+- **`::file-selector-button` used consistently**: the reboot layer
+  still targeted the legacy `::-webkit-file-upload-button` alias while
+  the rest of `src/` had already moved to the standard
+  `::file-selector-button` pseudo-element (supported everywhere since
+  ~2021).
+- **`<small>` now actually renders at its intended size**: the
+  `--cirth-font-size: 0.875em` custom property was set on `small` but
+  never consumed as `font-size` on that same selector, so `<small>`
+  silently fell back to the browser default `smaller` keyword (~83%)
+  instead of the token's 0.875em. `font-size: var(--cirth-font-size)`
+  now applies it.
+- **`table { border-color: currentcolor }`**: guards against a
+  Chrome/Safari inheritance bug for any future border added without an
+  explicit color (today's cell borders already set one explicitly, so
+  this is a latent-bug guard, not a visible change).
+- **iOS Safari date/time input alignment**: `::-webkit-date-and-time-value`
+  now inherits text alignment instead of forcing centered text, and
+  `::-webkit-datetime-edit` drops its default vertical padding —
+  fixes RTL/centering on `[type="date"]` and friends in Safari.
+
+### Removed
+
+- **Dead IE/legacy-browser rules purged** from the reboot layer,
+  matching modern-normalize v3's cuts: the `-ms-touch-action`
+  tap-delay block, `::-ms-expand` (both the global rule and the
+  `<select>`-scoped one), `input { overflow: visible }`, `textarea {
+  overflow: auto }`, `audio`/`video { display: inline-block }`,
+  `audio:not([controls])` (iOS 4-7), `canvas { display: inline-block }`,
+  `img { border-style: none }`, `svg:not(:root)`/`:not(:host) {
+  overflow: hidden }`, `[type="checkbox"]`/`[type="radio"] { padding:
+  0 }`, `button { overflow: visible }`, `select { text-transform: none
+  }`, `-ms-overflow-style` on `pre`, the IE-specific parts of the
+  `legend` reset (kept `padding: 0`), and the IE-only `display:
+  inline-block` on `progress` (kept `vertical-align: baseline`; Cirth's
+  own rules already set `display: inline-block` unconditionally).
+  Measurable size-budget win in the same commit.
+
 ## [0.6.0] - 2026-08-02
 
 ### Changed

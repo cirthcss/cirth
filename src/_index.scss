@@ -14,7 +14,7 @@
 @use "content/embedded"; // audio, canvas, iframe, img, svg, video
 @use "content/code"; // pre, code, ...
 @use "content/figure"; // figure, figcaption
-@use "content/misc"; // hr, template, [hidden], dialog, canvas
+@use "content/misc"; // hr, [hidden]
 
 // Forms
 @use "forms/basics"; // input, select, textarea, label, fieldset, legend
@@ -37,8 +37,10 @@
 @use "components/tooltip"; // data-tooltip
 
 // Utilities
-@use "utilities/accessibility"; // -ms-touch-action, aria-*
+@use "utilities/accessibility"; // aria-*, [dir="rtl"]
 @use "utilities/reduce-motion"; // prefers-reduced-motion
+@use "utilities/sr-only"; // .sr-only, .sr-only-focusable
+@use "utilities/truncate"; // .truncate
 
 // Theme
 // src/theme/ is the single source of Cirth's official design tokens.
