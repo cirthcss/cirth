@@ -9,12 +9,12 @@
 #{$parent-selector}
   input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]) {
   &:is(
-      [type="date"],
-      [type="datetime-local"],
-      [type="month"],
-      [type="time"],
-      [type="week"]
-    ) {
+    [type="date"],
+    [type="datetime-local"],
+    [type="month"],
+    [type="time"],
+    [type="week"]
+  ) {
     --cirth-icon-position: var(--cirth-space-3);
     --cirth-icon-width: var(--cirth-size-4);
 

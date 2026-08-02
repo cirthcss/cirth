@@ -89,11 +89,11 @@
   @supports selector(:has(*)) {
     // Group box shadow when a button is focused
     &:has(
-        button:focus,
-        [type="submit"]:focus,
-        [type="button"]:focus,
-        [role="button"]:focus
-      ) {
+      button:focus,
+      [type="submit"]:focus,
+      [type="button"]:focus,
+      [role="button"]:focus
+    ) {
       --cirth-group-box-shadow: var(--cirth-group-box-shadow-focus-with-button);
 
       // [aria-invalid] siblings keep their state border — hiding it while

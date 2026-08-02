@@ -43,11 +43,11 @@
       --cirth-underline: var(--cirth-secondary-underline);
 
       &:is(
-          [aria-current]:not([aria-current="false"]),
-          :hover,
-          :active,
-          :focus
-        ) {
+        [aria-current]:not([aria-current="false"]),
+        :hover,
+        :active,
+        :focus
+      ) {
         --cirth-color: var(--cirth-secondary-hover);
         --cirth-underline: var(--cirth-secondary-hover-underline);
       }
@@ -59,11 +59,11 @@
       --cirth-underline: var(--cirth-contrast-underline);
 
       &:is(
-          [aria-current]:not([aria-current="false"]),
-          :hover,
-          :active,
-          :focus
-        ) {
+        [aria-current]:not([aria-current="false"]),
+        :hover,
+        :active,
+        :focus
+      ) {
         --cirth-color: var(--cirth-contrast-hover);
         --cirth-underline: var(--cirth-contrast-hover-underline);
       }

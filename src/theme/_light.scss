@@ -213,13 +213,13 @@
 
   // Focus for buttons, radio and select
   input:is(
-      [type="submit"],
-      [type="button"],
-      [type="reset"],
-      [type="checkbox"],
-      [type="radio"],
-      [type="file"]
-    ) {
+    [type="submit"],
+    [type="button"],
+    [type="reset"],
+    [type="checkbox"],
+    [type="radio"],
+    [type="file"]
+  ) {
     --cirth-form-element-focus-color: var(--cirth-primary-focus);
   }
 }

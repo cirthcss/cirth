@@ -101,11 +101,11 @@
       transition: opacity var(--cirth-transition);
 
       &:is(
-          [aria-current]:not([aria-current="false"]),
-          :hover,
-          :active,
-          :focus
-        ) {
+        [aria-current]:not([aria-current="false"]),
+        :hover,
+        :active,
+        :focus
+      ) {
         opacity: 1;
       }
     }

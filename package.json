@@ -72,14 +72,14 @@
 		"@axe-core/playwright": "^4.12.1",
 		"@playwright/test": "^1.61.1",
 		"astro": "^7.1.6",
-		"lightningcss-cli": "^1.32.0",
+		"lightningcss-cli": "^1.33.0",
 		"lowlight": "^3.3.0",
 		"playwright": "^1.61.1",
 		"postcss": "^8.5.20",
 		"postcss-selector-parser": "^7.1.4",
-		"prettier": "^3.5.3",
+		"prettier": "^3.9.6",
 		"sass-embedded": "^1.100.0",
-		"stylelint": "^17.13.0",
+		"stylelint": "^17.14.1",
 		"stylelint-config-standard-scss": "^17.0.0"
 	},
 	"browserslist": [
