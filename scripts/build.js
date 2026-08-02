@@ -60,5 +60,12 @@ run("Minify", process.execPath, [
 	path.join(__dirname, "process-css.js"),
 	"--minify",
 ]);
+// Non-blocking: warns if a bundle grows past the gzip budget so it still
+// fits a single TCP/HTTP round trip. `npm run check:size` (used in CI)
+// runs the same check without --warn-only and fails the build instead.
+run("Check size", process.execPath, [
+	path.join(__dirname, "check-css-size.js"),
+	"--warn-only",
+]);
 
 console.log("\x1b[32m[@cirthcss/cirth] Done\x1b[0m");

@@ -12,6 +12,8 @@ const distDir = path.join(projectRoot, "dist");
 // Current bundles sit at ~11-12.5 KiB gzipped.
 const budgetBytes = 14 * 1024;
 
+const warnOnly = process.argv.includes("--warn-only");
+
 if (!fs.existsSync(distDir)) {
 	console.error("check-css-size: dist/ not found — run `npm run build` first.");
 	process.exit(1);
@@ -32,10 +34,11 @@ let failed = false;
 for (const name of bundles) {
 	const source = fs.readFileSync(path.join(distDir, name));
 	const gzippedBytes = zlib.gzipSync(source, { level: 9 }).length;
-	const overBudget = gzippedBytes > budgetBytes;
+	const overBudget = gzippedBytes >= budgetBytes;
 
+	const mark = overBudget ? (warnOnly ? "⚠" : "✗") : "✓";
 	console.log(
-		`${overBudget ? "✗" : "✓"} dist/${name} — ${gzippedBytes} B gzipped` +
+		`${mark} dist/${name} — ${gzippedBytes} B gzipped` +
 			` (budget ${budgetBytes} B)`,
 	);
 
@@ -45,10 +48,15 @@ for (const name of bundles) {
 }
 
 if (failed) {
-	console.error(
+	const message =
 		"\ncheck-css-size: a bundle exceeds the gzipped size budget. Either " +
-			"trim the change or raise budgetBytes deliberately in " +
-			"scripts/check-css-size.js.",
-	);
-	process.exit(1);
+		"trim the change or raise budgetBytes deliberately in " +
+		"scripts/check-css-size.js.";
+
+	if (warnOnly) {
+		console.warn(message);
+	} else {
+		console.error(message);
+		process.exit(1);
+	}
 }
