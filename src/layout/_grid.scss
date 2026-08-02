@@ -9,8 +9,7 @@
    */
 
   #{$parent-selector} .grid {
-    grid-column-gap: var(--cirth-grid-column-gap);
-    grid-row-gap: var(--cirth-grid-row-gap);
+    gap: var(--cirth-grid-row-gap) var(--cirth-grid-column-gap);
     display: grid;
     grid-template-columns: 1fr;
 

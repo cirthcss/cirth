@@ -9,6 +9,7 @@
   --cirth-color: var(--cirth-primary);
   --cirth-background-color: transparent;
   --cirth-underline: var(--cirth-primary-underline);
+
   outline: none;
   background-color: var(--cirth-background-color); // 1
   color: var(--cirth-color);
@@ -28,6 +29,7 @@
 
   &:focus-visible {
     box-shadow: 0 0 0 var(--cirth-outline-width) var(--cirth-primary-focus);
+
     // Invisible in normal rendering, but forced-colors mode strips
     // box-shadow and repaints transparent outlines with a system color —
     // without this, keyboard focus disappears in Windows High Contrast.

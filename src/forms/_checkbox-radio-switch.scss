@@ -20,6 +20,7 @@
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+
   // 1.5em = 24px at the default root font size: the WCAG 2.5.8 (AA)
   // minimum target size, without relying on the adjacent label
   width: 1.5em;
@@ -39,6 +40,7 @@
   &:checked:focus {
     --cirth-background-color: var(--cirth-primary-background);
     --cirth-border-color: var(--cirth-primary-border);
+
     background-image: var(--cirth-icon-checkbox);
     background-position: center;
     background-size: 0.9em auto;
@@ -62,6 +64,7 @@
   &:indeterminate {
     --cirth-background-color: var(--cirth-primary-background);
     --cirth-border-color: var(--cirth-primary-border);
+
     background-image: var(--cirth-icon-minus);
     background-position: center;
     background-size: 0.9em auto;
@@ -78,6 +81,7 @@
   &:checked:active,
   &:checked:focus {
     --cirth-background-color: var(--cirth-primary-inverse);
+
     border-width: 0.42em;
     background-image: none;
   }
@@ -108,7 +112,7 @@
     --cirth-border-color: var(--cirth-switch-background-color);
   }
 
-  &:before {
+  &::before {
     display: block;
     aspect-ratio: 1;
     height: 100%;
@@ -127,6 +131,7 @@
   &:checked {
     --cirth-background-color: var(--cirth-switch-checked-background-color);
     --cirth-border-color: var(--cirth-switch-checked-background-color);
+
     background-image: none;
 
     &::before {
@@ -150,6 +155,7 @@
       --cirth-background-color: var(--cirth-form-element-valid-border-color);
     }
   }
+
   &:checked,
   &:checked:active,
   &:checked:focus {
@@ -169,6 +175,7 @@
       --cirth-border-color: var(--cirth-form-element-valid-border-color);
     }
   }
+
   &:checked,
   &:checked:active,
   &:checked:focus {

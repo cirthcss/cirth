@@ -145,6 +145,7 @@
   > *:not(:first-child):last-child {
     --cirth-color: var(--cirth-muted-color);
     --cirth-font-weight: unset;
+
     font-size: var(--cirth-font-size-md);
   }
 }

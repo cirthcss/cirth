@@ -203,6 +203,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   --cirth-border-color: var(--cirth-form-element-border-color);
   --cirth-color: var(--cirth-form-element-color);
   --cirth-box-shadow: none;
+
   border: var(--cirth-border-width) solid var(--cirth-border-color);
   border-radius: var(--cirth-border-radius);
   outline: none;
@@ -265,6 +266,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   &:focus {
     --cirth-box-shadow: 0 0 0 var(--cirth-outline-width)
       var(--cirth-form-element-focus-color);
+
     // Invisible in normal rendering, but forced-colors mode strips
     // box-shadow and repaints transparent outlines with a system color —
     // without this, keyboard focus disappears in Windows High Contrast.
@@ -308,10 +310,10 @@ $helper-previous-tags: "input, select, textarea, fieldset";
       [type="range"]
     ) {
     &[aria-invalid] {
-      padding-inline-start: var(--cirth-form-element-spacing-horizontal);
-      padding-inline-end: calc(
-        var(--cirth-form-element-spacing-horizontal) + var(--cirth-space-6)
-      );
+      padding-inline: var(--cirth-form-element-spacing-horizontal)
+        calc(
+          var(--cirth-form-element-spacing-horizontal) + var(--cirth-space-6)
+        );
       background-position: center right var(--cirth-space-3);
       background-size: var(--cirth-size-4) auto;
       background-repeat: no-repeat;
@@ -400,10 +402,8 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   }
 
   &:not([multiple], [size]) {
-    padding-inline-start: var(--cirth-form-element-spacing-horizontal);
-    padding-inline-end: calc(
-      var(--cirth-form-element-spacing-horizontal) + var(--cirth-space-6)
-    );
+    padding-inline: var(--cirth-form-element-spacing-horizontal)
+      calc(var(--cirth-form-element-spacing-horizontal) + var(--cirth-space-6));
     background-image: var(--cirth-icon-chevron);
     background-position: center right var(--cirth-space-3);
     background-size: var(--cirth-size-4) auto;
@@ -440,6 +440,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
         var(--cirth-form-element-spacing-vertical) * 2 +
         var(--cirth-border-width) * 2
     );
+
     background-position: top right var(--cirth-space-3);
     background-size: var(--cirth-size-4) var(--cirth-icon-height);
   }
@@ -457,11 +458,13 @@ $helper-previous-tags: "input, select, textarea, fieldset";
     margin-bottom: var(--cirth-spacing);
     color: var(--cirth-muted-color);
   }
+
   &[aria-invalid="false"] {
     + small {
       color: var(--cirth-ins-color);
     }
   }
+
   &[aria-invalid="true"] {
     + small {
       color: var(--cirth-del-color);

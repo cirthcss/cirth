@@ -47,7 +47,8 @@
   --cirth-background-color: var(--cirth-primary-background);
   --cirth-border-color: var(--cirth-primary-border);
   --cirth-color: var(--cirth-primary-inverse);
-  --cirth-box-shadow: var(--cirth-button-box-shadow, 0 0 0 rgba(0, 0, 0, 0));
+  --cirth-box-shadow: var(--cirth-button-box-shadow, 0 0 0 rgb(0 0 0 / 0%));
+
   padding: var(--cirth-form-element-spacing-vertical)
     var(--cirth-form-element-spacing-horizontal);
   border: var(--cirth-border-width) solid var(--cirth-border-color);
@@ -75,7 +76,7 @@
     --cirth-border-color: var(--cirth-primary-hover-border);
     --cirth-box-shadow: var(
       --cirth-button-hover-box-shadow,
-      0 0 0 rgba(0, 0, 0, 0)
+      0 0 0 rgb(0 0 0 / 0%)
     );
     --cirth-color: var(--cirth-primary-inverse);
   }
@@ -89,8 +90,9 @@
   &:focus-visible,
   &:is([aria-current]:not([aria-current="false"])):focus-visible {
     --cirth-box-shadow:
-      var(--cirth-button-hover-box-shadow, 0 0 0 rgba(0, 0, 0, 0)),
+      var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
       0 0 0 var(--cirth-outline-width) var(--cirth-primary-focus);
+
     // Invisible in normal rendering, but forced-colors mode strips
     // box-shadow and repaints transparent outlines with a system color —
     // without this, keyboard focus disappears in Windows High Contrast.
@@ -115,6 +117,7 @@
     --cirth-background-color: var(--cirth-secondary-background);
     --cirth-border-color: var(--cirth-secondary-border);
     --cirth-color: var(--cirth-secondary-inverse);
+
     cursor: pointer;
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
@@ -126,7 +129,7 @@
     &:focus-visible,
     &:is([aria-current]:not([aria-current="false"])):focus-visible {
       --cirth-box-shadow:
-        var(--cirth-button-hover-box-shadow, 0 0 0 rgba(0, 0, 0, 0)),
+        var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
         0 0 0 var(--cirth-outline-width) var(--cirth-secondary-focus);
     }
   }
@@ -147,7 +150,7 @@
     &:focus-visible,
     &:is([aria-current]:not([aria-current="false"])):focus-visible {
       --cirth-box-shadow:
-        var(--cirth-button-hover-box-shadow, 0 0 0 rgba(0, 0, 0, 0)),
+        var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
         0 0 0 var(--cirth-outline-width) var(--cirth-contrast-focus);
     }
   }
@@ -208,6 +211,7 @@
     --cirth-background-color: var(--cirth-secondary-background);
     --cirth-border-color: var(--cirth-secondary-border);
     --cirth-color: var(--cirth-secondary-inverse);
+
     cursor: pointer;
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
@@ -218,7 +222,7 @@
 
     &:focus-visible {
       --cirth-box-shadow:
-        var(--cirth-button-hover-box-shadow, 0 0 0 rgba(0, 0, 0, 0)),
+        var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
         0 0 0 var(--cirth-outline-width) var(--cirth-secondary-focus);
     }
   }

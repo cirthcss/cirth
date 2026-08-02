@@ -37,6 +37,7 @@ $cobalt-300: oklch(72% 0.075 258deg);
   --cirth-primary-underline: #{color.change($cobalt-800, $alpha: 0.5)};
   --cirth-primary-hover: #{$cobalt-900};
   --cirth-primary-hover-background: #{$cobalt-850};
+
   // Composites to >= 3:1 against the cool paper canvas (WCAG 1.4.11 for
   // focus indicators)
   --cirth-primary-focus: #{color.change($cobalt-600, $alpha: 0.7)};
@@ -58,6 +59,7 @@ $cobalt-300: oklch(72% 0.075 258deg);
   --cirth-primary-underline: #{color.change($cobalt-400, $alpha: 0.5)};
   --cirth-primary-hover: #{$cobalt-300};
   --cirth-primary-hover-background: #{$cobalt-750};
+
   // Composites to >= 3:1 against the dark background (WCAG 1.4.11)
   --cirth-primary-focus: #{color.change($cobalt-400, $alpha: 0.7)};
 

@@ -43,7 +43,7 @@
   &[data-placement="top"]::after,
   &::after {
     padding: 0;
-    transform: translate(-50%, 0rem);
+    transform: translate(-50%, 0);
     border-top: 0.3rem solid;
     border-right: 0.3rem solid transparent;
     border-left: 0.3rem solid transparent;
@@ -61,7 +61,7 @@
       transform: translate(-50%, 0.25rem);
     }
 
-    &:after {
+    &::after {
       transform: translate(-50%, -0.3rem);
       border: 0.3rem solid transparent;
       border-bottom: 0.3rem solid;
@@ -71,14 +71,11 @@
   &[data-placement="left"] {
     &::before,
     &::after {
-      top: 50%;
-      right: 100%;
-      bottom: auto;
-      left: auto;
+      inset: 50% 100% auto auto;
       transform: translate(-0.25rem, -50%);
     }
 
-    &:after {
+    &::after {
       transform: translate(0.3rem, -50%);
       border: 0.3rem solid transparent;
       border-left: 0.3rem solid;
@@ -88,14 +85,11 @@
   &[data-placement="right"] {
     &::before,
     &::after {
-      top: 50%;
-      right: auto;
-      bottom: auto;
-      left: 100%;
+      inset: 50% auto auto 100%;
       transform: translate(0.25rem, -50%);
     }
 
-    &:after {
+    &::after {
       transform: translate(-0.3rem, -50%);
       border: 0.3rem solid transparent;
       border-right: 0.3rem solid;
@@ -110,6 +104,7 @@
       opacity: 1;
     }
   }
+
   // Animations, excluding touch devices
   @media (hover: hover) and (pointer: fine) {
     // Default (top)
@@ -118,6 +113,7 @@
       &::before,
       &::after {
         --cirth-tooltip-slide-to: translate(-50%, -0.25rem);
+
         transform: translate(-50%, 0.75rem);
         animation-duration: var(--cirth-duration-normal);
         animation-fill-mode: forwards;
@@ -127,6 +123,7 @@
 
       &::after {
         --cirth-tooltip-caret-slide-to: translate(-50%, 0rem);
+
         transform: translate(-50%, -0.25rem);
         animation-name: tooltip-caret-slide;
       }
@@ -139,12 +136,14 @@
         &::before,
         &::after {
           --cirth-tooltip-slide-to: translate(-50%, 0.25rem);
+
           transform: translate(-50%, -0.75rem);
           animation-name: tooltip-slide;
         }
 
         &::after {
           --cirth-tooltip-caret-slide-to: translate(-50%, -0.3rem);
+
           transform: translate(-50%, -0.5rem);
           animation-name: tooltip-caret-slide;
         }
@@ -158,12 +157,14 @@
         &::before,
         &::after {
           --cirth-tooltip-slide-to: translate(-0.25rem, -50%);
+
           transform: translate(0.75rem, -50%);
           animation-name: tooltip-slide;
         }
 
         &::after {
           --cirth-tooltip-caret-slide-to: translate(0.3rem, -50%);
+
           transform: translate(0.05rem, -50%);
           animation-name: tooltip-caret-slide;
         }
@@ -177,12 +178,14 @@
         &::before,
         &::after {
           --cirth-tooltip-slide-to: translate(0.25rem, -50%);
+
           transform: translate(-0.75rem, -50%);
           animation-name: tooltip-slide;
         }
 
         &::after {
           --cirth-tooltip-caret-slide-to: translate(-0.3rem, -50%);
+
           transform: translate(-0.05rem, -50%);
           animation-name: tooltip-caret-slide;
         }
@@ -201,7 +204,8 @@
     50% {
       opacity: 0;
     }
-    to {
+
+    100% {
       transform: var(--cirth-tooltip-caret-slide-to);
       opacity: 1;
     }

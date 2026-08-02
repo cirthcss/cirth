@@ -38,6 +38,7 @@ $coral-250: oklch(80% 0.1 35deg);
   --cirth-primary-underline: #{color.change($coral-550, $alpha: 0.5)};
   --cirth-primary-hover: #{$coral-650};
   --cirth-primary-hover-background: #{$coral-600};
+
   // Composites to >= 3:1 against the blush paper canvas (WCAG 1.4.11 for
   // focus indicators) — 0.75, not 0.7: on paper 0.7 lands at 2.99:1
   --cirth-primary-focus: #{color.change($coral-550, $alpha: 0.75)};
@@ -60,6 +61,7 @@ $coral-250: oklch(80% 0.1 35deg);
   --cirth-primary-underline: #{color.change($coral-350, $alpha: 0.5)};
   --cirth-primary-hover: #{$coral-250};
   --cirth-primary-hover-background: #{$coral-500};
+
   // Composites to >= 3:1 against the dark background (WCAG 1.4.11)
   --cirth-primary-focus: #{color.change($coral-350, $alpha: 0.7)};
 

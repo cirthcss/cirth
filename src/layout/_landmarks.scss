@@ -55,16 +55,20 @@ $container-root-selector: "body";
     // <header>, <main>, <footer> as containers
     @if not $enable-classes {
       $first-breakpoint: true;
+
       width: 100%;
       margin-inline: auto;
       padding: var(--cirth-block-spacing-vertical)
         var(--cirth-block-spacing-horizontal);
+
       @each $key, $values in $breakpoints {
         @if $values {
           @media (min-width: map.get($values, "breakpoint")) {
             max-width: map.get($values, "viewport");
+
             @if $first-breakpoint {
               $first-breakpoint: false;
+
               padding-inline: 0;
             }
           }

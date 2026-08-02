@@ -32,6 +32,7 @@
   --cirth-primary-hover-background: #{$amber-600};
   --cirth-primary-hover-border: var(--cirth-primary-hover-background);
   --cirth-primary-hover-underline: var(--cirth-primary-hover);
+
   // Focus rings composite to >= 3:1 against the page background (WCAG
   // 1.4.11 as applied to focus indicators) — don't lower these alphas.
   --cirth-primary-focus: #{color.change($amber-550, $alpha: 0.75)};
@@ -92,8 +93,8 @@
   // Button
   // To disable box-shadow, remove the var or set to '0 0 0 rgba(0, 0, 0, 0)'
   // Don't use, 'none, 'false, 'null', '0', etc.
-  --cirth-button-box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-  --cirth-button-hover-box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  --cirth-button-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
+  --cirth-button-hover-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
 
   // Table
   --cirth-table-border-color: var(--cirth-muted-border-color);
@@ -121,6 +122,7 @@
       $method: oklch
     )};
   --cirth-form-element-selected-background-color: #{$neutral-100};
+
   // >= 3:1 against both the field and the page background (WCAG 1.4.11).
   // 450, not 400: on the paper canvas the 400 step drops to 2.92:1.
   --cirth-form-element-border-color: #{$neutral-450};
@@ -147,7 +149,7 @@
   --cirth-switch-background-color: #{$neutral-450};
   --cirth-switch-checked-background-color: var(--cirth-primary-background);
   --cirth-switch-color: #{$white};
-  --cirth-switch-thumb-box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  --cirth-switch-thumb-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
 
   // Range (input[type="range"])
   --cirth-range-border-color: #{$neutral-100};

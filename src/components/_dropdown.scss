@@ -25,6 +25,7 @@
         );
         margin-inline-start: var(--cirth-space-1);
         float: right;
+
         // The float pins the marker at the content edge, i.e. the trigger's
         // horizontal padding away from its border — but a regular <select>
         // paints its chevron at --cirth-space-3 from the border (see
@@ -141,7 +142,7 @@
 
     > summary {
       &::after {
-        transform: rotate(0deg) translateX(0rem);
+        transform: rotate(0deg) translateX(0);
       }
 
       &:not([role]) {
@@ -283,6 +284,7 @@
       cursor: default;
     }
   }
+
   // Label
   // ––––––––––––––––––––
   #{$parent-selector} label > details.dropdown {
@@ -319,7 +321,7 @@
 
     #{$parent-selector} nav details.dropdown > summary {
       &::after {
-        transform: rotate(0deg) translateX(0rem);
+        transform: rotate(0deg) translateX(0);
       }
     }
   }

@@ -16,12 +16,15 @@
 
   #{$parent-selector} .container {
     $first-breakpoint: true;
+
     @each $key, $values in $breakpoints {
       @if $values {
         @media (min-width: map.get($values, "breakpoint")) {
           max-width: map.get($values, "viewport");
+
           @if $first-breakpoint {
             $first-breakpoint: false;
+
             padding-inline: 0;
           }
         }

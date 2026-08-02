@@ -17,6 +17,7 @@
     ) {
     --cirth-icon-position: var(--cirth-space-3);
     --cirth-icon-width: var(--cirth-size-4);
+
     padding-inline-end: calc(
       var(--cirth-icon-width) + var(--cirth-icon-position)
     );
@@ -41,8 +42,7 @@
 #{$parent-selector} [type="week"] {
   &::-webkit-calendar-picker-indicator {
     width: var(--cirth-icon-width);
-    margin-inline-start: var(--cirth-icon-position);
-    margin-inline-end: calc(var(--cirth-icon-width) * -1);
+    margin-inline: var(--cirth-icon-position) calc(var(--cirth-icon-width) * -1);
     opacity: 0;
   }
 }

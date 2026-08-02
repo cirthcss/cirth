@@ -10,6 +10,7 @@
 
 #{$parent-selector} [type="file"] {
   --cirth-color: var(--cirth-muted-color);
+
   margin-inline-start: calc(var(--cirth-outline-width) * -1); // 1
   padding: calc(var(--cirth-form-element-spacing-vertical) * 0.5) 0;
   padding-inline-start: var(--cirth-outline-width); // 1
@@ -33,7 +34,7 @@
   &:focus {
     &::file-selector-button {
       --cirth-box-shadow:
-        var(--cirth-button-hover-box-shadow, 0 0 0 rgba(0, 0, 0, 0)),
+        var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
         0 0 0 var(--cirth-outline-width) var(--cirth-secondary-focus);
     }
   }

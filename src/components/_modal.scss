@@ -15,10 +15,7 @@
   display: flex;
   z-index: var(--cirth-z-index-modal);
   position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  inset: 0;
   align-items: center;
   justify-content: center;
   width: inherit;
@@ -40,6 +37,7 @@
     }
 
     width: 100%;
+
     // dvh tracks mobile Safari's collapsing URL bar, so the footer stays
     // reachable (upstream #514); the vh line is the older-browser fallback
     max-height: calc(100vh - var(--cirth-spacing) * 2);
@@ -138,7 +136,7 @@
 
 @if $enable-classes {
   @include selectors.state(".modal-is-open") {
-    padding-inline-end: var(--cirth-scrollbar-width, 0px);
+    padding-inline-end: var(--cirth-scrollbar-width, 0);
     overflow: hidden;
     pointer-events: none;
     touch-action: none;
