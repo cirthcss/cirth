@@ -7,6 +7,8 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-08-02
+
 ### Changed
 
 - **Breaking: `.grid` now wraps; `.row` takes over its old behavior.**
@@ -558,7 +560,8 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
-[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.7.0...master
+[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.8.0...master
+[0.8.0]: https://github.com/cirthcss/cirth/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/cirthcss/cirth/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/cirthcss/cirth/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/cirthcss/cirth/compare/v0.4.0...v0.5.0
