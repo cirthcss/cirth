@@ -7,10 +7,7 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
-Reset modernization & structural utilities: from a source-level comparison
-of the reboot layer against modern-normalize v3.0.1 and Tailwind Preflight
-v4 — Cirth's reboot descended from normalize v8 (2018) + sanitize v13
-(2021), years past the Browserslist floor those resets still patch for.
+## [0.7.0] - 2026-08-02
 
 ### Added
 
@@ -519,7 +516,8 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
-[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.6.0...master
+[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.7.0...master
+[0.7.0]: https://github.com/cirthcss/cirth/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/cirthcss/cirth/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/cirthcss/cirth/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/cirthcss/cirth/compare/v0.3.0...v0.4.0
