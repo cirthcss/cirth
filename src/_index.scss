@@ -2,7 +2,8 @@
 @use "layout/document"; // html
 @use "layout/landmarks"; // body, header, main, footer
 @use "layout/section"; // section
-@use "layout/container"; // .container, .container-fluid
+@use "layout/container"; // .container, .container-fluid, .breakout
+@use "layout/row"; // .row
 @use "layout/grid"; // .grid
 @use "layout/overflow-auto"; // .overflow-auto
 

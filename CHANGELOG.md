@@ -7,6 +7,48 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking: `.grid` now wraps; `.row` takes over its old behavior.**
+  `.grid` used to promise a grid but deliver a single equal-column row
+  (`minmax(0%, 1fr)` never wraps). If you were using `.grid` for that
+  single-row behavior, rename it to `.row` — markup and behavior are
+  unchanged, only the class name is. `.grid` itself is now an
+  intrinsically responsive wrapping grid: `grid-template-columns:
+  repeat(auto-fit, minmax(min(100%, var(--cirth-grid-min-column)), 1fr))`,
+  new token `--cirth-grid-min-column` (default `12rem`). Columns follow
+  available space and wrap onto new rows instead of squeezing into one;
+  the old `md`-breakpoint media query is gone, replaced by `min()`
+  collapsing to one column on narrow viewports for free.
+- **Breaking: `.container`/`.container-fluid` repurposed as a fluid,
+  gutter-permanent grid with a new `.breakout` utility.** `.container`'s
+  five stepped breakpoints (510px–1450px) are gone, replaced by a
+  three-track CSS grid — two gutter tracks (`--cirth-spacing`) that never
+  drop out, and a center track holding content, capped at new token
+  `--cirth-container-max-width` (default `60rem`) for `.container`,
+  uncapped for `.container-fluid`. The cap resizes continuously with the
+  viewport instead of snapping at breakpoints. New `.breakout` utility
+  (`grid-column: 1 / -1`) lets a direct child of `.container` — a wide
+  table, image, or figure — fill the container's own box instead of
+  stopping at the measure; unlike the classic `100vw` trick, it escapes
+  only to the container's own edges, so it stays correct inside layouts
+  where the container itself isn't centered in the viewport (a sidebar
+  shell, for example), and it doesn't have the `100vw` trick's
+  scrollbar-gutter overflow bug. The classless build's `body >
+  header/main/footer` (`layout/_landmarks.scss`) adopts the identical
+  grid/token instead of its own separate stepped-width loop.
+
+### Added
+
+- **`.row`** class: single-row, equal-width columns — stacked below the
+  `md` breakpoint, one row from `md` up. Same behavior `.grid` used to
+  have, under an honest name. Classes build only.
+- **`.breakout`** utility: see above. Classes build only.
+- New custom properties: `--cirth-grid-min-column` (`.grid`'s minimum
+  column width, default `12rem`) and `--cirth-container-max-width`
+  (`.container`'s center-track cap, default `60rem`, also consumed by
+  the classless landmarks grid).
+
 ## [0.7.0] - 2026-08-02
 
 ### Added

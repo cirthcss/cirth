@@ -389,7 +389,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 }
 
 @if $enable-classes {
-  $helper-previous-tags: $helper-previous-tags + ", .grid";
+  $helper-previous-tags: $helper-previous-tags + ", .row";
 }
 
 #{$parent-selector} :where(#{$helper-previous-tags}) {

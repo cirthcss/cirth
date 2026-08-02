@@ -1,0 +1,44 @@
+@use "sass:map";
+@use "../breakpoints" as *;
+@use "../config" as *;
+
+@if $enable-classes {
+  /**
+   * Row
+   * Single-row, equal-width columns: stacked below md, one row of
+   * equal columns from md up. Main use case is form rows and stat
+   * groups, where stacking on mobile is the right default.
+   */
+
+  #{$parent-selector} .row {
+    gap: var(--cirth-grid-row-gap) var(--cirth-grid-column-gap);
+    display: grid;
+    grid-template-columns: 1fr;
+
+    @if map.get($breakpoints, "md") {
+      @media (min-width: map.get(map.get($breakpoints, "md"), "breakpoint")) {
+        grid-template-columns: repeat(auto-fit, minmax(0%, 1fr));
+      }
+    }
+
+    & > * {
+      min-width: 0; // HACK for children in overflow
+    }
+
+    // Form controls carry a stacking margin-bottom; inside a row the
+    // row-gap already provides that rhythm and the two would stack,
+    // misaligning columns (upstream #738)
+    &
+      > :where(
+        button,
+        [type="submit"],
+        [type="reset"],
+        [role="button"],
+        input:not([type="checkbox"], [type="radio"]),
+        select,
+        textarea
+      ) {
+      margin-bottom: 0;
+    }
+  }
+}

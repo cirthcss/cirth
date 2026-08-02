@@ -1,34 +1,45 @@
-@use "sass:map";
-@use "../breakpoints" as *;
 @use "../config" as *;
 
 @if $enable-classes {
   /**
    * Container
+   * A three-track grid: two gutter tracks that never drop out, and a
+   * center track holding content. `.container` caps the center track at
+   * a reading-friendly measure; `.container-fluid` leaves it uncapped
+   * (edge-to-edge, gutters only). The cap resizes continuously with the
+   * viewport instead of snapping at breakpoints.
    */
 
   #{$parent-selector} .container,
   #{$parent-selector} .container-fluid {
-    width: 100%;
-    margin-inline: auto;
-    padding-inline: var(--cirth-spacing);
+    display: grid;
+    grid-template-columns:
+      minmax(var(--cirth-spacing), 1fr)
+      minmax(0, 1fr)
+      minmax(var(--cirth-spacing), 1fr);
+
+    & > * {
+      grid-column: 2;
+    }
   }
 
   #{$parent-selector} .container {
-    $first-breakpoint: true;
+    grid-template-columns:
+      minmax(var(--cirth-spacing), 1fr)
+      minmax(0, var(--cirth-container-max-width))
+      minmax(var(--cirth-spacing), 1fr);
+  }
 
-    @each $key, $values in $breakpoints {
-      @if $values {
-        @media (min-width: map.get($values, "breakpoint")) {
-          max-width: map.get($values, "viewport");
+  /**
+   * Breakout
+   * Lets a direct child of `.container` fill the container's own box
+   * instead of stopping at the measure (a wide table, image, figure).
+   * Breaks out to the container's *own* edges, not the viewport, so it
+   * stays correct regardless of what surrounds the container.
+   * `.container-fluid` doesn't need it — already full width.
+   */
 
-          @if $first-breakpoint {
-            $first-breakpoint: false;
-
-            padding-inline: 0;
-          }
-        }
-      }
-    }
+  #{$parent-selector} .breakout {
+    grid-column: 1 / -1;
   }
 }

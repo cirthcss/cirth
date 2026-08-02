@@ -47,9 +47,17 @@
   --cirth-block-spacing-vertical: var(--cirth-spacing);
   --cirth-block-spacing-horizontal: var(--cirth-spacing);
 
+  // `.container` center-track cap (also consumed classless, by the
+  // body > header/main/footer grid in layout/_landmarks.scss) — a
+  // reading/app-shell-friendly measure, not full-viewport.
+  --cirth-container-max-width: 60rem;
+
   @if $enable-classes {
     --cirth-grid-column-gap: var(--cirth-spacing);
     --cirth-grid-row-gap: var(--cirth-spacing);
+
+    // `.grid` minimum column width before wrapping to a new row.
+    --cirth-grid-min-column: 12rem;
   }
 
   // Spacings for form elements and button

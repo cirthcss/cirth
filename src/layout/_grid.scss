@@ -1,23 +1,21 @@
-@use "sass:map";
-@use "../breakpoints" as *;
 @use "../config" as *;
 
 @if $enable-classes {
   /**
    * Grid
-   * Minimal grid system with auto-layout columns
+   * Intrinsically responsive wrapping grid: columns follow available
+   * space, wrapping into a new row once children no longer fit at
+   * --cirth-grid-min-column. min(100%, …) collapses to one column on
+   * narrow viewports for free, so no breakpoint is needed.
    */
 
   #{$parent-selector} .grid {
     gap: var(--cirth-grid-row-gap) var(--cirth-grid-column-gap);
     display: grid;
-    grid-template-columns: 1fr;
-
-    @if map.get($breakpoints, "md") {
-      @media (min-width: map.get(map.get($breakpoints, "md"), "breakpoint")) {
-        grid-template-columns: repeat(auto-fit, minmax(0%, 1fr));
-      }
-    }
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, var(--cirth-grid-min-column)), 1fr)
+    );
 
     & > * {
       min-width: 0; // HACK for children in overflow

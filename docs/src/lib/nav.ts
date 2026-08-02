@@ -38,6 +38,7 @@ export const sidebar: SidebarGroup[] = [
 			{ text: "Landmarks", link: "/layout/landmarks" },
 			{ text: "Section", link: "/layout/section" },
 			{ text: "Container", link: "/layout/container" },
+			{ text: "Row", link: "/layout/row" },
 			{ text: "Grid", link: "/layout/grid" },
 			{ text: "Overflow auto", link: "/layout/overflow-auto" },
 		],
@@ -88,6 +89,7 @@ export const sidebar: SidebarGroup[] = [
 			{ text: "Reduce motion", link: "/utilities/reduce-motion" },
 			{ text: "Screen-reader only", link: "/utilities/sr-only" },
 			{ text: "Truncate", link: "/utilities/truncate" },
+			{ text: "Breakout", link: "/utilities/breakout" },
 		],
 	},
 	{
