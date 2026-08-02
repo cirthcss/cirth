@@ -1,6 +1,6 @@
 const fs = require("node:fs");
 const path = require("node:path");
-const { spawnSync } = require("node:child_process");
+const { runSync } = require("./lib/run-sync");
 
 // Presets (src/presets/) are plain custom-property overrides compiled into
 // dist/presets/ and treated exactly like the rest of dist/: transformed by
@@ -24,18 +24,7 @@ const getCssFiles = (foldername) =>
 		)
 		.sort();
 
-const runLightningCss = (args) => {
-	const result = spawnSync(lightningcssBinary, args, { stdio: "inherit" });
-
-	if (result.error) {
-		console.error(result.error.message);
-		process.exit(1);
-	}
-
-	if (result.status !== 0) {
-		process.exit(result.status || 1);
-	}
-};
+const runLightningCss = (args) => runSync(lightningcssBinary, args);
 
 const transformFolder = (foldername) => {
 	getCssFiles(foldername).forEach((filename) => {

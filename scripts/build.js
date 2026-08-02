@@ -1,7 +1,7 @@
-const { spawnSync } = require("node:child_process");
 const fs = require("node:fs");
 const path = require("node:path");
-const sass = require("sass-embedded");
+const { compileScssFolder } = require("./lib/compile-scss");
+const { runSync } = require("./lib/run-sync");
 
 const projectRoot = path.join(__dirname, "..");
 const binFolder = path.join(projectRoot, "node_modules/.bin");
@@ -11,54 +11,20 @@ const outputFolder = path.join(projectRoot, "dist");
 
 const getBinary = (name) => path.join(binFolder, `${name}${binExtension}`);
 
-// Compile only public top-level Cirth entrypoints; internals are pulled in through @use.
-const getScssEntries = () =>
-	fs
-		.readdirSync(sourceFolder, { withFileTypes: true })
-		.filter(
-			(dirent) =>
-				dirent.isFile() &&
-				dirent.name.startsWith("cirth") &&
-				dirent.name.endsWith(".scss"),
-		)
-		.map((dirent) => path.join(sourceFolder, dirent.name))
-		.sort();
-
 const run = (label, command, args) => {
 	console.log(`[@cirthcss/cirth] ${label}`);
-
-	const result = spawnSync(command, args, {
-		cwd: projectRoot,
-		stdio: "inherit",
-		env: process.env,
-	});
-
-	if (result.error) {
-		console.error(result.error.message);
-		process.exit(1);
-	}
-
-	if (result.status !== 0) {
-		process.exit(result.status || 1);
-	}
+	runSync(command, args, { cwd: projectRoot, env: process.env });
 };
 
-// Use the Sass Embedded API directly so the build does not depend on an ambiguous sass CLI binary.
+// Compile only public top-level Cirth entrypoints; internals are pulled in
+// through @use. Uses the Sass Embedded API directly (via compileScssFolder)
+// so the build does not depend on an ambiguous sass CLI binary.
 const compileCss = () => {
 	console.log("[@cirthcss/cirth] Compile");
-
-	getScssEntries().forEach((source) => {
-		const output = path.join(
-			outputFolder,
-			path.basename(source).replace(/\.scss$/, ".css"),
-		);
-		const result = sass.compile(source, {
-			sourceMap: false,
-			style: "expanded",
-		});
-
-		fs.mkdirSync(path.dirname(output), { recursive: true });
-		fs.writeFileSync(output, result.css);
+	compileScssFolder({
+		sourceFolder,
+		outputFolder,
+		filter: (dirent) => dirent.name.startsWith("cirth"),
 	});
 };
 
