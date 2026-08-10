@@ -44,7 +44,7 @@
     <img alt="GitHub Release" src="https://img.shields.io/github/v/release/cirthcss/cirth?include_prereleases">
   </a>
   <img alt="Status" src="https://img.shields.io/badge/status-active%20development-blue">
-  <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
+  <img alt="License" src="https://img.shields.io/badge/license-Apache--2.0-blue">
 </p>
 
 ## Quickstart
@@ -308,4 +308,4 @@ Core principles:
 
 ## License
 
-Licensed under the [MIT License](LICENSE.md).
+Licensed under the [Apache License 2.0](LICENSE.md). See [NOTICE.md](NOTICE.md) for attribution to the original Pico CSS project this is forked from.

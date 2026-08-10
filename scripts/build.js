@@ -9,8 +9,14 @@ const binExtension = process.platform === "win32" ? ".cmd" : "";
 const sourceFolder = path.join(projectRoot, "src");
 const outputFolder = path.join(projectRoot, "dist");
 
+/** @param {string} name */
 const getBinary = (name) => path.join(binFolder, `${name}${binExtension}`);
 
+/**
+ * @param {string} label
+ * @param {string} command
+ * @param {readonly string[]} args
+ */
 const run = (label, command, args) => {
 	console.log(`[@cirthcss/cirth] ${label}`);
 	runSync(command, args, { cwd: projectRoot, env: process.env });

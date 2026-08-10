@@ -35,8 +35,13 @@ const allFiles = [...rootBuilds, ...presetBuilds].flatMap(({ name }) => [
 	`${name}.min.css`,
 ]);
 
+/** @type {string[]} */
 const failures = [];
 
+/**
+ * @param {string} file
+ * @param {string} message
+ */
 const fail = (file, message) => {
 	failures.push(`dist/${file}: ${message}`);
 };
@@ -74,20 +79,31 @@ for (const file of allFiles) {
 
 // The expanded and minified files come from the same transform, so the
 // structural checks parse the expanded file of each variant.
+/** @param {string} file */
 const parseDist = (file) => {
 	const source = fs.readFileSync(path.join(distDir, file), "utf8");
 	return postcss.parse(source, { from: file });
 };
 
+/** @param {import("postcss").Rule} rule */
 const isInsideKeyframes = (rule) => {
-	for (let node = rule.parent; node; node = node.parent) {
-		if (node.type === "atrule" && /keyframes$/i.test(node.name)) {
+	/** @type {import("postcss").Container | import("postcss").Document | undefined} */
+	let node = rule.parent;
+	for (; node; node = node.parent) {
+		if (
+			node.type === "atrule" &&
+			/keyframes$/i.test(/** @type {import("postcss").AtRule} */ (node).name)
+		) {
 			return true;
 		}
 	}
 	return false;
 };
 
+/**
+ * @param {import("postcss").Root} root
+ * @param {(rule: import("postcss").Rule) => void} callback
+ */
 const walkStyleRules = (root, callback) => {
 	root.walkRules((rule) => {
 		if (!isInsideKeyframes(rule)) {
@@ -96,10 +112,14 @@ const walkStyleRules = (root, callback) => {
 	});
 };
 
+/** @param {string} selector */
 const listClasses = (selector) => {
+	/** @type {string[]} */
 	const classes = [];
 	selectorParser((nodes) => {
-		nodes.walkClasses((node) => classes.push(node.value));
+		nodes.walkClasses((node) => {
+			classes.push(node.value);
+		});
 	}).processSync(selector);
 	return classes;
 };
@@ -118,6 +138,7 @@ const STATE_NONE = 0;
 const STATE_AT = 1;
 const STATE_INSIDE = 2;
 
+/** @param {import("postcss-selector-parser").Node} node */
 const compoundScopeState = (node) => {
 	if (node.type === "class" && node.value === scopeClass) {
 		return STATE_AT;
@@ -135,6 +156,7 @@ const compoundScopeState = (node) => {
 	return STATE_NONE;
 };
 
+/** @param {import("postcss-selector-parser").Selector} selectorNode */
 const selectorScopeState = (selectorNode) => {
 	let state = STATE_NONE;
 	for (const node of selectorNode.nodes) {
@@ -153,6 +175,7 @@ const selectorScopeState = (selectorNode) => {
 	return state;
 };
 
+/** @param {string} selector */
 const isScopedSelector = (selector) => {
 	let scoped = false;
 	selectorParser((nodes) => {
@@ -200,6 +223,7 @@ for (const { name, classless, scoped } of rootBuilds) {
 // Presets are single-knob token overlays: only custom-property
 // declarations, only on theme roots (:root/:host/[data-theme]/.cirth),
 // only inside plain @media blocks.
+/** @param {import("postcss-selector-parser").Node} node */
 const isPresetSelectorNode = (node) => {
 	switch (node.type) {
 		case "selector":

@@ -14,7 +14,9 @@ const {
 assertDocsBuilt("visual.spec");
 
 // One static docs server per worker process, on an ephemeral port.
+/** @type {import("node:http").Server} */
 let server;
+/** @type {string} */
 let origin;
 
 test.beforeAll(async () => {

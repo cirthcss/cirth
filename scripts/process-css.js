@@ -16,6 +16,7 @@ const lightningcssBinary = path.join(
 const mode = process.argv[2];
 
 // Lightning CSS works on the expanded files; minified files are regenerated separately.
+/** @param {string} foldername */
 const getCssFiles = (foldername) =>
 	fs
 		.readdirSync(foldername)
@@ -24,8 +25,10 @@ const getCssFiles = (foldername) =>
 		)
 		.sort();
 
+/** @param {readonly string[]} args */
 const runLightningCss = (args) => runSync(lightningcssBinary, args);
 
+/** @param {string} foldername */
 const transformFolder = (foldername) => {
 	getCssFiles(foldername).forEach((filename) => {
 		const source = path.join(foldername, filename);
@@ -37,6 +40,7 @@ const transformFolder = (foldername) => {
 	});
 };
 
+/** @param {string} foldername */
 const minifyFolder = (foldername) => {
 	getCssFiles(foldername).forEach((filename) => {
 		const source = path.join(foldername, filename);

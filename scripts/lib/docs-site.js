@@ -11,6 +11,7 @@ const path = require("node:path");
 const projectRoot = path.join(__dirname, "../..");
 const docsDist = path.join(projectRoot, "docs/dist");
 
+/** @param {string} label */
 const assertDocsBuilt = (label) => {
 	if (!fs.existsSync(path.join(docsDist, "index.html"))) {
 		throw new Error(
@@ -19,6 +20,11 @@ const assertDocsBuilt = (label) => {
 	}
 };
 
+/**
+ * @param {string} [dir]
+ * @param {string} [prefix]
+ * @returns {string[]}
+ */
 const listPages = (dir = docsDist, prefix = "") => {
 	const pages = [];
 	for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -39,6 +45,7 @@ const listPages = (dir = docsDist, prefix = "") => {
 	return pages.sort();
 };
 
+/** @type {Record<string, string>} */
 const contentTypes = {
 	".html": "text/html; charset=utf-8",
 	".css": "text/css",
@@ -56,7 +63,7 @@ const contentTypes = {
 const createServer = () =>
 	http.createServer((request, response) => {
 		const pathname = decodeURIComponent(
-			new URL(request.url, "http://localhost").pathname,
+			new URL(request.url ?? "/", "http://localhost").pathname,
 		);
 		let filePath = path.join(docsDist, pathname);
 
@@ -83,9 +90,11 @@ const createServer = () =>
 	});
 
 // Listens on an ephemeral port; resolves to the origin URL.
+/** @param {import("node:http").Server} server */
 const startServer = async (server) => {
-	await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
-	return `http://127.0.0.1:${server.address().port}`;
+	await new Promise((resolve) => server.listen(0, "127.0.0.1", () => resolve(undefined)));
+	const address = /** @type {import("node:net").AddressInfo} */ (server.address());
+	return `http://127.0.0.1:${address.port}`;
 };
 
 module.exports = { assertDocsBuilt, createServer, docsDist, listPages, startServer };

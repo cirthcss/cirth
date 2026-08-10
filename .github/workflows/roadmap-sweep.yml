@@ -1,0 +1,56 @@
+name: Roadmap sweep
+
+# Moves every roadmap item sitting in "Done" to "Released" once a GitHub
+# Release is published. "Done" means an issue closed after landing on
+# master; "Released" means it actually shipped in a tagged version — the
+# two are different states because an issue can sit closed-but-unreleased
+# between merge and the next release cut. A stateless full sweep on every
+# release is correct by construction: anything still in Done at release
+# time was, by definition, part of what just shipped.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sweep:
+    name: Move "Done" roadmap items to "Released"
+    if: ${{ !github.event.release.prerelease }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Move Done items to Released
+        env:
+          # Default GITHUB_TOKEN cannot write to org-owned Projects (v2) —
+          # this needs a PAT (classic, "project" scope, or fine-grained
+          # with Projects: read/write on the cirthcss org) stored as the
+          # PROJECTS_TOKEN repo secret.
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          project_id="PVT_kwDOEWByH84BfrIr"
+          status_field_id="PVTSSF_lADOEWByH84BfrIrzhZ8X98"
+          released_option_id="b35c0d11"
+
+          # Bump --limit if the roadmap project ever grows past this.
+          done_items=$(gh project item-list 1 --owner cirthcss --format json --limit 200 \
+            --jq '.items[] | select(.status == "✅ Done") | .id')
+
+          if [ -z "$done_items" ]; then
+            echo "No items in Done status — nothing to release."
+            exit 0
+          fi
+
+          echo "$done_items" | while IFS= read -r item_id; do
+            echo "Moving $item_id to Released"
+            gh project item-edit \
+              --project-id "$project_id" \
+              --id "$item_id" \
+              --field-id "$status_field_id" \
+              --single-select-option-id "$released_option_id"
+          done

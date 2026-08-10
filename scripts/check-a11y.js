@@ -21,7 +21,16 @@ const {
 const baselinePath = path.join(__dirname, "a11y-baseline.json");
 const updateBaseline = process.argv.includes("--update-baseline");
 
+/**
+ * @typedef {{
+ *   page: string,
+ *   scheme: "light" | "dark",
+ *   violation: import("axe-core").Result,
+ * }} Finding
+ */
+
 const wcagTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
+/** @type {("light" | "dark")[]} */
 const schemes = ["light", "dark"];
 const viewport = { width: 1440, height: 900 };
 const concurrency = 4;
@@ -29,7 +38,7 @@ const concurrency = 4;
 try {
 	assertDocsBuilt("check-a11y");
 } catch (error) {
-	console.error(error.message);
+	console.error(/** @type {Error} */ (error).message);
 	process.exit(1);
 }
 
@@ -46,6 +55,7 @@ const run = async () => {
 	const origin = await startServer(server);
 
 	const browser = await chromium.launch();
+	/** @type {Finding[]} */
 	const found = [];
 
 	for (const scheme of schemes) {
@@ -84,6 +94,7 @@ const run = async () => {
 
 run()
 	.then((found) => {
+		/** @param {Finding} finding */
 		const keyOf = ({ page, scheme, violation }) =>
 			`${page} [${scheme}] ${violation.id}`;
 		const foundKeys = new Set(found.map(keyOf));

@@ -11,6 +11,7 @@ const legacyPrefixPattern = /\$css-var-prefix/g;
 const sassExpressionPattern =
 	/\$[a-zA-Z_-]|\b[a-z][a-z0-9-]*\.[a-z][a-z0-9-]*\s*\(/;
 
+/** @param {string} folder @returns {string[]} */
 const getScssFiles = (folder) =>
 	fs
 		.readdirSync(folder, { withFileTypes: true })
@@ -25,6 +26,7 @@ const getScssFiles = (folder) =>
 		})
 		.sort();
 
+/** @type {string[]} */
 const violations = [];
 let checkedProperties = 0;
 

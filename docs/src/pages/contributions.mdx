@@ -47,7 +47,20 @@ npm run docs:dev   # run this docs site locally
   light/dark schemes. Most visual changes start here, not in components.
 * `src/presets/` contains `cobalt` and `coral`, token override presets published
   alongside the default build.
-* `docs/` contains this site (Astro), styled by Cirth's own build.
+* `docs/` contains this site (Astro), styled by Cirth's own build — and
+  also doubles as the fixture the library's own QA runs against: `tests/`
+  (visual regression) and `check:a11y` render the built docs site to catch
+  unintended rendering/accessibility changes from a source edit. Kept in
+  this repository rather than a dedicated one **on purpose, for now**: the
+  library is still under heavy, fast-moving revision, co-locating docs
+  with source keeps a change and its matching docs update in the same
+  commit checked by the same CI, and the QA coupling above means anyone
+  doing serious library work needs the docs build regardless of where it
+  lives. Whether to eventually split docs into their own repository — and
+  do a full manual review pass over everything written so far — is
+  something to evaluate later, not a settled plan; noted here so the
+  current layout isn't mistaken for either the permanent shape of the
+  project or a fixed roadmap item.
 * `scripts/` contains local Node build and check scripts. Prefer extending
   these over adding tooling dependencies; a new package needs to provide a
   real build capability that would be risky to maintain locally.
