@@ -566,7 +566,7 @@
 }
 
 /* Code blocks and demo frames breathe a little more vertically */
-.docs-content div[class*="language-"] {
+.docs-content pre {
 	margin-block: 2rem;
 }
 
