@@ -52,7 +52,7 @@
 Include one stylesheet and write ordinary semantic HTML.
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.8.0/dist/cirth.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.8.1/dist/cirth.min.css">
 ```
 
 ```html
