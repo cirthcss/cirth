@@ -1,0 +1,45 @@
+<footer class="docs-footer">
+	<div class="container">
+		<div class="docs-footer-top">
+			<div class="docs-footer-brand-block">
+				<a href="/" class="docs-brand docs-footer-brand">
+					<img class="docs-logo docs-logo-light" src="/logo_brand.svg" alt="" width="36" height="36" />
+					<img class="docs-logo docs-logo-dark" src="/logo_brand_dark.svg" alt="" width="36" height="36" />
+					<strong>{{ nav.siteTitle }}</strong>
+				</a>
+				<p class="docs-footer-credit">
+					Designed and built by Riccardo Pastori, with help from the
+					<a href="https://github.com/cirthcss/cirth/graphs/contributors" target="_blank" rel="noreferrer">contributors</a>.
+				</p>
+				<ul class="docs-footer-social">
+					<li><a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub</a></li>
+					<li><a href="https://www.npmjs.com/package/@cirthcss/cirth" target="_blank" rel="noreferrer">npm</a></li>
+					<li><a href="https://github.com/cirthcss/cirth/blob/master/CHANGELOG.md" target="_blank" rel="noreferrer">Changelog</a></li>
+				</ul>
+			</div>
+			<div class="docs-footer-columns">
+				{% for group in nav.footerLinks %}
+					<div class="docs-footer-column">
+						<strong>{{ group.title }}</strong>
+						<ul>
+							{% for item in group.items %}
+								<li>
+									{% if item.link.startsWith("http") %}
+										<a href="{{ item.link }}" target="_blank" rel="noreferrer">{{ item.text }}</a>
+									{% else %}
+										<a href="{{ item.link }}">{{ item.text }}</a>
+									{% endif %}
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+		<hr />
+		<small>
+			<span>{{ nav.footer.message }}</span>
+			<span>{{ nav.footer.copyright }}</span>
+		</small>
+	</div>
+</footer>

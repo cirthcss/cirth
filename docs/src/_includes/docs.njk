@@ -1,0 +1,101 @@
+---
+layout: base.njk
+---
+{% set pageHeaders = content | headings %}
+{% set pageIndex = nav.flatPages | findPageIndex(page.url) %}
+<main class="container">
+	<div class="docs-layout">
+		<aside class="docs-sidebar">
+			<nav aria-label="docs navigation">
+				{% for group in nav.sidebar %}
+					<details{% if group.items | hasActiveItem(page.url) %} open{% endif %}>
+						<summary>{{ group.text }}</summary>
+						<ul>
+							{% for item in group.items %}
+								<li>
+									<a href="{{ item.link }}"{% if page.url == (item.link | withSlash) %} aria-current="page"{% endif %}>{{ item.text }}</a>
+								</li>
+							{% endfor %}
+						</ul>
+					</details>
+				{% endfor %}
+			</nav>
+		</aside>
+		<div class="docs-content">
+			{% if pageHeaders.length > 1 %}
+				<nav class="docs-toc-top" aria-label="On this page">
+					<strong>On this page</strong>
+					<ul>
+						{% for header in pageHeaders %}
+							<li class="docs-toc-level-{{ header.depth }}">
+								<a href="#{{ header.slug }}">{{ header.text }}</a>
+							</li>
+						{% endfor %}
+					</ul>
+				</nav>
+			{% endif %}
+			{{ content | safe }}
+			{% if pageIndex > -1 %}
+				{% set prevPage = nav.flatPages[pageIndex - 1] if pageIndex > 0 %}
+				{% set nextPage = nav.flatPages[pageIndex + 1] if pageIndex < nav.flatPages.length - 1 %}
+				{% if prevPage or nextPage %}
+					<footer class="docs-prev-next">
+						{% if prevPage %}
+							<a href="{{ prevPage.link }}" class="secondary">← {{ prevPage.text }}</a>
+						{% else %}
+							<span></span>
+						{% endif %}
+						{% if nextPage %}
+							<a href="{{ nextPage.link }}" class="secondary">{{ nextPage.text }} →</a>
+						{% endif %}
+					</footer>
+				{% endif %}
+			{% endif %}
+		</div>
+		{% if pageHeaders.length > 1 %}
+			<aside class="docs-toc">
+				<nav aria-label="On this page" id="docs-toc-nav">
+					<strong>On this page</strong>
+					<ul>
+						{% for header in pageHeaders %}
+							<li class="docs-toc-level-{{ header.depth }}">
+								<a href="#{{ header.slug }}" data-toc-link data-slug="{{ header.slug }}">{{ header.text }}</a>
+							</li>
+						{% endfor %}
+					</ul>
+				</nav>
+			</aside>
+		{% endif %}
+	</div>
+</main>
+<script>
+	// Scroll-spy for the "On this page" aside: highlight whichever heading
+	// was most recently scrolled past. Purely additive — the TOC works
+	// (and its links navigate) without this script.
+	const links = Array.from(document.querySelectorAll("[data-toc-link]"));
+	if (links.length > 0) {
+		const headings = Array.from(
+			document.querySelectorAll(".docs-content :is(h2, h3)[id]"),
+		);
+
+		const update = () => {
+			// 96px offset: the heading counts as "reached" slightly before it
+			// touches the top edge, matching where the eye lands after a jump.
+			let current = "";
+			for (const heading of headings) {
+				if (heading.getBoundingClientRect().top <= 96) current = heading.id;
+				else break;
+			}
+			const activeSlug = current || (headings[0] ? headings[0].id : "");
+			for (const link of links) {
+				const active = link.dataset.slug === activeSlug;
+				link.classList.toggle("docs-toc-active", active);
+				if (active) link.setAttribute("aria-current", "true");
+				else link.removeAttribute("aria-current");
+			}
+		};
+
+		window.addEventListener("scroll", update, { passive: true });
+		update();
+	}
+</script>

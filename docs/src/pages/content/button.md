@@ -1,0 +1,62 @@
+---
+layout: docs.njk
+---
+
+
+# Button
+
+`button`, `[type="submit"]`, `[type="reset"]`, `[type="button"]`,
+`[role="button"]`, and a file input's `::file-selector-button` all share the
+same button styling, with no `.btn` class required.
+
+{% demo "buttons" %}
+
+```html
+<button type="button">Primary</button>
+<button type="button" class="secondary">Secondary</button>
+<button type="button" class="contrast">Contrast</button>
+<button type="button" class="outline">Primary outline</button>
+<button type="button" disabled>Disabled</button>
+```
+
+## Color modifiers
+
+Modifier classes (default build only) swap which color group a button reads
+`--cirth-background-color`/`--cirth-border-color`/`--cirth-color` from:
+
+| Class | Color group |
+| --- | --- |
+| *(none)* | Primary |
+| `.secondary` | Secondary |
+| `.contrast` | Contrast |
+| `.outline` | Primary, transparent background |
+| `.outline.secondary` | Secondary, transparent background |
+| `.outline.contrast` | Contrast, transparent background |
+
+Without `$enable-classes` (the classless build), `[type="reset"]` and a file
+input's selector button still get secondary styling automatically, since
+there's no way to add `.secondary` to them.
+
+## States
+
+* `:hover` / `:active` / `:focus` / `[aria-current]` switch to the
+  hover background and hover border tokens.
+* `:focus` additionally layers a focus ring in `--cirth-primary-focus` (or
+  the matching `-focus` token for the active color group) on top of the
+  hover shadow.
+* `[disabled]` drops opacity to `--cirth-opacity-disabled` and disables
+  pointer events.
+* A submit button (`[type="submit"]`, or a plain `button` with no `type`,
+  which defaults to submit) inside a `form:invalid` drops to
+  `--cirth-opacity-disabled` too, but stays **fully clickable** — no
+  `pointer-events: none`, no `[disabled]`. This is deliberate: a truly
+  disabled submit button can't be activated, so it can never trigger the
+  browser's own constraint-validation messages, and screen reader users get
+  no explanation for why nothing happens. Leaving it operable means a click
+  (or Enter) still surfaces the native "please fill in this field" UI with
+  zero JS. Note a required-but-untouched form is already `:invalid` on
+  first paint, so the button can look muted before the user has done
+  anything wrong — accepted as the trade-off for zero-JS feedback once
+  fields start getting filled in.
+* Combine with [Loading](/components/loading) (`aria-busy="true"`) to show a
+  spinner and disable interaction while a button's action is pending.

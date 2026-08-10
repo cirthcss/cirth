@@ -1,0 +1,40 @@
+<header class="container docs-header">
+	<nav aria-label="main navigation">
+		<ul>
+			<li>
+				<a href="/" class="contrast docs-brand">
+					<img class="docs-logo docs-logo-light" src="/logo_brand.svg" alt="" width="36" height="36" />
+					<img class="docs-logo docs-logo-dark" src="/logo_brand_dark.svg" alt="" width="36" height="36" />
+					<strong>{{ nav.siteTitle }}</strong>
+				</a>
+			</li>
+		</ul>
+		<ul>
+			{% for item in nav.topNav %}
+				<li class="docs-nav-item">
+					<a href="{{ item.link }}"{% if page.url == (item.link | withSlash) %} aria-current="page"{% endif %}>{{ item.text }}</a>
+				</li>
+			{% endfor %}
+			<li class="docs-nav-item">
+				<a href="{{ nav.github }}" target="_blank" rel="noreferrer">GitHub</a>
+			</li>
+			<li>
+				<button type="button" class="outline contrast docs-theme-toggle" aria-label="Toggle color scheme">
+					{% icon "sun", 18, "docs-theme-icon-sun" %}
+					{% icon "moon", 18, "docs-theme-icon-moon" %}
+				</button>
+				<script>
+					// Which icon is visible is driven entirely by CSS
+					// ([data-theme="dark"] .docs-theme-icon-*, see styles/style.css)
+					// — this script is only the click handler.
+					document.querySelector(".docs-theme-toggle")?.addEventListener("click", () => {
+						const next =
+							document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+						document.documentElement.setAttribute("data-theme", next);
+						localStorage.setItem("cirth-theme", next);
+					});
+				</script>
+			</li>
+		</ul>
+	</nav>
+</header>

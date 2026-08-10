@@ -23,7 +23,6 @@ pnpm-debug.log*
 /dist/
 /docs/src/styles/generated/
 /docs/dist/
-/docs/.astro/
 /docs/node_modules/
 
 # Local caches

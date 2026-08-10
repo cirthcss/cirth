@@ -869,7 +869,7 @@ nav.docs-toc-top li a {
 	color: var(--cirth-muted-color);
 }
 
-/* Markdown header anchors (VitePress adds .header-anchor links) */
+/* Markdown header anchors (markdown-it-anchor emits .header-anchor links) */
 .header-anchor {
 	margin-left: 0.25em;
 	float: none;
@@ -882,10 +882,10 @@ nav.docs-toc-top li a {
 	opacity: 1;
 }
 
-/* VitePress code blocks. Cirth's own pre/code styling supplies the frame;
-   token colors come from highlight.js classes (see markdown.highlight in
-   config.mts), themed here for both schemes. */
-div[class*="language-"] {
+/* Every `pre` is a positioning context for the injected copy button
+   (unconditional rather than `:has()` — the docs follow the framework's
+   own browser floor, and Firefox 113 lacks `:has()`). */
+pre {
 	position: relative;
 }
 
@@ -893,10 +893,6 @@ div[class*="language-"] {
    users must be able to reach them); give that focus a visible ring. */
 pre:focus-visible {
 	outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
-}
-
-div[class*="language-"] > span.lang {
-	display: none;
 }
 
 /* Highlight.js theme — light. GitHub-derived hues, adjusted to sit with
@@ -1013,9 +1009,10 @@ div[class*="language-"] > span.lang {
 	color: #86e39b;
 }
 
-/* Copy button emitted with each code block; the click handler lives in
-   Layout.vue. */
-div[class*="language-"] > button.copy {
+/* Copy button injected into every `pre > code` block; the click handler
+   lives in the base layout's inline script (positioning context: the
+   bare `pre` rule further up). */
+pre > button.copy {
 	position: absolute;
 	top: 0.5rem;
 	right: 0.5rem;
@@ -1030,18 +1027,18 @@ div[class*="language-"] > button.copy {
 	transition: opacity var(--cirth-transition);
 }
 
-div[class*="language-"]:hover > button.copy,
-div[class*="language-"] > button.copy:focus {
+pre:hover > button.copy,
+pre > button.copy:focus {
 	opacity: 1;
 }
 
-div[class*="language-"] > button.copy::before {
+pre > button.copy::before {
 	content: "⧉";
 	color: var(--cirth-muted-color);
 	font-size: 0.875rem;
 }
 
-div[class*="language-"] > button.copy.copied::before {
+pre > button.copy.copied::before {
 	content: "✓";
 	color: var(--cirth-ins-color);
 }

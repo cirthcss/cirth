@@ -7,6 +7,30 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Invalid-form submit hint no longer breaks WCAG AA contrast** — the
+  visual "not ready yet" state on submit buttons of `:invalid` forms
+  (introduced in 0.8.1) now uses luminance-preserving `filter:
+  grayscale(1)` instead of `opacity`. A dimmed-but-clickable control has
+  no disabled-state exemption under WCAG 1.4.3, and the opacity blend
+  pushed the button below the 4.5:1 floor; grayscale keeps every
+  theme-defined contrast ratio intact while still draining the "ready"
+  color from the control.
+
+### Changed
+
+- **Docs site migrated from Astro to Eleventy** — same content, same
+  routes, same dogfooded-CSS shell. Motivated by maintenance surface:
+  Eleventy's dependency tree is a fraction of Astro's, its release
+  cadence is far slower (3 breaking releases since 2017), and the docs
+  need no client-side framework. The port also restores the
+  hover-visible heading anchor permalinks lost in the VitePress→Astro
+  migration (gh#54), fixes the copy-to-clipboard button styling on code
+  blocks (gh#53), and re-adds the hero demo's missing layout wrapper on
+  the homepage (gh#52). Docs pages now state the Apache-2.0 license
+  (gh#77); the published npm metadata catches up at the next release.
+
 ## [0.8.1] - 2026-08-10
 
 ### Added

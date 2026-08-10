@@ -4,9 +4,9 @@ const path = require("node:path");
 
 // Shared access to the built docs site (docs/dist) for the checks that
 // audit it (check-a11y.js, tests/visual.spec.js): page enumeration and a
-// dependency-free static server. Astro builds with trailingSlash:
-// "always", emitting `<path>/index.html`, so extensionless requests
-// resolve the same way a real static host would.
+// dependency-free static server. Eleventy emits one `<path>/index.html`
+// per page, so extensionless requests resolve the same way a real static
+// host would.
 
 const projectRoot = path.join(__dirname, "../..");
 const docsDist = path.join(projectRoot, "docs/dist");
@@ -30,9 +30,7 @@ const listPages = (dir = docsDist, prefix = "") => {
 	for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
 		const relative = path.posix.join(prefix, entry.name);
 		if (entry.isDirectory()) {
-			if (entry.name !== "_astro") {
-				pages.push(...listPages(path.join(dir, entry.name), relative));
-			}
+			pages.push(...listPages(path.join(dir, entry.name), relative));
 		} else if (
 			entry.name.endsWith(".html") &&
 			// Skip macOS/iCloud "name 2.html" duplicates that can appear in

@@ -16,7 +16,7 @@ const excludedDirnames = new Set([
 	".claude",
 ]);
 
-const trackedFileExtensions = new Set([".md", ".mdx", ".astro", ".tsx", ".ts", ".mts"]);
+const trackedFileExtensions = new Set([".md", ".mdx", ".njk", ".ts", ".mts"]);
 
 /** @param {string} folder @returns {string[]} */
 const getTrackedFiles = (folder) =>
@@ -55,7 +55,7 @@ const semverTagPattern = /^v\d+\.\d+\.\d+$/;
 // .md/.mdx file must resolve to a real file. Two conventions coexist:
 // - README.md, CHANGELOG.md, and .github/**/*.md use plain repo-relative
 //   file paths (docs/colors.md, ../LICENSE.md, .github/CONTRIBUTING.md).
-// - docs/src/pages/**/*.mdx use Astro root-relative page routes (/colors,
+// - docs/src/pages/**/*.md use root-relative page routes (/colors,
 //   /forms/, no extension), resolved against docs/src/pages/ instead.
 const markdownLinkPattern = /(?<!!)\[[^\]]*\]\(([^)]+)\)/g;
 
@@ -66,10 +66,10 @@ const resolveDocRoute = (targetPath) => {
 
 	const candidates =
 		withoutFragment === "" || withoutFragment === "/"
-			? ["index.mdx", "index.md"]
+			? ["index.md"]
 			: withoutFragment.endsWith("/")
-				? [`${withoutFragment}index.mdx`, `${withoutFragment}index.md`]
-				: [`${withoutFragment}.mdx`, `${withoutFragment}.md`];
+				? [`${withoutFragment}index.md`]
+				: [`${withoutFragment}.md`];
 
 	const resolved = candidates.map((candidate) => path.join(pagesRoot, candidate));
 	return resolved.find((candidate) => fs.existsSync(candidate)) ?? resolved[0];

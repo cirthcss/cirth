@@ -1,0 +1,98 @@
+---
+layout: base.njk
+bodyClass: docs-home
+---
+<main class="docs-home">
+	<section class="docs-hero-panel">
+		<div class="container docs-hero">
+			<div class="docs-hero-copy">
+				{% if hero.eyebrow %}<p class="docs-hero-eyebrow">{{ hero.eyebrow }}</p>{% endif %}
+				<hgroup>
+					<h1 class="docs-hero-title">
+						<img class="docs-hero-mark docs-logo-light" src="/logo_brand.svg" alt="" width="64" height="64" />
+						<img class="docs-hero-mark docs-logo-dark" src="/logo_brand_dark.svg" alt="" width="64" height="64" />
+						<span>{{ hero.name }}</span>
+					</h1>
+					<p>{{ hero.text }}</p>
+				</hgroup>
+				<p class="docs-hero-tagline">{{ hero.tagline }}</p>
+				<p class="docs-hero-actions">
+					{% for action in hero.actions %}
+						<a href="{{ action.link }}" role="button"{% if action.theme != "brand" %} class="outline secondary"{% endif %}>{{ action.text }}</a>
+					{% endfor %}
+				</p>
+			</div>
+			<div class="docs-hero-demo">
+				{% include "home-demo.njk" %}
+			</div>
+		</div>
+	</section>
+
+	<div class="container">
+		{% if stats %}
+			<section class="docs-stats">
+				{% for stat in stats %}
+					<article class="docs-stat">
+						<strong class="docs-stat-value">{{ stat.value }}</strong>
+						<span class="docs-stat-label">{{ stat.label }}</span>
+					</article>
+				{% endfor %}
+			</section>
+		{% endif %}
+
+		{% if comparison %}
+			<section class="docs-compare">
+				<header class="docs-section-header">
+					<p class="docs-eyebrow">{{ comparison.eyebrow }}</p>
+					<h2>{{ comparison.title }}</h2>
+					<p class="docs-section-lede">{{ comparison.lede }}</p>
+				</header>
+				<div class="docs-compare-grid">
+					{% for side in comparison.sides %}
+						<article class="docs-compare-side">
+							<header>
+								<span>{{ side.label }}</span>
+								<span class="docs-compare-count">{{ side.count }}</span>
+							</header>
+							<pre><code>{{ side.code }}</code></pre>
+						</article>
+					{% endfor %}
+				</div>
+				<p class="docs-compare-note">{{ comparison.note }}</p>
+			</section>
+		{% endif %}
+
+		<section class="docs-features">
+			<header class="docs-section-header">
+				<p class="docs-eyebrow">{{ featuresEyebrow }}</p>
+				<h2>{{ featuresTitle }}</h2>
+			</header>
+			<dl class="docs-features-list">
+				{% for feature in features %}
+					<div class="docs-feature">
+						<dt>
+							{% if feature.icon %}{% icon feature.icon, 20, "docs-feature-icon" %}{% endif %}
+							{{ feature.title }}
+						</dt>
+						<dd>{{ feature.details | safe }}</dd>
+					</div>
+				{% endfor %}
+			</dl>
+		</section>
+	</div>
+
+	{% if closing %}
+		<section class="docs-closing">
+			<div class="container">
+				<img class="docs-closing-mark docs-logo-light" src="/logo_mono.svg" alt="" width="40" height="40" />
+				<img class="docs-closing-mark docs-logo-dark" src="/logo_mono_dark.svg" alt="" width="40" height="40" />
+				<p class="docs-closing-text">{{ closing.text }}</p>
+				<p class="docs-hero-actions">
+					{% for action in closing.actions %}
+						<a href="{{ action.link }}" role="button" class="outline secondary">{{ action.text }}</a>
+					{% endfor %}
+				</p>
+			</div>
+		</section>
+	{% endif %}
+</main>
