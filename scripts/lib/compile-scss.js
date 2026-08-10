@@ -7,6 +7,12 @@ const sass = require("sass-embedded");
 // build step both the default entrypoints (cirth*.scss, build.js) and
 // the presets (src/presets/*.scss, build-presets.js) go through before
 // Lightning CSS transforms and minifies the result.
+/**
+ * @param {object} options
+ * @param {string} options.sourceFolder
+ * @param {string} options.outputFolder
+ * @param {(dirent: import("node:fs").Dirent) => boolean} [options.filter]
+ */
 const compileScssFolder = ({ sourceFolder, outputFolder, filter = () => true }) => {
 	fs.mkdirSync(outputFolder, { recursive: true });
 

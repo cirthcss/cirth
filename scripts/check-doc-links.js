@@ -18,6 +18,7 @@ const excludedDirnames = new Set([
 
 const trackedFileExtensions = new Set([".md", ".mdx", ".astro", ".tsx", ".ts", ".mts"]);
 
+/** @param {string} folder @returns {string[]} */
 const getTrackedFiles = (folder) =>
 	fs
 		.readdirSync(folder, { withFileTypes: true })
@@ -34,8 +35,13 @@ const getTrackedFiles = (folder) =>
 		})
 		.sort();
 
+/**
+ * @param {string} source
+ * @param {number} index
+ */
 const lineAt = (source, index) => source.slice(0, index).split("\n").length;
 
+/** @type {string[]} */
 const violations = [];
 
 // Check A — every github.com/cirthcss/cirth/(blob|tree)/<ref> link must
@@ -53,6 +59,7 @@ const semverTagPattern = /^v\d+\.\d+\.\d+$/;
 //   /forms/, no extension), resolved against docs/src/pages/ instead.
 const markdownLinkPattern = /(?<!!)\[[^\]]*\]\(([^)]+)\)/g;
 
+/** @param {string} targetPath */
 const resolveDocRoute = (targetPath) => {
 	const withoutFragment = targetPath.split("#")[0].split("?")[0];
 	const pagesRoot = path.join(projectRoot, "docs/src/pages");
@@ -68,6 +75,10 @@ const resolveDocRoute = (targetPath) => {
 	return resolved.find((candidate) => fs.existsSync(candidate)) ?? resolved[0];
 };
 
+/**
+ * @param {string} fromFile
+ * @param {string} targetPath
+ */
 const resolveRelativeFile = (fromFile, targetPath) => {
 	const withoutFragment = targetPath.split("#")[0].split("?")[0];
 	return path.resolve(path.dirname(fromFile), withoutFragment);

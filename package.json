@@ -56,11 +56,12 @@
 		"check:variables": "node scripts/check-css-variables.js",
 		"check:doc-links": "node scripts/check-doc-links.js",
 		"check:size": "node scripts/check-css-size.js",
+		"check:types": "tsc --noEmit",
 		"check:visual": "playwright test",
 		"check:visual:update": "playwright test --update-snapshots",
 		"dev": "node scripts/watch.js",
 		"format": "prettier --write --log-level silent 'src/**/*.scss'",
-		"lint": "stylelint 'src/**/*.scss' && node scripts/check-css-variables.js && node scripts/check-doc-links.js",
+		"lint": "stylelint 'src/**/*.scss' && node scripts/check-css-variables.js && node scripts/check-doc-links.js && tsc --noEmit",
 		"lint:fix": "stylelint 'src/**/*.scss' --fix && node scripts/check-css-variables.js && node scripts/check-doc-links.js",
 		"docs:assets": "node scripts/build-docs.js",
 		"docs:dev": "npm run docs:assets && astro dev --root docs",
@@ -71,6 +72,7 @@
 		"@astrojs/mdx": "^7.0.5",
 		"@axe-core/playwright": "^4.12.1",
 		"@playwright/test": "^1.61.1",
+		"@types/node": "^26.2.0",
 		"astro": "^7.1.6",
 		"lightningcss-cli": "^1.33.0",
 		"lowlight": "^3.3.0",
@@ -80,7 +82,8 @@
 		"prettier": "^3.9.6",
 		"sass-embedded": "^1.100.0",
 		"stylelint": "^17.14.1",
-		"stylelint-config-standard-scss": "^17.0.0"
+		"stylelint-config-standard-scss": "^17.0.0",
+		"typescript": "^7.0.2"
 	},
 	"browserslist": [
 		"Chrome >= 111",

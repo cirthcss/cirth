@@ -9,13 +9,18 @@ const buildScript = path.join(__dirname, "build.js");
 // Polling avoids file-handle limits seen with recursive fs.watch on this source tree.
 const pollInterval = 500;
 
+/** @type {import("node:child_process").ChildProcess | null} */
 let buildProcess = null;
 let pendingBuild = false;
-let debounceTimer = null;
-let pollTimer = null;
+/** @type {NodeJS.Timeout | undefined} */
+let debounceTimer;
+/** @type {NodeJS.Timeout | undefined} */
+let pollTimer;
 let lastSnapshot = new Map();
 
+/** @param {string} foldername @returns {string[]} */
 const getScssFiles = (foldername) => {
+	/** @type {string[]} */
 	const files = [];
 
 	fs.readdirSync(foldername, { withFileTypes: true }).forEach((dirent) => {
@@ -45,6 +50,7 @@ const getSnapshot = () => {
 	return snapshot;
 };
 
+/** @param {Map<string, string>} nextSnapshot */
 const hasChanged = (nextSnapshot) => {
 	if (nextSnapshot.size !== lastSnapshot.size) {
 		return true;
