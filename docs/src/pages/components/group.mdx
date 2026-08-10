@@ -6,14 +6,25 @@ import Demo from "../../components/Demo.astro";
 
 # Group
 
-`[role="group"]` (or `[role="search"]`) merges a row of form controls and
-buttons into one visually joined control, without extra markup for the
-joins. Default build only.
+`.group` (or `[role="search"]`) merges a row of form controls and buttons
+into one visually joined control, without extra markup for the joins.
+
+**A `.group` class is required, on top of `role="group"`** (default build):
+`[role="group"]` alone used to be the trigger, but that meant any element
+grouped for pure accessibility reasons — including a plain `<fieldset
+role="group">`, where the role is entirely redundant since a fieldset's
+*implicit* role is already `group` — got hijacked into this decorative
+layout it never asked for, making a semantic group and a decorative one
+visually indistinguishable (WCAG 3.2.4, Consistent Identification). Keep
+`role="group"` for the semantics and add `class="group"` for the layout
+when you want both, as below. The classless build has no class to require,
+so it keeps `[role="group"]` as its only opt-in, but still excludes
+`fieldset` for the same reason.
 
 <Demo src="group" />
 
 ```html
-<fieldset role="group">
+<fieldset class="group" role="group">
   <input type="text" placeholder="Email" autocomplete="email">
   <button type="submit">Subscribe</button>
 </fieldset>

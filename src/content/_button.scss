@@ -247,3 +247,18 @@
   opacity: var(--cirth-opacity-disabled);
   pointer-events: none;
 }
+
+// Submit control of an invalid form
+// Visual only, deliberately not [disabled]/pointer-events: none — the
+// button stays clickable so a submit attempt still triggers the browser's
+// native constraint-validation UI (the "Please fill in this field"
+// bubbles), which a truly disabled/inert control could never surface.
+// A required-but-untouched form is :invalid from first paint, so this can
+// read as "disabled" before the user has done anything wrong; accepted as
+// a fair trade for zero-JS feedback once fields start getting filled in.
+
+#{$parent-selector}
+  form:invalid
+  :is(button:not([type="button"], [type="reset"]), [type="submit"]) {
+  opacity: var(--cirth-opacity-disabled);
+}

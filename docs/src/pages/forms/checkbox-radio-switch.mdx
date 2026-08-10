@@ -27,7 +27,11 @@ a checkbox turns it into a toggle switch with no extra markup.
 * A `[type="checkbox"][role="switch"]` becomes a pill shaped toggle: track
   color from `--cirth-switch-background-color` /
   `--cirth-switch-checked-background-color`, thumb color from
-  `--cirth-switch-color`.
+  `--cirth-switch-color`, which defaults to `--cirth-primary-inverse` (the
+  same token buttons use for their text) rather than a fixed white — keep
+  the two in sync if you customize `--cirth-primary-inverse`, and recheck
+  contrast (WCAG 1.4.11, >= 3:1) against both `--cirth-switch-background-color`
+  and `--cirth-switch-checked-background-color` if you do.
 * `aria-invalid="true"`/`"false"` recolor the checked state the same way as
   other form elements (see [Forms overview](/forms/)).
 * A `label` that contains a checkbox/radio becomes `cursor: pointer` and
