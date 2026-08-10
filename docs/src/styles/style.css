@@ -39,12 +39,20 @@
 	display: inline;
 }
 
-.docs-theme-toggle {
+/* Doubled class: nav's own `nav li button { height: auto; padding: ... }`
+   (components/_nav.scss) ties this rule's specificity at one class, and
+   wins on source order since it's the later declaration — verified by
+   removing it and watching padding/height apply correctly. Bumping to two
+   classes decisively outranks it instead of guessing at load order. */
+.docs-theme-toggle.docs-theme-toggle {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 2.5rem;
-	height: 2.5rem;
+	/* 44px: same WCAG 2.5.5 target size the library's own controls use
+	   (see src/theme/_styles.scss) — this is a custom control outside
+	   Cirth's button system, so it doesn't inherit that floor for free. */
+	width: 2.75rem;
+	height: 2.75rem;
 	margin-bottom: 0;
 	padding: 0;
 	border: none;
@@ -525,6 +533,22 @@
 	margin-bottom: 0;
 	color: var(--cirth-muted-color);
 	font-size: var(--cirth-font-size-sm);
+}
+
+/* .container doesn't cap its own width — it's a 3-track grid whose
+   center track is capped via the --cirth-container-max-width custom
+   property (60rem), so overriding `max-width` on the element itself is a
+   no-op; the token is what needs overriding. 60rem is right for a single
+   measure of prose, too narrow once it also has to fit a 14rem sidebar
+   and a 14rem page outline on either side of the content: the reading
+   column was landing at ~26rem regardless of viewport width, well under
+   .docs-content's own 50rem cap below, which never got the chance to
+   bind. Widened to match the home page's own wider container instead of
+   leaving docs content artificially narrow on desktop. */
+@media (min-width: 1024px) {
+	main.docs-container {
+		--cirth-container-max-width: 76rem;
+	}
 }
 
 /* Docs layout: sidebar + content, plus a page outline column on wide
@@ -1012,19 +1036,49 @@ pre:focus-visible {
 /* Copy button injected into every `pre > code` block; the click handler
    lives in the base layout's inline script (positioning context: the
    bare `pre` rule further up). */
-pre > button.copy {
+pre > button.copy.copy {
 	position: absolute;
 	top: 0.5rem;
 	right: 0.5rem;
-	width: 2rem;
-	height: 2rem;
+	/* 44px: same WCAG 2.5.5 target size the library's own controls use
+	   (see src/theme/_styles.scss) — this is a custom control outside
+	   Cirth's button system, so it doesn't inherit that floor for free. */
+	width: 2.75rem;
+	height: 2.75rem;
 	margin: 0;
 	padding: 0;
 	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-	background-color: var(--cirth-background-color);
+	/* Not --cirth-background-color: Cirth's own button rules redefine that
+	   custom property locally (as an alias for the primary-action
+	   background) on every <button>, so referencing it here resolved to
+	   amber instead of the page background. --cirth-code-background-color
+	   isn't shadowed the same way, and it's the more correct token anyway
+	   — this button should blend with the code panel it sits on. */
+	background-color: var(--cirth-code-background-color);
 	opacity: 0;
 	cursor: pointer;
 	transition: opacity var(--cirth-transition);
+}
+
+/* Fade code content out before the button's column instead of reserving
+   fixed padding: a `padding-right` on the scrolled content only clears
+   space at the *end* of a long line, not at whatever's currently under
+   the button (e.g. the CDN snippet's href, unscrolled, at its default
+   position). A background gradient is painted relative to the `pre` box
+   itself, not the scrolling content, so it stays put over the button's
+   footprint regardless of scroll position. Scoped like the button
+   injection script (base.njk): every pre except .home-demo-code, which
+   never gets a button. */
+pre:not(.home-demo-code pre) {
+	background-image: linear-gradient(
+		to left,
+		var(--cirth-code-background-color) 0%,
+		var(--cirth-code-background-color) 40%,
+		transparent 100%
+	);
+	background-repeat: no-repeat;
+	background-position: top right;
+	background-size: 3.5rem 2.75rem;
 }
 
 pre:hover > button.copy,
