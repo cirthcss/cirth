@@ -511,7 +511,10 @@
 	font-size: var(--cirth-font-size-sm);
 }
 
-/* Homepage sections breathe more at the sides than doc pages do */
+/* Homepage sections breathe more at the sides than doc pages do.
+   (Not `max-width` on .container itself — see the --cirth-container-
+   max-width comment below for why that's a no-op. The width cap here
+   comes from the site-wide token override; this rule is padding only.) */
 .docs-home .container {
 	padding-right: calc(var(--cirth-spacing) * 2);
 	padding-left: calc(var(--cirth-spacing) * 2);
@@ -519,7 +522,6 @@
 
 @media (min-width: 1024px) {
 	.docs-home .container {
-		max-width: 76rem;
 		padding-right: calc(var(--cirth-spacing) * 5);
 		padding-left: calc(var(--cirth-spacing) * 5);
 	}
@@ -537,16 +539,20 @@
 
 /* .container doesn't cap its own width — it's a 3-track grid whose
    center track is capped via the --cirth-container-max-width custom
-   property (60rem), so overriding `max-width` on the element itself is a
-   no-op; the token is what needs overriding. 60rem is right for a single
-   measure of prose, too narrow once it also has to fit a 14rem sidebar
-   and a 14rem page outline on either side of the content: the reading
-   column was landing at ~26rem regardless of viewport width, well under
-   .docs-content's own 50rem cap below, which never got the chance to
-   bind. Widened to match the home page's own wider container instead of
-   leaving docs content artificially narrow on desktop. */
+   property (60rem), so overriding `max-width` on an individual .container
+   element is a no-op; the token is what needs overriding, and since it's
+   inherited, one override on `body` reaches every .container on the
+   page — header, doc content, footer — consistently, instead of each
+   picking its own width and drifting out of alignment with the others
+   (which is what happened when only the docs <main> was widened: the
+   header above it stayed at the framework default and the two no longer
+   lined up). 60rem is right for a single measure of prose, too narrow
+   for this site once a 14rem sidebar and a 14rem page outline sit on
+   either side of doc content: the reading column was landing at ~26rem
+   regardless of viewport width, well under .docs-content's own 50rem cap
+   below, which never got the chance to bind. */
 @media (min-width: 1024px) {
-	main.docs-container {
+	body {
 		--cirth-container-max-width: 76rem;
 	}
 }
@@ -1047,17 +1053,31 @@ pre > button.copy.copy {
 	height: 2.75rem;
 	margin: 0;
 	padding: 0;
-	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-	/* Not --cirth-background-color: Cirth's own button rules redefine that
-	   custom property locally (as an alias for the primary-action
-	   background) on every <button>, so referencing it here resolved to
-	   amber instead of the page background. --cirth-code-background-color
-	   isn't shadowed the same way, and it's the more correct token anyway
-	   — this button should blend with the code panel it sits on. */
-	background-color: var(--cirth-code-background-color);
-	opacity: 0;
+	/* Ghost: no border, transparent at rest — a background only shows up
+	   as a hover/focus affordance, matching the GitHub code-block copy
+	   button rather than the bordered/hover-revealed treatment before. */
+	border: none;
+	border-radius: var(--cirth-border-radius);
+	background-color: transparent;
 	cursor: pointer;
-	transition: opacity var(--cirth-transition);
+	transition: background-color var(--cirth-transition);
+}
+
+/* muted-border-color, not --cirth-background-color: Cirth's own button
+   rules redefine that custom property locally (as an alias for the
+   primary-action background) on every <button>, so referencing it here
+   resolved to amber instead of a neutral wash. muted-border-color also
+   has real contrast against the code panel — code-background-color
+   would nearly vanish, since the button already sits on a fade to that
+   same color (see the pre background-image below). */
+pre > button.copy.copy:hover,
+pre > button.copy.copy:focus-visible {
+	background-color: var(--cirth-muted-border-color);
+}
+
+pre > button.copy.copy:focus-visible {
+	outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
+	outline-offset: -2px;
 }
 
 /* Fade code content out before the button's column instead of reserving
@@ -1081,15 +1101,10 @@ pre:not(.home-demo-code pre) {
 	background-size: 3.5rem 2.75rem;
 }
 
-pre:hover > button.copy,
-pre > button.copy:focus {
-	opacity: 1;
-}
-
 pre > button.copy::before {
 	content: "⧉";
 	color: var(--cirth-muted-color);
-	font-size: 0.875rem;
+	font-size: 1.125rem;
 }
 
 pre > button.copy.copied::before {

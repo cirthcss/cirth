@@ -4,26 +4,39 @@ bodyClass: docs-home
 ---
 <main class="docs-home">
 	<section class="docs-hero-panel">
-		<div class="container docs-hero">
-			<div class="docs-hero-copy">
-				{% if hero.eyebrow %}<p class="docs-hero-eyebrow">{{ hero.eyebrow }}</p>{% endif %}
-				<hgroup>
-					<h1 class="docs-hero-title">
-						<img class="docs-hero-mark docs-logo-light" src="/logo_brand.svg" alt="" width="64" height="64" />
-						<img class="docs-hero-mark docs-logo-dark" src="/logo_brand_dark.svg" alt="" width="64" height="64" />
-						<span>{{ hero.name }}</span>
-					</h1>
-					<p>{{ hero.text }}</p>
-				</hgroup>
-				<p class="docs-hero-tagline">{{ hero.tagline }}</p>
-				<p class="docs-hero-actions">
-					{% for action in hero.actions %}
-						<a href="{{ action.link }}" role="button"{% if action.theme != "brand" %} class="outline secondary"{% endif %}>{{ action.text }}</a>
-					{% endfor %}
-				</p>
-			</div>
-			<div class="docs-hero-demo">
-				{% include "home-demo.njk" %}
+		<div class="container">
+			{#- .container is Cirth's own 3-track grid (gutter/content/gutter),
+			    keyed to --cirth-container-max-width. .docs-hero is a *different*
+			    grid (single centered column). Combining both on one element
+			    meant two competing display:grid/grid-template-columns
+			    declarations fighting for the same box, with .docs-hero-copy and
+			    .docs-hero-demo then implicitly auto-placed into whichever
+			    grid-template-columns actually won — fragile, and the likely
+			    cause of the hero rendering off-center in some browsers/
+			    viewports. Nesting instead of combining removes the ambiguity:
+			    .container centers its content track as designed, .docs-hero
+			    governs its own children inside that track, no shared box. -#}
+			<div class="docs-hero">
+				<div class="docs-hero-copy">
+					{% if hero.eyebrow %}<p class="docs-hero-eyebrow">{{ hero.eyebrow }}</p>{% endif %}
+					<hgroup>
+						<h1 class="docs-hero-title">
+							<img class="docs-hero-mark docs-logo-light" src="/logo_brand.svg" alt="" width="64" height="64" />
+							<img class="docs-hero-mark docs-logo-dark" src="/logo_brand_dark.svg" alt="" width="64" height="64" />
+							<span>{{ hero.name }}</span>
+						</h1>
+						<p>{{ hero.text }}</p>
+					</hgroup>
+					<p class="docs-hero-tagline">{{ hero.tagline }}</p>
+					<p class="docs-hero-actions">
+						{% for action in hero.actions %}
+							<a href="{{ action.link }}" role="button"{% if action.theme != "brand" %} class="outline secondary"{% endif %}>{{ action.text }}</a>
+						{% endfor %}
+					</p>
+				</div>
+				<div class="docs-hero-demo">
+					{% include "home-demo.njk" %}
+				</div>
 			</div>
 		</div>
 	</section>
