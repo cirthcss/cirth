@@ -7,6 +7,8 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-08-10
+
 ### Added
 
 - **`:user-invalid`/`:user-valid` support for form validation styling**
@@ -596,7 +598,8 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
-[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.8.0...master
+[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.8.1...master
+[0.8.1]: https://github.com/cirthcss/cirth/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/cirthcss/cirth/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/cirthcss/cirth/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/cirthcss/cirth/compare/v0.5.0...v0.6.0
