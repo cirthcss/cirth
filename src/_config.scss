@@ -6,3 +6,20 @@ $enable-classes: true !default;
 
 // Scope all generated selectors and root custom properties
 $parent-selector: "" !default;
+
+// The layout-"group" component's trigger selector. A plain [role="group"]
+// attribute hijacks any semantically-grouped element — e.g. an explicit
+// <fieldset role="group">, or any element grouped for pure a11y reasons —
+// into decorative flex-bar styling it didn't ask for (gh#19, upstream
+// pico#430): a semantic group and a decorative one become visually
+// indistinguishable, a WCAG 3.2.4 (Consistent Identification) risk. In the
+// classes build, require the explicit .group class instead, so
+// role="group" stays free for pure semantics — pair the two
+// (class="group" role="group") when a group is both. The classless build
+// has no class to require, so [role="group"] remains its only opt-in, but
+// excludes <fieldset>: a fieldset's implicit role is already "group", so
+// writing it out explicitly signals the fieldset isn't reaching for this
+// decorative pattern.
+$group-selector: if(
+  sass($enable-classes): ".group"; else: '[role="group"]:not(fieldset)'
+);

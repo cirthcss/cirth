@@ -1,11 +1,12 @@
 @use "../config" as *;
 
 /**
-   * Group ([role="group"], [role="search"])
+   * Group (.group in the classes build, [role="group"]:not(fieldset) in
+   * the classless build — see $group-selector in config; [role="search"])
    */
 
 #{$parent-selector} [role="search"],
-#{$parent-selector} [role="group"] {
+#{$parent-selector} #{$group-selector} {
   display: inline-flex;
   position: relative;
   flex-wrap: wrap;

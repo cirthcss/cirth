@@ -316,7 +316,7 @@
   }
 
   [role="search"],
-  [role="group"] {
+  #{$group-selector} {
     @if $enable-classes {
       &:has(
         button.secondary:focus,

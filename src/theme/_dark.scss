@@ -149,7 +149,12 @@
   // control's off state stays perceivable (WCAG 1.4.11)
   --cirth-switch-background-color: #{$neutral-550};
   --cirth-switch-checked-background-color: var(--cirth-primary-background);
-  --cirth-switch-color: #{$white};
+
+  // Thumb matches button text color rather than a hardcoded white — see
+  // the matching comment in _light.scss. Verified >= 3:1 (WCAG 1.4.11):
+  // 5.35:1 unchecked (white on neutral-550), 5.46:1 checked (white on
+  // amber-550).
+  --cirth-switch-color: var(--cirth-primary-inverse);
   --cirth-switch-thumb-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
 
   // Range (input[type="range"])

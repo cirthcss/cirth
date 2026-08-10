@@ -148,7 +148,15 @@
   // control's off state stays perceivable (WCAG 1.4.11)
   --cirth-switch-background-color: #{$neutral-450};
   --cirth-switch-checked-background-color: var(--cirth-primary-background);
-  --cirth-switch-color: #{$white};
+
+  // Thumb matches button text color rather than a hardcoded white, so a
+  // customized --cirth-primary-inverse stays consistent everywhere it
+  // implies "text/icon on top of the primary color". Verified >= 3:1
+  // (WCAG 1.4.11) against both tracks with the shipped values: 3.75:1
+  // unchecked (white on neutral-450), 5.46:1 checked (white on
+  // amber-550) — the tightest of the two is the one to re-check if
+  // --cirth-primary-inverse or --cirth-switch-background-color changes.
+  --cirth-switch-color: var(--cirth-primary-inverse);
   --cirth-switch-thumb-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
 
   // Range (input[type="range"])

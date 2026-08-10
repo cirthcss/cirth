@@ -7,6 +7,42 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Added
+
+- **`:user-invalid`/`:user-valid` support for form validation styling**
+  (gh#24) — text-like `input`/`select`/`textarea` now pick up the same
+  border color, icon, focus ring, and helper-text color as
+  `[aria-invalid]` once a field has been interacted with and the browser
+  has checked it against its native constraints, with no JS setting the
+  attribute. An explicit `aria-invalid` always takes priority. Degrades
+  silently on browsers without support (Chrome/Edge < 119, Safari < 16.5).
+- **Disabled-look for a submit button in an invalid form** (gh#25) — a
+  submit-acting button (`[type="submit"]`, or a plain `button` with no
+  `type`) inside a `form:invalid` drops to `--cirth-opacity-disabled`, but
+  stays fully clickable/focusable (no `[disabled]`, no
+  `pointer-events: none`), so a click still triggers the browser's native
+  constraint-validation messages instead of doing nothing.
+
+### Changed
+
+- **Switch thumb color now follows `--cirth-primary-inverse`** (gh#26)
+  instead of a hardcoded white, matching the token buttons use for their
+  text. No visual change in the shipped theme (both resolve to white
+  today, verified >= 3:1 against both switch tracks per WCAG 1.4.11); only
+  matters if you customize `--cirth-primary-inverse`.
+- **Breaking: the group component needs `.group` in the default build**
+  (gh#19, upstream pico#430) — `[role="group"]` alone used to be the
+  trigger for the joined-controls layout, which meant any element grouped
+  purely for accessibility reasons (most notably an explicit `<fieldset
+  role="group">`, where the role is redundant since a fieldset's implicit
+  role is already `group`) got hijacked into decorative styling it never
+  asked for, making a semantic group and a decorative one visually
+  indistinguishable (WCAG 3.2.4, Consistent Identification). Add
+  `class="group"` alongside `role="group"` to keep the layout; the role
+  alone no longer triggers it. The classless build has no class to
+  require, so it keeps `[role="group"]` as its sole opt-in but now
+  excludes `fieldset` specifically. `[role="search"]` is unaffected.
+
 ## [0.8.0] - 2026-08-02
 
 ### Changed

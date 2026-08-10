@@ -70,7 +70,7 @@
 
     // Button groups size to their content and drop the stacking margin,
     // so they sit on the nav's rhythm like any other item (upstream #699)
-    [role="group"],
+    #{$group-selector},
     [role="search"] {
       width: auto;
       margin-bottom: 0;
