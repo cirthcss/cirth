@@ -1,54 +1,59 @@
 # Security Policy
 
-Cirth is a semantic-first CSS framework. This policy describes how to report
-potential security issues in the public repository and npm package.
+This repository follows the organisation-level security policy in
+[cirthcss/.github/SECURITY.md](https://github.com/cirthcss/.github/blob/master/SECURITY.md).
+This file adds the Cirth-specific scope and reporting context.
 
-## Reporting a potential security issue
+## Reporting a potential vulnerability
 
-Please do not include secrets, private data, exploit details, or working
-payloads in a public issue.
+Please do not open a public issue with exploit details, secrets, credentials,
+private data, or a working payload.
 
-The repository's GitHub issue tracker is the public support and feedback
-channel. If a report may expose a vulnerability or other sensitive
-information, open a short public issue without sensitive details and ask the
-maintainers for a private reporting channel before sharing the full report.
+Use the repository's **Security** tab and private vulnerability reporting
+channel when available. If private reporting is not available, contact the
+organisation owner through [the maintainer's GitHub profile](https://github.com/ricpastori)
+to arrange a private channel before sharing technical details.
 
-At the time of this policy's publication, no dedicated private security
-address is listed in the repository. If the maintainers add one, this document
-should be updated to identify it.
-
-## What to include
-
-A useful report can include:
+A useful report should identify:
 
 - the affected Cirth version, commit, or package release;
-- a concise description of the security concern;
-- safe reproduction steps that do not disclose secrets or live targets;
-- the expected and observed behavior;
-- the impact you believe the issue could have;
-- any suggested mitigation, if known.
+- the impact and a realistic scenario;
+- safe reproduction steps or a minimal proof of concept;
+- any suggested mitigation;
+- whether the concern has been disclosed elsewhere.
 
 Please redact credentials, tokens, personal data, and private URLs.
 
-## Scope and limitations
+## Cirth-specific scope
 
-This policy covers the Cirth source repository, its build and release
-configuration, and the published @cirthcss/cirth package.
+This policy covers security concerns caused or materially worsened by:
 
-It does not authorize testing against third-party applications, websites,
-networks, or user data. Please do not perform denial-of-service, social
-engineering, destructive testing, or activity that could affect availability
-or other users.
+- source under `src/` and the SCSS-to-CSS build pipeline;
+- the public `@cirthcss/cirth` npm package and its published `dist/` artifacts;
+- package exports, release configuration, and repository build scripts;
+- documentation or release-process changes that could alter the published package.
+
+The current package publishes compiled CSS from `dist/`; SCSS remains repository
+source and build infrastructure. Reports should identify the relevant version
+or commit where possible.
+
+## Out of scope
+
+Please report issues belonging to GitHub, npm, browsers, CDNs, or unrelated
+upstream dependencies to the responsible project. This policy does not
+authorise testing against third-party applications, websites, networks, or user
+data. Do not perform denial-of-service, social engineering, destructive testing,
+or activity that could affect availability or other users.
 
 ## Maintainer handling
 
-Maintainers will review reports as project capacity allows and may ask for
-clarification or a safer reproduction. This document does not promise a
-response time, severity classification, disclosure deadline, fix, or release.
+Maintainers will acknowledge actionable reports, investigate impact, coordinate
+fixes and disclosure, and credit reporters who wish to be credited. Response
+times are best effort; this document does not promise a severity label,
+disclosure deadline, fix, or release.
 
 Please allow maintainers to coordinate a fix and disclosure before publishing
-sensitive technical details. Credit for a responsible report can be discussed
-with the maintainers.
+sensitive technical details.
 
 ## Disclaimer
 
