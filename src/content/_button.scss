@@ -256,9 +256,15 @@
 // A required-but-untouched form is :invalid from first paint, so this can
 // read as "disabled" before the user has done anything wrong; accepted as
 // a fair trade for zero-JS feedback once fields start getting filled in.
+// grayscale(), not opacity: a dimmed-but-clickable control gets no
+// disabled-state exemption from WCAG 1.4.3, and compositing the whole
+// button toward the canvas collapses its text/background contrast below
+// AA. Luminance-preserving desaturation keeps every contrast ratio
+// exactly as the theme defined it while still draining the "ready"
+// color from the control.
 
 #{$parent-selector}
   form:invalid
   :is(button:not([type="button"], [type="reset"]), [type="submit"]) {
-  opacity: var(--cirth-opacity-disabled);
+  filter: grayscale(1);
 }
