@@ -9,6 +9,18 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Fixed
 
+- **Docs homepage hero rendered off-center on some viewports/browsers** —
+  the hero wrapper combined `.container` (Cirth's own 3-track grid) and
+  a custom `.docs-hero` grid on the same element; two competing
+  `display: grid` declarations meant the hero's children were
+  implicitly placed by whichever `grid-template-columns` happened to
+  win. Nested instead of combined; verified centered in Chromium and
+  WebKit.
+- **Docs header/footer were narrower than the page content below them**
+  — a previous fix widened only the docs `<main>`, leaving header and
+  footer at the framework's default container width. `--cirth-
+  container-max-width` now overrides once, site-wide, so all three
+  measure identically.
 - **Invalid-form submit hint no longer breaks WCAG AA contrast** — the
   visual "not ready yet" state on submit buttons of `:invalid` forms
   (introduced in 0.8.1) now uses luminance-preserving `filter:
@@ -20,6 +32,11 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Changed
 
+- **Docs code-block copy button restyled ghost and always visible** —
+  no border, transparent until hover/focus, matching GitHub's code
+  block convention instead of the previous bordered, hover-revealed
+  button (gh#53's original fix; this refines the styling further,
+  not a bug).
 - **Docs site migrated from Astro to Eleventy** — same content, same
   routes, same dogfooded-CSS shell. Motivated by maintenance surface:
   Eleventy's dependency tree is a fraction of Astro's, its release

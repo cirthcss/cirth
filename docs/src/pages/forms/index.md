@@ -41,7 +41,10 @@ behavior specific to each input type.
   its text, inside the same `label`, and it gets a small top margin
   automatically.
 * Text inputs, `select`, and `textarea` are full width and get a bottom
-  margin (`--cirth-spacing`) so stacked fields space themselves.
+  margin (`--cirth-spacing`) so stacked fields space themselves. An
+  explicit `size` attribute (`<input size="6">`) opts a text input out
+  of the full-width default instead, sizing it to its native,
+  content-based width.
 * A `small` immediately after a form control becomes helper/hint text:
   block, muted, with a small negative top margin to sit tight under the
   field.

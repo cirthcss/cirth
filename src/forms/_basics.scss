@@ -123,8 +123,11 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 }
 
 // Blocks, 100%
+// An explicit `size` (the standard, semantic way to size a field to its
+// expected content — a postcode, a short code, an OTP digit) opts an
+// input out of the full-width default and lets UA-native sizing apply.
 
-#{$parent-selector} input:not([type="checkbox"], [type="radio"]),
+#{$parent-selector} input:not([type="checkbox"], [type="radio"], [size]),
 #{$parent-selector} button[type="submit"],
 #{$parent-selector} select,
 #{$parent-selector} textarea {
