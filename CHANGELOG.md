@@ -7,8 +7,16 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+## [0.8.2] - 2026-08-11
+
 ### Fixed
 
+- **`input[size]` no longer forced to full width** (gh#60) — the
+  "Blocks, 100%" rule in `_basics.scss` overrode an explicit `size`
+  attribute, the standard way to size a field to its expected content
+  (a postcode, a short code, an OTP digit group). `size` now opts a
+  text input out of the full-width default; inputs without it are
+  unaffected.
 - **Docs homepage hero rendered off-center on some viewports/browsers** —
   the hero wrapper combined `.container` (Cirth's own 3-track grid) and
   a custom `.docs-hero` grid on the same element; two competing
@@ -639,7 +647,8 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
-[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.8.1...master
+[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.8.2...master
+[0.8.2]: https://github.com/cirthcss/cirth/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/cirthcss/cirth/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/cirthcss/cirth/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/cirthcss/cirth/compare/v0.6.0...v0.7.0

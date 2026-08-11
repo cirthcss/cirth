@@ -11,7 +11,7 @@ semantic markup, and most of your interface is already styled.
 ## CDN
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.8.1/dist/cirth.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.8.2/dist/cirth.min.css">
 ```
 
 ## npm
