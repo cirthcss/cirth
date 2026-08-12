@@ -6,6 +6,38 @@ const { defineConfig } = require("@playwright/test");
 // Linux, so local (darwin) and CI (linux) each compare against their
 // own committed set. Regenerate deliberately with
 // `npm run check:visual:update` after a wanted visual change.
+
+const viewports = {
+	desktop: { width: 1440, height: 900 },
+	mobile: { width: 390, height: 844 },
+};
+
+// Chromium keeps its original, unsuffixed project names (light-desktop,
+// not light-desktop-chromium) so its already-committed baselines stay
+// valid — Firefox and WebKit are added alongside it as engine-suffixed
+// projects, matching the Browserslist floor in package.json.
+/** @type {["chromium" | "firefox" | "webkit", string][]} */
+const engines = [
+	["chromium", ""],
+	["firefox", "-firefox"],
+	["webkit", "-webkit"],
+];
+
+/** @type {("light" | "dark")[]} */
+const colorSchemes = ["light", "dark"];
+
+const projects = [];
+for (const [browserName, suffix] of engines) {
+	for (const [form, viewport] of Object.entries(viewports)) {
+		for (const colorScheme of colorSchemes) {
+			projects.push({
+				name: `${colorScheme}-${form}${suffix}`,
+				use: { browserName, colorScheme, viewport },
+			});
+		}
+	}
+}
+
 module.exports = defineConfig({
 	testDir: "tests",
 	fullyParallel: true,
@@ -24,22 +56,5 @@ module.exports = defineConfig({
 	use: {
 		contextOptions: { reducedMotion: "reduce" },
 	},
-	projects: [
-		{
-			name: "light-desktop",
-			use: { colorScheme: "light", viewport: { width: 1440, height: 900 } },
-		},
-		{
-			name: "dark-desktop",
-			use: { colorScheme: "dark", viewport: { width: 1440, height: 900 } },
-		},
-		{
-			name: "light-mobile",
-			use: { colorScheme: "light", viewport: { width: 390, height: 844 } },
-		},
-		{
-			name: "dark-mobile",
-			use: { colorScheme: "dark", viewport: { width: 390, height: 844 } },
-		},
-	],
+	projects,
 });

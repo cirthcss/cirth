@@ -47,8 +47,8 @@ jobs:
       - name: Build docs
         run: npm run docs:build
 
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Check docs accessibility (axe, WCAG A/AA)
         run: npm run check:a11y

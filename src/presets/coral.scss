@@ -51,6 +51,14 @@ $coral-250: oklch(80% 0.1 35deg);
 }
 
 @mixin dark {
+  // Canvas: mirrors the base dark theme's near-black neutral-950/900 mix
+  // and its brighter neutral-900 card, both re-hued to coral. Needed
+  // explicitly (not left to fall through from the base theme) because this
+  // block and the `light` block above it share the same selector
+  // specificity — without its own value here, this preset's own light
+  // canvas would win the cascade tie over the base theme's dark canvas.
+  --cirth-background-color: oklch(19.5% 0.006 35deg);
+  --cirth-card-background-color: oklch(23% 0.008 35deg);
   --cirth-muted-color: oklch(66% 0.02 35deg);
   --cirth-muted-border-color: oklch(30% 0.025 35deg);
   --cirth-text-selection-color: #{color.change($coral-350, $alpha: 0.1875)};

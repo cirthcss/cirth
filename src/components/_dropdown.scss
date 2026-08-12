@@ -285,6 +285,24 @@
     }
   }
 
+  // Nested dropdown
+  // ––––––––––––––––––––
+  // A dropdown nested inside another open dropdown's menu gets its own
+  // close-catcher too — but that catcher is position: fixed, so it belongs
+  // to the outer menu's stacking context (its nearest positioned ancestor,
+  // not the viewport it visually covers). There it paints above the outer
+  // menu's own non-positioned items, in front of DOM order and regardless
+  // of z-index, and swallows clicks meant for them (upstream picocss/pico
+  // #614). Only the outermost open dropdown needs a catcher: a click
+  // outside the whole nested chain already reaches it once nothing above
+  // it covers that point.
+  #{$parent-selector}
+    details.dropdown[open]
+    details.dropdown[open]
+    > summary::before {
+    content: none;
+  }
+
   // Label
   // ––––––––––––––––––––
   #{$parent-selector} label > details.dropdown {
