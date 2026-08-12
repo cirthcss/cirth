@@ -47,6 +47,14 @@ $cobalt-300: oklch(72% 0.075 258deg);
 }
 
 @mixin dark {
+  // Canvas: mirrors the base dark theme's near-black neutral-950/900 mix
+  // and its brighter neutral-900 card, both re-hued to cobalt. Needed
+  // explicitly (not left to fall through from the base theme) because this
+  // block and the `light` block above it share the same selector
+  // specificity — without its own value here, this preset's own light
+  // canvas would win the cascade tie over the base theme's dark canvas.
+  --cirth-background-color: oklch(19.5% 0.006 258deg);
+  --cirth-card-background-color: oklch(23% 0.008 258deg);
   --cirth-muted-color: oklch(65% 0.02 258deg);
   --cirth-muted-border-color: oklch(30% 0.02 258deg);
   --cirth-text-selection-color: #{color.change($cobalt-550, $alpha: 0.1875)};
