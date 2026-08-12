@@ -59,23 +59,35 @@
   }
 }
 
-// Calendar icons are hidden in Firefox
-// Firefox can't hide its native calendar-picker icon the way Chromium/WebKit
-// can (there's no ::-moz-calendar-picker-indicator to opacity: 0), so
-// stacking our own SVG on top produces two icons. Detect it by testing for
-// the absence of ::-webkit-calendar-picker-indicator support, since that's
-// otherwise universal among current engines — this used to be gated behind
-// @-moz-document url-prefix(), but that rule has been restricted to
-// userContent.css/userChrome.css since Firefox 59 and is a no-op here.
+// Calendar icons are hidden in Firefox for date and datetime-local only
+// Firefox draws its own native picker icon for [type="date"] and
+// [type="datetime-local"] (verified against unstyled inputs) but not for
+// [type="month"], [type="week"], or [type="time"] — those three have no
+// native icon at all, so ours is the only one and must stay. Firefox also
+// can't hide its native icon the way Chromium/WebKit can (there's no
+// ::-moz-calendar-picker-indicator to opacity: 0), so stacking our own SVG
+// on top of date/datetime-local produces two icons there. Detect it by
+// testing for the absence of ::-webkit-calendar-picker-indicator support,
+// since that's otherwise universal among current engines — this used to be
+// gated behind @-moz-document url-prefix(), but that rule has been
+// restricted to userContent.css/userChrome.css since Firefox 59 and is a
+// no-op here.
 
+// Matches the specificity of the rule setting the icon above
+// (input:not(...):is(...)) — a plain [type="date"] selector here would
+// lose that tie and never actually override it, regardless of source order.
 @supports not selector(::-webkit-calendar-picker-indicator) {
-  #{$parent-selector} [type="date"],
-  #{$parent-selector} [type="datetime-local"],
-  #{$parent-selector} [type="month"],
-  #{$parent-selector} [type="time"],
-  #{$parent-selector} [type="week"] {
-    padding-inline-end: var(--cirth-form-element-spacing-horizontal);
-    background-image: none;
+  #{$parent-selector}
+    input:not(
+      [type="checkbox"],
+      [type="radio"],
+      [type="range"],
+      [type="file"]
+    ) {
+    &:is([type="date"], [type="datetime-local"]) {
+      padding-inline-end: var(--cirth-form-element-spacing-horizontal);
+      background-image: none;
+    }
   }
 }
 
