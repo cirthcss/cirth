@@ -7,6 +7,42 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+## [0.8.3] - 2026-08-12
+
+### Fixed
+
+- **Date/time inputs no longer show two calendar icons on Firefox**
+  (gh#79) — the Firefox-only reset that hid our custom icon relied on
+  `@-moz-document url-prefix()`, which Firefox restricted to
+  `userContent.css`/`userChrome.css` since version 59 and silently
+  ignores in an author stylesheet. Replaced with a real feature-detection
+  query, since Firefox is the only current engine without
+  `::-webkit-calendar-picker-indicator` support.
+- **Coral and cobalt presets kept a light background in system dark
+  mode** (gh#81) — both presets' dark mixin left the background tokens
+  undeclared, relying on the base theme's dark value to fall through.
+  But the preset's own light block shares the same CSS specificity as
+  the base theme's dark media-query block, and since a preset loads
+  after `cirth.min.css`, that tie was won by the preset's light
+  background even with no `data-theme` set. Each preset now declares
+  its own dark canvas explicitly.
+- **A dropdown nested inside another open dropdown's menu could block
+  clicks on the outer menu's own items** (gh#7) — the nested dropdown's
+  full-viewport close-catcher is `position: fixed`, so it belongs to the
+  outer menu's stacking context rather than the viewport it visually
+  covers, and painted above the outer menu's non-positioned items
+  regardless of DOM order or z-index. Only the outermost open dropdown
+  renders a close-catcher now; it already handles outside-click-to-close
+  for the whole nested chain.
+
+### Changed
+
+- Visual regression now runs across Firefox and WebKit in addition to
+  Chromium, on top of the existing light/dark × desktop/mobile matrix.
+  Cross-engine coverage would have caught the date-input and preset bugs
+  above automatically instead of relying on manual bug reports. Doesn't
+  touch the published package.
+
 ## [0.8.2] - 2026-08-11
 
 ### Fixed
@@ -647,7 +683,8 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
-[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.8.2...master
+[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.8.3...master
+[0.8.3]: https://github.com/cirthcss/cirth/compare/v0.8.2...v0.8.3
 [0.8.2]: https://github.com/cirthcss/cirth/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/cirthcss/cirth/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/cirthcss/cirth/compare/v0.7.0...v0.8.0
