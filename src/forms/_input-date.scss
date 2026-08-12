@@ -60,8 +60,15 @@
 }
 
 // Calendar icons are hidden in Firefox
+// Firefox can't hide its native calendar-picker icon the way Chromium/WebKit
+// can (there's no ::-moz-calendar-picker-indicator to opacity: 0), so
+// stacking our own SVG on top produces two icons. Detect it by testing for
+// the absence of ::-webkit-calendar-picker-indicator support, since that's
+// otherwise universal among current engines — this used to be gated behind
+// @-moz-document url-prefix(), but that rule has been restricted to
+// userContent.css/userChrome.css since Firefox 59 and is a no-op here.
 
-@-moz-document url-prefix() {
+@supports not selector(::-webkit-calendar-picker-indicator) {
   #{$parent-selector} [type="date"],
   #{$parent-selector} [type="datetime-local"],
   #{$parent-selector} [type="month"],
