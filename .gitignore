@@ -140,3 +140,8 @@ $RECYCLE.BIN/
 
 # Local working notes
 /TODO.md
+
+# Ad-hoc manual QA scratch files (e.g. reproducing a reported bug's exact
+# markup to eyeball in a real browser) — local only, not the published
+# examples gallery (see docs/examples.md, tracked separately under gh#29).
+/examples/
