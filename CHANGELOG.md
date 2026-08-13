@@ -7,6 +7,21 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+## [0.8.4] - 2026-08-13
+
+### Fixed
+
+- **Date/time inputs still showed two calendar icons on Firefox after
+  0.8.3** (gh#79) — the 0.8.3 fix used a CSS rule with lower specificity
+  than the rule it needed to override, so it silently never applied.
+  Replaced with a different approach entirely: instead of deferring to
+  Firefox's native icon on `date`/`datetime-local`, Cirth's own icon now
+  shows consistently across every date/time field type, in every
+  browser. Firefox paints its native icon via the element's `color`,
+  decoupled from the field's actual text glyphs (repainted independently
+  via the non-standard but Firefox-supported `-webkit-text-fill-color`),
+  so `color: transparent` hides just the icon without hiding the text.
+
 ## [0.8.3] - 2026-08-12
 
 ### Fixed
@@ -683,7 +698,8 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
-[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.8.3...master
+[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.8.4...master
+[0.8.4]: https://github.com/cirthcss/cirth/compare/v0.8.3...v0.8.4
 [0.8.3]: https://github.com/cirthcss/cirth/compare/v0.8.2...v0.8.3
 [0.8.2]: https://github.com/cirthcss/cirth/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/cirthcss/cirth/compare/v0.8.0...v0.8.1
