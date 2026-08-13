@@ -59,23 +59,27 @@
   }
 }
 
-// Calendar icons are hidden in Firefox for date and datetime-local only
+// Firefox's own native picker icon is hidden for date and datetime-local
 // Firefox draws its own native picker icon for [type="date"] and
 // [type="datetime-local"] (verified against unstyled inputs) but not for
-// [type="month"], [type="week"], or [type="time"] — those three have no
-// native icon at all, so ours is the only one and must stay. Firefox also
-// can't hide its native icon the way Chromium/WebKit can (there's no
-// ::-moz-calendar-picker-indicator to opacity: 0), so stacking our own SVG
-// on top of date/datetime-local produces two icons there. Detect it by
-// testing for the absence of ::-webkit-calendar-picker-indicator support,
-// since that's otherwise universal among current engines — this used to be
-// gated behind @-moz-document url-prefix(), but that rule has been
-// restricted to userContent.css/userChrome.css since Firefox 59 and is a
-// no-op here.
-
-// Matches the specificity of the rule setting the icon above
-// (input:not(...):is(...)) — a plain [type="date"] selector here would
-// lose that tie and never actually override it, regardless of source order.
+// [type="month"], [type="week"], or [type="time"], and — unlike
+// Chromium/WebKit — gives no pseudo-element to opacity: 0 it away (no
+// ::-moz-calendar-picker-indicator), so stacking our own SVG on top of
+// date/datetime-local used to produce two icons there.
+// `color: transparent` hides it: Firefox paints that icon using the
+// element's `color`, decoupled from the field's actual text glyphs, which
+// are repainted independently via the non-standard but Firefox-supported
+// `-webkit-text-fill-color`. An explicit color is required on that
+// property — `currentColor` resolves circularly to the `color: transparent`
+// set right above it on the same element, hiding the text along with the
+// icon. Interaction is unaffected: the (now invisible) native icon's
+// picker button still opens Firefox's date picker on click, so this only
+// swaps which icon is visible, not the field's behavior. Firefox has no
+// officially supported way to do this (bugzil.la/1817839#c1); this is a
+// browser-shipped implementation detail, not a spec guarantee.
+// Detect Firefox by testing for the absence of
+// ::-webkit-calendar-picker-indicator support, since that's otherwise
+// universal among current engines.
 @supports not selector(::-webkit-calendar-picker-indicator) {
   #{$parent-selector}
     input:not(
@@ -85,8 +89,8 @@
       [type="file"]
     ) {
     &:is([type="date"], [type="datetime-local"]) {
-      padding-inline-end: var(--cirth-form-element-spacing-horizontal);
-      background-image: none;
+      color: transparent;
+      -webkit-text-fill-color: var(--cirth-form-element-color);
     }
   }
 }
