@@ -64,18 +64,18 @@ behavior specific to each input type.
 * **`aria-invalid="true"`** marks the invalid state: border in
   `--cirth-form-element-invalid-border-color`, an alert icon, and the
   adjacent `small` colored with `--cirth-del-color`.
-* **`:user-valid`/`:user-invalid`** get the same treatment automatically,
-  with no `aria-invalid` attribute and no JS: once a field has been
-  interacted with and the browser has checked it against its native
-  constraints (`required`, `type="email"`, `pattern`, …), it picks up the
-  matching border, icon, and helper-text color on its own. An explicit
-  `aria-invalid` always wins if both are present. Falls back silently on
-  browsers that don't support the pseudo-classes yet (Chrome/Edge < 119,
-  Safari < 16.5) — those fields just show no validity styling until you set
-  `aria-invalid` yourself.
+* **`:user-invalid`** gets the invalid treatment automatically, with no
+  `aria-invalid` attribute and no JS, once a field has been interacted with
+  and the browser has checked it against its native constraints (`required`,
+  `type="email"`, `pattern`, …). Native `:user-valid` stays neutral because
+  satisfying HTML constraints does not necessarily mean that the submitted
+  data is correct. Use `aria-invalid="false"` when an explicit positive state
+  is useful. Range inputs are excluded from automatic validity styling, and a
+  native-invalid `select` stays neutral while focused so merely opening it
+  does not show an error. An explicit `aria-invalid` always wins.
 * **`:focus`** adds a box shadow ring in `--cirth-form-element-focus-color` (or
-  the valid/invalid focus variant when `aria-invalid` or a matching
-  `:user-valid`/`:user-invalid` state applies).
+  the valid/invalid focus variant when an explicit `aria-invalid` or matching
+  `:user-invalid` state applies).
 * **`[disabled]`** (or an ancestor `fieldset[disabled]`) applies opacity
   `--cirth-form-element-disabled-opacity`, pointer events off.
 * **`::placeholder`** is colored with `--cirth-form-element-placeholder-color`.

@@ -40,6 +40,7 @@ for (const [browserName, suffix] of engines) {
 
 module.exports = defineConfig({
 	testDir: "tests",
+	testMatch: "visual.spec.js",
 	fullyParallel: true,
 	forbidOnly: !!process.env.CI,
 	reporter: [["list"]],

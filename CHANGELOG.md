@@ -9,6 +9,13 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Fixed
 
+- **Native validation no longer produces misleading success states** (gh#83):
+  automatic styling now reacts only to `:user-invalid`; `:user-valid`
+  stays visually neutral unless the author explicitly sets
+  `aria-invalid="false"`. Range inputs no longer gain a green validation ring
+  after interaction, and required selects wait until they lose focus before
+  showing a native invalid state. Explicit `aria-invalid` behavior is
+  unchanged.
 - **Invalid-form submit hint no longer breaks WCAG AA contrast** — the
   visual "not ready yet" state on submit buttons of `:invalid` forms
   (introduced in 0.8.1) now uses luminance-preserving `filter:

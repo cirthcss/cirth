@@ -50,6 +50,9 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium firefox webkit
 
+      - name: Browser interaction regression tests
+        run: npm run check:behavior
+
       - name: Check docs accessibility (axe, WCAG A/AA)
         run: npm run check:a11y
 

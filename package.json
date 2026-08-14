@@ -52,6 +52,7 @@
 	"scripts": {
 		"build": "node scripts/build.js",
 		"check:a11y": "node scripts/check-a11y.js",
+		"check:behavior": "playwright test --config=playwright.behavior.config.js",
 		"check:dist": "node scripts/check-dist.js",
 		"check:variables": "node scripts/check-css-variables.js",
 		"check:doc-links": "node scripts/check-doc-links.js",
