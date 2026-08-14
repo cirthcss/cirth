@@ -107,7 +107,13 @@ $coral-250: oklch(80% 0.1 35deg);
 // bouncy motion. Each overrides one token that every consuming component
 // already reads, so nothing here duplicates component-level styles.
 @include selectors.root {
-  --cirth-border-radius: var(--cirth-radius-2xl);
+  // 4px, not the 16px this preset used to ship: the default theme is now
+  // a squared, machined system, and a pill-radius preset next to it reads
+  // as a different product rather than as the same product in another
+  // livery. This is still visibly the softest corner in the set (default
+  // sits at 2px, cobalt at 0) — it demonstrates that the radius knob
+  // works without leaving the design language.
+  --cirth-border-radius: var(--cirth-radius-sm);
   --cirth-font-family:
     "Trebuchet MS", "Segoe UI", Verdana, sans-serif,
     var(--cirth-font-family-emoji);

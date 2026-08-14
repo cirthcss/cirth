@@ -27,7 +27,7 @@
 			// choice that'd survive a closed tab into someone's next visit.
 			(function () {
 				var preset = sessionStorage.getItem("cirth-preset");
-				if (!preset || preset === "amber") return;
+				if (!preset || preset === "standard") return;
 				var base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
 				var link = document.createElement("link");
 				link.rel = "stylesheet";
@@ -91,7 +91,7 @@
 				const base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
 				const applyPreset = (preset) => {
 					const existing = document.getElementById("cirth-preset-stylesheet");
-					if (preset === "amber") {
+					if (preset === "standard") {
 						existing?.remove();
 						return;
 					}
@@ -101,7 +101,7 @@
 					link.href = `${base}/styles/generated/presets/${preset}.css`;
 					if (!existing) document.head.appendChild(link);
 				};
-				presetSelect.value = sessionStorage.getItem("cirth-preset") || "amber";
+				presetSelect.value = sessionStorage.getItem("cirth-preset") || "standard";
 				presetSelect.addEventListener("change", () => {
 					sessionStorage.setItem("cirth-preset", presetSelect.value);
 					applyPreset(presetSelect.value);

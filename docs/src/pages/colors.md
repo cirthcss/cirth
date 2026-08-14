@@ -5,7 +5,8 @@ layout: docs.njk
 
 # Colors
 
-Cirth has one official theme: amber, with hand tuned light and dark
+Cirth has one official theme — the standard build, a machine-orange
+brand color over warm paper and graphite, with hand tuned light and dark
 variants. `cobalt` and `coral` are optional **presets**: stylesheets that
 override an existing set of CSS custom properties on top of the default
 theme. They're worked examples of how far a customization can reasonably
@@ -18,10 +19,11 @@ light/dark switching logic are duplicated.
 * **`cobalt`** gives a corporate look: a deep navy primary accent, cool toned
   neutrals, a crisp flat shadow (no blur), a businesslike Arial/Helvetica
   font stack, denser spacing, snappier motion, and square corners.
-* **`coral`** gives a playful look: a vivid warm primary accent, warm toned
+* **`coral`** gives a softer look: a vivid warm primary accent, warm toned
   neutrals, a soft coral glow shadow with a matching hover lift for buttons,
-  a friendly Trebuchet MS font stack, looser spacing, bouncy motion, and more
-  rounded corners.
+  a friendly Trebuchet MS font stack, looser spacing, bouncier motion, and
+  the largest corner radius in the set (4px, against the standard theme's
+  2px and cobalt's square 0).
 
 Like the default theme, presets use font stacks that ship with every major
 OS: no `@import`, no webfont, zero network requests beyond the stylesheet
@@ -65,12 +67,12 @@ Sass variables aren't part of the public CSS custom property surface; they
 only exist at build time to derive the semantic tokens (`--cirth-primary`,
 `--cirth-primary-hover`, …) baked into the compiled stylesheet.
 
-Scales are named for what they visually are (`$amber-*` the brand accent,
-`$neutral-*` the cool gray) except the status colors, which are named for
-the role they play instead of their hue: `$error-*`, `$success-*`, and
-`$warning-*`, not `$red-*`, `$jade-*`, or `$gold-*`, because that's what
-they actually mean everywhere they're used (invalid/valid form state,
-deleted/inserted text, the `<mark>` highlight).
+Scales are named for the role they play rather than the hue they happen
+to be: `$brand-*` (the primary accent), `$neutral-*` (the warm graphite
+and steel used for text, panels and borders), `$error-*`, `$success-*`
+and `$warning-*`. Naming them `$orange-*` or `$red-*` would hide what
+they actually mean everywhere they're used, and would leave two families
+called "red" once the brand accent moved next to the error color.
 
 All five scales share one lightness ladder with 19 steps, from 950
 (darkest) to 50 (lightest) in increments of 50 and evenly spaced from 18%
@@ -78,19 +80,23 @@ to 96%. Every family defines every step, and picking one is the same
 exercise regardless of which family you're in. Chroma is derived rather
 than chosen by hand:
 `$neutral-*` holds a small, symmetric chroma bell peaking at the 500 step;
-each accent scale (`$amber-*`, `$error-*`, `$success-*`, `$warning-*`) is
+each accent scale (`$brand-*`, `$error-*`, `$success-*`, `$warning-*`) is
 pinned to one fixed hue and set to a constant 85% of that hue's own
 maximum sRGB chroma within the gamut at every step. The four accent scales
 don't peak at the same step because sRGB's gamut boundary shape differs per
-hue. For example, red orange's ceiling sits at a darker lightness than
-green's, but every
-step of every scale sits at the same fraction of what's actually
-displayable, so the shape difference is the gamut talking, not an
-inconsistency between families.
+hue. `$brand-*` is the clearest case: orange's ceiling collapses toward mid
+lightness, so the scale peaks up at the 350 step rather than in the middle
+like the red-based families do. Every step of every scale still sits at the
+same fraction of what's actually displayable, so the shape difference is
+the gamut talking, not an inconsistency between families.
 
-`$amber-*`'s hue (69.35deg) isn't an arbitrary pick; it's lifted directly
-from the brand mark, so the theme's primary accent and the logo are the
-same color by construction rather than by manual matching.
+The hues are chosen for separation as much as for looks. `$brand-*` sits
+at 48deg, a machine orange kept 30deg away from `$error-*` (18deg) so an
+invalid field never reads as a branded one, and clear of the `coral`
+preset (35deg) so a preset stays a different livery rather than a near
+copy of the default. The brand mark is currently drawn in an older amber
+that doesn't match the token; the mark is due to be redrawn, and the
+token is the thing consumers inherit, so the token led.
 
 `cobalt` and `coral` (`src/presets/`) declare only the `oklch()` literals
 their overridden tokens need. They don't duplicate the theme's full

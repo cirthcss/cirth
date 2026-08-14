@@ -10,103 +10,123 @@
 // family defines every step.
 // Chroma is derived, not hand-picked, and follows from what each family is
 // for: $neutral-* holds chroma to a small, symmetric bell that peaks at
-// the 500 step and returns to 0 at the extremes — enough to read as a
-// deliberate cool gray, not enough to compete with content color.
-// $amber-*, $error-*, $success-*, $warning-* are each pinned to one fixed
-// hue, then set to 85% of that hue's own maximum in-gamut sRGB chroma at
-// every lightness step. Because the sRGB gamut boundary shape differs per
-// hue (e.g. red-orange's ceiling peaks earlier, at a darker lightness,
-// than green's does), the four scales don't hit peak saturation at the
-// same step — that's the gamut speaking, not an inconsistency. What stays
-// consistent is the method: every step of every scale sits at the same
-// fraction of what's actually displayable.
-// Status colors (error, success, warning) are named for the role they
-// play, not the hue they happen to be — $error-500 is what most people
-// would call "red", but naming it that way would hide why it's actually
-// used (invalid form state, deleted/removed text). $amber and $neutral
-// are named for what they visually are (brand accent; cool gray) since
-// neither is tied to a single semantic role. $amber's hue (69.35deg) is
-// lifted directly from the brand mark, not picked independently of it.
+// the 500 step — enough to read as warm graphite/steel rather than a
+// neutral computer gray, not enough to compete with content color.
+// $brand-*, $error-*, $success-*, $warning-* are each pinned to one fixed
+// hue, then set to roughly 85% of that hue's own maximum in-gamut sRGB
+// chroma at every lightness step. Because the sRGB gamut boundary shape
+// differs per hue (e.g. red-orange's ceiling peaks earlier, at a darker
+// lightness, than yellow's does), the four scales don't hit peak
+// saturation at the same step — that's the gamut speaking, not an
+// inconsistency. What stays consistent is the method: every step of every
+// scale sits at the same fraction of what's actually displayable.
+// Color roles (see docs/src/pages/brand.md):
+//   brand   — identity + primary action: links, primary buttons, focus.
+//   warning — the operational/attention color: <mark>, progress, warnings.
+//             Never used as text on a light surface (it's a fill color at
+//             these lightness steps); always graphite text on top of it.
+//   error   — invalid form state, deleted text.
+//   success — valid form state, inserted text.
+//   neutral — text, panels, borders, metadata.
+// Status colors are named for the role they play, not the hue they happen
+// to be — $error-500 is what most people would call "red", but naming it
+// that way would hide why it's actually used, and would collide with the
+// brand red that now sits next to it.
 
 // B&W
 $black: oklch(0% 0 0deg);
 $white: oklch(100% 0 0deg);
 
-// Canvas — warm paper. The light theme's page background: white pulled
-// faintly toward the brand hue (69.35deg), far short of cream, so white
-// surfaces (cards, dropdowns) read as sheets lying on it. Off the
-// 19-step ladder on purpose: it's a surface color, not a scale step.
-// Verified against WCAG AA: every text token keeps >= 4.5:1 and every
-// 3:1 non-text claim in _light.scss still holds on this background.
-// Chroma halved (0.008 -> 0.004) from the original: white should read
-// as the canvas, amber as the accent on top of it, not as a wash across
-// the whole page — see docs/brand.md's "amber is functional, not
-// atmosphere." Presets already made this same call independently
-// (cobalt's own paper sits at 0.004 chroma too).
-$paper: oklch(97.4% 0.004 69.35deg);
+// Canvas — technical-manual paper. The light theme's page background: a
+// warm off-white with just enough body to read as printed stock rather
+// than as a blank screen, while white surfaces (cards, panels, fields)
+// still read as plates sitting on top of it. Off the 19-step ladder on
+// purpose: it's a surface color, not a scale step. Verified against WCAG
+// AA: every text token keeps >= 4.5:1 and every 3:1 non-text claim in
+// _light.scss still holds on this background.
+$paper: oklch(96.8% 0.008 85deg);
 
-// Neutral
-$neutral-950: oklch(18% 0 264deg);
-$neutral-900: oklch(22.3% 0.006 264deg);
-$neutral-850: oklch(26.7% 0.011 264deg);
-$neutral-800: oklch(31% 0.016 264deg);
-$neutral-750: oklch(35.3% 0.021 264deg);
-$neutral-700: oklch(39.7% 0.025 264deg);
-$neutral-650: oklch(44% 0.028 264deg);
-$neutral-600: oklch(48.3% 0.03 264deg);
-$neutral-550: oklch(52.7% 0.032 264deg);
-$neutral-500: oklch(57% 0.032 264deg);
-$neutral-450: oklch(61.3% 0.032 264deg);
-$neutral-400: oklch(65.7% 0.03 264deg);
-$neutral-350: oklch(70% 0.028 264deg);
-$neutral-300: oklch(74.3% 0.025 264deg);
-$neutral-250: oklch(78.7% 0.021 264deg);
-$neutral-200: oklch(83% 0.016 264deg);
-$neutral-150: oklch(87.3% 0.011 264deg);
-$neutral-100: oklch(91.7% 0.006 264deg);
-$neutral-50: oklch(96% 0 264deg);
+// Neutral — warm graphite and steel. Hue 75deg with a low chroma bell:
+// visibly warmer than a blue-cast UI gray (which reads as "software"),
+// well short of brown. Dark steps are the graphite a machine panel is
+// painted; light steps are the steel of a border or a stamped label.
+$neutral-950: oklch(18% 0.005 75deg);
+$neutral-900: oklch(22.3% 0.007 75deg);
+$neutral-850: oklch(26.7% 0.009 75deg);
+$neutral-800: oklch(31% 0.011 75deg);
+$neutral-750: oklch(35.3% 0.013 75deg);
+$neutral-700: oklch(39.7% 0.014 75deg);
+$neutral-650: oklch(44% 0.015 75deg);
+$neutral-600: oklch(48.3% 0.016 75deg);
+$neutral-550: oklch(52.7% 0.016 75deg);
+$neutral-500: oklch(57% 0.016 75deg);
+$neutral-450: oklch(61.3% 0.015 75deg);
+$neutral-400: oklch(65.7% 0.014 75deg);
+$neutral-350: oklch(70% 0.013 75deg);
+$neutral-300: oklch(74.3% 0.011 75deg);
+$neutral-250: oklch(78.7% 0.01 75deg);
+$neutral-200: oklch(83% 0.008 75deg);
+$neutral-150: oklch(87.3% 0.006 75deg);
+$neutral-100: oklch(91.7% 0.004 75deg);
+$neutral-50: oklch(96% 0.002 75deg);
 
-// Amber (primary brand accent)
-$amber-950: oklch(18% 0.033 69.35deg);
-$amber-900: oklch(22.3% 0.041 69.35deg);
-$amber-850: oklch(26.7% 0.049 69.35deg);
-$amber-800: oklch(31% 0.057 69.35deg);
-$amber-750: oklch(35.3% 0.065 69.35deg);
-$amber-700: oklch(39.7% 0.073 69.35deg);
-$amber-650: oklch(44% 0.081 69.35deg);
-$amber-600: oklch(48.3% 0.089 69.35deg);
-$amber-550: oklch(52.7% 0.097 69.35deg);
-$amber-500: oklch(57% 0.105 69.35deg);
-$amber-450: oklch(61.3% 0.113 69.35deg);
-$amber-400: oklch(65.7% 0.121 69.35deg);
-$amber-350: oklch(70% 0.129 69.35deg);
-$amber-300: oklch(74.3% 0.137 69.35deg);
-$amber-250: oklch(78.7% 0.146 69.35deg);
-$amber-200: oklch(83% 0.113 69.35deg);
-$amber-150: oklch(87.3% 0.082 69.35deg);
-$amber-100: oklch(91.7% 0.052 69.35deg);
-$amber-50: oklch(96% 0.024 69.35deg);
+// Brand (identity + primary action) — machine orange. Hue 48deg: the
+// burnt orange of equipment paint, chosen to sit clearly apart from the
+// two families it would otherwise be confused with. At the 550 step the
+// three read as #a25121 (brand), #b93143 (error crimson) and #c0401f
+// (the coral preset): 30deg from error, so an invalid field never looks
+// branded, and 13deg plus a visible drop in chroma from coral, so the
+// preset stays a different livery rather than a near-copy of the
+// default.
+// Orange is the hardest hue to keep both vivid and legible: sRGB's
+// ceiling collapses toward mid lightness, and a bright orange can't
+// carry white text at AA. The scale therefore peaks in chroma up at the
+// 350 step (#ed7a36, the dark scheme's link color, where it can be
+// bright) while the 550 step used for light-scheme text stays a deeper
+// rust — 5.11:1 on paper as text, 5.61:1 with white on it as a button
+// fill. Chroma is the in-gamut maximum at each step, measured rather
+// than estimated, then taken to 85% like every other family here.
+$brand-950: oklch(18% 0.054 48deg);
+$brand-900: oklch(22.3% 0.059 48deg);
+$brand-850: oklch(26.7% 0.067 48deg);
+$brand-800: oklch(31% 0.075 48deg);
+$brand-750: oklch(35.3% 0.084 48deg);
+$brand-700: oklch(39.7% 0.094 48deg);
+$brand-650: oklch(44% 0.104 48deg);
+$brand-600: oklch(48.3% 0.113 48deg);
+$brand-550: oklch(52.7% 0.123 48deg);
+$brand-500: oklch(57% 0.133 48deg);
+$brand-450: oklch(61.3% 0.143 48deg);
+$brand-400: oklch(65.7% 0.153 48deg);
+$brand-350: oklch(70% 0.163 48deg);
+$brand-300: oklch(74.3% 0.144 48deg);
+$brand-250: oklch(78.7% 0.115 48deg);
+$brand-200: oklch(83% 0.088 48deg);
+$brand-150: oklch(87.3% 0.063 48deg);
+$brand-100: oklch(91.7% 0.04 48deg);
+$brand-50: oklch(96% 0.019 48deg);
 
-// Error (invalid form state, deleted/removed text)
-$error-950: oklch(18% 0.063 29.73deg);
-$error-900: oklch(22.3% 0.078 29.73deg);
-$error-850: oklch(26.7% 0.092 29.73deg);
-$error-800: oklch(31% 0.107 29.73deg);
-$error-750: oklch(35.3% 0.122 29.73deg);
-$error-700: oklch(39.7% 0.137 29.73deg);
-$error-650: oklch(44% 0.151 29.73deg);
-$error-600: oklch(48.3% 0.166 29.73deg);
-$error-550: oklch(52.7% 0.181 29.73deg);
-$error-500: oklch(57% 0.196 29.73deg);
-$error-450: oklch(61.3% 0.211 29.73deg);
-$error-400: oklch(65.7% 0.196 29.73deg);
-$error-350: oklch(70% 0.163 29.73deg);
-$error-300: oklch(74.3% 0.133 29.73deg);
-$error-250: oklch(78.7% 0.106 29.73deg);
-$error-200: oklch(83% 0.081 29.73deg);
-$error-150: oklch(87.3% 0.058 29.73deg);
-$error-100: oklch(91.7% 0.036 29.73deg);
-$error-50: oklch(96% 0.017 29.73deg);
+// Error (invalid form state, deleted/removed text) — a cooler crimson
+// than $brand, so an invalid field never reads as a branded one.
+$error-950: oklch(18% 0.06 18deg);
+$error-900: oklch(22.3% 0.074 18deg);
+$error-850: oklch(26.7% 0.088 18deg);
+$error-800: oklch(31% 0.102 18deg);
+$error-750: oklch(35.3% 0.116 18deg);
+$error-700: oklch(39.7% 0.13 18deg);
+$error-650: oklch(44% 0.144 18deg);
+$error-600: oklch(48.3% 0.158 18deg);
+$error-550: oklch(52.7% 0.172 18deg);
+$error-500: oklch(57% 0.186 18deg);
+$error-450: oklch(61.3% 0.19 18deg);
+$error-400: oklch(65.7% 0.176 18deg);
+$error-350: oklch(70% 0.15 18deg);
+$error-300: oklch(74.3% 0.123 18deg);
+$error-250: oklch(78.7% 0.099 18deg);
+$error-200: oklch(83% 0.076 18deg);
+$error-150: oklch(87.3% 0.055 18deg);
+$error-100: oklch(91.7% 0.034 18deg);
+$error-50: oklch(96% 0.016 18deg);
 
 // Success (valid form state, inserted/added text)
 $success-950: oklch(18% 0.035 160.59deg);
@@ -129,25 +149,26 @@ $success-150: oklch(87.3% 0.166 160.59deg);
 $success-100: oklch(91.7% 0.113 160.59deg);
 $success-50: oklch(96% 0.051 160.59deg);
 
-// Warning (replaces the old decorative "amber"; used for the <mark>
-// highlight, the one place Cirth needed an attention color before there
-// was a proper warning scale to give it)
-$warning-950: oklch(18% 0.033 78deg);
-$warning-900: oklch(22.3% 0.04 78deg);
-$warning-850: oklch(26.7% 0.048 78deg);
-$warning-800: oklch(31% 0.055 78deg);
-$warning-750: oklch(35.3% 0.063 78deg);
-$warning-700: oklch(39.7% 0.07 78deg);
-$warning-650: oklch(44% 0.078 78deg);
-$warning-600: oklch(48.3% 0.086 78deg);
-$warning-550: oklch(52.7% 0.093 78deg);
-$warning-500: oklch(57% 0.101 78deg);
-$warning-450: oklch(61.3% 0.109 78deg);
-$warning-400: oklch(65.7% 0.116 78deg);
-$warning-350: oklch(70% 0.124 78deg);
-$warning-300: oklch(74.3% 0.132 78deg);
-$warning-250: oklch(78.7% 0.139 78deg);
-$warning-200: oklch(83% 0.134 78deg);
-$warning-150: oklch(87.3% 0.098 78deg);
-$warning-100: oklch(91.7% 0.063 78deg);
-$warning-50: oklch(96% 0.029 78deg);
+// Warning — the operational color: the safety yellow of working
+// machinery, at hue 88deg. Its useful steps are the bright ones (200 to
+// 300); the dark end of the ladder exists for completeness and for dark
+// mode fills, not because a dark yellow is ever the point.
+$warning-950: oklch(18% 0.036 88deg);
+$warning-900: oklch(22.3% 0.045 88deg);
+$warning-850: oklch(26.7% 0.053 88deg);
+$warning-800: oklch(31% 0.062 88deg);
+$warning-750: oklch(35.3% 0.07 88deg);
+$warning-700: oklch(39.7% 0.079 88deg);
+$warning-650: oklch(44% 0.088 88deg);
+$warning-600: oklch(48.3% 0.096 88deg);
+$warning-550: oklch(52.7% 0.105 88deg);
+$warning-500: oklch(57% 0.114 88deg);
+$warning-450: oklch(61.3% 0.123 88deg);
+$warning-400: oklch(65.7% 0.132 88deg);
+$warning-350: oklch(70% 0.141 88deg);
+$warning-300: oklch(74.3% 0.15 88deg);
+$warning-250: oklch(78.7% 0.16 88deg);
+$warning-200: oklch(83% 0.17 88deg);
+$warning-150: oklch(87.3% 0.163 88deg);
+$warning-100: oklch(91.7% 0.112 88deg);
+$warning-50: oklch(96% 0.055 88deg);

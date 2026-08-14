@@ -4,10 +4,17 @@
    * Card (<article>)
    */
 
+// A card is a plate: a bordered panel with a stamped band at the top and
+// a technical strip at the bottom, not a floating surface defined only by
+// its shadow. The border is what makes it read as a discrete part — it's
+// also what keeps the panel legible when it sits on a surface close to
+// its own background color, which a shadow alone can't do.
+
 #{$parent-selector} article {
   margin-bottom: var(--cirth-block-spacing-vertical);
   padding: var(--cirth-block-spacing-vertical)
     var(--cirth-block-spacing-horizontal);
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
   border-radius: var(--cirth-border-radius);
   background: var(--cirth-card-background-color);
   box-shadow: var(--cirth-card-box-shadow);

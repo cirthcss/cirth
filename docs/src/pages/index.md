@@ -2,20 +2,20 @@
 layout: home.njk
 
 hero:
-  eyebrow: HTML-native CSS framework
+  eyebrow: Semantic CSS system
   name: Cirth
-  text: Production-ready UI from semantic HTML.
-  tagline: >-
-    Cirth turns native HTML elements into accessible, themeable interfaces.
-    Load one stylesheet, customize it with runtime design tokens, and ship
-    with zero JavaScript and no required build step.
+  model: C-013
+  text: >-
+    Write HTML. It's already styled. Load one stylesheet and standard
+    elements come out as finished, accessible interface — no classes to
+    learn, no build step, no JavaScript.
   actions:
     - theme: brand
-      text: Get Started
+      text: Start
       link: /get-started
     - theme: alt
-      text: Examples
-      link: /examples
+      text: Components
+      link: /components/card
 
 pitch:
   eyebrow: Proof, not promises

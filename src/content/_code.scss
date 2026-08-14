@@ -58,9 +58,18 @@
   padding: var(--cirth-space-1) var(--cirth-space-2);
 }
 
+// A block of code is a printed procedure on the page, not a terminal
+// window: a light panel, a steel rule on every side, and a heavier bar
+// down the leading edge — the way a boxed instruction is set off in a
+// service manual. The leading-edge bar is `border-inline-start`, not a
+// left border, so it follows the writing direction in RTL.
+
 #{$parent-selector} pre {
   display: block;
   margin-bottom: var(--cirth-spacing);
+  border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+  border-inline-start: var(--cirth-border-width-4) solid
+    var(--cirth-code-edge-color);
   overflow-x: auto;
 
   > code,

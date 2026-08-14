@@ -13,29 +13,30 @@
   --cirth-color: #{$neutral-750};
 
   // Text selection color
-  --cirth-text-selection-color: #{color.change($amber-400, $alpha: 0.25)};
+  --cirth-text-selection-color: #{color.change($brand-400, $alpha: 0.25)};
 
   // Muted colors
+  // The border step is a real, visible steel line (neutral-200), not the
+  // near-invisible hairline the theme used to draw: panels, plates and
+  // dividers are load-bearing in this design language, so the edge of a
+  // thing has to actually read as an edge. Still well short of the text
+  // color — it delimits, it doesn't compete.
   --cirth-muted-color: #{$neutral-550};
-  --cirth-muted-border-color: #{color.mix(
-      $neutral-100,
-      $neutral-50,
-      $method: oklch
-    )};
+  --cirth-muted-border-color: #{$neutral-200};
 
   // Primary colors
-  --cirth-primary: #{$amber-550};
-  --cirth-primary-background: #{$amber-550};
+  --cirth-primary: #{$brand-550};
+  --cirth-primary-background: #{$brand-550};
   --cirth-primary-border: var(--cirth-primary-background);
-  --cirth-primary-underline: #{color.change($amber-550, $alpha: 0.5)};
-  --cirth-primary-hover: #{$amber-650};
-  --cirth-primary-hover-background: #{$amber-600};
+  --cirth-primary-underline: #{color.change($brand-550, $alpha: 0.5)};
+  --cirth-primary-hover: #{$brand-650};
+  --cirth-primary-hover-background: #{$brand-600};
   --cirth-primary-hover-border: var(--cirth-primary-hover-background);
   --cirth-primary-hover-underline: var(--cirth-primary-hover);
 
   // Focus rings composite to >= 3:1 against the page background (WCAG
   // 1.4.11 as applied to focus indicators) — don't lower these alphas.
-  --cirth-primary-focus: #{color.change($amber-550, $alpha: 0.75)};
+  --cirth-primary-focus: #{color.change($brand-550, $alpha: 0.75)};
   --cirth-primary-inverse: #{$white};
 
   // Secondary colors
@@ -63,7 +64,13 @@
   --cirth-contrast-inverse: #{$white};
 
   // Box shadow
-  --cirth-box-shadow: #{functions.shadow($neutral-400)};
+  // A single hard 2px drop, not the soft multi-layer blur this theme used
+  // to generate (functions.shadow, still available for themes that want
+  // it): a panel bolted to a surface casts a defined edge, not a halo.
+  // Elevation in this design language comes from borders and header
+  // bands; the shadow only keeps floating surfaces (dropdown, modal) from
+  // sitting flat on what they cover.
+  --cirth-box-shadow: 0 0.125rem 0 #{color.change($neutral-700, $alpha: 0.14)};
 
   // Typography
   // Headings colors — one step darker across the board than a plain
@@ -79,11 +86,12 @@
   --cirth-h6-color: #{$neutral-650};
 
   // Highlighted text (<mark>)
-  --cirth-mark-background-color: #{color.change(
-      $warning-250,
-      $lightness: 93%,
-      $chroma: 0.05
-    )};
+  // The operational yellow at full strength — this is the one place in
+  // running prose where the machine color appears, and washing it out to
+  // a pale wash (as this theme used to) throws away the only thing that
+  // makes it read as a marking. Graphite text on top, never the reverse:
+  // at this lightness the yellow is a fill, not a text color.
+  --cirth-mark-background-color: #{$warning-200};
   --cirth-mark-color: #{$neutral-950};
 
   // Inserted (<ins>) & Deleted (<del>)
@@ -91,7 +99,11 @@
   --cirth-del-color: #{$error-750};
 
   // Blockquote
-  --cirth-blockquote-border-color: var(--cirth-muted-border-color);
+  // Same graphite bar as a <pre>'s leading edge: a quote and a boxed
+  // procedure are the same gesture in a manual — content set off from the
+  // running text by a heavy rule — so they share one visual weight
+  // instead of the quote fading into a pale hairline.
+  --cirth-blockquote-border-color: var(--cirth-code-edge-color);
   --cirth-blockquote-footer-color: var(--cirth-muted-color);
 
   // Button
@@ -108,13 +120,19 @@
     )};
 
   // Code
-  --cirth-code-background-color: #{color.mix(
-      $neutral-50,
-      $white,
-      75%,
-      $method: oklch
-    )};
-  --cirth-code-color: #{$neutral-550};
+  // A tinted panel rather than a near-white one: a code block in this
+  // theme is a printed procedure on the page, so it needs to separate
+  // from the paper it sits on without going dark (a dark block would
+  // read as a terminal window, which is exactly the register this design
+  // avoids). Body-strength text, not muted — code is content here.
+  --cirth-code-background-color: #{$neutral-50};
+  --cirth-code-color: #{$neutral-800};
+
+  // The heavy rule down the leading edge of a <pre> (content/_code.scss).
+  // Graphite, not the brand color: code blocks are everywhere in
+  // documentation, and a red bar on each one would spend the identity
+  // color on the most repeated element on the page.
+  --cirth-code-edge-color: #{$neutral-700};
   --cirth-code-kbd-background-color: var(--cirth-color);
   --cirth-code-kbd-color: var(--cirth-background-color);
 
@@ -157,8 +175,8 @@
   // customized --cirth-primary-inverse stays consistent everywhere it
   // implies "text/icon on top of the primary color". Verified >= 3:1
   // (WCAG 1.4.11) against both tracks with the shipped values: 3.75:1
-  // unchecked (white on neutral-450), 5.46:1 checked (white on
-  // amber-550) — the tightest of the two is the one to re-check if
+  // unchecked (white on neutral-450), and white on brand-550 checked —
+  // the tightest of the two is the one to re-check if
   // --cirth-primary-inverse or --cirth-switch-background-color changes.
   --cirth-switch-color: var(--cirth-primary-inverse);
   --cirth-switch-thumb-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
@@ -178,16 +196,14 @@
 
   // Card (<article>)
   // White, not the background token: on the paper canvas a card is a
-  // sheet — the one surface brighter than the page.
+  // plate — the one surface brighter than the page. Its sectioning band
+  // (the <header>/<footer> strip) is a full step of tinted steel rather
+  // than a barely-there wash, so the band reads as the stamped strip at
+  // the top of a spec plate instead of as a slightly different white.
   --cirth-card-background-color: #{$white};
   --cirth-card-border-color: var(--cirth-muted-border-color);
   --cirth-card-box-shadow: var(--cirth-box-shadow);
-  --cirth-card-sectioning-background-color: #{color.mix(
-      $neutral-50,
-      $white,
-      25%,
-      $method: oklch
-    )};
+  --cirth-card-sectioning-background-color: #{$neutral-50};
 
   // Dropdown (details.dropdown)
   @if $enable-classes {

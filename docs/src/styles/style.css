@@ -18,16 +18,11 @@
 	   be painted through a mask in any color without a network request. */
 	--docs-emblem-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M260.64%20247.055V66L397.724%20193.816L345.132%20194.032L144.678%20400.521H108.036L260.64%20247.055Z'/%3E%3Cpath d='M339.097%20400.521H163.862L251.156%20311.071L339.097%20400.521Z'/%3E%3Cpath d='M260.64%20301.587L334.571%20376.34V284.99L372.29%20246.839H404.191L385.438%20208.904H350.09L260.64%20301.587Z'/%3E%3Cpath d='M377.125%20262.143H391.474L416.476%20300.725V446L349.227%20377.889V290.594L377.125%20262.143Z'/%3E%3Cpath d='M201.429%20137.87L220.79%20157.232L176.591%20201.431L231.326%20256.165L206.94%20280.551L152.205%20225.817L114.103%20263.919L76%20225.817L140.595%20161.222L201.429%20137.87Z'/%3E%3C/svg%3E");
 
-	/* Site-only override of a framework token: the compiled default build
-	   sets --cirth-font-family-display to the serif stack, which every
-	   h1–h6 uses (src/content/_typography.scss). Per brand direction,
-	   sans is this site's primary typographic voice — serif is reserved
-	   for editorial use (e.g. the name's origin story on /about and
-	   /brand), reached via --cirth-font-family-serif directly rather
-	   than through -display if it's ever needed again. This override is
-	   exactly the customization path the docs teach: override a
-	   --cirth- custom property after the stylesheet loads, no rebuild. */
-	--cirth-font-family-display: var(--cirth-font-family-sans);
+	/* No font override here any more. The library's own display role is
+	   the condensed stack (src/theme/_foundations.scss), so headings get
+	   their voice from the theme itself — this site deliberately stopped
+	   correcting the framework's typography, because a docs site that has
+	   to patch the defaults isn't demonstrating them. */
 }
 
 /* Header — logo | centered nav | controls, three columns instead of the
@@ -148,68 +143,28 @@
 	position: relative;
 }
 
-/* Vertical hero: centered copy with the demo composition below it */
+/* Identification plate + exploded drawing, side by side on wide screens
+   and stacked below 900px. Left-aligned, not centered: a plate is read
+   like a table, from a fixed left edge. */
 .docs-hero {
 	position: relative;
 	display: grid;
 	gap: calc(var(--cirth-spacing) * 3);
-	justify-items: center;
-	padding: calc(var(--cirth-spacing) * 3.5) 0 calc(var(--cirth-spacing) * 4);
-	text-align: center;
+	align-items: center;
+	padding: calc(var(--cirth-spacing) * 3) 0 calc(var(--cirth-spacing) * 4);
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 900px) {
 	.docs-hero {
-		padding-top: calc(var(--cirth-spacing) * 6);
-		padding-bottom: calc(var(--cirth-spacing) * 5.5);
+		grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+		gap: calc(var(--cirth-spacing) * 4);
+		padding-top: calc(var(--cirth-spacing) * 5);
+		padding-bottom: calc(var(--cirth-spacing) * 5);
 	}
 }
 
 .docs-hero-copy {
-	max-width: 44rem;
-}
-
-.docs-hero-demo-wrap {
-	position: relative;
-	width: 100%;
-	max-width: 60rem;
-}
-
-/* Radial-gradient glow, not an image — same device as Ruby's sunburst
-   behind its diamond mark, at zero asset cost. Both this and .docs-hero-
-   demo are position:relative with z-index:auto, so plain DOM order
-   decides paint order: the glow (first) sits behind the demo panel
-   (second), visible only in the bleed around its edges.
-
-   Color comes from --cirth-primary-underline — the framework's own
-   translucent-primary token (already themed for light/dark, and
-   re-themed by presets, e.g. cobalt/coral) — not a literal color, so a
-   preset switch (see the header's picker, gh#80) re-hues the glow along
-   with everything else instead of leaving it stuck on amber. It's
-   already ~50% alpha; the element's own `opacity` dims that further to
-   the subtle level a background glow wants, without needing
-   relative-color syntax (`oklch(from ...)`), which is Safari 16.4+ only
-   — past this project's own 15.4 floor. */
-.docs-hero-glow {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	width: 130%;
-	height: 160%;
-	background: radial-gradient(
-		closest-side,
-		var(--cirth-primary-underline),
-		transparent 70%
-	);
-	opacity: 0.4;
-	transform: translate(-50%, -50%);
-	pointer-events: none;
-}
-
-.docs-hero-demo {
-	position: relative;
-	width: 100%;
-	text-align: left;
+	max-width: 34rem;
 }
 
 /* Wordmark lockup (see docs/brand.md): the mark sits at cap height to the
@@ -217,17 +172,71 @@
 .docs-hero-title {
 	display: flex;
 	align-items: center;
-	justify-content: center;
 	gap: 0.3em;
+	margin-bottom: calc(var(--cirth-spacing) * 0.25);
 }
 
 .docs-hero-mark {
-	width: 4rem;
-	height: 4rem;
+	width: 3.5rem;
+	height: 3.5rem;
 }
 
 .docs-hero-copy hgroup > :first-child {
-	font-size: clamp(3rem, 2rem + 4vw, 4.75rem);
+	font-size: clamp(2.75rem, 2rem + 3.5vw, 4rem);
+}
+
+/* The identification plate itself: a bordered <dl> of stamped labels and
+   monospace figures, ruled between rows like a spec table. Values come
+   from _data/spec.js — measured, not typed. */
+.docs-plate {
+	margin: calc(var(--cirth-spacing) * 1.5) 0;
+	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	background-color: var(--cirth-card-background-color);
+}
+
+.docs-plate > div {
+	display: grid;
+	grid-template-columns: 7rem minmax(0, 1fr);
+	gap: var(--cirth-spacing);
+	padding: calc(var(--cirth-spacing) * 0.5) var(--cirth-spacing);
+	border-bottom: var(--cirth-border-width) solid
+		var(--cirth-muted-border-color);
+}
+
+.docs-plate > div:last-child {
+	border-bottom: 0;
+}
+
+.docs-plate dt {
+	color: var(--cirth-muted-color);
+	font-family: var(--cirth-font-family-condensed);
+	font-weight: var(--cirth-font-weight-bold);
+	font-size: var(--cirth-font-size-sm);
+	letter-spacing: var(--cirth-letter-spacing-wide);
+	text-transform: uppercase;
+}
+
+.docs-plate dd {
+	margin: 0;
+	color: var(--cirth-color);
+	font-family: var(--cirth-font-family-mono);
+	font-size: var(--cirth-font-size-sm);
+}
+
+.docs-plate-unit {
+	color: var(--cirth-muted-color);
+}
+
+/* The live demo sits in the hero's second column. */
+.docs-hero-figure {
+	min-width: 0;
+}
+
+.docs-hero-figure-caption {
+	margin: calc(var(--cirth-spacing) * 0.75) 0 0;
+	color: var(--cirth-muted-color);
+	font-family: var(--cirth-font-family-mono);
+	font-size: var(--cirth-font-size-xs);
 }
 
 .docs-hero-eyebrow {
@@ -390,8 +399,8 @@
 	margin-bottom: 0;
 }
 
-/* `!important` so element-specific styles (e.g. `.home-demo-code pre`)
-   can't reopen the box; `overflow: clip` forbids scrolling outright, so
+
+/* `!important` so element-specific styles can't reopen the box; `overflow: clip` forbids scrolling outright, so
    the clipped box doesn't count as a scrollable region needing keyboard
    access (`hidden` is the fallback below the browserslist floor,
    Safari < 16). */
@@ -584,25 +593,14 @@
 	letter-spacing: 0.08em;
 }
 
-/* Not the framework's own card shadow: --cirth-card-box-shadow is 7
-   stacked box-shadow layers (a soft-shadow technique, layered blur
-   radii up to 96px) — that specific layering is what triggers Safari/
-   WebKit's concentric-ring repaint artifact near a position:sticky
-   boundary, confirmed by testing a single-layer shadow at comparable
-   (even larger) blur in the same spot with no artifact at all. One
-   plain layer here keeps real depth without the bug. The border stays
-   too — belt and suspenders against the same near-white card vs. canvas
-   contrast issue, and it's what actually separates two directly
-   adjacent stacked cards where the shadow of the one on top is the only
-   other cue. */
+/* The local shadow override this rule used to carry is gone: it existed
+   to dodge a Safari/WebKit repaint artifact triggered by the framework's
+   old 7-layer soft shadow near a position:sticky boundary, and the theme
+   now ships a single hard-edged layer by default, which was the fix all
+   along. The card takes --cirth-card-box-shadow like every other panel.
+   The border is the framework's too — <article> already draws one. */
 .docs-stack-card {
 	margin-bottom: 0;
-	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-	box-shadow: 0 0.125rem 0.5rem oklch(0% 0 0 / 10%);
-}
-
-[data-theme="dark"] .docs-stack-card {
-	box-shadow: 0 0.125rem 0.75rem oklch(0% 0 0 / 35%);
 }
 
 .docs-stack-card h3 {
@@ -628,11 +626,13 @@
    than an inherited value from the parent .docs-badge-row, no matter
    how that parent rule's specificity compares) — so it has to be
    cleared here too, on the li itself, not just the ul. */
+/* Square tags, not pills: these are part markings stamped on a plate.
+   The radius comes from the theme knob so a preset retunes them too. */
 .docs-badge-row li {
 	margin: 0;
 	padding: calc(var(--cirth-spacing) * 0.3) calc(var(--cirth-spacing) * 0.75);
 	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-	border-radius: 9999px;
+	border-radius: var(--cirth-border-radius);
 	list-style: none;
 }
 
@@ -685,10 +685,12 @@
 	width: 3rem;
 	height: 3rem;
 	margin-bottom: calc(var(--cirth-spacing) * 0.25);
-	border-radius: 9999px;
-	/* --cirth-primary-underline (a translucent-primary token the
-	   framework already ships and re-themes per preset), not a literal
-	   amber — same reasoning as .docs-hero-glow above. */
+	/* A square badge plate, not a circle — see the .docs-badge-row note.
+	   --cirth-primary-underline (a translucent-primary token the framework
+	   already ships and re-themes per preset) rather than a literal color,
+	   so a preset switch re-hues it — same reasoning as .docs-hero-glow. */
+	border: var(--cirth-border-width) solid var(--cirth-primary);
+	border-radius: var(--cirth-border-radius);
 	background-color: var(--cirth-primary-underline);
 	color: var(--cirth-primary);
 }
@@ -1311,9 +1313,9 @@ pre > button.copy.copy:focus-visible {
    the button (e.g. the CDN snippet's href, unscrolled, at its default
    position). A background gradient is painted relative to the `pre` box
    itself, not the scrolling content, so it stays put over the button's
-   footprint regardless of scroll position. Scoped like the button
-   injection script (base.njk): every pre except .home-demo-code, which
-   never gets a button. */
+   footprint regardless of scroll position. Scoped like the copy-button
+   injection in base.njk: every pre except the hero demo's, which is
+   aria-hidden and never gets a button. */
 pre:not(.home-demo-code pre) {
 	background-image: linear-gradient(
 		to left,

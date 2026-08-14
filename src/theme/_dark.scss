@@ -7,35 +7,40 @@
 @mixin theme {
   color-scheme: dark;
 
-  --cirth-background-color: #{color.mix(
-      $neutral-950,
-      $neutral-900,
-      $method: oklch
-    )};
+  // Painted graphite, not absolute black: the dark scheme is a machine
+  // panel under shop light, so the canvas keeps the neutral scale's warmth
+  // and stops well above 0% lightness. Absolute black is reserved for the
+  // shadow color further down.
+  --cirth-background-color: #{$neutral-950};
 
   // Text color
-  --cirth-color: #{$neutral-200};
+  // Warm off-white rather than a cold gray — legible on graphite without
+  // the blue cast that makes a dark UI read as a terminal.
+  --cirth-color: #{$neutral-150};
 
   // Text selection color
-  --cirth-text-selection-color: #{color.change($amber-350, $alpha: 0.1875)};
+  --cirth-text-selection-color: #{color.change($brand-350, $alpha: 0.1875)};
 
   // Muted colors
+  // A steel border that's actually visible against the panel (800, not
+  // 850): same reasoning as the light scheme — edges are load-bearing
+  // here, and surfaces are separated by lines, not just by shadow.
   --cirth-muted-color: #{$neutral-450};
-  --cirth-muted-border-color: #{$neutral-850};
+  --cirth-muted-border-color: #{$neutral-800};
 
   // Primary colors
-  --cirth-primary: #{$amber-350};
-  --cirth-primary-background: #{$amber-550};
+  --cirth-primary: #{$brand-350};
+  --cirth-primary-background: #{$brand-550};
   --cirth-primary-border: var(--cirth-primary-background);
-  --cirth-primary-underline: #{color.change($amber-350, $alpha: 0.5)};
-  --cirth-primary-hover: #{$amber-250};
-  --cirth-primary-hover-background: #{$amber-500};
+  --cirth-primary-underline: #{color.change($brand-350, $alpha: 0.5)};
+  --cirth-primary-hover: #{$brand-250};
+  --cirth-primary-hover-background: #{$brand-500};
   --cirth-primary-hover-border: var(--cirth-primary-hover-background);
   --cirth-primary-hover-underline: var(--cirth-primary-hover);
 
   // Focus rings composite to >= 3:1 against the page background (WCAG
   // 1.4.11 as applied to focus indicators) — don't lower these alphas.
-  --cirth-primary-focus: #{color.change($amber-350, $alpha: 0.7)};
+  --cirth-primary-focus: #{color.change($brand-350, $alpha: 0.7)};
   --cirth-primary-inverse: #{$white};
 
   // Secondary colors
@@ -63,9 +68,8 @@
   --cirth-contrast-inverse: #{$black};
 
   // Box shadow
-  --cirth-box-shadow: #{functions.shadow(
-      color.mix($black, $neutral-950, $method: oklch)
-    )};
+  // Hard 2px drop, matching the light scheme — see the note there.
+  --cirth-box-shadow: 0 0.125rem 0 #{color.change($black, $alpha: 0.4)};
 
   // Typography
   // Headings colors
@@ -77,15 +81,21 @@
   --cirth-h6-color: #{$neutral-400};
 
   // Highlighted text (<mark>)
-  --cirth-mark-background-color: #{$warning-750};
-  --cirth-mark-color: #{$white};
+  // The same operational yellow as the light scheme, not a dark olive:
+  // a marking is applied *on top of* the machine, so it stays bright in
+  // both schemes and keeps graphite text on it. Inverting it to a dark
+  // fill with white text (as this theme used to) reads as a muddy
+  // background, not as a highlight.
+  --cirth-mark-background-color: #{$warning-250};
+  --cirth-mark-color: #{$neutral-950};
 
   // Inserted (<ins>) & Deleted (<del>)
   --cirth-ins-color: #{$success-250};
   --cirth-del-color: #{$error-250};
 
   // Blockquote
-  --cirth-blockquote-border-color: var(--cirth-muted-border-color);
+  // Shares the <pre> leading-edge rule — see the light scheme's note.
+  --cirth-blockquote-border-color: var(--cirth-code-edge-color);
   --cirth-blockquote-footer-color: var(--cirth-muted-color);
 
   // Button
@@ -102,13 +112,16 @@
     )};
 
   // Code
-  --cirth-code-background-color: #{color.mix(
-      $neutral-900,
-      $neutral-850,
-      75%,
-      $method: oklch
-    )};
-  --cirth-code-color: #{$neutral-400};
+  // Lighter than the canvas, not darker: on a graphite panel a printed
+  // procedure is a plate bolted on top, and a darker-still block would
+  // be the terminal window this design is steering away from. Body-
+  // strength text, matching the light scheme's reasoning.
+  --cirth-code-background-color: #{$neutral-900};
+  --cirth-code-color: #{$neutral-200};
+
+  // Leading-edge rule — see the light scheme's note. A step lighter than
+  // the border so it still reads as the heavy edge against graphite.
+  --cirth-code-edge-color: #{$neutral-600};
   --cirth-code-kbd-background-color: var(--cirth-color);
   --cirth-code-kbd-color: var(--cirth-background-color);
 
@@ -171,15 +184,14 @@
   --cirth-accordion-open-summary-color: var(--cirth-muted-color);
 
   // Card (<article>)
+  // The border is a real steel line here, not the card's own background
+  // colour (which is what this theme used to do, making dark cards edge-
+  // less and leaving separation entirely to the shadow). Panels in this
+  // design language are delimited by lines in both schemes.
   --cirth-card-background-color: #{$neutral-900};
-  --cirth-card-border-color: var(--cirth-card-background-color);
+  --cirth-card-border-color: var(--cirth-muted-border-color);
   --cirth-card-box-shadow: var(--cirth-box-shadow);
-  --cirth-card-sectioning-background-color: #{color.mix(
-      $neutral-900,
-      $neutral-850,
-      75%,
-      $method: oklch
-    )};
+  --cirth-card-sectioning-background-color: #{$neutral-850};
 
   // Dropdown (details.dropdown)
   @if $enable-classes {
@@ -205,7 +217,7 @@
   // 3:1). The border marks the track's extent at >= 3:1 against the page.
   --cirth-progress-background-color: #{$neutral-850};
   --cirth-progress-border-color: #{$neutral-550};
-  --cirth-progress-color: #{$amber-450};
+  --cirth-progress-color: #{$brand-450};
 
   // Tooltip ([data-tooltip])
   --cirth-tooltip-background-color: var(--cirth-contrast-background);

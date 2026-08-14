@@ -86,23 +86,33 @@ avatars, bookmark icons. Not for inline use next to text.
 
 ## Color
 
-The brand color is amber, and it is used as a functional signal, not an
-atmosphere: amber marks the primary action, the active state, the thing
-that matters most on a page, in the mark and in the framework's own
-`--cirth-primary*` tokens alike. It is not a wash applied across surfaces,
-navigation, or backgrounds — the base surface is graphite or cool neutral
-gray, in both the site and the framework's default theme.
+Color is functional here, never atmosphere. Each family has one job, and
+components are built so that two of them rarely appear in the same
+control:
 
-The mark's hue, **69.35°** in oklch, is the exact hue the framework's
-entire amber scale is generated from; the logo sits brighter than the UI
-tokens because it's an identity color, not a text color.
+| Role | Family | Where it appears |
+| --- | --- | --- |
+| Brand / action | Machine orange | Links, primary buttons, focus rings, the active state |
+| Operational | Safety yellow | `<mark>`, warnings — always as a fill with graphite text on it, never as text |
+| Surface | Graphite and steel | Text, panels, borders, metadata, the dark scheme's canvas |
+| Error | Crimson | Invalid fields, deleted text |
+| Success | Green | Valid fields, inserted text |
+
+The base surface is warm manual paper in light and painted graphite in
+dark — the accent colors sit *on* it, they never wash it.
 
 | Role | Value |
 | --- | --- |
+| UI primary (light theme) | `oklch(52.7% 0.123 48deg)`, from `$brand-550` |
+| UI primary (dark theme) | `oklch(70% 0.163 48deg)`, from `$brand-350` |
+| Operational fill | `oklch(83% 0.17 88deg)`, from `$warning-200` |
 | Mark, light backgrounds | `#CA8216` (`oklch(66.6% 0.139 69.35deg)`) |
 | Mark, dark backgrounds | `#DC8E18` (`oklch(71% 0.149 69.35deg)`) |
-| UI primary (light theme) | `oklch(52.7% 0.097 69.35deg)`, from `$amber-550` |
-| UI primary (dark theme) | `oklch(70% 0.129 69.35deg)`, from `$amber-350` |
+
+The mark is still the old amber drawing while the UI primary is machine
+orange, so the two are close but not the same. That is a known loose end
+rather than a decision: the mark is due to be redrawn, and the token is
+what every interface built on Cirth inherits, so the token led.
 
 In interfaces, always use the `--cirth-primary*` tokens rather than the
 logo hexes: the tokens are variants verified for WCAG. See

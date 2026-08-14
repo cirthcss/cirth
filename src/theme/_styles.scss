@@ -18,11 +18,16 @@
   // Borders
   // --cirth-border-radius stays the single knob presets and users override;
   // the per-component radii below are derived from it (var() substitutes at
-  // the root, so a preset that zeroes the knob zeroes these too): containers
-  // get a softer radius than the controls inside them, while small inline
-  // elements (checkboxes, code) are capped so they never read as circles.
-  --cirth-border-radius: var(--cirth-radius-lg);
-  --cirth-card-border-radius: calc(var(--cirth-border-radius) * 1.5);
+  // the root, so a preset that zeroes the knob zeroes these too), while
+  // small inline elements (checkboxes, code) are capped so they never read
+  // as circles.
+  // 2px, not the 8px this theme used to ship: controls are machined parts
+  // with a broken edge, not soft app chrome. Panels go further and sit at
+  // a true square corner — a plate bolted to a machine has no radius at
+  // all — which also inverts the old relationship, where containers were
+  // rounder than the controls inside them.
+  --cirth-border-radius: var(--cirth-radius-xs);
+  --cirth-card-border-radius: var(--cirth-radius-none);
   --cirth-checkbox-border-radius: min(
     var(--cirth-border-radius),
     var(--cirth-radius-sm)
@@ -207,12 +212,24 @@
   }
 
   // Table
+  // The header row is the label strip of a spec sheet: condensed, small,
+  // uppercase, openly tracked, sitting over a heavy 3px rule. Data rows
+  // stay plain — the contrast between a stamped header and quiet figures
+  // is what makes a table read as technical rather than decorative.
+  // (Body cells already opt into tabular-nums in content/_table.scss, so
+  // columns of measurements line up on the digit.)
   thead,
   tfoot {
     th,
     td {
-      --cirth-font-weight: var(--cirth-font-weight-semibold);
+      --cirth-font-family: var(--cirth-font-family-condensed);
+      --cirth-font-weight: var(--cirth-font-weight-bold);
+      --cirth-font-size: var(--cirth-font-size-sm);
       --cirth-border-width: 0.1875rem;
+
+      font-size: var(--cirth-font-size);
+      letter-spacing: var(--cirth-letter-spacing-wide);
+      text-transform: uppercase;
     }
   }
 
@@ -253,9 +270,10 @@
     --cirth-line-height: var(--cirth-line-height-relaxed);
   }
 
-  [type="search"] {
-    --cirth-border-radius: var(--cirth-radius-pill);
-  }
+  // Search keeps the standard control radius: a pill-shaped field is the
+  // one shape this design language explicitly rules out, and there's no
+  // reason a search input should be a different physical part than the
+  // text input next to it.
 
   // Buttons
   // The relaxed line-height is part of the 44px control-height math — see
@@ -311,10 +329,7 @@
   }
 
   // Group (role="group")
-  [role="search"] {
-    --cirth-border-radius: var(--cirth-radius-pill);
-  }
-
+  // No pill here either — see the [type="search"] note above.
   [role="search"],
   #{$group-selector} {
     @if $enable-classes {

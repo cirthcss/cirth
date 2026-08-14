@@ -15,16 +15,36 @@
   // Single source for every font stack. Components read the role tokens
   // set in theme/_styles.scss (--cirth-font-family, -display), which point
   // back here — don't redeclare these stacks anywhere else.
+  // Every stack resolves against fonts the OS already has: the library
+  // never loads a webfont, so a page that includes nothing but Cirth still
+  // makes zero network requests. A project that wants Barlow, Archivo or
+  // IBM Plex loads it itself and points these tokens at it.
   --cirth-font-family-emoji:
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --cirth-font-family-sans:
     system-ui, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, Helvetica, Arial,
     "Helvetica Neue", sans-serif, var(--cirth-font-family-emoji);
+
+  // Condensed — the voice of headings, labels and stamped markings. Named
+  // faces first for projects that do load one; then the narrow faces that
+  // actually ship with an OS: Arial Narrow (macOS, and Windows via
+  // Office), Liberation Sans Narrow (most Linux distros), Roboto
+  // Condensed (Android/ChromeOS). `system-ui` closes the stack so the
+  // worst case is the regular UI sans at heading weight, never a serif.
+  --cirth-font-family-condensed:
+    "Barlow Semi Condensed", "Archivo Narrow", "Roboto Condensed",
+    "Liberation Sans Narrow", "Arial Narrow", "Helvetica Neue Condensed",
+    system-ui, sans-serif, var(--cirth-font-family-emoji);
   --cirth-font-family-serif: Georgia, Cambria, "Times New Roman", Times, serif;
   --cirth-font-family-mono:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
-    monospace, var(--cirth-font-family-emoji);
-  --cirth-font-family-display: var(--cirth-font-family-serif);
+    "IBM Plex Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace, var(--cirth-font-family-emoji);
+
+  // The display role is the condensed face, not a serif: Cirth's headings
+  // are machine labels, not book chapters. --cirth-font-family-serif is
+  // kept above (unused by the default theme) so an override that wants an
+  // editorial voice back still has a stack to point at.
+  --cirth-font-family-display: var(--cirth-font-family-condensed);
 
   // Font sizes
   --cirth-font-size-xs: 0.75rem;
@@ -46,9 +66,14 @@
   --cirth-font-weight-bold: 700;
 
   // Letter spacing
-  // Negative tracking for display sizes only — body text stays at normal
-  --cirth-letter-spacing-tight: -0.02em;
-  --cirth-letter-spacing-snug: -0.01em;
+  // Negative tracking for display sizes only — body text stays at normal.
+  // `-wide` is the opposite end: the open tracking that makes a short
+  // uppercase run read as a stamped marking (table headers, legends,
+  // the code-block caption) instead of as shouted prose.
+  --cirth-letter-spacing-tight: -0.015em;
+  --cirth-letter-spacing-snug: -0.005em;
+  --cirth-letter-spacing-wide: 0.06em;
+  --cirth-letter-spacing-wider: 0.1em;
 
   // Line heights
   --cirth-line-height-none: 1;

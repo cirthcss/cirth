@@ -16,32 +16,61 @@ bodyClass: docs-home
 			    viewports. Nesting instead of combining removes the ambiguity:
 			    .container centers its content track as designed, .docs-hero
 			    governs its own children inside that track, no shared box. -#}
+			{#- The hero is an identification plate: the wordmark, what the
+			    thing is, and then the figures you'd read off a machine —
+			    model, revision, weight, input. Every value comes from
+			    _data/spec.js, which measures dist/ and reads package.json
+			    at build time, so the plate can't drift out of date the way
+			    a hand-typed number would. The exploded drawing sits beside
+			    it, the way a parts diagram sits beside a spec table. -#}
 			<div class="docs-hero">
 				<div class="docs-hero-copy">
-					{% if hero.eyebrow %}<p class="docs-hero-eyebrow">{{ hero.eyebrow }}</p>{% endif %}
 					<hgroup>
 						<h1 class="docs-hero-title">
-							<img class="docs-hero-mark docs-logo-light" src="/logo_brand.svg" alt="" width="64" height="64" />
-							<img class="docs-hero-mark docs-logo-dark" src="/logo_brand_dark.svg" alt="" width="64" height="64" />
+							<img class="docs-hero-mark docs-logo-light" src="/logo_brand.svg" alt="" width="56" height="56" />
+							<img class="docs-hero-mark docs-logo-dark" src="/logo_brand_dark.svg" alt="" width="56" height="56" />
 							<span>{{ hero.name }}</span>
 						</h1>
-						<p>{{ hero.text }}</p>
+						<p class="docs-hero-eyebrow">{{ hero.eyebrow }}</p>
 					</hgroup>
-					<p class="docs-hero-tagline">{{ hero.tagline }}</p>
+
+					<dl class="docs-plate">
+						<div>
+							<dt>Revision</dt>
+							<dd>{{ spec.version }}</dd>
+						</div>
+						<div>
+							<dt>Weight</dt>
+							<dd>{{ spec.defaultBuildLabel }} <span class="docs-plate-unit">gzipped</span></dd>
+						</div>
+						<div>
+							<dt>Builds</dt>
+							<dd>{{ spec.builds }} <span class="docs-plate-unit">variants</span></dd>
+						</div>
+						<div>
+							<dt>Input</dt>
+							<dd>Standard HTML</dd>
+						</div>
+					</dl>
+
+					<p class="docs-hero-tagline">{{ hero.text }}</p>
 					<p class="docs-hero-actions">
 						{% for action in hero.actions %}
 							<a href="{{ action.link }}" role="button"{% if action.theme != "brand" %} class="outline secondary"{% endif %}>{{ action.text }}</a>
 						{% endfor %}
 					</p>
 				</div>
-				{#- The glow is a plain CSS radial-gradient behind the demo panel
-				    (see .docs-hero-glow), not an image — same spirit as Ruby's
-				    sunburst behind its diamond mark, at zero asset cost. -#}
-				<div class="docs-hero-demo-wrap">
-					<div class="docs-hero-glow" aria-hidden="true"></div>
-					<div class="docs-hero-demo">
-						{% include "home-demo.njk" %}
-					</div>
+				{#- The live demo, beside the plate: plain semantic HTML is
+				    typed on the left and the rendered result builds up on the
+				    right, so the hero's claim ("write HTML, it's already
+				    styled") is demonstrated rather than asserted. The full
+				    final state is server-rendered inside the include, so
+				    no-JS visitors and assistive tech get the complete markup;
+				    the typing is a visual layer applied after load and
+				    skipped entirely under prefers-reduced-motion. -#}
+				<div class="docs-hero-figure">
+					{% include "home-demo.njk" %}
+					<p class="docs-hero-figure-caption">Fig. 1 — Input and output</p>
 				</div>
 			</div>
 		</div>
