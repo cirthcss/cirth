@@ -9,6 +9,11 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Fixed
 
+- **Hidden fields no longer break grouped-control corners** (gh#68):
+  `.group` and `[role="search"]` now calculate their outer corners from the
+  first and last visible items, ignoring `[hidden]` elements and
+  `input[type="hidden"]`. Hidden form metadata can now appear before or after
+  the visible controls without flattening the group's outer radius.
 - **Native validation no longer produces misleading success states** (gh#83):
   automatic styling now reacts only to `:user-invalid`; `:user-valid`
   stays visually neutral unless the author explicitly sets

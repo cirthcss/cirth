@@ -47,6 +47,9 @@ at both ends:
 
 * Children are laid out with `display: inline-flex`; adjoining corners are
   squared off so only the group's outer corners are rounded.
+* Elements with `[hidden]` and `input[type="hidden"]` are ignored when the
+  first and last visible controls are calculated, so hidden form metadata
+  does not break the group's outer corners.
 * Focusing any child raises it above its siblings (`z-index: 2`) and, where
   `:has()` is supported, recolors the whole group's shadow to match
   whichever child (button or input) is focused:
