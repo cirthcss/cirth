@@ -1,7 +1,8 @@
 // Site navigation config — ported 1:1 from the previous src/lib/nav.ts.
 
 const siteTitle = "Cirth";
-const siteDescription = "Semantic-first CSS for production-ready interfaces.";
+const siteDescription =
+	"HTML-native CSS framework. Production-ready UI from semantic HTML — under 14KB gzipped, 0 JavaScript.";
 
 const topNav = [
 	{ text: "Docs", link: "/get-started" },

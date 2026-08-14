@@ -21,14 +21,19 @@ $cobalt-400: oklch(64% 0.09 258deg);
 $cobalt-300: oklch(72% 0.075 258deg);
 
 @mixin light {
-  // Canvas: the default theme's paper concept in cobalt's own hue — a
-  // cool near-white page with white sheets (cards) on it
-  --cirth-background-color: oklch(97.4% 0.004 258deg);
+  // Canvas: classic-corporate white, not the default theme's paper
+  // concept — chroma cut to a bare trace (0.004 -> 0.002) so the page
+  // reads as white with cobalt reserved for the accent, closer to a
+  // conventional enterprise UI than to Cirth's own warm-paper identity.
+  // White sheets (cards) on it, same as before.
+  --cirth-background-color: oklch(97.4% 0.002 258deg);
   --cirth-card-background-color: oklch(100% 0 0deg);
 
-  // Surface: cool-toned neutrals instead of the default's neutral scale
-  --cirth-muted-color: oklch(50% 0.02 258deg);
-  --cirth-muted-border-color: oklch(88% 0.015 258deg);
+  // Surface: cool-toned neutrals, also pulled closer to true gray
+  // (chroma halved again from the already-subtle default) for the same
+  // "white first" reason as the canvas above.
+  --cirth-muted-color: oklch(50% 0.01 258deg);
+  --cirth-muted-border-color: oklch(88% 0.008 258deg);
   --cirth-text-selection-color: #{color.change($cobalt-600, $alpha: 0.25)};
 
   // Primary

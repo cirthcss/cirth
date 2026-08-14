@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-base="{{ '/' | htmlBaseUrl }}">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -17,6 +17,23 @@
 					? stored === "dark"
 					: window.matchMedia("(prefers-color-scheme: dark)").matches;
 				document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+			})();
+
+			// Same idea for the preset switcher (gh#80): apply a
+			// session-remembered preset before first paint, so returning to
+			// a page (or following a link) after picking one doesn't flash
+			// the default theme first. sessionStorage, not localStorage —
+			// the issue asks for "the current session", not a permanent
+			// choice that'd survive a closed tab into someone's next visit.
+			(function () {
+				var preset = sessionStorage.getItem("cirth-preset");
+				if (!preset || preset === "amber") return;
+				var base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
+				var link = document.createElement("link");
+				link.rel = "stylesheet";
+				link.id = "cirth-preset-stylesheet";
+				link.href = base + "/styles/generated/presets/" + preset + ".css";
+				document.head.appendChild(link);
 			})();
 		</script>
 	</head>
@@ -61,6 +78,111 @@
 				new MutationObserver(sync).observe(document.documentElement, {
 					attributeFilter: ["data-theme"],
 				});
+			}
+
+			// Live preset switcher (gh#80): the <head> script above already
+			// applied a remembered choice before first paint; this wires up
+			// the header <select> for changes after load. Swapping the
+			// stylesheet's href (rather than always keeping one <link> per
+			// preset and toggling disabled) means an unvisited preset is
+			// never fetched at all.
+			const presetSelect = document.querySelector("[data-cirth-preset-select]");
+			if (presetSelect) {
+				const base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
+				const applyPreset = (preset) => {
+					const existing = document.getElementById("cirth-preset-stylesheet");
+					if (preset === "amber") {
+						existing?.remove();
+						return;
+					}
+					const link = existing ?? document.createElement("link");
+					link.rel = "stylesheet";
+					link.id = "cirth-preset-stylesheet";
+					link.href = `${base}/styles/generated/presets/${preset}.css`;
+					if (!existing) document.head.appendChild(link);
+				};
+				presetSelect.value = sessionStorage.getItem("cirth-preset") || "amber";
+				presetSelect.addEventListener("change", () => {
+					sessionStorage.setItem("cirth-preset", presetSelect.value);
+					applyPreset(presetSelect.value);
+				});
+			}
+
+			// Everything below is docs-site chrome, not the framework: it only
+			// touches elements these specific homepage sections render, so it's
+			// a harmless no-op on every other page. Cirth itself still ships
+			// zero JavaScript — this is the site *about* it, same as the copy-
+			// to-clipboard buttons and theme toggle above.
+			const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+			// Scroll-reveal: .docs-reveal-armed (the hidden starting state) is
+			// added here, right before observing — never in the shipped CSS or
+			// markup — so a JS failure, a browser without IntersectionObserver,
+			// or prefers-reduced-motion all leave content in its plain, fully
+			// visible default instead of stuck invisible.
+			const revealTargets = document.querySelectorAll(".docs-reveal");
+			if (!reduceMotion && revealTargets.length > 0 && "IntersectionObserver" in window) {
+				for (const el of revealTargets) el.classList.add("docs-reveal-armed");
+				const revealObserver = new IntersectionObserver(
+					(entries) => {
+						for (const entry of entries) {
+							if (!entry.isIntersecting) continue;
+							entry.target.classList.add("docs-reveal-visible");
+							revealObserver.unobserve(entry.target);
+						}
+					},
+					{ threshold: 0.15, rootMargin: "0px 0px -10% 0px" },
+				);
+				for (const el of revealTargets) revealObserver.observe(el);
+
+				// Safety net: headless full-page capture (screenshot tools, some
+				// print-to-PDF paths, link-preview crawlers) renders the entire
+				// document at once through the compositor without ever moving
+				// the real scroll position, so IntersectionObserver correctly
+				// reports "never intersected" for anything below the original
+				// viewport — which would otherwise leave it permanently at
+				// opacity:0. Force-reveal anything still unrevealed after a
+				// few seconds; a no-op for a normal visitor who scrolled there
+				// well within that window.
+				setTimeout(() => {
+					for (const el of revealTargets) el.classList.add("docs-reveal-visible");
+				}, 2500);
+			}
+
+			// Count-up: the pitch stats already carry their real final value as
+			// plain text (that's what no-JS visitors and assistive tech read),
+			// this only re-animates the first number substring it finds once
+			// the card scrolls into view — "<14KB gzipped" counts up the 14,
+			// "244 tokens" counts up the 244, "AA" has no digit and is left
+			// alone entirely.
+			const countTargets = document.querySelectorAll(".docs-pitch-value");
+			if (!reduceMotion && countTargets.length > 0 && "IntersectionObserver" in window) {
+				const countObserver = new IntersectionObserver(
+					(entries) => {
+						for (const entry of entries) {
+							if (!entry.isIntersecting) continue;
+							countObserver.unobserve(entry.target);
+							const el = entry.target;
+							const text = el.textContent ?? "";
+							const match = text.match(/\d+/);
+							if (!match) continue;
+							const to = Number(match[0]);
+							const before = text.slice(0, match.index);
+							const after = text.slice(match.index + match[0].length);
+							const duration = 700;
+							const start = performance.now();
+							const tick = (now) => {
+								const t = Math.min(1, (now - start) / duration);
+								const eased = 1 - (1 - t) * (1 - t);
+								el.textContent = `${before}${Math.round(to * eased)}${after}`;
+								if (t < 1) requestAnimationFrame(tick);
+							};
+							requestAnimationFrame(tick);
+						}
+					},
+					{ threshold: 0.6 },
+				);
+				for (const el of countTargets) countObserver.observe(el);
 			}
 		</script>
 	</body>

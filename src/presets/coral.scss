@@ -23,8 +23,11 @@ $coral-250: oklch(80% 0.1 35deg);
 
 @mixin light {
   // Canvas: the default theme's paper concept in coral's own hue — a
-  // blush near-white page with white sheets (cards) on it
-  --cirth-background-color: oklch(97.4% 0.008 35deg);
+  // blush near-white page with white sheets (cards) on it. Chroma
+  // halved (0.008 -> 0.004) to match the same "white first, accent
+  // color second" adjustment made to the default theme and to cobalt —
+  // still a blush, just a fainter one.
+  --cirth-background-color: oklch(97.4% 0.004 35deg);
   --cirth-card-background-color: oklch(100% 0 0deg);
 
   // Surface: warm-toned neutrals instead of the default's cool neutral scale
