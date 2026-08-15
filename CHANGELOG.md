@@ -7,6 +7,8 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+## [0.8.5] - 2026-08-15
+
 ### Fixed
 
 - **Date-like inputs now shrink inside grouped grid columns** (gh#70):
@@ -720,7 +722,8 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
-[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.8.4...master
+[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.8.5...master
+[0.8.5]: https://github.com/cirthcss/cirth/compare/v0.8.4...v0.8.5
 [0.8.4]: https://github.com/cirthcss/cirth/compare/v0.8.3...v0.8.4
 [0.8.3]: https://github.com/cirthcss/cirth/compare/v0.8.2...v0.8.3
 [0.8.2]: https://github.com/cirthcss/cirth/compare/v0.8.1...v0.8.2
