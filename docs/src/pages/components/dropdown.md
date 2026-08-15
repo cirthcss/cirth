@@ -59,5 +59,7 @@ an account/actions menu in a header bar:
 * Menu items get hover/focus/active/`aria-current` background from
   `--cirth-dropdown-hover-background-color`; the menu itself uses background,
   border, shadow, and color tokens from the dropdown group.
+* Inside a nav, the dropdown establishes its own containing block so the
+  absolutely positioned menu remains aligned to the trigger in every browser.
 * `aria-invalid="true"`/`"false"` on the `summary` recolor it the same way as
   a form field.

@@ -7,7 +7,12 @@ const { defineConfig } = require("@playwright/test");
 
 module.exports = defineConfig({
 	testDir: "tests",
-	testMatch: ["forms-validity.spec.js", "group-hidden-elements.spec.js"],
+	testMatch: [
+		"date-input-group.spec.js",
+		"forms-validity.spec.js",
+		"group-hidden-elements.spec.js",
+		"nav-dropdown.spec.js",
+	],
 	fullyParallel: true,
 	forbidOnly: !!process.env.CI,
 	reporter: [["list"]],

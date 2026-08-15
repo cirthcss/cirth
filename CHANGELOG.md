@@ -9,6 +9,13 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Fixed
 
+- **Date-like inputs now shrink inside grouped grid columns** (gh#70):
+  date, datetime-local, month, time, and week controls now opt out of their
+  native intrinsic minimum width, keeping paired ranges on one row in narrow
+  grid columns across browser engines.
+- **Nav dropdown menus stay anchored to their trigger in Firefox** (gh#72):
+  nav dropdowns now establish a stable containing block for their absolutely
+  positioned menu instead of allowing Firefox to size it against the viewport.
 - **Hidden fields no longer break grouped-control corners** (gh#68):
   `.group` and `[role="search"]` now calculate their outer corners from the
   first and last visible items, ignoring `[hidden]` elements and

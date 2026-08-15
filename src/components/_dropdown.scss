@@ -137,7 +137,10 @@
   // Dropdown inside a nav
   // ––––––––––––––––––––
   #{$parent-selector} nav details.dropdown {
-    display: inline;
+    // An inline positioned container gives Firefox's absolutely positioned
+    // menu the viewport as its containing block. Inline-block preserves the
+    // inline nav flow while containing the menu (upstream #701).
+    display: inline-block;
     margin: calc(var(--cirth-nav-element-spacing-vertical) * -1) 0;
 
     > summary {

@@ -18,6 +18,10 @@
     --cirth-icon-position: var(--cirth-space-3);
     --cirth-icon-width: var(--cirth-size-4);
 
+    // Native date segments contribute an intrinsic minimum width in
+    // Chromium and Firefox. Let the control shrink when it is a flex item
+    // inside a group nested in a narrow grid column (upstream #733).
+    min-width: 0;
     padding-inline-end: calc(
       var(--cirth-icon-width) + var(--cirth-icon-position)
     );
