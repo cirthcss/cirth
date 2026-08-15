@@ -2,7 +2,7 @@
 name: Documentation
 about: Suggest a documentation improvement.
 title: "[Docs]: "
-labels: documentation
+type: "📚 documentation"
 ---
 
 Please search existing and closed issues before opening a new one.
