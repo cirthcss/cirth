@@ -2,7 +2,7 @@
 name: Bug report
 about: Report a confirmed Cirth bug with a reduced reproduction.
 title: "[Bug]: "
-labels: bug
+type: "🐛 bug"
 ---
 
 Please search existing and closed issues before opening a new one.
