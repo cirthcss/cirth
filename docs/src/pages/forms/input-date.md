@@ -24,3 +24,5 @@ dropped instead and normal input padding is restored. In `[dir="rtl"]`,
 text aligns right. In Safari/WebKit, the internal date/time segments are
 also reset to inherit text alignment and drop their default vertical
 padding, avoiding the centered/misaligned rendering iOS otherwise applies.
+Date-like controls can also shrink as flex items, so paired ranges remain
+on one row inside grouped grid columns.

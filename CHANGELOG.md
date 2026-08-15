@@ -7,6 +7,28 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Date-like inputs now shrink inside grouped grid columns** (gh#70):
+  date, datetime-local, month, time, and week controls now opt out of their
+  native intrinsic minimum width, keeping paired ranges on one row in narrow
+  grid columns across browser engines.
+- **Nav dropdown menus stay anchored to their trigger in Firefox** (gh#72):
+  nav dropdowns now establish a stable containing block for their absolutely
+  positioned menu instead of allowing Firefox to size it against the viewport.
+- **Hidden fields no longer break grouped-control corners** (gh#68):
+  `.group` and `[role="search"]` now calculate their outer corners from the
+  first and last visible items, ignoring `[hidden]` elements and
+  `input[type="hidden"]`. Hidden form metadata can now appear before or after
+  the visible controls without flattening the group's outer radius.
+- **Native validation no longer produces misleading success states** (gh#83):
+  automatic styling now reacts only to `:user-invalid`; `:user-valid`
+  stays visually neutral unless the author explicitly sets
+  `aria-invalid="false"`. Range inputs no longer gain a green validation ring
+  after interaction, and required selects wait until they lose focus before
+  showing a native invalid state. Explicit `aria-invalid` behavior is
+  unchanged.
+
 ## [0.8.4] - 2026-08-13
 
 ### Fixed

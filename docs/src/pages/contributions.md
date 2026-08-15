@@ -100,13 +100,21 @@ npm run lint          # stylelint + custom property audit + doc links
 npm run build         # compile src/ to dist/
 npm run check:dist    # structural invariants of the 12 dist files
 npm run check:size    # ≤ 14 KiB gzipped per root bundle
-npm run docs:build    # build this site (input for the two checks below)
+npm run docs:build    # build this site (input for the browser checks below)
+npm run check:behavior # browser interaction regressions across three engines
 npm run check:a11y    # axe WCAG A/AA audit of every docs page
-npm run check:visual  # screenshot diff of every docs page
+npm run check:visual  # screenshot diff of selected component/layout pages
 ```
 
-The two browser-based checks need a Playwright Chromium once:
-`npx playwright install chromium`.
+The browser-based checks need the Playwright browsers once:
+`npx playwright install chromium firefox webkit`.
+
+### Interaction regressions: `check:behavior`
+
+Runs focused interaction tests against Chromium, Firefox, and WebKit. These
+tests cover browser-managed states that static screenshots cannot exercise,
+such as focus, blur, `:user-valid`, and `:user-invalid`. WebKit provides the
+closest automated coverage available for Safari's rendering engine.
 
 ### Dist invariants — `check:dist`
 
@@ -135,11 +143,12 @@ goal is to keep it that way: fix violations rather than baseline them.
 
 ### Visual regression — `check:visual`
 
-Playwright screenshots every docs page — full page, light and dark, at
-1440 px and 390 px — and compares each against a committed baseline in
-`tests/__screenshots__/`. Any unexplained pixel difference fails the
-check; the docs demos make this double as visual coverage of every
-component.
+Playwright screenshots selected component and layout pages at full-page size,
+in light and dark modes, at 1440 px and 390 px, and compares each against a committed
+baseline in `tests/__screenshots__/`. Any unexplained pixel difference fails
+the check. Primarily editorial pages are intentionally excluded because the
+docs build, link check, and accessibility audit already cover them without
+multiplying text-only snapshots across every browser project.
 
 Two things to know about the baselines:
 
