@@ -2,7 +2,7 @@
 name: Tooling
 about: Report or propose a change to build, linting, CI, release, or npm packaging.
 title: "[Tooling]: "
-labels: tooling
+type: "🔧 maintenance"
 ---
 
 Please search existing and closed issues before opening a new one.
