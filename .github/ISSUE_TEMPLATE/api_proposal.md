@@ -2,7 +2,7 @@
 name: API proposal
 about: Propose a CSS variable, class, layout primitive, component behavior, or public API change.
 title: "[API]: "
-labels: proposal
+type: "🚀 feature"
 ---
 
 Please search existing and closed issues before opening a new one.
