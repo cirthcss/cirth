@@ -83,6 +83,28 @@ starts the Package workflow (release artifacts and the GitHub release) and
 the Publish npm workflow; both rebuild `dist/` from the tagged source, so
 the published files are whatever that source compiles to.
 
+### Which number to bump
+
+Cirth is pre-1.0, so the minor slot carries everything a 1.0 project would
+split between major and minor:
+
+- **Minor** (`0.X.0`) for a new feature, a new public custom property, any
+  breaking change, and any change to how existing markup renders by
+  default. A visited-link color that repaints every site's links is a
+  minor, even though it removes nothing.
+- **Patch** (`0.x.Y`) only for changes that bring behavior back to what
+  was already documented or intended: bug fixes, and internal or tooling
+  work with no effect on the published CSS.
+
+Minor numbers are not scarce, and 0.9.0 is not obliged to be the last stop
+before 1.0. When a release is a close call, bump the minor: a caret range
+(`^0.8.0` resolves to `>=0.8.0 <0.9.0`) means a patch reaches everyone
+automatically, and the version number is the only warning most people get.
+v0.8.1 is the counterexample to learn from: it shipped as a patch while
+carrying a change its own changelog entry labels breaking.
+
+### Cutting the release
+
 1. Update `CHANGELOG.md` (turn `[Unreleased]` into the new version, refresh
    the compare links) and write the release notes in
    `.github/releases/vX.Y.Z.md`.

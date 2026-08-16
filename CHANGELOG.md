@@ -7,6 +7,8 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-08-16
+
 ### Added
 
 - **Visited links get their own color** (gh#58): a followed content link
@@ -764,7 +766,8 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
-[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.8.5...master
+[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.9.0...master
+[0.9.0]: https://github.com/cirthcss/cirth/compare/v0.8.5...v0.9.0
 [0.8.5]: https://github.com/cirthcss/cirth/compare/v0.8.4...v0.8.5
 [0.8.4]: https://github.com/cirthcss/cirth/compare/v0.8.3...v0.8.4
 [0.8.3]: https://github.com/cirthcss/cirth/compare/v0.8.2...v0.8.3
