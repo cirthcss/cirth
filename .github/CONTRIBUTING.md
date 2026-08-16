@@ -75,3 +75,45 @@ should be partials or internal modules pulled in through `@use`.
 
 The npm package ships compiled CSS only. SCSS remains repository source and
 build infrastructure, not part of the published package surface.
+
+## Releasing
+
+Releases are cut on `master` and driven by a `vX.Y.Z` tag. Pushing the tag
+starts the Package workflow (release artifacts and the GitHub release) and
+the Publish npm workflow; both rebuild `dist/` from the tagged source, so
+the published files are whatever that source compiles to.
+
+1. Update `CHANGELOG.md` (turn `[Unreleased]` into the new version, refresh
+   the compare links) and write the release notes in
+   `.github/releases/vX.Y.Z.md`.
+2. Bump the version: `npm version --no-git-tag-version x.y.z`.
+3. `npm run build`, to compile the source the release will publish.
+4. `npm run sri`, which repins the documented CDN snippets to the new
+   version and rewrites their `integrity` hashes from the built `dist/`
+   files. The rewritten `README.md` and `docs/src/pages/get-started.md`
+   belong in the release commit.
+5. `npm run lint && npm run check:dist && npm run check:size`.
+6. Commit as `chore(release): prepare vX.Y.Z`, then tag that commit
+   `vX.Y.Z` and push the tag.
+7. Once npm has the version and jsDelivr has fetched it (a minute or two),
+   verify the documented hashes against reality:
+   `npm run check:sri -- --from-cdn`.
+
+### Subresource Integrity
+
+The CDN snippets carry a `sha384` `integrity` hash and
+`crossorigin="anonymous"`, so a browser refuses a jsDelivr response whose
+bytes are not the ones documented here. A hash only means anything next to
+the version it was taken from, which is why `npm run sri` rewrites the
+version pin and the hash in one pass: never bump one by hand.
+
+`npm run check:sri` runs as part of `npm run lint`. It is offline and
+structural: every snippet pins the version in `package.json`, carries a
+well-formed hash, and sets `crossorigin`. It cannot tell whether the hash
+matches the published file, because between releases `dist/` has already
+moved past the version the snippets pin. Step 7 above is the check that
+compares against the real published bytes.
+
+If step 7 disagrees, the release build was not reproducible: regenerate
+from the published files with `npm run sri -- --from-cdn` and commit the
+correction, then look into why the two builds differed.

@@ -11,8 +11,20 @@ semantic markup, and most of your interface is already styled.
 ## CDN
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.8.5/dist/cirth.min.css">
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.8.5/dist/cirth.min.css"
+  integrity="sha384-sTMjcMVehQBy9LqnFZtTTbADnB2DUwzUybwsSq+T19VN7gNqlS3BTeZ3/gXjDJGA"
+  crossorigin="anonymous">
 ```
+
+The `integrity` hash is the SHA-384 digest of that exact file: if the CDN
+ever answers with different bytes, the browser drops the stylesheet instead
+of applying it. `crossorigin="anonymous"` is what lets the browser read the
+response to check it. The hash is tied to the version in the URL: if you
+pin a different release, take that release's hash from its own copy of this
+page or from jsDelivr's file listing, because a mismatched pair blocks the
+stylesheet everywhere.
 
 ## npm
 

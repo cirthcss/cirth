@@ -96,7 +96,7 @@ review attention. Each one is enforced by an automated check that runs
 in CI on every push, and the same checks run locally:
 
 ```sh
-npm run lint          # stylelint + custom property audit + doc links
+npm run lint          # stylelint + custom property audit + doc links + CDN hashes
 npm run build         # compile src/ to dist/
 npm run check:dist    # structural invariants of the 12 dist files
 npm run check:size    # ≤ 14 KiB gzipped per root bundle
@@ -127,6 +127,22 @@ build, so the contracts of each build variant can't erode silently:
 * scoped builds keep **every rule inside the `.cirth` subtree** — no
   selector can style markup that didn't opt in;
 * presets only set custom properties on theme roots, never rules.
+
+### CDN integrity — `check:sri`
+
+The `<link>` snippets on [Get Started](/get-started#cdn) and in the README
+pin a version *and* carry the `sha384` hash of the file that version
+serves. `check:sri` (part of `npm run lint`) keeps the two honest: every
+snippet has to pin the version in `package.json`, carry a well-formed hash,
+and set `crossorigin="anonymous"`, without which the browser cannot verify
+the response at all.
+
+Version and hash are rewritten together by `npm run sri` at release time,
+then verified against the bytes jsDelivr actually serves with
+`npm run check:sri -- --from-cdn` after publishing. Editing either by hand
+is how you ship a snippet that every browser refuses to load; the
+[releasing section of `.github/CONTRIBUTING.md`](https://github.com/cirthcss/cirth/blob/master/.github/CONTRIBUTING.md#releasing)
+has the full sequence.
 
 ### Accessibility — `check:a11y`
 

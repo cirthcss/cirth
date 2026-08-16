@@ -7,6 +7,18 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Added
+
+- **Subresource Integrity on the documented CDN snippets** (gh#33): the
+  jsDelivr `<link>` in the README and on Get Started now carries the
+  `sha384` hash of the file it pins, plus `crossorigin="anonymous"`, so a
+  CDN response that isn't the published stylesheet is refused by the
+  browser. `npm run sri` rewrites the version pin and the hash together as
+  a release step, `npm run check:sri` (part of `npm run lint`) keeps the
+  snippets well-formed, and `npm run check:sri -- --from-cdn` verifies the
+  documented hashes against the bytes jsDelivr actually serves. Nothing in
+  the published CSS changes.
+
 ## [0.8.5] - 2026-08-15
 
 ### Fixed
