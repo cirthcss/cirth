@@ -53,7 +53,11 @@
 Include one stylesheet and write ordinary semantic HTML.
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.8.5/dist/cirth.min.css">
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.8.5/dist/cirth.min.css"
+  integrity="sha384-sTMjcMVehQBy9LqnFZtTTbADnB2DUwzUybwsSq+T19VN7gNqlS3BTeZ3/gXjDJGA"
+  crossorigin="anonymous">
 ```
 
 ```html
