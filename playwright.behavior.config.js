@@ -8,9 +8,12 @@ const { defineConfig } = require("@playwright/test");
 module.exports = defineConfig({
 	testDir: "tests",
 	testMatch: [
+		"button-overflow.spec.js",
 		"date-input-group.spec.js",
 		"forms-validity.spec.js",
 		"group-hidden-elements.spec.js",
+		"group-search-radius.spec.js",
+		"list-nesting.spec.js",
 		"nav-dropdown.spec.js",
 	],
 	fullyParallel: true,

@@ -162,7 +162,15 @@
 
 // 1. Remove the margin on nested lists in Chrome, Edge, IE, and Safari
 
-#{$parent-selector} :where(dl, ol, ul) :where(dl, ol, ul) {
+// :is(), not :where(): a nested list has to outrank the `dl, ol, ul` type
+// selectors that give every list its bottom margin above. With :where() on
+// both compounds this rule weighed nothing, silently lost the cascade, and
+// nested lists kept a full bottom margin, a visibly larger gap before the
+// next parent item than between the nested items themselves (gh#76).
+// Components that style their own nested lists (nav, dropdown) still win:
+// they either match this specificity later in the sheet or exceed it.
+
+#{$parent-selector} :is(dl, ol, ul) :is(dl, ol, ul) {
   margin: 0; // 1
   margin-top: calc(var(--cirth-typography-spacing-vertical) * 0.25);
 }

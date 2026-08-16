@@ -257,6 +257,17 @@
     --cirth-border-radius: var(--cirth-radius-pill);
   }
 
+  // The pill belongs to the search field itself and to the dedicated
+  // [role="search"] group. Inside a generic group the field is just one
+  // segment of a shared shape, so it takes the radius its group is drawn
+  // with, or its exposed corners (and the focus shadow tracing
+  // them) stay pill-round against the group's square ones (gh#69).
+  // `inherit` rather than a literal, so a customized
+  // --cirth-border-radius keeps the two in step.
+  #{$group-selector} [type="search"] {
+    --cirth-border-radius: inherit;
+  }
+
   // Buttons
   // The relaxed line-height is part of the 44px control-height math — see
   // the form-element spacing tokens above

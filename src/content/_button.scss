@@ -46,6 +46,12 @@
   --cirth-color: var(--cirth-primary-inverse);
   --cirth-box-shadow: var(--cirth-button-box-shadow, 0 0 0 rgb(0 0 0 / 0%));
 
+  // A control sizes to its label, but never past the space it was given:
+  // without a cap, a long unbroken string (a URL, a token, a hash) grows
+  // the button to its intrinsic width and pushes it out of its container,
+  // where the document's overflow-wrap never gets a constrained line to
+  // break (gh#75). Short labels are unaffected.
+  max-width: 100%;
   padding: var(--cirth-form-element-spacing-vertical)
     var(--cirth-form-element-spacing-horizontal);
   border: var(--cirth-border-width) solid var(--cirth-border-color);

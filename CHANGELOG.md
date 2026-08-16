@@ -7,6 +7,26 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Nested lists no longer leave a gap before the next parent item**
+  (gh#76): the rule that clears a nested list's bottom margin was written
+  with `:where()` on both compounds, so it had zero specificity and always
+  lost to the `dl, ol, ul` type selectors that give every list its bottom
+  margin. It now uses `:is()` and actually applies, for every combination
+  of nested `ul`/`ol`/`dl`. Top-level list spacing is unchanged.
+- **Buttons with a long unbroken label stay inside their container**
+  (gh#75): button-like controls cap at `max-width: 100%`, so a URL, token,
+  or hash wraps inside the button instead of growing it past its container
+  (~800px inside a 280px column before). A busy button (`aria-busy="true"`)
+  wraps too: the nowrap that keeps a spinner beside its label would
+  otherwise push the label straight back out.
+- **Search fields inside a generic group match the group's corners**
+  (gh#69): `[type="search"]` keeps its pill radius on its own and inside a
+  `[role="search"]` group, but inside a generic `.group` it now inherits
+  the group's radius. Its exposed corners (and the focus shadow tracing
+  them) used to stay pill-round against the group's square ones.
+
 ## [0.8.5] - 2026-08-15
 
 ### Fixed
