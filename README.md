@@ -9,13 +9,14 @@
 <h1 align="center">Cirth</h1>
 
 <p align="center">
-  <strong>Write HTML. It's already styled.</strong>
+  <strong>Production-ready UI from semantic HTML.</strong>
 </p>
 
 <p align="center">
-  Semantic-first CSS where standard elements carry the styling: nav,
-  article, button, table. Classes exist only for the few things HTML can't
-  say.
+  Cirth turns native HTML elements into accessible, themeable interfaces.
+  Load one stylesheet, customize it with runtime design tokens, and ship
+  with zero JavaScript and no required build step. Under 14KB gzipped ·
+  0 JavaScript · WCAG 2.2 AA baseline.
 </p>
 
 <p align="center">
@@ -33,7 +34,7 @@
   ·
   <a href="#browser-support">Browser support</a>
   ·
-  <a href="#philosophy">Philosophy</a>
+  <a href="#design-principles">Design principles</a>
 </p>
 
 <p align="center">
@@ -195,7 +196,7 @@ detail.
 
 The full documentation is published at
 [cirthcss.github.io/cirth](https://cirthcss.github.io/cirth/), built from
-[`docs/`](docs/) as an [Astro](https://astro.build) site with live
+[`docs/`](docs/) as an [Eleventy](https://11ty.dev) site with live
 examples. The site itself is styled with Cirth's own default build — the
 header, sidebar, prose, and every demo are ordinary semantic HTML dogfooding
 the framework.
@@ -293,18 +294,20 @@ against this Browserslist target:
 
 No version of Internet Explorer is supported.
 
-## Philosophy
+## Design principles
 
-Cirth is a semantic-first CSS framework. Standard HTML elements should carry
-most of the structure, meaning, and styling burden before a class is needed.
+Cirth is an HTML-native CSS framework: standard HTML elements carry most of
+the structure, meaning, and styling burden before a class is needed.
 
-Core principles:
-
-- Style semantic HTML by default.
-- Use classes only where HTML semantics are not enough.
-- Keep layout primitives small and structural.
-- Avoid utility-first class soup and broad component catalogs.
-- Keep customization based on CSS custom properties.
+- Style semantic HTML by default; add classes only where HTML semantics run
+  out.
+- Keep layout primitives small and structural, not a broad component
+  catalog.
+- Customize through runtime CSS custom properties, not a build step.
+- Ship zero JavaScript; interactive patterns use native element behavior.
+- Hold the default stylesheet to a 14KB gzipped size budget, checked on
+  every build. See [About Cirth](docs/src/pages/about.md#the-14kb-size-budget)
+  for why 14KB specifically.
 
 ## License
 

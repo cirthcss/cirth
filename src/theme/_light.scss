@@ -66,13 +66,17 @@
   --cirth-box-shadow: #{functions.shadow($neutral-400)};
 
   // Typography
-  // Headings colors
-  --cirth-h1-color: #{$neutral-800};
-  --cirth-h2-color: #{$neutral-750};
-  --cirth-h3-color: #{$neutral-700};
-  --cirth-h4-color: #{$neutral-650};
-  --cirth-h5-color: #{$neutral-600};
-  --cirth-h6-color: #{$neutral-550};
+  // Headings colors — one step darker across the board than a plain
+  // extension of --cirth-color (neutral-750) would give: bolder, more
+  // confident headline weight, closer to how assertively dark Ruby's own
+  // headings sit against its paper canvas. Still short of true black —
+  // this is a page of prose most of the time, not a poster.
+  --cirth-h1-color: #{$neutral-900};
+  --cirth-h2-color: #{$neutral-850};
+  --cirth-h3-color: #{$neutral-800};
+  --cirth-h4-color: #{$neutral-750};
+  --cirth-h5-color: #{$neutral-700};
+  --cirth-h6-color: #{$neutral-650};
 
   // Highlighted text (<mark>)
   --cirth-mark-background-color: #{color.change(

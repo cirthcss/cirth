@@ -1,15 +1,15 @@
 <header class="container docs-header">
 	<nav aria-label="main navigation">
-		<ul>
+		<ul class="docs-header-brand-group">
 			<li>
 				<a href="/" class="contrast docs-brand">
-					<img class="docs-logo docs-logo-light" src="/logo_brand.svg" alt="" width="36" height="36" />
-					<img class="docs-logo docs-logo-dark" src="/logo_brand_dark.svg" alt="" width="36" height="36" />
+					<img class="docs-logo docs-logo-light" src="/logo_brand.svg" alt="" width="48" height="48" />
+					<img class="docs-logo docs-logo-dark" src="/logo_brand_dark.svg" alt="" width="48" height="48" />
 					<strong>{{ nav.siteTitle }}</strong>
 				</a>
 			</li>
 		</ul>
-		<ul>
+		<ul class="docs-header-nav-group">
 			{% for item in nav.topNav %}
 				<li class="docs-nav-item">
 					<a href="{{ item.link }}"{% if page.url == (item.link | withSlash) %} aria-current="page"{% endif %}>{{ item.text }}</a>
@@ -17,6 +17,23 @@
 			{% endfor %}
 			<li class="docs-nav-item">
 				<a href="{{ nav.github }}" target="_blank" rel="noreferrer">GitHub</a>
+			</li>
+		</ul>
+		<ul class="docs-header-controls-group">
+			{#- Live preset switcher (gh#80): lets anyone preview cobalt/coral —
+			    including their light/dark variants — against the whole real
+			    site without downloading anything. Handled in base.njk: swaps
+			    in the compiled preset stylesheet built by build-docs.js,
+			    remembered for the session via sessionStorage. A native
+			    <select> on purpose, not a custom dropdown — full keyboard and
+			    screen-reader support for free, matching the theme toggle's own
+			    "smallest control that does the job" bar. -#}
+			<li>
+				<select class="docs-preset-select" aria-label="Color preset" data-cirth-preset-select>
+					<option value="amber">Amber</option>
+					<option value="cobalt">Cobalt</option>
+					<option value="coral">Coral</option>
+				</select>
 			</li>
 			<li>
 				<button type="button" class="outline contrast docs-theme-toggle" aria-label="Toggle color scheme">

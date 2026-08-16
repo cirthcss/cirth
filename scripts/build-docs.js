@@ -2,6 +2,7 @@ const sass = require("sass-embedded");
 const path = require("node:path");
 const fs = require("node:fs");
 const os = require("node:os");
+const { compileScssFolder } = require("./lib/compile-scss");
 
 // The docs site dogfoods Cirth: the whole site (header, sidebar, prose,
 // live examples) is styled by the real default build, unscoped. A second,
@@ -46,6 +47,17 @@ try {
 
 		fs.writeFileSync(path.join(outputFoldername, variant.filename), result.css);
 	}
+
+	// Presets, compiled the same way scripts/build-presets.js compiles them
+	// for dist/ (standalone, no build-time config to inject) — so the header's
+	// live preset switcher (see site-header.njk / base.njk, gh#80) has a real
+	// stylesheet to swap in rather than a reimplementation of one. Kept
+	// separate from npm run build's dist/presets/ output on purpose: docs:build
+	// stays runnable on its own, with no dependency on dist/ existing first.
+	compileScssFolder({
+		sourceFolder: path.join(projectRoot, "src/presets"),
+		outputFolder: path.join(outputFoldername, "presets"),
+	});
 
 	console.log("[cirth] docs assets built");
 } finally {

@@ -38,7 +38,12 @@ $white: oklch(100% 0 0deg);
 // 19-step ladder on purpose: it's a surface color, not a scale step.
 // Verified against WCAG AA: every text token keeps >= 4.5:1 and every
 // 3:1 non-text claim in _light.scss still holds on this background.
-$paper: oklch(97.4% 0.008 69.35deg);
+// Chroma halved (0.008 -> 0.004) from the original: white should read
+// as the canvas, amber as the accent on top of it, not as a wash across
+// the whole page — see docs/brand.md's "amber is functional, not
+// atmosphere." Presets already made this same call independently
+// (cobalt's own paper sits at 0.004 chroma too).
+$paper: oklch(97.4% 0.004 69.35deg);
 
 // Neutral
 $neutral-950: oklch(18% 0 264deg);

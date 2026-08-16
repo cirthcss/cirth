@@ -34,78 +34,134 @@ bodyClass: docs-home
 						{% endfor %}
 					</p>
 				</div>
-				<div class="docs-hero-demo">
-					{% include "home-demo.njk" %}
+				{#- The glow is a plain CSS radial-gradient behind the demo panel
+				    (see .docs-hero-glow), not an image — same spirit as Ruby's
+				    sunburst behind its diamond mark, at zero asset cost. -#}
+				<div class="docs-hero-demo-wrap">
+					<div class="docs-hero-glow" aria-hidden="true"></div>
+					<div class="docs-hero-demo">
+						{% include "home-demo.njk" %}
+					</div>
 				</div>
 			</div>
 		</div>
 	</section>
 
-	<div class="container">
-		{% if stats %}
-			<section class="docs-stats">
-				{% for stat in stats %}
-					<article class="docs-stat">
-						<strong class="docs-stat-value">{{ stat.value }}</strong>
-						<span class="docs-stat-label">{{ stat.label }}</span>
-					</article>
-				{% endfor %}
-			</section>
-		{% endif %}
-
-		{% if comparison %}
-			<section class="docs-compare">
-				<header class="docs-section-header">
-					<p class="docs-eyebrow">{{ comparison.eyebrow }}</p>
-					<h2>{{ comparison.title }}</h2>
-					<p class="docs-section-lede">{{ comparison.lede }}</p>
+	{% if pitch %}
+		<section class="docs-pitch">
+			<div class="container">
+				<header class="docs-section-header docs-reveal">
+					<p class="docs-eyebrow">{{ pitch.eyebrow }}</p>
+					<h2>{{ pitch.title }}</h2>
+					<p class="docs-section-lede">{{ pitch.lede }}</p>
 				</header>
-				<div class="docs-compare-grid">
-					{% for side in comparison.sides %}
-						<article class="docs-compare-side">
-							<header>
-								<span>{{ side.label }}</span>
-								<span class="docs-compare-count">{{ side.count }}</span>
-							</header>
-							<pre><code>{{ side.code }}</code></pre>
+				<div class="docs-pitch-grid">
+					{% for card in pitch.items %}
+						<article class="docs-reveal" style="transition-delay: {{ loop.index0 * 60 }}ms">
+							<strong class="docs-pitch-value">{{ card.value }}</strong>
+							<p>{{ card.details | safe }}</p>
 						</article>
 					{% endfor %}
 				</div>
-				<p class="docs-compare-note">{{ comparison.note }}</p>
-			</section>
-		{% endif %}
-
-		<section class="docs-features">
-			<header class="docs-section-header">
-				<p class="docs-eyebrow">{{ featuresEyebrow }}</p>
-				<h2>{{ featuresTitle }}</h2>
-			</header>
-			<dl class="docs-features-list">
-				{% for feature in features %}
-					<div class="docs-feature">
-						<dt>
-							{% if feature.icon %}{% icon feature.icon, 20, "docs-feature-icon" %}{% endif %}
-							{{ feature.title }}
-						</dt>
-						<dd>{{ feature.details | safe }}</dd>
-					</div>
-				{% endfor %}
-			</dl>
-		</section>
-	</div>
-
-	{% if closing %}
-		<section class="docs-closing">
-			<div class="container">
-				<img class="docs-closing-mark docs-logo-light" src="/logo_mono.svg" alt="" width="40" height="40" />
-				<img class="docs-closing-mark docs-logo-dark" src="/logo_mono_dark.svg" alt="" width="40" height="40" />
-				<p class="docs-closing-text">{{ closing.text }}</p>
-				<p class="docs-hero-actions">
-					{% for action in closing.actions %}
-						<a href="{{ action.link }}" role="button" class="outline secondary">{{ action.text }}</a>
-					{% endfor %}
-				</p>
 			</div>
 		</section>
 	{% endif %}
+
+	<div class="container">
+		{% if stack %}
+			{#- Sticky card stack (like FastHTML's "scales up and down"
+			    section): each card is position:sticky with an increasing
+			    `top`, so as you scroll, every card pins in place and the
+			    next one slides up to cover all but a sliver of it — pure
+			    CSS, the browser's own scroll position drives it, nothing to
+			    compute in JS. Falls back to plain stacked cards under
+			    768px (see style.css) where the peek effect reads as
+			    cramped rather than deliberate. -#}
+			<section class="docs-stack">
+				{#- position:sticky lives on a plain, unstyled wrapper div —
+				    never directly on an element that also has a background
+				    color, border-radius, or box-shadow. Safari/WebKit renders
+				    a visible concentric-ring repaint artifact right as a
+				    *styled* sticky element approaches its release point;
+				    splitting "what's sticky" (this wrapper) from "what's
+				    painted" (the header/card inside it) sidesteps the bug.
+				    Same pattern below for each card.
+
+				    The header's sticky wrapper additionally sits inside its
+				    own short .docs-stack-header-zone (see style.css) rather
+				    than spanning the whole section: a sticky element can only
+				    stay "stuck" within its own parent's height, so a short
+				    parent makes it release early — right after the first
+				    card or so — instead of clinging to the top all the way
+				    through and colliding with the *last* card's own release
+				    at the very end of the section (that collision is what
+				    made the lede line look detached, sliding away on its own
+				    under the final card). Same idea as fastht.ml's header,
+				    which releases via an explicit `bottom` offset — this is
+				    a container-height version of the same trick. -#}
+				<div class="docs-stack-header-zone">
+					<div class="docs-stack-sticky">
+						<header class="docs-section-header docs-reveal">
+							<p class="docs-eyebrow">{{ stack.eyebrow }}</p>
+							<h2>{{ stack.title }}</h2>
+							<p class="docs-section-lede">{{ stack.lede | safe }}</p>
+						</header>
+					</div>
+				</div>
+				<div class="docs-stack-list">
+					{% for card in stack.items %}
+						<div class="docs-stack-sticky docs-stack-card-sticky" style="top: calc(2rem + {{ loop.index0 * 1.25 }}rem)">
+							<article class="docs-stack-card">
+								<span class="docs-stack-index">{{ "0" if loop.index < 10 }}{{ loop.index }}</span>
+								<h3>{{ card.title }}</h3>
+								<p>{{ card.details | safe }}</p>
+								<ul class="docs-badge-row">
+									{% for badge in card.badges %}<li><code>{{ badge }}</code></li>{% endfor %}
+								</ul>
+							</article>
+						</div>
+					{% endfor %}
+				</div>
+			</section>
+		{% endif %}
+
+		{% if showcase %}
+			<section class="docs-showcase">
+				<header class="docs-section-header docs-reveal">
+					<p class="docs-eyebrow">{{ showcase.eyebrow }}</p>
+					<h2>{{ showcase.title }}</h2>
+					<p class="docs-section-lede">{{ showcase.lede }}</p>
+				</header>
+				<div class="docs-showcase-grid">
+					{% for item in showcase.items %}
+						<a class="docs-showcase-item docs-reveal" style="transition-delay: {{ loop.index0 * 70 }}ms" href="{{ item.link }}">
+							<span class="docs-showcase-icon">{% icon item.icon, 28 %}</span>
+							<strong>{{ item.title }}</strong>
+							<span>{{ item.details }}</span>
+						</a>
+					{% endfor %}
+				</div>
+				<p class="docs-showcase-cta">
+					<a href="{{ showcase.link }}" role="button" class="outline secondary">{{ showcase.linkText }}</a>
+				</p>
+			</section>
+		{% endif %}
+
+		{% if faq %}
+			<section class="docs-faq docs-reveal">
+				<header class="docs-section-header">
+					<p class="docs-eyebrow">{{ faq.eyebrow }}</p>
+					<h2>{{ faq.title }}</h2>
+				</header>
+				<div class="docs-faq-list">
+					{% for item in faq.items %}
+						<details>
+							<summary>{{ item.q }}</summary>
+							<p>{{ item.a | safe }}</p>
+						</details>
+					{% endfor %}
+				</div>
+			</section>
+		{% endif %}
+	</div>
 </main>
