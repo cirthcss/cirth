@@ -62,6 +62,11 @@
   --cirth-contrast-focus: #{color.change($neutral-150, $alpha: 0.5)};
   --cirth-contrast-inverse: #{$black};
 
+  // Visited links: same idea as the light scheme, dimmer than the accent
+  // rather than darker, since on a near-black canvas darkening is what costs
+  // contrast. 5.76:1 on the page, 5.49:1 on a card (WCAG 1.4.3 AA).
+  --cirth-link-visited-color: #{$neutral-400};
+
   // Box shadow
   --cirth-box-shadow: #{functions.shadow(
       color.mix($black, $neutral-950, $method: oklch)

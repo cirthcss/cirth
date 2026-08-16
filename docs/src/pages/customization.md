@@ -67,6 +67,11 @@ groups, each with a base, hover, focus, and inverse text color variant:
 [Link](/content/link)) simply swap which group a `button` or `a` reads its
 `--cirth-background-color`/`--cirth-color` from.
 
+One color sits outside the three groups: `--cirth-link-visited-color`, the
+neutral a followed content link falls back to (see
+[Link](/content/link#behavior)). Override it alongside the primary group if
+you restyle the accent, and keep it at 4.5:1 against your page background.
+
 The `cobalt` and `coral` [presets](/colors) build on exactly this: each
 overrides the primary group's variables (light and dark) to swap the
 accent, plus a handful of tokens from other layers: surface neutrals,

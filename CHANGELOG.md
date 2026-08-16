@@ -7,6 +7,19 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Added
+
+- **Visited links get their own color** (gh#58): a followed content link
+  drops the accent for the new `--cirth-link-visited-color`, a neutral
+  reading of the palette defined in both schemes and in the `cobalt` and
+  `coral` presets (verified at 4.5:1 or better against page and card
+  backgrounds). Navigation entries, dropdown menus, `.secondary`/`.contrast`
+  links, and the hover/focus/current states keep their own color: a menu
+  that grays out one item at a time as the reader browses looks broken
+  rather than oriented. The underline keeps its unvisited tint because
+  browsers only let `:visited` change color-ish properties, never
+  `text-decoration-color`.
+
 ### Fixed
 
 - **Nested lists no longer leave a gap before the next parent item**

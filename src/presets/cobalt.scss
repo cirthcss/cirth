@@ -47,6 +47,10 @@ $cobalt-300: oklch(72% 0.075 258deg);
   // focus indicators)
   --cirth-primary-focus: #{color.change($cobalt-600, $alpha: 0.7)};
 
+  // Visited links, re-hued to cobalt like the neutrals above: 5.96:1 on
+  // this canvas, 6.44:1 on a white card (WCAG 1.4.3 AA)
+  --cirth-link-visited-color: oklch(48.3% 0.02 258deg);
+
   // Shadow: a crisp 1px outline instead of a soft blur — flatter, more formal
   --cirth-box-shadow: 0 0 0 0.0625rem #{color.change($cobalt-800, $alpha: 0.14)};
 }
@@ -75,6 +79,9 @@ $cobalt-300: oklch(72% 0.075 258deg);
 
   // Composites to >= 3:1 against the dark background (WCAG 1.4.11)
   --cirth-primary-focus: #{color.change($cobalt-400, $alpha: 0.7)};
+
+  // Visited links: 5.68:1 on this canvas, 5.24:1 on a card (WCAG 1.4.3 AA)
+  --cirth-link-visited-color: oklch(65% 0.02 258deg);
 
   // Shadow
   --cirth-box-shadow: 0 0 0 0.0625rem #{color.change($cobalt-400, $alpha: 0.2)};

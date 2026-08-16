@@ -13,6 +13,7 @@ module.exports = defineConfig({
 		"forms-validity.spec.js",
 		"group-hidden-elements.spec.js",
 		"group-search-radius.spec.js",
+		"link-visited.spec.js",
 		"list-nesting.spec.js",
 		"nav-dropdown.spec.js",
 	],

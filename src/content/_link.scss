@@ -1,5 +1,20 @@
 @use "../config" as *;
 
+// Everything a :visited repaint has to stand aside for: the states that
+// own the link color while they last, the color variants that are already
+// a different color group, and navigation. Menu entries that gray out one
+// by one as someone browses read as broken rather than as oriented, so
+// the visited cue is for content links only (gh#58).
+// The color variants and the dropdown are class-based, so they only exist
+// to exclude in the builds that ship classes.
+$visited-class-exceptions: if(
+  $enable-classes,
+  ".secondary, .contrast, details.dropdown a, ",
+  ""
+);
+$visited-exceptions: $visited-class-exceptions +
+  '[aria-current]:not([aria-current="false"]), :hover, :active, :focus, nav a';
+
 /**
    * Link
    */
@@ -69,6 +84,20 @@
       }
     }
   }
+}
+
+// Visited links
+
+// An orientation cue for long documents: a link already followed drops the
+// accent and goes neutral. Privacy rules make this the one link state that
+// can't run through --cirth-color: a browser only lets :visited change
+// `color` (plus background/border/outline colors), and ignores everything
+// else, custom properties and text-decoration-color included, so the
+// underline keeps the unvisited tint by design, not by oversight.
+
+#{$parent-selector}
+  :where(a:not([role="button"])):visited:not(#{$visited-exceptions}) {
+  color: var(--cirth-link-visited-color);
 }
 
 #{$parent-selector} a {

@@ -46,6 +46,10 @@ $coral-250: oklch(80% 0.1 35deg);
   // focus indicators) — 0.75, not 0.7: on paper 0.7 lands at 2.99:1
   --cirth-primary-focus: #{color.change($coral-550, $alpha: 0.75)};
 
+  // Visited links, re-hued warm like the neutrals above: 6.03:1 on this
+  // canvas, 6.53:1 on a white card (WCAG 1.4.3 AA)
+  --cirth-link-visited-color: oklch(48.3% 0.03 35deg);
+
   // Shadow: a soft coral-tinted glow (reusing the same shadow generator the
   // theme itself uses, just recolored), with a matching lift on button hover
   --cirth-box-shadow: #{functions.shadow($coral-400)};
@@ -75,6 +79,9 @@ $coral-250: oklch(80% 0.1 35deg);
 
   // Composites to >= 3:1 against the dark background (WCAG 1.4.11)
   --cirth-primary-focus: #{color.change($coral-350, $alpha: 0.7)};
+
+  // Visited links: 5.60:1 on this canvas, 5.17:1 on a card (WCAG 1.4.3 AA)
+  --cirth-link-visited-color: oklch(65% 0.03 35deg);
 
   // Shadow
   --cirth-box-shadow: #{functions.shadow($coral-350)};

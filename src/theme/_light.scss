@@ -62,6 +62,12 @@
   --cirth-contrast-focus: #{color.change($neutral-600, $alpha: 0.7)};
   --cirth-contrast-inverse: #{$white};
 
+  // Visited links: the accent drained to neutral, so a followed link reads
+  // as spent without leaving the palette. A step darker than
+  // --cirth-secondary so the two aren't the same color by accident.
+  // 5.96:1 on the paper canvas, 6.43:1 on a white card (WCAG 1.4.3 AA).
+  --cirth-link-visited-color: #{$neutral-600};
+
   // Box shadow
   --cirth-box-shadow: #{functions.shadow($neutral-400)};
 
