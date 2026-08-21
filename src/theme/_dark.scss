@@ -204,6 +204,15 @@
       var(--cirth-opacity-overlay)
     )};
 
+  // Meter (<meter>)
+  // Same three readings, and the same trick inverted: on a dark track the
+  // weight has to come from lightness, so each step down the scale is a
+  // *lighter* color. 5.12:1, 5.61:1, 6.32:1 against the track
+  // (WCAG 1.4.11).
+  --cirth-meter-optimum-color: #{$success-400};
+  --cirth-meter-suboptimum-color: #{$warning-350};
+  --cirth-meter-even-less-good-color: #{$error-300};
+
   // Progress
   // The bar is a step lighter than the primary background here: amber-550
   // only reaches 2.8:1 against the neutral-850 track (WCAG 1.4.11 wants

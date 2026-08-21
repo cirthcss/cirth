@@ -1,0 +1,89 @@
+@use "../config" as *;
+
+/**
+   * Meter (<meter>)
+   */
+
+// Progress's semantic sibling: a scalar measurement inside a known range
+// (disk used, score, capacity) rather than the completion of a task. The
+// frame is progress's, borrowed rather than duplicated — same geometry,
+// same track, same border tokens (see theme/_styles.scss) — so the two
+// read as a matched pair.
+
+// What a meter has that progress doesn't is a notion of *where* in the
+// range the value falls: low/high/optimum split it into an optimum
+// region, a suboptimal one, and one the spec calls "even less good".
+// Resetting the appearance without honoring that split would throw away
+// information the author explicitly encoded, so all three are painted —
+// and, since the regions are mutually exclusive, only ever one at a time.
+
+// Each engine exposes the split differently: WebKit and Blink through
+// three value pseudo-elements, Firefox through pseudo-classes on the
+// element that re-color its single ::-moz-meter-bar. Both spellings are
+// needed; neither is redundant.
+
+#{$parent-selector} meter {
+  // Reset the default appearance
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  // Styles
+  display: inline-block;
+  appearance: none;
+  width: 100%;
+  height: var(--cirth-size-2);
+  margin-bottom: calc(var(--cirth-spacing) * 0.5);
+
+  // Clips the value to the track's rounded corners, in every engine
+  overflow: hidden;
+
+  // The track is too close to the page background to meet WCAG 1.4.11 on
+  // its own, so a >= 3:1 border marks the component's extent instead —
+  // same reasoning as progress.
+  border: var(--cirth-border-width-1) solid var(--cirth-meter-border-color);
+  border-radius: var(--cirth-border-radius);
+  background: var(--cirth-meter-background-color);
+
+  // WebKit / Blink. The bar is only there to be cleared: the track paints
+  // on the element itself, and `overflow: hidden` above is what rounds the
+  // value, so no radius is needed here.
+  &::-webkit-meter-bar {
+    background: none;
+  }
+
+  // Blink lays the bar out at half the element's height and centers it,
+  // and ignores an author `height` on the bar itself — an 8px meter fills
+  // 4px, a visibly thinner line than the progress bar beside it. Making
+  // the inner element a flex container stretches the bar to full height
+  // (measured, rather than assumed: rows of pixels sampled top to bottom
+  // in all three engines). WebKit and Firefox already fill it and are
+  // unaffected.
+  &::-webkit-meter-inner-element {
+    display: flex;
+  }
+
+  &::-webkit-meter-optimum-value {
+    background: var(--cirth-meter-optimum-color);
+  }
+
+  &::-webkit-meter-suboptimum-value {
+    background: var(--cirth-meter-suboptimum-color);
+  }
+
+  &::-webkit-meter-even-less-good-value {
+    background: var(--cirth-meter-even-less-good-color);
+  }
+
+  // Firefox
+  &::-moz-meter-bar {
+    background: var(--cirth-meter-optimum-color);
+  }
+
+  &:-moz-meter-sub-optimum::-moz-meter-bar {
+    background: var(--cirth-meter-suboptimum-color);
+  }
+
+  &:-moz-meter-sub-sub-optimum::-moz-meter-bar {
+    background: var(--cirth-meter-even-less-good-color);
+  }
+}

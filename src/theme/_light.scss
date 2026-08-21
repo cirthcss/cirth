@@ -213,6 +213,18 @@
       var(--cirth-opacity-overlay)
     )};
 
+  // Meter (<meter>)
+  // Green / amber / red, the reading every browser's own meter already
+  // teaches — but with the hue backed by weight: each step down the scale
+  // is also a darker color, so the same signal survives a reader who
+  // cannot separate the hues. All three clear 3:1 against the track
+  // (WCAG 1.4.11) with room: 3.97:1, 5.11:1, 6.55:1. A meter whose author
+  // declared no low/high/optimum is entirely optimum, so it prints as one
+  // flat green bar — which is what it means.
+  --cirth-meter-optimum-color: #{$success-550};
+  --cirth-meter-suboptimum-color: #{$warning-600};
+  --cirth-meter-even-less-good-color: #{$error-650};
+
   // Progress
   // The border marks the track's extent at >= 3:1 against the page
   // background (WCAG 1.4.11); the track itself stays subtle.

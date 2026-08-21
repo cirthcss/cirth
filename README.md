@@ -247,6 +247,7 @@ npm run docs:dev
   [Dropdown](docs/src/pages/components/dropdown.md) ·
   [Group](docs/src/pages/components/group.md) ·
   [Loading](docs/src/pages/components/loading.md) ·
+  [Meter](docs/src/pages/components/meter.md) ·
   [Modal](docs/src/pages/components/modal.md) ·
   [Nav](docs/src/pages/components/nav.md) ·
   [Progress](docs/src/pages/components/progress.md) ·

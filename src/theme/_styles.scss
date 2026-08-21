@@ -79,6 +79,16 @@
   --cirth-group-box-shadow-focus-with-input: 0 0 0 var(--cirth-border-width-1)
     var(--cirth-form-element-border-color);
 
+  // Meter (<meter>)
+  // The frame is progress's, borrowed rather than duplicated: same track,
+  // same border, so the two read as a matched pair and retheming one
+  // rethemes both. What goes *inside* the frame is a meter's own, because
+  // the two elements mean different things — progress is a task running to
+  // completion, a meter is a reading that can be good or bad — and those
+  // value colors are scheme-dependent (see theme/_light.scss).
+  --cirth-meter-background-color: var(--cirth-progress-background-color);
+  --cirth-meter-border-color: var(--cirth-progress-border-color);
+
   // Modal (<dialog>)
   --cirth-modal-overlay-backdrop-filter: blur(0.375rem);
 

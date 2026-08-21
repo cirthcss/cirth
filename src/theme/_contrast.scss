@@ -67,10 +67,14 @@
   --cirth-secondary-focus: #{$neutral-600};
   --cirth-contrast-focus: #{$neutral-600};
 
-  // Non-text controls whose *state* is a fill: the unchecked switch track
-  // and the progress track's extent.
+  // Non-text controls whose *state* is a fill: the unchecked switch track,
+  // the progress track's extent, and a meter's three readings (5.8:1,
+  // 7.4:1 and 7.8:1 against the track, up from 4.0:1, 5.1:1 and 6.6:1).
   --cirth-switch-background-color: #{$neutral-600};
   --cirth-progress-border-color: #{$neutral-600};
+  --cirth-meter-optimum-color: #{$success-650};
+  --cirth-meter-suboptimum-color: #{$warning-700};
+  --cirth-meter-even-less-good-color: #{$error-750};
 
   @if $enable-classes {
     --cirth-dropdown-border-color: var(--cirth-muted-border-color);
@@ -119,6 +123,12 @@
   // 3:1 against it (WCAG 1.4.11).
   --cirth-switch-background-color: #{$neutral-400};
   --cirth-progress-border-color: #{$neutral-350};
+
+  // 7.1:1, 7.7:1 and 8.8:1 against the track, up from 5.1:1, 5.6:1
+  // and 6.3:1.
+  --cirth-meter-optimum-color: #{$success-300};
+  --cirth-meter-suboptimum-color: #{$warning-250};
+  --cirth-meter-even-less-good-color: #{$error-200};
 
   @if $enable-classes {
     --cirth-dropdown-border-color: var(--cirth-muted-border-color);

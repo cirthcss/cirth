@@ -64,6 +64,7 @@ const sidebar = [
 			{ text: "Dropdown", link: "/components/dropdown" },
 			{ text: "Group", link: "/components/group" },
 			{ text: "Loading", link: "/components/loading" },
+			{ text: "Meter", link: "/components/meter" },
 			{ text: "Modal", link: "/components/modal" },
 			{ text: "Nav", link: "/components/nav" },
 			{ text: "Progress", link: "/components/progress" },

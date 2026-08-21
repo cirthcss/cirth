@@ -116,11 +116,15 @@ $print-root-selector: "body";
       --cirth-dropdown-box-shadow: none;
     }
 
-    // Insertions and deletions are pinned to the light scheme's inks
-    // rather than blacked out: the hue is the semantics, and the dark
-    // scheme's pale variants would barely register on paper.
+    // Insertions, deletions and a meter's three readings are pinned to the
+    // light scheme's inks rather than blacked out: the hue is the
+    // semantics, and the dark scheme's pale variants — tuned for contrast
+    // against a near-black track — would barely register on paper.
     --cirth-ins-color: #{$success-750};
     --cirth-del-color: #{$error-750};
+    --cirth-meter-optimum-color: #{$success-550};
+    --cirth-meter-suboptimum-color: #{$warning-600};
+    --cirth-meter-even-less-good-color: #{$error-650};
   }
 
   // <kbd> is the one inverted chip in the library. With its fill gone it
@@ -153,10 +157,12 @@ $print-root-selector: "body";
 
   // Color that carries meaning rather than decoration opts back in. Under
   // the browser's default economy setting a checked box loses its tick, a
-  // switch loses its on-state, a progress bar loses its fill and a <mark>
-  // loses its highlight — in each case the dropped paint *is* the content.
+  // switch loses its on-state, a meter or progress bar loses its fill and
+  // a <mark> loses its highlight — in each case the dropped paint *is*
+  // the content.
 
-  #{$parent-selector} :is(mark, progress, [type="checkbox"], [type="radio"]) {
+  #{$parent-selector}
+    :is(mark, meter, progress, [type="checkbox"], [type="radio"]) {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }

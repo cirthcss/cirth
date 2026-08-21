@@ -15,6 +15,7 @@ module.exports = defineConfig({
 		"group-search-radius.spec.js",
 		"link-visited.spec.js",
 		"list-nesting.spec.js",
+		"meter.spec.js",
 		"nav-dropdown.spec.js",
 		"prefers-contrast.spec.js",
 		"print.spec.js",

@@ -28,6 +28,28 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   no `@page` rule is set: which parts of a layout are chrome, and what the
   page margins should be, are the document's call. See
   [Print](https://cirthcss.github.io/cirth/utilities/print/).
+- **`<meter>` is styled** (gh#59): the semantic sibling of `<progress>` —
+  a measurement inside a known range rather than a task running to
+  completion — had no styling at all and fell back to raw UA rendering
+  beside a themed progress bar. It now borrows progress's frame outright
+  (`--cirth-meter-background-color` and `--cirth-meter-border-color`
+  default to progress's own tokens, so re-theming one re-themes the
+  other), and paints the value in one of three colors depending on which
+  region `low`/`high`/`optimum` put it in:
+  `--cirth-meter-optimum-color`, `--cirth-meter-suboptimum-color`,
+  `--cirth-meter-even-less-good-color` — the spec's own names, and the
+  names the engines' pseudo-elements use. Green, amber, red, with the hue
+  backed by weight: each step down the scale is a darker color in light
+  and a lighter one in dark, so the signal survives a reader who can't
+  separate the hues, and all three clear 3:1 against the track in both
+  schemes. A meter with no thresholds is entirely optimum per the spec and
+  renders as one flat green bar. Firefox needs
+  `:-moz-meter-sub-optimum::-moz-meter-bar` where Blink and WebKit expose
+  three value pseudo-elements, and Blink additionally lays the value out
+  at half the track's height, centred, ignoring an author `height` — an
+  8px meter filled 4px until `::-webkit-meter-inner-element` was made a
+  flex container. `tests/meter.spec.js` pins all of it to pixels. See
+  [Meter](https://cirthcss.github.io/cirth/components/meter/).
 - **`prefers-contrast: more` support** (gh#34): the softer complement to
   the existing `forced-colors` handling — where forced-colors hands the
   palette to the operating system, this keeps Cirth's palette and stops

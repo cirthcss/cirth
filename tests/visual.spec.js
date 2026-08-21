@@ -23,6 +23,7 @@ const visualPages = [
 	"components/dropdown/index.html",
 	"components/group/index.html",
 	"components/loading/index.html",
+	"components/meter/index.html",
 	"components/modal/index.html",
 	"components/nav/index.html",
 	"components/progress/index.html",
