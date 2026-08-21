@@ -163,7 +163,6 @@ $print-root-selector: "body";
 
   #{$parent-selector}
     :is(mark, meter, progress, [type="checkbox"], [type="radio"]) {
-    -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 

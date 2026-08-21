@@ -43,7 +43,6 @@
 
 @include selectors.document-root {
   -webkit-tap-highlight-color: transparent; // 4
-  -webkit-text-size-adjust: 100%; // 5
   text-size-adjust: 100%; // 5
   background-color: var(--cirth-background-color);
   color: var(--cirth-color);

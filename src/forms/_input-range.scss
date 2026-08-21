@@ -18,7 +18,6 @@ $border-thumb: var(--cirth-border-width-2);
 
 // Slider Thumb
 @mixin slider-thumb {
-  -webkit-appearance: none;
   width: $height-thumb;
   height: $height-thumb;
   margin-top: #{(-($height-thumb * 0.5) + ($height-track * 0.5))};
@@ -37,8 +36,6 @@ $border-thumb: var(--cirth-border-width-2);
 
 #{$parent-selector} [type="range"] {
   // Styles
-  -webkit-appearance: none;
-  -moz-appearance: none;
   appearance: none;
   width: 100%;
   height: $height-thumb;
@@ -52,19 +49,18 @@ $border-thumb: var(--cirth-border-width-2);
     @include slider-track;
   }
 
-  &::-ms-track {
-    @include slider-track;
-  }
-
   &::-webkit-slider-thumb {
+    // The one -webkit-appearance the Browserslist floor still needs, and
+    // the reason it sits here rather than in the mixin: on the thumb
+    // pseudo-element the unprefixed property resets nothing, while on the
+    // input itself Safari 15.4 handles it. Sharing it with the Firefox
+    // thumb below would only ship a declaration that engine ignores.
+    -webkit-appearance: none;
+
     @include slider-thumb;
   }
 
   &::-moz-range-thumb {
-    @include slider-thumb;
-  }
-
-  &::-ms-thumb {
     @include slider-thumb;
   }
 
@@ -81,10 +77,6 @@ $border-thumb: var(--cirth-border-width-2);
     }
 
     &::-moz-range-thumb {
-      transform: scale(1.25);
-    }
-
-    &::-ms-thumb {
       transform: scale(1.25);
     }
   }

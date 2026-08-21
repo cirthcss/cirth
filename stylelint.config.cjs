@@ -17,11 +17,18 @@ module.exports = {
 		],
 
 		// Genuinely necessary cross-browser workarounds — not API surface,
-		// not laziness. Each one targets a native control quirk (search/file
-		// input appearance, focus ring reset, tap highlight, Firefox text
-		// size adjust) with no unprefixed equivalent inside the Browserslist
-		// floor. See forms/_basics.scss, layout/_document.scss,
-		// forms/_checkbox-radio-switch.scss.
+		// not laziness. What survives targets a native control quirk with no
+		// unprefixed equivalent inside the Browserslist floor: the
+		// non-standard `appearance` values (search and file inputs, buttons),
+		// the range thumb pseudo-element, the color swatch focus ring, tap
+		// highlight, and text fill color. See forms/_basics.scss,
+		// forms/_input-range.scss, forms/_input-color.scss,
+		// layout/_document.scss.
+		// Prefixes the build already generates from the standard property
+		// (backdrop-filter, mask-*, user-select, text-size-adjust,
+		// print-color-adjust) are deliberately *not* written by hand:
+		// Lightning CSS adds them per Browserslist, and duplicating them in
+		// the source only suggests they are load-bearing.
 		"property-no-vendor-prefix": null,
 		// @-moz-document url-prefix() in forms/_input-date.scss: the only way
 		// to feature-target Firefox in CSS, no standard alternative exists.

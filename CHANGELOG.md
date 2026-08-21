@@ -7,6 +7,30 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Changed
+
+- **Source hygiene: dead rules and redundant declarations removed.** No
+  supported browser renders anything differently — the visual suite passes
+  unchanged, pixel for pixel, on all three engines — and the published CSS
+  is 64 B smaller gzipped. Three sweeps:
+  `::-ms-check`, `::-ms-track`, `::-ms-thumb` and `::-moz-list-bullet` were
+  matched by no browser in the declared Browserslist floor (they target IE,
+  EdgeHTML, and a Firefox pseudo-element removed in Firefox 86), and
+  `<progress>` carried a `color` declaration whose only job was feeding
+  IE10's bar color. The 12 inline icons dropped their `width`/`height`
+  attributes: every rule consuming one sets an explicit `background-size`
+  or `mask-size`, and the `viewBox` alone carries the ratio the `auto` axis
+  resolves against. And the hand-written vendor prefixes that the floor
+  does not need (`-webkit-`/`-moz-appearance: none`, which Safari 15.4
+  covers unprefixed) or that Lightning CSS already generates from the
+  standard property (`-webkit-text-size-adjust`,
+  `-webkit-print-color-adjust`) are gone, including one inert
+  `-webkit-appearance` the shared range-thumb mixin was pushing into
+  Firefox's `::-moz-range-thumb`. What survives is documented in
+  `stylelint.config.cjs`: non-standard `appearance` values, the range thumb
+  pseudo-element, the color-swatch focus ring, tap highlight, text fill
+  color.
+
 ## [0.10.0] - 2026-08-22
 
 ### Added

@@ -17,8 +17,6 @@
 
 #{$parent-selector} [type="checkbox"],
 #{$parent-selector} [type="radio"] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
   appearance: none;
 
   // 1.5em = 24px at the default root font size: the WCAG 2.5.8 (AA)
@@ -30,10 +28,6 @@
   border-width: var(--cirth-border-width);
   vertical-align: middle;
   cursor: pointer;
-
-  &::-ms-check {
-    display: none; // unstyle IE checkboxes
-  }
 
   &:checked,
   &:checked:active,

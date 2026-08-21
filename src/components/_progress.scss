@@ -23,10 +23,6 @@
 // ––––––––––––––––––––
 
 #{$parent-selector} progress {
-  // Reset the default appearance
-  -webkit-appearance: none;
-  -moz-appearance: none;
-
   // Styles
   display: inline-block;
   appearance: none;
@@ -41,9 +37,6 @@
   border: var(--cirth-border-width-1) solid var(--cirth-progress-border-color);
   border-radius: var(--cirth-border-radius);
   background-color: var(--cirth-progress-background-color);
-
-  // IE10 uses `color` to set the bar background-color
-  color: var(--cirth-progress-color);
 
   &::-webkit-progress-bar {
     border-radius: var(--cirth-border-radius);

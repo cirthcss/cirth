@@ -27,10 +27,6 @@
       display: none;
     }
 
-    &::-moz-list-bullet {
-      list-style-type: none;
-    }
-
     // Marker
     &::after {
       display: block;

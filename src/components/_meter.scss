@@ -23,10 +23,6 @@
 // needed; neither is redundant.
 
 #{$parent-selector} meter {
-  // Reset the default appearance
-  -webkit-appearance: none;
-  -moz-appearance: none;
-
   // Styles
   display: inline-block;
   appearance: none;
