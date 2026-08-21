@@ -122,9 +122,10 @@ for (const build of builds) {
 		expect(source).toContain("@media (prefers-contrast: more)");
 
 		// Both schemes, through the same wiring the themes themselves use:
-		// the light roots, and the forced-dark root.
-		expect(block).toContain(`${build.root}:not([data-theme="dark"])`);
-		expect(block).toContain('[data-theme="dark"]');
+		// the light roots (kept at the weight of a plain root by :where(),
+		// see gh#92), and the forced-dark root.
+		expect(block).toContain(`${build.root}:where(:not([data-theme="dark"]))`);
+		expect(block).toContain(':where([data-theme="dark"])');
 		expect(block).toContain("prefers-color-scheme: dark");
 
 		// Geometry is deliberately untouched — control heights are built

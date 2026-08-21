@@ -229,8 +229,10 @@ const isPresetSelectorNode = (node) => {
 		case "selector":
 			return node.nodes.every(isPresetSelectorNode);
 		case "pseudo":
+			// :where() is how the theme keeps its scheme roots at the weight
+			// of a plain :root (gh#92); the presets mirror those selectors.
 			return (
-				[":root", ":host", ":not"].includes(node.value) &&
+				[":root", ":host", ":not", ":where"].includes(node.value) &&
 				node.nodes.every(isPresetSelectorNode)
 			);
 		case "attribute":

@@ -46,6 +46,28 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   strengthened values straight back. See
   [High contrast](https://cirthcss.github.io/cirth/utilities/high-contrast/).
 
+### Fixed
+
+- **A `:root` override now actually changes a color token** (gh#92): the
+  customization path the documentation leads with — override
+  `--cirth-*` from your own stylesheet, loaded after Cirth — silently did
+  nothing for every color in the library. Loading order was never the
+  problem: the schemes declared their tokens on
+  `:root:not([data-theme="dark"])`, which weighs (0,2,0) against a plain
+  `:root`'s (0,1,0), so the override lost on specificity. Foundation and
+  style tokens (`--cirth-spacing`, `--cirth-border-radius`,
+  `--cirth-font-family`, …) were unaffected and always worked, which is
+  what made the gap so easy to miss. The parts of those selectors that
+  only *choose* a scheme now sit inside `:where()`, leaving the scheme
+  roots at the weight of a plain root, so source order decides again. Both
+  presets get the same treatment, for the same reason one stylesheet
+  further down the chain. Overrides already written against the old shape
+  (`:root:not([data-theme="dark"])`, `[data-theme="dark"]`) are more
+  specific still and keep working; a bare `:root` override now applies to
+  both schemes, and
+  [Customization](https://cirthcss.github.io/cirth/customization/#overriding-a-color-in-one-scheme-only)
+  documents how to part them.
+
 ## [0.9.0] - 2026-08-16
 
 ### Added

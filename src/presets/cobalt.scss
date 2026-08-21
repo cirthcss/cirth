@@ -133,38 +133,42 @@ $cobalt-150: oklch(86% 0.05 258deg);
 // Presets are always compiled unscoped, so the light/dark switching here is
 // hardcoded to :root/:host rather than going through the theme's
 // $parent-selector-aware helper — one less thing a standalone preset needs.
-[data-theme="light"],
-:root:not([data-theme="dark"]),
-:host(:not([data-theme="dark"])) {
+// The :where() wrapping is the theme's too (see theme/_schemes.scss,
+// gh#92): it keeps these roots at the weight of a plain :root, so a
+// consumer's own :root override — loaded after this preset — still wins on
+// source order instead of losing to the preset's selectors.
+:where([data-theme="light"]),
+:root:where(:not([data-theme="dark"])),
+:host(:where(:not([data-theme="dark"]))) {
   @include light;
 }
 
 @media only screen and (prefers-color-scheme: dark) {
-  :root:not([data-theme]),
-  :host(:not([data-theme])) {
+  :root:where(:not([data-theme])),
+  :host(:where(:not([data-theme]))) {
     @include dark;
   }
 }
 
-[data-theme="dark"] {
+:where([data-theme="dark"]) {
   @include dark;
 }
 
 @media (prefers-contrast: more) {
-  [data-theme="light"],
-  :root:not([data-theme="dark"]),
-  :host(:not([data-theme="dark"])) {
+  :where([data-theme="light"]),
+  :root:where(:not([data-theme="dark"])),
+  :host(:where(:not([data-theme="dark"]))) {
     @include contrast-light;
   }
 
   @media only screen and (prefers-color-scheme: dark) {
-    :root:not([data-theme]),
-    :host(:not([data-theme])) {
+    :root:where(:not([data-theme])),
+    :host(:where(:not([data-theme]))) {
       @include contrast-dark;
     }
   }
 
-  [data-theme="dark"] {
+  :where([data-theme="dark"]) {
     @include contrast-dark;
   }
 }

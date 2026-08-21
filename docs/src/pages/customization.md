@@ -117,6 +117,29 @@ dark mode, mirror the host's theme onto the wrapper:
 <div class="cirth" data-theme="dark">…</div>
 ```
 
+### Overriding a color in one scheme only
+
+A `:root` override applies to *both* schemes: it sets the token once, and
+neither scheme is more specific than it, so whichever scheme is active
+inherits your value. When you want to change light and dark separately,
+say which one you mean:
+
+```css
+:root:not([data-theme="dark"]) {
+  --cirth-primary: #2563eb;
+}
+
+[data-theme="dark"] {
+  --cirth-primary: #93c5fd;
+}
+```
+
+Those are the same selectors the schemes use, and the presets with them.
+One consequence worth knowing: an element carrying `data-theme` declares
+the whole palette on itself, so a `:root` override does not reach inside
+such a subtree. Repeat the override on the selectors above if you have
+forced a scheme somewhere in the page.
+
 ## Spacing and typography
 
 * `--cirth-spacing` drives most component padding/margins; it defaults to

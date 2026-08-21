@@ -8,6 +8,24 @@
    * Color scheme switching
    */
 
+// Every part of these selectors that only *filters* which scheme applies —
+// the data-theme tests — sits inside :where(), which contributes nothing to
+// specificity. What is left is the root itself: :root (0,1,0) unscoped, the
+// wrapper class in the scoped builds.
+
+// That ceiling is the point (gh#92). The scheme roots are where every color
+// token in the library is declared, and the documented way to change one is
+// a `:root` rule in a stylesheet loaded after Cirth — which weighs exactly
+// (0,1,0) and would lose outright to the `:root:not([data-theme="dark"])`
+// this used to be, whatever the loading order. Matching the plain root's
+// weight lets source order decide again, so a later declaration wins the
+// way the documentation has always said it does. Anything more specific
+// (`:root:not([data-theme="dark"])`, `[data-theme="dark"]`) still wins too,
+// so overrides written against the old shape keep working.
+
+// The filters are still real selectors: a scheme is chosen by them, and
+// only the weight of the choosing is given up.
+
 // Applies a light and a dark mixin through the data-theme / prefers-color-scheme wiring.
 @mixin apply($light, $dark) {
   // Light color scheme (Default)
@@ -15,15 +33,15 @@
   // Can be forced with data-theme="light"
 
   @if $parent-selector == "" {
-    [data-theme="light"],
-    :root:not([data-theme="dark"]),
-    :host(:not([data-theme="dark"])) {
+    :where([data-theme="light"]),
+    :root:where(:not([data-theme="dark"])),
+    :host(:where(:not([data-theme="dark"]))) {
       @include meta.apply($light);
     }
   } @else {
-    #{$parent-selector}[data-theme="light"],
-    #{$parent-selector} [data-theme="light"],
-    #{$parent-selector}:not([data-theme="dark"]) {
+    #{$parent-selector}:where([data-theme="light"]),
+    #{$parent-selector} :where([data-theme="light"]),
+    #{$parent-selector}:where(:not([data-theme="dark"])) {
       @include meta.apply($light);
     }
   }
@@ -34,12 +52,12 @@
 
   @media only screen and (prefers-color-scheme: dark) {
     @if $parent-selector == "" {
-      :root:not([data-theme]),
-      :host(:not([data-theme])) {
+      :root:where(:not([data-theme])),
+      :host(:where(:not([data-theme]))) {
         @include meta.apply($dark);
       }
     } @else {
-      #{$parent-selector}:not([data-theme]) {
+      #{$parent-selector}:where(:not([data-theme])) {
         @include meta.apply($dark);
       }
     }
@@ -50,12 +68,12 @@
   // Enabled if forced with data-theme="dark"
 
   @if $parent-selector == "" {
-    [data-theme="dark"] {
+    :where([data-theme="dark"]) {
       @include meta.apply($dark);
     }
   } @else {
-    #{$parent-selector}[data-theme="dark"],
-    #{$parent-selector} [data-theme="dark"] {
+    #{$parent-selector}:where([data-theme="dark"]),
+    #{$parent-selector} :where([data-theme="dark"]) {
       @include meta.apply($dark);
     }
   }

@@ -18,6 +18,7 @@ module.exports = defineConfig({
 		"nav-dropdown.spec.js",
 		"prefers-contrast.spec.js",
 		"print.spec.js",
+		"token-override.spec.js",
 	],
 	fullyParallel: true,
 	forbidOnly: !!process.env.CI,

@@ -74,17 +74,25 @@ with color instead.
 ## Customization
 
 The overrides are plain token declarations, applied through the same
-light/dark wiring as the schemes themselves. That is also what your own
-overrides have to match: like every other color token in Cirth, these are
-declared on the scheme roots (`:root:not([data-theme="dark"])` and
-`[data-theme="dark"]`), so a bare `:root` rule is less specific and loses,
-however late it is loaded.
+light/dark wiring as the schemes themselves — so your own values win the
+same way they do anywhere else, as long as they are inside the same media
+query. A bare `:root` covers both schemes:
+
+```css
+@media (prefers-contrast: more) {
+  :root {
+    --cirth-muted-border-color: #595f6b;
+  }
+}
+```
+
+To part light from dark, name the scheme roots, exactly as on
+[Customization](/customization#overriding-a-color-in-one-scheme-only):
 
 ```css
 @media (prefers-contrast: more) {
   :root:not([data-theme="dark"]) {
     --cirth-primary: #6b3f00;
-    --cirth-muted-border-color: #595f6b;
   }
 
   [data-theme="dark"] {
@@ -92,6 +100,3 @@ however late it is loaded.
   }
 }
 ```
-
-In a scoped build, swap `:root` for the scope wrapper
-(`.cirth:not([data-theme="dark"])`).

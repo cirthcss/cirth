@@ -27,11 +27,11 @@ $print-root-selector: "body";
 // Note where the scheme overrides land: on the *document body* (the scope
 // wrapper in the scoped builds), not on :root. Custom properties inherit,
 // and a declaration made directly on an element always beats one it would
-// otherwise inherit — no matter how specific the rule that set it upstream
-// was. That sidesteps the cascade fight this pass would otherwise lose
-// twice over: against the color schemes, whose own roots are more specific
-// than a bare :root, and against the presets in src/presets/, which
-// redeclare the same tokens from a stylesheet loaded *after* this one.
+// otherwise inherit, whatever the weight of the rule that set it upstream.
+// A :root block here would tie with the color schemes and win on order,
+// but it would still lose to the presets in src/presets/, which redeclare
+// the same tokens on the same roots from a stylesheet loaded *after* this
+// one. Declaring on the body settles both at once.
 
 @media print {
   @include selectors.root {
