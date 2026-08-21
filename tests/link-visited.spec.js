@@ -101,7 +101,18 @@ for (const build of builds) {
 
 	test(`both color schemes define the visited token in the ${build.name} build`, () => {
 		const css = read(build.file);
-		const declarations = css.match(/--cirth-link-visited-color:[^;]+;/g) ?? [];
+
+		// Only the base schemes: the preference passes that follow them
+		// (prefers-contrast: more, then @media print) deliberately redefine
+		// the token again, and are asserted in their own specs.
+		const preferences = css.indexOf("@media (prefers-contrast: more)");
+
+		expect(preferences, "the preference passes follow the schemes").toBeGreaterThan(
+			0,
+		);
+
+		const declarations =
+			css.slice(0, preferences).match(/--cirth-link-visited-color:[^;]+;/g) ?? [];
 
 		// Light, dark, and the explicit [data-theme="dark"] override.
 		expect(declarations.length).toBeGreaterThanOrEqual(3);

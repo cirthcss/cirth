@@ -49,3 +49,8 @@
 // stylesheets that only override CSS custom properties, meant to be
 // loaded after this one — they are not alternate builds of this file.
 @use "theme";
+
+// Print
+// Last on purpose: the print pass overrides component rules by source
+// order, so every rule it has to outrank must already have been emitted.
+@use "utilities/print"; // @media print

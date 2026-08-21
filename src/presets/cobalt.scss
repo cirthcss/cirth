@@ -20,6 +20,11 @@ $cobalt-550: oklch(52% 0.1 258deg);
 $cobalt-400: oklch(64% 0.09 258deg);
 $cobalt-300: oklch(72% 0.075 258deg);
 
+// 250/150 exist only for the prefers-contrast: more pass below — the
+// ladder's light end doesn't reach AAA against this preset's dark card.
+$cobalt-250: oklch(80% 0.07 258deg);
+$cobalt-150: oklch(86% 0.05 258deg);
+
 @mixin light {
   // Canvas: classic-corporate white, not the default theme's paper
   // concept — chroma cut to a bare trace (0.004 -> 0.002) so the page
@@ -87,6 +92,44 @@ $cobalt-300: oklch(72% 0.075 258deg);
   --cirth-box-shadow: 0 0 0 0.0625rem #{color.change($cobalt-400, $alpha: 0.2)};
 }
 
+// prefers-contrast: more — this preset's own high-contrast pass.
+// The framework's (src/theme/_contrast.scss) can't do this job here: a
+// preset is loaded after it and redeclares the same tokens on the same
+// roots, so everything it strengthened would be handed straight back to
+// the screen values above. Only the tokens this preset overrides need
+// restating; the rest still come from the framework's pass. Ratios are
+// measured against the worst surface of each scheme — the cool canvas in
+// light, a card in dark.
+@mixin contrast-light {
+  --cirth-muted-color: oklch(40% 0.01 258deg);
+  --cirth-muted-border-color: oklch(57% 0.01 258deg);
+
+  // The accent itself is already 12.7:1 here — this preset's navy is
+  // dark to begin with — so only its underline and focus ring need the
+  // pass: full strength instead of the 50%-alpha tint, and opaque
+  // instead of 70% (6.6:1).
+  --cirth-primary-underline: var(--cirth-primary);
+  --cirth-primary-focus: #{$cobalt-600};
+
+  // 8.5:1, still drained of the accent like the default visited color.
+  --cirth-link-visited-color: oklch(40% 0.02 258deg);
+}
+
+@mixin contrast-dark {
+  --cirth-muted-color: oklch(80% 0.02 258deg);
+  --cirth-muted-border-color: oklch(57% 0.01 258deg);
+  --cirth-card-border-color: var(--cirth-muted-border-color);
+
+  // 9.1:1 and 11.1:1, opaque focus ring at 5.4:1 against the page.
+  --cirth-primary: #{$cobalt-250};
+  --cirth-primary-hover: #{$cobalt-150};
+  --cirth-primary-underline: var(--cirth-primary);
+  --cirth-primary-focus: #{$cobalt-400};
+
+  // 9.1:1, drained of the accent like the default visited color.
+  --cirth-link-visited-color: oklch(80% 0.02 258deg);
+}
+
 // Presets are always compiled unscoped, so the light/dark switching here is
 // hardcoded to :root/:host rather than going through the theme's
 // $parent-selector-aware helper — one less thing a standalone preset needs.
@@ -105,6 +148,25 @@ $cobalt-300: oklch(72% 0.075 258deg);
 
 [data-theme="dark"] {
   @include dark;
+}
+
+@media (prefers-contrast: more) {
+  [data-theme="light"],
+  :root:not([data-theme="dark"]),
+  :host(:not([data-theme="dark"])) {
+    @include contrast-light;
+  }
+
+  @media only screen and (prefers-color-scheme: dark) {
+    :root:not([data-theme]),
+    :host(:not([data-theme])) {
+      @include contrast-dark;
+    }
+  }
+
+  [data-theme="dark"] {
+    @include contrast-dark;
+  }
 }
 
 // Scheme-independent system feel: square corners, a neutral grotesque font

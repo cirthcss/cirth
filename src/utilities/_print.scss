@@ -1,0 +1,237 @@
+@use "../config" as *;
+@use "../helpers/selectors";
+@use "../theme/colors" as *;
+
+// The element the scheme overrides below are declared on: the document
+// body, or the wrapper in the scoped builds.
+$print-root-selector: "body";
+
+@if $parent-selector != "" {
+  $print-root-selector: $parent-selector;
+}
+
+/**
+   * Print
+   */
+
+// Paper is not a screen: there is no elevation, no hover, no color scheme
+// to follow, and toner is not free. This pass flattens Cirth's surfaces to
+// ink on white, keeps the color that actually carries meaning, and stops
+// long content from being lost at the fold.
+
+// The three print tokens below are the customization surface: set
+// --cirth-print-color, --cirth-print-muted-color and
+// --cirth-print-border-color to retune the whole pass, or add your own
+// @media print rules after this stylesheet.
+
+// Note where the scheme overrides land: on the *document body* (the scope
+// wrapper in the scoped builds), not on :root. Custom properties inherit,
+// and a declaration made directly on an element always beats one it would
+// otherwise inherit — no matter how specific the rule that set it upstream
+// was. That sidesteps the cascade fight this pass would otherwise lose
+// twice over: against the color schemes, whose own roots are more specific
+// than a bare :root, and against the presets in src/presets/, which
+// redeclare the same tokens from a stylesheet loaded *after* this one.
+
+@media print {
+  @include selectors.root {
+    // Ink, measured on white paper: solid black for text, 6.5:1 for the
+    // secondary ink, 3.8:1 for hairlines — gray that survives a
+    // monochrome printer instead of fading out of it. Declared here, one
+    // level above where they're consumed, so overriding them takes
+    // nothing more than a `:root` rule of your own.
+    --cirth-print-color: #{$black};
+    --cirth-print-muted-color: #{$neutral-600};
+    --cirth-print-border-color: #{$neutral-450};
+  }
+
+  // The page itself. Browsers already drop author backgrounds when
+  // printing (print-color-adjust: economy) but keep text color, so a
+  // dark-scheme page prints pale gray on white unless the pair is reset
+  // together. color-scheme goes with them, so native controls and
+  // scrollbars stop rendering their dark variants.
+
+  @if $parent-selector == "" {
+    html {
+      background: none;
+      color-scheme: light;
+    }
+  }
+
+  #{$print-root-selector} {
+    background: none;
+    color: var(--cirth-print-color);
+    color-scheme: light;
+
+    // Text, in every role the schemes give it. The heading ramp collapses
+    // onto the body ink: six shades of near-black is a screen luxury.
+    --cirth-color: var(--cirth-print-color);
+    --cirth-h1-color: var(--cirth-print-color);
+    --cirth-h2-color: var(--cirth-print-color);
+    --cirth-h3-color: var(--cirth-print-color);
+    --cirth-h4-color: var(--cirth-print-color);
+    --cirth-h5-color: var(--cirth-print-color);
+    --cirth-h6-color: var(--cirth-print-color);
+    --cirth-code-color: var(--cirth-print-color);
+    --cirth-code-kbd-color: var(--cirth-print-color);
+    --cirth-form-element-color: var(--cirth-print-color);
+
+    // Muted stays muted, one rung up: figure captions, blockquote
+    // attributions, an open accordion's summary, placeholders.
+    --cirth-muted-color: var(--cirth-print-muted-color);
+    --cirth-form-element-placeholder-color: var(--cirth-print-muted-color);
+
+    // Links keep their underline and lose their accent. A mid-tone accent
+    // is a screen affordance; out of a monochrome printer it is gray mush,
+    // and the underline is the cue that survives either way.
+    --cirth-primary: var(--cirth-print-color);
+    --cirth-primary-hover: var(--cirth-print-color);
+    --cirth-primary-underline: var(--cirth-print-color);
+    --cirth-secondary: var(--cirth-print-color);
+    --cirth-secondary-underline: var(--cirth-print-color);
+    --cirth-contrast: var(--cirth-print-color);
+    --cirth-contrast-underline: var(--cirth-print-color);
+    --cirth-link-visited-color: var(--cirth-print-color);
+
+    // Hairlines: table rules, card and blockquote edges, hr, accordion
+    // dividers and field borders all derive from these two.
+    --cirth-muted-border-color: var(--cirth-print-border-color);
+    --cirth-form-element-border-color: var(--cirth-print-border-color);
+
+    // Surfaces flatten. A printed page has no elevation, and the sheet is
+    // already the lightest thing on offer.
+    --cirth-box-shadow: none;
+    --cirth-card-box-shadow: none;
+    --cirth-card-background-color: transparent;
+    --cirth-card-sectioning-background-color: transparent;
+    --cirth-code-background-color: transparent;
+    --cirth-code-kbd-background-color: transparent;
+    --cirth-form-element-background-color: transparent;
+    --cirth-form-element-active-background-color: transparent;
+    --cirth-table-row-stripped-background-color: transparent;
+    --cirth-modal-overlay-background-color: transparent;
+
+    @if $enable-classes {
+      --cirth-dropdown-background-color: transparent;
+      --cirth-dropdown-box-shadow: none;
+    }
+
+    // Insertions and deletions are pinned to the light scheme's inks
+    // rather than blacked out: the hue is the semantics, and the dark
+    // scheme's pale variants would barely register on paper.
+    --cirth-ins-color: #{$success-750};
+    --cirth-del-color: #{$error-750};
+  }
+
+  // <kbd> is the one inverted chip in the library. With its fill gone it
+  // is just text, so it takes a border to keep reading as a key.
+
+  #{$parent-selector} kbd {
+    border: var(--cirth-border-width) solid var(--cirth-print-border-color);
+  }
+
+  // Controls print as outlined labels. Their fill is dropped by the
+  // browser anyway, and a button's label is --cirth-primary-inverse —
+  // white — which would leave nothing at all on the paper. Done as a rule
+  // rather than through the primary tokens on purpose: those same tokens
+  // fill a checked checkbox and a progress bar, whose color is content.
+
+  #{$parent-selector}
+    :is(
+      button,
+      [type="submit"],
+      [type="reset"],
+      [type="button"],
+      [role="button"]
+    ),
+  #{$parent-selector} [type="file"]::file-selector-button {
+    border-color: var(--cirth-print-border-color);
+    background: none;
+    box-shadow: none;
+    color: var(--cirth-print-color);
+  }
+
+  // Color that carries meaning rather than decoration opts back in. Under
+  // the browser's default economy setting a checked box loses its tick, a
+  // switch loses its on-state, a progress bar loses its fill and a <mark>
+  // loses its highlight — in each case the dropped paint *is* the content.
+
+  #{$parent-selector} :is(mark, progress, [type="checkbox"], [type="radio"]) {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  // Where a link points is the one thing paper can't resolve for itself.
+  // Absolute URLs only — in-page and relative hrefs print as noise — and
+  // never for navigation or controls, where the label is the whole point.
+
+  #{$parent-selector} a[href^="http"]:not([role="button"], nav a)::after {
+    content: " (" attr(href) ")";
+    color: var(--cirth-print-muted-color);
+    font-size: var(--cirth-font-size-sm);
+    word-break: break-all;
+  }
+
+  // Tables: the header repeats on every page the table spans, the footer
+  // lands after the last row, and no row is torn in half by the fold.
+
+  #{$parent-selector} thead {
+    display: table-header-group;
+  }
+
+  #{$parent-selector} tfoot {
+    display: table-footer-group;
+  }
+
+  #{$parent-selector} tr {
+    break-inside: avoid;
+  }
+
+  // What the screen scrolls sideways would simply be cut off on paper, so
+  // it wraps or spills instead: a clipped code block is lost content, not
+  // a layout detail.
+
+  #{$parent-selector} pre {
+    overflow: visible;
+    white-space: pre-wrap;
+  }
+
+  @if $enable-classes {
+    #{$parent-selector} .overflow-auto {
+      overflow: visible;
+    }
+  }
+
+  // An open <dialog> is pinned to the viewport, which on paper means it
+  // covers the first page and hides the document behind it. Print it
+  // where it sits in the flow instead.
+
+  #{$parent-selector} dialog {
+    position: static;
+    min-width: 0;
+    min-height: 0;
+    backdrop-filter: none;
+
+    > article {
+      max-height: none;
+      overflow: visible;
+    }
+  }
+
+  // Page breaks: a heading never ends a page on its own, figures and
+  // images stay whole, and a paragraph keeps at least three lines on
+  // either side of a break.
+
+  #{$parent-selector} :is(h1, h2, h3, h4, h5, h6) {
+    break-after: avoid;
+  }
+
+  #{$parent-selector} :is(figure, img) {
+    break-inside: avoid;
+  }
+
+  #{$parent-selector} :is(blockquote, li, p) {
+    orphans: 3;
+    widows: 3;
+  }
+}

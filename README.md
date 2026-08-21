@@ -253,7 +253,9 @@ npm run docs:dev
   [Tooltip](docs/src/pages/components/tooltip.md)
 - **Utilities** —
   [Accessibility](docs/src/pages/utilities/accessibility.md) ·
-  [Reduce motion](docs/src/pages/utilities/reduce-motion.md)
+  [High contrast](docs/src/pages/utilities/high-contrast.md) ·
+  [Reduce motion](docs/src/pages/utilities/reduce-motion.md) ·
+  [Print](docs/src/pages/utilities/print.md)
 - **Project** —
   [Examples](docs/src/pages/examples.md) ·
   [Contributions](docs/src/pages/contributions.md) ·

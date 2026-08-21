@@ -73,8 +73,8 @@ overhead, HTTP version, prior congestion state, and the network path.
 
 WCAG 2.2 AA contrast, visible focus rings that survive Windows High
 Contrast / forced-colors mode, 44px touch targets, and
-`prefers-reduced-motion` support are checked in the source rather than
-left to integrators to add. This is a floor Cirth verifies for its own
+`prefers-reduced-motion` / `prefers-contrast: more` support are checked in
+the source rather than left to integrators to add. This is a floor Cirth verifies for its own
 components and default theme — a baseline, not a substitute for testing
 the accessibility of the interface you build on top of it.
 

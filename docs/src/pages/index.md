@@ -99,12 +99,13 @@ stack:
     - title: Accessible by default
       details: >-
         Visible focus rings that survive Windows High Contrast, 44px
-        touch targets, and <code>prefers-reduced-motion</code> support
-        are checked in the source, not bolted on after.
+        touch targets, and <code>prefers-reduced-motion</code> /
+        <code>prefers-contrast</code> support are checked in the source,
+        not bolted on after.
       badges:
         - forced-colors
         - 44px targets
-        - prefers-reduced-motion
+        - prefers-contrast
 
 showcase:
   eyebrow: Samples

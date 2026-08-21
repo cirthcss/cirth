@@ -13,6 +13,11 @@
 @use "../helpers/selectors";
 
 // Coral
+// 750/700 and 150 exist only for the prefers-contrast: more pass below —
+// the ladder's own ends aren't far enough out to reach AAA on this
+// preset's canvases.
+$coral-750: oklch(35% 0.12 35deg);
+$coral-700: oklch(40% 0.14 35deg);
 $coral-650: oklch(45% 0.15 35deg);
 $coral-600: oklch(50% 0.16 35deg);
 $coral-550: oklch(55% 0.17 35deg);
@@ -20,6 +25,7 @@ $coral-500: oklch(60% 0.18 35deg);
 $coral-400: oklch(65% 0.17 35deg);
 $coral-350: oklch(68% 0.16 35deg);
 $coral-250: oklch(80% 0.1 35deg);
+$coral-150: oklch(85% 0.08 35deg);
 
 @mixin light {
   // Canvas: the default theme's paper concept in coral's own hue — a
@@ -89,6 +95,44 @@ $coral-250: oklch(80% 0.1 35deg);
     #{color.change($coral-250, $alpha: 0.4)};
 }
 
+// prefers-contrast: more — this preset's own high-contrast pass.
+// The framework's (src/theme/_contrast.scss) can't do this job here: a
+// preset is loaded after it and redeclares the same tokens on the same
+// roots, so everything it strengthened would be handed straight back to
+// the screen values above. Only the tokens this preset overrides need
+// restating; the rest still come from the framework's pass. Ratios are
+// measured against the worst surface of each scheme — the blush canvas in
+// light, a card in dark.
+@mixin contrast-light {
+  --cirth-muted-color: oklch(40% 0.02 35deg);
+  --cirth-muted-border-color: oklch(57% 0.02 35deg);
+
+  // 9.1:1 and 11.1:1, with the underline at full strength instead of the
+  // 50%-alpha tint, and an opaque focus ring (7.4:1).
+  --cirth-primary: #{$coral-700};
+  --cirth-primary-hover: #{$coral-750};
+  --cirth-primary-underline: var(--cirth-primary);
+  --cirth-primary-focus: #{$coral-650};
+
+  // 8.6:1, still drained of the accent like the default visited color.
+  --cirth-link-visited-color: oklch(40% 0.03 35deg);
+}
+
+@mixin contrast-dark {
+  --cirth-muted-color: oklch(80% 0.02 35deg);
+  --cirth-muted-border-color: oklch(57% 0.02 35deg);
+  --cirth-card-border-color: var(--cirth-muted-border-color);
+
+  // 8.7:1 and 10.4:1, opaque focus ring at 6.0:1 against the page.
+  --cirth-primary: #{$coral-250};
+  --cirth-primary-hover: #{$coral-150};
+  --cirth-primary-underline: var(--cirth-primary);
+  --cirth-primary-focus: #{$coral-350};
+
+  // 9.0:1, drained of the accent like the default visited color.
+  --cirth-link-visited-color: oklch(80% 0.03 35deg);
+}
+
 // Presets are always compiled unscoped, so the light/dark switching here is
 // hardcoded to :root/:host rather than going through the theme's
 // $parent-selector-aware helper — one less thing a standalone preset needs.
@@ -107,6 +151,25 @@ $coral-250: oklch(80% 0.1 35deg);
 
 [data-theme="dark"] {
   @include dark;
+}
+
+@media (prefers-contrast: more) {
+  [data-theme="light"],
+  :root:not([data-theme="dark"]),
+  :host(:not([data-theme="dark"])) {
+    @include contrast-light;
+  }
+
+  @media only screen and (prefers-color-scheme: dark) {
+    :root:not([data-theme]),
+    :host(:not([data-theme])) {
+      @include contrast-dark;
+    }
+  }
+
+  [data-theme="dark"] {
+    @include contrast-dark;
+  }
 }
 
 // Scheme-independent system feel: extra-rounded corners, a rounded,

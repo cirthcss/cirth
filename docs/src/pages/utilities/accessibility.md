@@ -20,3 +20,11 @@ rather than by class.
   mirror their icons/spacing under this attribute (nav breadcrumbs,
   dropdown menus, form icons, tooltips); see each component's page for its
   specific RTL behavior.
+
+## Related preferences
+
+Two more user preferences are handled globally, each on its own page:
+[High contrast](/utilities/high-contrast) (`prefers-contrast: more`, and
+how it differs from `forced-colors: active`) and
+[Reduce motion](/utilities/reduce-motion) (`prefers-reduced-motion`).
+Output for paper is covered by [Print](/utilities/print).

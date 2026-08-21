@@ -74,10 +74,12 @@ const sidebar = [
 		text: "Utilities",
 		items: [
 			{ text: "Accessibility", link: "/utilities/accessibility" },
+			{ text: "High contrast", link: "/utilities/high-contrast" },
 			{ text: "Reduce motion", link: "/utilities/reduce-motion" },
 			{ text: "Screen-reader only", link: "/utilities/sr-only" },
 			{ text: "Truncate", link: "/utilities/truncate" },
 			{ text: "Breakout", link: "/utilities/breakout" },
+			{ text: "Print", link: "/utilities/print" },
 		],
 	},
 	{

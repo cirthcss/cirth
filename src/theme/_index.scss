@@ -6,3 +6,8 @@
 
 // Color schemes
 @use "schemes";
+
+// Increased contrast preference (prefers-contrast: more)
+// After the schemes it refines: each override lands on the same selector
+// as the value it replaces and wins on source order.
+@use "contrast";

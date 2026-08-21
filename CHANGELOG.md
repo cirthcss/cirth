@@ -7,6 +7,45 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Added
+
+- **A print pass** (gh#32): Cirth now ships `@media print` styles, so any
+  page built from semantic HTML prints as a readable document without a
+  print-only stylesheet of your own. The one that matters most is the
+  surface reset — browsers drop author *backgrounds* when printing but keep
+  author *text color*, so a page printed while the dark scheme was active
+  used to come out near-white on white. Surfaces (cards, dropdowns, code,
+  `<kbd>`, fields, striped rows, the modal overlay) go transparent and lose
+  their shadows, links print as ink plus their underline with the URL of
+  external links spelled out after them, buttons print as outlined labels
+  instead of white-on-nothing, table headers repeat across pages and rows
+  stay whole, `<pre>` wraps instead of being cut at the fold, and an open
+  `<dialog>` prints in the flow rather than over the first page. Color that
+  carries meaning — `<mark>`, `<progress>`, checked checkboxes and radios —
+  opts back in with `print-color-adjust: exact`. Three new tokens,
+  `--cirth-print-color`, `--cirth-print-muted-color` and
+  `--cirth-print-border-color`, retune the whole pass. Nothing is hidden and
+  no `@page` rule is set: which parts of a layout are chrome, and what the
+  page margins should be, are the document's call. See
+  [Print](https://cirthcss.github.io/cirth/utilities/print/).
+- **`prefers-contrast: more` support** (gh#34): the softer complement to
+  the existing `forced-colors` handling — where forced-colors hands the
+  palette to the operating system, this keeps Cirth's palette and stops
+  spending it on subtlety, in both light and dark. Text reaches WCAG AAA
+  (7:1 or better, 15:1 for body copy) against the surface it sits on and the
+  six-step heading ramp collapses onto the body ink; muted text, code, and
+  visited links climb from just over the AA floor to 8.7:1; hairlines and
+  field borders clear the 3:1 non-text floor by a wide margin (in the dark
+  scheme a card's border stops being its own background); link underlines
+  drop their half-alpha tint; and focus rings turn fully opaque. Geometry is
+  deliberately untouched: control height is computed from
+  `--cirth-border-width`, so thickening borders here would silently resize
+  every control. The `cobalt` and `coral` presets carry their own version
+  of the pass at their own hues — a preset is loaded after the framework
+  and redeclares the same tokens, so without one it would hand the
+  strengthened values straight back. See
+  [High contrast](https://cirthcss.github.io/cirth/utilities/high-contrast/).
+
 ## [0.9.0] - 2026-08-16
 
 ### Added

@@ -1,0 +1,130 @@
+@use "sass:meta";
+@use "../config" as *;
+@use "colors" as *;
+@use "schemes";
+
+/**
+   * Increased contrast (prefers-contrast: more)
+   */
+
+// The softer complement to the forced-colors handling already scattered
+// through the components. forced-colors hands the palette over to the
+// operating system wholesale; this keeps Cirth's own palette and simply
+// stops spending contrast on subtlety: text inks go to WCAG AAA (>= 7:1)
+// on the surface they sit on, hairlines and control borders climb well
+// past the 3:1 non-text floor, link underlines lose their half-alpha
+// tint, and focus rings turn fully opaque.
+
+// Tokens only, no geometry. Control heights are built from
+// --cirth-border-width (44px, WCAG 2.5.5 — see theme/_styles.scss), so
+// thickening borders here would silently resize every control in the
+// library; contrast is bought with color instead.
+
+// Runs through the same schemes.apply() wiring as the base themes, so
+// each override lands on exactly the selector it overrides and wins on
+// source order. Ratios in the comments below are measured against the
+// worst surface of each scheme — the paper canvas in light, a card in
+// dark — so they hold everywhere the token is used.
+
+@mixin light {
+  // Text: 15.9:1 on paper, and the heading ramp collapses onto it rather
+  // than fading out over six steps.
+  --cirth-color: #{$neutral-900};
+  --cirth-h1-color: var(--cirth-color);
+  --cirth-h2-color: var(--cirth-color);
+  --cirth-h3-color: var(--cirth-color);
+  --cirth-h4-color: var(--cirth-color);
+  --cirth-h5-color: var(--cirth-color);
+  --cirth-h6-color: var(--cirth-color);
+
+  // Secondary inks: 8.7:1 or better, up from 5:1 — still subordinate, no
+  // longer AA-and-no-further.
+  --cirth-muted-color: #{$neutral-700};
+  --cirth-secondary: #{$neutral-700};
+  --cirth-code-color: #{$neutral-750};
+  --cirth-link-visited-color: #{$neutral-750};
+
+  // Hairlines and control borders: 4.1:1 and 8.7:1, up from ~1.1:1 and
+  // 3.5:1. Table, card, blockquote and accordion borders all derive from
+  // --cirth-muted-border-color, so they follow this one line.
+  --cirth-muted-border-color: #{$neutral-500};
+  --cirth-form-element-border-color: #{$neutral-700};
+  --cirth-form-element-invalid-border-color: #{$error-600};
+  --cirth-form-element-valid-border-color: #{$success-600};
+
+  // Link accent: 8.8:1, with the underline at full strength instead of
+  // the 50%-alpha tint.
+  --cirth-primary: #{$amber-700};
+  --cirth-primary-hover: #{$amber-800};
+  --cirth-primary-underline: var(--cirth-primary);
+  --cirth-secondary-underline: var(--cirth-secondary);
+  --cirth-contrast-underline: var(--cirth-contrast);
+
+  // Focus rings drop their alpha: a translucent ring composites against
+  // whatever it lands on, which is exactly what "more contrast" asks us
+  // to stop doing.
+  --cirth-primary-focus: #{$amber-600};
+  --cirth-secondary-focus: #{$neutral-600};
+  --cirth-contrast-focus: #{$neutral-600};
+
+  // Non-text controls whose *state* is a fill: the unchecked switch track
+  // and the progress track's extent.
+  --cirth-switch-background-color: #{$neutral-600};
+  --cirth-progress-border-color: #{$neutral-600};
+
+  @if $enable-classes {
+    --cirth-dropdown-border-color: var(--cirth-muted-border-color);
+  }
+}
+
+@mixin dark {
+  // 15.3:1 on a card, the worst surface in this scheme.
+  --cirth-color: #{$neutral-50};
+  --cirth-h1-color: var(--cirth-color);
+  --cirth-h2-color: var(--cirth-color);
+  --cirth-h3-color: var(--cirth-color);
+  --cirth-h4-color: var(--cirth-color);
+  --cirth-h5-color: var(--cirth-color);
+  --cirth-h6-color: var(--cirth-color);
+
+  // 8.8:1 or better, up from 4.6:1.
+  --cirth-muted-color: #{$neutral-250};
+  --cirth-secondary: #{$neutral-250};
+  --cirth-code-color: #{$neutral-200};
+  --cirth-link-visited-color: #{$neutral-250};
+
+  // 3.9:1 and 6.4:1, up from 1.1:1 and 3.2:1. The card border is normally
+  // the card background — an invisible seam — and becomes a real edge
+  // here.
+  --cirth-muted-border-color: #{$neutral-500};
+  --cirth-card-border-color: var(--cirth-muted-border-color);
+  --cirth-form-element-border-color: #{$neutral-350};
+  --cirth-form-element-invalid-border-color: #{$error-250};
+  --cirth-form-element-valid-border-color: #{$success-250};
+
+  // 8.6:1, underlines at full strength.
+  --cirth-primary: #{$amber-250};
+  --cirth-primary-hover: #{$amber-150};
+  --cirth-primary-underline: var(--cirth-primary);
+  --cirth-secondary-underline: var(--cirth-secondary);
+  --cirth-contrast-underline: var(--cirth-contrast);
+
+  // Opaque focus rings, as in the light scheme above.
+  --cirth-primary-focus: #{$amber-350};
+  --cirth-secondary-focus: #{$neutral-350};
+  --cirth-contrast-focus: #{$neutral-150};
+
+  // Not lighter than the 400 step: the thumb riding on this track is
+  // --cirth-primary-inverse (white), and 400 is where white still clears
+  // 3:1 against it (WCAG 1.4.11).
+  --cirth-switch-background-color: #{$neutral-400};
+  --cirth-progress-border-color: #{$neutral-350};
+
+  @if $enable-classes {
+    --cirth-dropdown-border-color: var(--cirth-muted-border-color);
+  }
+}
+
+@media (prefers-contrast: more) {
+  @include schemes.apply(meta.get-mixin("light"), meta.get-mixin("dark"));
+}

@@ -1465,3 +1465,37 @@ pre > button.copy.copied::before {
 	text-align: center;
 	text-transform: capitalize;
 }
+
+/* Print: this site's half of the bargain
+   ––––––––––––––––––––
+   The framework's own print pass (src/utilities/_print.scss) flattens
+   Cirth's surfaces to ink on paper, but deliberately hides nothing —
+   which parts of a layout are chrome is something only the site knows.
+   Last in the file on purpose: these rules override the layout above by
+   source order, the same way the framework's pass overrides its own
+   components. */
+@media print {
+	/* Navigation, on-page outlines, the theme and preset controls, and the
+	   copy-to-clipboard buttons are all ways of moving around a page that
+	   is no longer being moved around. */
+	.docs-header,
+	.docs-sidebar,
+	.docs-toc,
+	.docs-toc-top,
+	.docs-prev-next,
+	.docs-footer,
+	pre > button.copy {
+		display: none;
+	}
+
+	/* With the side columns gone, the document takes the full measure of
+	   the sheet: the reading cap that keeps line length comfortable on
+	   screen would only narrow it further. */
+	.docs-layout {
+		display: block;
+	}
+
+	.docs-content {
+		max-width: none;
+	}
+}
