@@ -9,6 +9,25 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Changed
 
+- **The Browserslist target now names the browsers it always meant.** It
+  listed desktop Chrome, Edge, Firefox, Safari and iOS Safari, and nothing
+  else — which left Chrome for Android out of a query that is supposed to
+  describe the supported web, and Chrome for Android alone is 46% of global
+  usage. Coverage read 33.85% not because support was narrow but because
+  the question was badly asked; it now reads 83.06%. Added
+  `ChromeAndroid >= 111`, `FirefoxAndroid >= 113`, `Opera >= 97`,
+  `OperaMobile >= 73` and `Samsung >= 22` — Opera 97 and Samsung Internet
+  22 being the releases built on the same Chromium as Chrome 111, so the
+  list still describes a single engine floor. **Every published file is
+  byte-identical to before the change**, which is the point: this corrects
+  the declaration, not the output.
+
+  The legacy Android Browser is deliberately not in the list. Its one
+  modern entry is the same engine as Chrome for Android, it accounts for
+  0.03% of usage, and including it makes Lightning CSS downlevel every
+  grouped selector in the library — 743 B gzipped, over the size budget,
+  in exchange for three hundredths of a percent.
+
 - **Source hygiene: dead rules and redundant declarations removed.** No
   supported browser renders anything differently — the visual suite passes
   unchanged, pixel for pixel, on all three engines — and the published CSS

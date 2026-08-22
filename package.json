@@ -90,9 +90,14 @@
 	},
 	"browserslist": [
 		"Chrome >= 111",
+		"ChromeAndroid >= 111",
 		"Edge >= 111",
 		"Firefox >= 113",
+		"FirefoxAndroid >= 113",
+		"iOS >= 15.4",
+		"Opera >= 97",
+		"OperaMobile >= 73",
 		"Safari >= 15.4",
-		"iOS >= 15.4"
+		"Samsung >= 22"
 	]
 }

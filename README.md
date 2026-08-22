@@ -286,20 +286,32 @@ npm pack --dry-run
 ## Browser Support
 
 Cirth is designed and tested for the latest stable Chrome, Edge, Firefox,
-and Safari releases. The compiled CSS is processed with Lightning CSS
-against this Browserslist target:
+and Safari releases, on desktop and mobile. The compiled CSS is processed
+with Lightning CSS against this Browserslist target:
 
 ```json
 [
   "Chrome >= 111",
+  "ChromeAndroid >= 111",
   "Edge >= 111",
   "Firefox >= 113",
+  "FirefoxAndroid >= 113",
+  "iOS >= 15.4",
+  "Opera >= 97",
+  "OperaMobile >= 73",
   "Safari >= 15.4",
-  "iOS >= 15.4"
+  "Samsung >= 22"
 ]
 ```
 
-No version of Internet Explorer is supported.
+Opera 97 and Samsung Internet 22 are the releases built on the same
+Chromium as Chrome 111, so every entry above describes one engine floor,
+not ten independent ones. Together they account for roughly 83% of global
+browser usage.
+
+No version of Internet Explorer is supported, and neither is the legacy
+Android Browser — on any current Android device that name refers to
+Chrome, which `ChromeAndroid` already covers.
 
 ## Design principles
 

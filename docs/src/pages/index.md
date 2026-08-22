@@ -154,9 +154,11 @@ faq:
         bundle crosses it.
     - q: Which browsers are supported?
       a: >-
-        The latest stable Chrome, Edge, Firefox, and Safari (desktop and
-        iOS), compiled against that exact Browserslist target with
-        Lightning CSS. No version of Internet Explorer is supported.
+        The latest stable Chrome, Edge, Firefox, Opera and Safari, on
+        desktop and mobile — including Chrome and Firefox for Android and
+        Samsung Internet, together about 83% of global browser usage.
+        Compiled against that exact Browserslist target with Lightning
+        CSS. No version of Internet Explorer is supported.
     - q: How is this different from Pico CSS?
       a: >-
         Cirth started as a fork of Pico CSS. It now has its own package
