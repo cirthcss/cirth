@@ -10,6 +10,7 @@ module.exports = defineConfig({
 	testMatch: [
 		"button-overflow.spec.js",
 		"date-input-group.spec.js",
+		"form-sizing.spec.js",
 		"forms-validity.spec.js",
 		"group-hidden-elements.spec.js",
 		"group-search-radius.spec.js",

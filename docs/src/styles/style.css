@@ -84,14 +84,17 @@
    that reads as a header control, matching the theme toggle beside them:
    auto width, since their labels are short and fixed.
 
-   What is deliberately not overridden is the height. These used to carry a
-   reduced padding-block and came out at 33px and 38px against the toggle's
-   44 — this project undercutting, in its own chrome, the WCAG 2.5.5 target
-   size it verifies in its own source. The small type stays; the library's
-   min-block-size floor holds the target size underneath it. */
+   The height is asked for outright. These used to carry a reduced
+   padding-block and came out at 33px and 38px against the toggle's 44 —
+   this project undercutting, in its own chrome, the WCAG 2.5.5 target size
+   it verifies in its own source. Cirth's own floor does not supply it here:
+   a <nav> opts down to the AA minimum (see components/_nav.scss), which is
+   the right default for a compact navigation row but not for this header,
+   where these sit beside a 44px toggle. The small type stays. */
 .docs-preset-select,
 .docs-version-select {
 	width: auto;
+	min-block-size: 2.75rem;
 	margin-bottom: 0;
 	padding-inline: calc(var(--cirth-spacing) * 0.75)
 		calc(var(--cirth-spacing) * 1.75);

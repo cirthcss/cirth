@@ -83,6 +83,14 @@
     input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]),
     select {
       height: auto;
+
+      // A nav is a row of compact controls by design, so it opts out of the
+      // 44px floor the same way it opts out of the fixed height above —
+      // `height: auto` alone cannot, since a min-block-size survives it.
+      // It opts down, not out: 24px is WCAG 2.5.8 Target Size (Minimum),
+      // the AA threshold, where 44px is 2.5.5's AAA one. Compact stays
+      // possible; smaller than a thumb does not.
+      min-block-size: var(--cirth-size-6);
       margin-inline: inherit;
       margin-bottom: 0;
       padding: calc(

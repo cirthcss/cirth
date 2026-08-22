@@ -52,6 +52,20 @@
   // where the document's overflow-wrap never gets a constrained line to
   // break (gh#75). Short labels are unaffected.
   max-width: 100%;
+
+  // The 44px target size (WCAG 2.5.5), as a floor rather than as an
+  // outcome. The padding and line-height below add up to it at the default
+  // type scale and stop doing so the moment anyone changes the font-size —
+  // a button at 0.875rem came out at 40.75px. Measured from
+  // --cirth-size-4 rather than from the element's own font-size, so the
+  // floor stays put when the type does not, and matched by the same floor
+  // on select and textarea in forms/_basics.scss. Navs opt down to the
+  // AA minimum instead; see components/_nav.scss.
+  min-block-size: calc(
+    (var(--cirth-size-4) * var(--cirth-line-height)) +
+      (var(--cirth-form-element-spacing-vertical) * 2) +
+      (var(--cirth-border-width) * 2)
+  );
   padding: var(--cirth-form-element-spacing-vertical)
     var(--cirth-form-element-spacing-horizontal);
   border: var(--cirth-border-width) solid var(--cirth-border-color);

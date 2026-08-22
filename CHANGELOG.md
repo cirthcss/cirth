@@ -9,6 +9,26 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Fixed
 
+- **Buttons keep the 44px target size when their font-size changes.** The
+  same defect fixed for `select` and `textarea` below, on the control the
+  others were measured against: padding and line-height add up to 44px at
+  the default type scale and stop doing so as soon as anyone sets a
+  different font-size, so a button at `0.875rem` came out at 40.75px. It now
+  carries the same `min-block-size` floor, measured from `--cirth-size-4`
+  rather than from its own text. This project's own brand page had download
+  buttons sitting at 30px.
+
+  Controls inside a `nav` opt *down* rather than out: a navigation row is
+  compact by design and already escaped the fixed control height with
+  `height: auto`, which a `min-block-size` survives. It restates the floor
+  at 24px — WCAG 2.5.8 Target Size (Minimum), the AA threshold — where 44px
+  is 2.5.5's AAA one. Compact stays possible; smaller than a thumb does not.
+
+  `[type="file"]::file-selector-button` is exempt: it is part of the input
+  rather than a target of its own, the input is what the pointer is aimed at
+  and is already 44px tall, and forcing the floor onto the pseudo-element
+  made it overflow the control holding it.
+
 - **A `textarea` opens four rows tall instead of the browser's two.** Two
   rows shows a line and a half of a paragraph, so a control meant for prose
   opened as a box you immediately scroll inside. An explicit `rows`

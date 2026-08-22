@@ -51,6 +51,11 @@ behavior specific to each input type.
   only applies when you haven't said how tall you want it. The four rows
   are measured in `lh`, so they stay four rows of *this* textarea's text
   if you change its font size.
+* Controls are at least 44px tall (the WCAG 2.5.5 target size) whatever
+  font size you set on them — buttons, `select` and `textarea` each hold
+  that floor independently of the type scale. Inside a `nav` the floor
+  drops to 24px (WCAG 2.5.8's AA minimum), since a navigation row is
+  meant to be compact.
 * A `small` immediately after a form control becomes helper/hint text:
   block, muted, with a small negative top margin to sit tight under the
   field.

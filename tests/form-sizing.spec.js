@@ -2,7 +2,14 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
 
-// WCAG 2.5.5 target size, checked as a floor rather than as a coincidence.
+// How tall form controls come out, which is two separate questions.
+//
+// The first is target size, checked as a floor rather than as a
+// coincidence — and there are two thresholds, deliberately. Outside a nav
+// it is 44px, WCAG 2.5.5 Target Size (Enhanced), which this project treats
+// as a product requirement. Inside a nav it is 24px, WCAG 2.5.8 Target
+// Size (Minimum): a navigation row is compact by design, and Cirth lets it
+// opt down to the AA threshold rather than out of any threshold at all.
 //
 // An input is pinned to 44px by an explicit height. A select grows with its
 // longest option and a textarea with its rows, so neither can be pinned the
@@ -18,6 +25,7 @@ const css = fs.readFileSync(
 );
 
 const TARGET = 44;
+const TARGET_NAV = 24;
 
 /** @param {import("@playwright/test").Page} page */
 const heightOf = (page, /** @type {string} */ id) =>
@@ -122,4 +130,64 @@ test("a one-row textarea still meets the target size", async ({ page }) => {
 	// The floor and the default answer to different things: this one is
 	// short because the author said so, and stays clickable regardless.
 	expect(await heightOf(page, "one")).toBeGreaterThanOrEqual(TARGET);
+});
+
+test(`a nav may be compact, but never below ${TARGET_NAV}px`, async ({
+	page,
+}) => {
+	// `height: auto` is how the nav escapes the input's fixed height, and it
+	// cannot escape a min-block-size the same way — so the nav restates the
+	// floor at the AA minimum instead of inheriting the AAA one.
+	await page.setContent(
+		`<style>${css}</style>
+		<nav style="font-size: 0.75rem">
+			<ul>
+				<li><button id="button" type="button">Menu</button></li>
+				<li><select id="select"><option>Option</option></select></li>
+				<li><input id="text" type="text"></li>
+			</ul>
+		</nav>`,
+	);
+
+	for (const id of ["button", "select", "text"]) {
+		const height = await heightOf(page, id);
+		expect(height, `${id} clears the AA minimum`).toBeGreaterThanOrEqual(
+			TARGET_NAV,
+		);
+		// And is allowed to stay under the enhanced one: if this ever reaches
+		// 44 the nav has quietly stopped being compact, which is a change to
+		// argue for rather than to discover.
+		expect(height, `${id} stays compact`).toBeLessThan(TARGET);
+	}
+});
+
+test("the file input's button is not forced past the input holding it", async ({
+	page,
+}) => {
+	// ::file-selector-button is matched by the same selector list as every
+	// other button, and giving it the 44px floor made it taller than the
+	// content box of the 44px input it lives in, so it spilled out. The
+	// target here is the input — that is what the pointer is aimed at, and
+	// it meets the size on its own; the pseudo-element is a part of it.
+	await page.setContent(
+		`<style>${css}</style><main class="container"><input id="file" type="file"></main>`,
+	);
+
+	const { height, scrollHeight } = await page.evaluate(() => {
+		const el = document.getElementById("file");
+		if (!el) {
+			throw new Error("missing file input");
+		}
+		return {
+			height: el.getBoundingClientRect().height,
+			scrollHeight: el.scrollHeight,
+		};
+	});
+
+	expect(height, "the input is the target and meets the size").toBeGreaterThanOrEqual(
+		TARGET,
+	);
+	expect(scrollHeight, "and nothing overflows it").toBeLessThanOrEqual(
+		Math.ceil(height),
+	);
 });
