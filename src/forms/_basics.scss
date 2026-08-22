@@ -412,6 +412,28 @@ $validation-any: "[aria-invalid], #{$invalid-native}";
   display: block;
   resize: vertical;
 
+  // Two rows is the user agent's default and it is too few: a control
+  // meant for a paragraph opens showing a line and a half of it, and the
+  // reader scrolls inside a box instead of reading what they wrote. Four
+  // rows is a paragraph.
+
+  // Only when the author has not said otherwise. `rows` is them declaring
+  // the height in the markup, and a framework quietly overruling an
+  // explicit rows="2" would be worse than the default it replaced. Same
+  // shape as select:not([multiple], [size]) above.
+
+  // Measured in `lh` — the element's own line box — so four rows means
+  // four rows of whatever text this textarea is actually set in, not four
+  // rows of the default type scale. That is the opposite of the target
+  // size floor below, which must not move when the type does. Padding and
+  // border are added because the box is border-box.
+  &:not([rows]) {
+    min-block-size: calc(
+      4lh + (var(--cirth-form-element-spacing-vertical) * 2) +
+        (var(--cirth-border-width) * 2)
+    );
+  }
+
   &:is(#{$validation-any}) {
     --cirth-icon-height: calc(
       var(--cirth-size-4) * var(--cirth-line-height) +

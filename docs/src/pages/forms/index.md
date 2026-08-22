@@ -45,6 +45,12 @@ behavior specific to each input type.
   explicit `size` attribute (`<input size="6">`) opts a text input out
   of the full-width default instead, sizing it to its native,
   content-based width.
+* `textarea` opens four rows tall instead of the browser's two, so a
+  field meant for a paragraph shows a paragraph. An explicit `rows`
+  attribute (`<textarea rows="2">`) takes over completely — the default
+  only applies when you haven't said how tall you want it. The four rows
+  are measured in `lh`, so they stay four rows of *this* textarea's text
+  if you change its font size.
 * A `small` immediately after a form control becomes helper/hint text:
   block, muted, with a small negative top margin to sit tight under the
   field.

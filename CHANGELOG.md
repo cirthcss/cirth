@@ -9,6 +9,15 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Fixed
 
+- **A `textarea` opens four rows tall instead of the browser's two.** Two
+  rows shows a line and a half of a paragraph, so a control meant for prose
+  opened as a box you immediately scroll inside. An explicit `rows`
+  attribute takes over completely — `rows="2"` is you declaring the height
+  in the markup, and the default only fills in when you have not. The four
+  rows are measured in `lh`, so they remain four rows of that textarea's own
+  text if its font size changes, rather than four rows of the default type
+  scale.
+
 - **`select` and `textarea` keep the 44px target size** (WCAG 2.5.5) when
   their font-size changes. An `<input>` was pinned to it by an explicit
   height, but the other two derived their height from the text inside them
