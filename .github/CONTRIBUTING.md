@@ -116,10 +116,14 @@ carrying a change its own changelog entry labels breaking.
    `.github/releases/vX.Y.Z.md`.
 3. Bump the version: `npm version --no-git-tag-version x.y.z`.
 4. `npm run build`, to compile the source the release will publish.
-5. `npm run sri`, which repins the documented CDN snippets to the new
-   version and rewrites their `integrity` hashes from the built `dist/`
-   files. The rewritten `README.md` and `docs/src/pages/get-started.md`
-   belong in the release commit.
+5. `npm run sri`, **after the last change to the CSS** — it hashes what is
+   in `dist/` at the moment it runs, so anything that touches the source
+   afterwards leaves the documented snippets pointing at a build that will
+   never be published, and browsers will refuse the file. It repins the
+   documented CDN snippets to the new version and rewrites their
+   `integrity` hashes from the built `dist/` files. The rewritten
+   `README.md` and `docs/src/pages/get-started.md` belong in the release
+   commit.
 6. `npm run lint && npm run check:dist && npm run check:size`.
 7. Commit as `chore(release): prepare vX.Y.Z`, then tag that commit
    `vX.Y.Z` and push the tag.
