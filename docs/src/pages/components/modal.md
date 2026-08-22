@@ -5,9 +5,10 @@ layout: docs.njk
 
 # Modal
 
-The native `<dialog>` element is styled as a centered modal with a backdrop.
-open and close it with the standard DOM API
-(`dialog.showModal()`/`dialog.close()`), no framework JavaScript involved.
+The native `<dialog>` element is styled as a centered modal with a
+backdrop. Opening it, closing it, locking the page behind it and animating
+it in are all the platform's work — Cirth supplies the appearance and
+nothing else, and no longer asks your script for anything.
 
 {% demo "modal" %}
 
@@ -27,11 +28,48 @@ open and close it with the standard DOM API
 </dialog>
 ```
 
+## Opening and closing
+
+Two attributes, no script:
+
+```html
+<button type="button" commandfor="confirm" command="show-modal">
+  Delete item
+</button>
+
+<dialog id="confirm">
+  <article>
+    <p>Are you sure?</p>
+    <footer>
+      <button type="button" commandfor="confirm" command="request-close">
+        Cancel
+      </button>
+      <form method="dialog"><button type="submit">Confirm</button></form>
+    </footer>
+  </article>
+</dialog>
+```
+
+`command="show-modal"` opens it, `close` and `request-close` close it — the
+second firing a cancel event first, so a form can object. A
+`<form method="dialog">` closes the dialog on submit and reports which
+button did it through `dialog.returnValue`.
+
+**Invoker commands are newer than Cirth's
+[browser floor](https://github.com/cirthcss/cirth#browser-support)**
+(Chrome 135, Firefox 144, Safari 26.2). Below that the attributes are
+ignored and the button does nothing, so treat them as an enhancement and
+keep the DOM API wherever the interaction is essential:
+
 ```js
 const dialog = document.getElementById("confirm");
 dialog.showModal(); // open
 dialog.close(); // close
 ```
+
+That is a compatibility path and application logic — confirming a
+deletion, sending a request — not something Cirth needs in order to
+present the component.
 
 ## Behavior
 
@@ -44,8 +82,22 @@ dialog.close(); // close
   viewport.
 * A close control, `.close` or `:is(a, button)[rel="prev"]` in the header,
   is styled as a small floated icon button (`--cirth-icon-close`).
-* Add the `.modal-is-open` class to the document root (in your open/close
-  JS) to lock page scroll while a modal is open; add
-  `.modal-is-opening`/`.modal-is-closing` briefly to animate the transition.
-  All three classes are behavior your own script opts into. Cirth only
-  supplies the CSS for them.
+* **The page stops scrolling on its own.** `html:has(dialog[open])` sets
+  `overflow: hidden` and `scrollbar-gutter: stable` — the gutter stays
+  reserved, so hiding the overflow does not widen the content by a
+  scrollbar's width. This replaces the old `.modal-is-open` class and the
+  `--cirth-scrollbar-width` measurement it needed from your script. Scoped
+  builds do not do this: they are anchored inside a wrapper and have no
+  business reaching the document root, so a scoped widget has to ask its
+  host to lock the page.
+* **It animates itself in.** `@starting-style` gives the dialog the "before"
+  frame an element entering the top layer otherwise cannot have: the
+  backdrop fades and the card slides down. This replaces
+  `.modal-is-opening`.
+* **The close is instant outside Chromium.** Animating an element *out* of
+  the top layer needs the `overlay` property, which only Chromium ships, so
+  `display` and `overlay` transition with `allow-discrete` where they can
+  and the dialog simply disappears where they cannot. Nothing is lost by
+  that: closing means the dialog goes away.
+* All of the motion collapses under
+  [reduced motion](/utilities/reduce-motion).

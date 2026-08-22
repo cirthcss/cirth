@@ -9,6 +9,13 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Removed
 
+- **The modal's JavaScript hooks are gone** (gh#64): `.modal-is-open`,
+  `.modal-is-opening`, `.modal-is-closing` and `--cirth-scrollbar-width`.
+  All four existed because CSS could not do the job on its own, and it can
+  now — see Added below. Markup is unaffected; what changes is that a
+  script toggling those classes no longer has to, and no longer needs to
+  measure a scrollbar to hand the width over.
+
 - **The CSS-only tooltip (`[data-tooltip]`) is gone** (gh#51), and with it
   `--cirth-tooltip-background-color`, `--cirth-tooltip-color` and
   `--cirth-z-index-tooltip`. It drew its message with `content: attr()` on
@@ -53,6 +60,29 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   grouped selector in the library — 743 B gzipped, over the size budget,
   in exchange for three hundredths of a percent.
 
+- **The modal locks the page and animates itself in, with no script**
+  (gh#64). `html:has(dialog[open])` lets the document notice its own open
+  dialog and stop scrolling, and `scrollbar-gutter: stable` holds the
+  gutter open so hiding the overflow no longer widens the content by a
+  scrollbar's width — which is the entire reason the old scroll lock needed
+  a measurement handed to it from JavaScript. `@starting-style` supplies
+  the "before" frame an element entering the top layer cannot otherwise
+  have, so the backdrop fades and the card slides down on open. Verified in
+  all three engines: no layout shift, animation running, lock engaging and
+  releasing on its own.
+
+  Two honest limits. The close is instant outside Chromium, because
+  animating an element *out* of the top layer needs the `overlay` property
+  and only Chromium ships it — nothing is lost, since closing means the
+  dialog goes away. And the scoped builds do not lock the page: they are
+  anchored inside a wrapper and have no business reaching the document
+  root, so a scoped widget has to ask its host.
+
+  The docs now lead with `command="show-modal"` and `request-close`, which
+  open and close a dialog with no script at all, flagged as an enhancement
+  because invoker commands are newer than the browser floor (Chrome 135,
+  Firefox 144, Safari 26.2). The DOM API stays documented as the
+  compatibility path and for application logic.
 - **A popover primitive** (gh#51): `popover` is an attribute, not an
   element — it lifts anything into the top layer — so what is styled is the
   **surface** that comes with that and nothing about the content. The

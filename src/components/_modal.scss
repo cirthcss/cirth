@@ -7,12 +7,25 @@
    * Modal (<dialog>)
    */
 
-@include selectors.root {
-  --cirth-scrollbar-width: 0px;
-}
+// Opening and closing without a script. @starting-style supplies the
+// "before" frame an element entering the top layer otherwise has no way to
+// have, and `display`/`overlay` with allow-discrete keep it rendered and
+// promoted for the length of the exit instead of vanishing on the first
+// frame. Both replace what .modal-is-opening/.modal-is-closing used to do
+// with classes only an integrator's JavaScript could add and remove.
+
+// The exit is honest about its reach: `overlay` is Chromium-only, so
+// elsewhere the close is instant. Nothing is lost by that — the dialog
+// goes away, which is what closing means — and prefers-reduced-motion
+// collapses all of it anyway (utilities/_reduce-motion.scss).
 
 #{$parent-selector} dialog {
   display: flex;
+  opacity: 0;
+  transition:
+    opacity var(--cirth-transition),
+    display var(--cirth-transition) allow-discrete,
+    overlay var(--cirth-transition) allow-discrete;
   z-index: var(--cirth-z-index-modal);
   position: fixed;
   inset: 0;
@@ -28,8 +41,27 @@
   background-color: var(--cirth-modal-overlay-background-color);
   color: var(--cirth-color);
 
+  &[open] {
+    opacity: 1;
+
+    @starting-style {
+      opacity: 0;
+    }
+
+    > article {
+      @starting-style {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+    }
+  }
+
   // Content
   > article {
+    transition:
+      opacity var(--cirth-transition),
+      transform var(--cirth-transition);
+
     $close-selector: ":is(a, button)[rel=prev]";
 
     @if $enable-classes {
@@ -134,63 +166,19 @@
   }
 }
 
-@if $enable-classes {
-  @include selectors.state(".modal-is-open") {
-    padding-inline-end: var(--cirth-scrollbar-width, 0);
+// Scroll lock, asked of the document rather than of a script. :has() lets
+// the page notice its own open dialog, and scrollbar-gutter holds the
+// gutter open so hiding the overflow does not widen the content by a
+// scrollbar's width — which is the whole reason the old .modal-is-open
+// needed --cirth-scrollbar-width measured and handed to it by JavaScript.
+
+// Only in the unscoped builds: the scoped ones are anchored inside a
+// wrapper and have no business reaching the document root. A scoped widget
+// that wants the page to stop scrolling has to ask its host.
+
+@if $parent-selector == "" {
+  html:has(dialog[open]) {
     overflow: hidden;
-    pointer-events: none;
-    touch-action: none;
-
-    dialog {
-      pointer-events: auto;
-      touch-action: auto;
-    }
-  }
-}
-
-// Animations
-
-@if $enable-classes {
-  @include selectors.state(":where(.modal-is-opening, .modal-is-closing)") {
-    dialog,
-    dialog > article {
-      animation-duration: var(--cirth-duration-normal);
-      animation-timing-function: var(--cirth-ease-in-out);
-      animation-fill-mode: both;
-    }
-
-    dialog {
-      animation-duration: calc(var(--cirth-duration-normal) * 4);
-      animation-name: modal-overlay;
-
-      > article {
-        animation-delay: var(--cirth-duration-normal);
-        animation-name: modal;
-      }
-    }
-  }
-
-  @include selectors.state(".modal-is-closing") {
-    dialog,
-    dialog > article {
-      animation-delay: var(--cirth-duration-instant);
-      animation-direction: reverse;
-    }
-  }
-}
-
-@if $enable-classes {
-  @keyframes modal-overlay {
-    from {
-      backdrop-filter: none;
-      background-color: transparent;
-    }
-  }
-
-  @keyframes modal {
-    from {
-      transform: translateY(-100%);
-      opacity: 0;
-    }
+    scrollbar-gutter: stable;
   }
 }

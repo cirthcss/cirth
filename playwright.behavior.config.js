@@ -16,6 +16,7 @@ module.exports = defineConfig({
 		"link-visited.spec.js",
 		"list-nesting.spec.js",
 		"meter.spec.js",
+		"modal.spec.js",
 		"nav-dropdown.spec.js",
 		"popover.spec.js",
 		"prefers-contrast.spec.js",
