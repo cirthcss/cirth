@@ -35,8 +35,8 @@
 @use "components/meter"; // meter
 @use "components/modal"; // dialog
 @use "components/nav"; // nav
+@use "components/popover"; // [popover]
 @use "components/progress"; // progress
-@use "components/tooltip"; // data-tooltip
 
 // Utilities
 @use "utilities/accessibility"; // aria-*, [dir="rtl"]

@@ -1,0 +1,93 @@
+@use "../config" as *;
+
+/**
+   * Popover ([popover])
+   */
+
+// Replaces the CSS-only [data-tooltip] this library used to ship (gh#51).
+// That component rendered its message with content: attr() on a
+// pseudo-element, which cannot satisfy WCAG 1.4.13: generated content is
+// not reliably exposed to the accessibility tree, a trigger cannot point
+// at it with aria-describedby, replaced elements render no pseudo-element
+// at all, and there is no way to make it dismissible, hoverable and
+// persistent without JavaScript.
+
+// The popover is a real element with real content and an id a trigger can
+// reference, so all of that comes from the platform instead: the top
+// layer, light dismiss, Escape, and the invoker relationship are the
+// browser's job. What is left for CSS is what it should have been all
+// along — how the thing looks.
+
+// And only that. `popover` is an attribute, not an element: it grants top
+// layer and light dismiss to *anything*, so what it marks may be a hint, a
+// menu, a picker, a filter panel. Styling it as a hint — narrow, small
+// type — would be this library deciding what popovers are for. What is
+// styled here is the surface a thing in the top layer needs in order to
+// read as a sheet above the page at all, since the user agent's own
+// default is a box with a 1px black border. Everything about the content
+// is left alone, and the two decisions that remain (a width cap, a
+// comfortable padding) are one token and one line away.
+
+// Positioning is deliberately left to the user agent, which centres a
+// popover in the viewport. Tying it to its trigger needs anchor
+// positioning, which is outside the Browserslist floor (Chrome 125,
+// Firefox 147, Safari 26); until then a hint reads as a small panel
+// rather than a bubble with a tail, and authors who need it attached can
+// position it themselves.
+
+// Only the popovers this library can claim. `auto` (the default, written
+// as a bare `popover`) and `hint` are content the browser light-dismisses
+// on the reader's behalf — a panel, which is what is styled below.
+// `popover="manual"` is the opposite: shown and hidden entirely under the
+// author's control, which is what application chrome, toasts and injected
+// tooling overlays use. Painting a border and a fade onto those would be
+// this library redecorating something it knows nothing about, and it
+// bites: Playwright renders its screenshot masks into an injected
+// `<x-pw-glass popover="manual">`, so a blanket `[popover]` rule handed
+// the test harness's own overlay a 200ms fade and made every masked
+// screenshot unstable.
+$popover-selector: '[popover=""], [popover="auto"], [popover="hint"]';
+
+#{$parent-selector} :is(#{$popover-selector}):not(dialog) {
+  // Fails closed. An unrecognised popover attribute carries no behaviour,
+  // so without this the element would render as ordinary page content —
+  // the message leaking into the document instead of staying hidden.
+  // The open state below is naturally more specific, so it wins without
+  // any help.
+  --cirth-popover-display: block;
+
+  display: none;
+
+  &:popover-open {
+    display: var(--cirth-popover-display);
+
+    // Generous, and a token: the cap exists so a long line cannot run the
+    // width of the viewport, not to decide how wide a panel should be.
+    max-width: var(--cirth-popover-max-width);
+
+    // A menu whose items carry their own padding sets this to 0.
+    padding: var(--cirth-space-2) var(--cirth-space-3);
+    border: var(--cirth-border-width) solid var(--cirth-popover-border-color);
+    border-radius: var(--cirth-border-radius);
+    background-color: var(--cirth-popover-background-color);
+    box-shadow: var(--cirth-popover-box-shadow);
+    color: var(--cirth-popover-color);
+
+    // Discrete transitions and @starting-style are what let an element
+    // fade in and back out of display: none without a script toggling
+    // classes for it. Both are inside the floor; prefers-reduced-motion is
+    // handled globally in utilities/_reduce-motion.scss.
+    transition:
+      opacity var(--cirth-transition),
+      display var(--cirth-transition) allow-discrete,
+      overlay var(--cirth-transition) allow-discrete;
+
+    @starting-style {
+      opacity: 0;
+    }
+  }
+
+  &:not(:popover-open) {
+    opacity: 0;
+  }
+}

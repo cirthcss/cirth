@@ -17,6 +17,7 @@ module.exports = defineConfig({
 		"list-nesting.spec.js",
 		"meter.spec.js",
 		"nav-dropdown.spec.js",
+		"popover.spec.js",
 		"prefers-contrast.spec.js",
 		"print.spec.js",
 		"token-override.spec.js",

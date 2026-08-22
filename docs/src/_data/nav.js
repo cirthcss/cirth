@@ -67,8 +67,8 @@ const sidebar = [
 			{ text: "Meter", link: "/components/meter" },
 			{ text: "Modal", link: "/components/modal" },
 			{ text: "Nav", link: "/components/nav" },
+			{ text: "Popover", link: "/components/popover" },
 			{ text: "Progress", link: "/components/progress" },
-			{ text: "Tooltip", link: "/components/tooltip" },
 		],
 	},
 	{

@@ -250,8 +250,8 @@ npm run docs:dev
   [Meter](docs/src/pages/components/meter.md) ·
   [Modal](docs/src/pages/components/modal.md) ·
   [Nav](docs/src/pages/components/nav.md) ·
-  [Progress](docs/src/pages/components/progress.md) ·
-  [Tooltip](docs/src/pages/components/tooltip.md)
+  [Popover](docs/src/pages/components/popover.md) ·
+  [Progress](docs/src/pages/components/progress.md)
 - **Utilities** —
   [Accessibility](docs/src/pages/utilities/accessibility.md) ·
   [High contrast](docs/src/pages/utilities/high-contrast.md) ·

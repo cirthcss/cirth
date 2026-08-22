@@ -18,7 +18,7 @@ rather than by class.
   common "skip to content" link pattern).
 * `[dir="rtl"]` sets `direction: rtl`. Most components in Cirth already
   mirror their icons/spacing under this attribute (nav breadcrumbs,
-  dropdown menus, form icons, tooltips); see each component's page for its
+  dropdown menus, form icons); see each component's page for its
   specific RTL behavior.
 
 ## Related preferences

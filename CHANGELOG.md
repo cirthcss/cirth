@@ -7,6 +7,20 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Removed
+
+- **The CSS-only tooltip (`[data-tooltip]`) is gone** (gh#51), and with it
+  `--cirth-tooltip-background-color`, `--cirth-tooltip-color` and
+  `--cirth-z-index-tooltip`. It drew its message with `content: attr()` on
+  a pseudo-element, which cannot satisfy WCAG 1.4.13 by construction:
+  generated content is not reliably exposed to the accessibility tree, no
+  trigger can point at it with `aria-describedby`, replaced elements like
+  `<input>` render no pseudo-element at all, and nothing can make it
+  dismissible, hoverable and persistent without JavaScript. It looked like
+  a tooltip and was not one, which is worse than not shipping one. Replaced
+  by [Popover](https://cirthcss.github.io/cirth/components/popover/) below;
+  gh#10 and gh#11 close as moot.
+
 ### Changed
 
 - **The Browserslist floor moves to Chrome 123 / Firefox 130 / Safari 18.2.**
@@ -39,6 +53,27 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   grouped selector in the library — 743 B gzipped, over the size budget,
   in exchange for three hundredths of a percent.
 
+- **A popover primitive** (gh#51): `popover` is an attribute, not an
+  element — it lifts anything into the top layer — so what is styled is the
+  **surface** that comes with that and nothing about the content. The
+  card's surface, the muted hairline, a width cap that only stops a long
+  line running the width of the screen, and a fade built from
+  `@starting-style` and discrete transitions rather than from classes a
+  script has to toggle. Type size and layout inside are untouched, so the
+  same sheet serves a hint, a menu, a filter panel or a disclosure that has
+  to escape an ancestor's `overflow`. The message is a real element with
+  a real id, so `aria-describedby` reaches it even while it is closed, and
+  the top layer, light dismiss, `Escape` and the invoker relationship all
+  come from the platform instead of from CSS pretending. It fails closed:
+  a browser that does not know the attribute keeps the content hidden
+  rather than spilling it into the page. `<dialog popover>` is left to the
+  modal component, and so is `popover="manual"` — a manual popover is
+  driven entirely by its author's script, so styling it would mean
+  redecorating application chrome, a toast, or an overlay injected by
+  tooling. Only `auto` and `hint` are claimed. Deliberately opened by activation and named for what it
+  is — a true hover tooltip needs `interestfor` with `popover="hint"`,
+  which Safari does not support at all, so it stays a future addition. Net
+  effect on the bundle: 492 B smaller than the component it replaces.
 - **`check:browserslist` guards the shape of the browser target.** The
   target names ten families but describes one engine floor: Opera and
   Samsung Internet are Chromium forks, Firefox for Android is desktop

@@ -22,6 +22,6 @@ it still visibly communicates progress) gets:
 
 This covers Cirth's own animated bits: the
 [progress](/components/progress) indeterminate sweep, the
-[tooltip](/components/tooltip) slide in, and [modal](/components/modal)
+[popover](/components/popover) fade, and [modal](/components/modal)
 open/close animations, without you having to special case each one in your
 own CSS.

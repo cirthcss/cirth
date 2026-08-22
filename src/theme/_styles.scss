@@ -89,6 +89,24 @@
   --cirth-meter-background-color: var(--cirth-progress-background-color);
   --cirth-meter-border-color: var(--cirth-progress-border-color);
 
+  // Popover ([popover])
+  // A floating sheet, so it borrows the card's surface and the muted
+  // hairline rather than declaring a parallel palette: one panel look
+  // across the library, and a preset that recolors cards recolors this
+  // with them. The border is the muted one, not the card's — in the dark
+  // scheme a card's border is its own background, which is the right
+  // answer for a card sitting on the page and the wrong one for a sheet
+  // floating above it.
+  --cirth-popover-background-color: var(--cirth-card-background-color);
+  --cirth-popover-border-color: var(--cirth-muted-border-color);
+  --cirth-popover-color: var(--cirth-color);
+  --cirth-popover-box-shadow: var(--cirth-box-shadow);
+
+  // Wide enough for a panel or a menu, capped so a single long line cannot
+  // run the width of the screen. Not a statement about what belongs in a
+  // popover — override it per popover where the content asks for it.
+  --cirth-popover-max-width: min(30rem, 100% - var(--cirth-spacing) * 2);
+
   // Modal (<dialog>)
   --cirth-modal-overlay-backdrop-filter: blur(0.375rem);
 
