@@ -65,8 +65,7 @@ $visible-group-item: ':not([hidden], input[type="hidden"])';
   }
 
   // A trailing helper makes the control before it the visual row end, so
-  // that control keeps its end radii. (:has() misses Firefox < 121, which
-  // degrades to squared corners there — cosmetic only.)
+  // that control keeps its end radii.
   > :has(+ small:last-child) {
     border-start-end-radius: var(--cirth-border-radius);
     border-end-end-radius: var(--cirth-border-radius);

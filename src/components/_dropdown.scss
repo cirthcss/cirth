@@ -241,7 +241,7 @@
           var(--cirth-form-element-spacing-horizontal);
       }
 
-      // Not working in Firefox, which doesn't support the `:has()` pseudo-class
+      // The whole row highlights, not just the label inside it.
       &:has(label):hover {
         background-color: var(--cirth-dropdown-hover-background-color);
       }

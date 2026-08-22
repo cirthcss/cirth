@@ -155,7 +155,7 @@ bodyClass: docs-home
 				</header>
 				<div class="docs-faq-list">
 					{% for item in faq.items %}
-						<details>
+						<details name="faq">
 							<summary>{{ item.q }}</summary>
 							<p>{{ item.a | safe }}</p>
 						</details>

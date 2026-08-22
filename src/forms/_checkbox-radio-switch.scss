@@ -6,7 +6,8 @@
 
 // Labels
 
-// Not working in Firefox, which doesn't support the `:has()` pseudo-class
+// A label wrapping its own control shrinks to the control and its text, so
+// the pointer cursor covers exactly what is clickable and no further.
 
 #{$parent-selector} label {
   &:has([type="checkbox"], [type="radio"]) {

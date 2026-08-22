@@ -39,6 +39,21 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   grouped selector in the library — 743 B gzipped, over the size budget,
   in exchange for three hundredths of a percent.
 
+- **`:has()` is now guaranteed, and three caveats about it are gone.** The
+  old floor allowed Firefox 113, where `:has()` did not exist (it landed in
+  121), so three rules shipped with comments explaining what would not work
+  there: the label that shrinks to wrap its own checkbox, the group's end
+  rounding before a trailing `small`, and the dropdown row that highlights
+  when it holds a label. All three now work everywhere the library claims
+  to run; the comments have been replaced with ones that say what the rules
+  do instead of what they fail to do, and the Group page no longer warns
+  about squared corners in old Firefox.
+- **The accordion documents exclusive groups.** Giving a set of `details`
+  the same `name` makes the browser close the others when one opens — no
+  JavaScript, no `aria-expanded` bookkeeping. It needs nothing from Cirth,
+  since the styling is per item, and it is now shown on the Accordion page
+  with a live demo and a note on when *not* to reach for it. The FAQ on the
+  docs home page uses it.
 - **Source hygiene: dead rules and redundant declarations removed.** No
   supported browser renders anything differently — the visual suite passes
   unchanged, pixel for pixel, on all three engines — and the published CSS
