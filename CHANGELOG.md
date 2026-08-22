@@ -7,6 +7,8 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-08-22
+
 ### Removed
 
 - **The modal's JavaScript hooks are gone** (gh#64): `.modal-is-open`,
@@ -1014,7 +1016,8 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
-[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.10.0...master
+[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.11.0...master
+[0.11.0]: https://github.com/cirthcss/cirth/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/cirthcss/cirth/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/cirthcss/cirth/compare/v0.8.5...v0.9.0
 [0.8.5]: https://github.com/cirthcss/cirth/compare/v0.8.4...v0.8.5
