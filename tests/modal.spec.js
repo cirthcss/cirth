@@ -165,15 +165,30 @@ test.describe("motion", () => {
 				throw new Error("missing dialog");
 			}
 			sheet.showModal();
-			await new Promise((resolve) =>
-				requestAnimationFrame(() => requestAnimationFrame(resolve)),
-			);
-			return sheet
-				.getAnimations({ subtree: true })
-				.map((animation) =>
-					animation instanceof CSSTransition ? animation.transitionProperty : "",
-				)
-				.filter(Boolean);
+
+			// Polled rather than sampled at a fixed frame: a @starting-style
+			// transition begins after the next style flush, and how many
+			// frames that takes is a property of the machine, not of the
+			// component. A loaded CI runner is slower than a laptop, and a
+			// test that only passes on the laptop proves nothing.
+			for (let frame = 0; frame < 30; frame++) {
+				const running = sheet
+					.getAnimations({ subtree: true })
+					.map((animation) =>
+						animation instanceof CSSTransition
+							? animation.transitionProperty
+							: "",
+					)
+					.filter(Boolean);
+
+				if (running.length > 0) {
+					return running;
+				}
+
+				await new Promise((resolve) => requestAnimationFrame(resolve));
+			}
+
+			return [];
 		});
 
 		expect(running, "the backdrop fades").toContain("opacity");

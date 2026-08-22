@@ -41,7 +41,22 @@
 
 // 5. Prevent adjustments of font size after orientation changes in iOS
 
+// 6. Reserve the scrollbar's gutter for good (opinionated)
+
 @include selectors.document-root {
+  // Always, not only while something needs it. A classic scrollbar takes
+  // layout width; an overlay one does not. Reserving the gutter on demand
+  // therefore *causes* the shift it is meant to prevent on every platform
+  // that draws overlay scrollbars — measured: 1280px wide before, 1265px
+  // after. Held open permanently, the width never changes: a page that
+  // scrolls looks the same as one that does not, and hiding the overflow
+  // (components/_modal.scss) moves nothing.
+
+  // The cost lands on classic-scrollbar platforms, where a short page now
+  // keeps an empty gutter it would not otherwise have. That is the price of
+  // a scroll lock nobody has to write JavaScript for; `scrollbar-gutter:
+  // auto` on your own :root takes it back.
+  scrollbar-gutter: stable; // 6
   -webkit-tap-highlight-color: transparent; // 4
   text-size-adjust: 100%; // 5
   background-color: var(--cirth-background-color);

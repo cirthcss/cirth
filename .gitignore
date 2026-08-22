@@ -145,3 +145,10 @@ $RECYCLE.BIN/
 # markup to eyeball in a real browser) — local only, not the published
 # examples gallery (see docs/examples.md, tracked separately under gh#29).
 /examples/
+
+# iCloud Drive sync duplicates. This repository lives in a synced folder,
+# and a fast rebuild can race the sync into leaving "name 2.js" beside
+# "name.js" — which Eleventy will happily publish as a page and Playwright
+# will happily collect as a spec.
+* [0-9]*
+* [0-9]*.*

@@ -79,10 +79,15 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   reading has not shipped.
 - **The modal locks the page and animates itself in, with no script**
   (gh#64). `html:has(dialog[open])` lets the document notice its own open
-  dialog and stop scrolling, and `scrollbar-gutter: stable` holds the
-  gutter open so hiding the overflow no longer widens the content by a
-  scrollbar's width — which is the entire reason the old scroll lock needed
-  a measurement handed to it from JavaScript. `@starting-style` supplies
+  dialog and stop scrolling, and the scrollbar's gutter is now held open
+  permanently on the document so hiding the overflow moves nothing — which
+  is the entire reason the old scroll lock needed a measurement handed to
+  it from JavaScript. Permanently, not on demand: on platforms with overlay
+  scrollbars nothing was taking width to begin with, so reserving the
+  gutter only while the dialog is open *causes* the shift it is meant to
+  prevent (measured on CI: 1280px before, 1265px after). The cost is an
+  empty gutter on short pages where scrollbars are classic;
+  `scrollbar-gutter: auto` on your own `:root` takes it back. `@starting-style` supplies
   the "before" frame an element entering the top layer cannot otherwise
   have, so the backdrop fades and the card slides down on open. Verified in
   all three engines: no layout shift, animation running, lock engaging and

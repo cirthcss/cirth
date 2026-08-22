@@ -83,9 +83,10 @@ present the component.
 * A close control, `.close` or `:is(a, button)[rel="prev"]` in the header,
   is styled as a small floated icon button (`--cirth-icon-close`).
 * **The page stops scrolling on its own.** `html:has(dialog[open])` sets
-  `overflow: hidden` and `scrollbar-gutter: stable` — the gutter stays
-  reserved, so hiding the overflow does not widen the content by a
-  scrollbar's width. This replaces the old `.modal-is-open` class and the
+  `overflow: hidden`, and the scrollbar's gutter is held open permanently
+  (`scrollbar-gutter: stable` on the document, see
+  [Document](/layout/document)) so hiding the overflow moves nothing. This
+  replaces the old `.modal-is-open` class and the
   `--cirth-scrollbar-width` measurement it needed from your script. Scoped
   builds do not do this: they are anchored inside a wrapper and have no
   business reaching the document root, so a scoped widget has to ask its

@@ -43,3 +43,28 @@ None of this is meant to be overridden one selector at a time. Tune it through
 the tokens instead: `--cirth-font-family`, `--cirth-font-size`,
 `--cirth-line-height`, `--cirth-background-color`, `--cirth-color`. See
 [Customization](/customization).
+
+## Scrollbar gutter
+
+The document reserves the scrollbar's gutter permanently
+(`scrollbar-gutter: stable`), so a page that scrolls is exactly as wide as
+one that does not.
+
+It is there for the [modal](/components/modal), which stops the page
+scrolling while it is open: without a reserved gutter, hiding the overflow
+would widen the content by a scrollbar's width and shift the whole layout.
+Reserving it only while the dialog is open does not work — on platforms
+with overlay scrollbars, where nothing was taking width in the first place,
+that *causes* the shift instead of preventing it.
+
+The cost lands on platforms with classic scrollbars, where a short page now
+keeps an empty gutter it would not otherwise have. If you would rather have
+it back:
+
+```css
+:root {
+  scrollbar-gutter: auto;
+}
+```
+
+Cirth sets it inside `:where()`, so a single declaration of your own wins.
