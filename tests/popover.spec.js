@@ -200,9 +200,27 @@ test("it stays centred even when page CSS zeroes its margin", async ({
 			throw new Error("missing popover");
 		}
 		const { top, left, width, height } = hint.getBoundingClientRect();
+
+		// Measured against the box a fixed element is actually laid out in,
+		// by putting a fixed element in it. window.innerWidth counts the
+		// scrollbar and this library reserves that space permanently with
+		// scrollbar-gutter, so on a platform with classic scrollbars a
+		// correctly centred popover reads as half a gutter off — which is
+		// what CI saw on Linux (7.5px) while macOS, with overlay scrollbars,
+		// agreed. documentElement.clientHeight is no better: setContent
+		// writes no doctype, and in quirks mode Firefox answers with the
+		// document's height rather than the viewport's. This asks the
+		// question in the terms the spec answers it in.
+		const probe = document.createElement("div");
+		probe.style.cssText =
+			"position: fixed; inset: 0; visibility: hidden; pointer-events: none";
+		document.body.append(probe);
+		const { width: vw, height: vh } = probe.getBoundingClientRect();
+		probe.remove();
+
 		return {
 			box: { top, left, width, height },
-			viewport: { width: window.innerWidth, height: window.innerHeight },
+			viewport: { width: vw, height: vh },
 		};
 	});
 
