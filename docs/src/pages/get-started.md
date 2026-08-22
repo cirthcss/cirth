@@ -14,7 +14,7 @@ semantic markup, and most of your interface is already styled.
 <link
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.11.0/dist/cirth.min.css"
-  integrity="sha384-gY1h03CuKKEHKTnH6uBur925Uk1yp4+5VW4BQoPN/UTG/dqjekX52Eg084QriHT4"
+  integrity="sha384-N9rWTT73I7G1gNspu/VEngTQMLcKtLoWDKaYcjyIkLjfqME3UOrOGT+DLwvXWziJ"
   crossorigin="anonymous">
 ```
 
