@@ -39,6 +39,20 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   grouped selector in the library — 743 B gzipped, over the size budget,
   in exchange for three hundredths of a percent.
 
+- **`check:browserslist` guards the shape of the browser target.** The
+  target names ten families but describes one engine floor: Opera and
+  Samsung Internet are Chromium forks, Firefox for Android is desktop
+  Gecko, iOS Safari is WebKit either way. Raising `Chrome` and leaving
+  `Opera` behind does not widen support — it silently lowers the floor back
+  to whatever Chromium that Opera release was built on, because Lightning
+  CSS compiles for the oldest engine in the list, and nothing else in the
+  repository notices: the build succeeds, the output is valid, and every
+  feature the floor was raised to buy quietly stops being guaranteed. The
+  new check (part of `npm run lint`) asserts the invariant instead of the
+  numbers, and refuses the legacy Android Browser outright. Its
+  Chromium-to-fork table was derived from MDN's compat data rather than
+  from a version offset, carries the recipe for regenerating it, and fails
+  loudly when the floor moves past its range instead of passing quietly.
 - **`:has()` is now guaranteed, and three caveats about it are gone.** The
   old floor allowed Firefox 113, where `:has()` did not exist (it landed in
   121), so three rules shipped with comments explaining what would not work

@@ -96,7 +96,7 @@ review attention. Each one is enforced by an automated check that runs
 in CI on every push, and the same checks run locally:
 
 ```sh
-npm run lint          # stylelint + custom property audit + doc links + CDN hashes
+npm run lint          # stylelint + custom property audit + browser target + doc links + CDN hashes
 npm run build         # compile src/ to dist/
 npm run check:dist    # structural invariants of the 12 dist files
 npm run check:size    # ≤ 14 KiB gzipped per root bundle
@@ -143,6 +143,25 @@ then verified against the bytes jsDelivr actually serves with
 is how you ship a snippet that every browser refuses to load; the
 [releasing section of `.github/CONTRIBUTING.md`](https://github.com/cirthcss/cirth/blob/master/.github/CONTRIBUTING.md#releasing)
 has the full sequence.
+
+### Browser target — `check:browserslist`
+
+The Browserslist target names ten browser families but describes a single
+engine floor: Opera and Samsung Internet are Chromium forks, Firefox for
+Android is the same Gecko as the desktop build, and iOS Safari is WebKit
+either way. Raising `Chrome` and forgetting `Opera` does not widen
+support — it quietly lowers the floor back to whatever Chromium that Opera
+release was built on, because Lightning CSS compiles for the oldest engine
+in the list, and nothing else in the repository notices.
+
+`check:browserslist` (part of `npm run lint`) asserts that invariant: every
+Chromium family on the same version, the two forks on the releases built
+from it, Firefox and Safari in step with their mobile counterparts, and the
+legacy Android Browser absent — it is the same engine as Chrome for
+Android and including it makes Lightning CSS expand every grouped selector
+in the library. The Chromium-to-fork table lives in the script with a note
+on how it was derived; when the floor moves past it, the check says so
+instead of passing quietly.
 
 ### Accessibility — `check:a11y`
 
