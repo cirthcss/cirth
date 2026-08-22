@@ -55,8 +55,8 @@ Include one stylesheet and write ordinary semantic HTML.
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.11.0/dist/cirth.min.css"
-  integrity="sha384-N9rWTT73I7G1gNspu/VEngTQMLcKtLoWDKaYcjyIkLjfqME3UOrOGT+DLwvXWziJ"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.12.0/dist/cirth.min.css"
+  integrity="sha384-g4j2ojPkWM2tpFfoHS/bGPrb4gS2JFU8QOLuDOtXauCZQ9f7yPhXR0KYxcGK80jf"
   crossorigin="anonymous">
 ```
 
