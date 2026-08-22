@@ -60,6 +60,21 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   grouped selector in the library — 743 B gzipped, over the size budget,
   in exchange for three hundredths of a percent.
 
+- **The documentation is versioned, at breaking changes rather than at
+  releases.** A line covers every version documenting the same API, so the
+  switcher in the site header reads `up to v0.10.0` / `from v0.11.0`
+  instead of listing patches nobody needs to choose between — and before
+  1.0 that boundary is a minor release, after it a major, with no change to
+  how the list works. The outgoing line is frozen at the release that ends
+  it (`npm run docs:archive`, which builds it in a detached worktree and
+  commits the result under `docs/versions/`) and served verbatim from then
+  on, so an archived line never has to keep compiling against a toolchain
+  that has moved on. Each line carries its own migration guide: the new
+  [Upgrading](https://cirthcss.github.io/cirth/upgrading/) page documents
+  every breaking change in this release and what to do about it. The site
+  root stays the released version, and `develop` is now published beside it
+  under `/next/`, with a banner on every page saying that what you are
+  reading has not shipped.
 - **The modal locks the page and animates itself in, with no script**
   (gh#64). `html:has(dialog[open])` lets the document notice its own open
   dialog and stop scrolling, and `scrollbar-gutter: stable` holds the

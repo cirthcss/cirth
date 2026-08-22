@@ -36,6 +36,18 @@ const iconPaths = {
 	sun: "M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z",
 };
 
+// Where this build will be served from. The released site sits at the
+// root; the preview of the unreleased branch sits beside it under /next/,
+// so both can be published from one Pages artifact without either
+// pretending to be the other.
+const pathPrefix = () => {
+	if (process.env.GITHUB_PAGES !== "true") {
+		return "/";
+	}
+
+	return process.env.DOCS_VARIANT === "next" ? "/cirth/next/" : "/cirth/";
+};
+
 module.exports = (eleventyConfig) => {
 	// --- Markdown pipeline ------------------------------------------------
 	// Fenced code: highlight.js token classes (same .hljs-* classes the docs
@@ -188,10 +200,32 @@ module.exports = (eleventyConfig) => {
 	});
 
 	// --- Copy & structure -------------------------------------------------
+	// Archived documentation lines: whole sites, built once at the breaking
+	// release that ended them and committed as-is. Copied rather than
+	// rebuilt, so an old line never has to keep compiling against today's
+	// toolchain to stay readable.
+	eleventyConfig.addPassthroughCopy({
+		"docs/versions": "/",
+	});
+
 	eleventyConfig.addPassthroughCopy({
 		"docs/public": "/",
 		"docs/src/styles/style.css": "styles/style.css",
 		"docs/src/styles/generated": "styles/generated",
+	});
+
+	// Getting out of the /next/ preview and back to the released site.
+	// Root-relative links are no use here: EleventyHtmlBasePlugin rewrites
+	// them with this build's own prefix, so "/" would resolve back inside
+	// /next/. A relative path is the one shape the plugin leaves alone.
+	eleventyConfig.addFilter("siteRoot", (/** @type {string} */ url) => {
+		if (process.env.DOCS_VARIANT !== "next") {
+			return "/";
+		}
+
+		const depth = String(url).split("/").filter(Boolean).length;
+
+		return "../".repeat(depth + 1);
 	});
 
 	eleventyConfig.addPlugin(EleventyHtmlBasePlugin);
@@ -205,6 +239,6 @@ module.exports = (eleventyConfig) => {
 		},
 		markdownTemplateEngine: "njk",
 		htmlTemplateEngine: "njk",
-		pathPrefix: process.env.GITHUB_PAGES === "true" ? "/cirth/" : "/",
+		pathPrefix: pathPrefix(),
 	};
 };

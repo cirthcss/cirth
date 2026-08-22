@@ -17,6 +17,7 @@ const sidebar = [
 			{ text: "Customization", link: "/customization" },
 			{ text: "Colors", link: "/colors" },
 			{ text: "About Cirth", link: "/about" },
+			{ text: "Upgrading", link: "/upgrading" },
 		],
 	},
 	{
@@ -107,6 +108,7 @@ const footerLinks = [
 		title: "Project",
 		items: [
 			{ text: "About Cirth", link: "/about" },
+			{ text: "Upgrading", link: "/upgrading" },
 			{ text: "Brand", link: "/brand" },
 			{ text: "Examples", link: "/examples" },
 			{ text: "Contributions", link: "/contributions" },

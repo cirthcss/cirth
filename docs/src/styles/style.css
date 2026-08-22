@@ -1466,6 +1466,43 @@ pre > button.copy.copied::before {
 	text-transform: capitalize;
 }
 
+/* Documentation line switcher: the same shape as the preset select beside
+   it, narrower because its labels are short and fixed. */
+.docs-version-select {
+	width: auto;
+	min-width: 8.5rem;
+	padding-block: calc(var(--cirth-form-element-spacing-vertical) * 0.5);
+	font-size: var(--cirth-font-size-sm);
+}
+
+@media (max-width: 767px) {
+	/* The preset select already gives way at this width; this one carries
+	   more weight — knowing which version you are reading matters more than
+	   previewing a color — so it is the one that stays. */
+	.docs-version-select {
+		min-width: 7rem;
+	}
+}
+
+/* Unreleased-preview banner. Full-bleed and above the header, because it
+   qualifies the entire page under it and a reader arriving from a search
+   result has no other signal. */
+.docs-next-banner {
+	border-bottom: var(--cirth-border-width) solid
+		var(--cirth-muted-border-color);
+	background-color: var(--cirth-mark-background-color);
+	color: var(--cirth-mark-color);
+	text-align: center;
+}
+
+.docs-next-banner p {
+	max-width: 60rem;
+	margin: 0 auto;
+	padding: var(--cirth-space-2) var(--cirth-space-4);
+	color: inherit;
+	font-size: var(--cirth-font-size-sm);
+}
+
 /* Print: this site's half of the bargain
    ––––––––––––––––––––
    The framework's own print pass (src/utilities/_print.scss) flattens

@@ -20,6 +20,34 @@
 			</li>
 		</ul>
 		<ul class="docs-header-controls-group">
+			{#- Documentation line switcher. The list is short by design: it
+			    gains an entry only when a release breaks something, so it
+			    answers "does what I am reading apply to the version I have?"
+			    rather than listing every patch. A native <select> for the
+			    same reason as the preset one below — keyboard and screen
+			    reader support for free. -#}
+			<li>
+				<select
+					class="docs-version-select"
+					aria-label="Documentation version"
+					data-docs-version-select
+				>
+					{% for line in versions.lines %}
+						<option value="{{ line.href }}"{% if line.current and not versions.isNext %} selected{% endif %}>{{ line.label }}</option>
+					{% endfor %}
+					{% if versions.isNext %}<option value="{{ versions.next }}" selected>unreleased</option>{% endif %}
+				</select>
+				<script>
+					// Navigating between documentation lines is a page load, not
+					// a preference: each line is a separate build with its own
+					// pages, so there is nothing to remember or restore.
+					document
+						.querySelector("[data-docs-version-select]")
+						?.addEventListener("change", (event) => {
+							window.location.href = event.target.value;
+						});
+				</script>
+			</li>
 			{#- Live preset switcher (gh#80): lets anyone preview cobalt/coral —
 			    including their light/dark variants — against the whole real
 			    site without downloading anything. Handled in base.njk: swaps

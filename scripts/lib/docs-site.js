@@ -20,6 +20,13 @@ const assertDocsBuilt = (label) => {
 	}
 };
 
+// Archived documentation lines (docs/versions/, copied into the output at
+// build time) are frozen sites, not part of this one: auditing them would
+// re-audit whatever the toolchain thought a year ago, and any finding
+// would be unfixable by definition. The /next/ preview is excluded for the
+// opposite reason — it is this site, built twice.
+const excludedTopLevel = /^(v\d+\.\d+|next)$/;
+
 /**
  * @param {string} [dir]
  * @param {string} [prefix]
@@ -30,6 +37,10 @@ const listPages = (dir = docsDist, prefix = "") => {
 	for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
 		const relative = path.posix.join(prefix, entry.name);
 		if (entry.isDirectory()) {
+			if (prefix === "" && excludedTopLevel.test(entry.name)) {
+				continue;
+			}
+
 			pages.push(...listPages(path.join(dir, entry.name), relative));
 		} else if (
 			entry.name.endsWith(".html") &&

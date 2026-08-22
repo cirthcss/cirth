@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - develop
   workflow_dispatch:
 
 permissions:
@@ -21,8 +22,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # master, whichever branch triggered this: the root of the site is
+      # always the released version. A push to develop gets here too, but
+      # only to refresh the preview built below.
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          ref: master
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
@@ -40,6 +47,26 @@ jobs:
         run: npm run docs:build
         env:
           GITHUB_PAGES: true
+
+      # Pages publishes one artifact, so the released site and the preview of
+      # the unreleased branch are assembled together rather than racing each
+      # other for the same deployment. The root is always master — what is on
+      # npm — and develop is built beside it under /next/, where the banner
+      # says so. A push to either branch rebuilds both, so neither goes stale
+      # while the other moves.
+      - name: Build the unreleased preview
+        run: |
+          git fetch origin develop
+          git worktree add --detach ../next origin/develop
+          cd ../next
+          npm ci
+          npm run build
+          npm run docs:build
+          cd -
+          cp -R ../next/docs/dist docs/dist/next
+        env:
+          GITHUB_PAGES: true
+          DOCS_VARIANT: next
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

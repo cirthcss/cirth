@@ -163,6 +163,41 @@ in the library. The Chromium-to-fork table lives in the script with a note
 on how it was derived; when the floor moves past it, the check says so
 instead of passing quietly.
 
+### Documentation lines
+
+The site is versioned at breaking changes, not at releases. A line covers
+every version that documents the same API, which is why the switcher in the
+header reads `up to v0.10.0` / `from v0.11.0` rather than listing patches.
+Before 1.0 that boundary is a minor release; after it, a major.
+
+Three things make it work:
+
+* `docs/src/_data/versions.js` lists the lines. Adding one is a hand edit —
+  a deliberate decision, not something a script infers from tags.
+* `docs/versions/<dir>/` holds the frozen sites. They are built once, at the
+  release that ends them, and committed as-is. They are never rebuilt: an
+  archived line should not have to keep compiling against a toolchain that
+  has moved on.
+* `npm run docs:archive -- <tag> <dir>` does the freezing, in a detached
+  worktree so the working tree is untouched. It repoints the tag's
+  `pathPrefix` at the archive's own subdirectory before building, since a
+  tag predates the directory it ends up in.
+
+At a breaking release, in order: archive the outgoing line
+(`npm run docs:archive -- v0.10.0 v0.10`), move `current: true` onto the
+new entry in `versions.js`, and write the migration on
+[Upgrading](/upgrading). The archived line is excluded from `check:a11y`
+and the visual suite on purpose — auditing it would re-audit what the
+toolchain thought a year ago, and any finding would be unfixable.
+
+### Where the site is published
+
+The root is always `master`, which is to say the version on npm. `develop`
+is built beside it under `/next/`, with a banner on every page saying that
+what you are reading has not shipped. Both come out of one Pages artifact,
+built by the same workflow, so a push to either branch refreshes both and
+neither goes stale while the other moves.
+
 ### Accessibility — `check:a11y`
 
 Runs [axe-core](https://github.com/dequelabs/axe-core) with the

@@ -38,6 +38,20 @@
 		</script>
 	</head>
 	<body{% if bodyClass %} class="{{ bodyClass }}"{% endif %}>
+		{%- if versions.isNext %}
+			{#- Only ever rendered on the /next/ preview build. Not a
+			    decoration: someone arriving from a search result has no
+			    other way to know that what they are reading has not
+			    shipped. -#}
+			<aside class="docs-next-banner">
+				<p>
+					<strong>Unreleased documentation.</strong> This is the
+					<code>develop</code> branch, not a published version. What it
+					describes may change or be dropped before release —
+					<a href="{{ page.url | siteRoot }}">read the current documentation</a> instead.
+				</p>
+			</aside>
+		{%- endif %}
 		{% include "site-header.njk" %}
 		{{ content | safe }}
 		{% include "site-footer.njk" %}

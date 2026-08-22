@@ -105,19 +105,25 @@ carrying a change its own changelog entry labels breaking.
 
 ### Cutting the release
 
-1. Update `CHANGELOG.md` (turn `[Unreleased]` into the new version, refresh
+1. If the release breaks something, freeze the outgoing documentation line
+   first: `npm run docs:archive -- <previous tag> <dir>` (e.g.
+   `v0.10.0 v0.10`), then move `current: true` onto the new entry in
+   `docs/src/_data/versions.js` and write the migration on the Upgrading
+   page. Doing it before the version bump means the archive captures the
+   line as it was actually published.
+2. Update `CHANGELOG.md` (turn `[Unreleased]` into the new version, refresh
    the compare links) and write the release notes in
    `.github/releases/vX.Y.Z.md`.
-2. Bump the version: `npm version --no-git-tag-version x.y.z`.
-3. `npm run build`, to compile the source the release will publish.
-4. `npm run sri`, which repins the documented CDN snippets to the new
+3. Bump the version: `npm version --no-git-tag-version x.y.z`.
+4. `npm run build`, to compile the source the release will publish.
+5. `npm run sri`, which repins the documented CDN snippets to the new
    version and rewrites their `integrity` hashes from the built `dist/`
    files. The rewritten `README.md` and `docs/src/pages/get-started.md`
    belong in the release commit.
-5. `npm run lint && npm run check:dist && npm run check:size`.
-6. Commit as `chore(release): prepare vX.Y.Z`, then tag that commit
+6. `npm run lint && npm run check:dist && npm run check:size`.
+7. Commit as `chore(release): prepare vX.Y.Z`, then tag that commit
    `vX.Y.Z` and push the tag.
-7. Once npm has the version and jsDelivr has fetched it (a minute or two),
+8. Once npm has the version and jsDelivr has fetched it (a minute or two),
    verify the documented hashes against reality:
    `npm run check:sri -- --from-cdn`.
 

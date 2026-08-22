@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="en" data-base="/cirth/v0.10/">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Cirth</title>
+		<meta name="description" content="HTML-native CSS framework. Production-ready UI from semantic HTML — under 14KB gzipped, 0 JavaScript.">
+		<link rel="icon" href="/cirth/v0.10/logo_brand_app.svg">
+		<link rel="icon" href="/cirth/v0.10/logo_brand_app.svg" media="(prefers-color-scheme: light)">
+		<link rel="icon" href="/cirth/v0.10/logo_brand_app_dark.svg" media="(prefers-color-scheme: dark)">
+		<link rel="stylesheet" href="/cirth/v0.10/styles/style.css">
+		<script>
+			// Set data-theme before first paint to avoid a light-mode flash.
+			(function () {
+				var stored = localStorage.getItem("cirth-theme");
+				var dark = stored
+					? stored === "dark"
+					: window.matchMedia("(prefers-color-scheme: dark)").matches;
+				document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+			})();
+
+			// Same idea for the preset switcher (gh#80): apply a
+			// session-remembered preset before first paint, so returning to
+			// a page (or following a link) after picking one doesn't flash
+			// the default theme first. sessionStorage, not localStorage —
+			// the issue asks for "the current session", not a permanent
+			// choice that'd survive a closed tab into someone's next visit.
+			(function () {
+				var preset = sessionStorage.getItem("cirth-preset");
+				if (!preset || preset === "amber") return;
+				var base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
+				var link = document.createElement("link");
+				link.rel = "stylesheet";
+				link.id = "cirth-preset-stylesheet";
+				link.href = base + "/styles/generated/presets/" + preset + ".css";
+				document.head.appendChild(link);
+			})();
+		</script>
+	</head>
+	<body class="docs-home"><aside style="border-bottom:1px solid #8884;padding:.5rem 1rem;text-align:center;font-size:.875rem">Archived documentation for v0.10.0 and earlier. <a href="/cirth/">Read the current documentation</a>.</aside>
+		<header class="container docs-header">
+	<nav aria-label="main navigation">
+		<ul class="docs-header-brand-group">
+			<li>
+				<a href="/cirth/v0.10/" class="contrast docs-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.10/logo_brand.svg" alt="" width="48" height="48">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.10/logo_brand_dark.svg" alt="" width="48" height="48">
+					<strong>Cirth</strong>
+				</a>
+			</li>
+		</ul>
+		<ul class="docs-header-nav-group">
+			
+				<li class="docs-nav-item">
+					<a href="/cirth/v0.10/get-started">Docs</a>
+				</li>
+			
+				<li class="docs-nav-item">
+					<a href="/cirth/v0.10/examples">Examples</a>
+				</li>
+			
+			<li class="docs-nav-item">
+				<a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub</a>
+			</li>
+		</ul>
+		<ul class="docs-header-controls-group"><li>
+				<select class="docs-preset-select" aria-label="Color preset" data-cirth-preset-select="">
+					<option value="amber">Amber</option>
+					<option value="cobalt">Cobalt</option>
+					<option value="coral">Coral</option>
+				</select>
+			</li>
+			<li>
+				<button type="button" class="outline contrast docs-theme-toggle" aria-label="Toggle color scheme">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="18" height="18" fill="currentColor" aria-hidden="true" class="docs-theme-icon-sun"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"></path></svg>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="18" height="18" fill="currentColor" aria-hidden="true" class="docs-theme-icon-moon"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"></path></svg>
+				</button>
+				<script>
+					// Which icon is visible is driven entirely by CSS
+					// ([data-theme="dark"] .docs-theme-icon-*, see styles/style.css)
+					// — this script is only the click handler.
+					document.querySelector(".docs-theme-toggle")?.addEventListener("click", () => {
+						const next =
+							document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+						document.documentElement.setAttribute("data-theme", next);
+						localStorage.setItem("cirth-theme", next);
+					});
+				</script>
+			</li>
+		</ul>
+	</nav>
+</header>
+
+		<main class="docs-home">
+	<section class="docs-hero-panel">
+		<div class="container"><div class="docs-hero">
+				<div class="docs-hero-copy">
+					<p class="docs-hero-eyebrow">HTML-native CSS framework</p>
+					<hgroup>
+						<h1 class="docs-hero-title">
+							<img class="docs-hero-mark docs-logo-light" src="/cirth/v0.10/logo_brand.svg" alt="" width="64" height="64">
+							<img class="docs-hero-mark docs-logo-dark" src="/cirth/v0.10/logo_brand_dark.svg" alt="" width="64" height="64">
+							<span>Cirth</span>
+						</h1>
+						<p>Production-ready UI from semantic HTML.</p>
+					</hgroup>
+					<p class="docs-hero-tagline">Cirth turns native HTML elements into accessible, themeable interfaces. Load one stylesheet, customize it with runtime design tokens, and ship with zero JavaScript and no required build step.</p>
+					<p class="docs-hero-actions">
+						
+							<a href="/cirth/v0.10/get-started" role="button">Get Started</a>
+						
+							<a href="/cirth/v0.10/examples" role="button" class="outline secondary">Examples</a>
+						
+					</p>
+				</div><div class="docs-hero-demo-wrap">
+					<div class="docs-hero-glow" aria-hidden="true"></div>
+					<div class="docs-hero-demo">
+						<div class="home-demo" aria-label="Live example: semantic HTML rendered by Cirth"><div class="home-demo-code" data-theme="dark">
+		<div class="home-demo-code-bar">
+			<span class="home-demo-filename">index.html — no classes</span>
+		</div>
+		<pre aria-hidden="true"><code id="home-demo-typed">
+&lt;article&gt;
+  &lt;h2&gt;Sign in&lt;/h2&gt;
+  &lt;form&gt;
+    &lt;label&gt;
+      Email
+      &lt;input type=&quot;email&quot;&gt;
+    &lt;/label&gt;
+    &lt;label&gt;
+      Password
+      &lt;input type=&quot;password&quot;&gt;
+    &lt;/label&gt;
+    &lt;label&gt;
+      &lt;input type=&quot;checkbox&quot; checked&gt;
+      Remember me
+    &lt;/label&gt;
+    &lt;button&gt;Sign in&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/article&gt;</code></pre><pre class="visually-hidden"><code>
+&lt;article&gt;
+  &lt;h2&gt;Sign in&lt;/h2&gt;
+  &lt;form&gt;
+    &lt;label&gt;
+      Email
+      &lt;input type=&quot;email&quot;&gt;
+    &lt;/label&gt;
+    &lt;label&gt;
+      Password
+      &lt;input type=&quot;password&quot;&gt;
+    &lt;/label&gt;
+    &lt;label&gt;
+      &lt;input type=&quot;checkbox&quot; checked&gt;
+      Remember me
+    &lt;/label&gt;
+    &lt;button&gt;Sign in&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/article&gt;</code></pre>
+	</div><div class="home-demo-preview" id="home-demo-preview"><article><h2>Sign in</h2><form><label>Email <input type="email"></label><label>Password <input type="password"></label><label><input type="checkbox" checked=""> Remember me</label><button>Sign in</button></form></article></div>
+</div>
+
+<script>
+	(() => {
+		const segments = [
+			{
+				src: "<article>\n  <h2>Sign in</h2>\n",
+				snapshot: "<article><h2>Sign in</h2></article>",
+			},
+			{
+				src: '  <form>\n    <label>\n      Email\n      <input type="email">\n    </label>\n',
+				snapshot:
+					'<article><h2>Sign in</h2><form><label>Email <input type="email"></label></form></article>',
+			},
+			{
+				src: '    <label>\n      Password\n      <input type="password">\n    </label>\n',
+				snapshot:
+					'<article><h2>Sign in</h2><form><label>Email <input type="email"></label><label>Password <input type="password"></label></form></article>',
+			},
+			{
+				src: '    <label>\n      <input type="checkbox" checked>\n      Remember me\n    </label>\n',
+				snapshot:
+					'<article><h2>Sign in</h2><form><label>Email <input type="email"></label><label>Password <input type="password"></label><label><input type="checkbox" checked> Remember me</label></form></article>',
+			},
+			{
+				src: "    <button>Sign in</button>\n  </form>\n</article>",
+				snapshot:
+					'<article><h2>Sign in</h2><form><label>Email <input type="email"></label><label>Password <input type="password"></label><label><input type="checkbox" checked> Remember me</label><button>Sign in</button></form></article>',
+			},
+		];
+		const fullSource = segments.map((segment) => segment.src).join("");
+
+		const TYPE_MS = 18;
+		const NEWLINE_MS = 60;
+		const SEGMENT_RENDER_MS = 240;
+		const HOLD_FULL_MS = 3500;
+		const DELETE_MS = 9;
+		const HOLD_EMPTY_MS = 900;
+
+		const segmentEnds = [];
+		segments.reduce((acc, segment) => {
+			const end = acc + segment.src.length;
+			segmentEnds.push(end);
+			return end;
+		}, 0);
+
+		const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+		if (reduceMotion) return;
+
+		const typedEl = document.getElementById("home-demo-typed");
+		const previewEl = document.getElementById("home-demo-preview");
+		const cursor = document.createElement("span");
+		cursor.className = "home-demo-cursor";
+
+		let timers = [];
+		const clearTimers = () => {
+			for (const timer of timers) clearTimeout(timer);
+			timers = [];
+		};
+
+		const setTyped = (text) => {
+			typedEl.textContent = text;
+			typedEl.append(cursor);
+		};
+
+		// One full cycle: type each segment (rendering its preview as it
+		// lands), hold the finished page, delete backward (the preview
+		// un-building the same way), hold the blank pane, then schedule the
+		// next cycle.
+		const cycle = () => {
+			clearTimers();
+			setTyped("");
+			previewEl.innerHTML = "";
+			let at = 0;
+			let typed = "";
+
+			for (const segment of segments) {
+				for (const char of segment.src) {
+					at += char === "\n" ? NEWLINE_MS : TYPE_MS;
+					timers.push(
+						setTimeout(() => {
+							typed += char;
+							setTyped(typed);
+						}, at),
+					);
+				}
+				at += SEGMENT_RENDER_MS;
+				const snapshot = segment.snapshot;
+				timers.push(
+					setTimeout(() => {
+						previewEl.innerHTML = snapshot;
+					}, at),
+				);
+			}
+
+			at += HOLD_FULL_MS;
+
+			for (let length = fullSource.length - 1; length >= 0; length--) {
+				at += DELETE_MS;
+				const sliceTo = length;
+				timers.push(
+					setTimeout(() => {
+						setTyped(fullSource.slice(0, sliceTo));
+						const partial = segmentEnds.findIndex((end) => sliceTo < end);
+						previewEl.innerHTML = partial <= 0 ? "" : segments[partial - 1].snapshot;
+					}, at),
+				);
+			}
+
+			at += HOLD_EMPTY_MS;
+			timers.push(setTimeout(cycle, at));
+		};
+
+		timers.push(setTimeout(cycle, 600));
+	})();
+</script>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	
+		<section class="docs-pitch">
+			<div class="container">
+				<header class="docs-section-header docs-reveal">
+					<p class="docs-eyebrow">Proof, not promises</p>
+					<h2>A production-ready baseline, out of the box.</h2>
+					<p class="docs-section-lede">Every number below is checked automatically, on every build — not a claim you have to take on faith.</p>
+				</header>
+				<div class="docs-pitch-grid">
+					
+						<article class="docs-reveal" style="transition-delay: 0ms">
+							<strong class="docs-pitch-value">&lt;14KB gzipped</strong>
+							<p>The default stylesheet is a strict maximum limit for gzip compression during each build; failing that, the build fails.</p>
+						</article>
+					
+						<article class="docs-reveal" style="transition-delay: 60ms">
+							<strong class="docs-pitch-value">0 JavaScript</strong>
+							<p>Accordions, dropdowns, and modals run on native <code>&lt;details&gt;</code> and <code>&lt;dialog&gt;</code> behavior. Nothing shipped, nothing to hydrate.</p>
+						</article>
+					
+						<article class="docs-reveal" style="transition-delay: 120ms">
+							<strong class="docs-pitch-value">WCAG 2.2 AA</strong>
+							<p>Contrast, visible focus rings, and 44px touch targets are checked in the source, not left to integrators to add later.</p>
+						</article>
+					
+						<article class="docs-reveal" style="transition-delay: 180ms">
+							<strong class="docs-pitch-value">244 tokens</strong>
+							<p>Every color, spacing, radius, and font is a runtime <code>--cirth-</code> custom property, overridable without a rebuild.</p>
+						</article>
+					
+				</div>
+			</div>
+		</section>
+	
+
+	<div class="container">
+		<section class="docs-stack"><div class="docs-stack-header-zone">
+					<div class="docs-stack-sticky">
+						<header class="docs-section-header docs-reveal">
+							<p class="docs-eyebrow">What&#39;s in the box</p>
+							<h2>Small surface, finished defaults</h2>
+							<p class="docs-section-lede">Keep scrolling — each card stays pinned until the next one covers it.</p>
+						</header>
+					</div>
+				</div>
+				<div class="docs-stack-list">
+					
+						<div class="docs-stack-sticky docs-stack-card-sticky" style="top: calc(2rem + 0rem)">
+							<article class="docs-stack-card">
+								<span class="docs-stack-index">01</span>
+								<h3>Semantic HTML first</h3>
+								<p>Standard elements — <code>nav</code>, <code>article</code>, <code>button</code>, <code>table</code>, <code>details</code> — carry the styling. Add a class only where HTML semantics run out.</p>
+								<ul class="docs-badge-row">
+									<li><code>&lt;nav&gt;</code></li><li><code>&lt;article&gt;</code></li><li><code>&lt;button&gt;</code></li><li><code>&lt;table&gt;</code></li><li><code>&lt;details&gt;</code></li>
+								</ul>
+							</article>
+						</div>
+					
+						<div class="docs-stack-sticky docs-stack-card-sticky" style="top: calc(2rem + 1.25rem)">
+							<article class="docs-stack-card">
+								<span class="docs-stack-index">02</span>
+								<h3>Fully customizable theme</h3>
+								<p>Every color, spacing, radius, font, and shadow is a <code>--cirth-</code> custom property. Override them after loading the framework — no build step, no Sass.</p>
+								<ul class="docs-badge-row">
+									<li><code>--cirth-primary</code></li><li><code>--cirth-spacing</code></li><li><code>--cirth-border-radius</code></li><li><code>custom properties</code></li>
+								</ul>
+							</article>
+						</div>
+					
+						<div class="docs-stack-sticky docs-stack-card-sticky" style="top: calc(2rem + 2.5rem)">
+							<article class="docs-stack-card">
+								<span class="docs-stack-index">03</span>
+								<h3>Classless &amp; scoped builds</h3>
+								<p>Ship the default build, a classless build for markup close to zero, or a scoped build that only styles inside a <code>.cirth</code> container.</p>
+								<ul class="docs-badge-row">
+									<li><code>Default</code></li><li><code>Classless</code></li><li><code>Scoped</code></li><li><code>Scoped + classless</code></li>
+								</ul>
+							</article>
+						</div>
+					
+						<div class="docs-stack-sticky docs-stack-card-sticky" style="top: calc(2rem + 3.75rem)">
+							<article class="docs-stack-card">
+								<span class="docs-stack-index">04</span>
+								<h3>Light and dark out of the box</h3>
+								<p>The default theme ships light and dark variants, switching automatically with <code>prefers-color-scheme</code> or forced with <code>data-theme</code>.</p>
+								<ul class="docs-badge-row">
+									<li><code>prefers-color-scheme</code></li><li><code>data-theme</code></li>
+								</ul>
+							</article>
+						</div>
+					
+						<div class="docs-stack-sticky docs-stack-card-sticky" style="top: calc(2rem + 5rem)">
+							<article class="docs-stack-card">
+								<span class="docs-stack-index">05</span>
+								<h3>Interactive without JavaScript</h3>
+								<p>Accordions, dropdowns, and modals build on native <code>&lt;details&gt;</code> and <code>&lt;dialog&gt;</code> elements and their native behavior — no runtime, nothing to hydrate.</p>
+								<ul class="docs-badge-row">
+									<li><code>&lt;details&gt;</code></li><li><code>&lt;dialog&gt;</code></li>
+								</ul>
+							</article>
+						</div>
+					
+						<div class="docs-stack-sticky docs-stack-card-sticky" style="top: calc(2rem + 6.25rem)">
+							<article class="docs-stack-card">
+								<span class="docs-stack-index">06</span>
+								<h3>Accessible by default</h3>
+								<p>Visible focus rings that survive Windows High Contrast, 44px touch targets, and <code>prefers-reduced-motion</code> / <code>prefers-contrast</code> support are checked in the source, not bolted on after.</p>
+								<ul class="docs-badge-row">
+									<li><code>forced-colors</code></li><li><code>44px targets</code></li><li><code>prefers-contrast</code></li>
+								</ul>
+							</article>
+						</div>
+					
+				</div>
+			</section>
+		
+
+		
+			<section class="docs-showcase">
+				<header class="docs-section-header docs-reveal">
+					<p class="docs-eyebrow">Samples</p>
+					<h2>See Cirth in action</h2>
+					<p class="docs-section-lede">Three interfaces built entirely from documented components — full HTML source included.</p>
+				</header>
+				<div class="docs-showcase-grid">
+					
+						<a class="docs-showcase-item docs-reveal" style="transition-delay: 0ms" href="/cirth/v0.10/examples#documentation">
+							<span class="docs-showcase-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M69.12,94.15,28.5,128l40.62,33.85a8,8,0,1,1-10.24,12.29l-48-40a8,8,0,0,1,0-12.29l48-40a8,8,0,0,1,10.24,12.3Zm176,27.7-48-40a8,8,0,1,0-10.24,12.3L227.5,128l-40.62,33.85a8,8,0,1,0,10.24,12.29l48-40a8,8,0,0,0,0-12.29ZM162.73,32.48a8,8,0,0,0-10.25,4.79l-64,176a8,8,0,0,0,4.79,10.26A8.14,8.14,0,0,0,96,224a8,8,0,0,0,7.52-5.27l64-176A8,8,0,0,0,162.73,32.48Z"></path></svg></span>
+							<strong>Documentation site</strong>
+							<span>Sidebar nav, prose, code blocks</span>
+						</a>
+					
+						<a class="docs-showcase-item docs-reveal" style="transition-delay: 70ms" href="/cirth/v0.10/examples#dashboard">
+							<span class="docs-showcase-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M12,111l112,64a8,8,0,0,0,7.94,0l112-64a8,8,0,0,0,0-13.9l-112-64a8,8,0,0,0-7.94,0l-112,64A8,8,0,0,0,12,111ZM128,49.21,223.87,104,128,158.79,32.13,104ZM246.94,140A8,8,0,0,1,244,151L132,215a8,8,0,0,1-7.94,0L12,151A8,8,0,0,1,20,137.05l108,61.74,108-61.74A8,8,0,0,1,246.94,140Z"></path></svg></span>
+							<strong>Dashboard</strong>
+							<span>Cards, tables, live retheming</span>
+						</a>
+					
+						<a class="docs-showcase-item docs-reveal" style="transition-delay: 140ms" href="/cirth/v0.10/examples#settings-form">
+							<span class="docs-showcase-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M136,120v96a8,8,0,0,1-16,0V120a8,8,0,0,1,16,0Zm64,72a8,8,0,0,0-8,8v16a8,8,0,0,0,16,0V200A8,8,0,0,0,200,192Zm24-32H208V40a8,8,0,0,0-16,0V160H176a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16ZM56,160a8,8,0,0,0-8,8v48a8,8,0,0,0,16,0V168A8,8,0,0,0,56,160Zm24-32H64V40a8,8,0,0,0-16,0v88H32a8,8,0,0,0,0,16H80a8,8,0,0,0,0-16Zm72-48H136V40a8,8,0,0,0-16,0V80H104a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16Z"></path></svg></span>
+							<strong>Settings form</strong>
+							<span>Validation, scoped build</span>
+						</a>
+					
+				</div>
+				<p class="docs-showcase-cta">
+					<a href="/cirth/v0.10/examples" role="button" class="outline secondary">View all examples</a>
+				</p>
+			</section>
+		
+
+		
+			<section class="docs-faq docs-reveal">
+				<header class="docs-section-header">
+					<p class="docs-eyebrow">Questions</p>
+					<h2>Before you install</h2>
+				</header>
+				<div class="docs-faq-list">
+					
+						<details>
+							<summary>Do I need to write any JavaScript?</summary>
+							<p>No. Cirth ships zero JavaScript. Accordions, dropdowns, and modals are native <code>&lt;details&gt;</code> and <code>&lt;dialog&gt;</code> elements, styled by the framework and driven by the browser's own behavior.</p>
+						</details>
+					
+						<details>
+							<summary>Is a build step required?</summary>
+							<p>No. Add one <code>&lt;link rel="stylesheet"&gt;</code> (or one <code>import</code> in a bundler) and standard elements are styled. SCSS exists in the repository to produce the compiled output; it isn't a public Sass API you need to compile yourself.</p>
+						</details>
+					
+						<details>
+							<summary>How big is the default stylesheet?</summary>
+							<p><14KB gzipped, currently. Every build is checked against that budget on every commit by <a href="https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js">a script</a> that gzips the real output and fails the build if any bundle crosses it.</p>
+						</details>
+					
+						<details>
+							<summary>Which browsers are supported?</summary>
+							<p>The latest stable Chrome, Edge, Firefox, and Safari (desktop and iOS), compiled against that exact Browserslist target with Lightning CSS. No version of Internet Explorer is supported.</p>
+						</details>
+					
+						<details>
+							<summary>How is this different from Pico CSS?</summary>
+							<p>Cirth started as a fork of Pico CSS. It now has its own package name, a reduced single-theme color system, a runtime token surface, and a WCAG 2.2 AA baseline checked in the source — see <a href="/cirth/v0.10/about#relationship-to-pico-css">the full comparison</a>.</p>
+						</details>
+					
+						<details>
+							<summary>Is Cirth affiliated with the Tolkien estate?</summary>
+							<p>No. The name references the real-world Cirth runic alphabet as a design metaphor for the framework's size constraints, not a license or partnership — see <a href="/cirth/v0.10/brand">Brand</a>.</p>
+						</details>
+					
+						<details>
+							<summary>What license is Cirth under?</summary>
+							<p>Apache License 2.0 for the code. The name and logo are separate brand assets with their own terms, documented on the <a href="/cirth/v0.10/brand">Brand</a> page.</p>
+						</details>
+					
+				</div>
+			</section>
+		
+	</div>
+</main>
+
+		<footer class="docs-footer">
+	<div class="container">
+		<div class="docs-footer-top">
+			<div class="docs-footer-brand-block">
+				<a href="/cirth/v0.10/" class="docs-brand docs-footer-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.10/logo_brand.svg" alt="" width="36" height="36">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.10/logo_brand_dark.svg" alt="" width="36" height="36">
+					<strong>Cirth</strong>
+				</a>
+				<p class="docs-footer-credit">
+					Designed and built by Riccardo Pastori, with help from the
+					<a href="https://github.com/cirthcss/cirth/graphs/contributors" target="_blank" rel="noreferrer">contributors</a>.
+				</p>
+				<ul class="docs-footer-social">
+					<li><a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub</a></li>
+					<li><a href="https://www.npmjs.com/package/@cirthcss/cirth" target="_blank" rel="noreferrer">npm</a></li>
+					<li><a href="https://github.com/cirthcss/cirth/blob/master/CHANGELOG.md" target="_blank" rel="noreferrer">Changelog</a></li>
+				</ul>
+			</div>
+			<div class="docs-footer-columns">
+				
+					<div class="docs-footer-column">
+						<strong>Docs</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="/cirth/v0.10/get-started">Get Started</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.10/customization">Customization</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.10/colors">Colors</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.10/components/card">Components</a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+					<div class="docs-footer-column">
+						<strong>Project</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="/cirth/v0.10/about">About Cirth</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.10/brand">Brand</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.10/examples">Examples</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.10/contributions">Contributions</a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+					<div class="docs-footer-column">
+						<strong>Community</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="https://github.com/cirthcss/cirth/issues" target="_blank" rel="noreferrer">Issues</a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+			</div>
+		</div>
+		<hr>
+		<small>
+			<span>Released under the Apache License 2.0.</span>
+			<span>Copyright © 2025-present Riccardo Pastori</span>
+		</small>
+	</div>
+</footer>
+
+		<script>
+			// Copy-to-clipboard for fenced code blocks: the markdown pipeline
+			// only highlights, it doesn't add a button, so one is injected for
+			// every `pre > code` on the page (prose fences and Demo's
+			// "Show HTML" source alike).
+			for (const pre of document.querySelectorAll("pre:not(.home-demo-code pre)")) {
+				if (pre.querySelector(":scope > button.copy")) continue;
+				const code = pre.querySelector("code");
+				if (!code?.textContent) continue;
+
+				const button = document.createElement("button");
+				button.type = "button";
+				button.className = "copy";
+				button.setAttribute("aria-label", "Copy to clipboard");
+				pre.append(button);
+
+				button.addEventListener("click", () => {
+					navigator.clipboard.writeText(code.textContent ?? "").then(() => {
+						button.classList.add("copied");
+						setTimeout(() => button.classList.remove("copied"), 2000);
+					});
+				});
+			}
+
+			// The scoped classless build reads data-theme from its own root
+			// element (.cirth-classless demos), so mirror the site theme onto
+			// every such wrapper whenever it changes.
+			const classlessRoots = document.querySelectorAll(".cirth-classless");
+			if (classlessRoots.length > 0) {
+				const sync = () => {
+					const theme = document.documentElement.getAttribute("data-theme");
+					for (const root of classlessRoots) root.setAttribute("data-theme", theme ?? "light");
+				};
+				sync();
+				new MutationObserver(sync).observe(document.documentElement, {
+					attributeFilter: ["data-theme"],
+				});
+			}
+
+			// Live preset switcher (gh#80): the <head> script above already
+			// applied a remembered choice before first paint; this wires up
+			// the header <select> for changes after load. Swapping the
+			// stylesheet's href (rather than always keeping one <link> per
+			// preset and toggling disabled) means an unvisited preset is
+			// never fetched at all.
+			const presetSelect = document.querySelector("[data-cirth-preset-select]");
+			if (presetSelect) {
+				const base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
+				const applyPreset = (preset) => {
+					const existing = document.getElementById("cirth-preset-stylesheet");
+					if (preset === "amber") {
+						existing?.remove();
+						return;
+					}
+					const link = existing ?? document.createElement("link");
+					link.rel = "stylesheet";
+					link.id = "cirth-preset-stylesheet";
+					link.href = `${base}/styles/generated/presets/${preset}.css`;
+					if (!existing) document.head.appendChild(link);
+				};
+				presetSelect.value = sessionStorage.getItem("cirth-preset") || "amber";
+				presetSelect.addEventListener("change", () => {
+					sessionStorage.setItem("cirth-preset", presetSelect.value);
+					applyPreset(presetSelect.value);
+				});
+			}
+
+			// Everything below is docs-site chrome, not the framework: it only
+			// touches elements these specific homepage sections render, so it's
+			// a harmless no-op on every other page. Cirth itself still ships
+			// zero JavaScript — this is the site *about* it, same as the copy-
+			// to-clipboard buttons and theme toggle above.
+			const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+			// Scroll-reveal: .docs-reveal-armed (the hidden starting state) is
+			// added here, right before observing — never in the shipped CSS or
+			// markup — so a JS failure, a browser without IntersectionObserver,
+			// or prefers-reduced-motion all leave content in its plain, fully
+			// visible default instead of stuck invisible.
+			const revealTargets = document.querySelectorAll(".docs-reveal");
+			if (!reduceMotion && revealTargets.length > 0 && "IntersectionObserver" in window) {
+				for (const el of revealTargets) el.classList.add("docs-reveal-armed");
+				const revealObserver = new IntersectionObserver(
+					(entries) => {
+						for (const entry of entries) {
+							if (!entry.isIntersecting) continue;
+							entry.target.classList.add("docs-reveal-visible");
+							revealObserver.unobserve(entry.target);
+						}
+					},
+					{ threshold: 0.15, rootMargin: "0px 0px -10% 0px" },
+				);
+				for (const el of revealTargets) revealObserver.observe(el);
+
+				// Safety net: headless full-page capture (screenshot tools, some
+				// print-to-PDF paths, link-preview crawlers) renders the entire
+				// document at once through the compositor without ever moving
+				// the real scroll position, so IntersectionObserver correctly
+				// reports "never intersected" for anything below the original
+				// viewport — which would otherwise leave it permanently at
+				// opacity:0. Force-reveal anything still unrevealed after a
+				// few seconds; a no-op for a normal visitor who scrolled there
+				// well within that window.
+				setTimeout(() => {
+					for (const el of revealTargets) el.classList.add("docs-reveal-visible");
+				}, 2500);
+			}
+
+			// Count-up: the pitch stats already carry their real final value as
+			// plain text (that's what no-JS visitors and assistive tech read),
+			// this only re-animates the first number substring it finds once
+			// the card scrolls into view — "<14KB gzipped" counts up the 14,
+			// "244 tokens" counts up the 244, "AA" has no digit and is left
+			// alone entirely.
+			const countTargets = document.querySelectorAll(".docs-pitch-value");
+			if (!reduceMotion && countTargets.length > 0 && "IntersectionObserver" in window) {
+				const countObserver = new IntersectionObserver(
+					(entries) => {
+						for (const entry of entries) {
+							if (!entry.isIntersecting) continue;
+							countObserver.unobserve(entry.target);
+							const el = entry.target;
+							const text = el.textContent ?? "";
+							const match = text.match(/\d+/);
+							if (!match) continue;
+							const to = Number(match[0]);
+							const before = text.slice(0, match.index);
+							const after = text.slice(match.index + match[0].length);
+							const duration = 700;
+							const start = performance.now();
+							const tick = (now) => {
+								const t = Math.min(1, (now - start) / duration);
+								const eased = 1 - (1 - t) * (1 - t);
+								el.textContent = `${before}${Math.round(to * eased)}${after}`;
+								if (t < 1) requestAnimationFrame(tick);
+							};
+							requestAnimationFrame(tick);
+						}
+					},
+					{ threshold: 0.6 },
+				);
+				for (const el of countTargets) countObserver.observe(el);
+			}
+		</script>
+	</body>
+</html>
