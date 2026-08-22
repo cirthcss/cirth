@@ -89,15 +89,15 @@
 		"typescript": "^7.0.2"
 	},
 	"browserslist": [
-		"Chrome >= 111",
-		"ChromeAndroid >= 111",
-		"Edge >= 111",
-		"Firefox >= 113",
-		"FirefoxAndroid >= 113",
-		"iOS >= 15.4",
-		"Opera >= 97",
+		"Chrome >= 123",
+		"ChromeAndroid >= 123",
+		"Edge >= 123",
+		"Firefox >= 130",
+		"FirefoxAndroid >= 130",
+		"iOS >= 18.2",
+		"Opera >= 109",
 		"OperaMobile >= 73",
-		"Safari >= 15.4",
-		"Samsung >= 22"
+		"Safari >= 18.2",
+		"Samsung >= 27"
 	]
 }

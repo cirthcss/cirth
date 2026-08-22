@@ -291,23 +291,29 @@ with Lightning CSS against this Browserslist target:
 
 ```json
 [
-  "Chrome >= 111",
-  "ChromeAndroid >= 111",
-  "Edge >= 111",
-  "Firefox >= 113",
-  "FirefoxAndroid >= 113",
-  "iOS >= 15.4",
-  "Opera >= 97",
+  "Chrome >= 123",
+  "ChromeAndroid >= 123",
+  "Edge >= 123",
+  "Firefox >= 130",
+  "FirefoxAndroid >= 130",
+  "iOS >= 18.2",
+  "Opera >= 109",
   "OperaMobile >= 73",
-  "Safari >= 15.4",
-  "Samsung >= 22"
+  "Safari >= 18.2",
+  "Samsung >= 27"
 ]
 ```
 
-Opera 97 and Samsung Internet 22 are the releases built on the same
-Chromium as Chrome 111, so every entry above describes one engine floor,
-not ten independent ones. Together they account for roughly 83% of global
-browser usage.
+Opera 109 and Samsung Internet 27 are the releases built on the same
+Chromium as Chrome 123, so every entry above describes one engine floor,
+not ten independent ones. Together they account for roughly 78% of global
+browser usage, and the number rises on its own as old versions retire.
+
+The floor is set by what the library needs, not by age: `popover`,
+`@starting-style`, `transition-behavior: allow-discrete` and
+`scrollbar-gutter` are what let components open, close and animate
+without JavaScript, and `:has()`, `color-mix()` and `light-dark()` are
+what let the theme express relationships instead of baking them.
 
 No version of Internet Explorer is supported, and neither is the legacy
 Android Browser — on any current Android device that name refers to

@@ -156,7 +156,7 @@ faq:
       a: >-
         The latest stable Chrome, Edge, Firefox, Opera and Safari, on
         desktop and mobile — including Chrome and Firefox for Android and
-        Samsung Internet, together about 83% of global browser usage.
+        Samsung Internet, together about 78% of global browser usage.
         Compiled against that exact Browserslist target with Lightning
         CSS. No version of Internet Explorer is supported.
     - q: How is this different from Pico CSS?

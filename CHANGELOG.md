@@ -9,6 +9,17 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Changed
 
+- **The Browserslist floor moves to Chrome 123 / Firefox 130 / Safari 18.2.**
+  Raised for what it unlocks, not for size — measured, raising it saves 5 B,
+  in the wrong direction. What it buys is `popover`, `@starting-style`,
+  `transition-behavior: allow-discrete` and `scrollbar-gutter`, which
+  between them let a dialog or a popover open, close and animate with no
+  JavaScript at all, plus `:has()`, `color-mix()` and `light-dark()`, all
+  three of which sat outside the old floor. It costs about 5% of global
+  usage, and it was taken now, while the library is young enough that a
+  support promise is cheap to change, rather than in six months when it
+  is not.
+
 - **The Browserslist target now names the browsers it always meant.** It
   listed desktop Chrome, Edge, Firefox, Safari and iOS Safari, and nothing
   else — which left Chrome for Android out of a query that is supposed to
