@@ -167,7 +167,12 @@
 }
 
 // Scroll lock, asked of the document rather than of a script. :has() lets
-// the page notice its own open dialog; the gutter that keeps hiding the
+// the page notice its own open dialog — :modal and not [open], because a
+// non-modal <dialog open> is ordinary in-flow content that happens to be
+// a dialog, and locking the page behind it would be locking the page
+// behind something the reader can simply scroll past. Caught on this
+// project's own documentation, where the modal demo renders open and
+// inline and took the whole page's scrolling with it; the gutter that keeps hiding the
 // overflow from moving anything is reserved permanently in
 // layout/_document.scss, because reserving it only while the dialog is
 // open is itself a layout change. Together they replace the old
@@ -179,7 +184,7 @@
 // that wants the page to stop scrolling has to ask its host.
 
 @if $parent-selector == "" {
-  html:has(dialog[open]) {
+  html:has(dialog:modal) {
     overflow: hidden;
   }
 }

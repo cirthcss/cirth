@@ -7,6 +7,15 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Fixed
+
+- **An open, non-modal `<dialog>` no longer locks the page.** The scroll
+  lock added in 0.11.0 was keyed on `html:has(dialog[open])`, which also
+  matches a dialog rendered inline as ordinary content — as this project's
+  own documentation does to show one. Readers could not scroll past the
+  example. It is now `html:has(dialog:modal)`, so only a dialog opened with
+  `showModal()` — the one that actually covers the page — locks it.
+
 ## [0.11.0] - 2026-08-22
 
 ### Removed

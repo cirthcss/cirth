@@ -31,6 +31,9 @@ const markup = `
 	<main class="container">
 		<p style="block-size: 300vh">A page tall enough to scroll.</p>
 	</main>
+	<dialog id="inline" open>
+		<article><p>An open dialog that is not modal.</p></article>
+	</dialog>
 	<dialog id="sheet">
 		<article>
 			<header><strong>Confirm</strong></header>
@@ -56,7 +59,9 @@ const measureWidth = (page) =>
 /** @param {import("@playwright/test").Page} page */
 const dialogStyle = (page, /** @type {string} */ property) =>
 	page.evaluate((name) => {
-		const sheet = document.querySelector("dialog");
+		// By id: this page also renders a non-modal dialog, and the first
+		// dialog in the document is not the one these assertions are about.
+		const sheet = document.querySelector("#sheet");
 		if (!sheet) {
 			throw new Error("missing dialog");
 		}
@@ -98,9 +103,9 @@ for (const build of [
 		// The scoped builds are anchored in a wrapper and must not reach the
 		// document root, so they cannot lock the page — and must not try.
 		if (build.scoped) {
-			expect(source).not.toContain("html:has(dialog[open])");
+			expect(source).not.toContain("html:has(dialog:modal)");
 		} else {
-			expect(source).toContain("html:has(dialog[open])");
+			expect(source).toContain("html:has(dialog:modal)");
 		}
 	});
 }
@@ -124,6 +129,28 @@ test("the page stops scrolling while a dialog is open, and starts again after", 
 
 	await page.keyboard.press("Escape");
 	await expect.poll(() => rootOverflow(page)).not.toBe("hidden");
+});
+
+// Regression, found on this project's own documentation: the modal page
+// renders an open <dialog> inline as its worked example, and a scroll lock
+// keyed on [open] took the whole page's scrolling with it — the reader
+// could not reach the prose below the demo. A non-modal dialog is ordinary
+// in-flow content, so :modal is the condition, and this is the case that
+// says so.
+test("an open but non-modal dialog leaves the page scrolling", async ({
+	page,
+}) => {
+	await render(page);
+
+	const inline = page.locator("#inline");
+	await expect(inline).toBeVisible();
+	expect(await rootOverflow(page)).not.toBe("hidden");
+
+	const scrolled = await page.evaluate(() => {
+		window.scrollTo(0, 400);
+		return window.scrollY;
+	});
+	expect(scrolled, "the reader can still reach the rest of the page").toBe(400);
 });
 
 test("locking the page does not shift the layout", async ({ page }) => {
