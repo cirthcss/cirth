@@ -163,3 +163,56 @@ test("a dialog that is also a popover keeps the dialog treatment", async ({
 	// the user agent, not by a border-radius and a box shadow.
 	expect(await styleOf(page, "sheet", "border-top-style")).not.toBe("solid");
 });
+
+// Regression, found on this project's own documentation: a layout rule
+// zeroing the bottom margin of a container's last child also zeroed it on
+// the popover, which happened to be that last child. The user agent centres
+// a popover with `margin: auto` on all four sides, so removing one of them
+// left the other three to absorb every pixel of free space and the panel
+// slid to the bottom edge of the screen.
+//
+// Nothing about that rule is unusual, and a library that only stays centred
+// while no one touches its margins is not centred, it is lucky. So the
+// component declares the centring itself, and this is the case that holds
+// it to it: the panel is asked to land in the middle of the viewport with
+// exactly the page CSS that used to push it off.
+test("it stays centred even when page CSS zeroes its margin", async ({
+	page,
+}) => {
+	// The page rule is written the way the one that caused this was: a
+	// container tidying up its last child, reaching the popover only because
+	// the popover happens to be it. An author who names the element outright
+	// still outranks the component, and should — that is them positioning it
+	// on purpose, not a layout rule catching it by accident.
+	await page.setContent(
+		`<style>${css}</style>
+		<style>.preview > :last-child { margin-block-end: 0; margin-inline-end: 0 }</style>
+		<div class="preview">
+			<p>Preceding content.</p>
+			<span id="hint" popover>A panel with nothing to anchor to.</span>
+		</div>`,
+	);
+	await page.evaluate(() => document.getElementById("hint")?.showPopover());
+
+	const { box, viewport } = await page.evaluate(() => {
+		const hint = document.getElementById("hint");
+		if (!hint) {
+			throw new Error("missing popover");
+		}
+		const { top, left, width, height } = hint.getBoundingClientRect();
+		return {
+			box: { top, left, width, height },
+			viewport: { width: window.innerWidth, height: window.innerHeight },
+		};
+	});
+
+	// Centred to within a pixel, which is as exact as sub-pixel layout gets.
+	expect(
+		Math.abs(box.top + box.height / 2 - viewport.height / 2),
+		"vertically centred",
+	).toBeLessThanOrEqual(1);
+	expect(
+		Math.abs(box.left + box.width / 2 - viewport.width / 2),
+		"horizontally centred",
+	).toBeLessThanOrEqual(1);
+});

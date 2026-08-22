@@ -28,12 +28,13 @@
 // is left alone, and the two decisions that remain (a width cap, a
 // comfortable padding) are one token and one line away.
 
-// Positioning is deliberately left to the user agent, which centres a
-// popover in the viewport. Tying it to its trigger needs anchor
-// positioning, which is outside the Browserslist floor (Chrome 125,
-// Firefox 147, Safari 26); until then a hint reads as a small panel
-// rather than a bubble with a tail, and authors who need it attached can
-// position it themselves.
+// Positioning stays in the middle of the viewport. Tying a popover to its
+// trigger needs anchor positioning, which is outside the Browserslist floor
+// (Chrome 125, Firefox 147, Safari 26); until then a hint reads as a small
+// panel rather than a bubble with a tail, and authors who need it attached
+// can position it themselves — `position-area` overrides what is set below.
+// The centring is declared rather than inherited from the user agent, for
+// the reason given at the rule.
 
 // Only the popovers this library can claim. `auto` (the default, written
 // as a bare `popover`) and `hint` are content the browser light-dismisses
@@ -60,6 +61,16 @@ $popover-selector: '[popover=""], [popover="auto"], [popover="hint"]';
 
   &:popover-open {
     display: var(--cirth-popover-display);
+
+    // Centred by this library, not by the user agent's default margin.
+    // Anything on the page that touches margins — a layout rule zeroing
+    // the last child's, say — would otherwise leave one side auto and the
+    // other fixed, and the panel would slide to an edge. Where anchor
+    // positioning is available and asked for, `position-area` overrides
+    // these; where it is not, this is the fallback that keeps the panel
+    // in the middle of the screen at any viewport size.
+    inset: 0;
+    margin: auto;
 
     // Generous, and a token: the cap exists so a long line cannot run the
     // width of the viewport, not to decide how wide a panel should be.

@@ -129,13 +129,21 @@ so it is a future addition, not a thing to ship now.
 
 ## Positioning
 
-The browser centres a popover in the viewport, and Cirth does not override
-that. It means a hint can land on top of the control that opened it.
+A popover opens in the middle of the viewport. That is the browser's own
+default, but Cirth states it rather than relying on it: the user agent
+centres a popover by giving it `margin: auto` on all four sides, and any
+rule of yours that sets a margin on that element — a container zeroing its
+last child's, say — leaves the remaining sides to absorb the free space and
+slides the panel to an edge. Cirth sets `inset: 0; margin: auto` on the open
+panel so the centring survives ordinary layout CSS.
+
+It does mean a hint can land on top of the control that opened it.
 
 Attaching it to its trigger needs CSS anchor positioning, which is outside
 Cirth's [browser floor](https://github.com/cirthcss/cirth#browser-support)
 (Chrome 125, Firefox 147, Safari 26). Shipping it behind `@supports` would
-serve one engine and not the others, so it is left to you:
+serve one engine and not the others, so it is left to you — `position-area`
+takes precedence over the centring above, so nothing needs undoing first:
 
 ```css
 @supports (anchor-name: --hint) {

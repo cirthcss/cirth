@@ -9,6 +9,14 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Fixed
 
+- **A popover stays centred when your CSS touches its margins.** The
+  browser centres a popover with `margin: auto` on all four sides, so a
+  rule like `.container > :last-child { margin-bottom: 0 }` left the other
+  sides to absorb the free space and slid the panel to the bottom of the
+  screen. The open panel now declares `inset: 0; margin: auto` itself.
+  Anchor positioning still overrides it: `position-area` takes precedence,
+  so authors attaching a popover to its trigger need change nothing.
+
 - **An open, non-modal `<dialog>` no longer locks the page.** The scroll
   lock added in 0.11.0 was keyed on `html:has(dialog[open])`, which also
   matches a dialog rendered inline as ordinary content — as this project's
