@@ -9,6 +9,14 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Fixed
 
+- **`select` and `textarea` keep the 44px target size** (WCAG 2.5.5) when
+  their font-size changes. An `<input>` was pinned to it by an explicit
+  height, but the other two derived their height from the text inside them
+  and so met the threshold only at the default type scale — a select at
+  `font-size: 0.875rem` came out at 41px. Both now carry a
+  `min-block-size` floor measured from `--cirth-size-4`, independent of
+  the element's own font-size.
+
 - **A popover stays centred when your CSS touches its margins.** The
   browser centres a popover with `margin: auto` on all four sides, so a
   rule like `.container > :last-child { margin-bottom: 0 }` left the other

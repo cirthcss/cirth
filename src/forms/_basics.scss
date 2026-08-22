@@ -98,6 +98,25 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   );
 }
 
+// The same 44px target, as a floor rather than a fixed height. A select
+// grows with its longest option and a textarea with its rows, so neither
+// can be pinned the way an input is — but both would otherwise reach the
+// target only by coincidence, since their height falls out of the text
+// inside them. Set a smaller font-size on a select and it quietly drops
+// below the threshold; this is what keeps WCAG 2.5.5 a property of the
+// component instead of a property of the default type scale. Measured
+// from --cirth-size-4, not from the element's own font-size, so the
+// floor stays put when the type does not.
+
+#{$parent-selector} select,
+#{$parent-selector} textarea {
+  min-block-size: calc(
+    (var(--cirth-size-4) * var(--cirth-line-height)) +
+      (var(--cirth-form-element-spacing-vertical) * 2) +
+      (var(--cirth-border-width) * 2)
+  );
+}
+
 // Fieldset
 
 #{$parent-selector} fieldset {
