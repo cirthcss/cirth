@@ -252,3 +252,43 @@ test("a closed dialog renders nothing", async ({ page }) => {
 	// why the library does not ship a defensive rule of its own.
 	expect(await dialogStyle(page, "display")).toBe("none");
 });
+
+test("the close button is a full-size target around a small icon", async ({
+	page,
+}) => {
+	await page.setContent(
+		`<style>${css}</style>
+		<dialog id="sheet" open>
+			<article>
+				<header>
+					<button id="close" aria-label="Close" rel="prev"></button>
+					<strong id="title">Confirm</strong>
+				</header>
+				<p id="body">Body copy.</p>
+			</article>
+		</dialog>`,
+	);
+
+	// The icon is 1rem and stays 1rem — what grows is what a pointer has to
+	// hit. 16px was the whole target for the control people reach for in a
+	// hurry, and a floor that only grew its height would have left it tall
+	// and thin, which is worse than either.
+	const { close, header } = await page.evaluate(() => {
+		const box = (/** @type {string} */ id) => {
+			const el = document.getElementById(id);
+			if (!el) {
+				throw new Error(`missing ${id}`);
+			}
+			const { width, height } = el.getBoundingClientRect();
+			return { width, height };
+		};
+		return { close: box("close"), header: box("title") };
+	});
+
+	expect(close.width).toBeGreaterThanOrEqual(44);
+	expect(close.height).toBeGreaterThanOrEqual(44);
+
+	// And the header it sits in is unchanged: the extra is taken back out
+	// with negative margins, so the target grew without moving anything.
+	expect(header.height).toBeLessThan(44);
+});

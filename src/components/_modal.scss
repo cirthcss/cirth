@@ -68,6 +68,15 @@
       $close-selector: ".close, :is(a, button)[rel=prev]";
     }
 
+    $close-offset: calc(
+      (
+          (var(--cirth-size-4) * var(--cirth-line-height)) +
+            (var(--cirth-form-element-spacing-vertical) * 2) +
+            (var(--cirth-border-width) * 2) - var(--cirth-size-4)
+        ) /
+        2
+    );
+
     width: 100%;
 
     // dvh tracks mobile Safari's collapsing URL bar, so the footer stays
@@ -95,7 +104,11 @@
       }
 
       #{$close-selector} {
-        margin: 0;
+        // The same offset taken back out here: this block is more specific
+        // than the one below and would otherwise zero those margins, which
+        // would leave the enlarged target pushing the icon down and inwards
+        // instead of growing invisibly around it.
+        margin: calc(#{$close-offset} * -1);
         margin-inline-start: var(--cirth-spacing);
         padding: 0;
         float: right;
@@ -116,12 +129,22 @@
     }
 
     // Close icon
+
+    // The icon is 1rem; the target around it is the full control height,
+    // because a 16px close button is 16px of anything a pointer has to hit
+    // and this is the control people reach for in a hurry. The box grows,
+    // the icon does not — background-size below pins it — and the negative
+    // margins take the extra back out of the layout, so the header is laid
+    // out around the same 1rem the design was built on. Without the width
+    // the min-block-size floor in content/_button.scss would make this
+    // 16px wide and 44px tall, which is worse than either.
     #{$close-selector} {
       display: block;
-      width: var(--cirth-size-4);
-      height: var(--cirth-size-4);
-      margin-top: calc(var(--cirth-spacing) * -1);
-      margin-bottom: var(--cirth-spacing);
+      width: calc(var(--cirth-size-4) + #{$close-offset} * 2);
+      height: calc(var(--cirth-size-4) + #{$close-offset} * 2);
+      margin-top: calc(var(--cirth-spacing) * -1 - #{$close-offset});
+      margin-right: calc(#{$close-offset} * -1);
+      margin-bottom: calc(var(--cirth-spacing) - #{$close-offset});
       margin-inline-start: auto;
       border: none;
       background-image: var(--cirth-icon-close);

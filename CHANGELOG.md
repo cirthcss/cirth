@@ -9,6 +9,13 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Fixed
 
+- **A modal's close button is a 44px target instead of a 16px one.** It is
+  drawn as a 1rem icon and was 1rem of hit area to go with it — on the
+  control people reach for in a hurry, and the one a mis-click is most
+  costly on. The icon is unchanged and nothing around it moves: the box
+  grows to the control height, `background-size` keeps the glyph at 1rem,
+  and negative margins take the extra back out of the layout.
+
 - **Buttons keep the 44px target size when their font-size changes.** The
   same defect fixed for `select` and `textarea` below, on the control the
   others were measured against: padding and line-height add up to 44px at
