@@ -7,6 +7,19 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-08-22
+
+### Changed
+
+- **A `textarea` opens four rows tall instead of the browser's two.** Two
+  rows shows a line and a half of a paragraph, so a control meant for prose
+  opened as a box you immediately scroll inside. An explicit `rows`
+  attribute takes over completely — `rows="2"` is you declaring the height
+  in the markup, and the default only fills in when you have not. The four
+  rows are measured in `lh`, so they remain four rows of that textarea's own
+  text if its font size changes, rather than four rows of the default type
+  scale.
+
 ### Fixed
 
 - **A modal's close button is a 44px target instead of a 16px one.** It is
@@ -35,15 +48,6 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   rather than a target of its own, the input is what the pointer is aimed at
   and is already 44px tall, and forcing the floor onto the pseudo-element
   made it overflow the control holding it.
-
-- **A `textarea` opens four rows tall instead of the browser's two.** Two
-  rows shows a line and a half of a paragraph, so a control meant for prose
-  opened as a box you immediately scroll inside. An explicit `rows`
-  attribute takes over completely — `rows="2"` is you declaring the height
-  in the markup, and the default only fills in when you have not. The four
-  rows are measured in `lh`, so they remain four rows of that textarea's own
-  text if its font size changes, rather than four rows of the default type
-  scale.
 
 - **`select` and `textarea` keep the 44px target size** (WCAG 2.5.5) when
   their font-size changes. An `<input>` was pinned to it by an explicit
@@ -1082,7 +1086,8 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
-[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.11.0...master
+[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.12.0...master
+[0.12.0]: https://github.com/cirthcss/cirth/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/cirthcss/cirth/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/cirthcss/cirth/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/cirthcss/cirth/compare/v0.8.5...v0.9.0
