@@ -74,9 +74,9 @@ bodyClass: docs-home
 			    `top`, so as you scroll, every card pins in place and the
 			    next one slides up to cover all but a sliver of it — pure
 			    CSS, the browser's own scroll position drives it, nothing to
-			    compute in JS. Falls back to plain stacked cards under
-			    768px (see style.css) where the peek effect reads as
-			    cramped rather than deliberate. -#}
+			    compute in JS. The offsets keep the full active card visible
+			    at mobile widths too, so the behavior is consistent across
+			    viewport sizes. -#}
 			<section class="docs-stack">
 				{#- position:sticky lives on a plain, unstyled wrapper div —
 				    never directly on an element that also has a background

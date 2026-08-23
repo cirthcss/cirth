@@ -9,6 +9,7 @@ module.exports = defineConfig({
 	testDir: "tests",
 	testMatch: [
 		"button-overflow.spec.js",
+		"docs-stack.spec.js",
 		"date-input-group.spec.js",
 		"form-sizing.spec.js",
 		"forms-validity.spec.js",

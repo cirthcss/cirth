@@ -512,9 +512,8 @@
    in view while cards pin in turn beneath it and the next one slides up
    to cover all but a sliver of the last — the browser's own scroll
    position drives the whole effect, position:sticky and nothing else,
-   no JS. Falls back to plain static flow under 768px, where the peek
-   needs more vertical room than a small screen has to read as
-   deliberate rather than glitchy.
+   no JS. The same behavior applies at every viewport width: the card
+   offsets leave enough room for the full card even on a small screen.
 
    .docs-stack-sticky is deliberately bare — no background, no shadow,
    no border-radius. Safari/WebKit renders a visible concentric-ring
@@ -569,20 +568,6 @@
 
 .docs-stack-list > .docs-stack-sticky {
 	margin-bottom: calc(var(--cirth-spacing) * 1.25);
-}
-
-@media (max-width: 767px) {
-	.docs-stack-sticky {
-		position: static;
-	}
-
-	/* The fixed height exists only to give the header's sticky wrapper
-	   an early, deliberate release point (see .docs-stack-header-zone
-	   above) — irrelevant once sticky is off, and would otherwise leave
-	   a tall dead gap under the header on a small screen. */
-	.docs-stack-header-zone {
-		height: auto;
-	}
 }
 
 .docs-stack-index {
