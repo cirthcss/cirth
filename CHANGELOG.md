@@ -7,6 +7,14 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Fixed
+
+- **The homepage cards now pin and stack on mobile browsers** (gh#85).
+  A narrow-viewport rule changed every sticky wrapper to static positioning
+  below 768px, disabling the demo in Firefox/IronFox on Android and Safari on
+  iOS while desktop mode continued to work. The CSS-only stack now behaves the
+  same at every viewport width.
+
 ## [0.12.0] - 2026-08-22
 
 ### Changed
