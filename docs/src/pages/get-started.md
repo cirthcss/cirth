@@ -38,7 +38,7 @@ import "@cirthcss/cirth/dist/cirth.min.css";
 
 Every published build also has a shorter `exports` path, for example
 `@cirthcss/cirth/classless`, `@cirthcss/cirth/scoped`, or
-`@cirthcss/cirth/presets/cobalt`; see
+`@cirthcss/cirth/presets/plain`; see
 [Contributions](/contributions#package-exports) for the full map. The
 `dist/*.css` paths keep working alongside them.
 
@@ -64,11 +64,11 @@ Cirth publishes four CSS builds from the same source:
 | `dist/cirth.scoped.min.css` | You're embedding Cirth into an existing page, CMS, or app shell and only want elements inside a `.cirth` wrapper affected. |
 | `dist/cirth.classless.scoped.min.css` | Both: scoped **and** classless. |
 
-All four builds share the same official amber theme. `cobalt` and `coral`
+All four builds share the same official amber theme. `plain` and `playroom`
 (see [Colors](/colors)) are optional presets: stylesheets that override an
 existing set of custom properties (color, shadow, type, spacing, motion).
 Load them after any of the four builds above, for example
-`dist/presets/cobalt.min.css`.
+`dist/presets/plain.min.css`.
 
 ### Classless
 
@@ -104,5 +104,5 @@ top.
 ## Next steps
 
 * [Customization](/customization): override the CSS custom property surface.
-* [Colors](/colors): the default theme, plus the `cobalt`/`coral` presets.
+* [Colors](/colors): the default theme, plus the `plain`/`playroom` presets.
 * [Layout](/layout/document): start reading the component reference.

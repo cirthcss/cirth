@@ -14,8 +14,8 @@
 		"./scoped/print": "./dist/cirth.print.scoped.min.css",
 		"./classless/scoped": "./dist/cirth.classless.scoped.min.css",
 		"./classless/scoped/print": "./dist/cirth.print.classless.scoped.min.css",
-		"./presets/coral": "./dist/presets/coral.min.css",
-		"./presets/cobalt": "./dist/presets/cobalt.min.css",
+		"./presets/plain": "./dist/presets/plain.min.css",
+		"./presets/playroom": "./dist/presets/playroom.min.css",
 		"./presets/*": "./dist/presets/*",
 		"./dist/*": "./dist/*",
 		"./package.json": "./package.json"

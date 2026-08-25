@@ -6,22 +6,28 @@ layout: docs.njk
 # Colors
 
 Cirth has one official theme: amber, with hand tuned light and dark
-variants. `cobalt` and `coral` are optional **presets**: stylesheets that
-override an existing set of CSS custom properties on top of the default
-theme. They're worked examples of how far a customization can reasonably
-go across color, shadow, type, spacing, and motion without becoming a
-separately maintained theme: no component styles, reset rules, or
-light/dark switching logic are duplicated.
+variants. `plain` and `playroom` are optional **presets**: stylesheets that
+override CSS custom properties on top of the default theme. No component
+styles, reset rules, or light/dark switching logic are duplicated.
+
+They are also deliberately the two ends of the same worked example. One
+changes as little as a preset can; the other changes as much as one
+reasonably should.
 
 {% colorSwatches %}
 
-* **`cobalt`** gives a corporate look: a deep navy primary accent, cool toned
-  neutrals, a crisp flat shadow (no blur), a businesslike Arial/Helvetica
-  font stack, denser spacing, snappier motion, and square corners.
-* **`coral`** gives a playful look: a vivid warm primary accent, warm toned
-  neutrals, a soft coral glow shadow with a matching hover lift for buttons,
-  a friendly Trebuchet MS font stack, looser spacing, bouncy motion, and more
-  rounded corners.
+* **`plain`** is the conventional application baseline: a familiar blue
+  accent, a plain white page, and headings in the body face rather than the
+  default theme's serif. It is the whole point of the token model in four
+  declarations — it sets **only input tokens**, and the accent's fill,
+  hover, focus ring and underline tint follow on their own. Reach for it
+  when you want an interface that looks unremarkable in the good sense.
+* **`playroom`** is the expressive end: a soft violet accent, surfaces
+  tinted toward it, large radii, a rounded system face, generous spacing,
+  springy motion, and a wide soft shadow. It reaches across colour,
+  geometry, typography, motion and depth — and overrides two *derived*
+  tokens on purpose, so its hover lightens rather than darkens. Suited to a
+  consumer app, a community site, or a tool aimed at children.
 
 Like the default theme, presets use font stacks that ship with every major
 OS: no `@import`, no webfont, zero network requests beyond the stylesheet
@@ -36,12 +42,12 @@ default, classless, or scoped builds:
 
 ```html
 <link rel="stylesheet" href="dist/cirth.min.css">
-<link rel="stylesheet" href="dist/presets/cobalt.min.css">
+<link rel="stylesheet" href="dist/presets/plain.min.css">
 ```
 
 ```css
 @import "@cirthcss/cirth";
-@import "@cirthcss/cirth/presets/cobalt";
+@import "@cirthcss/cirth/presets/plain";
 ```
 
 Presets are generated from `src/presets/` by `scripts/build-presets.js`
@@ -52,10 +58,9 @@ during `npm run build`; see [Contributions](/contributions) for how the build wo
 If you only need a single custom accent, override the primary color group with
 your own values directly instead of loading a preset; see
 [Customization](/customization#primary-secondary-and-contrast). This is the
-right tool when a single page or component needs a custom brand color; reach
-for `cobalt` or `coral` when you want a worked example of restyling the
-system more broadly across accent, shadow, type, spacing, and motion,
-with light/dark variants already handled.
+right tool when a single page or component needs a custom brand color; read
+`plain` when you want to see how little a retheme can be, and `playroom`
+when you want to see how far one can go.
 
 ## Underlying palette
 
@@ -92,11 +97,11 @@ inconsistency between families.
 from the brand mark, so the theme's primary accent and the logo are the
 same color by construction rather than by manual matching.
 
-`cobalt` and `coral` (`src/presets/`) declare only the `oklch()` literals
-their overridden tokens need. They don't duplicate the theme's full
-palette, component styles, or reset rules. `coral`'s glow shadow reuses the
-theme's own shadow generator (`src/helpers/_functions.scss`), just recolored,
-rather than reimplementing it.
+`plain` and `playroom` (`src/presets/`) declare only the `oklch()`
+literals their overridden tokens need. They don't duplicate the theme's
+full palette, component styles, or reset rules — and they no longer
+duplicate its scheme wiring either: each scheme difference is stated once
+as a `light-dark()` pair, which is why `plain` fits in four declarations.
 
 Cirth targets browsers with native `oklch()` support (see the `browserslist`
 field in `package.json`), so the compiled CSS ships `oklch()` directly rather
@@ -107,5 +112,5 @@ than converting it to a `hex` / `lab()` fallback.
 Cirth previously inherited a set of twenty accent color themes from Pico CSS, then
 briefly maintained three full themes (azure, jade, slate). That has been
 reduced further to a single official theme plus two token override presets,
-`cobalt` and `coral`; see [About Cirth](/about) for the project philosophy
+`plain` and `playroom`; see [About Cirth](/about) for the project philosophy
 and [Contributions](/contributions) before proposing color system changes.

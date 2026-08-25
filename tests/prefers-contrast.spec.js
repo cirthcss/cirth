@@ -46,8 +46,8 @@ const css = read("dist/cirth.css");
 // on the same roots, so each one has to carry its own pass or it would
 // hand the strengthened values straight back (see src/presets/).
 const presets = [
-	{ css: read("dist/presets/cobalt.css"), name: "cobalt" },
-	{ css: read("dist/presets/coral.css"), name: "coral" },
+	{ css: read("dist/presets/plain.css"), name: "plain" },
+	{ css: read("dist/presets/playroom.css"), name: "playroom" },
 ];
 
 const markup = `
@@ -58,6 +58,7 @@ const markup = `
 		<hr id="rule">
 		<input id="field" type="text">
 		<article id="card"><p id="card-text">On a card.</p></article>
+		<button id="button" type="button">Button</button>
 	</main>
 `;
 
@@ -219,6 +220,42 @@ for (const scheme of /** @type {const} */ (["light", "dark"])) {
 		// The underline drops its half-alpha tint for the link color itself.
 		expect(parseColor(base.underline).alpha).toBeLessThan(1);
 		expect(more.underline).toBe(more.linkColor);
+	});
+}
+
+// A button label sits on a fill, not on the page, so it is the one place
+// where strengthening the accent can make things *worse*: the fill derives
+// from --cirth-primary, the label is --cirth-primary-inverse (white), and an
+// accent lightened for text legibility drags the fill up under the label.
+// That regressed once, in the dark scheme, to 4.2:1 — below where it sat
+// with no preference expressed at all — because the pass boosted the accent
+// and let the fill follow. Both the theme and every preset now pin the fill.
+for (const scheme of /** @type {const} */ (["light", "dark"])) {
+	test(`${scheme} scheme: a button label clears AAA on its own fill`, async ({
+		page,
+	}) => {
+		test.skip(
+			!(await reportsPreference(page)),
+			"this engine does not expose prefers-contrast to automation",
+		);
+
+		/** @param {boolean} more */
+		const measure = async (more) => {
+			await render(page, { more, scheme });
+
+			return contrastRatio(
+				await styleOf(page, "button", "color"),
+				await styleOf(page, "button", "background-color"),
+			);
+		};
+
+		const plain = await measure(false);
+		const more = await measure(true);
+
+		expect(more, "AAA under the preference").toBeGreaterThanOrEqual(7);
+		expect(more, "never worse than with no preference").toBeGreaterThanOrEqual(
+			plain,
+		);
 	});
 }
 

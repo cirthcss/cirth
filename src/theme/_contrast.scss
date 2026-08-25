@@ -132,6 +132,14 @@
   // 8.6:1, underlines at full strength.
   --cirth-primary: #{$amber-250};
   --cirth-primary-hover: #{$amber-150};
+
+  // The accent above lightens for *text* legibility, and the button fill
+  // derives from it — so left alone it would lighten too, and the white
+  // label on top would come out at 4.2:1, worse than the 5.5:1 it has with
+  // no preference at all. Pinning the fill keeps the two moving in the
+  // directions they each need: white on these clears 7:1 (WCAG 1.4.6).
+  --cirth-primary-background: #{$amber-650};
+  --cirth-primary-hover-background: #{$amber-700};
   --cirth-primary-underline: var(--cirth-primary);
   --cirth-secondary-underline: var(--cirth-secondary);
   --cirth-contrast-underline: var(--cirth-contrast);

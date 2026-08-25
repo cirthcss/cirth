@@ -45,7 +45,7 @@ npm run docs:dev   # run this docs site locally
   customization stays CSS first through `--cirth-` custom properties.
 * `src/theme/` contains design tokens: color scales, foundations, and the
   light/dark schemes. Most visual changes start here, not in components.
-* `src/presets/` contains `cobalt` and `coral`, token override presets published
+* `src/presets/` contains `plain` and `playroom`, token override presets published
   alongside the default build.
 * `docs/` contains this site (Eleventy), styled by Cirth's own build — and
   also doubles as the fixture the library's own QA runs against: `tests/`
@@ -79,8 +79,8 @@ the `dist/` filename convention:
   "./classless": "./dist/cirth.classless.min.css",
   "./scoped": "./dist/cirth.scoped.min.css",
   "./classless/scoped": "./dist/cirth.classless.scoped.min.css",
-  "./presets/coral": "./dist/presets/coral.min.css",
-  "./presets/cobalt": "./dist/presets/cobalt.min.css"
+  "./presets/plain": "./dist/presets/plain.min.css",
+  "./presets/playroom": "./dist/presets/playroom.min.css"
 }
 ```
 

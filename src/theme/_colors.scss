@@ -42,7 +42,7 @@ $white: oklch(100% 0 0deg);
 // as the canvas, amber as the accent on top of it, not as a wash across
 // the whole page — see docs/brand.md's "amber is functional, not
 // atmosphere." Presets already made this same call independently
-// (cobalt's own paper sits at 0.004 chroma too).
+// (the plain preset's own page sits at zero chroma).
 $paper: oklch(97.4% 0.004 69.35deg);
 
 // Neutral

@@ -131,7 +131,7 @@ compatibility. The most important differences for users are:
 - Scoped builds target a `.cirth` wrapper, including custom properties,
   document styles, color schemes, and modal states.
 - The inherited set of twenty accent themes has been reduced to a single
-  official theme (amber), with `cobalt` and `coral` published as optional
+  official theme (amber), with `plain` and `playroom` published as optional
   token override presets; see [Colors](/colors).
 - A WCAG 2.2 AA baseline (contrast, focus visibility, target size) is
   verified in the source, and the default stylesheet is held to a 14KB

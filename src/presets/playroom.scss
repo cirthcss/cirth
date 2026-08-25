@@ -1,0 +1,142 @@
+// Playroom preset
+// ––––––––––––––––––––
+// For interfaces with a friendly voice — a consumer app, a community site,
+// a tool aimed at children or the people helping them. Soft geometry,
+// generous spacing, a rounded face, and motion with a little overshoot, so
+// the interface reads as approachable rather than administrative.
+// It is the longer half of a worked example. Where src/presets/plain.scss
+// changes four input tokens and lets the theme derive the rest, this one
+// reaches across the whole surface: colour, geometry, typography, motion
+// and depth. It also overrides two *derived* tokens on purpose, which is
+// the other thing worth demonstrating — see the note further down.
+// Import after the main Cirth stylesheet. No @import, no webfont: the
+// rounded stack below is whatever the operating system already has.
+@use "../helpers/selectors";
+
+@include selectors.root {
+  // Colour
+  // A soft violet reads playful without the shouting a primary red or
+  // yellow would do at this saturation. The hue is deliberately away from
+  // the status families so a friendly accent never reads as a warning.
+  --cirth-primary: light-dark(oklch(50% 0.16 300deg), oklch(70% 0.14 300deg));
+
+  // The page carries a trace of the accent instead of being neutral: at
+  // this chroma it reads as "warm paper, but violet", which is what keeps
+  // the whole thing from feeling clinical.
+  --cirth-background-color: light-dark(
+    oklch(98% 0.012 300deg),
+    oklch(24% 0.028 295deg)
+  );
+  --cirth-card-background-color: light-dark(
+    oklch(100% 0 0deg),
+    oklch(29% 0.032 295deg)
+  );
+  --cirth-color: light-dark(oklch(36% 0.03 295deg), oklch(93% 0.012 300deg));
+  --cirth-muted-color: light-dark(
+    oklch(52% 0.035 295deg),
+    oklch(70% 0.028 295deg)
+  );
+  --cirth-muted-border-color: light-dark(
+    oklch(90% 0.02 300deg),
+    oklch(36% 0.03 295deg)
+  );
+  --cirth-link-visited-color: light-dark(
+    oklch(50% 0.03 295deg),
+    oklch(70% 0.025 295deg)
+  );
+
+  // Status colours warm up with the rest of the theme. They stay
+  // recognisable — a red-orange error, a green success, an amber warning —
+  // but sit at the same softness as the accent instead of cutting through
+  // it. Each is an input: the field borders, meter readings, <ins>/<del>
+  // inks and <mark> tint all follow from these three.
+  // The error anchor sits where the default theme's does (a 44%-ish
+  // lightness): the invalid border derives *lighter* than its input, so an
+  // anchor picked for how it reads as a fill leaves the border under the
+  // 3:1 non-text floor against a white card.
+  --cirth-error: light-dark(oklch(45% 0.16 25deg), oklch(74% 0.13 25deg));
+  --cirth-success: light-dark(oklch(52% 0.11 155deg), oklch(72% 0.11 155deg));
+  --cirth-warning: light-dark(oklch(56% 0.1 75deg), oklch(74% 0.11 75deg));
+
+  // Geometry
+  // The pill radius stays a pill; everything else grows. --cirth-border-radius
+  // is the single knob the per-component radii derive from, so one line
+  // rounds cards, fields, buttons and popovers together.
+  --cirth-border-radius: var(--cirth-radius-2xl);
+  --cirth-spacing: var(--cirth-space-5);
+
+  // Typography
+  // ui-rounded is Apple's system rounded face; the rest of the stack falls
+  // back to the ordinary system UI font, which is what most other
+  // platforms have. Nothing is fetched.
+  --cirth-font-family:
+    ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", system-ui,
+    "Segoe UI", Roboto, sans-serif, var(--cirth-font-family-emoji);
+  --cirth-font-family-display: var(--cirth-font-family);
+  --cirth-font-weight: var(--cirth-font-weight-medium);
+  --cirth-line-height: var(--cirth-line-height-relaxed);
+
+  // Motion and depth
+  // A short overshoot on the way in — enough to feel springy, small enough
+  // not to read as a bug. Components that animate under
+  // prefers-reduced-motion are already excluded by the theme.
+  --cirth-transition: var(--cirth-duration-slow)
+    cubic-bezier(0.34, 1.56, 0.64, 1);
+  --cirth-box-shadow:
+    0 0.0625rem 0.125rem oklch(36% 0.03 295deg / 6%),
+    0 0.75rem 1.5rem oklch(36% 0.03 295deg / 10%);
+
+  // Deliberately breaking two relationships
+  // The theme derives the hover state by mixing the accent toward black,
+  // which is the right instinct for a reference manual and the wrong one
+  // here: on a friendly interface the hover should feel like the control
+  // lighting up, not pressing down. Setting these two directly opts them
+  // out of the derivation — which is exactly what a derived token is for,
+  // as long as you mean it.
+  --cirth-primary-hover: light-dark(
+    oklch(58% 0.18 300deg),
+    oklch(80% 0.13 300deg)
+  );
+  --cirth-primary-hover-background: light-dark(
+    oklch(58% 0.18 300deg),
+    oklch(58% 0.18 300deg)
+  );
+}
+
+// Increased contrast (prefers-contrast: more)
+// Restated for the same reason as in plain.scss: this file loads after the
+// theme's own pass and would otherwise hand the softer values back. The
+// softness is what gives way here, not the character — the hue is the
+// same, it simply stops being gentle about it.
+@media (prefers-contrast: more) {
+  @include selectors.root {
+    --cirth-primary: light-dark(oklch(41% 0.17 300deg), oklch(86% 0.1 300deg));
+
+    // The fill is pinned for the same reason as in the theme's own pass.
+    --cirth-primary-background: light-dark(
+      oklch(41% 0.17 300deg),
+      oklch(42% 0.15 300deg)
+    );
+    --cirth-primary-hover-background: light-dark(
+      oklch(34% 0.15 300deg),
+      oklch(35% 0.13 300deg)
+    );
+    --cirth-primary-hover: light-dark(
+      oklch(34% 0.16 300deg),
+      oklch(92% 0.07 300deg)
+    );
+    --cirth-color: light-dark(oklch(22% 0.02 295deg), oklch(98% 0.006 300deg));
+    --cirth-muted-color: light-dark(
+      oklch(40% 0.035 295deg),
+      oklch(82% 0.02 295deg)
+    );
+    --cirth-muted-border-color: light-dark(
+      oklch(58% 0.03 295deg),
+      oklch(62% 0.03 295deg)
+    );
+    --cirth-link-visited-color: light-dark(
+      oklch(36% 0.03 295deg),
+      oklch(84% 0.02 295deg)
+    );
+  }
+}

@@ -38,7 +38,7 @@ const rootBuilds = [
 	{ name: "cirth.print.classless.scoped", classless: true, scoped: true },
 ];
 
-const presetBuilds = [{ name: "presets/coral" }, { name: "presets/cobalt" }];
+const presetBuilds = [{ name: "presets/plain" }, { name: "presets/playroom" }];
 
 const allFiles = [...rootBuilds, ...presetBuilds].flatMap(({ name }) => [
 	`${name}.css`,

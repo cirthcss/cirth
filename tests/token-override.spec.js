@@ -56,7 +56,7 @@ const builds = [
 	},
 ];
 
-const presets = ["cobalt", "coral"];
+const presets = ["plain", "playroom"];
 
 // One from each scheme layer, so a regression in any of them shows up:
 // text, an accent, a surface, and a border.

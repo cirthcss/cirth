@@ -45,7 +45,7 @@ Under `prefers-contrast: more`, in both light and dark:
 
 ## Presets
 
-The [`cobalt` and `coral`](/customization) presets carry their own version
+The [`plain` and `playroom`](/customization) presets carry their own version
 of this pass. They have to: a preset is loaded after Cirth and redeclares
 the same tokens on the same roots, so anything the framework's pass
 strengthened would be handed straight back to the screen values.

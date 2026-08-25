@@ -7,7 +7,125 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Added
+
+- **Status colors are addressable.** `--cirth-error`, `--cirth-success` and
+  `--cirth-warning` are inputs now, each driving four derived roles —
+  `-text`, `-border`, `-active` and `-surface`. They did not exist before:
+  the status palettes lived only inside the tokens that consumed them, baked
+  in by Sass, so a theme could not move them without rewriting each
+  consumer by hand. Setting one input now retunes every status treatment
+  that reads from it — the fill a meter paints, the ink `<ins>`/`<del>` use,
+  the border a field takes when it validates, the tint behind a `<mark>`.
+
+- **Two redesigned presets, `plain` and `playroom`** (gh#86), replacing
+  `cobalt` and `coral`. They are named for their character rather than
+  their hue, and between them they are one worked example read from both
+  ends. `plain` is the conventional application baseline — a familiar blue
+  accent, a plain white page, headings in the body face — and it is **four
+  declarations, all of them input tokens**: the accent's fill, hover, focus
+  ring and underline tint derive on their own. `playroom` is the expressive
+  end — a soft violet accent, tinted surfaces, large radii, a rounded
+  system face, generous spacing, springy motion — and it overrides two
+  *derived* tokens on purpose, so its hover lightens rather than darkens.
+  Both carry their own increased-contrast pass, and both are verified in
+  light, dark, and both under `prefers-contrast: more`. **Breaking:** the
+  `./presets/coral` and `./presets/cobalt` exports are gone.
+
+- **A print stylesheet, shipped separately.** `dist/cirth.print.min.css` and
+  one per build variant, plus the `./print`, `./classless/print`,
+  `./scoped/print` and `./classless/scoped/print` package exports. See the
+  Changed section below for why it moved out, and the Upgrading page for
+  what to add.
+
+- **`--cirth-font-size-7xl`**, so the fluid heading clamps can read their
+  own upper bound off the type scale.
+
+### Changed
+
+- **The accent is an input, and the rest of it derives.** Set
+  `--cirth-primary` and the background, hover, focus and underline tint
+  follow. Previously each was a separately picked value, so retheming the
+  accent meant setting seven tokens and keeping them in step. The
+  derivations reproduce the shipped amber ladder step for step, so nothing
+  changed colour: this is the same theme, stated as relationships instead
+  of as a list.
+
+- **A `:root` override now reaches into a subtree that forces a scheme.**
+  The scheme differences live once at the root as `light-dark()` pairs
+  rather than being redeclared in each scheme block, so setting a token
+  once holds in both schemes and inside any `data-theme` subtree. This is a
+  behaviour change; see the Upgrading page. To vary a token by scheme,
+  write the pair yourself — `light-dark(#2563eb, #93c5fd)` — which is the
+  same shape the theme uses internally.
+
+- **Print ships as its own stylesheet instead of riding in the bundle.**
+  It is around 630 B gzipped that is never needed to paint the screen, and
+  as a separate sheet whose media query does not match the display the
+  browser fetches it at low priority. **Breaking:** a page that links only
+  the main build prints with no pass at all. See the Upgrading page.
+
+- **Icons follow the theme.** Where the element can carry a
+  pseudo-element — the checkbox mark, the accordion and dropdown chevrons,
+  the modal close — the icon is applied as a mask over a theme token
+  instead of an SVG with a baked stroke. This also closes a latent bug: the
+  checkbox mark baked white, so a light custom accent left an invisible
+  tick on a light fill. The icons that sit on replaced form controls cannot
+  do this — there is no pseudo-element to hang a mask on — so they are
+  baked per scheme instead, tracking `--cirth-muted-color` through the
+  increased-contrast pass as well. The `<select>` chevron and the masked
+  ones were drifting apart in every scheme; they match now.
+
+- **The display end of the type scale is re-spaced**, and `h1`–`h3` read
+  their clamp bounds from it. The top five steps had no consumer because
+  those headings restated rem literals the ladder could not express — it
+  stopped at 2.3rem while `h1` ran to 3.5rem. Rendered sizes are unchanged.
+
+- **Opera Mobile is no longer a Browserslist target.** caniuse-lite pins the
+  family to a single stale bucket — op_mob 80, the release where the engine
+  went Chromium — and both Browserslist and Lightning CSS read it
+  literally. That one dead data point held the whole build below the
+  `light-dark()` floor, and Lightning then compiled every pair down to an
+  emulation that does not reproduce the semantics: a `data-theme` subtree
+  stopped resolving its own scheme. The build now fails if that emulation
+  ever reappears.
+
+- **The bundles are smaller.** `cirth.min.css` 14,010 → 13,121 B gzipped,
+  `cirth.scoped.min.css` 14,224 → 13,341 B, `cirth.classless.min.css`
+  12,569 → 11,740 B.
+
+### Removed
+
+- **`--cirth-size-*`.** It duplicated `--cirth-space-*` value for value, and
+  its three real uses were semantic values wearing scale-step names: the
+  text size the 44px control maths is built from, a progress bar's height,
+  and a nav's 24px target floor. Those read from `--cirth-font-size-md` and
+  `--cirth-space-*` now, which is also why the 44px maths documents itself.
+
+- **`--cirth-outline-width-*`.** Identical to `--cirth-border-width-*` step
+  for step. One ladder remains, with `--cirth-border-width` and
+  `--cirth-outline-width` deciding which step each use gets.
+
+- **Seven tokens nothing referenced:** `--cirth-color-black`,
+  `--cirth-color-white`, `--cirth-color-transparent`,
+  `--cirth-color-current`, `--cirth-opacity-muted`,
+  `--cirth-accordion-border-color` and `--cirth-loading-spinner-opacity`.
+
+- **Compatibility scaffolding the Browserslist floor made dead:** the
+  `@supports selector(:has(*))` guard, and three `-webkit-appearance`
+  declarations whose unprefixed form is supported everywhere Cirth targets.
+
 ### Fixed
+
+- **A button label no longer loses contrast under `prefers-contrast: more`.**
+  In the dark scheme it had fallen to 4.2:1 — worse than the 5.5:1 it has
+  with no preference expressed — because the pass strengthens
+  `--cirth-primary` for text legibility and the button fill, which now
+  derives from it, followed the accent upward under a white label. The
+  theme and both presets pin the fill in that pass, and a test asserts both
+  that it clears AAA and that it is never worse than the unstrengthened
+  value.
+
 
 - **The homepage cards now pin and stack on mobile browsers** (gh#85).
   A narrow-viewport rule changed every sticky wrapper to static positioning
