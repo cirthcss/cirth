@@ -91,49 +91,47 @@ $visible-group-item: ':not([hidden], input[type="hidden"])';
     width: auto;
   }
 
-  @supports selector(:has(*)) {
-    // Group box shadow when a button is focused
-    &:has(
-      button:focus,
-      [type="submit"]:focus,
-      [type="button"]:focus,
-      [role="button"]:focus
-    ) {
-      --cirth-group-box-shadow: var(--cirth-group-box-shadow-focus-with-button);
+  // Group box shadow when a button is focused
+  &:has(
+    button:focus,
+    [type="submit"]:focus,
+    [type="button"]:focus,
+    [role="button"]:focus
+  ) {
+    --cirth-group-box-shadow: var(--cirth-group-box-shadow-focus-with-button);
 
-      // [aria-invalid] siblings keep their state border — hiding it while
-      // the button has focus dropped the invalid signal (upstream #536)
-      input:not([type="checkbox"], [type="radio"], [aria-invalid]),
-      select:not([aria-invalid]) {
-        border-color: transparent;
-      }
+    // [aria-invalid] siblings keep their state border — hiding it while
+    // the button has focus dropped the invalid signal (upstream #536)
+    input:not([type="checkbox"], [type="radio"], [aria-invalid]),
+    select:not([aria-invalid]) {
+      border-color: transparent;
     }
+  }
 
-    // Group box shadow when an input is focused
-    &:has(input:not([type="submit"], [type="button"]):focus, select:focus) {
-      --cirth-group-box-shadow: var(--cirth-group-box-shadow-focus-with-input);
+  // Group box shadow when an input is focused
+  &:has(input:not([type="submit"], [type="button"]):focus, select:focus) {
+    --cirth-group-box-shadow: var(--cirth-group-box-shadow-focus-with-input);
 
-      // Adapt box shadow for buttons
-      button,
-      [type="submit"],
-      [type="button"],
-      [role="button"] {
-        --cirth-button-box-shadow: 0 0 0 var(--cirth-border-width)
-          var(--cirth-primary-border);
-        --cirth-button-hover-box-shadow: 0 0 0 var(--cirth-border-width)
-          var(--cirth-primary-hover-border);
-      }
-    }
-
-    // Remove button box shadow if we have a group box shadow
+    // Adapt box shadow for buttons
     button,
     [type="submit"],
-    [type="reset"],
     [type="button"],
     [role="button"] {
-      &:focus {
-        box-shadow: none;
-      }
+      --cirth-button-box-shadow: 0 0 0 var(--cirth-border-width)
+        var(--cirth-primary-border);
+      --cirth-button-hover-box-shadow: 0 0 0 var(--cirth-border-width)
+        var(--cirth-primary-hover-border);
+    }
+  }
+
+  // Remove button box shadow if we have a group box shadow
+  button,
+  [type="submit"],
+  [type="reset"],
+  [type="button"],
+  [role="button"] {
+    &:focus {
+      box-shadow: none;
     }
   }
 }

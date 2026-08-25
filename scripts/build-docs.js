@@ -12,7 +12,7 @@ const { compileScssFolder } = require("./lib/compile-scss");
 const variants = [
 	{
 		filename: "cirth-docs.css",
-		content: `@use "src";`,
+		content: `@use "src"; @use "src/utilities/print";`,
 	},
 	{
 		filename: "cirth-docs-classless.css",
@@ -20,7 +20,8 @@ const variants = [
       $enable-classes: false,
       $parent-selector: ".cirth-classless"
     );
-    @use "src";`,
+    @use "src";
+    @use "src/utilities/print";`,
 	},
 ];
 

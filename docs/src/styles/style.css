@@ -1362,7 +1362,7 @@ pre > button.copy.copied::before {
 }
 
 .docs-demo-source summary::after {
-	height: calc(var(--cirth-size-4) * var(--cirth-line-height));
+	height: calc(var(--cirth-font-size-md) * var(--cirth-line-height));
 }
 
 .docs-demo-source[open] > summary {

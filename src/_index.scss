@@ -51,7 +51,8 @@
 // loaded after this one — they are not alternate builds of this file.
 @use "theme";
 
-// Print
-// Last on purpose: the print pass overrides component rules by source
-// order, so every rule it has to outrank must already have been emitted.
-@use "utilities/print"; // @media print
+// Print is not here on purpose. It ships as its own stylesheet
+// (src/cirth.print*.scss -> dist/cirth.print*.css), loaded with
+// media="print", so the bytes that only matter on paper stay out of the
+// payload that has to arrive in the first round trip. See those entry
+// files for why source order still works.

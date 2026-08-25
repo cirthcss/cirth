@@ -50,7 +50,9 @@
 
 ## Quickstart
 
-Include one stylesheet and write ordinary semantic HTML.
+Include one stylesheet and write ordinary semantic HTML. Add the print
+sheet too if your pages get printed — it is separate so it does not weigh
+on the first paint.
 
 ```html
 <link

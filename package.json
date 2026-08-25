@@ -7,9 +7,13 @@
 	"style": "dist/cirth.min.css",
 	"exports": {
 		".": "./dist/cirth.min.css",
+		"./print": "./dist/cirth.print.min.css",
 		"./classless": "./dist/cirth.classless.min.css",
+		"./classless/print": "./dist/cirth.print.classless.min.css",
 		"./scoped": "./dist/cirth.scoped.min.css",
+		"./scoped/print": "./dist/cirth.print.scoped.min.css",
 		"./classless/scoped": "./dist/cirth.classless.scoped.min.css",
+		"./classless/scoped/print": "./dist/cirth.print.classless.scoped.min.css",
 		"./presets/coral": "./dist/presets/coral.min.css",
 		"./presets/cobalt": "./dist/presets/cobalt.min.css",
 		"./presets/*": "./dist/presets/*",
@@ -98,7 +102,6 @@
 		"FirefoxAndroid >= 130",
 		"iOS >= 18.2",
 		"Opera >= 109",
-		"OperaMobile >= 73",
 		"Safari >= 18.2",
 		"Samsung >= 27"
 	]

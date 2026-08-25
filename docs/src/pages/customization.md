@@ -119,10 +119,34 @@ dark mode, mirror the host's theme onto the wrapper:
 
 ### Overriding a color in one scheme only
 
-A `:root` override applies to *both* schemes: it sets the token once, and
-neither scheme is more specific than it, so whichever scheme is active
-inherits your value. When you want to change light and dark separately,
-say which one you mean:
+A `:root` override applies to *both* schemes, and it applies everywhere —
+including inside a subtree that forces a scheme with `data-theme`:
+
+```css
+:root {
+  --cirth-primary: #2563eb;
+}
+```
+
+When you want light and dark to differ, give the token both values at once
+with [`light-dark()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark):
+
+```css
+:root {
+  --cirth-primary: light-dark(#2563eb, #93c5fd);
+}
+```
+
+That is the same shape Cirth uses internally, so an override composes with
+the theme rather than fighting it: the pair is resolved wherever the token
+is used, against the color scheme in effect at that point. Set it once at
+`:root` and a forced-dark widget picks the dark half on its own.
+
+Tokens that are *derived* — `--cirth-primary-hover`, the focus ring, the
+underline tint, the status roles — follow whatever you set, so in most cases
+the accent above is the only line you need. See [the token layers](#two-layers-of-tokens).
+
+You can still target the scheme selectors directly if you prefer:
 
 ```css
 :root:not([data-theme="dark"]) {
@@ -134,11 +158,10 @@ say which one you mean:
 }
 ```
 
-Those are the same selectors the schemes use, and the presets with them.
-One consequence worth knowing: an element carrying `data-theme` declares
-the whole palette on itself, so a `:root` override does not reach inside
-such a subtree. Repeat the override on the selectors above if you have
-forced a scheme somewhere in the page.
+Those are the selectors the schemes themselves use. They win over a plain
+`:root` rule, which makes them useful for overriding one scheme without
+touching the other — but for a value that should hold everywhere, prefer the
+pair above: it is one line, and it cannot fall out of step with itself.
 
 ## Spacing and typography
 

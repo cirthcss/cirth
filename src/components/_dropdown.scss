@@ -18,9 +18,9 @@
     > a {
       &::after {
         display: block;
-        width: var(--cirth-size-4);
+        width: var(--cirth-font-size-md);
         height: calc(
-          var(--cirth-size-4) *
+          var(--cirth-font-size-md) *
             var(--cirth-line-height, var(--cirth-line-height-normal))
         );
         margin-inline-start: var(--cirth-space-1);
@@ -41,10 +41,19 @@
                 )
             )
           );
-        background-image: var(--cirth-icon-chevron);
-        background-position: right center;
-        background-size: var(--cirth-size-4) auto;
-        background-repeat: no-repeat;
+
+        // Masked over a theme token — see components/_accordion.scss for
+        // why the matching <select> chevron cannot follow.
+        background-color: var(--cirth-muted-color);
+        mask-image: var(--cirth-icon-chevron);
+        mask-position: right center;
+        mask-size: var(--cirth-font-size-md) auto;
+        mask-repeat: no-repeat;
+
+        @media (forced-colors: active) {
+          background-color: CanvasText;
+        }
+
         content: "";
       }
     }
@@ -63,7 +72,7 @@
   // ––––––––––––––––––––
   #{$parent-selector} details.dropdown > summary:not([role]) {
     height: calc(
-      var(--cirth-size-4) *
+      var(--cirth-font-size-md) *
         var(--cirth-line-height) +
         var(--cirth-form-element-spacing-vertical) *
         2 +
@@ -151,7 +160,7 @@
       &:not([role]) {
         // Override height
         height: calc(
-          (var(--cirth-size-4) * var(--cirth-line-height)) +
+          (var(--cirth-font-size-md) * var(--cirth-line-height)) +
             (var(--cirth-nav-link-spacing-vertical) * 2)
         );
         padding: calc(

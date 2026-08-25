@@ -9,7 +9,7 @@
   margin-bottom: var(--cirth-spacing);
 
   summary {
-    line-height: var(--cirth-size-4);
+    line-height: var(--cirth-font-size-md);
     list-style-type: none;
     cursor: pointer;
     transition: color var(--cirth-transition);
@@ -30,17 +30,29 @@
     // Marker
     &::after {
       display: block;
-      width: var(--cirth-size-4);
-      height: var(--cirth-size-4);
+      width: var(--cirth-font-size-md);
+      height: var(--cirth-font-size-md);
       margin-inline-start: calc(
         var(--cirth-spacing, var(--cirth-space-4)) * 0.5
       );
       float: right;
       transform: rotate(-90deg);
-      background-image: var(--cirth-icon-chevron);
-      background-position: right center;
-      background-size: var(--cirth-size-4) auto;
-      background-repeat: no-repeat;
+
+      // Masked over a theme token rather than drawn with the icon's own
+      // baked stroke, so the marker follows a retheme. The <select>
+      // chevron in forms/_basics.scss cannot do this — a replaced element
+      // has no pseudo-element to hang the mask on — so it keeps the baked
+      // neutral and the two diverge under a custom theme (gh#82).
+      background-color: var(--cirth-muted-color);
+      mask-image: var(--cirth-icon-chevron);
+      mask-position: right center;
+      mask-size: var(--cirth-font-size-md) auto;
+      mask-repeat: no-repeat;
+
+      @media (forced-colors: active) {
+        background-color: CanvasText;
+      }
+
       content: "";
       transition: transform var(--cirth-transition);
     }
@@ -69,7 +81,7 @@
       // Marker
       &::after {
         height: calc(
-          var(--cirth-size-4) *
+          var(--cirth-font-size-md) *
             var(--cirth-line-height, var(--cirth-line-height-normal))
         );
       }

@@ -62,18 +62,33 @@ const PAIRED_FAMILIES = [
 	["Safari", "iOS"],
 ];
 
-// Opera Mobile is deliberately unconstrained. caniuse tracks it as a
-// single current bucket whose number is not a Chromium version, so there
-// is nothing to align it to; it is in the target because its users are
-// real, and it is accepted that it may sit below the floor.
-const UNCONSTRAINED = ["OperaMobile"];
+/** @type {string[]} */
+const UNCONSTRAINED = [];
 
 // Never in the target. Its one modern caniuse entry is the same engine as
 // Chrome for Android, already covered, and it accounts for 0.03% of
 // usage — while including it makes Lightning CSS stop trusting grouped
 // selectors and expand every `A, B { }` in the library into separate
 // rules, 743 B gzipped and over the size budget.
-const FORBIDDEN = ["Android", "AndroidBrowser", "and_chr_legacy"];
+// Opera Mobile was in the target until 2026-08-25, deliberately exempt
+// from the floor. It is forbidden now, and the reason is not usage: it is
+// that caniuse-lite pins the family to a single stale bucket, op_mob 80,
+// which is the release where the engine went Chromium — not a version
+// anyone still runs. Browserslist and Lightning CSS both read that bucket
+// literally, so one dead data point held the whole build below the floor
+// for light-dark(). Lightning then compiled every pair down to its
+// --lightningcss-light/--lightningcss-dark emulation, and that emulation
+// does not reproduce the native semantics: a [data-theme] subtree stopped
+// resolving its own scheme entirely (verified in all three engines).
+// Re-adding this family does not merely cost bytes — it silently breaks
+// theme/_dual.scss. scripts/process-css.js fails the build if the
+// emulation ever reappears.
+const FORBIDDEN = [
+	"Android",
+	"AndroidBrowser",
+	"and_chr_legacy",
+	"OperaMobile",
+];
 
 /** @type {string[]} */
 const violations = [];

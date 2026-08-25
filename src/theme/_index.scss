@@ -4,6 +4,9 @@
 // Styles
 @use "styles";
 
+// Scheme differences, centralised as light-dark() pairs
+@use "dual";
+
 // Color schemes
 @use "schemes";
 

@@ -7,94 +7,63 @@
 @mixin theme {
   color-scheme: light;
 
-  --cirth-background-color: #{$paper};
-
-  // Text color
-  --cirth-color: #{$neutral-750};
-
-  // Text selection color
-  --cirth-text-selection-color: #{color.change($amber-400, $alpha: 0.25)};
-
-  // Muted colors
-  --cirth-muted-color: #{$neutral-550};
-  --cirth-muted-border-color: #{color.mix(
-      $neutral-100,
-      $neutral-50,
-      $method: oklch
-    )};
-
-  // Primary colors
-  --cirth-primary: #{$amber-550};
-  --cirth-primary-background: #{$amber-550};
+  --cirth-error-text: color-mix(in oklch, var(--cirth-error) 80.2%, black);
+  --cirth-error-border: oklch(
+    from var(--cirth-error) calc(l * 1.493) calc(c * 1.298) h
+  );
+  --cirth-error-active: oklch(
+    from var(--cirth-error) calc(l * 1.198) calc(c * 1.199) h
+  );
+  --cirth-error-surface: oklch(from var(--cirth-error) 93% 0.05 h);
+  --cirth-success-text: color-mix(in oklch, var(--cirth-success) 67%, black);
+  --cirth-success-border: oklch(
+    from var(--cirth-success) calc(l * 1.163) calc(c * 1.17) h
+  );
+  --cirth-success-active: var(--cirth-success);
+  --cirth-success-surface: oklch(from var(--cirth-success) 93% 0.05 h);
+  --cirth-warning-text: color-mix(in oklch, var(--cirth-warning) 73.1%, black);
+  --cirth-warning-border: oklch(
+    from var(--cirth-warning) calc(l * 1.269) calc(c * 1.267) h
+  );
+  --cirth-warning-active: oklch(
+    from var(--cirth-warning) calc(l * 1.091) calc(c * 1.081) h
+  );
+  --cirth-warning-surface: oklch(from var(--cirth-warning) 93% 0.05 h);
+  --cirth-primary-background: var(--cirth-primary);
   --cirth-primary-border: var(--cirth-primary-background);
-  --cirth-primary-underline: #{color.change($amber-550, $alpha: 0.5)};
-  --cirth-primary-hover: #{$amber-650};
-  --cirth-primary-hover-background: #{$amber-600};
+  --cirth-primary-underline: oklch(from var(--cirth-primary) l c h / 50%);
+
+  // 83.5% and 91.7% of the accent mixed toward black land exactly on
+  // $amber-650 and $amber-600 — the ladder is proportional in L and C at
+  // this end, so a single mix reproduces a step.
+  --cirth-primary-hover: color-mix(in oklch, var(--cirth-primary) 83.5%, black);
+  --cirth-primary-hover-background: color-mix(
+    in oklch,
+    var(--cirth-primary) 91.7%,
+    black
+  );
   --cirth-primary-hover-border: var(--cirth-primary-hover-background);
   --cirth-primary-hover-underline: var(--cirth-primary-hover);
 
   // Focus rings composite to >= 3:1 against the page background (WCAG
   // 1.4.11 as applied to focus indicators) — don't lower these alphas.
-  --cirth-primary-focus: #{color.change($amber-550, $alpha: 0.75)};
+  --cirth-primary-focus: oklch(from var(--cirth-primary) l c h / 75%);
   --cirth-primary-inverse: #{$white};
-
-  // Secondary colors
-  --cirth-secondary: #{$neutral-550};
   --cirth-secondary-background: #{$neutral-600};
   --cirth-secondary-border: var(--cirth-secondary-background);
-  --cirth-secondary-underline: #{color.change($neutral-550, $alpha: 0.5)};
-  --cirth-secondary-hover: #{$neutral-650};
-  --cirth-secondary-hover-background: #{$neutral-650};
   --cirth-secondary-hover-border: var(--cirth-secondary-hover-background);
   --cirth-secondary-hover-underline: var(--cirth-secondary-hover);
-  --cirth-secondary-focus: #{color.change($neutral-600, $alpha: 0.7)};
   --cirth-secondary-inverse: #{$white};
-
-  // Contrast colors
-  --cirth-contrast: #{$neutral-900};
-  --cirth-contrast-background: #{$neutral-900};
   --cirth-contrast-border: var(--cirth-contrast-background);
-  --cirth-contrast-underline: #{color.change($neutral-900, $alpha: 0.5)};
-  --cirth-contrast-hover: #{$black};
-  --cirth-contrast-hover-background: #{$black};
   --cirth-contrast-hover-border: var(--cirth-contrast-hover-background);
   --cirth-contrast-hover-underline: var(--cirth-secondary-hover);
-  --cirth-contrast-focus: #{color.change($neutral-600, $alpha: 0.7)};
-  --cirth-contrast-inverse: #{$white};
-
-  // Visited links: the accent drained to neutral, so a followed link reads
-  // as spent without leaving the palette. A step darker than
-  // --cirth-secondary so the two aren't the same color by accident.
-  // 5.96:1 on the paper canvas, 6.43:1 on a white card (WCAG 1.4.3 AA).
-  --cirth-link-visited-color: #{$neutral-600};
-
-  // Box shadow
-  --cirth-box-shadow: #{functions.shadow($neutral-400)};
-
-  // Typography
-  // Headings colors — one step darker across the board than a plain
-  // extension of --cirth-color (neutral-750) would give: bolder, more
-  // confident headline weight, closer to how assertively dark Ruby's own
-  // headings sit against its paper canvas. Still short of true black —
-  // this is a page of prose most of the time, not a poster.
-  --cirth-h1-color: #{$neutral-900};
-  --cirth-h2-color: #{$neutral-850};
-  --cirth-h3-color: #{$neutral-800};
-  --cirth-h4-color: #{$neutral-750};
-  --cirth-h5-color: #{$neutral-700};
-  --cirth-h6-color: #{$neutral-650};
 
   // Highlighted text (<mark>)
-  --cirth-mark-background-color: #{color.change(
-      $warning-250,
-      $lightness: 93%,
-      $chroma: 0.05
-    )};
-  --cirth-mark-color: #{$neutral-950};
+  --cirth-mark-background-color: var(--cirth-warning-surface);
 
   // Inserted (<ins>) & Deleted (<del>)
-  --cirth-ins-color: #{$success-750};
-  --cirth-del-color: #{$error-750};
+  --cirth-ins-color: var(--cirth-success-text);
+  --cirth-del-color: var(--cirth-error-text);
 
   // Blockquote
   --cirth-blockquote-border-color: var(--cirth-muted-border-color);
@@ -102,9 +71,12 @@
 
   // Button
   // To disable box-shadow, remove the var or set to '0 0 0 rgba(0, 0, 0, 0)'
-  // Don't use, 'none, 'false, 'null', '0', etc.
   --cirth-button-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
   --cirth-button-hover-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
+
+  // Button
+  // To disable box-shadow, remove the var or set to '0 0 0 rgba(0, 0, 0, 0)'
+  // Don't use, 'none, 'false, 'null', '0', etc.
 
   // Table
   --cirth-table-border-color: var(--cirth-muted-border-color);
@@ -112,51 +84,23 @@
       $neutral-500,
       $alpha: 0.0375
     )};
-
-  // Code
-  --cirth-code-background-color: #{color.mix(
-      $neutral-50,
-      $white,
-      75%,
-      $method: oklch
-    )};
-  --cirth-code-color: #{$neutral-550};
   --cirth-code-kbd-background-color: var(--cirth-color);
   --cirth-code-kbd-color: var(--cirth-background-color);
-
-  // Form elements
-  --cirth-form-element-background-color: #{color.mix(
-      $neutral-50,
-      $white,
-      25%,
-      $method: oklch
-    )};
-  --cirth-form-element-selected-background-color: #{$neutral-100};
-
-  // >= 3:1 against both the field and the page background (WCAG 1.4.11).
-  // 450, not 400: on the paper canvas the 400 step drops to 2.92:1.
-  --cirth-form-element-border-color: #{$neutral-450};
-  --cirth-form-element-color: #{$neutral-850};
   --cirth-form-element-placeholder-color: var(--cirth-muted-color);
-  --cirth-form-element-active-background-color: #{$white};
   --cirth-form-element-active-border-color: var(--cirth-primary-border);
   --cirth-form-element-focus-color: var(--cirth-primary-border);
   --cirth-form-element-disabled-opacity: var(--cirth-opacity-disabled);
-  --cirth-form-element-invalid-border-color: #{$error-400};
-  --cirth-form-element-invalid-active-border-color: #{$error-550};
+  --cirth-form-element-invalid-border-color: var(--cirth-error-border);
+  --cirth-form-element-invalid-active-border-color: var(--cirth-error-active);
   --cirth-form-element-invalid-focus-color: var(
     --cirth-form-element-invalid-active-border-color
   );
-  --cirth-form-element-valid-border-color: #{$success-450};
-  --cirth-form-element-valid-active-border-color: #{$success-550};
+  --cirth-form-element-valid-border-color: var(--cirth-success-border);
+  --cirth-form-element-valid-active-border-color: var(--cirth-success-active);
   --cirth-form-element-valid-focus-color: var(
     --cirth-form-element-valid-active-border-color
   );
-
-  // Switch (input[type="checkbox"][role="switch"])
-  // Unchecked track needs >= 3:1 against the page background so the
-  // control's off state stays perceivable (WCAG 1.4.11)
-  --cirth-switch-background-color: #{$neutral-450};
+  --cirth-switch-thumb-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
   --cirth-switch-checked-background-color: var(--cirth-primary-background);
 
   // Thumb matches button text color rather than a hardcoded white, so a
@@ -167,45 +111,24 @@
   // amber-550) — the tightest of the two is the one to re-check if
   // --cirth-primary-inverse or --cirth-switch-background-color changes.
   --cirth-switch-color: var(--cirth-primary-inverse);
-  --cirth-switch-thumb-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
-
-  // Range (input[type="range"])
-  --cirth-range-border-color: #{$neutral-100};
-  --cirth-range-active-border-color: #{$neutral-200};
   --cirth-range-thumb-border-color: var(--cirth-background-color);
   --cirth-range-thumb-color: var(--cirth-secondary-background);
   --cirth-range-thumb-active-color: var(--cirth-primary-background);
 
   // Accordion (<details>)
-  --cirth-accordion-border-color: var(--cirth-muted-border-color);
   --cirth-accordion-active-summary-color: var(--cirth-primary-hover);
   --cirth-accordion-close-summary-color: var(--cirth-color);
   --cirth-accordion-open-summary-color: var(--cirth-muted-color);
-
-  // Card (<article>)
-  // White, not the background token: on the paper canvas a card is a
-  // sheet — the one surface brighter than the page.
-  --cirth-card-background-color: #{$white};
   --cirth-card-border-color: var(--cirth-muted-border-color);
   --cirth-card-box-shadow: var(--cirth-box-shadow);
-  --cirth-card-sectioning-background-color: #{color.mix(
-      $neutral-50,
-      $white,
-      25%,
-      $method: oklch
-    )};
 
   // Dropdown (details.dropdown)
   @if $enable-classes {
-    --cirth-dropdown-background-color: #{$white};
-    --cirth-dropdown-border-color: #{$neutral-50};
     --cirth-dropdown-box-shadow: var(--cirth-box-shadow);
     --cirth-dropdown-color: var(--cirth-color);
-    --cirth-dropdown-hover-background-color: #{$neutral-50};
   }
 
   // Loading ([aria-busy=true])
-  --cirth-loading-spinner-opacity: var(--cirth-opacity-disabled);
 
   // Modal (<dialog>)
   --cirth-modal-overlay-background-color: #{functions.with-var-alpha(
@@ -221,17 +144,23 @@
   // (WCAG 1.4.11) with room: 3.97:1, 5.11:1, 6.55:1. A meter whose author
   // declared no low/high/optimum is entirely optimum, so it prints as one
   // flat green bar — which is what it means.
-  --cirth-meter-optimum-color: #{$success-550};
-  --cirth-meter-suboptimum-color: #{$warning-600};
-  --cirth-meter-even-less-good-color: #{$error-650};
-
-  // Progress
-  // The border marks the track's extent at >= 3:1 against the page
-  // background (WCAG 1.4.11); the track itself stays subtle.
-  // 450, not 400: on the paper canvas the 400 step drops to 2.92:1.
-  --cirth-progress-background-color: #{$neutral-100};
-  --cirth-progress-border-color: #{$neutral-450};
+  --cirth-meter-optimum-color: var(--cirth-success);
+  --cirth-meter-suboptimum-color: var(--cirth-warning);
+  --cirth-meter-even-less-good-color: var(--cirth-error);
   --cirth-progress-color: var(--cirth-primary-background);
+
+  // Icons painted as background-image on replaced form controls. They
+  // live in the scheme rather than at the root because a data URI cannot
+  // read a custom property: the only way their colour can follow the
+  // theme is to bake one per scheme. The value tracks --cirth-muted-color
+  // above, so they match the masked chevrons in the accordion and the
+  // dropdown, which take that token directly. A consumer who rethemes
+  // past the shipped schemes has to re-emit these four — that is what the
+  // theme generator (gh#90) is for.
+  --cirth-icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-550)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  --cirth-icon-date: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-550)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+  --cirth-icon-time: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-550)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpolyline points='12 6 12 12 16 14'%3E%3C/polyline%3E%3C/svg%3E");
+  --cirth-icon-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-550)}' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
 
   // Form validation icons
   --cirth-icon-valid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($success-550)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");

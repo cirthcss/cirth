@@ -26,6 +26,16 @@ const rootBuilds = [
 	{ name: "cirth.classless", classless: true, scoped: false },
 	{ name: "cirth.scoped", classless: false, scoped: true },
 	{ name: "cirth.classless.scoped", classless: true, scoped: true },
+	// The print pass ships separately (see src/cirth.print*.scss). It is a
+	// root build like the others and owes the same invariants: a classless
+	// print sheet must stay class-free, a scoped one must stay inside the
+	// wrapper. Nothing here treats it as optional — a print stylesheet that
+	// leaked a class selector would break the classless promise on paper
+	// just as surely as on screen.
+	{ name: "cirth.print", classless: false, scoped: false },
+	{ name: "cirth.print.classless", classless: true, scoped: false },
+	{ name: "cirth.print.scoped", classless: false, scoped: true },
+	{ name: "cirth.print.classless.scoped", classless: true, scoped: true },
 ];
 
 const presetBuilds = [{ name: "presets/coral" }, { name: "presets/cobalt" }];

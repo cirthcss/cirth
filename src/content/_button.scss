@@ -28,7 +28,7 @@
 #{$parent-selector} [type="submit"],
 #{$parent-selector} [type="reset"],
 #{$parent-selector} [type="button"] {
-  -webkit-appearance: button;
+  appearance: auto;
 }
 
 // Cirth
@@ -57,12 +57,12 @@
   // outcome. The padding and line-height below add up to it at the default
   // type scale and stop doing so the moment anyone changes the font-size —
   // a button at 0.875rem came out at 40.75px. Measured from
-  // --cirth-size-4 rather than from the element's own font-size, so the
+  // --cirth-font-size-md rather than from the element's own font-size, so the
   // floor stays put when the type does not, and matched by the same floor
   // on select and textarea in forms/_basics.scss. Navs opt down to the
   // AA minimum instead; see components/_nav.scss.
   min-block-size: calc(
-    (var(--cirth-size-4) * var(--cirth-line-height)) +
+    (var(--cirth-font-size-md) * var(--cirth-line-height)) +
       (var(--cirth-form-element-spacing-vertical) * 2) +
       (var(--cirth-border-width) * 2)
   );

@@ -13,15 +13,27 @@
 // specificity. What is left is the root itself: :root (0,1,0) unscoped, the
 // wrapper class in the scoped builds.
 
-// That ceiling is the point (gh#92). The scheme roots are where every color
-// token in the library is declared, and the documented way to change one is
-// a `:root` rule in a stylesheet loaded after Cirth — which weighs exactly
+// That ceiling was half of gh#92. The documented way to change a token is a
+// `:root` rule in a stylesheet loaded after Cirth, which weighs exactly
 // (0,1,0) and would lose outright to the `:root:not([data-theme="dark"])`
 // this used to be, whatever the loading order. Matching the plain root's
-// weight lets source order decide again, so a later declaration wins the
-// way the documentation has always said it does. Anything more specific
-// (`:root:not([data-theme="dark"])`, `[data-theme="dark"]`) still wins too,
-// so overrides written against the old shape keep working.
+// weight lets source order decide again. Anything more specific still wins
+// too, so overrides written against the old shape keep working.
+
+// The other half was reach, and specificity could not fix it. While these
+// blocks declared the palette itself, an element carrying data-theme got
+// every colour declared *on it* — and a declaration on an element beats one
+// inherited from an ancestor at any weight. A consumer override written at
+// :root therefore stopped at the edge of any subtree that forced a scheme,
+// and the documentation had to tell people to repeat it there. That was a
+// consequence of where the values lived, never a deliberate guard.
+
+// So the values moved: theme/_dual.scss states each scheme difference once,
+// at the root, as a light-dark() pair. These blocks kept what genuinely
+// belongs to a scheme — color-scheme itself, the derived tokens whose
+// *formula* differs rather than just their value, the aliases that have to
+// re-resolve per scheme, and the icons a data URI cannot derive. What they
+// no longer do is shadow a consumer.
 
 // The filters are still real selectors: a scheme is chosen by them, and
 // only the weight of the choosing is given up.

@@ -14,13 +14,34 @@ const { contrastRatio, parseColor } = require("../scripts/lib/color");
 // Rendered against the built stylesheet with page.emulateMedia, not
 // against the docs site: the pass is a property of dist/, and setContent
 // keeps the fixtures small enough to read.
+//
+// The pass ships as its own stylesheet (dist/cirth.print*.css) rather than
+// inside the main bundle, so each fixture loads the pair in the order a
+// consumer would: the build first, its print sheet after. Concatenating
+// them here reproduces that order exactly — which is what the pass needs,
+// since it wins over component rules by source position.
 
 const projectRoot = path.join(__dirname, "..");
 
 const builds = [
-	{ file: "dist/cirth.css", name: "default", scope: "" },
-	{ file: "dist/cirth.classless.css", name: "classless", scope: "" },
-	{ file: "dist/cirth.scoped.css", name: "scoped", scope: ".cirth" },
+	{
+		file: "dist/cirth.css",
+		print: "dist/cirth.print.css",
+		name: "default",
+		scope: "",
+	},
+	{
+		file: "dist/cirth.classless.css",
+		print: "dist/cirth.print.classless.css",
+		name: "classless",
+		scope: "",
+	},
+	{
+		file: "dist/cirth.scoped.css",
+		print: "dist/cirth.print.scoped.css",
+		name: "scoped",
+		scope: ".cirth",
+	},
 ];
 
 /** @param {string} file */
@@ -36,7 +57,7 @@ const read = (file) => {
 	return fs.readFileSync(stylesheet, "utf8");
 };
 
-const css = read("dist/cirth.css");
+const css = read("dist/cirth.css") + read("dist/cirth.print.css");
 const externalHref = "https://example.com/deep/link";
 
 const markup = `
@@ -90,7 +111,7 @@ const styleOf = (page, id, property, pseudo) =>
 
 for (const build of builds) {
 	test(`the print pass ships in the ${build.name} build`, () => {
-		const source = read(build.file);
+		const source = read(build.file) + read(build.print);
 
 		expect(source).toContain("@media print");
 
