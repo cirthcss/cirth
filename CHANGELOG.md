@@ -5,7 +5,7 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Cirth is pre-1.0 and the custom property surface is not yet stable.
 
-## [Unreleased]
+## [0.13.0] - 2026-08-26
 
 ### Added
 
@@ -1246,7 +1246,7 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
-[Unreleased]: https://github.com/cirthcss/cirth/compare/v0.12.0...master
+[0.13.0]: https://github.com/cirthcss/cirth/compare/v0.12.0...v0.13.0
 [0.12.0]: https://github.com/cirthcss/cirth/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/cirthcss/cirth/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/cirthcss/cirth/compare/v0.9.0...v0.10.0

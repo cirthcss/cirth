@@ -13,8 +13,8 @@ semantic markup, and most of your interface is already styled.
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.12.0/dist/cirth.min.css"
-  integrity="sha384-g4j2ojPkWM2tpFfoHS/bGPrb4gS2JFU8QOLuDOtXauCZQ9f7yPhXR0KYxcGK80jf"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.13.0/dist/cirth.min.css"
+  integrity="sha384-We4yOXPnW3E8umXftrXI7CJA/zNHuBCSzS/RC9TDbDotlSbx+3zWA0k279wKa27P"
   crossorigin="anonymous">
 ```
 

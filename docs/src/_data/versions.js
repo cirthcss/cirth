@@ -24,9 +24,15 @@ const lines = [
 	{
 		current: true,
 		href: root,
-		label: "from v0.11.0",
+		label: "from v0.13.0",
 		summary:
-			"Popover replaces the CSS-only tooltip, and the modal asks nothing of your JavaScript.",
+			"The palette is driven by input tokens, and print ships as its own stylesheet.",
+	},
+	{
+		href: `${root}v0.12/`,
+		label: "up to v0.12.0",
+		summary:
+			"The last line where print rode inside the bundle and every colour was declared per scheme.",
 	},
 	{
 		href: `${root}v0.10/`,
