@@ -124,6 +124,38 @@ is to copy the values you cared about out of the old file and set them
 yourself — which is now a much shorter list than it used to be, since the
 accent's hover, focus and underline derive from `--cirth-primary`.
 
+### `.outline` buttons have a surface now
+
+An outline button used to be transparent. It paints `--cirth-canvas`, the
+page surface, and tints it on hover. Nothing changes where one sits on the
+page — which is most places — but on a card, a coloured band or a header it
+used to show the backdrop through and now does not.
+
+If transparent was what you wanted, that is `.ghost`: no surface, no
+border, and a hover that tints its background with its own colour group.
+It is the right variant for an icon button in a header or a toolbar, and it
+is what this documentation site's own theme toggle uses.
+
+```html
+<!-- a quiet button that keeps a surface -->
+<button type="button" class="outline">Cancel</button>
+
+<!-- a quiet button that has none -->
+<button type="button" class="ghost">Dismiss</button>
+```
+
+One related fix: `[type="reset"].outline` used to come out with the
+secondary colours whether or not it asked for them. It takes the primary
+group now, and `.outline.secondary` still gets secondary.
+
+### Form fields answer the pointer
+
+`input`, `select` and `textarea` had no `:hover` at all. They do now — the
+border moves toward the field's own ink, which is deliberately not the
+focus treatment. Nothing to change unless you were relying on a field
+looking identical whether or not the pointer was over it; `[readonly]` and
+`[aria-invalid]` fields are left alone.
+
 ### While you are here
 
 Neither of these is breaking, but both change what you have to write:
@@ -136,6 +168,13 @@ Neither of these is breaking, but both change what you have to write:
   `--cirth-warning` drive the validation borders, the meter readings, the
   `<ins>`/`<del>` inks and the `<mark>` tint. Retuning a status treatment
   used to mean finding each consumer; now it is one token per family.
+* **`--cirth-canvas` is new**: the page surface as a value of its own.
+  `--cirth-background-color` is the slot components paint through — a
+  button rebinds it to its own fill — so it was never a reliable way to
+  refer to *the page*. It defaults to `--cirth-canvas` now. If you set the
+  page colour, set the canvas; if you were setting
+  `--cirth-background-color` at `:root`, it still works, but anything
+  tinting toward the page will follow the canvas instead.
 * **`--cirth-size-*` and `--cirth-outline-width-*` are gone**, both exact
   duplicates of scales that remain. Use `--cirth-space-*` for spacing,
   `--cirth-font-size-md` where the old `--cirth-size-4` stood in for the

@@ -57,10 +57,11 @@ do the same for whichever color tokens you override.
 ## What stays the same
 
 **Geometry.** No border grows, no control resizes, no spacing changes.
-Cirth's control height (44px, the WCAG 2.5.5 target size) is computed from
-`--cirth-border-width`, so thickening borders under this preference would
-silently resize every control in the library. The extra contrast is bought
-with color instead.
+A control's natural height is the sum of its text, its padding and its
+border, so thickening `--cirth-border-width` under this preference would
+make every control in the library taller — and the 44px floor (WCAG 2.5.5's
+target size) is a `min-block-size`, so it would not hold that growth back.
+The extra contrast is bought with colour instead.
 
 ## Testing it
 

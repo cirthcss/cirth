@@ -257,8 +257,11 @@ updating baselines.
   utility classes need a stronger one. If native HTML can express it,
   style the element instead.
 * **Don't regress the accessibility floor.** Contrast ratios, focus
-  visibility, and the 44px control height are verified properties of the
-  source; a PR that trades them away for aesthetics won't land.
+  visibility, and the 44px control target size are verified properties of
+  the source; a PR that trades them away for aesthetics won't land. The
+  target size is a floor, not a fixed height — controls may grow past it,
+  and `nav` opts down to WCAG 2.5.8's 24px — so the property to preserve is
+  that nothing drops below what it is entitled to.
 * **Stay on the spacing scale.** Spacing values are `--cirth-space-*`
   tokens (0.25rem steps to 1.5, 0.5 steps to 3, then whole rems). If a
   value isn't on the scale, that's a design smell worth flagging.
