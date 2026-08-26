@@ -1,0 +1,14 @@
+// Cirth print stylesheet
+// Load after the matching main build, with media="print":
+//   <link rel="stylesheet" href="cirth.min.css">
+//   <link rel="stylesheet" href="cirth.print.min.css" media="print">
+// The print pass wins by source order over the component rules it has to
+// outrank, which is why it used to sit last inside the bundle. As its own
+// stylesheet loaded afterwards it keeps exactly that position, and the
+// browser fetches it at low priority because the media query does not
+// match the screen — so it never competes with the first paint.
+
+@use "config" with (
+  $enable-classes: false
+);
+@use "utilities/print";

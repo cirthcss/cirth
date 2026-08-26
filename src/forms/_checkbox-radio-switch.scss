@@ -35,11 +35,6 @@
   &:checked:focus {
     --cirth-background-color: var(--cirth-primary-background);
     --cirth-border-color: var(--cirth-primary-border);
-
-    background-image: var(--cirth-icon-checkbox);
-    background-position: center;
-    background-size: 0.9em auto;
-    background-repeat: no-repeat;
   }
 
   & ~ label {
@@ -55,15 +50,47 @@
 
 // Checkboxes
 
-#{$parent-selector} [type="checkbox"] {
+// The mark is the icon applied as a mask over --cirth-primary-inverse, not
+// an SVG with a baked stroke: a data URI cannot read a custom property, so
+// a baked white mark stays white on a light custom accent and disappears.
+// The inverse token is the one the theme already computes for text on the
+// accent, so the mark follows any retheme.
+
+// Scoped away from [role="switch"] — a switch paints its own thumb through
+// ::before (see below), and a mask set here would cut that thumb to the
+// shape of the mark. Radios are excluded by construction: they draw their
+// dot with a thick border, and this block never reaches them.
+
+#{$parent-selector} [type="checkbox"]:not([role="switch"]) {
+  &:checked::before,
+  &:indeterminate::before {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: var(--cirth-primary-inverse);
+    content: "";
+    mask-position: center;
+    mask-size: 0.9em auto;
+    mask-repeat: no-repeat;
+
+    // Forced colors strips author backgrounds, which would blank the
+    // masked mark; a system color stays visible.
+    @media (forced-colors: active) {
+      background-color: CanvasText;
+    }
+  }
+
+  &:checked::before {
+    mask-image: var(--cirth-icon-checkbox);
+  }
+
   &:indeterminate {
     --cirth-background-color: var(--cirth-primary-background);
     --cirth-border-color: var(--cirth-primary-border);
 
-    background-image: var(--cirth-icon-minus);
-    background-position: center;
-    background-size: 0.9em auto;
-    background-repeat: no-repeat;
+    &::before {
+      mask-image: var(--cirth-icon-minus);
+    }
   }
 }
 
@@ -78,7 +105,6 @@
     --cirth-background-color: var(--cirth-primary-inverse);
 
     border-width: 0.42em;
-    background-image: none;
   }
 }
 
@@ -126,8 +152,6 @@
   &:checked {
     --cirth-background-color: var(--cirth-switch-checked-background-color);
     --cirth-border-color: var(--cirth-switch-checked-background-color);
-
-    background-image: none;
 
     &::before {
       margin-inline-start: calc(#{$switch-width} - #{$switch-height});

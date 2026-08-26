@@ -45,7 +45,7 @@ npm run docs:dev   # run this docs site locally
   customization stays CSS first through `--cirth-` custom properties.
 * `src/theme/` contains design tokens: color scales, foundations, and the
   light/dark schemes. Most visual changes start here, not in components.
-* `src/presets/` contains `cobalt` and `coral`, token override presets published
+* `src/presets/` contains `plain` and `playroom`, token override presets published
   alongside the default build.
 * `docs/` contains this site (Eleventy), styled by Cirth's own build — and
   also doubles as the fixture the library's own QA runs against: `tests/`
@@ -79,8 +79,8 @@ the `dist/` filename convention:
   "./classless": "./dist/cirth.classless.min.css",
   "./scoped": "./dist/cirth.scoped.min.css",
   "./classless/scoped": "./dist/cirth.classless.scoped.min.css",
-  "./presets/coral": "./dist/presets/coral.min.css",
-  "./presets/cobalt": "./dist/presets/cobalt.min.css"
+  "./presets/plain": "./dist/presets/plain.min.css",
+  "./presets/playroom": "./dist/presets/playroom.min.css"
 }
 ```
 
@@ -257,8 +257,11 @@ updating baselines.
   utility classes need a stronger one. If native HTML can express it,
   style the element instead.
 * **Don't regress the accessibility floor.** Contrast ratios, focus
-  visibility, and the 44px control height are verified properties of the
-  source; a PR that trades them away for aesthetics won't land.
+  visibility, and the 44px control target size are verified properties of
+  the source; a PR that trades them away for aesthetics won't land. The
+  target size is a floor, not a fixed height — controls may grow past it,
+  and `nav` opts down to WCAG 2.5.8's 24px — so the property to preserve is
+  that nothing drops below what it is entitled to.
 * **Stay on the spacing scale.** Spacing values are `--cirth-space-*`
   tokens (0.25rem steps to 1.5, 0.5 steps to 3, then whole rems). If a
   value isn't on the scale, that's a design smell worth flagging.

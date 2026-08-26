@@ -50,13 +50,15 @@
 
 ## Quickstart
 
-Include one stylesheet and write ordinary semantic HTML.
+Include one stylesheet and write ordinary semantic HTML. Add the print
+sheet too if your pages get printed — it is separate so it does not weigh
+on the first paint.
 
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.12.0/dist/cirth.min.css"
-  integrity="sha384-g4j2ojPkWM2tpFfoHS/bGPrb4gS2JFU8QOLuDOtXauCZQ9f7yPhXR0KYxcGK80jf"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.13.0/dist/cirth.min.css"
+  integrity="sha384-We4yOXPnW3E8umXftrXI7CJA/zNHuBCSzS/RC9TDbDotlSbx+3zWA0k279wKa27P"
   crossorigin="anonymous">
 ```
 
@@ -110,7 +112,7 @@ The main generated stylesheets are:
 | `dist/cirth.classless.scoped.min.css` | Scoped classless build. |
 
 All four builds share Cirth's one official theme (amber), with light and
-dark variants. `cobalt` and `coral` are optional presets, not separate theme
+dark variants. `plain` and `playroom` are optional presets, not separate theme
 builds — see [Presets](#presets) below and [Colors](docs/src/pages/colors.md).
 
 ### Classless
@@ -140,28 +142,34 @@ when embedding Cirth into an existing page, CMS, widget, or application shell.
 
 ## Presets
 
-`cobalt` and `coral` are optional presets: stylesheets that override an
+`plain` and `playroom` are optional presets: stylesheets that override an
 existing set of custom properties (color, shadow, type, spacing, motion) on
 top of the default theme. They're worked examples of restyling the system,
 not independently maintained themes — load one after the main stylesheet.
 
-- **`cobalt`** — corporate: deep navy primary, cool-toned neutrals, a flat
-  shadow, a business-like Arial/Helvetica font stack, denser spacing,
-  snappier motion, square corners.
-- **`coral`** — playful: vivid warm primary, warm-toned neutrals, a soft
-  coral-tinted glow shadow, a friendly Trebuchet MS font stack, looser
-  spacing, bouncy motion, extra-rounded corners.
+- **`plain`** — the conventional application baseline: a familiar blue
+  accent, a plain white page, headings in the body face. Four declarations,
+  all of them input tokens: the accent's fill, hover, focus ring and
+  underline tint derive from `--cirth-primary` on their own.
+- **`playroom`** — the expressive end: a soft violet accent, surfaces
+  tinted toward it, large radii, a rounded system face, generous spacing,
+  springy motion. Reaches across colour, geometry, typography, motion and
+  depth, and overrides two derived tokens on purpose so its hover lightens
+  instead of darkening.
+
+Between them they are one worked example read from both ends: how little a
+retheme can be, and how far one can go.
 
 Like the default theme, presets stick to fonts that ship with every major
 OS — no `@import`, no webfont, zero network requests.
 
 ```html
 <link rel="stylesheet" href="dist/cirth.min.css">
-<link rel="stylesheet" href="dist/presets/cobalt.min.css">
+<link rel="stylesheet" href="dist/presets/plain.min.css">
 ```
 
 ```js
-import "@cirthcss/cirth/presets/cobalt";
+import "@cirthcss/cirth/presets/plain";
 ```
 
 See [Colors](docs/src/pages/colors.md) for what each preset changes.

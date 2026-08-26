@@ -67,8 +67,29 @@ try {
 
 	fs.rmSync(destination, { force: true, recursive: true });
 	fs.mkdirSync(path.dirname(destination), { recursive: true });
+
+	// docs/versions/ is a passthrough into the built site (see
+	// docs/eleventy.config.js), so a build made at this tag contains every
+	// line archived before it. Copying those in would nest a second copy of
+	// each older line inside this one, and a third inside the next — and
+	// none of them would ever be read: the version switcher builds its links
+	// from the site root, not from the archive it is sitting in. Skip them.
+	const archived = new Set(
+		fs.existsSync(path.join(projectRoot, "docs/versions"))
+			? fs.readdirSync(path.join(projectRoot, "docs/versions"))
+			: [],
+	);
+
 	fs.cpSync(path.join(worktree, "docs/dist"), destination, {
 		recursive: true,
+		filter: (source) => {
+			const relative = path.relative(
+				path.join(worktree, "docs/dist"),
+				source,
+			);
+
+			return !(relative && archived.has(relative.split(path.sep)[0]));
+		},
 	});
 
 	// A frozen line cannot grow a version switcher, so it gets told where it

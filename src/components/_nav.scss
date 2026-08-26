@@ -90,7 +90,7 @@
       // It opts down, not out: 24px is WCAG 2.5.8 Target Size (Minimum),
       // the AA threshold, where 44px is 2.5.5's AAA one. Compact stays
       // possible; smaller than a thumb does not.
-      min-block-size: var(--cirth-size-6);
+      min-block-size: var(--cirth-space-6);
       margin-inline: inherit;
       margin-bottom: 0;
       padding: calc(

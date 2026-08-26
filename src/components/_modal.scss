@@ -70,9 +70,9 @@
 
     $close-offset: calc(
       (
-          (var(--cirth-size-4) * var(--cirth-line-height)) +
+          (var(--cirth-font-size-md) * var(--cirth-line-height)) +
             (var(--cirth-form-element-spacing-vertical) * 2) +
-            (var(--cirth-border-width) * 2) - var(--cirth-size-4)
+            (var(--cirth-border-width) * 2) - var(--cirth-font-size-md)
         ) /
         2
     );
@@ -140,20 +140,42 @@
     // 16px wide and 44px tall, which is worse than either.
     #{$close-selector} {
       display: block;
-      width: calc(var(--cirth-size-4) + #{$close-offset} * 2);
-      height: calc(var(--cirth-size-4) + #{$close-offset} * 2);
+      width: calc(var(--cirth-font-size-md) + #{$close-offset} * 2);
+      height: calc(var(--cirth-font-size-md) + #{$close-offset} * 2);
       margin-top: calc(var(--cirth-spacing) * -1 - #{$close-offset});
       margin-right: calc(#{$close-offset} * -1);
       margin-bottom: calc(var(--cirth-spacing) - #{$close-offset});
       margin-inline-start: auto;
       border: none;
-      background-image: var(--cirth-icon-close);
-      background-position: center;
-      background-size: auto var(--cirth-size-4);
-      background-repeat: no-repeat;
       background-color: transparent;
       opacity: 0.5;
       transition: opacity var(--cirth-transition);
+
+      // The glyph is the icon masked over a theme token instead of the
+      // neutral the SVG used to bake in, so it follows a retheme. Not
+      // currentColor, unlike the spinner in components/_loading.scss: this
+      // control is a <button>, and content/_button.scss gives buttons
+      // --cirth-color: var(--cirth-primary-inverse) — white — because a
+      // button is normally a filled accent surface. The close control keeps
+      // the box but drops the fill, so currentColor would paint a white
+      // glyph on the dialog header. The muted ink is what the baked stroke
+      // was approximating anyway; the opacity above still carries the
+      // resting/hover distinction.
+      &::before {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background-color: var(--cirth-muted-color);
+        content: "";
+        mask-image: var(--cirth-icon-close);
+        mask-position: center;
+        mask-size: auto var(--cirth-font-size-md);
+        mask-repeat: no-repeat;
+
+        @media (forced-colors: active) {
+          background-color: CanvasText;
+        }
+      }
 
       &:is(
         [aria-current]:not([aria-current="false"]),

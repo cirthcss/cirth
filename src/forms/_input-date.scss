@@ -16,7 +16,7 @@
     [type="week"]
   ) {
     --cirth-icon-position: var(--cirth-space-3);
-    --cirth-icon-width: var(--cirth-size-4);
+    --cirth-icon-width: var(--cirth-font-size-md);
 
     // Native date segments contribute an intrinsic minimum width in
     // Chromium and Firefox. Let the control shrink when it is a flex item

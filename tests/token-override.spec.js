@@ -3,15 +3,23 @@ const path = require("node:path");
 const { expect, test } = require("@playwright/test");
 
 // gh#92 — the documented customization path: a `:root` rule in a
-// stylesheet loaded after Cirth changes the token.
+// stylesheet loaded after Cirth changes the token, everywhere.
 //
-// It used to be true only for the foundation and style tokens. Every
-// *color* is declared on the scheme roots, which were written as
+// Two things had to be true, and each was fixed in its own pass. First the
+// weight: every colour is declared on the scheme roots, which used to read
 // `:root:not([data-theme="dark"])` — (0,2,0) against a plain `:root`'s
-// (0,1,0), so the override lost on specificity and no amount of loading
-// order could save it. The filters now sit inside :where(), which is what
-// this asserts: the shape of the selector is an implementation detail, the
-// override winning is the contract.
+// (0,1,0), so the override lost on specificity whatever the loading order.
+// The filters moved inside :where(), giving up the weight of the choosing
+// while keeping the choosing itself.
+//
+// Then the reach. Matching weight is not enough while the scheme blocks
+// *redeclare* a token on the [data-theme] element: a declaration made on
+// an element beats one inherited from an ancestor at any specificity, so
+// an override written at :root stopped at the edge of any subtree that
+// forced a scheme, and the docs had to tell people to repeat it there.
+// The scheme differences now live once at the root as light-dark() pairs
+// (theme/_dual.scss), so replacing a pair replaces both schemes and the
+// value carries into forced-scheme subtrees.
 //
 // Checked for both schemes, in every build, with each preset stacked on
 // top, because each of those is a separate stylesheet declaring the same
@@ -48,7 +56,7 @@ const builds = [
 	},
 ];
 
-const presets = ["cobalt", "coral"];
+const presets = ["plain", "playroom"];
 
 // One from each scheme layer, so a regression in any of them shows up:
 // text, an accent, a surface, and a border.
@@ -155,12 +163,14 @@ for (const preset of presets) {
 	}
 }
 
-test("an explicitly re-themed subtree keeps its own scheme", async ({
+test("a root override reaches into a subtree that forces a scheme", async ({
 	page,
 }) => {
-	// The counterpart of the rule above: `[data-theme]` declares the whole
-	// palette on that element, so a root override does not reach into it.
-	// That is the point of the attribute, not a leak in the fix.
+	// The reach half of the contract. `data-theme` switches the scheme; it
+	// no longer redeclares the palette on itself, so a consumer who sets one
+	// token at :root gets it inside the forced-dark subtree too. This used to
+	// be the documented exception people worked around by repeating the
+	// override on the scheme selectors.
 	await page.emulateMedia({ colorScheme: "light" });
 	await page.setContent(
 		`<style>${read("dist/cirth.css")}</style>` +
@@ -176,5 +186,35 @@ test("an explicitly re-themed subtree keeps its own scheme", async ({
 		return getComputedStyle(element).color;
 	});
 
-	expect(color).not.toBe("rgb(4, 5, 6)");
+	expect(color).toBe("rgb(4, 5, 6)");
+});
+
+test("a forced scheme still switches the tokens it was not given", async ({
+	page,
+}) => {
+	// The other half: reach must not cost the switch. With no override in
+	// play a forced-dark subtree still resolves to the dark value — that is
+	// the light-dark() pair being evaluated against the subtree's own
+	// color-scheme rather than the root's, which is the whole reason the
+	// pairs can live at the root at all.
+	await page.emulateMedia({ colorScheme: "light" });
+	await page.setContent(
+		`<style>${read("dist/cirth.css")}</style>` +
+			`<p id="outside">Light.</p>` +
+			`<div data-theme="dark"><p id="inside">Dark.</p></div>`,
+	);
+
+	const { outside, inside } = await page.evaluate(() => {
+		/** @param {string} id */
+		const color = (id) => {
+			const element = document.getElementById(id);
+			if (!element) {
+				throw new Error(`missing #${id}`);
+			}
+			return getComputedStyle(element).color;
+		};
+		return { outside: color("outside"), inside: color("inside") };
+	});
+
+	expect(inside).not.toBe(outside);
 });

@@ -1,0 +1,72 @@
+// Plain preset
+// ––––––––––––––––––––
+// For the project that wants a conventional application look and no
+// decisions: a familiar blue accent, a plain white page, and headings in
+// the same face as the body text. It is deliberately the least opinionated
+// thing Cirth ships — where the default theme carries the project's own
+// identity (warm paper, serif display), this carries none.
+// It is also the shorter half of a worked example. This preset changes
+// *only input tokens*: nothing below is a derived value. The accent's
+// background, hover, focus ring and underline tint are not set here
+// because they follow --cirth-primary on their own — which is the whole
+// point of the token model, and the reason this file is four
+// declarations rather than the forty it would have been.
+// See src/presets/playroom.scss for the other half: a preset that
+// overrides broadly, including derived tokens where it wants to break a
+// relationship on purpose.
+// Import after the main Cirth stylesheet. No @import, no webfont: like the
+// default theme, presets make zero network requests.
+@use "../helpers/selectors";
+
+@include selectors.root {
+  // A single pair per token covers both schemes. light-dark() is resolved
+  // where the token is used, so these hold inside a subtree that forces a
+  // scheme too — no second block, no scheme wiring.
+  --cirth-primary: light-dark(oklch(52% 0.17 258deg), oklch(72% 0.13 258deg));
+
+  // Plain white rather than the default's warm paper: the page should read
+  // as a document surface, not as the project's brand.
+  --cirth-canvas: light-dark(oklch(98.5% 0 0deg), oklch(20% 0.008 264deg));
+  --cirth-card-background-color: light-dark(
+    oklch(100% 0 0deg),
+    oklch(24.5% 0.011 264deg)
+  );
+
+  // A followed link drains to neutral, as in the default theme, but from
+  // this accent rather than amber.
+  --cirth-link-visited-color: light-dark(
+    oklch(48% 0.02 258deg),
+    oklch(66% 0.02 258deg)
+  );
+
+  // Headings in the body face. The serif display is the default theme's
+  // signature; a conventional application baseline does not want one.
+  --cirth-font-family-display: var(--cirth-font-family);
+}
+
+// Increased contrast (prefers-contrast: more)
+// The theme's own pass strengthens --cirth-primary, and a preset loaded
+// afterwards would otherwise win over it unconditionally and hand the
+// base accent back. Restating the accent here keeps the preference
+// working: text ink reaches AAA against the surface it sits on.
+@media (prefers-contrast: more) {
+  @include selectors.root {
+    --cirth-primary: light-dark(oklch(41% 0.17 258deg), oklch(86% 0.09 258deg));
+
+    // Same reason as the theme's own pass: the accent lightens for text,
+    // so the button fill has to be pinned or the white label on it gets
+    // worse instead of better.
+    --cirth-primary-background: light-dark(
+      oklch(41% 0.17 258deg),
+      oklch(42% 0.14 258deg)
+    );
+    --cirth-primary-hover-background: light-dark(
+      oklch(34% 0.15 258deg),
+      oklch(35% 0.13 258deg)
+    );
+    --cirth-link-visited-color: light-dark(
+      oklch(38% 0.02 258deg),
+      oklch(80% 0.02 258deg)
+    );
+  }
+}

@@ -48,7 +48,7 @@
 						});
 				</script>
 			</li>
-			{#- Live preset switcher (gh#80): lets anyone preview cobalt/coral —
+			{#- Live preset switcher (gh#80): lets anyone preview the presets —
 			    including their light/dark variants — against the whole real
 			    site without downloading anything. Handled in base.njk: swaps
 			    in the compiled preset stylesheet built by build-docs.js,
@@ -59,12 +59,12 @@
 			<li>
 				<select class="docs-preset-select" aria-label="Color preset" data-cirth-preset-select>
 					<option value="amber">Amber</option>
-					<option value="cobalt">Cobalt</option>
-					<option value="coral">Coral</option>
+					<option value="plain">Plain</option>
+					<option value="playroom">Playroom</option>
 				</select>
 			</li>
 			<li>
-				<button type="button" class="outline contrast docs-theme-toggle" aria-label="Toggle color scheme">
+				<button type="button" class="ghost contrast docs-theme-toggle" aria-label="Toggle color scheme">
 					{% icon "sun", 18, "docs-theme-icon-sun" %}
 					{% icon "moon", 18, "docs-theme-icon-moon" %}
 				</button>

@@ -1,0 +1,1031 @@
+<!doctype html>
+<html lang="en" data-base="/cirth/v0.12/">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Cirth</title>
+		<meta name="description" content="HTML-native CSS framework. Production-ready UI from semantic HTML — under 14KB gzipped, 0 JavaScript.">
+		<link rel="icon" href="/cirth/v0.12/logo_brand_app.svg">
+		<link rel="icon" href="/cirth/v0.12/logo_brand_app.svg" media="(prefers-color-scheme: light)">
+		<link rel="icon" href="/cirth/v0.12/logo_brand_app_dark.svg" media="(prefers-color-scheme: dark)">
+		<link rel="stylesheet" href="/cirth/v0.12/styles/style.css">
+		<script>
+			// Set data-theme before first paint to avoid a light-mode flash.
+			(function () {
+				var stored = localStorage.getItem("cirth-theme");
+				var dark = stored
+					? stored === "dark"
+					: window.matchMedia("(prefers-color-scheme: dark)").matches;
+				document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+			})();
+
+			// Same idea for the preset switcher (gh#80): apply a
+			// session-remembered preset before first paint, so returning to
+			// a page (or following a link) after picking one doesn't flash
+			// the default theme first. sessionStorage, not localStorage —
+			// the issue asks for "the current session", not a permanent
+			// choice that'd survive a closed tab into someone's next visit.
+			(function () {
+				var preset = sessionStorage.getItem("cirth-preset");
+				if (!preset || preset === "amber") return;
+				var base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
+				var link = document.createElement("link");
+				link.rel = "stylesheet";
+				link.id = "cirth-preset-stylesheet";
+				link.href = base + "/styles/generated/presets/" + preset + ".css";
+				document.head.appendChild(link);
+			})();
+		</script>
+	</head>
+	<body><aside style="border-bottom:1px solid #8884;padding:.5rem 1rem;text-align:center;font-size:.875rem">Archived documentation for v0.12.0 and earlier. <a href="/cirth/">Read the current documentation</a>.</aside>
+		<header class="container docs-header">
+	<nav aria-label="main navigation">
+		<ul class="docs-header-brand-group">
+			<li>
+				<a href="/cirth/v0.12/" class="contrast docs-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.12/logo_brand.svg" alt="" width="48" height="48">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.12/logo_brand_dark.svg" alt="" width="48" height="48">
+					<strong>Cirth</strong>
+				</a>
+			</li>
+		</ul>
+		<ul class="docs-header-nav-group">
+			
+				<li class="docs-nav-item">
+					<a href="/cirth/v0.12/get-started">Docs</a>
+				</li>
+			
+				<li class="docs-nav-item">
+					<a href="/cirth/v0.12/examples">Examples</a>
+				</li>
+			
+			<li class="docs-nav-item">
+				<a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub</a>
+			</li>
+		</ul>
+		<ul class="docs-header-controls-group"><li>
+				<select class="docs-version-select" aria-label="Documentation version" data-docs-version-select="">
+					
+						<option value="/cirth/" selected="">from v0.11.0</option>
+					
+						<option value="/cirth/v0.10/">up to v0.10.0</option>
+					
+					
+				</select>
+				<script>
+					// Navigating between documentation lines is a page load, not
+					// a preference: each line is a separate build with its own
+					// pages, so there is nothing to remember or restore.
+					document
+						.querySelector("[data-docs-version-select]")
+						?.addEventListener("change", (event) => {
+							window.location.href = event.target.value;
+						});
+				</script>
+			</li><li>
+				<select class="docs-preset-select" aria-label="Color preset" data-cirth-preset-select="">
+					<option value="amber">Amber</option>
+					<option value="cobalt">Cobalt</option>
+					<option value="coral">Coral</option>
+				</select>
+			</li>
+			<li>
+				<button type="button" class="outline contrast docs-theme-toggle" aria-label="Toggle color scheme">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="18" height="18" fill="currentColor" aria-hidden="true" class="docs-theme-icon-sun"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"></path></svg>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="18" height="18" fill="currentColor" aria-hidden="true" class="docs-theme-icon-moon"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"></path></svg>
+				</button>
+				<script>
+					// Which icon is visible is driven entirely by CSS
+					// ([data-theme="dark"] .docs-theme-icon-*, see styles/style.css)
+					// — this script is only the click handler.
+					document.querySelector(".docs-theme-toggle")?.addEventListener("click", () => {
+						const next =
+							document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+						document.documentElement.setAttribute("data-theme", next);
+						localStorage.setItem("cirth-theme", next);
+					});
+				</script>
+			</li>
+		</ul>
+	</nav>
+</header>
+
+		
+
+<main class="container">
+	<div class="docs-layout">
+		<aside class="docs-sidebar">
+			<nav aria-label="docs navigation">
+				
+					<details>
+						<summary>Introduction</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.12/get-started">Get Started</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/customization">Customization</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/colors">Colors</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/about">About Cirth</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/upgrading">Upgrading</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Layout</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.12/layout/document">Document</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/layout/landmarks">Landmarks</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/layout/section">Section</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/layout/container">Container</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/layout/row">Row</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/layout/grid">Grid</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/layout/overflow-auto">Overflow auto</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Content</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.12/content/typography">Typography</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/content/link">Link</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/content/button">Button</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/content/table">Table</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/content/code">Code</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/content/figure">Figure</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/content/embedded">Embedded content</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/content/misc">Misc</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Forms</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.12/forms/">Overview</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/forms/checkbox-radio-switch">Checkbox, radio, switch</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/forms/input-color">Input color</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/forms/input-date">Input date</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/forms/input-file">Input file</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/forms/input-range">Input range</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/forms/input-search">Input search</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Components</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.12/components/accordion">Accordion</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/components/card">Card</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/components/dropdown">Dropdown</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/components/group">Group</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/components/loading">Loading</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/components/meter">Meter</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/components/modal">Modal</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/components/nav">Nav</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/components/popover">Popover</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/components/progress">Progress</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Utilities</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.12/utilities/accessibility">Accessibility</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/utilities/high-contrast">High contrast</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/utilities/reduce-motion">Reduce motion</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/utilities/sr-only">Screen-reader only</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/utilities/truncate">Truncate</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/utilities/breakout">Breakout</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/utilities/print">Print</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details open="">
+						<summary>Project</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.12/examples">Examples</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/contributions" aria-current="page">Contributions</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.12/brand">Brand</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+			</nav>
+		</aside>
+		<div class="docs-content">
+			
+				<nav class="docs-toc-top" aria-label="On this page">
+					<strong>On this page</strong>
+					<ul>
+						
+							<li class="docs-toc-level-2">
+								<a href="#getting-set-up">Getting set up</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#where-things-live">Where things live</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#package-exports">Package exports</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#quality-gates">Quality gates</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#interaction-regressions-checkbehavior">Interaction regressions: check:behavior</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#dist-invariants--checkdist">Dist invariants — check:dist</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#cdn-integrity--checksri">CDN integrity — check:sri</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#browser-target--checkbrowserslist">Browser target — check:browserslist</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#documentation-lines">Documentation lines</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#where-the-site-is-published">Where the site is published</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#accessibility--checka11y">Accessibility — check:a11y</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#visual-regression--checkvisual">Visual regression — check:visual</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#what-makes-a-good-contribution">What makes a good contribution</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#license">License</a>
+							</li>
+						
+					</ul>
+				</nav>
+			
+			<h1>Contributions</h1>
+<p>Cirth is developed in the open at
+<a href="https://github.com/cirthcss/cirth">github.com/cirthcss/cirth</a>.
+Bug reports, accessibility findings, and focused pull requests are all
+welcome. The full workflow lives in
+<a href="https://github.com/cirthcss/cirth/blob/master/.github/CONTRIBUTING.md"><code>.github/CONTRIBUTING.md</code></a>;
+this page is the practical summary.</p>
+<h2 id="getting-set-up" tabindex="-1">Getting set up <a class="header-anchor" href="#getting-set-up">#</a></h2>
+<p>npm is the only supported package manager: one install path, one lockfile.
+Node.js 24.18 (current LTS) is the version CI and the release workflows run
+on; <code>.nvmrc</code> pins it for local use with <code>nvm use</code>.</p>
+<pre tabindex="0"><code class="hljs language-sh">git lfs install    <span class="hljs-comment"># once per machine — visual test baselines are Git LFS objects</span>
+git <span class="hljs-built_in">clone</span> https://github.com/cirthcss/cirth.git
+<span class="hljs-built_in">cd</span> cirth
+npm install
+</code></pre>
+<p>If you cloned before installing <a href="https://git-lfs.com">Git LFS</a>, the
+screenshot baselines under <code>tests/__screenshots__/</code> are small pointer
+files instead of images; <code>git lfs pull</code> fetches the real ones.</p>
+<p>The commands you'll actually use:</p>
+<pre tabindex="0"><code class="hljs language-sh">npm run build      <span class="hljs-comment"># compile src/ to dist/ (format, lint, compile, minify)</span>
+npm run dev        <span class="hljs-comment"># rebuild on change</span>
+npm run lint       <span class="hljs-comment"># stylelint + CSS custom property check</span>
+npm run lint:fix
+npm run docs:dev   <span class="hljs-comment"># run this docs site locally</span>
+</code></pre>
+<h2 id="where-things-live" tabindex="-1">Where things live <a class="header-anchor" href="#where-things-live">#</a></h2>
+<ul>
+<li><code>src/</code> contains SCSS source. It is repository infrastructure, <strong>not</strong> a public Sass
+API: the npm package ships compiled CSS from <code>dist/</code> only, and
+customization stays CSS first through <code>--cirth-</code> custom properties.</li>
+<li><code>src/theme/</code> contains design tokens: color scales, foundations, and the
+light/dark schemes. Most visual changes start here, not in components.</li>
+<li><code>src/presets/</code> contains <code>cobalt</code> and <code>coral</code>, token override presets published
+alongside the default build.</li>
+<li><code>docs/</code> contains this site (Eleventy), styled by Cirth's own build — and
+also doubles as the fixture the library's own QA runs against: <code>tests/</code>
+(visual regression) and <code>check:a11y</code> render the built docs site to catch
+unintended rendering/accessibility changes from a source edit. Kept in
+this repository rather than a dedicated one <strong>on purpose, for now</strong>: the
+library is still under heavy, fast-moving revision, co-locating docs
+with source keeps a change and its matching docs update in the same
+commit checked by the same CI, and the QA coupling above means anyone
+doing serious library work needs the docs build regardless of where it
+lives. Whether to eventually split docs into their own repository — and
+do a full manual review pass over everything written so far — is
+something to evaluate later, not a settled plan; noted here so the
+current layout isn't mistaken for either the permanent shape of the
+project or a fixed roadmap item.</li>
+<li><code>scripts/</code> contains local Node build and check scripts. Prefer extending
+these over adding tooling dependencies; a new package needs to provide a
+real build capability that would be risky to maintain locally.</li>
+<li><code>tests/</code> contains the visual regression suite and its screenshot
+baselines (stored in Git LFS).</li>
+</ul>
+<h2 id="package-exports" tabindex="-1">Package exports <a class="header-anchor" href="#package-exports">#</a></h2>
+<p><code>package.json</code> declares an <code>exports</code> map with one entry per generated
+build, so bundlers and Node's resolver can pick a build without knowing
+the <code>dist/</code> filename convention:</p>
+<pre tabindex="0"><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;.&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./dist/cirth.min.css&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;./classless&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./dist/cirth.classless.min.css&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;./scoped&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./dist/cirth.scoped.min.css&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;./classless/scoped&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./dist/cirth.classless.scoped.min.css&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;./presets/coral&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./dist/presets/coral.min.css&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;./presets/cobalt&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./dist/presets/cobalt.min.css&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>A <code>./dist/*</code> wildcard keeps existing deep imports resolving. If you add a
+build variant, add its export path and verify it resolves from a packed
+tarball (<code>npm pack</code>) before opening the PR.</p>
+<h2 id="quality-gates" tabindex="-1">Quality gates <a class="header-anchor" href="#quality-gates">#</a></h2>
+<p>The properties this site advertises — the size, the WCAG AA compliance,
+what each build variant does and doesn't contain — are not checked by
+review attention. Each one is enforced by an automated check that runs
+in CI on every push, and the same checks run locally:</p>
+<pre tabindex="0"><code class="hljs language-sh">npm run lint          <span class="hljs-comment"># stylelint + custom property audit + browser target + doc links + CDN hashes</span>
+npm run build         <span class="hljs-comment"># compile src/ to dist/</span>
+npm run check:dist    <span class="hljs-comment"># structural invariants of the 12 dist files</span>
+npm run check:size    <span class="hljs-comment"># ≤ 14 KiB gzipped per root bundle</span>
+npm run docs:build    <span class="hljs-comment"># build this site (input for the browser checks below)</span>
+npm run check:behavior <span class="hljs-comment"># browser interaction regressions across three engines</span>
+npm run check:a11y    <span class="hljs-comment"># axe WCAG A/AA audit of every docs page</span>
+npm run check:visual  <span class="hljs-comment"># screenshot diff of selected component/layout pages</span>
+</code></pre>
+<p>The browser-based checks need the Playwright browsers once:
+<code>npx playwright install chromium firefox webkit</code>.</p>
+<h3 id="interaction-regressions-checkbehavior" tabindex="-1">Interaction regressions: <code>check:behavior</code> <a class="header-anchor" href="#interaction-regressions-checkbehavior">#</a></h3>
+<p>Runs focused interaction tests against Chromium, Firefox, and WebKit. These
+tests cover browser-managed states that static screenshots cannot exercise,
+such as focus, blur, <code>:user-valid</code>, and <code>:user-invalid</code>. WebKit provides the
+closest automated coverage available for Safari's rendering engine.</p>
+<h3 id="dist-invariants--checkdist" tabindex="-1">Dist invariants — <code>check:dist</code> <a class="header-anchor" href="#dist-invariants--checkdist">#</a></h3>
+<p>Runs mechanical assertions over every file in <code>dist/</code> right after the
+build, so the contracts of each build variant can't erode silently:</p>
+<ul>
+<li>every build re-parses with Lightning CSS and is non-empty;</li>
+<li>classless builds emit <strong>no class selectors</strong> (the <code>.cirth</code> wrapper is
+the single exception in the scoped variant);</li>
+<li>scoped builds keep <strong>every rule inside the <code>.cirth</code> subtree</strong> — no
+selector can style markup that didn't opt in;</li>
+<li>presets only set custom properties on theme roots, never rules.</li>
+</ul>
+<h3 id="cdn-integrity--checksri" tabindex="-1">CDN integrity — <code>check:sri</code> <a class="header-anchor" href="#cdn-integrity--checksri">#</a></h3>
+<p>The <code>&lt;link&gt;</code> snippets on <a href="/cirth/v0.12/get-started#cdn">Get Started</a> and in the README
+pin a version <em>and</em> carry the <code>sha384</code> hash of the file that version
+serves. <code>check:sri</code> (part of <code>npm run lint</code>) keeps the two honest: every
+snippet has to pin the version in <code>package.json</code>, carry a well-formed hash,
+and set <code>crossorigin=&quot;anonymous&quot;</code>, without which the browser cannot verify
+the response at all.</p>
+<p>Version and hash are rewritten together by <code>npm run sri</code> at release time,
+then verified against the bytes jsDelivr actually serves with
+<code>npm run check:sri -- --from-cdn</code> after publishing. Editing either by hand
+is how you ship a snippet that every browser refuses to load; the
+<a href="https://github.com/cirthcss/cirth/blob/master/.github/CONTRIBUTING.md#releasing">releasing section of <code>.github/CONTRIBUTING.md</code></a>
+has the full sequence.</p>
+<h3 id="browser-target--checkbrowserslist" tabindex="-1">Browser target — <code>check:browserslist</code> <a class="header-anchor" href="#browser-target--checkbrowserslist">#</a></h3>
+<p>The Browserslist target names ten browser families but describes a single
+engine floor: Opera and Samsung Internet are Chromium forks, Firefox for
+Android is the same Gecko as the desktop build, and iOS Safari is WebKit
+either way. Raising <code>Chrome</code> and forgetting <code>Opera</code> does not widen
+support — it quietly lowers the floor back to whatever Chromium that Opera
+release was built on, because Lightning CSS compiles for the oldest engine
+in the list, and nothing else in the repository notices.</p>
+<p><code>check:browserslist</code> (part of <code>npm run lint</code>) asserts that invariant: every
+Chromium family on the same version, the two forks on the releases built
+from it, Firefox and Safari in step with their mobile counterparts, and the
+legacy Android Browser absent — it is the same engine as Chrome for
+Android and including it makes Lightning CSS expand every grouped selector
+in the library. The Chromium-to-fork table lives in the script with a note
+on how it was derived; when the floor moves past it, the check says so
+instead of passing quietly.</p>
+<h3 id="documentation-lines" tabindex="-1">Documentation lines <a class="header-anchor" href="#documentation-lines">#</a></h3>
+<p>The site is versioned at breaking changes, not at releases. A line covers
+every version that documents the same API, which is why the switcher in the
+header reads <code>up to v0.10.0</code> / <code>from v0.11.0</code> rather than listing patches.
+Before 1.0 that boundary is a minor release; after it, a major.</p>
+<p>Three things make it work:</p>
+<ul>
+<li><code>docs/src/_data/versions.js</code> lists the lines. Adding one is a hand edit —
+a deliberate decision, not something a script infers from tags.</li>
+<li><code>docs/versions/&lt;dir&gt;/</code> holds the frozen sites. They are built once, at the
+release that ends them, and committed as-is. They are never rebuilt: an
+archived line should not have to keep compiling against a toolchain that
+has moved on.</li>
+<li><code>npm run docs:archive -- &lt;tag&gt; &lt;dir&gt;</code> does the freezing, in a detached
+worktree so the working tree is untouched. It repoints the tag's
+<code>pathPrefix</code> at the archive's own subdirectory before building, since a
+tag predates the directory it ends up in.</li>
+</ul>
+<p>At a breaking release, in order: archive the outgoing line
+(<code>npm run docs:archive -- v0.10.0 v0.10</code>), move <code>current: true</code> onto the
+new entry in <code>versions.js</code>, and write the migration on
+<a href="/cirth/v0.12/upgrading">Upgrading</a>. The archived line is excluded from <code>check:a11y</code>
+and the visual suite on purpose — auditing it would re-audit what the
+toolchain thought a year ago, and any finding would be unfixable.</p>
+<h3 id="where-the-site-is-published" tabindex="-1">Where the site is published <a class="header-anchor" href="#where-the-site-is-published">#</a></h3>
+<p>The root is always <code>master</code>, which is to say the version on npm. <code>develop</code>
+is built beside it under <code>/next/</code>, with a banner on every page saying that
+what you are reading has not shipped. Both come out of one Pages artifact,
+built by the same workflow, so a push to either branch refreshes both and
+neither goes stale while the other moves.</p>
+<h3 id="accessibility--checka11y" tabindex="-1">Accessibility — <code>check:a11y</code> <a class="header-anchor" href="#accessibility--checka11y">#</a></h3>
+<p>Runs <a href="https://github.com/dequelabs/axe-core">axe-core</a> with the
+WCAG 2.x A/AA rule set against every page of the built docs site, in
+both light and dark schemes. Since the component demos live on these
+pages, this continuously re-verifies the framework's own AA claim, not
+just the site around it.</p>
+<p>The check fails on any violation not listed in
+<code>scripts/a11y-baseline.json</code>. That baseline exists so an intentionally
+accepted finding can be recorded explicitly — but it is empty, and the
+goal is to keep it that way: fix violations rather than baseline them.</p>
+<h3 id="visual-regression--checkvisual" tabindex="-1">Visual regression — <code>check:visual</code> <a class="header-anchor" href="#visual-regression--checkvisual">#</a></h3>
+<p>Playwright screenshots selected component and layout pages at full-page size,
+in light and dark modes, at 1440 px and 390 px, and compares each against a committed
+baseline in <code>tests/__screenshots__/</code>. Any unexplained pixel difference fails
+the check. Primarily editorial pages are intentionally excluded because the
+docs build, link check, and accessibility audit already cover them without
+multiplying text-only snapshots across every browser project.</p>
+<p>Two things to know about the baselines:</p>
+<ul>
+<li><strong>They are per-platform.</strong> System font rendering differs between
+operating systems, so macOS runs compare against the <code>*-darwin</code> sets
+and CI compares against the <code>*-linux</code> sets. You never edit the Linux
+sets by hand — see below.</li>
+<li><strong>They live in Git LFS</strong>, so the repository history stays small while
+the images stay versioned.</li>
+</ul>
+<p>When your change <strong>intentionally</strong> alters how something renders:</p>
+<ol>
+<li>regenerate your platform's baselines —
+<code>npm run check:visual:update</code>;</li>
+<li>commit them with the change, and say in the PR what changed visually
+and why.</li>
+</ol>
+<p>You don't need to touch the Linux sets. On every push that could affect
+rendering, the <code>update-visual-baselines</code> workflow regenerates them on a
+CI runner and, if anything actually differs, commits them back to the
+branch as <code>github-actions[bot]</code> — this self-heals both a first-time
+bootstrap and a partial change (only the pages your PR touched drift).
+Review that commit's images like any other diff.</p>
+<p>That commit lands as a separate, later push, so <strong><code>check:visual</code> in the
+same CI run as your content change can fail against the not-yet-updated
+Linux baseline</strong> — this is expected for a visual change, not a
+regression. Re-run the check (or wait for the bot commit and push again)
+once it lands. If <code>check:visual</code> fails and you <em>didn't</em> intend a visual
+change, that's the check working — fix the regression instead of
+updating baselines.</p>
+<h2 id="what-makes-a-good-contribution" tabindex="-1">What makes a good contribution <a class="header-anchor" href="#what-makes-a-good-contribution">#</a></h2>
+<ul>
+<li><strong>Keep the surface small.</strong> New components need a strong case; new
+utility classes need a stronger one. If native HTML can express it,
+style the element instead.</li>
+<li><strong>Don't regress the accessibility floor.</strong> Contrast ratios, focus
+visibility, and the 44px control height are verified properties of the
+source; a PR that trades them away for aesthetics won't land.</li>
+<li><strong>Stay on the spacing scale.</strong> Spacing values are <code>--cirth-space-*</code>
+tokens (0.25rem steps to 1.5, 0.5 steps to 3, then whole rems). If a
+value isn't on the scale, that's a design smell worth flagging.</li>
+<li><strong>Match the CSS first philosophy.</strong> Runtime customization through custom
+properties beats switches decided at compile time; those switches beat new
+build variants.</li>
+</ul>
+<h2 id="license" tabindex="-1">License <a class="header-anchor" href="#license">#</a></h2>
+<p>Contributions are accepted under the project's
+<a href="https://github.com/cirthcss/cirth/blob/master/LICENSE.md">Apache License 2.0</a>
+(see <a href="https://github.com/cirthcss/cirth/blob/master/NOTICE.md">NOTICE.md</a> for
+attribution). Documentation contributions fall under the same terms.</p>
+
+			
+				
+				
+				
+					<footer class="docs-prev-next">
+						
+							<a href="/cirth/v0.12/examples" class="secondary">← Examples</a>
+						
+						
+							<a href="/cirth/v0.12/brand" class="secondary">Brand →</a>
+						
+					</footer>
+				
+			
+		</div>
+		
+			<aside class="docs-toc">
+				<nav aria-label="On this page" id="docs-toc-nav">
+					<strong>On this page</strong>
+					<ul>
+						
+							<li class="docs-toc-level-2">
+								<a href="#getting-set-up" data-toc-link="" data-slug="getting-set-up">Getting set up</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#where-things-live" data-toc-link="" data-slug="where-things-live">Where things live</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#package-exports" data-toc-link="" data-slug="package-exports">Package exports</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#quality-gates" data-toc-link="" data-slug="quality-gates">Quality gates</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#interaction-regressions-checkbehavior" data-toc-link="" data-slug="interaction-regressions-checkbehavior">Interaction regressions: check:behavior</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#dist-invariants--checkdist" data-toc-link="" data-slug="dist-invariants--checkdist">Dist invariants — check:dist</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#cdn-integrity--checksri" data-toc-link="" data-slug="cdn-integrity--checksri">CDN integrity — check:sri</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#browser-target--checkbrowserslist" data-toc-link="" data-slug="browser-target--checkbrowserslist">Browser target — check:browserslist</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#documentation-lines" data-toc-link="" data-slug="documentation-lines">Documentation lines</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#where-the-site-is-published" data-toc-link="" data-slug="where-the-site-is-published">Where the site is published</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#accessibility--checka11y" data-toc-link="" data-slug="accessibility--checka11y">Accessibility — check:a11y</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#visual-regression--checkvisual" data-toc-link="" data-slug="visual-regression--checkvisual">Visual regression — check:visual</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#what-makes-a-good-contribution" data-toc-link="" data-slug="what-makes-a-good-contribution">What makes a good contribution</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#license" data-toc-link="" data-slug="license">License</a>
+							</li>
+						
+					</ul>
+				</nav>
+			</aside>
+		
+	</div>
+</main>
+<script>
+	// Scroll-spy for the "On this page" aside: highlight whichever heading
+	// was most recently scrolled past. Purely additive — the TOC works
+	// (and its links navigate) without this script.
+	const links = Array.from(document.querySelectorAll("[data-toc-link]"));
+	if (links.length > 0) {
+		const headings = Array.from(
+			document.querySelectorAll(".docs-content :is(h2, h3)[id]"),
+		);
+
+		const update = () => {
+			// 96px offset: the heading counts as "reached" slightly before it
+			// touches the top edge, matching where the eye lands after a jump.
+			let current = "";
+			for (const heading of headings) {
+				if (heading.getBoundingClientRect().top <= 96) current = heading.id;
+				else break;
+			}
+			const activeSlug = current || (headings[0] ? headings[0].id : "");
+			for (const link of links) {
+				const active = link.dataset.slug === activeSlug;
+				link.classList.toggle("docs-toc-active", active);
+				if (active) link.setAttribute("aria-current", "true");
+				else link.removeAttribute("aria-current");
+			}
+		};
+
+		window.addEventListener("scroll", update, { passive: true });
+		update();
+	}
+</script>
+
+		<footer class="docs-footer">
+	<div class="container">
+		<div class="docs-footer-top">
+			<div class="docs-footer-brand-block">
+				<a href="/cirth/v0.12/" class="docs-brand docs-footer-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.12/logo_brand.svg" alt="" width="36" height="36">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.12/logo_brand_dark.svg" alt="" width="36" height="36">
+					<strong>Cirth</strong>
+				</a>
+				<p class="docs-footer-credit">
+					Designed and built by Riccardo Pastori, with help from the
+					<a href="https://github.com/cirthcss/cirth/graphs/contributors" target="_blank" rel="noreferrer">contributors</a>.
+				</p>
+				<ul class="docs-footer-social">
+					<li><a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub</a></li>
+					<li><a href="https://www.npmjs.com/package/@cirthcss/cirth" target="_blank" rel="noreferrer">npm</a></li>
+					<li><a href="https://github.com/cirthcss/cirth/blob/master/CHANGELOG.md" target="_blank" rel="noreferrer">Changelog</a></li>
+				</ul>
+			</div>
+			<div class="docs-footer-columns">
+				
+					<div class="docs-footer-column">
+						<strong>Docs</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="/cirth/v0.12/get-started">Get Started</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.12/customization">Customization</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.12/colors">Colors</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.12/components/card">Components</a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+					<div class="docs-footer-column">
+						<strong>Project</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="/cirth/v0.12/about">About Cirth</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.12/upgrading">Upgrading</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.12/brand">Brand</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.12/examples">Examples</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.12/contributions">Contributions</a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+					<div class="docs-footer-column">
+						<strong>Community</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="https://github.com/cirthcss/cirth/issues" target="_blank" rel="noreferrer">Issues</a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+			</div>
+		</div>
+		<hr>
+		<small>
+			<span>Released under the Apache License 2.0.</span>
+			<span>Copyright © 2025-present Riccardo Pastori</span>
+		</small>
+	</div>
+</footer>
+
+		<script>
+			// Copy-to-clipboard for fenced code blocks: the markdown pipeline
+			// only highlights, it doesn't add a button, so one is injected for
+			// every `pre > code` on the page (prose fences and Demo's
+			// "Show HTML" source alike).
+			for (const pre of document.querySelectorAll("pre:not(.home-demo-code pre)")) {
+				if (pre.querySelector(":scope > button.copy")) continue;
+				const code = pre.querySelector("code");
+				if (!code?.textContent) continue;
+
+				const button = document.createElement("button");
+				button.type = "button";
+				button.className = "copy";
+				button.setAttribute("aria-label", "Copy to clipboard");
+				pre.append(button);
+
+				button.addEventListener("click", () => {
+					navigator.clipboard.writeText(code.textContent ?? "").then(() => {
+						button.classList.add("copied");
+						setTimeout(() => button.classList.remove("copied"), 2000);
+					});
+				});
+			}
+
+			// The scoped classless build reads data-theme from its own root
+			// element (.cirth-classless demos), so mirror the site theme onto
+			// every such wrapper whenever it changes.
+			const classlessRoots = document.querySelectorAll(".cirth-classless");
+			if (classlessRoots.length > 0) {
+				const sync = () => {
+					const theme = document.documentElement.getAttribute("data-theme");
+					for (const root of classlessRoots) root.setAttribute("data-theme", theme ?? "light");
+				};
+				sync();
+				new MutationObserver(sync).observe(document.documentElement, {
+					attributeFilter: ["data-theme"],
+				});
+			}
+
+			// Live preset switcher (gh#80): the <head> script above already
+			// applied a remembered choice before first paint; this wires up
+			// the header <select> for changes after load. Swapping the
+			// stylesheet's href (rather than always keeping one <link> per
+			// preset and toggling disabled) means an unvisited preset is
+			// never fetched at all.
+			const presetSelect = document.querySelector("[data-cirth-preset-select]");
+			if (presetSelect) {
+				const base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
+				const applyPreset = (preset) => {
+					const existing = document.getElementById("cirth-preset-stylesheet");
+					if (preset === "amber") {
+						existing?.remove();
+						return;
+					}
+					const link = existing ?? document.createElement("link");
+					link.rel = "stylesheet";
+					link.id = "cirth-preset-stylesheet";
+					link.href = `${base}/styles/generated/presets/${preset}.css`;
+					if (!existing) document.head.appendChild(link);
+				};
+				presetSelect.value = sessionStorage.getItem("cirth-preset") || "amber";
+				presetSelect.addEventListener("change", () => {
+					sessionStorage.setItem("cirth-preset", presetSelect.value);
+					applyPreset(presetSelect.value);
+				});
+			}
+
+			// Everything below is docs-site chrome, not the framework: it only
+			// touches elements these specific homepage sections render, so it's
+			// a harmless no-op on every other page. Cirth itself still ships
+			// zero JavaScript — this is the site *about* it, same as the copy-
+			// to-clipboard buttons and theme toggle above.
+			const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+			// Scroll-reveal: .docs-reveal-armed (the hidden starting state) is
+			// added here, right before observing — never in the shipped CSS or
+			// markup — so a JS failure, a browser without IntersectionObserver,
+			// or prefers-reduced-motion all leave content in its plain, fully
+			// visible default instead of stuck invisible.
+			const revealTargets = document.querySelectorAll(".docs-reveal");
+			if (!reduceMotion && revealTargets.length > 0 && "IntersectionObserver" in window) {
+				for (const el of revealTargets) el.classList.add("docs-reveal-armed");
+				const revealObserver = new IntersectionObserver(
+					(entries) => {
+						for (const entry of entries) {
+							if (!entry.isIntersecting) continue;
+							entry.target.classList.add("docs-reveal-visible");
+							revealObserver.unobserve(entry.target);
+						}
+					},
+					{ threshold: 0.15, rootMargin: "0px 0px -10% 0px" },
+				);
+				for (const el of revealTargets) revealObserver.observe(el);
+
+				// Safety net: headless full-page capture (screenshot tools, some
+				// print-to-PDF paths, link-preview crawlers) renders the entire
+				// document at once through the compositor without ever moving
+				// the real scroll position, so IntersectionObserver correctly
+				// reports "never intersected" for anything below the original
+				// viewport — which would otherwise leave it permanently at
+				// opacity:0. Force-reveal anything still unrevealed after a
+				// few seconds; a no-op for a normal visitor who scrolled there
+				// well within that window.
+				setTimeout(() => {
+					for (const el of revealTargets) el.classList.add("docs-reveal-visible");
+				}, 2500);
+			}
+
+			// Count-up: the pitch stats already carry their real final value as
+			// plain text (that's what no-JS visitors and assistive tech read),
+			// this only re-animates the first number substring it finds once
+			// the card scrolls into view — "<14KB gzipped" counts up the 14,
+			// "244 tokens" counts up the 244, "AA" has no digit and is left
+			// alone entirely.
+			const countTargets = document.querySelectorAll(".docs-pitch-value");
+			if (!reduceMotion && countTargets.length > 0 && "IntersectionObserver" in window) {
+				const countObserver = new IntersectionObserver(
+					(entries) => {
+						for (const entry of entries) {
+							if (!entry.isIntersecting) continue;
+							countObserver.unobserve(entry.target);
+							const el = entry.target;
+							const text = el.textContent ?? "";
+							const match = text.match(/\d+/);
+							if (!match) continue;
+							const to = Number(match[0]);
+							const before = text.slice(0, match.index);
+							const after = text.slice(match.index + match[0].length);
+							const duration = 700;
+							const start = performance.now();
+							const tick = (now) => {
+								const t = Math.min(1, (now - start) / duration);
+								const eased = 1 - (1 - t) * (1 - t);
+								el.textContent = `${before}${Math.round(to * eased)}${after}`;
+								if (t < 1) requestAnimationFrame(tick);
+							};
+							requestAnimationFrame(tick);
+						}
+					},
+					{ threshold: 0.6 },
+				);
+				for (const el of countTargets) countObserver.observe(el);
+			}
+		</script>
+	</body>
+</html>

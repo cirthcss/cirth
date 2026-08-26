@@ -155,8 +155,8 @@ module.exports = (eleventyConfig) => {
 	eleventyConfig.addShortcode("colorSwatches", () => {
 		const colors = [
 			{ name: "amber", hex: "#8f6023", note: "default theme" },
-			{ name: "cobalt", hex: "#0f2d57", note: "preset" },
-			{ name: "coral", hex: "#c0401f", note: "preset" },
+			{ name: "plain", hex: "#1c65c8", note: "preset" },
+			{ name: "playroom", hex: "#7347af", note: "preset" },
 		];
 		return `<div class="docs-colors-grid">${colors
 			.map(

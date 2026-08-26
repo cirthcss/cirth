@@ -27,7 +27,7 @@
   display: inline-block;
   appearance: none;
   width: 100%;
-  height: var(--cirth-size-2);
+  height: var(--cirth-space-2);
   margin-bottom: calc(var(--cirth-spacing) * 0.5);
 
   // Clips the value to the track's rounded corners, in every engine

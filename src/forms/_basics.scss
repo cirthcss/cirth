@@ -50,7 +50,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 // 2. Correct the outline style in Safari
 
 #{$parent-selector} [type="search"] {
-  -webkit-appearance: textfield; // 1
+  appearance: textfield; // 1
   outline-offset: -2px; // 2
 }
 
@@ -65,7 +65,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 // 2. Change font properties to `inherit` in Safari
 
 #{$parent-selector} ::file-selector-button {
-  -webkit-appearance: button; // 1
+  appearance: auto; // 1
   font: inherit; // 2
 }
 
@@ -92,7 +92,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 #{$parent-selector}
   input:not([type="checkbox"], [type="radio"], [type="range"]) {
   height: calc(
-    (var(--cirth-size-4) * var(--cirth-line-height)) +
+    (var(--cirth-font-size-md) * var(--cirth-line-height)) +
       (var(--cirth-form-element-spacing-vertical) * 2) +
       (var(--cirth-border-width) * 2)
   );
@@ -105,13 +105,13 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 // inside them. Set a smaller font-size on a select and it quietly drops
 // below the threshold; this is what keeps WCAG 2.5.5 a property of the
 // component instead of a property of the default type scale. Measured
-// from --cirth-size-4, not from the element's own font-size, so the
+// from --cirth-font-size-md, not from the element's own font-size, so the
 // floor stays put when the type does not.
 
 #{$parent-selector} select,
 #{$parent-selector} textarea {
   min-block-size: calc(
-    (var(--cirth-size-4) * var(--cirth-line-height)) +
+    (var(--cirth-font-size-md) * var(--cirth-line-height)) +
       (var(--cirth-form-element-spacing-vertical) * 2) +
       (var(--cirth-border-width) * 2)
   );
@@ -221,6 +221,41 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   }
 }
 
+// Hover
+
+// Every other interactive control in the library answers the pointer, and
+// a field that does not reads as inert next to them — the affordance is
+// the point, not the decoration. It is deliberately not the focus
+// treatment: the border moves toward the field's own ink rather than to
+// the accent, so hover stays legible as "this is reachable" while focus
+// keeps the accent and the ring to itself.
+// Mixing toward --cirth-color needs no second value and no new token:
+// inside these rules that slot is the field's ink, so the hover darkens in
+// the light scheme and lightens in the dark one on its own. It also cannot
+// weaken the 3:1 the resting border owes WCAG 1.4.11 — moving toward the
+// ink only ever increases the contrast against the field.
+
+#{$parent-selector}
+  input:not(
+    [type="submit"],
+    [type="button"],
+    [type="reset"],
+    [type="checkbox"],
+    [type="radio"],
+    [type="range"],
+    [type="file"],
+    [readonly]
+  ),
+#{$parent-selector} :where(select, textarea):not([readonly]) {
+  &:hover:not(:active, :focus, [disabled], [aria-invalid]) {
+    --cirth-border-color: color-mix(
+      in oklch,
+      var(--cirth-form-element-border-color) 65%,
+      var(--cirth-color)
+    );
+  }
+}
+
 // Focus
 
 #{$parent-selector}
@@ -299,7 +334,7 @@ $validation-any: "[aria-invalid], #{$invalid-native}";
           var(--cirth-form-element-spacing-horizontal) + var(--cirth-space-6)
         );
       background-position: center right var(--cirth-space-3);
-      background-size: var(--cirth-size-4) auto;
+      background-size: var(--cirth-font-size-md) auto;
       background-repeat: no-repeat;
     }
 
@@ -384,7 +419,7 @@ $validation-any: "[aria-invalid], #{$invalid-native}";
       calc(var(--cirth-form-element-spacing-horizontal) + var(--cirth-space-6));
     background-image: var(--cirth-icon-chevron);
     background-position: center right var(--cirth-space-3);
-    background-size: var(--cirth-size-4) auto;
+    background-size: var(--cirth-font-size-md) auto;
     background-repeat: no-repeat;
   }
 
@@ -436,13 +471,13 @@ $validation-any: "[aria-invalid], #{$invalid-native}";
 
   &:is(#{$validation-any}) {
     --cirth-icon-height: calc(
-      var(--cirth-size-4) * var(--cirth-line-height) +
+      var(--cirth-font-size-md) * var(--cirth-line-height) +
         var(--cirth-form-element-spacing-vertical) * 2 +
         var(--cirth-border-width) * 2
     );
 
     background-position: top right var(--cirth-space-3);
-    background-size: var(--cirth-size-4) var(--cirth-icon-height);
+    background-size: var(--cirth-font-size-md) var(--cirth-icon-height);
   }
 }
 

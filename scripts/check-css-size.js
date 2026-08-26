@@ -9,7 +9,6 @@ const distDir = path.join(projectRoot, "dist");
 // pitch ("lightweight", minimal philosophy), so growth past this line
 // should be a deliberate decision, not creep: raise the budget in the
 // same change that needs it, and say why in the commit.
-// Current bundles sit at ~11-12.5 KiB gzipped.
 const budgetBytes = 14 * 1024;
 
 const warnOnly = process.argv.includes("--warn-only");

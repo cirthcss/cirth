@@ -102,30 +102,52 @@ for (const build of builds) {
 	test(`both color schemes define the visited token in the ${build.name} build`, () => {
 		const css = read(build.file);
 
-		// Only the base schemes: the preference passes that follow them
-		// (prefers-contrast: more, then @media print) deliberately redefine
-		// the token again, and are asserted in their own specs.
+		// The token is a light-dark() pair in theme/_dual.scss: one
+		// declaration carrying both scheme values, rather than one per scheme
+		// root. What matters has not changed — a followed link is drained to
+		// neutral in *both* schemes, and the two neutrals are not the same
+		// colour — so this asserts the pair rather than counting declarations.
+		// Only the base pair: the preference passes that follow
+		// (prefers-contrast: more, then the print stylesheet) deliberately
+		// redefine the token, and are asserted in their own specs.
 		const preferences = css.indexOf("@media (prefers-contrast: more)");
 
-		expect(preferences, "the preference passes follow the schemes").toBeGreaterThan(
-			0,
-		);
+		expect(
+			preferences,
+			"the preference passes follow the schemes",
+		).toBeGreaterThan(0);
 
-		const declarations =
-			css.slice(0, preferences).match(/--cirth-link-visited-color:[^;]+;/g) ?? [];
+		const pair = css
+			.slice(0, preferences)
+			.match(/--cirth-link-visited-color:\s*light-dark\(([^;]+)\);/);
 
-		// Light, dark, and the explicit [data-theme="dark"] override.
-		expect(declarations.length).toBeGreaterThanOrEqual(3);
-		expect(new Set(declarations).size).toBe(2);
+		expect(pair, "declared as a light-dark() pair").not.toBeNull();
+
+		const [light, dark] = String(pair?.[1]).split(/,(?![^(]*\))/);
+
+		expect(light?.trim()).toBeTruthy();
+		expect(dark?.trim()).toBeTruthy();
+		expect(light?.trim()).not.toBe(dark?.trim());
 	});
 }
 
 test("the presets carry their own visited color", () => {
-	for (const preset of ["dist/presets/cobalt.css", "dist/presets/coral.css"]) {
-		const declarations =
-			read(preset).match(/--cirth-link-visited-color:[^;]+;/g) ?? [];
+	for (const preset of ["dist/presets/plain.css", "dist/presets/playroom.css"]) {
+		// One declaration, not two: a preset states the scheme difference as a
+		// light-dark() pair, the same shape theme/_dual.scss uses. What matters
+		// is unchanged — a followed link is drained to neutral in both schemes,
+		// and the two neutrals differ.
+		const pair = read(preset).match(
+			/--cirth-link-visited-color:\s*light-dark\(([^;]+)\);/,
+		);
 
-		expect(declarations.length, `${preset} light and dark`).toBeGreaterThanOrEqual(2);
+		expect(pair, `${preset} declares the pair`).not.toBeNull();
+
+		const [light, dark] = String(pair?.[1]).split(/,(?![^(]*\))/);
+
+		expect(light?.trim(), `${preset} light`).toBeTruthy();
+		expect(dark?.trim(), `${preset} dark`).toBeTruthy();
+		expect(light?.trim()).not.toBe(dark?.trim());
 	}
 });
 

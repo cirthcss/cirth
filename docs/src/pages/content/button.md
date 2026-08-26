@@ -16,6 +16,7 @@ same button styling, with no `.btn` class required.
 <button type="button" class="secondary">Secondary</button>
 <button type="button" class="contrast">Contrast</button>
 <button type="button" class="outline">Primary outline</button>
+<button type="button" class="ghost">Primary ghost</button>
 <button type="button" disabled>Disabled</button>
 ```
 
@@ -29,9 +30,33 @@ Modifier classes (default build only) swap which color group a button reads
 | *(none)* | Primary |
 | `.secondary` | Secondary |
 | `.contrast` | Contrast |
-| `.outline` | Primary, transparent background |
-| `.outline.secondary` | Secondary, transparent background |
-| `.outline.contrast` | Contrast, transparent background |
+| `.outline` | Primary, on the page surface |
+| `.outline.secondary` | Secondary, on the page surface |
+| `.outline.contrast` | Contrast, on the page surface |
+| `.ghost` | Primary, no surface and no border |
+| `.ghost.secondary` | Secondary, no surface and no border |
+| `.ghost.contrast` | Contrast, no surface and no border |
+
+### Quiet variants
+
+`.outline` and `.ghost` are the two quiet treatments, and they differ in
+one thing: whether the control owns an opaque surface.
+
+`.outline` does. It paints `--cirth-canvas`, the page surface, so it stays
+a control wherever it sits rather than letting whatever is behind it show
+through — and it draws a border. `.ghost` owns neither, which makes it the
+right choice for an icon button in a header or a toolbar, where a border
+would be one line too many.
+
+Both answer `:hover` by tinting their own background with their colour
+group rather than switching to a filled treatment: the point of a quiet
+button is that it stays quiet, and a wash is enough to say it is live.
+`.ghost` mixes toward `transparent` so the wash composites over whatever it
+is actually on — a card, a header, a popover — while `.outline`, already
+opaque, mixes toward the canvas it is painting.
+
+A ghost button keeps a transparent border rather than removing it, so
+swapping between the variants never moves the layout.
 
 Without `$enable-classes` (the classless build), `[type="reset"]` and a file
 input's selector button still get secondary styling automatically, since

@@ -28,6 +28,39 @@ const getCssFiles = (foldername) =>
 /** @param {readonly string[]} args */
 const runLightningCss = (args) => runSync(lightningcssBinary, args);
 
+// theme/_dual.scss states every scheme difference once, as a light-dark()
+// pair, and the whole customization contract rests on that resolving
+// natively: the pair is evaluated where the token is *used*, against that
+// element's color-scheme, which is what lets a [data-theme] subtree switch
+// while a consumer's :root override still reaches into it.
+//
+// Lightning CSS will compile light-dark() away if any target sits below
+// its floor, replacing it with a --lightningcss-light/--lightningcss-dark
+// emulation. That emulation does not reproduce the semantics — a forced
+// scheme subtree stops resolving its own values — so its appearance is a
+// broken build, not a slower one. It is worth failing loudly for: the
+// output still looks plausible, and the visual suite does not render
+// forced-scheme subtrees, so nothing else would catch it.
+//
+// The usual cause is a family whose caniuse bucket is stale; see the
+// FORBIDDEN list in scripts/check-browserslist.js.
+/** @param {string} filename */
+const assertNativeLightDark = (filename) => {
+	const css = fs.readFileSync(filename, "utf8");
+
+	if (!css.includes("--lightningcss-")) {
+		return;
+	}
+
+	console.error(
+		`[@cirthcss/cirth] ${path.basename(filename)}: light-dark() was ` +
+			"compiled to Lightning CSS's emulation, which does not reproduce " +
+			"its semantics. A Browserslist target is below the light-dark() " +
+			"floor — check package.json against scripts/check-browserslist.js.",
+	);
+	process.exit(1);
+};
+
 /** @param {string} foldername */
 const transformFolder = (foldername) => {
 	getCssFiles(foldername).forEach((filename) => {
@@ -37,6 +70,7 @@ const transformFolder = (foldername) => {
 		// Write to a temporary file first so the input is never overwritten mid-process.
 		runLightningCss(["--browserslist", source, "-o", temp]);
 		fs.renameSync(temp, source);
+		assertNativeLightDark(source);
 	});
 };
 
@@ -48,6 +82,7 @@ const minifyFolder = (foldername) => {
 
 		// Minified output is always derived from the already transformed CSS.
 		runLightningCss(["--browserslist", "--minify", source, "-o", output]);
+		assertNativeLightDark(output);
 	});
 };
 

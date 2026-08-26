@@ -1,0 +1,99 @@
+:where([data-theme=light]),
+:root:where(:not([data-theme=dark])),
+:host(:where(:not([data-theme=dark]))) {
+  --cirth-background-color: oklch(97.4% 0.002 258deg);
+  --cirth-card-background-color: oklch(100% 0 0deg);
+  --cirth-muted-color: oklch(50% 0.01 258deg);
+  --cirth-muted-border-color: oklch(88% 0.008 258deg);
+  --cirth-text-selection-color: oklch(46% 0.095 258deg / 0.25);
+  --cirth-primary: oklch(30% 0.085 258deg);
+  --cirth-primary-background: oklch(30% 0.085 258deg);
+  --cirth-primary-underline: oklch(30% 0.085 258deg / 0.5);
+  --cirth-primary-hover: oklch(22% 0.07 258deg);
+  --cirth-primary-hover-background: oklch(26% 0.08 258deg);
+  --cirth-primary-focus: oklch(46% 0.095 258deg / 0.7);
+  --cirth-link-visited-color: oklch(48.3% 0.02 258deg);
+  --cirth-box-shadow: 0 0 0 0.0625rem oklch(30% 0.085 258deg / 0.14);
+}
+
+@media only screen and (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme])),
+  :host(:where(:not([data-theme]))) {
+    --cirth-background-color: oklch(19.5% 0.006 258deg);
+    --cirth-card-background-color: oklch(23% 0.008 258deg);
+    --cirth-muted-color: oklch(65% 0.02 258deg);
+    --cirth-muted-border-color: oklch(30% 0.02 258deg);
+    --cirth-text-selection-color: oklch(52% 0.1 258deg / 0.1875);
+    --cirth-primary: oklch(64% 0.09 258deg);
+    --cirth-primary-background: oklch(30% 0.085 258deg);
+    --cirth-primary-underline: oklch(64% 0.09 258deg / 0.5);
+    --cirth-primary-hover: oklch(72% 0.075 258deg);
+    --cirth-primary-hover-background: oklch(34% 0.09 258deg);
+    --cirth-primary-focus: oklch(64% 0.09 258deg / 0.7);
+    --cirth-link-visited-color: oklch(65% 0.02 258deg);
+    --cirth-box-shadow: 0 0 0 0.0625rem oklch(64% 0.09 258deg / 0.2);
+  }
+}
+:where([data-theme=dark]) {
+  --cirth-background-color: oklch(19.5% 0.006 258deg);
+  --cirth-card-background-color: oklch(23% 0.008 258deg);
+  --cirth-muted-color: oklch(65% 0.02 258deg);
+  --cirth-muted-border-color: oklch(30% 0.02 258deg);
+  --cirth-text-selection-color: oklch(52% 0.1 258deg / 0.1875);
+  --cirth-primary: oklch(64% 0.09 258deg);
+  --cirth-primary-background: oklch(30% 0.085 258deg);
+  --cirth-primary-underline: oklch(64% 0.09 258deg / 0.5);
+  --cirth-primary-hover: oklch(72% 0.075 258deg);
+  --cirth-primary-hover-background: oklch(34% 0.09 258deg);
+  --cirth-primary-focus: oklch(64% 0.09 258deg / 0.7);
+  --cirth-link-visited-color: oklch(65% 0.02 258deg);
+  --cirth-box-shadow: 0 0 0 0.0625rem oklch(64% 0.09 258deg / 0.2);
+}
+
+@media (prefers-contrast: more) {
+  :where([data-theme=light]),
+  :root:where(:not([data-theme=dark])),
+  :host(:where(:not([data-theme=dark]))) {
+    --cirth-muted-color: oklch(40% 0.01 258deg);
+    --cirth-muted-border-color: oklch(57% 0.01 258deg);
+    --cirth-primary-underline: var(--cirth-primary);
+    --cirth-primary-focus: oklch(46% 0.095 258deg);
+    --cirth-link-visited-color: oklch(40% 0.02 258deg);
+  }
+}
+@media only screen and (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme])),
+  :host(:where(:not([data-theme]))) {
+    --cirth-muted-color: oklch(80% 0.02 258deg);
+    --cirth-muted-border-color: oklch(57% 0.01 258deg);
+    --cirth-card-border-color: var(--cirth-muted-border-color);
+    --cirth-primary: oklch(80% 0.07 258deg);
+    --cirth-primary-hover: oklch(86% 0.05 258deg);
+    --cirth-primary-underline: var(--cirth-primary);
+    --cirth-primary-focus: oklch(64% 0.09 258deg);
+    --cirth-link-visited-color: oklch(80% 0.02 258deg);
+  }
+}
+@media (prefers-contrast: more) {
+  :where([data-theme=dark]) {
+    --cirth-muted-color: oklch(80% 0.02 258deg);
+    --cirth-muted-border-color: oklch(57% 0.01 258deg);
+    --cirth-card-border-color: var(--cirth-muted-border-color);
+    --cirth-primary: oklch(80% 0.07 258deg);
+    --cirth-primary-hover: oklch(86% 0.05 258deg);
+    --cirth-primary-underline: var(--cirth-primary);
+    --cirth-primary-focus: oklch(64% 0.09 258deg);
+    --cirth-link-visited-color: oklch(80% 0.02 258deg);
+  }
+}
+:root,
+:host {
+  --cirth-border-radius: 0;
+  --cirth-radius-pill: 0;
+  --cirth-font-family:
+    Arial, "Helvetica Neue", Helvetica, sans-serif,
+    var(--cirth-font-family-emoji);
+  --cirth-font-family-display: var(--cirth-font-family);
+  --cirth-spacing: var(--cirth-space-3);
+  --cirth-transition: var(--cirth-duration-fast) var(--cirth-ease-out);
+}
