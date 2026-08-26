@@ -172,16 +172,49 @@
     }
   }
 
+  // Outline and ghost
+  // Two quiet variants that differ in one thing: whether the control owns
+  // an opaque surface. Outline does — it paints the page colour, so it
+  // stays a control wherever it sits instead of letting the backdrop show
+  // through — and it draws a border. Ghost owns neither, and only becomes
+  // visible when the pointer arrives.
+  // Both answer hover by tinting their background with their own accent
+  // rather than by swapping to a filled treatment: the point of a quiet
+  // button is that it stays quiet, and a wash is enough to say it is live.
+  // Ghost mixes toward transparent rather than toward the canvas so the
+  // wash composites over whatever it is actually on — a card, a header, a
+  // popover — while outline, already opaque, mixes toward the canvas it
+  // is painting.
+  // The border stays declared as transparent on ghost rather than removed:
+  // a border-width of zero would resize the control, and these two are
+  // meant to be swappable with the filled variants without the layout
+  // moving.
+  #{$parent-selector}
+    :is(button, [type="submit"], [type="button"], [role="button"]).outline,
+  #{$parent-selector} [type="reset"].outline {
+    --cirth-background-color: var(--cirth-canvas);
+  }
+
+  #{$parent-selector}
+    :is(button, [type="submit"], [type="button"], [role="button"]).ghost,
+  #{$parent-selector} [type="reset"].ghost {
+    --cirth-background-color: transparent;
+    --cirth-box-shadow: none;
+  }
+
   // Outline (primary)
   #{$parent-selector}
     :is(button, [type="submit"], [type="button"], [role="button"]).outline,
   #{$parent-selector} [type="reset"].outline {
-    --cirth-background-color: transparent;
     --cirth-color: var(--cirth-primary);
     --cirth-border-color: var(--cirth-primary);
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
-      --cirth-background-color: transparent;
+      --cirth-background-color: color-mix(
+        in oklch,
+        var(--cirth-primary) 12%,
+        var(--cirth-canvas)
+      );
       --cirth-color: var(--cirth-primary-hover);
       --cirth-border-color: var(--cirth-primary-hover);
     }
@@ -195,11 +228,16 @@
       [type="button"],
       [role="button"]
     ).outline.secondary,
-  #{$parent-selector} [type="reset"].outline {
+  #{$parent-selector} [type="reset"].outline.secondary {
     --cirth-color: var(--cirth-secondary);
     --cirth-border-color: var(--cirth-secondary);
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
+      --cirth-background-color: color-mix(
+        in oklch,
+        var(--cirth-secondary) 12%,
+        var(--cirth-canvas)
+      );
       --cirth-color: var(--cirth-secondary-hover);
       --cirth-border-color: var(--cirth-secondary-hover);
     }
@@ -212,13 +250,83 @@
       [type="submit"],
       [type="button"],
       [role="button"]
-    ).outline.contrast {
+    ).outline.contrast,
+  #{$parent-selector} [type="reset"].outline.contrast {
     --cirth-color: var(--cirth-contrast);
     --cirth-border-color: var(--cirth-contrast);
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
+      --cirth-background-color: color-mix(
+        in oklch,
+        var(--cirth-contrast) 12%,
+        var(--cirth-canvas)
+      );
       --cirth-color: var(--cirth-contrast-hover);
       --cirth-border-color: var(--cirth-contrast-hover);
+    }
+  }
+
+  // Ghost (primary)
+  #{$parent-selector}
+    :is(button, [type="submit"], [type="button"], [role="button"]).ghost,
+  #{$parent-selector} [type="reset"].ghost {
+    --cirth-color: var(--cirth-primary);
+    --cirth-border-color: transparent;
+
+    &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
+      --cirth-background-color: color-mix(
+        in oklch,
+        var(--cirth-primary) 12%,
+        transparent
+      );
+      --cirth-color: var(--cirth-primary-hover);
+      --cirth-border-color: transparent;
+    }
+  }
+
+  // Ghost (secondary)
+  #{$parent-selector}
+    :is(
+      button,
+      [type="submit"],
+      [type="button"],
+      [role="button"]
+    ).ghost.secondary,
+  #{$parent-selector} [type="reset"].ghost.secondary {
+    --cirth-color: var(--cirth-secondary);
+    --cirth-border-color: transparent;
+
+    &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
+      --cirth-background-color: color-mix(
+        in oklch,
+        var(--cirth-secondary) 12%,
+        transparent
+      );
+      --cirth-color: var(--cirth-secondary-hover);
+      --cirth-border-color: transparent;
+    }
+  }
+
+  // Ghost (contrast)
+  #{$parent-selector}
+    :is(
+      button,
+      [type="submit"],
+      [type="button"],
+      [role="button"]
+    ).ghost.contrast,
+  #{$parent-selector} [type="reset"].ghost.contrast {
+    --cirth-color: var(--cirth-contrast);
+    --cirth-border-color: transparent;
+
+    &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
+      --cirth-background-color: color-mix(
+        in oklch,
+        var(--cirth-contrast) 12%,
+        transparent
+      );
+      --cirth-color: var(--cirth-contrast-hover);
+      --cirth-border-color: transparent;
     }
   }
 } @else {

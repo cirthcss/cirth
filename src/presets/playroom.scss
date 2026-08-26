@@ -23,10 +23,7 @@
   // The page carries a trace of the accent instead of being neutral: at
   // this chroma it reads as "warm paper, but violet", which is what keeps
   // the whole thing from feeling clinical.
-  --cirth-background-color: light-dark(
-    oklch(98% 0.012 300deg),
-    oklch(24% 0.028 295deg)
-  );
+  --cirth-canvas: light-dark(oklch(98% 0.012 300deg), oklch(24% 0.028 295deg));
   --cirth-card-background-color: light-dark(
     oklch(100% 0 0deg),
     oklch(29% 0.032 295deg)

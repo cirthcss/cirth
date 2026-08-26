@@ -39,6 +39,13 @@
   --cirth-border-width: var(--cirth-border-width-1);
   --cirth-outline-width: var(--cirth-border-width-2);
 
+  // The page surface slot, defaulting to the canvas input. Declared here
+  // rather than in the scheme files because the value it copies is an
+  // unresolved light-dark() pair: an alias to one carries the pair rather
+  // than a resolved colour, so it still answers to the scheme in force
+  // wherever it is used.
+  --cirth-background-color: var(--cirth-canvas);
+
   // Transitions
   --cirth-transition: var(--cirth-duration-normal) var(--cirth-ease-out);
 

@@ -209,6 +209,13 @@ test("Firefox keeps an opened required select neutral and a valid choice does no
 
 	await select.selectOption("one");
 	await select.press("Tab");
+
+	// The pointer is still where the click left it, and a field answers
+	// hover now (forms/_basics.scss) — so it has to be moved off before the
+	// border is compared against a reference that was never hovered, or the
+	// comparison is between two different states rather than two schemes of
+	// validity styling.
+	await page.mouse.move(0, 0);
 	state = await stateOf(select);
 	expect(state.userValid).toBe(true);
 	expect(state.borderColor).toBe(neutral.borderColor);

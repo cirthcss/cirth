@@ -26,10 +26,7 @@
 
   // Plain white rather than the default's warm paper: the page should read
   // as a document surface, not as the project's brand.
-  --cirth-background-color: light-dark(
-    oklch(98.5% 0 0deg),
-    oklch(20% 0.008 264deg)
-  );
+  --cirth-canvas: light-dark(oklch(98.5% 0 0deg), oklch(20% 0.008 264deg));
   --cirth-card-background-color: light-dark(
     oklch(100% 0 0deg),
     oklch(24.5% 0.011 264deg)

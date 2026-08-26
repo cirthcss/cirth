@@ -44,7 +44,12 @@
 //   - color-scheme itself, which is what makes every pair below resolve.
 
 @include selectors.root {
-  --cirth-background-color: light-dark(
+  // The page surface, as an input of its own. --cirth-background-color is
+  // the slot components rebind (a button paints its own fill through it),
+  // so anything that needs to refer to *the page* — an outline button
+  // wanting an opaque background, a hover tint mixing toward it — needs a
+  // name the components are not allowed to shadow. That is this one.
+  --cirth-canvas: light-dark(
     #{$paper},
     #{color.mix($neutral-950, $neutral-900, $method: oklch)}
   );

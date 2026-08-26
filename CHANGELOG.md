@@ -18,6 +18,20 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   that reads from it — the fill a meter paints, the ink `<ins>`/`<del>` use,
   the border a field takes when it validates, the tint behind a `<mark>`.
 
+- **A `.ghost` button variant**, in all three colour groups: no surface, no
+  border, and a hover that tints its background with its own colour group
+  rather than switching to a filled treatment. It is what an icon button in
+  a header or a toolbar wants, and it is the variant the docs site's own
+  theme toggle had been faking by taking `.outline` and removing its border
+  in site CSS — which is how a button ended up with neither a border nor a
+  hover anyone could see.
+
+- **`--cirth-canvas`**, the page surface as an input of its own.
+  `--cirth-background-color` is the slot components rebind — a button
+  paints its own fill through it — so anything needing to refer to *the
+  page* had no name it could rely on. `--cirth-background-color` now
+  defaults to it.
+
 - **Two redesigned presets, `plain` and `playroom`** (gh#86), replacing
   `cobalt` and `coral`. They are named for their character rather than
   their hue, and between them they are one worked example read from both
@@ -42,6 +56,21 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   own upper bound off the type scale.
 
 ### Changed
+
+- **`.outline` buttons paint the page surface instead of being
+  transparent**, and answer hover by tinting it. Visible if you put one on
+  a surface that is not the page — a card, a coloured band — where it used
+  to show the backdrop through and now does not. Reach for the new
+  `.ghost` if that was the behaviour you wanted.
+
+- **Form controls answer the pointer.** `input`, `select` and `textarea`
+  had no `:hover` at all, which left them the only interactive controls in
+  the library that looked inert next to everything else. The border now
+  moves toward the field's own ink — not to the accent, so hover stays
+  distinct from focus — and it moves in the right direction in both schemes
+  without a second value or a new token. `[readonly]` and `[aria-invalid]`
+  are left alone: one is not offering, and the other has something more
+  important to say.
 
 - **The accent is an input, and the rest of it derives.** Set
   `--cirth-primary` and the background, hover, focus and underline tint
@@ -116,6 +145,11 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   declarations whose unprefixed form is supported everywhere Cirth targets.
 
 ### Fixed
+
+- **`[type="reset"].outline` takes the primary colours it asks for.** The
+  selector appeared in both the primary and the secondary outline rules, so
+  the later one won and a reset button styled `.outline` came out secondary
+  whether or not it said so.
 
 - **A button label no longer loses contrast under `prefers-contrast: more`.**
   In the dark scheme it had fallen to 4.2:1 — worse than the 5.5:1 it has

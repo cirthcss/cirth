@@ -221,6 +221,41 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   }
 }
 
+// Hover
+
+// Every other interactive control in the library answers the pointer, and
+// a field that does not reads as inert next to them — the affordance is
+// the point, not the decoration. It is deliberately not the focus
+// treatment: the border moves toward the field's own ink rather than to
+// the accent, so hover stays legible as "this is reachable" while focus
+// keeps the accent and the ring to itself.
+// Mixing toward --cirth-color needs no second value and no new token:
+// inside these rules that slot is the field's ink, so the hover darkens in
+// the light scheme and lightens in the dark one on its own. It also cannot
+// weaken the 3:1 the resting border owes WCAG 1.4.11 — moving toward the
+// ink only ever increases the contrast against the field.
+
+#{$parent-selector}
+  input:not(
+    [type="submit"],
+    [type="button"],
+    [type="reset"],
+    [type="checkbox"],
+    [type="radio"],
+    [type="range"],
+    [type="file"],
+    [readonly]
+  ),
+#{$parent-selector} :where(select, textarea):not([readonly]) {
+  &:hover:not(:active, :focus, [disabled], [aria-invalid]) {
+    --cirth-border-color: color-mix(
+      in oklch,
+      var(--cirth-form-element-border-color) 65%,
+      var(--cirth-color)
+    );
+  }
+}
+
 // Focus
 
 #{$parent-selector}
