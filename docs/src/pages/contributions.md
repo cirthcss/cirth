@@ -101,8 +101,8 @@ npm run build         # compile src/ to dist/
 npm run check:dist    # structural invariants of the 12 dist files
 npm run check:size    # ≤ 14 KiB gzipped per root bundle
 npm run docs:build    # build this site (input for the browser checks below)
-npm run check:behavior # browser interaction regressions across three engines
-npm run check:a11y    # axe WCAG A/AA audit of every docs page
+npm run check:behavior # interaction, reflow, user styles, and input parity across three engines
+npm run check:a11y    # axe WCAG 2.0–2.2 A/AA audit of every docs page
 npm run check:visual  # screenshot diff of selected component/layout pages
 ```
 
@@ -113,8 +113,14 @@ The browser-based checks need the Playwright browsers once:
 
 Runs focused interaction tests against Chromium, Firefox, and WebKit. These
 tests cover browser-managed states that static screenshots cannot exercise,
-such as focus, blur, `:user-valid`, and `:user-invalid`. WebKit provides the
-closest automated coverage available for Safari's rendering engine.
+such as focus, blur, `:user-valid`, and `:user-invalid`; mouse, Enter, and
+Space activation parity; and open dialog and popover states. For the default,
+`plain`, and `playroom` themes, the suite also checks every docs page at 320
+CSS px, with text at 200%, with WCAG text-spacing overrides, and with
+`forced-colors: active`. Reflow assertions compare
+`documentElement.scrollWidth` with its `clientWidth`, detect clipped text, and
+check open top-layer surfaces independently. WebKit provides the closest
+automated coverage available for Safari's rendering engine.
 
 ### Dist invariants — `check:dist`
 
@@ -200,11 +206,19 @@ neither goes stale while the other moves.
 
 ### Accessibility — `check:a11y`
 
-Runs [axe-core](https://github.com/dequelabs/axe-core) with the
-WCAG 2.x A/AA rule set against every page of the built docs site, in
-both light and dark schemes. Since the component demos live on these
-pages, this continuously re-verifies the framework's own AA claim, not
+Runs [axe-core](https://github.com/dequelabs/axe-core) with the explicit
+`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, and `wcag22aa` tags against every
+page of the built docs site. The complete matrix covers the default, `plain`,
+and `playroom` themes in light, dark, and forced-colors modes. Dialog and
+popover demos are audited once more while open. Since the component demos live
+on these pages, this continuously re-verifies the framework's own AA claim, not
 just the site around it.
+
+axe's contrast algorithm cannot model the system-color remapping performed by
+forced-colors mode, so `color-contrast` remains enabled in light and dark and
+is disabled only for that emulation. The behavior suite covers the forced-
+colors rendering directly, including focus rings, loading indicators, borders,
+open surfaces, and horizontal reflow.
 
 The check fails on any violation not listed in
 `scripts/a11y-baseline.json`. That baseline exists so an intentionally

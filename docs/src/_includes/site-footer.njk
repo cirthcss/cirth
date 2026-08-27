@@ -9,12 +9,12 @@
 				</a>
 				<p class="docs-footer-credit">
 					Designed and built by Riccardo Pastori, with help from the
-					<a href="https://github.com/cirthcss/cirth/graphs/contributors" target="_blank" rel="noreferrer">contributors</a>.
+					<a href="https://github.com/cirthcss/cirth/graphs/contributors" target="_blank" rel="noreferrer">contributors<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>.
 				</p>
 				<ul class="docs-footer-social">
-					<li><a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub</a></li>
-					<li><a href="https://www.npmjs.com/package/@cirthcss/cirth" target="_blank" rel="noreferrer">npm</a></li>
-					<li><a href="https://github.com/cirthcss/cirth/blob/master/CHANGELOG.md" target="_blank" rel="noreferrer">Changelog</a></li>
+					<li><a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+					<li><a href="https://www.npmjs.com/package/@cirthcss/cirth" target="_blank" rel="noreferrer">npm<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+					<li><a href="https://github.com/cirthcss/cirth/blob/master/CHANGELOG.md" target="_blank" rel="noreferrer">Changelog<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
 				</ul>
 			</div>
 			<div class="docs-footer-columns">
@@ -25,7 +25,7 @@
 							{% for item in group.items %}
 								<li>
 									{% if item.link.startsWith("http") %}
-										<a href="{{ item.link }}" target="_blank" rel="noreferrer">{{ item.text }}</a>
+										<a href="{{ item.link }}" target="_blank" rel="noreferrer">{{ item.text }}<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
 									{% else %}
 										<a href="{{ item.link }}">{{ item.text }}</a>
 									{% endif %}

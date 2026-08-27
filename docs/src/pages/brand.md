@@ -28,48 +28,48 @@ writing system, not a claim of license or partnership.
     <img src="/logo_brand.svg" alt="Cirth brand mark, amber on light" width="96" height="96" />
     <figcaption>Brand · light</figcaption>
     <p class="docs-brand-downloads">
-      <a role="button" class="outline secondary" href="/logo_brand.svg" download>SVG</a>
-      <a role="button" class="outline secondary" href="/logo_brand.png" download>PNG</a>
+      <a class="secondary" href="/logo_brand.svg" download>SVG</a>
+      <a class="secondary" href="/logo_brand.png" download>PNG</a>
     </p>
   </figure>
   <figure class="docs-brand-tile" data-theme="light">
     <img src="/logo_mono.svg" alt="Cirth monochrome mark, black on light" width="96" height="96" />
     <figcaption>Mono · light</figcaption>
     <p class="docs-brand-downloads">
-      <a role="button" class="outline secondary" href="/logo_mono.svg" download>SVG</a>
-      <a role="button" class="outline secondary" href="/logo_mono.png" download>PNG</a>
+      <a class="secondary" href="/logo_mono.svg" download>SVG</a>
+      <a class="secondary" href="/logo_mono.png" download>PNG</a>
     </p>
   </figure>
   <figure class="docs-brand-tile" data-theme="light">
     <img src="/logo_brand_app.svg" alt="Cirth icon on its background tile, light" width="96" height="96" />
     <figcaption>Icon · light</figcaption>
     <p class="docs-brand-downloads">
-      <a role="button" class="outline secondary" href="/logo_brand_app.svg" download>SVG</a>
-      <a role="button" class="outline secondary" href="/logo_brand_app.png" download>PNG</a>
+      <a class="secondary" href="/logo_brand_app.svg" download>SVG</a>
+      <a class="secondary" href="/logo_brand_app.png" download>PNG</a>
     </p>
   </figure>
   <figure class="docs-brand-tile" data-theme="dark">
     <img src="/logo_brand_dark.svg" alt="Cirth brand mark, amber on dark" width="96" height="96" />
     <figcaption>Brand · dark</figcaption>
     <p class="docs-brand-downloads">
-      <a role="button" class="outline secondary" href="/logo_brand_dark.svg" download>SVG</a>
-      <a role="button" class="outline secondary" href="/logo_brand_dark.png" download>PNG</a>
+      <a class="secondary" href="/logo_brand_dark.svg" download>SVG</a>
+      <a class="secondary" href="/logo_brand_dark.png" download>PNG</a>
     </p>
   </figure>
   <figure class="docs-brand-tile" data-theme="dark">
     <img src="/logo_mono_dark.svg" alt="Cirth monochrome mark, white on dark" width="96" height="96" />
     <figcaption>Mono · dark</figcaption>
     <p class="docs-brand-downloads">
-      <a role="button" class="outline secondary" href="/logo_mono_dark.svg" download>SVG</a>
-      <a role="button" class="outline secondary" href="/logo_mono_dark.png" download>PNG</a>
+      <a class="secondary" href="/logo_mono_dark.svg" download>SVG</a>
+      <a class="secondary" href="/logo_mono_dark.png" download>PNG</a>
     </p>
   </figure>
   <figure class="docs-brand-tile" data-theme="dark">
     <img src="/logo_brand_app_dark.svg" alt="Cirth icon on its background tile, dark" width="96" height="96" />
     <figcaption>Icon · dark</figcaption>
     <p class="docs-brand-downloads">
-      <a role="button" class="outline secondary" href="/logo_brand_app_dark.svg" download>SVG</a>
-      <a role="button" class="outline secondary" href="/logo_brand_app_dark.png" download>PNG</a>
+      <a class="secondary" href="/logo_brand_app_dark.svg" download>SVG</a>
+      <a class="secondary" href="/logo_brand_app_dark.png" download>PNG</a>
     </p>
   </figure>
 </div>

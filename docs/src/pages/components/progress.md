@@ -11,9 +11,12 @@ colors, including an animated indeterminate state.
 {% demo "progress" %}
 
 ```html
-<progress value="25" max="100"></progress>
-<progress value="75" max="100"></progress>
-<progress></progress> <!-- no value: indeterminate -->
+<label id="file-upload-label" for="file-upload-progress">File upload</label>
+<progress id="file-upload-progress" aria-labelledby="file-upload-label" value="25" max="100">25%</progress>
+<label id="data-import-label" for="data-import-progress">Data import</label>
+<progress id="data-import-progress" aria-labelledby="data-import-label" value="75" max="100">75%</progress>
+<label id="loading-results-label" for="loading-results-progress">Loading results</label>
+<progress id="loading-results-progress" aria-labelledby="loading-results-label"></progress> <!-- no value: indeterminate -->
 ```
 
 ## Behavior
@@ -37,3 +40,10 @@ colors, including an animated indeterminate state.
   completion — disk used, a score, capacity — reach for
   [meter](/components/meter) instead. It is styled as this component's
   matched pair.
+* Give every progress indicator an accessible name. The examples connect a
+  visible `<label>` with both `for` and `aria-labelledby`, which remains
+  robust in browser/screen-reader combinations that do not expose
+  `<progress>` as a labelable element consistently. `aria-label` is a terse
+  alternative when no visible label is appropriate. The numeric value is
+  exposed by the native element; fallback text such as `25%` also helps
+  older user agents.

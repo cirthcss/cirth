@@ -57,8 +57,8 @@ on the first paint.
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.13.0/dist/cirth.min.css"
-  integrity="sha384-We4yOXPnW3E8umXftrXI7CJA/zNHuBCSzS/RC9TDbDotlSbx+3zWA0k279wKa27P"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.14.0/dist/cirth.min.css"
+  integrity="sha384-sU2A7luz2xm9uj6FZ0hdflySgcbY9uN+QeQgJzyaZaM4ujBLxiPPibqEcaG2Ckuk"
   crossorigin="anonymous">
 ```
 

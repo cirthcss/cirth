@@ -2,7 +2,7 @@
 layout: base.njk
 bodyClass: docs-home
 ---
-<main class="docs-home">
+<main id="main-content" class="docs-home">
 	<section class="docs-hero-panel">
 		<div class="container">
 			{#- .container is Cirth's own 3-track grid (gutter/content/gutter),
@@ -30,7 +30,7 @@ bodyClass: docs-home
 					<p class="docs-hero-tagline">{{ hero.tagline }}</p>
 					<p class="docs-hero-actions">
 						{% for action in hero.actions %}
-							<a href="{{ action.link }}" role="button"{% if action.theme != "brand" %} class="outline secondary"{% endif %}>{{ action.text }}</a>
+							<a href="{{ action.link }}"{% if action.theme != "brand" %} class="secondary"{% endif %}>{{ action.text }}</a>
 						{% endfor %}
 					</p>
 				</div>
@@ -142,7 +142,7 @@ bodyClass: docs-home
 					{% endfor %}
 				</div>
 				<p class="docs-showcase-cta">
-					<a href="{{ showcase.link }}" role="button" class="outline secondary">{{ showcase.linkText }}</a>
+					<a href="{{ showcase.link }}" class="secondary">{{ showcase.linkText }}</a>
 				</p>
 			</section>
 		{% endif %}

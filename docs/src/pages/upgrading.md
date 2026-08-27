@@ -4,13 +4,46 @@ layout: docs.njk
 
 # Upgrading
 
-Cirth is pre-1.0, so a breaking change ships in a minor release. Each one
-starts a new line of documentation — the selector in the header switches
-between them — and gets an entry here saying what stopped working and what
-to do about it.
+Cirth is pre-1.0, so a breaking change ships in a minor release. Every one
+gets an entry here saying what stopped working and what to do about it, and
+one that leaves the documented API behind it also starts a new line of
+documentation — the selector in the header switches between them.
 
 After 1.0 the same boundary becomes a major release, and this page keeps
 working the way it already does.
+
+## To v0.14.0, from v0.13.x
+
+One behaviour change, on an attribute that was doing more than it says.
+
+### `aria-busy` no longer blocks interaction
+
+`aria-busy="true"` set `pointer-events: none` on buttons and links, so a
+busy control could not be clicked. It could still be activated with Enter
+or Space, because CSS cannot reach keyboard activation — so the protection
+covered the pointer and left the keyboard open, which is worse than not
+having it: the behaviour differed by input method and nothing announced it.
+
+`aria-busy` is a status. It tells assistive technology that a region is
+being updated, and that is all it means now.
+
+```html
+<!-- before: interaction stopped for a mouse, not for a keyboard -->
+<button type="submit" aria-busy="true">Saving…</button>
+
+<!-- after: say what you mean -->
+<button type="submit" aria-busy="true" disabled>Saving…</button>
+```
+
+Set `disabled` when the action starts and remove it when the action
+settles. For a control that is not a native button, use
+`aria-disabled="true"` and have its script ignore pointer and keyboard
+activation alike — `aria-disabled` describes the state, it does not enforce
+it.
+
+This line of documentation still covers v0.13.0: nothing above changes the
+token surface, the build layout or the class list that v0.13.0 introduced,
+so the switcher keeps one entry for both.
 
 ## To v0.13.0, from v0.12.x
 

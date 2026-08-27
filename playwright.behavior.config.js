@@ -2,12 +2,14 @@ const { defineConfig } = require("@playwright/test");
 
 // Interaction tests exercise behavior that static screenshots cannot cover,
 // including keyboard flows and browser-managed validity states. One
-// desktop/light project per engine is enough here: visual coverage across
-// themes and viewports remains in playwright.config.js.
+// desktop/light project per engine is enough here: resilience and parity
+// specs explicitly exercise the default, plain, and playroom themes, while
+// screenshot coverage across schemes and viewports remains elsewhere.
 
 module.exports = defineConfig({
 	testDir: "tests",
 	testMatch: [
+		"accessibility-resilience.spec.js",
 		"button-overflow.spec.js",
 		"docs-stack.spec.js",
 		"date-input-group.spec.js",
@@ -15,6 +17,7 @@ module.exports = defineConfig({
 		"forms-validity.spec.js",
 		"group-hidden-elements.spec.js",
 		"group-search-radius.spec.js",
+		"input-parity.spec.js",
 		"link-visited.spec.js",
 		"list-nesting.spec.js",
 		"meter.spec.js",

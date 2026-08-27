@@ -9,8 +9,8 @@
 // *only input tokens*: nothing below is a derived value. The accent's
 // background, hover, focus ring and underline tint are not set here
 // because they follow --cirth-primary on their own — which is the whole
-// point of the token model, and the reason this file is four
-// declarations rather than the forty it would have been.
+// point of the token model, and the reason this file is five declarations
+// rather than the forty it would have been.
 // See src/presets/playroom.scss for the other half: a preset that
 // overrides broadly, including derived tokens where it wants to break a
 // relationship on purpose.
@@ -29,7 +29,7 @@
   --cirth-canvas: light-dark(oklch(98.5% 0 0deg), oklch(20% 0.008 264deg));
   --cirth-card-background-color: light-dark(
     oklch(100% 0 0deg),
-    oklch(24.5% 0.011 264deg)
+    oklch(22% 0.011 264deg)
   );
 
   // A followed link drains to neutral, as in the default theme, but from

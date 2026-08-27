@@ -38,6 +38,7 @@
 		</script>
 	</head>
 	<body{% if bodyClass %} class="{{ bodyClass }}"{% endif %}>
+		<a href="#main-content" class="sr-only sr-only-focusable docs-skip-link">Skip to main content</a>
 		{%- if versions.isNext %}
 			{#- Only ever rendered on the /next/ preview build. Not a
 			    decoration: someone arriving from a search result has no
@@ -55,11 +56,21 @@
 		{% include "site-header.njk" %}
 		{{ content | safe }}
 		{% include "site-footer.njk" %}
+		<div class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-copy-status></div>
 		<script>
 			// Copy-to-clipboard for fenced code blocks: the markdown pipeline
 			// only highlights, it doesn't add a button, so one is injected for
 			// every `pre > code` on the page (prose fences and Demo's
 			// "Show HTML" source alike).
+			const copyStatus = document.querySelector("[data-copy-status]");
+			const announceCopyStatus = (message) => {
+				if (!copyStatus) return;
+				copyStatus.textContent = "";
+				requestAnimationFrame(() => {
+					copyStatus.textContent = message;
+				});
+			};
+
 			for (const pre of document.querySelectorAll("pre:not(.home-demo-code pre)")) {
 				if (pre.querySelector(":scope > button.copy")) continue;
 				const code = pre.querySelector("code");
@@ -71,11 +82,15 @@
 				button.setAttribute("aria-label", "Copy to clipboard");
 				pre.append(button);
 
-				button.addEventListener("click", () => {
-					navigator.clipboard.writeText(code.textContent ?? "").then(() => {
+				button.addEventListener("click", async () => {
+					try {
+						await navigator.clipboard.writeText(code.textContent ?? "");
 						button.classList.add("copied");
 						setTimeout(() => button.classList.remove("copied"), 2000);
-					});
+						announceCopyStatus("Code copied to clipboard.");
+					} catch {
+						announceCopyStatus("Code could not be copied.");
+					}
 				});
 			}
 

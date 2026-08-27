@@ -72,15 +72,52 @@ jobs:
       - name: Regenerate baselines
         run: npx playwright test --update-snapshots
 
+      # The push races anything else landing on the branch: regenerating 456
+      # screenshots takes minutes, and a second push in that window leaves
+      # this one pushing from a stale base. It used to just fail, which is
+      # indistinguishable from a real breakage at a glance and leaves the
+      # baselines unwritten — so a branch that had moved once stayed stale
+      # until someone pushed again.
+      #
+      # Rebasing and retrying is correct whichever way the race went. If the
+      # newer commits did not change rendered output, these baselines are
+      # still the right ones for the new head. If they did, a second run is
+      # already queued for that push and will overwrite them — pushing
+      # slightly stale baselines in the meantime is no worse than the
+      # already-documented window where CI compares against baselines the
+      # follow-up commit has not caught up with yet.
+      #
+      # -X theirs resolves against the commit being replayed, which during a
+      # rebase is ours: two runs racing means the later regeneration wins,
+      # which is the one that saw the newer content.
       - name: Commit and push baselines
         run: |
           git lfs install --local
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add tests/__screenshots__
+
           if git diff --cached --quiet; then
             echo "Baselines unchanged — nothing to commit."
-          else
-            git commit -m "test: regenerate Linux visual baselines"
-            git push origin "HEAD:${{ github.ref_name }}"
+            exit 0
           fi
+
+          git commit -m "test: regenerate Linux visual baselines"
+
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:${{ github.ref_name }}"; then
+              exit 0
+            fi
+
+            echo "Push rejected (attempt $attempt) — the branch moved. Rebasing."
+            git fetch origin "${{ github.ref_name }}"
+
+            if ! git rebase -X theirs "origin/${{ github.ref_name }}"; then
+              git rebase --abort || true
+              echo "::error::Could not rebase the baseline commit onto the branch."
+              exit 1
+            fi
+          done
+
+          echo "::error::Still could not push after three attempts."
+          exit 1
