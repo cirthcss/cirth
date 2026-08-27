@@ -18,7 +18,7 @@ reasonably should.
 
 * **`plain`** is the conventional application baseline: a familiar blue
   accent, a plain white page, and headings in the body face rather than the
-  default theme's serif. It is the whole point of the token model in four
+  default theme's serif. It is the whole point of the token model in five
   declarations — it sets **only input tokens**, and the accent's fill,
   hover, focus ring and underline tint follow on their own. Reach for it
   when you want an interface that looks unremarkable in the good sense.
@@ -101,7 +101,7 @@ same color by construction rather than by manual matching.
 literals their overridden tokens need. They don't duplicate the theme's
 full palette, component styles, or reset rules — and they no longer
 duplicate its scheme wiring either: each scheme difference is stated once
-as a `light-dark()` pair, which is why `plain` fits in four declarations.
+as a `light-dark()` pair, which is why `plain` fits in five declarations.
 
 Cirth targets browsers with native `oklch()` support (see the `browserslist`
 field in `package.json`), so the compiled CSS ships `oklch()` directly rather

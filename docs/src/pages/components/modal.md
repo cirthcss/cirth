@@ -13,16 +13,16 @@ nothing else, and no longer asks your script for anything.
 {% demo "modal" %}
 
 ```html
-<dialog id="confirm">
+<dialog id="confirm" aria-labelledby="confirm-title">
   <article>
     <header>
-      <button aria-label="Close" rel="prev"></button>
-      <strong>Confirm action</strong>
+      <button type="button" aria-label="Close" rel="prev"></button>
+      <strong id="confirm-title">Confirm action</strong>
     </header>
     <p>Are you sure you want to delete this item? This cannot be undone.</p>
     <footer>
-      <button role="button" class="secondary">Cancel</button>
-      <button role="button">Confirm</button>
+      <button type="button" class="secondary">Cancel</button>
+      <button type="button">Confirm</button>
     </footer>
   </article>
 </dialog>
@@ -37,8 +37,9 @@ Two attributes, no script:
   Delete item
 </button>
 
-<dialog id="confirm">
+<dialog id="confirm" aria-labelledby="confirm-title">
   <article>
+    <h2 id="confirm-title">Confirm action</h2>
     <p>Are you sure?</p>
     <footer>
       <button type="button" commandfor="confirm" command="request-close">

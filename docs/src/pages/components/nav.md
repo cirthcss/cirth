@@ -17,7 +17,7 @@ extra classes.
   <ul>
     <li><a href="#">Features</a></li>
     <li><a href="#" aria-current="page">Pricing</a></li>
-    <li><a href="#" role="button">Sign up</a></li>
+    <li><a href="#">Sign up</a></li>
   </ul>
 </nav>
 ```

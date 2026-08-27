@@ -55,7 +55,14 @@
 #{$parent-selector} kbd,
 #{$parent-selector} samp {
   display: inline-block;
+
+  // Keep a long URL, token, or hash inside the available line instead of
+  // letting the inline box widen the document at narrow viewports. `pre`
+  // overrides these elements to `display: block` below and remains the
+  // intentionally scrollable variant.
+  max-inline-size: 100%;
   padding: var(--cirth-space-1) var(--cirth-space-2);
+  overflow-wrap: anywhere;
 }
 
 #{$parent-selector} pre {

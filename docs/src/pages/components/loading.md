@@ -5,14 +5,15 @@ layout: docs.njk
 
 # Loading
 
-`aria-busy="true"` shows a small spinner and disables interaction, on any
-element, including buttons, links, and plain text.
+`aria-busy="true"` shows a small spinner and tells assistive technology that
+an element is being updated. It can be used on buttons, links, and plain
+text, but it does not disable an action by itself.
 
 {% demo "loading" %}
 
 ```html
-<button type="button" aria-busy="true">Loading…</button>
-<button type="button" aria-busy="true" aria-label="Loading" class="secondary"></button>
+<button type="button" aria-busy="true" disabled>Loading…</button>
+<button type="button" aria-busy="true" aria-label="Loading" class="secondary" disabled></button>
 <p aria-busy="true">Loading data…</p>
 ```
 
@@ -24,9 +25,11 @@ element, including buttons, links, and plain text.
   system color.
 * Content with text gets the spinner prefixed with a small gap; empty
   content (like the second button above) centers the spinner alone.
-* On `button`/`[type="submit"]`/`[type="button"]`/`[type="reset"]`/
-  `[role="button"]`/`a`, `aria-busy="true"` also sets
-  `pointer-events: none`, so a loading action can't be triggered twice.
+* `aria-busy` is a status, not a disabled state. If a native button must not
+  run twice, add its `disabled` property while the action is pending and
+  remove it when the action finishes. For a custom control, use
+  `aria-disabled="true"` and make its JavaScript ignore both pointer and
+  keyboard activation. CSS alone cannot make that behavior consistent.
 * Button-like `input`s (`submit`/`button`/`reset`) can't render
   pseudo-elements, so they paint the spinner as a background icon at the
   line start instead.

@@ -11,6 +11,12 @@ const path = require("node:path");
 const projectRoot = path.join(__dirname, "../..");
 const docsDist = path.join(projectRoot, "docs/dist");
 
+const themeVariants = [
+	{ name: "default", storageValue: "amber" },
+	{ name: "plain", storageValue: "plain" },
+	{ name: "playroom", storageValue: "playroom" },
+];
+
 /** @param {string} label */
 const assertDocsBuilt = (label) => {
 	if (!fs.existsSync(path.join(docsDist, "index.html"))) {
@@ -106,4 +112,50 @@ const startServer = async (server) => {
 	return `http://127.0.0.1:${address.port}`;
 };
 
-module.exports = { assertDocsBuilt, createServer, docsDist, listPages, startServer };
+/**
+ * Configure the docs' real preset loader before the first page script runs.
+ * BrowserContext and Page both expose addInitScript(), so this works for the
+ * standalone axe runner as well as Playwright fixtures.
+ *
+ * @param {{ addInitScript: Function }} target
+ * @param {(typeof themeVariants)[number]} theme
+ */
+const installTheme = (target, theme) =>
+	target.addInitScript((/** @type {string} */ storageValue) => {
+		sessionStorage.setItem("cirth-preset", storageValue);
+	}, theme.storageValue);
+
+/**
+ * Wait until the switcher reflects the requested theme and, for a preset,
+ * its dynamically inserted stylesheet has finished loading.
+ *
+ * @param {import("playwright").Page} page
+ * @param {(typeof themeVariants)[number]} theme
+ */
+const waitForTheme = (page, theme) =>
+	page.waitForFunction(
+		({ name, storageValue }) => {
+			const select = document.querySelector("[data-cirth-preset-select]");
+			const link = document.getElementById("cirth-preset-stylesheet");
+			if (!(select instanceof HTMLSelectElement)) return false;
+			if (select.value !== storageValue) return false;
+			if (name === "default") return link === null;
+			return (
+				link instanceof HTMLLinkElement &&
+				link.href.endsWith(`/styles/generated/presets/${name}.css`) &&
+				Boolean(link.sheet)
+			);
+		},
+		{ name: theme.name, storageValue: theme.storageValue },
+	);
+
+module.exports = {
+	assertDocsBuilt,
+	createServer,
+	docsDist,
+	installTheme,
+	listPages,
+	startServer,
+	themeVariants,
+	waitForTheme,
+};

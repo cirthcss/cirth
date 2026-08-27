@@ -16,7 +16,7 @@
 				</li>
 			{% endfor %}
 			<li class="docs-nav-item">
-				<a href="{{ nav.github }}" target="_blank" rel="noreferrer">GitHub</a>
+				<a href="{{ nav.github }}" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
 			</li>
 		</ul>
 		<ul class="docs-header-controls-group">
@@ -27,25 +27,29 @@
 			    same reason as the preset one below — keyboard and screen
 			    reader support for free. -#}
 			<li>
-				<select
-					class="docs-version-select"
-					aria-label="Documentation version"
-					data-docs-version-select
-				>
-					{% for line in versions.lines %}
-						<option value="{{ line.href }}"{% if line.current and not versions.isNext %} selected{% endif %}>{{ line.label }}</option>
-					{% endfor %}
-					{% if versions.isNext %}<option value="{{ versions.next }}" selected>unreleased</option>{% endif %}
-				</select>
+				<form class="docs-version-picker" data-docs-version-form>
+					<select
+						class="docs-version-select"
+						aria-label="Documentation version"
+						data-docs-version-select
+					>
+						{% for line in versions.lines %}
+							<option value="{{ line.href }}"{% if line.current and not versions.isNext %} selected{% endif %}>{{ line.label }}</option>
+						{% endfor %}
+						{% if versions.isNext %}<option value="{{ versions.next }}" selected>unreleased</option>{% endif %}
+					</select>
+					<button type="submit" class="outline secondary docs-version-submit">Go</button>
+				</form>
 				<script>
 					// Navigating between documentation lines is a page load, not
 					// a preference: each line is a separate build with its own
 					// pages, so there is nothing to remember or restore.
-					document
-						.querySelector("[data-docs-version-select]")
-						?.addEventListener("change", (event) => {
-							window.location.href = event.target.value;
-						});
+					const versionForm = document.querySelector("[data-docs-version-form]");
+					versionForm?.addEventListener("submit", (event) => {
+						event.preventDefault();
+						const select = versionForm.querySelector("[data-docs-version-select]");
+						if (select?.value) window.location.assign(select.value);
+					});
 				</script>
 			</li>
 			{#- Live preset switcher (gh#80): lets anyone preview the presets —
@@ -64,7 +68,7 @@
 				</select>
 			</li>
 			<li>
-				<button type="button" class="ghost contrast docs-theme-toggle" aria-label="Toggle color scheme">
+				<button type="button" class="ghost contrast docs-theme-toggle" aria-label="Dark color scheme" aria-pressed="false">
 					{% icon "sun", 18, "docs-theme-icon-sun" %}
 					{% icon "moon", 18, "docs-theme-icon-moon" %}
 				</button>
@@ -72,11 +76,20 @@
 					// Which icon is visible is driven entirely by CSS
 					// ([data-theme="dark"] .docs-theme-icon-*, see styles/style.css)
 					// — this script is only the click handler.
-					document.querySelector(".docs-theme-toggle")?.addEventListener("click", () => {
+					const themeToggle = document.querySelector(".docs-theme-toggle");
+					const syncThemeToggle = () => {
+						themeToggle?.setAttribute(
+							"aria-pressed",
+							document.documentElement.getAttribute("data-theme") === "dark" ? "true" : "false",
+						);
+					};
+					syncThemeToggle();
+					themeToggle?.addEventListener("click", () => {
 						const next =
 							document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
 						document.documentElement.setAttribute("data-theme", next);
 						localStorage.setItem("cirth-theme", next);
+						syncThemeToggle();
 					});
 				</script>
 			</li>

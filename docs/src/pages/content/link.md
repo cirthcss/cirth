@@ -15,7 +15,6 @@ color groups.
 <a href="#">Primary link</a>
 <a href="#" class="secondary">Secondary link</a>
 <a href="#" class="contrast">Contrast link</a>
-<a href="#" role="button">Link styled as a button</a>
 ```
 
 ## Behavior
@@ -33,9 +32,16 @@ color groups.
   time as the reader browses looks broken rather than oriented. `.secondary`
   and `.contrast` links stay in their own color group too, as do the states
   above.
-* `a[role="button"]` opts out of link styling entirely and is styled by
-  [Button](/content/button) instead. This is how you get a link that looks
-  like a button.
+* `a[role="button"]` opts out of link styling and receives
+  [Button](/content/button) styling for backward compatibility. Do not use
+  it for navigation: changing the role hides the link semantics, while the
+  anchor still lacks a button's Space-key behavior. Prefer an ordinary link
+  for a destination and a native `<button>` for an action.
+
+Likewise, `role="link"` changes only semantics and styling. A non-anchor
+custom link still needs `tabindex="0"`, keyboard activation, and navigation
+logic supplied by the application. Native `<a href>` remains the reliable
+default.
 
 The underline keeps its unvisited tint on a visited link, and that is not an
 oversight: browsers let `:visited` change `color` (plus background, border,

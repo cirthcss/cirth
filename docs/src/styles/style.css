@@ -37,9 +37,13 @@
    space-between alone can't guarantee. */
 .docs-header nav {
 	display: grid;
-	grid-template-columns: auto 1fr auto;
+	grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
 	align-items: center;
 	gap: calc(var(--cirth-spacing) * 1.5);
+}
+
+.docs-header-brand-group {
+	justify-content: flex-start;
 }
 
 .docs-header-nav-group {
@@ -47,8 +51,17 @@
 }
 
 .docs-header-controls-group {
+	min-width: 0;
+	flex-wrap: wrap;
 	justify-content: flex-end;
 	gap: calc(var(--cirth-spacing) * 0.75);
+}
+
+.docs-version-picker {
+	display: flex;
+	align-items: center;
+	gap: var(--cirth-space-2);
+	margin: 0;
 }
 
 /* Bigger wordmark lockup than a body-text nav link warrants (Ruby-style
@@ -121,6 +134,29 @@
 	line-height: 1;
 }
 
+.docs-version-submit.docs-version-submit {
+	min-block-size: 2.75rem;
+	height: 2.75rem;
+	margin: 0;
+	padding-inline: var(--cirth-space-3);
+	font-size: var(--cirth-font-size-sm);
+}
+
+.docs-skip-link:focus {
+	position: fixed;
+	inset-block-start: var(--cirth-space-3);
+	inset-inline-start: var(--cirth-space-3);
+	z-index: 1000;
+	padding: var(--cirth-space-2) var(--cirth-space-3);
+	border-radius: var(--cirth-border-radius);
+	background: var(--cirth-card-background-color);
+	box-shadow: 0 0 0 var(--cirth-outline-width) var(--cirth-primary-focus);
+}
+
+.docs-external-mark {
+	white-space: nowrap;
+}
+
 /* Phosphor sun/moon: show the icon for the active scheme */
 .docs-theme-icon-moon,
 [data-theme="dark"] .docs-theme-icon-sun {
@@ -142,12 +178,34 @@
 	   the outer two share the row directly instead of leaving a dead
 	   1fr gap between them. */
 	.docs-header nav {
-		grid-template-columns: auto auto;
-		justify-content: space-between;
+		grid-template-columns: auto minmax(0, 1fr);
 	}
 
 	.docs-header-nav-group {
 		display: none;
+	}
+}
+
+@media (max-width: 575px) {
+	.docs-header nav {
+		grid-template-columns: minmax(0, 1fr);
+		justify-items: center;
+		gap: var(--cirth-spacing);
+	}
+
+	.docs-header-brand-group,
+	.docs-header-controls-group {
+		justify-content: center;
+	}
+
+	.docs-header-controls-group {
+		width: 100%;
+	}
+
+	.docs-header-controls-group > li:first-child {
+		display: flex;
+		flex-basis: 100%;
+		justify-content: center;
 	}
 }
 
@@ -1330,6 +1388,19 @@ pre > button.copy::before {
 pre > button.copy.copied::before {
 	content: "✓";
 	color: var(--cirth-ins-color);
+}
+
+/* Markdown tables are wrapped by Eleventy in this keyboard-reachable
+   region. `min-width: 100%` keeps short tables aligned with the prose while
+   long ones scroll inside the page instead of widening the document. */
+.docs-table-scroll {
+	max-inline-size: 100%;
+	margin-block-end: var(--cirth-spacing);
+}
+
+.docs-table-scroll > table {
+	min-width: 100%;
+	margin-bottom: 0;
 }
 
 /* Live demo frames: white sheets on the paper canvas */

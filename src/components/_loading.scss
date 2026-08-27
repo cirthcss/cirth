@@ -8,8 +8,6 @@
 
 #{$parent-selector}
   [aria-busy="true"]:not(input, select, textarea, html, form) {
-  white-space: nowrap;
-
   // The spinner is the icon SVG applied as a mask over currentColor, so it
   // always matches the text it sits next to — a baked-in stroke color can't
   // adapt on primary buttons or colored cards (upstream #643)
@@ -42,22 +40,6 @@
   }
 }
 
-// Buttons cap at the width of their container (see _button.scss), so the
-// nowrap above would push a long busy label straight back out of the box
-// it was just constrained to (gh#75). Wrapping keeps the spinner at the
-// start of the first line, where it still reads as one control.
-
-#{$parent-selector}
-  :is(
-    button,
-    [type="submit"],
-    [type="reset"],
-    [type="button"],
-    [role="button"]
-  )[aria-busy="true"] {
-  white-space: normal;
-}
-
 // Submit/button/reset inputs are replaced elements — pseudo-elements don't
 // render on them — so the spinner is painted as a background icon at the
 // line start instead (upstream #693). Kept as a background-image (not a
@@ -85,18 +67,5 @@
       background-position: center right
         var(--cirth-form-element-spacing-horizontal);
     }
-  }
-}
-
-// Buttons and links
-
-#{$parent-selector} button,
-#{$parent-selector} [type="submit"],
-#{$parent-selector} [type="button"],
-#{$parent-selector} [type="reset"],
-#{$parent-selector} [role="button"],
-#{$parent-selector} a {
-  &[aria-busy="true"] {
-    pointer-events: none;
   }
 }

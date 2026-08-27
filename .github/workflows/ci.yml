@@ -53,7 +53,7 @@ jobs:
       - name: Browser interaction regression tests
         run: npm run check:behavior
 
-      - name: Check docs accessibility (axe, WCAG A/AA)
+      - name: Check all themes accessibility (axe, WCAG 2.0–2.2 A/AA)
         run: npm run check:a11y
 
       # Visual baselines are Git LFS objects and platform-specific (font

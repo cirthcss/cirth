@@ -60,8 +60,9 @@ npm run check:dist
 npm run check:size
 ```
 
-CI additionally audits the built docs site for accessibility (axe,
-WCAG A/AA) and visual regressions on every push. Those checks, how to
+CI additionally audits the built docs site and all three shipped themes for
+accessibility (axe, WCAG 2.0–2.2 A/AA), reflow and input parity, plus visual
+regressions on every push. Those checks, how to
 run them locally, and how the screenshot baselines are updated are
 documented in the
 [quality gates section of `docs/contributions.md`](../docs/src/pages/contributions.md#quality-gates).

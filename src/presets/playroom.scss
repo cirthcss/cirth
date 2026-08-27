@@ -5,7 +5,7 @@
 // generous spacing, a rounded face, and motion with a little overshoot, so
 // the interface reads as approachable rather than administrative.
 // It is the longer half of a worked example. Where src/presets/plain.scss
-// changes four input tokens and lets the theme derive the rest, this one
+// changes five input tokens and lets the theme derive the rest, this one
 // reaches across the whole surface: colour, geometry, typography, motion
 // and depth. It also overrides two *derived* tokens on purpose, which is
 // the other thing worth demonstrating — see the note further down.
@@ -91,7 +91,7 @@
   // out of the derivation — which is exactly what a derived token is for,
   // as long as you mean it.
   --cirth-primary-hover: light-dark(
-    oklch(58% 0.18 300deg),
+    oklch(56% 0.18 300deg),
     oklch(80% 0.13 300deg)
   );
   --cirth-primary-hover-background: light-dark(

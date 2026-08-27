@@ -84,15 +84,40 @@ module.exports = (eleventyConfig) => {
 			assistiveText: (title) => `Permalink to "${title}"`,
 		}),
 	});
+
+	// Markdown tables can become wider than the reading column at narrow
+	// viewports or under text zoom. Keep that overflow local and make the
+	// resulting scroll region keyboard reachable. The column names produce
+	// a useful, page-specific accessible name instead of a repeated generic
+	// "scrollable table" landmark.
+	markdown.renderer.rules.table_open = (tokens, index) => {
+		const columnNames = [];
+		for (let cursor = index + 1; cursor < tokens.length; cursor += 1) {
+			if (tokens[cursor].type === "tbody_open") break;
+			if (tokens[cursor].type !== "th_open") continue;
+
+			const inline = tokens.slice(cursor + 1).find((token) => token.type === "inline");
+			if (inline?.content) columnNames.push(inline.content.replace(/[*_`]/g, ""));
+		}
+
+		const suffix = columnNames.length > 0 ? `: ${columnNames.join(", ")}` : "";
+		return `<div class="overflow-auto docs-table-scroll" tabindex="0" role="region" aria-label="Table${escapeHtml(suffix)}"><table>`;
+	};
+	markdown.renderer.rules.table_close = () => "</table></div>";
 	// One slugger per build, reset per page, so repeated headings on a page
 	// dedupe (foo, foo-1) without pages leaking suffixes into each other.
 	eleventyConfig.on("eleventy.before", () => slugger.reset());
 
 	// Eleventy doesn't clean its output directory (Astro did); start each
-	// build fresh so stale pages — or iCloud "name 2.html" duplicates —
-	// can't accumulate in docs/dist between builds.
+	// process fresh so stale pages — or iCloud "name 2.html" duplicates —
+	// can't accumulate in docs/dist. The guard matters in --serve mode:
+	// eleventy.before also runs for incremental rebuilds, where deleting the
+	// active output directory leaves Eleventy with nowhere to write.
+	let outputCleaned = false;
 	eleventyConfig.on("eleventy.before", () => {
+		if (outputCleaned) return;
 		fs.rmSync(path.join(docsRoot, "dist"), { recursive: true, force: true });
+		outputCleaned = true;
 	});
 	markdown.core.ruler.before("normalize", "cirth-reset-slugs", () => {
 		slugger.reset();

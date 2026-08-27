@@ -84,4 +84,18 @@ there's no way to add `.secondary` to them.
   anything wrong — accepted as the trade-off for zero-JS feedback once
   fields start getting filled in.
 * Combine with [Loading](/components/loading) (`aria-busy="true"`) to show a
-  spinner and disable interaction while a button's action is pending.
+  spinner while a button's action is pending. Add the native `disabled`
+  property separately if the action must not run twice.
+
+## Native behavior first
+
+Prefer a native `<button>` for actions. Styling `[role="button"]` does not
+make a generic element focusable and does not add Enter or Space activation;
+those behaviors, disabled-state handling, and form behavior remain the
+application's responsibility. Use the ARIA role only when native HTML cannot
+represent the control and its complete keyboard interaction is implemented.
+
+For navigation, keep an anchor's link semantics. Do not add `role="button"`
+to an `<a href>` merely to change its appearance: a link announces and
+behaves differently from a button, and CSS cannot repair that semantic
+mismatch.

@@ -225,11 +225,9 @@
           calc(var(--cirth-form-element-spacing-horizontal) * -1);
         padding: calc(var(--cirth-form-element-spacing-vertical) * 0.5)
           var(--cirth-form-element-spacing-horizontal);
-        overflow: hidden;
         border-radius: 0;
         color: var(--cirth-dropdown-color);
         text-decoration: none;
-        text-overflow: ellipsis;
 
         &:hover,
         &:focus,

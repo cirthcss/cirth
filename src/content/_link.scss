@@ -7,11 +7,12 @@
 // the visited cue is for content links only (gh#58).
 // The color variants and the dropdown are class-based, so they only exist
 // to exclude in the builds that ship classes.
-$visited-class-exceptions: if(
-  $enable-classes,
-  ".secondary, .contrast, details.dropdown a, ",
-  ""
-);
+$visited-class-exceptions: "";
+
+@if $enable-classes {
+  $visited-class-exceptions: ".secondary, .contrast, details.dropdown a, ";
+}
+
 $visited-exceptions: $visited-class-exceptions +
   '[aria-current]:not([aria-current="false"]), :hover, :active, :focus, nav a';
 

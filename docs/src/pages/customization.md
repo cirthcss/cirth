@@ -128,7 +128,7 @@ these.
 
 The `plain` preset is those first two plus two more, and nothing else — see
 [Colors](/colors) for what it looks like. It exists partly to prove the
-point: a coherent, accessible, light-and-dark theme in four declarations.
+point: a coherent, accessible, light-and-dark theme in five declarations.
 
 Here is a custom accent applied live, which is two declarations — the pair
 and a radius — over the build this page is already using:
@@ -802,4 +802,3 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-h4-color` | input |
 | `--cirth-h5-color` | input |
 | `--cirth-h6-color` | input |
-
