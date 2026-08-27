@@ -79,10 +79,11 @@ build infrastructure, not part of the published package surface.
 
 ## Releasing
 
-Releases are cut on `master` and driven by a `vX.Y.Z` tag. Pushing the tag
-starts the Package workflow (release artifacts and the GitHub release) and
-the Publish npm workflow; both rebuild `dist/` from the tagged source, so
-the published files are whatever that source compiles to.
+Releases are cut on `master` from a `vX.Y.Z` tag. Tag pushes do not publish
+anything by themselves. The Package workflow (release artifacts and the
+GitHub release) and Publish npm workflow are dispatched deliberately against
+that tag; both rebuild `dist/` from the tagged source, so the published files
+are whatever that source compiles to.
 
 ### Which number to bump
 
@@ -126,9 +127,17 @@ carrying a change its own changelog entry labels breaking.
    `README.md` and `docs/src/pages/get-started.md` belong in the release
    commit.
 6. `npm run lint && npm run check:dist && npm run check:size`.
-7. Commit as `chore(release): prepare vX.Y.Z`, then tag that commit
-   `vX.Y.Z` and push the tag.
-8. Once npm has the version and jsDelivr has fetched it (a minute or two),
+7. Commit as `chore(release): prepare vX.Y.Z`, push that commit to `master`,
+   then tag it `vX.Y.Z` and push the tag. Wait until GitHub shows the tag
+   before dispatching either release workflow.
+8. Dispatch Package against the tag and wait for it to create the GitHub
+   release successfully:
+   `gh workflow run package.yml --ref vX.Y.Z`. Then dispatch Publish npm
+   against the same tag:
+   `gh workflow run npm-publish.yml --ref vX.Y.Z -f tag=latest`. The Actions
+   UI is equivalent, but the selected ref must be the release tag; both jobs
+   refuse to run from a branch.
+9. Once npm has the version and jsDelivr has fetched it (a minute or two),
    verify the documented hashes against reality:
    `npm run check:sri -- --from-cdn`.
 
@@ -147,6 +156,6 @@ matches the published file, because between releases `dist/` has already
 moved past the version the snippets pin. Step 7 above is the check that
 compares against the real published bytes.
 
-If step 7 disagrees, the release build was not reproducible: regenerate
+If step 9 disagrees, the release build was not reproducible: regenerate
 from the published files with `npm run sri -- --from-cdn` and commit the
 correction, then look into why the two builds differed.

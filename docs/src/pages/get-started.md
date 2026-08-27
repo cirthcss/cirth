@@ -13,7 +13,7 @@ semantic markup, and most of your interface is already styled.
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.14.0/dist/cirth.min.css"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.14.1/dist/cirth.min.css"
   integrity="sha384-sU2A7luz2xm9uj6FZ0hdflySgcbY9uN+QeQgJzyaZaM4ujBLxiPPibqEcaG2Ckuk"
   crossorigin="anonymous">
 ```

@@ -3,6 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const postcss = require("postcss");
 const selectorParser = require("postcss-selector-parser");
+const { listPresetNames } = require("./lib/presets");
 
 const projectRoot = path.join(__dirname, "..");
 const distDir = path.join(projectRoot, "dist");
@@ -38,7 +39,9 @@ const rootBuilds = [
 	{ name: "cirth.print.classless.scoped", classless: true, scoped: true },
 ];
 
-const presetBuilds = [{ name: "presets/plain" }, { name: "presets/playroom" }];
+const presetBuilds = listPresetNames().map((name) => ({
+	name: `presets/${name}`,
+}));
 
 const allFiles = [...rootBuilds, ...presetBuilds].flatMap(({ name }) => [
 	`${name}.css`,

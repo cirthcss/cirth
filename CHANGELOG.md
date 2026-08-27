@@ -5,6 +5,41 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Cirth is pre-1.0 and the custom property surface is not yet stable.
 
+## [0.14.1] - 2026-08-27
+
+### Added
+
+- **Visual coverage for prose pages and every maintained preset.** About,
+  Customization, Get Started, Upgrading, and Contributions now have
+  screenshot baselines. Presets add representative color, semantic,
+  component, form, modal, and popover captures automatically from the
+  `src/presets/` lineup (gh#88, gh#99).
+
+### Fixed
+
+- **Playroom's light warning border clears the 3:1 non-text floor.** Its
+  derived field border measured 2.54:1 against the field surface; the preset
+  input is retuned and held by the new semantic contrast matrix (gh#88).
+
+### Changed
+
+- **Release publishing is explicitly dispatched from a tag.** Pushing a tag
+  no longer starts Package or Publish npm. The release checklist now runs the
+  two workflows deliberately and in order, preventing delayed tag webhooks
+  from creating duplicate publish attempts (gh#100).
+
+- **Preset verification discovers the maintained lineup from source.** Build
+  invariants, interaction checks, contrast assertions, axe audits, the docs
+  switcher, and visual cases now share `src/presets/` as their source of truth.
+  The contrast fixture names the affected theme, scheme, preference, and
+  semantic pair, including error, warning, and success treatments (gh#88).
+
+### Removed
+
+- **508 ignored iCloud conflict copies** with ` 2.*` names. The contribution
+  guide now explains why they appear, how to remove them safely, and how to
+  prevent them from returning (gh#102).
+
 ## [0.14.0] - 2026-08-27
 
 ### Changed
@@ -1300,6 +1335,7 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
+[0.14.1]: https://github.com/cirthcss/cirth/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/cirthcss/cirth/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/cirthcss/cirth/compare/v0.12.0...v0.13.0
 [0.12.0]: https://github.com/cirthcss/cirth/compare/v0.11.0...v0.12.0

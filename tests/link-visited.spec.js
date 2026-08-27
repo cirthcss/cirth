@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
+const { listPresetNames } = require("../scripts/lib/presets");
 const {
 	assertDocsBuilt,
 	createServer,
@@ -132,7 +133,8 @@ for (const build of builds) {
 }
 
 test("the presets carry their own visited color", () => {
-	for (const preset of ["dist/presets/plain.css", "dist/presets/playroom.css"]) {
+	for (const name of listPresetNames()) {
+		const preset = `dist/presets/${name}.css`;
 		// One declaration, not two: a preset states the scheme difference as a
 		// light-dark() pair, the same shape theme/_dual.scss uses. What matters
 		// is unchanged — a followed link is drained to neutral in both schemes,

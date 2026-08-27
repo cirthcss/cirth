@@ -2,6 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
 const { contrastRatio, parseColor } = require("../scripts/lib/color");
+const { listPresetNames } = require("../scripts/lib/presets");
 
 // gh#34 — prefers-contrast: more (src/theme/_contrast.scss).
 //
@@ -45,10 +46,10 @@ const css = read("dist/cirth.css");
 // Presets are loaded *after* the framework and redeclare the same tokens
 // on the same roots, so each one has to carry its own pass or it would
 // hand the strengthened values straight back (see src/presets/).
-const presets = [
-	{ css: read("dist/presets/plain.css"), name: "plain" },
-	{ css: read("dist/presets/playroom.css"), name: "playroom" },
-];
+const presets = listPresetNames().map((name) => ({
+	css: read(`dist/presets/${name}.css`),
+	name,
+}));
 
 const markup = `
 	<main>
@@ -57,8 +58,14 @@ const markup = `
 		<p><a id="link" href="https://example.com">A link</a></p>
 		<hr id="rule">
 		<input id="field" type="text">
+		<input id="error-field" type="text" aria-invalid="true">
+		<input id="success-field" type="text" aria-invalid="false">
+		<input id="warning-field" type="text" style="border-color: var(--cirth-warning-border)">
 		<article id="card"><p id="card-text">On a card.</p></article>
 		<button id="button" type="button">Button</button>
+		<p id="error-text" style="color: var(--cirth-error-text)">Error text.</p>
+		<p id="success-text" style="color: var(--cirth-success-text)">Success text.</p>
+		<mark id="warning-text">Warning text.</mark>
 	</main>
 `;
 
@@ -300,6 +307,105 @@ for (const preset of presets) {
 					more[role],
 					`${role} is at least as strong as the default`,
 				).toBeGreaterThanOrEqual(base[role]);
+			}
+		});
+	}
+}
+
+// The complete shipped-theme matrix for the pairs named in the
+// customization guide. These assertions are deliberately numeric: axe
+// covers the real docs pages, while this compact fixture makes a failure say
+// exactly which theme, scheme, contrast preference, and semantic state
+// regressed. Every pair must clear its AA floor in both preference modes,
+// and asking for more contrast must never make any one of them worse.
+const themes = [{ css: "", name: "default" }, ...presets];
+const pairFloors = {
+	accent: 4.5,
+	button: 4.5,
+	errorBorder: 3,
+	errorText: 4.5,
+	muted: 4.5,
+	successBorder: 3,
+	successText: 4.5,
+	warningBorder: 3,
+	warningText: 4.5,
+};
+
+/** @param {import("@playwright/test").Page} page */
+const measureNamedPairs = async (page) => {
+	const canvas = await pageBackground(page);
+	const fieldBackground = await styleOf(page, "field", "background-color");
+
+	return {
+		accent: contrastRatio(await styleOf(page, "link", "color"), canvas),
+		button: contrastRatio(
+			await styleOf(page, "button", "color"),
+			await styleOf(page, "button", "background-color"),
+		),
+		errorBorder: contrastRatio(
+			await styleOf(page, "error-field", "border-top-color"),
+			fieldBackground,
+		),
+		errorText: contrastRatio(
+			await styleOf(page, "error-text", "color"),
+			canvas,
+		),
+		muted: contrastRatio(await styleOf(page, "muted", "color"), canvas),
+		successBorder: contrastRatio(
+			await styleOf(page, "success-field", "border-top-color"),
+			fieldBackground,
+		),
+		successText: contrastRatio(
+			await styleOf(page, "success-text", "color"),
+			canvas,
+		),
+		warningBorder: contrastRatio(
+			await styleOf(page, "warning-field", "border-top-color"),
+			fieldBackground,
+		),
+		warningText: contrastRatio(
+			await styleOf(page, "warning-text", "color"),
+			await styleOf(page, "warning-text", "background-color"),
+		),
+	};
+};
+
+for (const theme of themes) {
+	for (const scheme of /** @type {const} */ (["light", "dark"])) {
+		test(`${theme.name}, ${scheme}, contrast fixture: every named pair clears AA and never weakens`, async ({
+			page,
+		}) => {
+			test.skip(
+				!(await reportsPreference(page)),
+				"this engine does not expose prefers-contrast to automation",
+			);
+
+			await render(page, {
+				more: false,
+				preset: theme.css,
+				scheme,
+			});
+			const base = await measureNamedPairs(page);
+
+			await render(page, {
+				more: true,
+				preset: theme.css,
+				scheme,
+			});
+			const more = await measureNamedPairs(page);
+
+			for (const pair of /** @type {(keyof typeof pairFloors)[]} */ (
+				Object.keys(pairFloors)
+			)) {
+				const floor = pairFloors[pair];
+				expect(base[pair], `${pair}, no-preference`).toBeGreaterThanOrEqual(
+					floor,
+				);
+				expect(more[pair], `${pair}, more`).toBeGreaterThanOrEqual(floor);
+				expect(
+					more[pair],
+					`${pair}, more is never worse`,
+				).toBeGreaterThanOrEqual(base[pair] - 0.001);
 			}
 		});
 	}

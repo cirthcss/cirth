@@ -63,8 +63,9 @@
 			<li>
 				<select class="docs-preset-select" aria-label="Color preset" data-cirth-preset-select>
 					<option value="amber">Amber</option>
-					<option value="plain">Plain</option>
-					<option value="playroom">Playroom</option>
+					{% for preset in presets %}
+						<option value="{{ preset.name }}">{{ preset.label }}</option>
+					{% endfor %}
 				</select>
 			</li>
 			<li>

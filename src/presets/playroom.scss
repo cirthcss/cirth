@@ -51,9 +51,11 @@
   // lightness): the invalid border derives *lighter* than its input, so an
   // anchor picked for how it reads as a fill leaves the border under the
   // 3:1 non-text floor against a white card.
+  // Warning follows the same constraint: 50% keeps its derived light border
+  // above 3:1 against the form surface without losing the warm amber hue.
   --cirth-error: light-dark(oklch(45% 0.16 25deg), oklch(74% 0.13 25deg));
   --cirth-success: light-dark(oklch(52% 0.11 155deg), oklch(72% 0.11 155deg));
-  --cirth-warning: light-dark(oklch(56% 0.1 75deg), oklch(74% 0.11 75deg));
+  --cirth-warning: light-dark(oklch(50% 0.1 75deg), oklch(74% 0.11 75deg));
 
   // Geometry
   // The pill radius stays a pill; everything else grows. --cirth-border-radius
