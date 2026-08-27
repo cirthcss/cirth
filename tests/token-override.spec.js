@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
+const { listPresetNames } = require("../scripts/lib/presets");
 
 // gh#92 — the documented customization path: a `:root` rule in a
 // stylesheet loaded after Cirth changes the token, everywhere.
@@ -56,7 +57,7 @@ const builds = [
 	},
 ];
 
-const presets = ["plain", "playroom"];
+const presets = listPresetNames();
 
 // One from each scheme layer, so a regression in any of them shows up:
 // text, an accent, a surface, and a border.

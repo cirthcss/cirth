@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
+const { listPresetNames } = require("../scripts/lib/presets");
 
 // Pointer and keyboard input must reach the same native actions. This is
 // especially important for aria-busy: CSS once blocked pointer activation
@@ -16,8 +17,10 @@ if (!fs.existsSync(stylesheet)) {
 const css = fs.readFileSync(stylesheet, "utf8");
 const themes = [
 	{ name: "default", presetCss: "" },
-	{ name: "plain", presetCss: "dist/presets/plain.css" },
-	{ name: "playroom", presetCss: "dist/presets/playroom.css" },
+	...listPresetNames().map((name) => ({
+		name,
+		presetCss: `dist/presets/${name}.css`,
+	})),
 ].map((theme) => {
 	if (!theme.presetCss) return { ...theme, presetCss: "" };
 	const preset = path.join(__dirname, "..", theme.presetCss);

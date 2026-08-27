@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const http = require("node:http");
 const path = require("node:path");
+const { listPresetNames } = require("./presets");
 
 // Shared access to the built docs site (docs/dist) for the checks that
 // audit it (check-a11y.js, tests/visual.spec.js): page enumeration and a
@@ -13,8 +14,7 @@ const docsDist = path.join(projectRoot, "docs/dist");
 
 const themeVariants = [
 	{ name: "default", storageValue: "amber" },
-	{ name: "plain", storageValue: "plain" },
-	{ name: "playroom", storageValue: "playroom" },
+	...listPresetNames().map((name) => ({ name, storageValue: name })),
 ];
 
 /** @param {string} label */

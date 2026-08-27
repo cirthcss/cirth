@@ -28,6 +28,21 @@ If you cloned before installing [Git LFS](https://git-lfs.com), the
 screenshot baselines under `tests/__screenshots__/` are small pointer
 files instead of images; `git lfs pull` fetches the real ones.
 
+This repository currently lives in iCloud Drive. A sync racing a fast build
+or checkout can leave conflict copies such as `name 2.js` and `image 2.png`
+beside the real files. They are ignored by Git, but they are not harmless:
+Eleventy can publish a copied page and Playwright can collect a copied spec.
+If they appear, stop the process that is writing the tree and remove only
+those numbered copies:
+
+```sh
+find . -name '* 2.*' -not -path './node_modules/*' -delete
+```
+
+Do not rename one over its unsuffixed neighbour; the unsuffixed file is the
+tracked source. Moving the repository outside a synced folder prevents the
+copies at the source.
+
 The commands you'll actually use:
 
 ```sh
@@ -45,8 +60,10 @@ npm run docs:dev   # run this docs site locally
   customization stays CSS first through `--cirth-` custom properties.
 * `src/theme/` contains design tokens: color scales, foundations, and the
   light/dark schemes. Most visual changes start here, not in components.
-* `src/presets/` contains `plain` and `playroom`, token override presets published
-  alongside the default build.
+* `src/presets/` contains the maintained token override presets published
+  alongside the default build. Its filenames are the source of truth used by
+  the build, docs switcher, accessibility matrix, and visual suite; adding a
+  preset automatically adds it to those checks.
 * `docs/` contains this site (Eleventy), styled by Cirth's own build — and
   also doubles as the fixture the library's own QA runs against: `tests/`
   (visual regression) and `check:a11y` render the built docs site to catch
@@ -98,12 +115,12 @@ in CI on every push, and the same checks run locally:
 ```sh
 npm run lint          # stylelint + custom property audit + browser target + doc links + CDN hashes
 npm run build         # compile src/ to dist/
-npm run check:dist    # structural invariants of the 12 dist files
+npm run check:dist    # structural invariants of every generated dist file
 npm run check:size    # ≤ 14 KiB gzipped per root bundle
 npm run docs:build    # build this site (input for the browser checks below)
 npm run check:behavior # interaction, reflow, user styles, and input parity across three engines
 npm run check:a11y    # axe WCAG 2.0–2.2 A/AA audit of every docs page
-npm run check:visual  # screenshot diff of selected component/layout pages
+npm run check:visual  # screenshot diff across docs pages and maintained presets
 ```
 
 The browser-based checks need the Playwright browsers once:
@@ -114,10 +131,10 @@ The browser-based checks need the Playwright browsers once:
 Runs focused interaction tests against Chromium, Firefox, and WebKit. These
 tests cover browser-managed states that static screenshots cannot exercise,
 such as focus, blur, `:user-valid`, and `:user-invalid`; mouse, Enter, and
-Space activation parity; and open dialog and popover states. For the default,
-`plain`, and `playroom` themes, the suite also checks every docs page at 320
-CSS px, with text at 200%, with WCAG text-spacing overrides, and with
-`forced-colors: active`. Reflow assertions compare
+Space activation parity; and open dialog and popover states. For the default
+theme and every preset discovered from `src/presets/`, the suite also checks
+every docs page at 320 CSS px, with text at 200%, with WCAG text-spacing
+overrides, and with `forced-colors: active`. Reflow assertions compare
 `documentElement.scrollWidth` with its `clientWidth`, detect clipped text, and
 check open top-layer surfaces independently. WebKit provides the closest
 automated coverage available for Safari's rendering engine.
@@ -208,11 +225,11 @@ neither goes stale while the other moves.
 
 Runs [axe-core](https://github.com/dequelabs/axe-core) with the explicit
 `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, and `wcag22aa` tags against every
-page of the built docs site. The complete matrix covers the default, `plain`,
-and `playroom` themes in light, dark, and forced-colors modes. Dialog and
-popover demos are audited once more while open. Since the component demos live
-on these pages, this continuously re-verifies the framework's own AA claim, not
-just the site around it.
+page of the built docs site. The complete matrix covers the default theme and
+every preset discovered from `src/presets/` in light, dark, and forced-colors
+modes. Dialog and popover demos are audited once more while open. Since the
+component demos live on these pages, this continuously re-verifies the
+framework's own AA claim, not just the site around it.
 
 axe's contrast algorithm cannot model the system-color remapping performed by
 forced-colors mode, so `color-contrast` remains enabled in light and dark and
@@ -227,12 +244,18 @@ goal is to keep it that way: fix violations rather than baseline them.
 
 ### Visual regression — `check:visual`
 
-Playwright screenshots selected component and layout pages at full-page size,
-in light and dark modes, at 1440 px and 390 px, and compares each against a committed
-baseline in `tests/__screenshots__/`. Any unexplained pixel difference fails
-the check. Primarily editorial pages are intentionally excluded because the
-docs build, link check, and accessibility audit already cover them without
-multiplying text-only snapshots across every browser project.
+Playwright screenshots the default theme's selected documentation pages at
+full-page size in light and dark modes, at 1440 px and 390 px, and compares
+each against a committed baseline in `tests/__screenshots__/`. The set includes
+the prose-heavy About, Customization, Get Started, Upgrading, and Contributions
+pages: a large editorial rewrite must produce a reviewable visual diff too.
+
+Every preset discovered from `src/presets/` also renders a representative
+matrix covering colors, semantic meter states, button variants, form validity,
+and open modal and popover states. The default theme gets the same open-state
+captures. Adding a preset therefore adds visual cases automatically; a missing
+stylesheet or docs-switcher option fails before a screenshot is accepted. Any
+unexplained pixel difference fails the check.
 
 Two things to know about the baselines:
 

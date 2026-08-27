@@ -5,6 +5,7 @@ const markdownIt = require("markdown-it");
 const markdownItAnchor = require("markdown-it-anchor");
 const GithubSlugger = require("github-slugger").default;
 const hljs = require("highlight.js");
+const { listPresetNames, presetLabel } = require("../scripts/lib/presets");
 
 // Eleventy replacement for the previous Astro setup. Same site shape:
 // docs/src/pages -> docs/dist, one <path>/index.html per page, served at
@@ -49,6 +50,11 @@ const pathPrefix = () => {
 };
 
 module.exports = (eleventyConfig) => {
+	eleventyConfig.addGlobalData(
+		"presets",
+		listPresetNames().map((name) => ({ label: presetLabel(name), name })),
+	);
+
 	// --- Markdown pipeline ------------------------------------------------
 	// Fenced code: highlight.js token classes (same .hljs-* classes the docs
 	// shell has colored since the VitePress era) + tabindex="0" so

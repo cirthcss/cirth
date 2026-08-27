@@ -72,10 +72,10 @@ jobs:
       - name: Regenerate baselines
         run: npx playwright test --update-snapshots
 
-      # The push races anything else landing on the branch: regenerating 456
-      # screenshots takes minutes, and a second push in that window leaves
-      # this one pushing from a stale base. It used to just fail, which is
-      # indistinguishable from a real breakage at a glance and leaves the
+      # The push races anything else landing on the branch: regenerating
+      # hundreds of screenshots takes minutes, and a second push in that
+      # window leaves this one pushing from a stale base. It used to just fail,
+      # which is indistinguishable from a real breakage at a glance and leaves the
       # baselines unwritten — so a branch that had moved once stayed stale
       # until someone pushed again.
       #
