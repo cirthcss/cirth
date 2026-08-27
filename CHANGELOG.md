@@ -5,6 +5,60 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Cirth is pre-1.0 and the custom property surface is not yet stable.
 
+## [0.14.0] - 2026-08-27
+
+### Changed
+
+- **`aria-busy="true"` no longer blocks pointer events.** It set
+  `pointer-events: none` on busy buttons and links, which stopped a mouse
+  from reaching them and did nothing at all about Enter or Space. That is
+  the shape of the defect it looked like it was preventing: the action was
+  guarded for one input method and open for the other, so a keyboard user
+  could submit twice where a pointer user could not, and neither the markup
+  nor the documentation said so.
+
+  `aria-busy` is a status. It tells assistive technology that a region is
+  being updated; it does not mean *disabled*, and CSS on its own cannot
+  make it mean that consistently. To stop a native button running twice,
+  set its `disabled` property while the action is pending and remove it
+  when the action settles. For a custom control, `aria-disabled="true"`
+  plus a script that ignores pointer **and** keyboard activation.
+  **Breaking** — see the Upgrading page.
+
+- **Dropdown items wrap instead of truncating.** A long label was clipped
+  with an ellipsis, which drops content outright rather than presenting it
+  differently: at 200% text or under the WCAG 1.4.12 text-spacing
+  overrides, the part that mattered was often the part cut off, and there
+  was no way to reach it. It now wraps to the next line (gh#8, closed at
+  the time as not planned, and reversed here on the accessibility
+  argument).
+
+- **`code`, `kbd` and `samp` keep long strings inside the line.** A URL,
+  hash or token with no break opportunity widened the whole document at a
+  narrow viewport, which breaks reflow at 320 CSS pixels (WCAG 1.4.10) for
+  every other element on the page as well. They now cap at the available
+  inline size and break anywhere. `pre` is untouched and stays the
+  deliberately scrollable variant.
+
+- **The dropdown is documented as what it is.** `<details class="dropdown">`
+  with an unlabelled `summary` is styled like a select and is *not* one: it
+  owns no form value, no selected option and none of a listbox's keyboard
+  conventions. The docs called it a "custom select" pattern and now say to
+  reach for a native `<select>` when the user is choosing a value.
+
+### Fixed
+
+- **Preset contrast corrections.** `plain`'s dark card surface and
+  `playroom`'s light hover accent are retuned to hold their contrast pairs
+  in the audit that now runs across both presets, both schemes and
+  `prefers-contrast: more`.
+
+- **Long busy labels no longer need a second rule to wrap.** The spinner
+  forced `white-space: nowrap`, and buttons had to undo it to stay inside
+  the width they had just been constrained to (gh#75). Both rules are gone;
+  wrapping is the default and the spinner still holds the start of the
+  first line.
+
 ## [0.13.0] - 2026-08-26
 
 ### Added
@@ -1246,6 +1300,7 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
+[0.14.0]: https://github.com/cirthcss/cirth/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/cirthcss/cirth/compare/v0.12.0...v0.13.0
 [0.12.0]: https://github.com/cirthcss/cirth/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/cirthcss/cirth/compare/v0.10.0...v0.11.0
