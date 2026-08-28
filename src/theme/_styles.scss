@@ -59,6 +59,16 @@
   --cirth-block-spacing-vertical: var(--cirth-spacing);
   --cirth-block-spacing-horizontal: var(--cirth-spacing);
 
+  // Page gutters scale independently of the global spacing knob: making a
+  // wide shell breathe must not also enlarge controls, cards, and grid gaps.
+  // The percentage follows the container itself, not the viewport, so a
+  // shell nested in a narrow panel gets the narrow gutter it has room for.
+  --cirth-container-gutter: clamp(
+    var(--cirth-space-4),
+    4%,
+    var(--cirth-space-12)
+  );
+
   // `.container` center-track cap (also consumed classless, by the
   // body > header/main/footer grid in layout/_landmarks.scss) — a
   // reading/app-shell-friendly measure, not full-viewport.
@@ -126,6 +136,7 @@
   --cirth-popover-max-width: min(30rem, 100% - var(--cirth-spacing) * 2);
 
   // Modal (<dialog>)
+  --cirth-modal-max-width: 43.75rem;
   --cirth-modal-overlay-backdrop-filter: blur(0.375rem);
 
   // Spacings for nav component

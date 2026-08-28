@@ -5,6 +5,24 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Cirth is pre-1.0 and the custom property surface is not yet stable.
 
+## [Unreleased]
+
+### Added
+
+- `--cirth-container-gutter`, a fluid container-only gutter independent of
+  the global spacing token, and `--cirth-modal-max-width`, a single runtime
+  cap for modal cards.
+
+### Changed
+
+- Containers now expose named `content`/`full` grid lines internally;
+  `.container-fluid` gives only the gutter width to its outer tracks, and
+  `.breakout` is limited to direct children of `.container` so it cannot
+  affect unrelated grids.
+- Modal width now follows its available space continuously through `min()`
+  instead of stepping through the old `sm` and `md` viewport caps. `.row`
+  remains the only intentional layout breakpoint.
+
 ## [0.14.1] - 2026-08-27
 
 ### Added

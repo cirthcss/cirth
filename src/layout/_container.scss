@@ -3,31 +3,34 @@
 @if $enable-classes {
   /**
    * Container
-   * A three-track grid: two gutter tracks that never drop out, and a
-   * center track holding content. `.container` caps the center track at
-   * a reading-friendly measure; `.container-fluid` leaves it uncapped
-   * (edge-to-edge, gutters only). The cap resizes continuously with the
-   * viewport instead of snapping at breakpoints.
+   * A three-track grid with named `full` and `content` lines. `.container`
+   * lets the outer tracks absorb surplus space after the center track
+   * reaches its cap; `.container-fluid` keeps them at the fluid gutter and
+   * gives every other pixel to content. Both resize continuously instead
+   * of snapping at breakpoints.
    */
 
   #{$parent-selector} .container,
   #{$parent-selector} .container-fluid {
     display: grid;
-    grid-template-columns:
-      minmax(var(--cirth-spacing), 1fr)
-      minmax(0, 1fr)
-      minmax(var(--cirth-spacing), 1fr);
 
     & > * {
-      grid-column: 2;
+      grid-column: content;
     }
   }
 
   #{$parent-selector} .container {
     grid-template-columns:
-      minmax(var(--cirth-spacing), 1fr)
-      minmax(0, var(--cirth-container-max-width))
-      minmax(var(--cirth-spacing), 1fr);
+      [full-start] minmax(var(--cirth-container-gutter), 1fr)
+      [content-start] minmax(0, var(--cirth-container-max-width)) [content-end]
+      minmax(var(--cirth-container-gutter), 1fr) [full-end];
+  }
+
+  #{$parent-selector} .container-fluid {
+    grid-template-columns:
+      [full-start] var(--cirth-container-gutter)
+      [content-start] minmax(0, 1fr) [content-end]
+      var(--cirth-container-gutter) [full-end];
   }
 
   /**
@@ -36,10 +39,10 @@
    * instead of stopping at the measure (a wide table, image, figure).
    * Breaks out to the container's *own* edges, not the viewport, so it
    * stays correct regardless of what surrounds the container.
-   * `.container-fluid` doesn't need it — already full width.
+   * `.container-fluid` doesn't need it — its content track is uncapped.
    */
 
-  #{$parent-selector} .breakout {
-    grid-column: 1 / -1;
+  #{$parent-selector} .container > .breakout {
+    grid-column: full;
   }
 }

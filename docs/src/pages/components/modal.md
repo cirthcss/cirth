@@ -78,9 +78,11 @@ present the component.
   centers its content; the backdrop uses
   `--cirth-modal-overlay-background-color` and
   `--cirth-modal-overlay-backdrop-filter` (a blur by default).
-* The `> article` is the actual modal card, capped at the `sm`/`md`
-  breakpoints' container widths and scrollable if content is taller than the
-  viewport.
+* The `> article` is the actual modal card. Its width is
+  `min(100% - 2 * --cirth-spacing, --cirth-modal-max-width)` (the cap
+  defaults to `43.75rem`/700px), so it follows the available space
+  continuously with no viewport breakpoint. It is scrollable if content is
+  taller than the viewport.
 * A close control, `.close` or `:is(a, button)[rel="prev"]` in the header,
   is styled as a small floated icon button (`--cirth-icon-close`).
 * **The page stops scrolling on its own.** `html:has(dialog[open])` sets

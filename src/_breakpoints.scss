@@ -1,28 +1,7 @@
-// Breakpoints and container viewports
+// Row breakpoint
 // ––––––––––––––––––––
-// The root font size is fixed at 100% across all breakpoints: control
-// heights (44px targets) and body text stay stable, while display type
-// scales fluidly via clamp() in theme/_styles.scss.
+// Layout and component sizing is otherwise intrinsic. `.row` deliberately
+// keeps one viewport decision: peers stack on narrow pages and become one
+// indivisible row when the page is wide enough.
 
-$breakpoints: (
-  sm: (
-    breakpoint: 576px,
-    viewport: 510px,
-  ),
-  md: (
-    breakpoint: 768px,
-    viewport: 700px,
-  ),
-  lg: (
-    breakpoint: 1024px,
-    viewport: 950px,
-  ),
-  xl: (
-    breakpoint: 1280px,
-    viewport: 1200px,
-  ),
-  xxl: (
-    breakpoint: 1536px,
-    viewport: 1450px,
-  ),
-);
+$row-breakpoint: 768px;

@@ -341,8 +341,10 @@ in a `.grid`, and the padding inside controls derive from it:
 | `--cirth-block-spacing-vertical` | Space between landmarks and sections |
 | `--cirth-typography-spacing-vertical` | Space between paragraphs and lists |
 | `--cirth-form-element-spacing-vertical` | Padding inside a control |
+| `--cirth-container-gutter` | Fluid inline gutter for containers and classless landmarks |
 | `--cirth-container-max-width` | The `.container` measure |
 | `--cirth-grid-min-column` | When `.grid` wraps to a new row |
+| `--cirth-modal-max-width` | The fluid modal card's upper width bound |
 
 A note on control height: Cirth's controls are at least 44px tall — WCAG
 2.5.5's target size — and that floor is a `min-block-size`, not a fixed
@@ -494,7 +496,7 @@ they change which selectors exist at all:
   `.outline`, `.ghost`, …) exist in the default build and not in the
   classless one.
 * **Scoping every selector under `.cirth`** is the scoped build.
-* **Breakpoints** are fixed in `src/_breakpoints.scss`.
+* **The `.row` breakpoint** is fixed in `src/_breakpoints.scss`.
 
 If you need different values for these you are choosing a different
 published build, not overriding a variable. See [Get Started](/get-started).
@@ -637,6 +639,7 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | --- | --- |
 | `--cirth-block-spacing-horizontal` | role |
 | `--cirth-block-spacing-vertical` | role |
+| `--cirth-container-gutter` | role |
 | `--cirth-container-max-width` | role |
 | `--cirth-grid-column-gap` | role |
 | `--cirth-grid-min-column` | role |
@@ -774,6 +777,7 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-group-box-shadow` | role |
 | `--cirth-group-box-shadow-focus-with-button` | role |
 | `--cirth-group-box-shadow-focus-with-input` | role |
+| `--cirth-modal-max-width` | role |
 | `--cirth-modal-overlay-backdrop-filter` | role |
 | `--cirth-modal-overlay-background-color` | derived |
 | `--cirth-popover-background-color` | role |

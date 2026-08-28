@@ -169,6 +169,30 @@ test("locking the page does not shift the layout", async ({ page }) => {
 	expect(await measureWidth(page)).toBe(before);
 });
 
+test("the modal card sizes fluidly from one configurable cap", async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 1280, height: 720 });
+	await render(page);
+	await page.evaluate(() => {
+		/** @type {HTMLDialogElement | null} */
+		const sheet = document.querySelector("#sheet");
+		sheet?.showModal();
+	});
+
+	const article = page.locator("#sheet > article");
+	await expect(article).toHaveCSS("width", "700px");
+
+	await page.setViewportSize({ width: 390, height: 720 });
+	await expect(article).toHaveCSS("width", "358px");
+
+	await page.addStyleTag({
+		content: ":root { --cirth-modal-max-width: 30rem; }",
+	});
+	await page.setViewportSize({ width: 1280, height: 720 });
+	await expect(article).toHaveCSS("width", "480px");
+});
+
 // Every context in this suite runs under prefers-reduced-motion: reduce,
 // which is the right default and also collapses the very transitions these
 // two tests are about. The first opts out deliberately; the second checks

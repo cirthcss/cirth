@@ -56,13 +56,14 @@ $container-root-selector: "body";
     @if not $enable-classes {
       display: grid;
       grid-template-columns:
-        minmax(var(--cirth-spacing), 1fr)
-        minmax(0, var(--cirth-container-max-width))
-        minmax(var(--cirth-spacing), 1fr);
+        [full-start] minmax(var(--cirth-container-gutter), 1fr)
+        [content-start] minmax(0, var(--cirth-container-max-width))
+        [content-end]
+        minmax(var(--cirth-container-gutter), 1fr) [full-end];
       padding-block: var(--cirth-block-spacing-vertical);
 
       & > * {
-        grid-column: 2;
+        grid-column: content;
       }
     }
 

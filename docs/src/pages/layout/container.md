@@ -6,7 +6,7 @@ layout: docs.njk
 # Container
 
 `.container` is an editorial container: a centered content column capped
-at a reading-friendly measure, with permanent side gutters.
+at a reading-friendly measure, with fluid side gutters.
 `.container-fluid` is a dashboard/app-shell container: edge to edge, no
 cap, gutters only. Both are only available in the **default** build with
 classes enabled; the classless build applies `.container`'s behavior to
@@ -23,21 +23,23 @@ classes enabled; the classless build applies `.container`'s behavior to
 
 ## How it works
 
-Both classes are the same three-track CSS grid — two gutter tracks that
-never drop out, and a center track that holds the content:
+Both classes are three-track CSS grids with named `full` and `content`
+lines — two gutter tracks that never drop out, and a center track that
+holds the content:
 
 ```css
-.container,
-.container-fluid {
+.container {
   display: grid;
   grid-template-columns:
-    minmax(var(--cirth-spacing), 1fr)
-    minmax(0, /* center track width */)
-    minmax(var(--cirth-spacing), 1fr);
+    [full-start] minmax(var(--cirth-container-gutter), 1fr)
+    [content-start]
+      minmax(0, var(--cirth-container-max-width))
+    [content-end]
+    minmax(var(--cirth-container-gutter), 1fr) [full-end];
 }
 .container > *,
 .container-fluid > * {
-  grid-column: 2; /* the center track */
+  grid-column: content;
 }
 ```
 
@@ -45,9 +47,17 @@ never drop out, and a center track that holds the content:
 (default `60rem`, 960px at the standard 16px root);
 `.container-fluid`'s isn't. The cap resizes continuously with the
 viewport — there's no breakpoint table to memorize, and no jump between
-fixed widths as the window is resized. The gutters (`--cirth-spacing`)
-never drop out, at any viewport width; there's no "full-bleed" moment
-below a breakpoint the way stepped-width containers had.
+fixed widths as the window is resized. The gutters are controlled by
+`--cirth-container-gutter`, which defaults to
+`clamp(1rem, 4%, 3rem)`: they grow with the container itself but never drop
+out. A container nested in a narrow panel therefore gets a narrow gutter
+even on a large viewport. This is deliberately separate from
+`--cirth-spacing`, so opening up a page shell does not also enlarge
+controls, cards, and grid gaps.
+
+`.container-fluid` fixes each outer track to that gutter and gives all the
+remaining width to `content`. It does not split the box into three equal
+`1fr` columns.
 
 Override `--cirth-container-max-width` per instance for layouts that sit
 between the two — for example a docs shell with a sidebar might want a
@@ -56,6 +66,15 @@ wider measure than an article:
 ```css
 .container {
   --cirth-container-max-width: 76rem;
+}
+```
+
+Override the gutter independently when a particular shell needs a fixed
+edge:
+
+```css
+.dashboard-shell {
+  --cirth-container-gutter: 1.5rem;
 }
 ```
 
@@ -78,8 +97,8 @@ measure:
 ```
 
 ```css
-.breakout {
-  grid-column: 1 / -1; /* both gutter tracks and the center track */
+.container > .breakout {
+  grid-column: full;
 }
 ```
 
@@ -92,6 +111,37 @@ container's *own* edges, so it's correct regardless of what surrounds
 it, and it doesn't have the `100vw` trick's scrollbar-gutter overflow
 bug. `.container-fluid` doesn't need `.breakout` — it's already full
 width.
+
+The selector is deliberately limited to a direct child of `.container`.
+A `.breakout` inside an unrelated `.grid` remains an ordinary grid item,
+and a nested descendant cannot jump into an ancestor's grid. Put
+`.container` on the semantic element whose direct children need to switch
+between the two tracks:
+
+```html
+<section class="container">
+  <h1>Release notes</h1>
+  <p>Regular prose.</p>
+  <figure class="breakout">…</figure>
+</section>
+```
+
+## Composition contract
+
+One class should own an element's layout. Do not combine `.container` with
+`.grid`, `.row`, or another class that defines `grid-template-columns` on
+the same node; nest the second layout instead:
+
+```html
+<main class="container">
+  <div class="grid">…</div>
+</main>
+```
+
+Cirth intentionally exposes one escape lane, `.breakout`, rather than a
+scale of `popout`/`feature`/`full` classes. More lanes would add vocabulary
+and markup before the library has distinct recurring uses for them; local
+CSS can add a specialized editorial grid without enlarging the core API.
 
 `.breakout` is only available in the default build with classes enabled.
 

@@ -1,4 +1,3 @@
-@use "sass:map";
 @use "../breakpoints" as *;
 @use "../config" as *;
 
@@ -15,10 +14,8 @@
     display: grid;
     grid-template-columns: 1fr;
 
-    @if map.get($breakpoints, "md") {
-      @media (min-width: map.get(map.get($breakpoints, "md"), "breakpoint")) {
-        grid-template-columns: repeat(auto-fit, minmax(0%, 1fr));
-      }
+    @media (min-width: $row-breakpoint) {
+      grid-template-columns: repeat(auto-fit, minmax(0%, 1fr));
     }
 
     & > * {

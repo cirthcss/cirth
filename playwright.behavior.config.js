@@ -18,6 +18,7 @@ module.exports = defineConfig({
 		"group-hidden-elements.spec.js",
 		"group-search-radius.spec.js",
 		"input-parity.spec.js",
+		"layout.spec.js",
 		"link-visited.spec.js",
 		"list-nesting.spec.js",
 		"meter.spec.js",
