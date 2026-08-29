@@ -1,12 +1,21 @@
 {%- set defaultSource -%}
+<!-- Layout: container -->
 <main class="container">
+  <!-- Component: card -->
   <article>
     <h2>Sign in</h2>
+    <!-- Components: form controls -->
     <form>
-      <label>Email <input type="email"></label>
-      <label>Password <input type="password"></label>
-      <label><input type="checkbox" checked> Remember me</label>
-      <button>Sign in</button>
+      <label>
+        Email
+        <input type="email" name="email" autocomplete="email">
+      </label>
+      <label>
+        Password
+        <input type="password" name="password" autocomplete="current-password">
+      </label>
+      <label><input type="checkbox" checked> Remember this device</label>
+      <button type="button">Sign in</button>
     </form>
   </article>
 </main>
@@ -66,26 +75,90 @@
 		if (!build || !theme || !frame || !source) return;
 
 		const sources = {
-			default: `<main class="container">
+			default: `<!-- Layout: container -->
+<main class="container">
+  <!-- Component: card -->
   <article>
     <h2>Sign in</h2>
-    <form>…native controls…</form>
+    <!-- Components: form controls -->
+    <form>
+      <label>
+        Email
+        <input type="email" name="email" autocomplete="email">
+      </label>
+      <label>
+        Password
+        <input type="password" name="password" autocomplete="current-password">
+      </label>
+      <label><input type="checkbox" checked> Remember this device</label>
+      <button type="button">Sign in</button>
+    </form>
   </article>
 </main>`,
-			classless: `<main>
+			classless: `<!-- Layout: document flow -->
+<main>
+  <!-- Component: card -->
   <article>
     <h2>Sign in</h2>
-    <form>…native controls…</form>
+    <!-- Components: form controls -->
+    <form>
+      <label>
+        Email
+        <input type="email" name="email" autocomplete="email">
+      </label>
+      <label>
+        Password
+        <input type="password" name="password" autocomplete="current-password">
+      </label>
+      <label><input type="checkbox" checked> Remember this device</label>
+      <button type="button">Sign in</button>
+    </form>
   </article>
 </main>`,
-			scoped: `<div class="cirth">
+			scoped: `<!-- Scope: .cirth -->
+<div class="cirth">
+  <!-- Layout: container -->
   <main class="container">
-    <article>…native controls…</article>
+    <!-- Component: card -->
+    <article>
+      <h2>Sign in</h2>
+      <!-- Components: form controls -->
+      <form>
+        <label>
+          Email
+          <input type="email" name="email" autocomplete="email">
+        </label>
+        <label>
+          Password
+          <input type="password" name="password" autocomplete="current-password">
+        </label>
+        <label><input type="checkbox" checked> Remember this device</label>
+        <button type="button">Sign in</button>
+      </form>
+    </article>
   </main>
 </div>`,
-			"scoped-classless": `<div class="cirth">
+			"scoped-classless": `<!-- Scope: .cirth -->
+<div class="cirth">
+  <!-- Layout: document flow -->
   <main>
-    <article>…native controls…</article>
+    <!-- Component: card -->
+    <article>
+      <h2>Sign in</h2>
+      <!-- Components: form controls -->
+      <form>
+        <label>
+          Email
+          <input type="email" name="email" autocomplete="email">
+        </label>
+        <label>
+          Password
+          <input type="password" name="password" autocomplete="current-password">
+        </label>
+        <label><input type="checkbox" checked> Remember this device</label>
+        <button type="button">Sign in</button>
+      </form>
+    </article>
   </main>
 </div>`,
 		};

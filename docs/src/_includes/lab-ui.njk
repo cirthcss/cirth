@@ -20,31 +20,21 @@
 	</head>
 	<body>
 		{% if labScoped %}<div class="cirth">{% endif %}
-		<header class="container">
-			<nav aria-label="Workspace">
-				<ul><li><strong>Access desk</strong></li></ul>
-				<ul><li><small>Baseline / live</small></li></ul>
-			</nav>
-		</header>
-		<main class="container">
+		<main{% if not labClassless %} class="container"{% endif %}>
 			<article>
-				<header>
-					<small>Account 04</small>
-					<h2>Sign in</h2>
-				</header>
+				<h2>Sign in</h2>
 				<form>
 					<label>
 						Email
-						<input type="email" name="email" autocomplete="email" value="maintainer@example.dev" />
+						<input type="email" name="email" autocomplete="email" />
 					</label>
 					<label>
 						Password
-						<input type="password" name="password" autocomplete="current-password" value="baseline" />
+						<input type="password" name="password" autocomplete="current-password" />
 					</label>
 					<label><input type="checkbox" checked /> Remember this device</label>
 					<button type="button">Sign in</button>
 				</form>
-				<footer><small>Native controls · no component JavaScript</small></footer>
 			</article>
 		</main>
 		{% if labScoped %}</div>{% endif %}

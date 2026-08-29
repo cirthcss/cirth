@@ -39,6 +39,8 @@
 	--docs-code-surface: var(--cirth-code-background-color);
 	--docs-status-verified: var(--cirth-ins-color);
 	--docs-card-shadow: 0.5rem 0.5rem 0 var(--docs-signal-soft);
+	--docs-card-shadow-hover: 0.75rem 0.75rem 0
+		color-mix(in oklch, var(--docs-signal-soft) 76%, white);
 	--docs-motion-fast: 140ms;
 	--docs-motion-slow: 320ms;
 	--docs-grid-dots: radial-gradient(
@@ -2064,13 +2066,18 @@ body {
 	box-shadow: var(--docs-card-shadow);
 	color: var(--docs-ink);
 	text-decoration: none;
-	transition: border-color var(--docs-motion-fast) ease-out;
+	transition:
+		border-color var(--docs-motion-fast) ease-out,
+		box-shadow var(--docs-motion-fast) ease-out,
+		transform var(--docs-motion-fast) ease-out;
 }
 
 .docs-case:hover,
 .docs-case:focus-visible {
 	border-color: var(--docs-signal);
+	box-shadow: var(--docs-card-shadow-hover);
 	text-decoration: none;
+	transform: translate(-0.25rem, -0.25rem);
 }
 
 .docs-case-icon {
@@ -2107,10 +2114,14 @@ body {
 
 .docs-native-faq .docs-faq-list {
 	grid-column: 5 / -1;
+	inline-size: 100%;
+	max-width: none;
+	margin: 0;
 	border-block-start: 2px solid var(--docs-ink);
 }
 
 .docs-native-faq .docs-faq-list details {
+	inline-size: 100%;
 	margin: 0;
 	padding: 0;
 	border: 0;
@@ -2120,13 +2131,26 @@ body {
 }
 
 .docs-native-faq .docs-faq-list summary {
-	padding-block: 1rem;
+	box-sizing: border-box;
+	inline-size: 100%;
+	padding: 1rem;
 	font-size: 1rem;
+	transition:
+		background-color var(--docs-motion-fast) ease-out,
+		color var(--docs-motion-fast) ease-out;
+}
+
+.docs-native-faq .docs-faq-list summary:hover {
+	background-color: var(--docs-signal-soft);
+	color: var(--docs-ink);
 }
 
 .docs-native-faq .docs-faq-list details > p {
-	max-width: 65ch;
-	padding-block-end: 1rem;
+	box-sizing: border-box;
+	inline-size: 100%;
+	max-width: none;
+	margin: 0;
+	padding: 0 1rem 1rem;
 	color: var(--docs-annotation);
 }
 
@@ -2319,6 +2343,11 @@ body {
 @media (prefers-reduced-motion: reduce) {
 	.docs-case {
 		transition: none;
+	}
+
+	.docs-case:hover,
+	.docs-case:focus-visible {
+		transform: none;
 	}
 }
 
@@ -2551,14 +2580,21 @@ body {
 	font-size: 0.75rem;
 }
 
-.docs-sidebar nav a[aria-current="page"]::before,
 .docs-toc a.docs-toc-active::before {
 	width: 0.25rem;
 	border-radius: 0;
 }
 
+.docs-sidebar nav a[aria-current="page"]::before {
+	inset-block: 0;
+	left: -1px;
+	width: 0.25rem;
+	border-radius: 0;
+}
+
 .docs-sidebar nav a[aria-current="page"] {
-	background: linear-gradient(to right, var(--docs-signal-soft), transparent 80%);
+	border-radius: 0;
+	background: var(--docs-signal-soft);
 }
 
 .docs-toc strong,
