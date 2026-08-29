@@ -1,13 +1,13 @@
 // Playroom preset
 // ––––––––––––––––––––
 // For interfaces with a friendly voice — a consumer app, a community site,
-// a tool aimed at children or the people helping them. Soft geometry,
-// generous spacing, a rounded face, and motion with a little overshoot, so
-// the interface reads as approachable rather than administrative.
+// a tool aimed at children or the people helping them. A rounded system
+// face and softer colour make it approachable without replacing Cirth's
+// geometry, density or interaction model.
 // It is the longer half of a worked example. Where src/presets/plain.scss
 // changes five input tokens and lets the theme derive the rest, this one
-// reaches across the whole surface: colour, geometry, typography, motion
-// and depth. It also overrides two *derived* tokens on purpose, which is
+// reaches across colour and typography while preserving the framework's
+// permanent silhouette. It also overrides two *derived* tokens on purpose, which is
 // the other thing worth demonstrating — see the note further down.
 // Import after the main Cirth stylesheet. No @import, no webfont: the
 // rounded stack below is whatever the operating system already has.
@@ -57,13 +57,6 @@
   --cirth-success: light-dark(oklch(52% 0.11 155deg), oklch(72% 0.11 155deg));
   --cirth-warning: light-dark(oklch(50% 0.1 75deg), oklch(74% 0.11 75deg));
 
-  // Geometry
-  // The pill radius stays a pill; everything else grows. --cirth-border-radius
-  // is the single knob the per-component radii derive from, so one line
-  // rounds cards, fields, buttons and popovers together.
-  --cirth-border-radius: var(--cirth-radius-2xl);
-  --cirth-spacing: var(--cirth-space-5);
-
   // Typography
   // ui-rounded is Apple's system rounded face; the rest of the stack falls
   // back to the ordinary system UI font, which is what most other
@@ -72,18 +65,6 @@
     ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", system-ui,
     "Segoe UI", Roboto, sans-serif, var(--cirth-font-family-emoji);
   --cirth-font-family-display: var(--cirth-font-family);
-  --cirth-font-weight: var(--cirth-font-weight-medium);
-  --cirth-line-height: var(--cirth-line-height-relaxed);
-
-  // Motion and depth
-  // A short overshoot on the way in — enough to feel springy, small enough
-  // not to read as a bug. Components that animate under
-  // prefers-reduced-motion are already excluded by the theme.
-  --cirth-transition: var(--cirth-duration-slow)
-    cubic-bezier(0.34, 1.56, 0.64, 1);
-  --cirth-box-shadow:
-    0 0.0625rem 0.125rem oklch(36% 0.03 295deg / 6%),
-    0 0.75rem 1.5rem oklch(36% 0.03 295deg / 10%);
 
   // Deliberately breaking two relationships
   // The theme derives the hover state by mixing the accent toward black,

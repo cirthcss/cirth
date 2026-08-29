@@ -94,7 +94,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   height: calc(
     (var(--cirth-font-size-md) * var(--cirth-line-height)) +
       (var(--cirth-form-element-spacing-vertical) * 2) +
-      (var(--cirth-border-width) * 2)
+      var(--cirth-border-width) + var(--cirth-registration-width)
   );
 }
 
@@ -113,7 +113,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   min-block-size: calc(
     (var(--cirth-font-size-md) * var(--cirth-line-height)) +
       (var(--cirth-form-element-spacing-vertical) * 2) +
-      (var(--cirth-border-width) * 2)
+      var(--cirth-border-width) + var(--cirth-registration-width)
   );
 }
 
@@ -175,6 +175,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   --cirth-box-shadow: none;
 
   border: var(--cirth-border-width) solid var(--cirth-border-color);
+  border-block-end-width: var(--cirth-registration-width);
   border-radius: var(--cirth-border-radius);
   outline: none;
   background-color: var(--cirth-background-color);
@@ -186,6 +187,13 @@ $helper-previous-tags: "input, select, textarea, fieldset";
     border-color var(--cirth-transition),
     color var(--cirth-transition),
     box-shadow var(--cirth-transition);
+}
+
+// Read-only is a state, not simply the absence of focus. The dashed frame
+// remains legible without colour and keeps it distinct from disabled input.
+#{$parent-selector} :where(input, textarea)[readonly] {
+  border-style: dashed;
+  background-color: var(--cirth-card-sectioning-background-color);
 }
 
 // Active & Focus
@@ -465,7 +473,7 @@ $validation-any: "[aria-invalid], #{$invalid-native}";
   &:not([rows]) {
     min-block-size: calc(
       4lh + (var(--cirth-form-element-spacing-vertical) * 2) +
-        (var(--cirth-border-width) * 2)
+        var(--cirth-border-width) + var(--cirth-registration-width)
     );
   }
 
@@ -473,7 +481,7 @@ $validation-any: "[aria-invalid], #{$invalid-native}";
     --cirth-icon-height: calc(
       var(--cirth-font-size-md) * var(--cirth-line-height) +
         var(--cirth-form-element-spacing-vertical) * 2 +
-        var(--cirth-border-width) * 2
+        var(--cirth-border-width) + var(--cirth-registration-width)
     );
 
     background-position: top right var(--cirth-space-3);

@@ -64,11 +64,12 @@
   min-block-size: calc(
     (var(--cirth-font-size-md) * var(--cirth-line-height)) +
       (var(--cirth-form-element-spacing-vertical) * 2) +
-      (var(--cirth-border-width) * 2)
+      var(--cirth-border-width) + var(--cirth-registration-width)
   );
   padding: var(--cirth-form-element-spacing-vertical)
     var(--cirth-form-element-spacing-horizontal);
   border: var(--cirth-border-width) solid var(--cirth-border-color);
+  border-block-end-width: var(--cirth-registration-width);
   border-radius: var(--cirth-border-radius);
   outline: none;
   background-color: var(--cirth-background-color);
@@ -174,7 +175,7 @@
 
   // Outline and ghost
   // Two quiet variants that differ in one thing: whether the control owns
-  // an opaque surface. Outline does — it paints the page colour, so it
+  // an opaque surface. Outline does — it paints the control colour, so it
   // stays a control wherever it sits instead of letting the backdrop show
   // through — and it draws a border. Ghost owns neither, and only becomes
   // visible when the pointer arrives.
@@ -192,7 +193,7 @@
   #{$parent-selector}
     :is(button, [type="submit"], [type="button"], [role="button"]).outline,
   #{$parent-selector} [type="reset"].outline {
-    --cirth-background-color: var(--cirth-canvas);
+    --cirth-background-color: var(--cirth-form-element-background-color);
   }
 
   #{$parent-selector}
@@ -213,7 +214,7 @@
       --cirth-background-color: color-mix(
         in oklch,
         var(--cirth-primary) 12%,
-        var(--cirth-canvas)
+        var(--cirth-form-element-background-color)
       );
       --cirth-color: var(--cirth-primary-hover);
       --cirth-border-color: var(--cirth-primary-hover);
@@ -236,7 +237,7 @@
       --cirth-background-color: color-mix(
         in oklch,
         var(--cirth-secondary) 12%,
-        var(--cirth-canvas)
+        var(--cirth-form-element-background-color)
       );
       --cirth-color: var(--cirth-secondary-hover);
       --cirth-border-color: var(--cirth-secondary-hover);
@@ -259,7 +260,7 @@
       --cirth-background-color: color-mix(
         in oklch,
         var(--cirth-contrast) 12%,
-        var(--cirth-canvas)
+        var(--cirth-form-element-background-color)
       );
       --cirth-color: var(--cirth-contrast-hover);
       --cirth-border-color: var(--cirth-contrast-hover);

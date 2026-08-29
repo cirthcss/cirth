@@ -66,11 +66,13 @@ bodyClass: docs-home-page
 				<ol class="docs-system-modules">
 					{% for card in stack.items %}
 						<li>
-							<h3>{{ card.title }}</h3>
-							<p>{{ card.details | safe }}</p>
-							<ul class="docs-badge-row">
-								{% for badge in card.badges %}<li><code>{{ badge }}</code></li>{% endfor %}
-							</ul>
+							<article>
+								<h3>{{ card.title }}</h3>
+								<p>{{ card.details | safe }}</p>
+								<ul class="docs-badge-row">
+									{% for badge in card.badges %}<li><code>{{ badge }}</code></li>{% endfor %}
+								</ul>
+							</article>
 						</li>
 					{% endfor %}
 				</ol>

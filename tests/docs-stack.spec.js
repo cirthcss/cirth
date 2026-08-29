@@ -241,7 +241,11 @@ test("homepage cards and FAQ expose consistent interactive states", async ({
 			.locator("p")
 			.evaluate((element) => element.getBoundingClientRect().width),
 	]);
-	expect(new Set([...closedWidths, ...openWidths]).size).toBe(1);
+	// The public details surface owns its border and padding. Opening it must
+	// not resize either the outer frame or the inner content measure.
+	expect(openWidths[0]).toBe(closedWidths[0]);
+	expect(openWidths[1]).toBe(closedWidths[1]);
+	expect(openWidths[2]).toBe(openWidths[1]);
 
 	const nextSummary = page.locator(".docs-native-faq summary").nth(1);
 	const backgroundBefore = await nextSummary.evaluate(
@@ -255,7 +259,7 @@ test("homepage cards and FAQ expose consistent interactive states", async ({
 	expect(backgroundAfter).not.toBe(backgroundBefore);
 });
 
-test("documentation active navigation is angular and fills its row", async ({
+test("documentation active navigation uses the public registered state", async ({
 	page,
 }) => {
 	await page.goto(`${origin}/get-started/`, { waitUntil: "networkidle" });
@@ -264,16 +268,17 @@ test("documentation active navigation is angular and fills its row", async ({
 		const style = getComputedStyle(element);
 		const marker = getComputedStyle(element, "::before");
 		return {
-			anchorHeight: element.getBoundingClientRect().height,
 			backgroundImage: style.backgroundImage,
+			backgroundColor: style.backgroundColor,
 			borderRadius: style.borderRadius,
-			markerHeight: Number.parseFloat(marker.height),
-			markerRadius: marker.borderRadius,
+			leadingEdge: Number.parseFloat(style.borderInlineStartWidth),
+			markerContent: marker.content,
 		};
 	});
 
 	expect(geometry.backgroundImage).toBe("none");
-	expect(geometry.borderRadius).toBe("0px");
-	expect(geometry.markerRadius).toBe("0px");
-	expect(geometry.markerHeight).toBeCloseTo(geometry.anchorHeight, 1);
+	expect(geometry.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+	expect(geometry.borderRadius).toBe("4px");
+	expect(geometry.leadingEdge).toBe(2);
+	expect(geometry.markerContent).toBe("none");
 });

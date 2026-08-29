@@ -66,6 +66,21 @@
       &:not(:hover) {
         text-decoration: none;
       }
+
+      &:is([aria-current]:not([aria-current="false"]), [aria-selected="true"]) {
+        // Active navigation keeps readable body ink. The accent lives in
+        // the registered edge and tint, so the state survives both a hue
+        // change and users who cannot distinguish that hue from the text.
+        border-block-end: var(--cirth-registration-width) solid
+          var(--cirth-primary-border);
+        background-color: color-mix(
+          in oklch,
+          var(--cirth-primary) 9%,
+          transparent
+        );
+        color: var(--cirth-nav-active-color);
+        font-weight: var(--cirth-font-weight-semibold);
+      }
     }
 
     // Button groups size to their content and drop the stacking margin,
@@ -135,6 +150,7 @@
 
     // Minimal support for aria-current
     & a[aria-current]:not([aria-current="false"]) {
+      border-block-end-color: transparent;
       background-color: transparent;
       color: inherit;
       text-decoration: none;
@@ -159,6 +175,12 @@
 
     a {
       display: block;
+
+      &:is([aria-current]:not([aria-current="false"]), [aria-selected="true"]) {
+        border-block-end-color: transparent;
+        border-inline-start: var(--cirth-registration-width) solid
+          var(--cirth-primary-border);
+      }
     }
 
     // Minimal support for links as buttons

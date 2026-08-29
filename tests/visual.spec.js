@@ -70,6 +70,9 @@ const representativePresetPages = [
 	"forms/index.html",
 ];
 
+// No docs shell or logo: the public theme has to carry the family resemblance.
+const frameworkSpecimens = ["amber", "plain", "playroom", "blue"];
+
 /**
  * @type {{
  *   pagePath: string,
@@ -245,4 +248,14 @@ for (const theme of themeVariants) {
 			await expectScreenshot(page, name);
 		});
 	}
+}
+
+for (const specimen of frameworkSpecimens) {
+	test(`specimen-${specimen}`, async ({ page }) => {
+		await page.goto(`${origin}/specimen/${specimen}/`, {
+			waitUntil: "networkidle",
+		});
+		await page.evaluate(() => document.fonts.ready);
+		await expectScreenshot(page, `specimen-${specimen}`);
+	});
 }

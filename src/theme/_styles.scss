@@ -26,8 +26,8 @@
   // the root, so a preset that zeroes the knob zeroes these too): containers
   // get a softer radius than the controls inside them, while small inline
   // elements (checkboxes, code) are capped so they never read as circles.
-  --cirth-border-radius: var(--cirth-radius-md);
-  --cirth-card-border-radius: calc(var(--cirth-border-radius) * 1.3333);
+  --cirth-border-radius: var(--cirth-radius-sm);
+  --cirth-card-border-radius: var(--cirth-radius-md);
   --cirth-checkbox-border-radius: min(
     var(--cirth-border-radius),
     var(--cirth-radius-sm)
@@ -37,6 +37,12 @@
     var(--cirth-radius-sm)
   );
   --cirth-border-width: var(--cirth-border-width-1);
+
+  // Cirth's quiet registration edge: controls and resting surfaces carry a
+  // slightly stronger baseline. In vertical navigation the same weight is
+  // rotated into a leading rail. The geometry, rather than the accent hue,
+  // is what makes the family recognisable across presets.
+  --cirth-registration-width: var(--cirth-border-width-2);
   --cirth-outline-width: var(--cirth-border-width-2);
 
   // The page surface slot, defaulting to the canvas input. Declared here
@@ -83,11 +89,9 @@
   }
 
   // Spacings for form elements and button
-  // Controls are 2.75rem (44px) tall — the WCAG 2.5.5 target size, and a
-  // hard product requirement — built from on-scale values: 1rem text at
-  // the relaxed line-height (1.625 → 26px, set on controls below) plus
-  // 2 × 0.5rem padding plus 2 × 1px border. Changing either token here or
-  // the control line-height changes that height.
+  // Controls are 2.75rem (44px) tall — the WCAG 2.5.5 target size. Their
+  // compact 25px line box plus 2 × 0.5rem padding, a 1px top edge and the
+  // 2px registered baseline produces that height exactly.
 
   // These values produce it; they do not guarantee it. Anything that moves
   // a control's font-size moves the sum, so button, select and textarea
@@ -98,7 +102,7 @@
   --cirth-form-element-spacing-horizontal: var(--cirth-space-4);
 
   // Font weight for form labels & fieldsets legend
-  --cirth-form-label-font-weight: var(--cirth-font-weight);
+  --cirth-form-label-font-weight: var(--cirth-font-weight-medium);
 
   // Group (role="group")
   --cirth-group-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
@@ -145,6 +149,7 @@
   --cirth-nav-link-spacing-vertical: var(--cirth-space-2);
   --cirth-nav-link-spacing-horizontal: var(--cirth-space-2);
   --cirth-nav-breadcrumb-divider: ">";
+  --cirth-nav-active-color: var(--cirth-contrast);
 
   // Icons
   // Every icon below is a viewBox and nothing else: no width/height
@@ -217,14 +222,14 @@
   }
 
   h1 {
-    // Reference-manual scale: the page title is a display moment
+    // Decisive without turning every product page into a campaign page.
     --cirth-font-size: clamp(
-      var(--cirth-font-size-5xl),
-      1.7rem + 2.2vw,
-      var(--cirth-font-size-7xl)
+      var(--cirth-font-size-4xl),
+      1.65rem + 1.65vw,
+      var(--cirth-font-size-6xl)
     );
-    --cirth-line-height: var(--cirth-line-height-tight);
-    --cirth-letter-spacing: var(--cirth-letter-spacing-tight);
+    --cirth-line-height: 1.08;
+    --cirth-letter-spacing: var(--cirth-letter-spacing-snug);
     --cirth-typography-spacing-top: var(--cirth-space-12);
   }
 
@@ -234,8 +239,8 @@
       1.3rem + 1vw,
       var(--cirth-font-size-4xl)
     );
-    --cirth-line-height: 1.15;
-    --cirth-letter-spacing: var(--cirth-letter-spacing-tight);
+    --cirth-line-height: 1.2;
+    --cirth-letter-spacing: var(--cirth-letter-spacing-snug);
     --cirth-typography-spacing-top: var(--cirth-space-12);
   }
 
@@ -272,9 +277,8 @@
   // Containers get a softer radius and more generous padding than the
   // controls that sit inside them
   article {
-    --cirth-border-radius: var(--cirth-card-border-radius);
-    --cirth-block-spacing-vertical: var(--cirth-space-6);
-    --cirth-block-spacing-horizontal: var(--cirth-space-6);
+    --cirth-block-spacing-vertical: var(--cirth-space-5);
+    --cirth-block-spacing-horizontal: var(--cirth-space-5);
   }
 
   // Table
@@ -283,7 +287,7 @@
     th,
     td {
       --cirth-font-weight: var(--cirth-font-weight-semibold);
-      --cirth-border-width: 0.1875rem;
+      --cirth-border-width: var(--cirth-registration-width);
     }
   }
 
@@ -309,8 +313,7 @@
   }
 
   // Inputs and Selects
-  // The relaxed line-height is part of the 44px control-height math — see
-  // the form-element spacing tokens above
+  // The compact line-height is part of the 44px control-height math above.
   input:not(
     [type="submit"],
     [type="button"],
@@ -321,42 +324,36 @@
   ),
   :where(select, textarea) {
     --cirth-outline-width: var(--cirth-border-width-1);
-    --cirth-line-height: var(--cirth-line-height-relaxed);
+    --cirth-line-height: 1.5625;
   }
 
   [type="search"] {
     --cirth-border-radius: var(--cirth-radius-pill);
   }
 
-  // The pill belongs to the search field itself and to the dedicated
-  // [role="search"] group. Inside a generic group the field is just one
-  // segment of a shared shape, so it takes the radius its group is drawn
-  // with, or its exposed corners (and the focus shadow tracing
-  // them) stay pill-round against the group's square ones (gh#69).
-  // `inherit` rather than a literal, so a customized
-  // --cirth-border-radius keeps the two in step.
+  // Search owns a recognisable native silhouette. A search field in a
+  // generic group becomes an ordinary segment so its joined corners match.
   #{$group-selector} [type="search"] {
     --cirth-border-radius: inherit;
   }
 
   // Buttons
-  // The relaxed line-height is part of the 44px control-height math — see
-  // the form-element spacing tokens above
+  // Buttons share the same 25px line box and registered baseline as fields.
   button,
   [type="submit"],
   [type="reset"],
   [type="button"],
   [role="button"] {
     --cirth-font-weight: var(--cirth-font-weight-semibold);
-    --cirth-line-height: var(--cirth-line-height-relaxed);
-    --cirth-form-element-spacing-horizontal: var(--cirth-space-5);
+    --cirth-line-height: 1.5625;
+    --cirth-form-element-spacing-horizontal: var(--cirth-space-4);
   }
 
   // The file input only gets the line-height (for its ::file-selector-button,
   // which inherits custom properties from the input) — not the button font
   // weight, which would also embolden the filename text
   [type="file"] {
-    --cirth-line-height: var(--cirth-line-height-relaxed);
+    --cirth-line-height: 1.5625;
   }
 
   // Checkboxes, Radios and Switches

@@ -30,7 +30,7 @@ const updateBaseline = process.argv.includes("--update-baseline");
 /**
  * @typedef {{
  *   page: string,
- *   theme: "default" | "plain" | "playroom",
+ *   theme: "default" | "plain" | "playroom" | "amber" | "blue",
  *   mode: "light" | "dark" | "forced-colors",
  *   state: "default" | "dialog-open" | "popover-open" | "search-open",
  *   violation: import("axe-core").Result,
@@ -109,6 +109,7 @@ const openStates = [
 ];
 const viewport = { width: 1440, height: 900 };
 const concurrency = 4;
+const frameworkSpecimens = ["amber", "plain", "playroom", "blue"];
 
 try {
 	assertDocsBuilt("check-a11y");
@@ -230,6 +231,37 @@ const run = async () => {
 		}
 	}
 
+	// These routes intentionally omit the documentation preset loader: their
+	// colour treatment is fixed by the specimen itself and only the public
+	// Cirth stylesheets are present.
+	for (const specimen of frameworkSpecimens) {
+		for (const mode of modes) {
+			const context = await browser.newContext({
+				...mode.options,
+				reducedMotion: "reduce",
+				viewport,
+			});
+			const page = await context.newPage();
+			await page.goto(`${origin}/specimen/${specimen}/`, {
+				waitUntil: "load",
+			});
+			const results = await analyze(
+				page,
+				/** @type {Finding["mode"]} */ (mode.name),
+			);
+			for (const violation of results.violations) {
+				found.push({
+					page: `specimen/${specimen}/index.html`,
+					theme: /** @type {Finding["theme"]} */ (specimen),
+					mode: /** @type {Finding["mode"]} */ (mode.name),
+					state: "default",
+					violation,
+				});
+			}
+			await context.close();
+		}
+	}
+
 	await browser.close();
 	server.close();
 	return found;
@@ -280,7 +312,8 @@ run()
 			console.error(
 				`\ncheck-a11y: ${fresh.length} new WCAG 2.0–2.2 A/AA ` +
 					`violation(s) across ${pages.length} pages × ${themeVariants.length} ` +
-					`themes × ${modes.length} modes plus ${openStates.length} open states ` +
+					`themes × ${modes.length} modes plus ${openStates.length} open states and ` +
+					`${frameworkSpecimens.length} shell-free specimens ` +
 					`per theme/mode. Fix them or, ` +
 					`if accepted deliberately, run ` +
 					`\`node scripts/check-a11y.js --update-baseline\`.`,
@@ -292,7 +325,7 @@ run()
 			`✓ check-a11y: no new WCAG 2.0–2.2 A/AA violations across ` +
 				`${pages.length} pages × ${themeVariants.length} themes × ` +
 				`${modes.length} modes plus ${openStates.length} open states per ` +
-				`theme/mode` +
+				`theme/mode and ${frameworkSpecimens.length} shell-free specimens` +
 				(baseline.size > 0 ? ` (${baseline.size} baselined)` : "") +
 				".",
 		);

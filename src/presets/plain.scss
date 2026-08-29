@@ -2,9 +2,9 @@
 // ––––––––––––––––––––
 // For the project that wants a conventional application look and no
 // decisions: a familiar blue accent, a plain white page, and headings in
-// the same face as the body text. It is deliberately the least opinionated
-// thing Cirth ships — where the default theme carries the project's own
-// identity (warm paper, serif display), this carries none.
+// the same face as the body text. It is deliberately the quietest colour
+// treatment Cirth ships; geometry, density, borders and interaction remain
+// shared with the default so Plain is still recognisably Cirth.
 // It is also the shorter half of a worked example. This preset changes
 // *only input tokens*: nothing below is a derived value. The accent's
 // background, hover, focus ring and underline tint are not set here
@@ -39,8 +39,8 @@
     oklch(66% 0.02 258deg)
   );
 
-  // Headings in the body face. The serif display is the default theme's
-  // signature; a conventional application baseline does not want one.
+  // Keep headings in the body face even when the consumer has replaced the
+  // display role independently.
   --cirth-font-family-display: var(--cirth-font-family);
 }
 

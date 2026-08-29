@@ -8,7 +8,9 @@
   margin-bottom: var(--cirth-block-spacing-vertical);
   padding: var(--cirth-block-spacing-vertical)
     var(--cirth-block-spacing-horizontal);
-  border-radius: var(--cirth-border-radius);
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-block-end-width: var(--cirth-registration-width);
+  border-radius: var(--cirth-card-border-radius);
   background: var(--cirth-card-background-color);
   box-shadow: var(--cirth-card-box-shadow);
 
@@ -31,15 +33,15 @@
     margin-bottom: var(--cirth-block-spacing-vertical);
     border-bottom: var(--cirth-border-width) solid
       var(--cirth-card-border-color);
-    border-top-right-radius: var(--cirth-border-radius);
-    border-top-left-radius: var(--cirth-border-radius);
+    border-top-right-radius: var(--cirth-card-border-radius);
+    border-top-left-radius: var(--cirth-card-border-radius);
   }
 
   > footer {
     margin-top: var(--cirth-block-spacing-vertical);
     margin-bottom: calc(var(--cirth-block-spacing-vertical) * -1);
     border-top: var(--cirth-border-width) solid var(--cirth-card-border-color);
-    border-bottom-right-radius: var(--cirth-border-radius);
-    border-bottom-left-radius: var(--cirth-border-radius);
+    border-bottom-right-radius: var(--cirth-card-border-radius);
+    border-bottom-left-radius: var(--cirth-card-border-radius);
   }
 }

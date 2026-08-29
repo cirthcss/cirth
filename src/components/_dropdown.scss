@@ -76,14 +76,15 @@
         var(--cirth-line-height) +
         var(--cirth-form-element-spacing-vertical) *
         2 +
-        var(--cirth-border-width) *
-        2
+        var(--cirth-border-width) +
+        var(--cirth-registration-width)
     );
     padding: var(--cirth-form-element-spacing-vertical)
       var(--cirth-form-element-spacing-horizontal);
     border: var(--cirth-border-width)
       solid
       var(--cirth-form-element-border-color);
+    border-block-end-width: var(--cirth-registration-width);
     border-radius: var(--cirth-border-radius);
     background-color: var(--cirth-form-element-background-color);
     color: var(--cirth-form-element-placeholder-color);

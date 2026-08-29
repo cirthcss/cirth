@@ -37,7 +37,7 @@ const assertDocsBuilt = (label) => {
 // for; their real form markup and builds are covered by the home comparison
 // and the underlying component suites.
 const excludedTopLevel =
-	/^(v\d+\.\d+|next|lab|social-preview|readme-preview-light|readme-preview-dark|favicon-preview)$/;
+	/^(v\d+\.\d+|next|lab|specimen|social-preview|readme-preview-light|readme-preview-dark|favicon-preview)$/;
 
 /**
  * @param {string} [dir]

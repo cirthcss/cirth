@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{{ specimenTitle }} — Cirth framework specimen</title>
+		<link rel="stylesheet" href="/styles/generated/cirth-lab-default.css" />
+		{% if specimenPreset %}<link rel="stylesheet" href="/styles/generated/presets/{{ specimenPreset }}.css" />{% endif %}
+		{% if specimenPrimary %}<style>:root { --cirth-primary: {{ specimenPrimary }}; }</style>{% endif %}
+	</head>
+	<body>
+		<header class="container">
+			<nav aria-label="Product">
+				<ul>
+					<li><strong>Operations</strong></li>
+					<li><a href="#overview" aria-current="page">Overview</a></li>
+					<li><a href="#activity">Activity</a></li>
+				</ul>
+				<ul>
+					<li><button class="outline secondary" type="button">New request</button></li>
+				</ul>
+			</nav>
+		</header>
+		<main class="container" id="overview">
+			<nav aria-label="Breadcrumb">
+				<ul>
+					<li><a href="#">Workspace</a></li>
+					<li><a href="#" aria-current="page">Release queue</a></li>
+				</ul>
+			</nav>
+			<div class="grid">
+				<aside>
+					<nav aria-label="Workspace sections">
+						<ul>
+							<li><a href="#overview" aria-current="page">Release queue</a></li>
+							<li><a href="#access">Access</a></li>
+							<li><a href="#activity">Audit log</a></li>
+						</ul>
+					</nav>
+				</aside>
+				<section>
+					<h1>Release queue</h1>
+					<p>Review deployment requests, ownership and validation state for the current maintenance window.</p>
+					<div role="group" aria-label="Queue actions">
+						<button type="button">Approve selected</button>
+						<button class="secondary" type="button">Assign</button>
+						<button class="outline" type="button">Export</button>
+					</div>
+
+					<article>
+						<header><strong>Request RQ-184</strong><br /><small>Awaiting review</small></header>
+						<form>
+							<div class="grid">
+								<label>Owner<input name="owner" value="Marta Costa" /></label>
+								<label>Environment<select name="environment"><option>Staging</option><option>Production</option></select></label>
+							</div>
+							<label>Change summary<textarea name="summary" rows="3">Update the billing reconciliation worker.</textarea></label>
+							<label>Reference<input name="reference" value="Locked after approval" readonly /></label>
+							<label>Approval code<input name="approval" value="19" aria-invalid="true" aria-describedby="approval-error" /></label>
+							<small id="approval-error">Enter the six-digit code from the change record.</small>
+							<fieldset>
+								<legend>Review policy</legend>
+								<label><input type="checkbox" checked /> Run automated checks</label>
+								<label><input type="radio" name="window" checked /> Current window</label>
+								<label><input type="radio" name="window" /> Next window</label>
+								<label><input type="checkbox" role="switch" checked /> Notify maintainers</label>
+							</fieldset>
+						</form>
+						<footer><button type="button">Save review</button> <button class="outline secondary" type="button">Cancel</button></footer>
+					</article>
+
+					<section id="activity">
+						<h2>Current activity</h2>
+						<div class="overflow-auto" tabindex="0" role="region" aria-label="Current release requests">
+							<table>
+								<thead><tr><th scope="col">Request</th><th scope="col">Owner</th><th scope="col">State</th><th scope="col">Progress</th></tr></thead>
+								<tbody>
+									<tr aria-selected="true"><th scope="row">RQ-184</th><td>Marta Costa</td><td>Review</td><td>75%</td></tr>
+									<tr><th scope="row">RQ-183</th><td>Owen Park</td><td>Checks</td><td>42%</td></tr>
+									<tr><th scope="row">RQ-181</th><td>Sam Lee</td><td>Ready</td><td>100%</td></tr>
+								</tbody>
+							</table>
+						</div>
+						<label for="queue-progress">Window completion</label>
+						<progress id="queue-progress" value="68" max="100">68%</progress>
+					</section>
+
+					<blockquote role="status">
+						Automated checks passed. Human approval is still required.
+						<footer>Validated at 14:32 UTC</footer>
+					</blockquote>
+
+					<details id="access">
+						<summary>Access and audit requirements</summary>
+						<p>Production changes require an owner, an approval record and a retained audit event.</p>
+					</details>
+
+					<button class="outline" type="button" data-open-dialog>Review confirmation dialog</button>
+					<dialog aria-labelledby="confirmation-title">
+						<article>
+							<h2 id="confirmation-title">Confirm approval</h2>
+							<p>This records your identity and releases the request to production.</p>
+							<footer><button type="button" data-close-dialog>Cancel</button> <button type="button">Confirm</button></footer>
+						</article>
+					</dialog>
+				</section>
+			</div>
+		</main>
+		<footer class="container"><small>Operations workspace · Last synchronized 14:32 UTC</small></footer>
+		<script>
+			// Specimen-only behavior. The distributed library remains zero JavaScript.
+			const dialog = document.querySelector("dialog");
+			document.querySelector("[data-open-dialog]").addEventListener("click", () => dialog.showModal());
+			document.querySelector("[data-close-dialog]").addEventListener("click", () => dialog.close());
+		</script>
+	</body>
+</html>

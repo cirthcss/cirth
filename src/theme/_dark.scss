@@ -97,7 +97,11 @@
   // Don't use, 'none, 'false, 'null', '0', etc.
 
   // Table
-  --cirth-table-border-color: var(--cirth-muted-border-color);
+  --cirth-table-border-color: color-mix(
+    in oklch,
+    var(--cirth-form-element-border-color) 42%,
+    var(--cirth-card-background-color)
+  );
   --cirth-table-row-stripped-background-color: #{color.change(
       $neutral-500,
       $alpha: 0.0375
@@ -134,8 +138,12 @@
   --cirth-accordion-active-summary-color: var(--cirth-primary-hover);
   --cirth-accordion-close-summary-color: var(--cirth-color);
   --cirth-accordion-open-summary-color: var(--cirth-muted-color);
-  --cirth-card-border-color: var(--cirth-card-background-color);
-  --cirth-card-box-shadow: var(--cirth-box-shadow);
+  --cirth-card-border-color: color-mix(
+    in oklch,
+    var(--cirth-form-element-border-color) 46%,
+    var(--cirth-card-background-color)
+  );
+  --cirth-card-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
 
   // Dropdown (details.dropdown)
   @if $enable-classes {
@@ -159,7 +167,11 @@
   --cirth-meter-optimum-color: var(--cirth-success);
   --cirth-meter-suboptimum-color: var(--cirth-warning);
   --cirth-meter-even-less-good-color: var(--cirth-error);
-  --cirth-progress-color: #{$amber-450};
+
+  // Progress is part of the active-control language, not a brand specimen.
+  // Following the public primary keeps Plain, Playroom and custom themes
+  // recognisable as the same framework without leaking the default amber.
+  --cirth-progress-color: var(--cirth-primary);
 
   // Icons painted as background-image on replaced form controls. They
   // live in the scheme rather than at the root because a data URI cannot

@@ -82,7 +82,7 @@
 				});
 			};
 
-			for (const pre of document.querySelectorAll("pre:not(.home-demo-code pre)")) {
+			for (const pre of document.querySelectorAll("pre")) {
 				if (pre.querySelector(":scope > button.copy")) continue;
 				const code = pre.querySelector("code");
 				if (!code?.textContent) continue;

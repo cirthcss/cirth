@@ -15,6 +15,7 @@ module.exports = defineConfig({
 		"date-input-group.spec.js",
 		"form-sizing.spec.js",
 		"forms-validity.spec.js",
+		"framework-specimen.spec.js",
 		"group-hidden-elements.spec.js",
 		"group-search-radius.spec.js",
 		"input-parity.spec.js",

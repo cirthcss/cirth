@@ -46,6 +46,32 @@
   text-align: start;
 }
 
+#{$parent-selector} thead th {
+  font-size: var(--cirth-font-size-sm);
+  line-height: var(--cirth-line-height-snug);
+}
+
+#{$parent-selector} tbody tr {
+  transition: background-color var(--cirth-transition);
+
+  &:hover {
+    background-color: color-mix(
+      in oklch,
+      var(--cirth-table-border-color) 28%,
+      transparent
+    );
+  }
+
+  &:is([aria-selected="true"], [aria-current]:not([aria-current="false"])) {
+    background-color: color-mix(in oklch, var(--cirth-primary) 9%, transparent);
+
+    > :first-child {
+      border-inline-start: var(--cirth-registration-width) solid
+        var(--cirth-primary-border);
+    }
+  }
+}
+
 // Footer
 
 #{$parent-selector} tfoot {

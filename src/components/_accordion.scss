@@ -12,7 +12,17 @@
     line-height: var(--cirth-font-size-md);
     list-style-type: none;
     cursor: pointer;
-    transition: color var(--cirth-transition);
+    transition:
+      background-color var(--cirth-transition),
+      color var(--cirth-transition);
+
+    &:hover:not([role]) {
+      background-color: color-mix(
+        in oklch,
+        var(--cirth-primary) 7%,
+        transparent
+      );
+    }
 
     &:not([role]) {
       color: var(--cirth-accordion-close-summary-color);
@@ -103,6 +113,32 @@
         transform: rotate(0);
       }
     }
+  }
+}
+
+// A resting disclosure is a quiet surface. Dropdowns already own a menu
+// frame, so class builds leave that specialised component untouched.
+$surface-details: "details";
+
+@if $enable-classes {
+  $surface-details: "details:not(.dropdown)";
+}
+
+#{$parent-selector} #{$surface-details} {
+  padding: var(--cirth-space-4);
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-block-end-width: var(--cirth-registration-width);
+  border-radius: var(--cirth-border-radius);
+  background: var(--cirth-card-background-color);
+
+  > summary {
+    font-weight: var(--cirth-font-weight-semibold);
+  }
+
+  &[open] > summary {
+    padding-bottom: var(--cirth-space-3);
+    border-bottom: var(--cirth-border-width) solid
+      var(--cirth-card-border-color);
   }
 }
 
