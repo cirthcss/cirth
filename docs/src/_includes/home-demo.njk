@@ -12,11 +12,7 @@
 </main>
 {%- endset -%}
 
-<figure class="docs-transform-figure" aria-labelledby="transform-caption">
-	<figcaption id="transform-caption" class="docs-figure-caption">
-		<span><strong>Fig. 01</strong> Semantic source → native baseline</span>
-		<span class="docs-fidelity"><i aria-hidden="true"></i> High fidelity · live Cirth</span>
-	</figcaption>
+<figure class="docs-transform-figure" aria-label="Semantic HTML source and authentic Cirth output">
 	<div class="docs-lab-toolbar">
 		<label>
 			<span>Build</span>
@@ -28,34 +24,24 @@
 			</select>
 		</label>
 		<label>
-			<span>Output theme</span>
+			<span>Theme</span>
 			<select data-lab-theme>
 				<option value="light">Light</option>
 				<option value="dark">Dark</option>
 			</select>
 		</label>
-		<small><strong>Docs JS</strong> changes the comparison only. Cirth ships none.</small>
 	</div>
 	<div class="docs-transform-grid">
 		<section class="docs-source-panel" aria-labelledby="source-label">
 			<header>
-				<span id="source-label">01 / source</span>
-				<code>index.html</code>
+				<span id="source-label">Source</span>
 			</header>
 			<pre tabindex="0"><code data-lab-source>{{ defaultSource }}</code></pre>
 		</section>
 
-		<div class="docs-mechanism" aria-label="The selected Cirth stylesheet transforms semantic HTML into the rendered interface">
-			<span class="docs-mechanism-node" aria-hidden="true"></span>
-			<strong>02 / mechanism</strong>
-			<code data-lab-file>cirth.min.css</code>
-			<small>one stylesheet</small>
-		</div>
-
 		<section class="docs-output-panel" aria-labelledby="output-label">
 			<header>
-				<span id="output-label">03 / output</span>
-				<span><i aria-hidden="true"></i> authentic</span>
+				<span id="output-label">Output</span>
 			</header>
 			<iframe
 				title="Authentic Cirth default build rendering a semantic sign-in form"
@@ -66,9 +52,8 @@
 		</section>
 	</div>
 	<p class="docs-figure-note">
-		<span>Override declaration</span>
-		<strong>None inside the output frame.</strong>
-		The frame loads the selected build compiled directly from <code>src/</code>.
+		<strong>Docs controls use JavaScript.</strong>
+		The output has no preview overrides.
 	</p>
 </figure>
 
@@ -78,8 +63,7 @@
 		const theme = document.querySelector("[data-lab-theme]");
 		const frame = document.querySelector("[data-lab-frame]");
 		const source = document.querySelector("[data-lab-source]");
-		const file = document.querySelector("[data-lab-file]");
-		if (!build || !theme || !frame || !source || !file) return;
+		if (!build || !theme || !frame || !source) return;
 
 		const sources = {
 			default: `<main class="container">
@@ -105,19 +89,11 @@
   </main>
 </div>`,
 		};
-		const files = {
-			default: "cirth.min.css",
-			classless: "cirth.classless.min.css",
-			scoped: "cirth.scoped.min.css",
-			"scoped-classless": "cirth.classless.scoped.min.css",
-		};
-
 		const render = () => {
 			const base = (document.documentElement.dataset.base || "/").replace(/\/$/, "");
 			frame.src = `${base}/lab/${build.value}/?theme=${theme.value}`;
 			frame.title = `Authentic Cirth ${build.options[build.selectedIndex].text} build in ${theme.value} mode`;
 			source.textContent = sources[build.value];
-			file.textContent = files[build.value];
 		};
 
 		build.addEventListener("change", render);

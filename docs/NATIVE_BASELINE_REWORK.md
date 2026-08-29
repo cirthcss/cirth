@@ -9,8 +9,8 @@ Cirth is presented as an operational technical plate rather than a marketing
 landing page. Real semantic HTML, the selected stylesheet, and authentic Cirth
 output share a measurable grid. Warm paper and graphite provide the working
 surface, cool construction lines provide structure, and amber is reserved for
-functional signal. The monogram's 45-degree geometry appears selectively in
-junctions, separators, figure crops, and the responsive mark. Claims are paired
+functional signal. The monogram's geometry is concentrated in the responsive
+mark rather than repeated as ornamental corner cuts. Claims are paired
 with their verification method in a compact proof ledger.
 
 ## Layer contract
@@ -35,7 +35,8 @@ the initial example and all fundamental content remain available without it.
 - System sans for product, headings, and UI; system monospace for code, data,
   tokens, coordinates, and proof states. No webfonts.
 - Borders and tonal surfaces before shadows; controlled 0–8 px shell radii.
-- The 45-degree cut is structural, not a universal card or button treatment.
+- Decorative coordinates, figure numbering, and corner cuts stay out of the
+  shell unless they carry information the reader needs.
 - UI fidelity: high for live Cirth, medium for explanatory fragments, and low
   for reduced marks/greeking at small scale.
 - Motion explains source-to-output and state changes, has a complete static
@@ -56,7 +57,7 @@ screenshots.
 
 - Homepage: retained the production-ready semantic HTML claim, promoted
   semantic HTML and accessible baseline, replaced the typing/sticky-tour
-  language with source/mechanism/output labels, and changed the stale hard-coded
+  language with a direct source/output comparison, and changed the stale hard-coded
   `244 tokens` proof to a build-derived current count (`246` on this branch).
 - Brand: added operational construction, clearspace, fidelity, small-size, and
   incorrect-use guidance; corrected the claim that the full mark works at

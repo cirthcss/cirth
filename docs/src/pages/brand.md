@@ -9,7 +9,6 @@ integrations, and anywhere else the project is named.
 
 <section class="docs-brand-spec" aria-labelledby="brand-spec-title">
   <header class="docs-brand-spec-header">
-    <p><span>Fig. B01</span><span>Operational identity / experimental</span></p>
     <h2 id="brand-spec-title">One mark, three levels of fidelity.</h2>
   </header>
   <div class="docs-brand-construction">

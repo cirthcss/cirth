@@ -12,7 +12,6 @@ HTML" opens the exact source.
 
 <section class="docs-build-comparison" aria-labelledby="build-comparison-title">
   <header>
-    <p><span>Fig. E01</span><span>High fidelity / isolated output</span></p>
     <h2 id="build-comparison-title">One interface, four real builds.</h2>
     <p>Each frame is isolated from the documentation shell and loads a stylesheet compiled directly from <code>src/</code>. No preview overrides are applied.</p>
   </header>

@@ -11,7 +11,7 @@ names first. Load it, write semantic markup, and most of an interface is
 already a finished, accessible baseline.
 
 <section class="docs-proof-strip" aria-labelledby="about-proof-title">
-  <header><span>Proof ledger / current build</span><h2 id="about-proof-title">The contract, at a glance.</h2></header>
+  <header><h2 id="about-proof-title">The contract, at a glance.</h2></header>
   <dl>
     <div><dt>Semantic baseline</dt><dd><strong>covered</strong><small>native element selectors</small></dd></div>
     <div><dt>Accessibility</dt><dd><strong>verified</strong><small>WCAG 2.2 AA floor</small></dd></div>

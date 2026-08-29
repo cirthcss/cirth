@@ -6,13 +6,6 @@ bodyClass: docs-home-page
 	<section class="docs-native-hero" aria-labelledby="home-title">
 		<div class="docs-native-grid">
 			<header class="docs-native-claim">
-				<p class="docs-coordinate"><span>N 00° / WEB</span><span>{{ versions.current.label }}</span></p>
-				<div class="docs-native-lockup" aria-hidden="true">
-					<img class="docs-logo-light" src="/logo_brand.svg" alt="" width="64" height="64" />
-					<img class="docs-logo-dark" src="/logo_brand_dark.svg" alt="" width="64" height="64" />
-					<span>{{ hero.name }}</span>
-				</div>
-				<p class="docs-hero-eyebrow">{{ hero.eyebrow }}</p>
 				<h1 id="home-title">Production-ready UI<br /><em>from semantic HTML.</em></h1>
 				<p class="docs-native-lede">{{ hero.tagline }}</p>
 				<p class="docs-hero-actions">
@@ -34,8 +27,6 @@ bodyClass: docs-home-page
 	<section class="docs-ledger" aria-labelledby="ledger-title">
 		<div class="docs-native-grid">
 			<header class="docs-ledger-intro">
-				<p class="docs-coordinate"><span>Ledger 01</span><span>Build evidence</span></p>
-				<p class="docs-eyebrow">{{ pitch.eyebrow }}</p>
 				<h2 id="ledger-title">Claims with a check path.</h2>
 				<p>{{ pitch.lede }}</p>
 			</header>
@@ -69,15 +60,12 @@ bodyClass: docs-home-page
 		<section class="docs-system-map" aria-labelledby="system-title">
 			<div class="docs-native-grid">
 				<header class="docs-system-intro">
-					<p class="docs-coordinate"><span>Fig. 02</span><span>Coverage map</span></p>
-					<p class="docs-eyebrow">{{ stack.eyebrow }}</p>
 					<h2 id="system-title">{{ stack.title }}</h2>
 					<p>{{ stack.lede }}</p>
 				</header>
 				<ol class="docs-system-modules">
 					{% for card in stack.items %}
 						<li>
-							<span class="docs-module-index">{{ "0" if loop.index < 10 }}{{ loop.index }}</span>
 							<h3>{{ card.title }}</h3>
 							<p>{{ card.details | safe }}</p>
 							<ul class="docs-badge-row">
@@ -94,8 +82,6 @@ bodyClass: docs-home-page
 		<section class="docs-native-showcase" aria-labelledby="showcase-title">
 			<div class="docs-native-grid">
 				<header class="docs-showcase-intro">
-					<p class="docs-coordinate"><span>Fig. 03</span><span>Operating contexts</span></p>
-					<p class="docs-eyebrow">{{ showcase.eyebrow }}</p>
 					<h2 id="showcase-title">{{ showcase.title }}</h2>
 					<p>{{ showcase.lede }}</p>
 					<a href="{{ showcase.link }}" class="secondary">{{ showcase.linkText }} →</a>
@@ -103,7 +89,6 @@ bodyClass: docs-home-page
 				<div class="docs-case-grid">
 					{% for item in showcase.items %}
 						<a class="docs-case" href="{{ item.link }}">
-							<span class="docs-case-toolbar"><i></i><i></i><i></i><small>Live composition / {{ loop.index }}</small></span>
 							<span class="docs-case-icon">{% icon item.icon, 32 %}</span>
 							<strong>{{ item.title }}</strong>
 							<span>{{ item.details }}</span>
@@ -119,8 +104,6 @@ bodyClass: docs-home-page
 		<section class="docs-native-faq" aria-labelledby="faq-title">
 			<div class="docs-native-grid">
 				<header>
-					<p class="docs-coordinate"><span>Reference</span><span>Author questions</span></p>
-					<p class="docs-eyebrow">{{ faq.eyebrow }}</p>
 					<h2 id="faq-title">{{ faq.title }}</h2>
 				</header>
 				<div class="docs-faq-list">

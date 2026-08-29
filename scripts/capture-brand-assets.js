@@ -12,6 +12,7 @@ const captures = [
 	{ page: "favicon-preview", file: "apple-touch-icon.png", width: 180, height: 180 },
 ];
 
+/** @type {Array<{file: string, width: number, height: number, theme: "light" | "dark"}>} */
 const reviewCaptures = [
 	{ file: "home-desktop-light.png", width: 1440, height: 900, theme: "light" },
 	{ file: "home-desktop-dark.png", width: 1440, height: 900, theme: "dark" },

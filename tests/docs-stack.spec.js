@@ -21,24 +21,25 @@ test.afterAll(() => {
 	server.close();
 });
 
-test("homepage prioritizes authentic output before mechanism and source on mobile", async ({ page }) => {
+test("homepage keeps the source and authentic output comparison focused on mobile", async ({ page }) => {
 	await page.setViewportSize({ width: 390, height: 844 });
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
 	const output = page.locator(".docs-output-panel");
-	const mechanism = page.locator(".docs-mechanism");
 	const source = page.locator(".docs-source-panel");
 	await expect(output).toHaveCount(1);
+	await expect(page.locator(".docs-mechanism")).toHaveCount(0);
+	await expect(page.locator(".docs-figure-caption")).toHaveCount(0);
 	await expect(source.locator("[data-lab-source]")).toContainText(
 		'<main class="container">',
 	);
 
 	const order = await Promise.all(
-		[output, mechanism, source].map((locator) =>
+		[output, source].map((locator) =>
 			locator.evaluate((element) => Number(getComputedStyle(element).order)),
 		),
 	);
-	expect(order).toEqual([1, 2, 3]);
+	expect(order).toEqual([1, 2]);
 
 	const frame = page.frameLocator("[data-lab-frame]");
 	await expect(frame.getByRole("heading", { name: "Sign in" })).toBeVisible();
