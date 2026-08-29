@@ -66,38 +66,42 @@
 	--cirth-font-family-display: var(--cirth-font-family-sans);
 }
 
-/* Header — logo | centered nav | controls, three columns instead of the
-   framework nav's own default two (space-between on however many <ul>
-   children it's given). A grid wrapper forces true centering for the
-   middle group regardless of how wide the outer two are, which
-   space-between alone can't guarantee. */
+/* Header — product navigation | search | controls. The three regions use
+   equal outer tracks so search stays visually centred even when the
+   control cluster is wider than the navigation cluster. */
 .docs-header nav {
 	display: grid;
-	grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+	grid-template-columns: minmax(0, 1fr) minmax(16rem, 32rem) minmax(0, 1fr);
 	align-items: center;
-	gap: calc(var(--cirth-spacing) * 1.5);
+	gap: var(--cirth-spacing);
 }
 
-.docs-header-brand-group {
+.docs-header-start-group {
+	min-width: 0;
+	flex-wrap: nowrap;
 	justify-content: flex-start;
 }
 
-.docs-header-nav-group {
-	justify-content: center;
+.docs-header-search {
+	width: 100%;
+	max-width: 32rem;
+	margin: 0;
+	justify-self: center;
+}
+
+.docs-header-search input {
+	width: 100%;
+	min-block-size: 2.75rem;
+	margin: 0;
+	border-radius: var(--cirth-radius-sm);
+	font-size: var(--cirth-font-size-sm);
 }
 
 .docs-header-controls-group {
 	min-width: 0;
 	flex-wrap: wrap;
 	justify-content: flex-end;
-	gap: calc(var(--cirth-spacing) * 0.75);
-}
-
-.docs-version-picker {
-	display: flex;
-	align-items: center;
 	gap: var(--cirth-space-2);
-	margin: 0;
 }
 
 /* Bigger wordmark lockup than a body-text nav link warrants (Ruby-style
@@ -150,6 +154,14 @@
 	font-size: var(--cirth-font-size-sm);
 }
 
+.docs-version-select {
+	width: 5.75rem;
+}
+
+.docs-preset-select {
+	width: 7rem;
+}
+
 /* Doubled class: nav's own `nav li button { height: auto; padding: ... }`
    (components/_nav.scss) ties this rule's specificity at one class, and
    wins on source order since it's the later declaration — verified by
@@ -168,14 +180,6 @@
 	padding: 0;
 	border: none;
 	line-height: 1;
-}
-
-.docs-version-submit.docs-version-submit {
-	min-block-size: 2.75rem;
-	height: 2.75rem;
-	margin: 0;
-	padding-inline: var(--cirth-space-3);
-	font-size: var(--cirth-font-size-sm);
 }
 
 .docs-skip-link:focus {
@@ -205,19 +209,22 @@
 
 /* Hide secondary nav items on small screens; the sidebar still links
    everything. */
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
 	.docs-nav-item {
 		display: none;
 	}
 
-	/* The centered column collapses to nothing without its items — let
-	   the outer two share the row directly instead of leaving a dead
-	   1fr gap between them. */
 	.docs-header nav {
 		grid-template-columns: auto minmax(0, 1fr);
 	}
 
-	.docs-header-nav-group {
+	.docs-header-search {
+		grid-column: 1 / -1;
+		grid-row: 2;
+		max-width: none;
+	}
+
+	.docs-header-github {
 		display: none;
 	}
 }
@@ -229,19 +236,21 @@
 		gap: var(--cirth-spacing);
 	}
 
-	.docs-header-brand-group,
+	.docs-header-start-group,
 	.docs-header-controls-group {
 		justify-content: center;
+	}
+
+	.docs-header-start-group {
+		justify-content: space-between;
 	}
 
 	.docs-header-controls-group {
 		width: 100%;
 	}
 
-	.docs-header-controls-group > li:first-child {
-		display: flex;
-		flex-basis: 100%;
-		justify-content: center;
+	.docs-header-search {
+		grid-row: auto;
 	}
 }
 
@@ -1657,8 +1666,7 @@ body {
 
 .docs-preset-select,
 .docs-version-select,
-.docs-theme-toggle.docs-theme-toggle,
-.docs-version-submit.docs-version-submit {
+.docs-theme-toggle.docs-theme-toggle {
 	border-radius: var(--cirth-radius-sm);
 }
 
@@ -1831,7 +1839,7 @@ body {
 .docs-source-panel,
 .docs-output-panel {
 	display: grid;
-	grid-template-rows: auto 1fr;
+	grid-template-rows: auto minmax(0, 1fr);
 	min-width: 0;
 	margin: 0;
 }
@@ -1875,7 +1883,7 @@ body {
 .docs-output-panel iframe {
 	display: block;
 	width: 100%;
-	height: 100%;
+	height: auto;
 	min-height: 28.5rem;
 	border: 0;
 	background: var(--docs-paper);
@@ -1886,6 +1894,7 @@ body {
 	flex-wrap: wrap;
 	gap: 0.35rem 0.75rem;
 	margin: 0;
+	max-width: none;
 	padding: 0.625rem 1rem;
 	border-block-start: 1px solid var(--docs-line);
 	color: var(--docs-annotation);
@@ -2682,7 +2691,7 @@ body {
 }
 
 @media (max-width: 575px) {
-	.docs-header-brand-group {
+	.docs-header-start-group {
 		display: flex;
 		width: 100%;
 		justify-content: space-between;
@@ -2708,16 +2717,16 @@ body {
 
 	.docs-header-controls-group {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
 		gap: 0.5rem;
 	}
 
-	.docs-header-controls-group > li:first-child {
-		grid-column: 1 / -1;
+	.docs-header-controls-group select {
+		width: 100%;
 	}
 
-	.docs-version-picker {
-		justify-content: center;
+	.docs-header-search {
+		width: 100%;
 	}
 
 	.docs-mobile-nav > nav {

@@ -10,7 +10,7 @@ bodyClass: docs-home-page
 				<p class="docs-native-lede">{{ hero.tagline }}</p>
 				<p class="docs-hero-actions">
 					{% for action in hero.actions %}
-						<a href="{{ action.link }}"{% if action.theme != "brand" %} class="secondary outline"{% endif %}>{{ action.text }}</a>
+						<a href="{{ action.link }}" role="button"{% if action.theme != "brand" %} class="secondary outline"{% endif %}>{{ action.text }}</a>
 					{% endfor %}
 				</p>
 				<ul class="docs-primary-signals" aria-label="Primary product principles">

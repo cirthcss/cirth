@@ -39,6 +39,14 @@ test("homepage keeps the source and authentic output comparison focused on mobil
 		'<input type="email" name="email" autocomplete="email">',
 	);
 	await expect(source.locator("[data-lab-source]")).not.toContainText("…");
+	await expect(page.getByRole("button", { name: "Get Started" })).toHaveAttribute(
+		"href",
+		"/get-started",
+	);
+	await expect(page.getByRole("button", { name: "Examples" })).toHaveAttribute(
+		"href",
+		"/examples",
+	);
 
 	const order = await Promise.all(
 		[output, source].map((locator) =>
@@ -96,6 +104,56 @@ test("homepage keeps the source and authentic output comparison focused on mobil
 			await expect(frame.locator("main")).not.toHaveAttribute("class");
 		}
 	}
+
+	await page.setViewportSize({ width: 1440, height: 900 });
+	const figureBox = await page.locator(".docs-transform-figure").boundingBox();
+	const frameBox = await page.locator("[data-lab-frame]").boundingBox();
+	const noteBox = await page.locator(".docs-figure-note").boundingBox();
+	if (!figureBox || !frameBox || !noteBox) {
+		throw new Error("Expected the hero figure, preview, and footer to be visible");
+	}
+	expect(
+		Math.abs(noteBox.x + noteBox.width - (figureBox.x + figureBox.width)),
+	).toBeLessThanOrEqual(1);
+	expect(frameBox.y + frameBox.height).toBeLessThanOrEqual(noteBox.y + 1);
+	expect(noteBox.y + noteBox.height).toBeLessThanOrEqual(
+		figureBox.y + figureBox.height + 1,
+	);
+});
+
+test("header keeps navigation, search, and automatic versioning distinct", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+
+	const start = page.locator(".docs-header-start-group");
+	const search = page.locator(".docs-header-search");
+	const controls = page.locator(".docs-header-controls-group");
+	const [startBox, searchBox, controlsBox] = await Promise.all([
+		start.boundingBox(),
+		search.boundingBox(),
+		controls.boundingBox(),
+	]);
+	if (!startBox || !searchBox || !controlsBox) {
+		throw new Error("Expected all desktop header regions to be visible");
+	}
+	expect(startBox.x).toBeLessThan(searchBox.x);
+	expect(searchBox.x).toBeLessThan(controlsBox.x);
+
+	const searchInput = search.locator("[data-docs-search-input]");
+	await searchInput.fill("Accordion");
+	await searchInput.press("Enter");
+	await expect(page).toHaveURL(`${origin}/components/accordion/`);
+
+	const version = page.locator("[data-docs-version-select]");
+	await expect(page.locator(".docs-version-submit")).toHaveCount(0);
+	expect(await version.locator("option").allTextContents()).toEqual([
+		"v0.13",
+		"v0.12",
+		"v0.10",
+	]);
+	await version.selectOption({ label: "v0.12" });
+	await expect(page).toHaveURL(`${origin}/v0.12/`);
 });
 
 test("homepage cards and FAQ expose consistent interactive states", async ({
