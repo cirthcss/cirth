@@ -15,6 +15,10 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Changed
 
+- The default display role now uses the system sans stack, keeping product
+  headings, UI, and documentation in one technical voice. Default control
+  corners move from the `0.5rem` to `0.375rem` scale step; card corners
+  remain one step softer through the same runtime radius knob.
 - Containers now expose named `content`/`full` grid lines internally;
   `.container-fluid` gives only the gutter width to its outer tracks, and
   `.breakout` is limited to direct children of `.container` so it cannot

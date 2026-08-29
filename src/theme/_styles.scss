@@ -14,7 +14,7 @@
   // A role token, not a primitive: it names what the stack is *for*, and
   // presets override it (see src/presets/). It lived in
   // theme/_foundations.scss, which is meant to hold only raw scales.
-  --cirth-font-family-display: var(--cirth-font-family-serif);
+  --cirth-font-family-display: var(--cirth-font-family-sans);
   --cirth-line-height: var(--cirth-line-height-normal);
   --cirth-font-weight: var(--cirth-font-weight-regular);
   --cirth-font-size: 100%;
@@ -26,8 +26,8 @@
   // the root, so a preset that zeroes the knob zeroes these too): containers
   // get a softer radius than the controls inside them, while small inline
   // elements (checkboxes, code) are capped so they never read as circles.
-  --cirth-border-radius: var(--cirth-radius-lg);
-  --cirth-card-border-radius: calc(var(--cirth-border-radius) * 1.5);
+  --cirth-border-radius: var(--cirth-radius-md);
+  --cirth-card-border-radius: calc(var(--cirth-border-radius) * 1.3333);
   --cirth-checkbox-border-radius: min(
     var(--cirth-border-radius),
     var(--cirth-radius-sm)
