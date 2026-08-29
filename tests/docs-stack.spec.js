@@ -21,6 +21,45 @@ test.afterAll(() => {
 	server.close();
 });
 
+/** @param {import("@playwright/test").Page} page */
+const assertHeroDemoGeometry = async (page) => {
+	const figureBox = await page.locator(".docs-transform-figure").boundingBox();
+	const gridBox = await page.locator(".docs-transform-grid").boundingBox();
+	const frameBox = await page.locator("[data-lab-frame]").boundingBox();
+	const frameWrapperBox = await page.locator(".docs-output-frame").boundingBox();
+	const outputBox = await page.locator(".docs-output-panel").boundingBox();
+	const noteBox = await page.locator(".docs-figure-note").boundingBox();
+	if (
+		!figureBox ||
+		!gridBox ||
+		!frameBox ||
+		!frameWrapperBox ||
+		!outputBox ||
+		!noteBox
+	) {
+		throw new Error(
+			"Expected the hero figure, preview, and footer to be visible",
+		);
+	}
+	expect(
+		Math.abs(noteBox.x + noteBox.width - (figureBox.x + figureBox.width)),
+	).toBeLessThanOrEqual(1);
+	expect(Math.abs(frameBox.y - frameWrapperBox.y)).toBeLessThanOrEqual(1);
+	expect(
+		Math.abs(
+			frameBox.y + frameBox.height -
+				(frameWrapperBox.y + frameWrapperBox.height),
+		),
+	).toBeLessThanOrEqual(1);
+	expect(frameWrapperBox.y + frameWrapperBox.height).toBeLessThanOrEqual(
+		outputBox.y + outputBox.height + 1,
+	);
+	expect(gridBox.y + gridBox.height).toBeLessThanOrEqual(noteBox.y + 1);
+	expect(noteBox.y + noteBox.height).toBeLessThanOrEqual(
+		figureBox.y + figureBox.height + 1,
+	);
+};
+
 test("homepage keeps the source and authentic output comparison focused on mobile", async ({
 	page,
 }) => {
@@ -105,26 +144,21 @@ test("homepage keeps the source and authentic output comparison focused on mobil
 		}
 	}
 
+	await assertHeroDemoGeometry(page);
 	await page.setViewportSize({ width: 1440, height: 900 });
-	const figureBox = await page.locator(".docs-transform-figure").boundingBox();
-	const frameBox = await page.locator("[data-lab-frame]").boundingBox();
-	const outputBox = await page.locator(".docs-output-panel").boundingBox();
-	const noteBox = await page.locator(".docs-figure-note").boundingBox();
-	if (!figureBox || !frameBox || !outputBox || !noteBox) {
-		throw new Error(
-			"Expected the hero figure, preview, and footer to be visible",
-		);
-	}
-	expect(
-		Math.abs(noteBox.x + noteBox.width - (figureBox.x + figureBox.width)),
-	).toBeLessThanOrEqual(1);
-	expect(frameBox.y + frameBox.height).toBeLessThanOrEqual(noteBox.y + 1);
-	expect(
-		Math.abs(frameBox.y + frameBox.height - (outputBox.y + outputBox.height)),
-	).toBeLessThanOrEqual(1);
-	expect(noteBox.y + noteBox.height).toBeLessThanOrEqual(
-		figureBox.y + figureBox.height + 1,
+	await assertHeroDemoGeometry(page);
+
+	const actionAlignment = await page.locator(".docs-hero-actions").evaluate(
+		(element) => ({
+			containerX: element.getBoundingClientRect().x,
+			firstActionX: element.firstElementChild?.getBoundingClientRect().x,
+			justifyContent: getComputedStyle(element).justifyContent,
+			textAlign: getComputedStyle(element).textAlign,
+		}),
 	);
+	expect(actionAlignment.justifyContent).toBe("flex-start");
+	expect(actionAlignment.textAlign).toBe("start");
+	expect(actionAlignment.firstActionX).toBeCloseTo(actionAlignment.containerX, 1);
 });
 
 test("header keeps navigation, search, and automatic versioning distinct", async ({

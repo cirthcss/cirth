@@ -1925,9 +1925,14 @@ body {
 
 .docs-hero-actions {
 	display: flex;
+	align-items: center;
+	justify-content: flex-start;
 	flex-wrap: wrap;
+	width: 100%;
+	max-width: none;
 	gap: 0.5rem;
-	margin-block: 1.5rem;
+	margin: 1.5rem 0;
+	text-align: start;
 }
 
 .docs-hero-actions a {
@@ -2061,11 +2066,21 @@ body {
 	border-inline-start: 1px solid var(--docs-line);
 }
 
+.docs-output-frame {
+	position: relative;
+	min-width: 0;
+	min-height: 0;
+	overflow: hidden;
+	background: var(--docs-paper);
+}
+
 .docs-output-panel iframe {
+	position: absolute;
+	inset: 0;
 	display: block;
 	width: 100%;
 	height: 100%;
-	min-height: 28.5rem;
+	min-height: 0;
 	border: 0;
 	background: var(--docs-paper);
 }
@@ -2452,7 +2467,7 @@ body {
 		border-inline-start: 0;
 	}
 
-	.docs-output-panel iframe {
+	.docs-output-frame {
 		min-height: 31rem;
 	}
 
@@ -2560,7 +2575,7 @@ body {
 
 @media print {
 	.docs-lab-toolbar,
-	.docs-output-panel iframe {
+	.docs-output-frame {
 		display: none;
 	}
 
