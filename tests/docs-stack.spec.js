@@ -108,14 +108,20 @@ test("homepage keeps the source and authentic output comparison focused on mobil
 	await page.setViewportSize({ width: 1440, height: 900 });
 	const figureBox = await page.locator(".docs-transform-figure").boundingBox();
 	const frameBox = await page.locator("[data-lab-frame]").boundingBox();
+	const outputBox = await page.locator(".docs-output-panel").boundingBox();
 	const noteBox = await page.locator(".docs-figure-note").boundingBox();
-	if (!figureBox || !frameBox || !noteBox) {
-		throw new Error("Expected the hero figure, preview, and footer to be visible");
+	if (!figureBox || !frameBox || !outputBox || !noteBox) {
+		throw new Error(
+			"Expected the hero figure, preview, and footer to be visible",
+		);
 	}
 	expect(
 		Math.abs(noteBox.x + noteBox.width - (figureBox.x + figureBox.width)),
 	).toBeLessThanOrEqual(1);
 	expect(frameBox.y + frameBox.height).toBeLessThanOrEqual(noteBox.y + 1);
+	expect(
+		Math.abs(frameBox.y + frameBox.height - (outputBox.y + outputBox.height)),
+	).toBeLessThanOrEqual(1);
 	expect(noteBox.y + noteBox.height).toBeLessThanOrEqual(
 		figureBox.y + figureBox.height + 1,
 	);
@@ -140,8 +146,19 @@ test("header keeps navigation, search, and automatic versioning distinct", async
 	expect(startBox.x).toBeLessThan(searchBox.x);
 	expect(searchBox.x).toBeLessThan(controlsBox.x);
 
-	const searchInput = search.locator("[data-docs-search-input]");
+	const searchTrigger = search.locator("[data-docs-search-trigger]");
+	await expect(searchTrigger).toBeVisible();
+	await searchTrigger.click();
+	const searchDialog = page.locator("[data-docs-search-dialog]");
+	await expect(searchDialog).toBeVisible();
+	const searchInput = searchDialog.locator("[data-docs-search-input]");
+	await expect(searchInput).toBeFocused();
 	await searchInput.fill("Accordion");
+	await expect(
+		searchDialog.locator(
+			'[data-docs-search-result][href$="/components/accordion/"]',
+		),
+	).toBeVisible();
 	await searchInput.press("Enter");
 	await expect(page).toHaveURL(`${origin}/components/accordion/`);
 

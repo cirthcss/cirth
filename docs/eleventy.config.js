@@ -5,6 +5,7 @@ const markdownIt = require("markdown-it");
 const markdownItAnchor = require("markdown-it-anchor");
 const GithubSlugger = require("github-slugger").default;
 const hljs = require("highlight.js");
+const { buildPagefindIndex } = require("../scripts/build-pagefind");
 const { listPresetNames, presetLabel } = require("../scripts/lib/presets");
 
 // Eleventy replacement for the previous Astro setup. Same site shape:
@@ -36,6 +37,8 @@ const escapeHtml = (value) =>
 // @phosphor-icons/vue for pixel parity. Zero client JS.
 const iconPaths = {
 	code: "M69.12,94.15,28.5,128l40.62,33.85a8,8,0,1,1-10.24,12.29l-48-40a8,8,0,0,1,0-12.29l48-40a8,8,0,0,1,10.24,12.3Zm176,27.7-48-40a8,8,0,1,0-10.24,12.3L227.5,128l-40.62,33.85a8,8,0,1,0,10.24,12.29l48-40a8,8,0,0,0,0-12.29ZM162.73,32.48a8,8,0,0,0-10.25,4.79l-64,176a8,8,0,0,0,4.79,10.26A8.14,8.14,0,0,0,96,224a8,8,0,0,0,7.52-5.27l64-176A8,8,0,0,0,162.73,32.48Z",
+	search:
+		"M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z",
 	sliders:
 		"M136,120v96a8,8,0,0,1-16,0V120a8,8,0,0,1,16,0Zm64,72a8,8,0,0,0-8,8v16a8,8,0,0,0,16,0V200A8,8,0,0,0,200,192Zm24-32H208V40a8,8,0,0,0-16,0V160H176a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16ZM56,160a8,8,0,0,0-8,8v48a8,8,0,0,0,16,0V168A8,8,0,0,0,56,160Zm24-32H64V40a8,8,0,0,0-16,0v88H32a8,8,0,0,0,0,16H80a8,8,0,0,0,0-16Zm72-48H136V40a8,8,0,0,0-16,0V80H104a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16Z",
 	layers:
@@ -139,6 +142,7 @@ module.exports = (eleventyConfig) => {
 		fs.rmSync(path.join(docsRoot, "dist"), { recursive: true, force: true });
 		outputCleaned = true;
 	});
+	eleventyConfig.on("eleventy.after", buildPagefindIndex);
 	markdown.core.ruler.before("normalize", "cirth-reset-slugs", () => {
 		slugger.reset();
 		return true;

@@ -23,68 +23,21 @@
 				</details>
 			</li>
 		</ul>
-		<form class="docs-header-search" role="search" data-docs-search>
-			<label class="sr-only" for="docs-site-search">Search documentation</label>
-			<input
-				id="docs-site-search"
-				type="search"
-				name="q"
-				placeholder="Search documentation…"
-				autocomplete="off"
-				list="docs-search-pages"
-				data-docs-search-input
-			/>
-			<datalist id="docs-search-pages">
-				<option value="Home" data-path="/"></option>
-				{% for item in nav.flatPages %}
-					<option value="{{ item.text }}" data-path="{{ item.link }}"></option>
-				{% endfor %}
-			</datalist>
-		</form>
-		<script>
-			// Native search input + datalist: the page index is present in the
-			// markup, while this small enhancement resolves a selected or partial
-			// query to its documentation page. Core navigation remains available
-			// through the links and mobile menu without JavaScript.
-			const docsSearch = document.querySelector("[data-docs-search]");
-			const docsSearchInput = docsSearch?.querySelector("[data-docs-search-input]");
-			const docsSearchOptions = Array.from(
-				document.querySelectorAll("#docs-search-pages option"),
-			);
-			const openSearchResult = () => {
-				if (!(docsSearchInput instanceof HTMLInputElement)) return;
-				const query = docsSearchInput.value.trim().toLocaleLowerCase();
-				const result =
-					docsSearchOptions.find(
-						(option) => option.value.toLocaleLowerCase() === query,
-					) ??
-					docsSearchOptions.find((option) =>
-						option.value.toLocaleLowerCase().includes(query),
-					);
-				if (!query || !result?.dataset.path) {
-					docsSearchInput.setCustomValidity("Choose a page from the suggestions.");
-					docsSearchInput.reportValidity();
-					return;
-				}
-				const base = (document.documentElement.dataset.base || "/").replace(/\/$/, "");
-				const path = result.dataset.path.endsWith("/")
-					? result.dataset.path
-					: `${result.dataset.path}/`;
-				window.location.assign(`${base}${path}`);
-			};
-			docsSearch?.addEventListener("submit", (event) => {
-				event.preventDefault();
-				openSearchResult();
-			});
-			docsSearchInput?.addEventListener("input", () => {
-				docsSearchInput.setCustomValidity("");
-			});
-			docsSearchInput?.addEventListener("keydown", (event) => {
-				if (event.key !== "Enter") return;
-				event.preventDefault();
-				openSearchResult();
-			});
-		</script>
+		<div class="docs-header-search">
+			<button
+				type="button"
+				class="docs-search-trigger"
+				aria-haspopup="dialog"
+				aria-controls="docs-search-dialog"
+				aria-expanded="false"
+				data-docs-search-trigger
+				hidden
+			>
+				{% icon "search", 16 %}
+				<span>Search documentation</span>
+				<kbd><span data-docs-search-modifier>Ctrl</span> K</kbd>
+			</button>
+		</div>
 		<ul class="docs-header-controls-group">
 			<li class="docs-header-github">
 				<a href="{{ nav.github }}" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>

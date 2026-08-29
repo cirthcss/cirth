@@ -32,7 +32,7 @@ const updateBaseline = process.argv.includes("--update-baseline");
  *   page: string,
  *   theme: "default" | "plain" | "playroom",
  *   mode: "light" | "dark" | "forced-colors",
- *   state: "default" | "dialog-open" | "popover-open",
+ *   state: "default" | "dialog-open" | "popover-open" | "search-open",
  *   violation: import("axe-core").Result,
  * }} Finding
  */
@@ -66,6 +66,16 @@ const modes = [
  * }[]}
  */
 const openStates = [
+	{
+		page: "index.html",
+		state: "search-open",
+		prepare: async (page) => {
+			await page.locator("[data-docs-search-trigger]").click();
+			const dialog = page.locator("[data-docs-search-dialog]");
+			await dialog.locator("[data-docs-search-input]").fill("semantic");
+			await dialog.locator("[data-docs-search-result]").first().waitFor();
+		},
+	},
 	{
 		page: "components/modal/index.html",
 		state: "dialog-open",

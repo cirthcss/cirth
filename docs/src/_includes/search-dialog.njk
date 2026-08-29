@@ -1,0 +1,37 @@
+<dialog
+	id="docs-search-dialog"
+	class="docs-search-dialog"
+	aria-labelledby="docs-search-title"
+	data-docs-search-dialog
+>
+	<article>
+		<header>
+			{% icon "search", 20 %}
+			<h2 id="docs-search-title" class="sr-only">Search documentation</h2>
+			<input
+				id="docs-search-input"
+				type="text"
+				role="searchbox"
+				aria-label="Search documentation"
+				placeholder="Search the Cirth documentation…"
+				autocomplete="off"
+				enterkeyhint="search"
+				aria-controls="docs-search-results"
+				aria-describedby="docs-search-status"
+				data-docs-search-input
+			/>
+			<button type="button" class="close" aria-label="Close search" data-docs-search-close></button>
+		</header>
+		<p id="docs-search-status" class="docs-search-status" role="status" aria-live="polite" data-docs-search-status>
+			Type at least two characters to search.
+		</p>
+		<ol id="docs-search-results" class="docs-search-results" data-docs-search-results></ol>
+		<footer class="docs-search-help" aria-hidden="true">
+			<span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+			<span><kbd>↵</kbd> open</span>
+			<span><kbd>esc</kbd> close</span>
+			<small>Search by Pagefind</small>
+		</footer>
+	</article>
+</dialog>
+<script type="module" src="/search.js"></script>

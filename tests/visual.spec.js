@@ -79,6 +79,19 @@ const representativePresetPages = [
  */
 const interactiveCases = [
 	{
+		pagePath: "index.html",
+		state: "search-open",
+		prepare: async (page) => {
+			await page.locator("[data-docs-search-trigger]").click();
+			const dialog = page.locator("[data-docs-search-dialog]");
+			await expect(dialog).toBeVisible();
+			await dialog.locator("[data-docs-search-input]").fill("semantic");
+			await expect(
+				dialog.locator("[data-docs-search-result]").first(),
+			).toBeVisible();
+		},
+	},
+	{
 		pagePath: "components/modal/index.html",
 		state: "modal-open",
 		prepare: (page) =>

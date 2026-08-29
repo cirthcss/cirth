@@ -72,6 +72,7 @@ const contentTypes = {
 	".css": "text/css",
 	".js": "text/javascript",
 	".json": "application/json",
+	".wasm": "application/wasm",
 	".svg": "image/svg+xml",
 	".png": "image/png",
 	".jpg": "image/jpeg",
