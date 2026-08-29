@@ -7,6 +7,60 @@ layout: docs.njk
 Assets and guidelines for representing Cirth in articles, talks,
 integrations, and anywhere else the project is named.
 
+<section class="docs-brand-spec" aria-labelledby="brand-spec-title">
+  <header class="docs-brand-spec-header">
+    <p><span>Fig. B01</span><span>Operational identity / experimental</span></p>
+    <h2 id="brand-spec-title">One mark, three levels of fidelity.</h2>
+  </header>
+  <div class="docs-brand-construction">
+    <figure class="docs-mark-blueprint">
+      <div class="docs-mark-clearspace">
+        <img src="/logo_brand.svg" alt="Full Cirth monogram over its construction grid" width="240" height="240" />
+        <i class="axis-x" aria-hidden="true"></i>
+        <i class="axis-y" aria-hidden="true"></i>
+      </div>
+      <figcaption><strong>High fidelity</strong><span>Full five-part mark · 48px and above</span></figcaption>
+    </figure>
+    <figure class="docs-mark-medium">
+      <img src="/logo_brand.svg" alt="Full Cirth monogram at medium size" width="48" height="48" />
+      <figcaption><strong>Medium fidelity</strong><span>Full mark · 24–47px</span></figcaption>
+    </figure>
+    <figure class="docs-mark-low">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="/mark_small_dark.svg" />
+        <img src="/mark_small.svg" alt="Optically simplified Cirth small-size mark" width="20" height="20" />
+      </picture>
+      <figcaption><strong>Low fidelity</strong><span>Four-part optical mark · 16–23px</span></figcaption>
+    </figure>
+  </div>
+  <dl class="docs-brand-measures">
+    <div><dt>Base unit</dt><dd><code>8px</code></dd></div>
+    <div><dt>Micro unit</dt><dd><code>4px</code></dd></div>
+    <div><dt>Primary joint</dt><dd><code>45°</code></dd></div>
+    <div><dt>Clearspace</dt><dd><code>0.5 × mark width</code></dd></div>
+    <div><dt>Signal hue</dt><dd><code>69.35°</code></dd></div>
+    <div><dt>Minimum size</dt><dd><code>16px optical</code></dd></div>
+  </dl>
+</section>
+
+## Operational rules
+
+Use the full mark above 24px and switch to the optical small-size mark for
+favicon-scale contexts. The optical variant preserves the incised “C”,
+removes the detached origin accent, and fills more of its view box. It is an
+experimental responsive asset; the original SVG files remain unchanged.
+
+The 45° joint is a structural device for diagram junctions, section
+terminals, and large composition crops. Do not apply it to every card,
+button, or input. Keep clearspace equal to half the visible mark width.
+
+### Incorrect use
+
+Do not stretch, rotate, outline, add a glow, put the mark on low-contrast
+surfaces, repeat it as wallpaper, or pair it with fantasy imagery. Do not
+use the small-size variant above 24px, where its reduced detail becomes
+unnecessarily blunt.
+
 ## The mark
 
 The Cirth mark is a rune-form monogram: angular strokes that read as a
@@ -114,11 +168,10 @@ The wordmark is "Cirth" set in the site's sans-serif voice, bold, with the
 mark at the cap height to its left — sans-serif is the primary typographic
 voice for product surfaces, headings, and UI chrome. Monospace is reserved
 for code, size metrics, and proof points (`<14KB`, `--cirth-primary`).
-The serif display face (Georgia and platform equivalents) is used
-sparingly, only for editorial passages such as the name's origin story on
-the [About](/about#origin-of-the-name) page — never for the wordmark
-itself or for technical content. There is no custom font to install: the
-brand uses the same system stacks the framework ships, on purpose.
+Serif remains available as a primitive token for an author to opt into,
+but is not part of Cirth's product voice. There is no custom font to
+install: the brand uses the same system stacks the framework ships, on
+purpose.
 
 Write the name as **Cirth** (capitalized, never uppercase); the npm scope
 is `@cirthcss/cirth`.
@@ -190,7 +243,7 @@ For permissions, open an issue on
 When you do use the mark:
 
 * keep clearspace around it of at least half its width;
-* scale it down to 16px if needed; the strokes survive favicon size;
+* use the responsive small-size asset from 16–23px;
 * pick the brand or mono variant that keeps contrast on your background;
 * don't recolor, outline, rotate, add effects, or redraw the strokes,
   and don't set the wordmark in another typeface.

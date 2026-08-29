@@ -23,6 +23,30 @@ const variants = [
     @use "src";
     @use "src/utilities/print";`,
 	},
+	// The homepage build laboratory is isolated in an iframe so the docs'
+	// unscoped default build cannot leak into the comparison. These are the
+	// actual four public configurations, compiled from source with the same
+	// switches as the distributed entrypoints — not look-alike shell CSS.
+	{
+		filename: "cirth-lab-default.css",
+		content: `@use "src";`,
+	},
+	{
+		filename: "cirth-lab-classless.css",
+		content: `@use "src/config" with ($enable-classes: false); @use "src";`,
+	},
+	{
+		filename: "cirth-lab-scoped.css",
+		content: `@use "src/config" with ($parent-selector: ".cirth"); @use "src";`,
+	},
+	{
+		filename: "cirth-lab-scoped-classless.css",
+		content: `@use "src/config" with (
+      $enable-classes: false,
+      $parent-selector: ".cirth"
+    );
+    @use "src";`,
+	},
 ];
 
 const projectRoot = path.join(__dirname, "..");

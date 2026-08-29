@@ -1,8 +1,8 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/public/logo_brand_app_dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="docs/public/logo_brand_app.svg">
-    <img alt="Cirth" src="docs/public/logo_brand_app.svg" width="120" height="120">
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/readme-native-baseline-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/readme-native-baseline.png">
+    <img alt="Cirth — UI from semantic HTML; accessible baseline, zero JavaScript, under 14KB gzipped" src="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/readme-native-baseline.png" width="960" height="240">
   </picture>
 </p>
 

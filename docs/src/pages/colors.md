@@ -17,9 +17,8 @@ reasonably should.
 {% colorSwatches %}
 
 * **`plain`** is the conventional application baseline: a familiar blue
-  accent, a plain white page, and headings in the body face rather than the
-  default theme's serif. It is the whole point of the token model in five
-  declarations — it sets **only input tokens**, and the accent's fill,
+  accent and a plain white page. It is the whole point of the token model
+  in five declarations — it sets **only input tokens**, and the accent's fill,
   hover, focus ring and underline tint follow on their own. Reach for it
   when you want an interface that looks unremarkable in the good sense.
 * **`playroom`** is the expressive end: a soft violet accent, surfaces
@@ -28,6 +27,9 @@ reasonably should.
   geometry, typography, motion and depth — and overrides two *derived*
   tokens on purpose, so its hover lightens rather than darkens. Suited to a
   consumer app, a community site, or a tool aimed at children.
+
+The default theme uses the system sans stack for product UI and headings;
+monospace is reserved for code, token names, values, and technical proof.
 
 Like the default theme, presets use font stacks that ship with every major
 OS: no `@import`, no webfont, zero network requests beyond the stylesheet

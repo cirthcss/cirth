@@ -14,6 +14,16 @@ const { listPresetNames, presetLabel } = require("../scripts/lib/presets");
 const docsRoot = __dirname;
 const demosFolder = path.join(docsRoot, "src/content/demos");
 
+const runtimeTokenCount = () => {
+	const generatedBuild = path.join(
+		docsRoot,
+		"src/styles/generated/cirth-lab-default.css",
+	);
+	if (!fs.existsSync(generatedBuild)) return 0;
+	const css = fs.readFileSync(generatedBuild, "utf8");
+	return new Set(css.match(/--cirth-[a-z0-9-]+/g) ?? []).size;
+};
+
 const escapeHtml = (value) =>
 	value
 		.replace(/&/g, "&amp;")
@@ -50,6 +60,10 @@ const pathPrefix = () => {
 };
 
 module.exports = (eleventyConfig) => {
+	eleventyConfig.addGlobalData("proof", {
+		tokenCount: runtimeTokenCount(),
+		buildCount: 4,
+	});
 	eleventyConfig.addGlobalData(
 		"presets",
 		listPresetNames().map((name) => ({ label: presetLabel(name), name })),
@@ -150,7 +164,9 @@ module.exports = (eleventyConfig) => {
 		}
 		const html = fs.readFileSync(file, "utf8").trim();
 		const classlessClass = variant === "classless" ? " cirth-classless" : "";
-		return `<div class="docs-demo">
+		const variantLabel = variant === "classless" ? "Classless build" : "Default build";
+		return `<figure class="docs-demo" data-demo-fidelity="live">
+<figcaption class="docs-demo-caption"><span><strong>Live UI</strong> · ${variantLabel}</span><span>Authentic Cirth · shell overrides declared in source</span></figcaption>
 <div class="docs-demo-preview${classlessClass}">${html}</div>
 <details class="docs-demo-source">
 <summary>Show HTML</summary>
@@ -158,7 +174,7 @@ module.exports = (eleventyConfig) => {
 			hljs.highlight(html, { language: "html", ignoreIllegals: true }).value
 		}</code></pre>
 </details>
-</div>`;
+</figure>`;
 	};
 
 	eleventyConfig.addShortcode(
@@ -196,7 +212,19 @@ module.exports = (eleventyConfig) => {
 <div class="docs-color-swatch-label">${color.name} (${color.note})</div>
 </div>`,
 			)
-			.join("")}</div>`;
+			.join("")}</div>
+<section class="docs-theme-lab" aria-label="Default theme role comparison">
+  <figure data-theme="light">
+    <figcaption><strong>Light / warm paper</strong><code>data-theme="light"</code></figcaption>
+    <div class="docs-theme-sample"><article><small>Verified state</small><h3>Semantic surface</h3><p>Canvas, card, text, border and amber signal are live theme roles.</p><button type="button">Primary action</button></article></div>
+    <dl><div><dt>Canvas</dt><dd><i style="background:var(--cirth-background-color)"></i><code>--cirth-background-color</code></dd></div><div><dt>Signal</dt><dd><i style="background:var(--cirth-primary)"></i><code>--cirth-primary</code></dd></div></dl>
+  </figure>
+  <figure data-theme="dark">
+    <figcaption><strong>Dark / graphite</strong><code>data-theme="dark"</code></figcaption>
+    <div class="docs-theme-sample"><article><small>Verified state</small><h3>Semantic surface</h3><p>Dark roles are designed values, not a mathematical inversion.</p><button type="button">Primary action</button></article></div>
+    <dl><div><dt>Canvas</dt><dd><i style="background:var(--cirth-background-color)"></i><code>--cirth-background-color</code></dd></div><div><dt>Signal</dt><dd><i style="background:var(--cirth-primary)"></i><code>--cirth-primary</code></dd></div></dl>
+  </figure>
+</section>`;
 	});
 
 	// --- Filters ----------------------------------------------------------

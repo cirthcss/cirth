@@ -8,6 +8,15 @@
 					<strong>{{ nav.siteTitle }}</strong>
 				</a>
 			</li>
+			<li class="docs-mobile-menu">
+				<details class="dropdown">
+					<summary>Menu</summary>
+					<ul>
+						{% for item in nav.topNav %}<li><a href="{{ item.link }}">{{ item.text }}</a></li>{% endfor %}
+						<li><a href="{{ nav.github }}" target="_blank" rel="noreferrer">GitHub ↗<span class="sr-only"> (opens in a new tab)</span></a></li>
+					</ul>
+				</details>
+			</li>
 		</ul>
 		<ul class="docs-header-nav-group">
 			{% for item in nav.topNav %}

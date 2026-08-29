@@ -1,5 +1,6 @@
 ---
 layout: docs.njk
+usesClassless: true
 ---
 
 

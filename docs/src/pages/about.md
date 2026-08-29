@@ -10,6 +10,18 @@ HTML elements directly — `<button>`, `<nav>`, `<article>`, `<table>`,
 names first. Load it, write semantic markup, and most of an interface is
 already a finished, accessible baseline.
 
+<section class="docs-proof-strip" aria-labelledby="about-proof-title">
+  <header><span>Proof ledger / current build</span><h2 id="about-proof-title">The contract, at a glance.</h2></header>
+  <dl>
+    <div><dt>Semantic baseline</dt><dd><strong>covered</strong><small>native element selectors</small></dd></div>
+    <div><dt>Accessibility</dt><dd><strong>verified</strong><small>WCAG 2.2 AA floor</small></dd></div>
+    <div><dt>Distributed runtime</dt><dd><strong>0 B JS</strong><small>CSS package only</small></dd></div>
+    <div><dt>Default budget</dt><dd><strong>&lt;14 KB</strong><small>gzip check blocks builds</small></dd></div>
+    <div><dt>Build modes</dt><dd><strong>{{ proof.buildCount }}</strong><small>default / classless / scoped</small></dd></div>
+    <div><dt>Runtime surface</dt><dd><strong>{{ proof.tokenCount }}</strong><small><code>--cirth-*</code> tokens</small></dd></div>
+  </dl>
+</section>
+
 ## What Cirth is
 
 - A CSS framework distributed as compiled stylesheets, published to npm as

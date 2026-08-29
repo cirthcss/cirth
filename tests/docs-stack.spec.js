@@ -21,49 +21,33 @@ test.afterAll(() => {
 	server.close();
 });
 
-test("homepage cards pin and stack at a mobile viewport", async ({ page }) => {
+test("homepage prioritizes authentic output before mechanism and source on mobile", async ({ page }) => {
 	await page.setViewportSize({ width: 390, height: 844 });
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
-	const cards = page.locator(".docs-stack-card-sticky");
-	await expect(cards).toHaveCount(6);
-
-	const initial = await cards.evaluateAll((elements) =>
-		elements.slice(0, 2).map((element) => {
-			const rect = element.getBoundingClientRect();
-			const style = getComputedStyle(element);
-			return {
-				documentTop: rect.top + window.scrollY,
-				height: rect.height,
-				position: style.position,
-				stickyTop: Number.parseFloat(style.top),
-			};
-		}),
+	const output = page.locator(".docs-output-panel");
+	const mechanism = page.locator(".docs-mechanism");
+	const source = page.locator(".docs-source-panel");
+	await expect(output).toHaveCount(1);
+	await expect(source.locator("[data-lab-source]")).toContainText(
+		'<main class="container">',
 	);
 
-	for (const card of initial) {
-		expect(card.position).toBe("sticky");
-	}
-	expect(initial[1].stickyTop).toBeGreaterThan(initial[0].stickyTop);
-
-	// Scroll just beyond the second card's sticking point. Both cards must
-	// remain pinned at their distinct top offsets, with the second covering
-	// most of the first instead of both continuing up in ordinary flow.
-	const targetScroll = Math.ceil(
-		initial[1].documentTop - initial[1].stickyTop + 1,
+	const order = await Promise.all(
+		[output, mechanism, source].map((locator) =>
+			locator.evaluate((element) => Number(getComputedStyle(element).order)),
+		),
 	);
-	await page.evaluate((top) => {
-		window.scrollTo(0, top);
-	}, targetScroll);
-	await page.evaluate(
-		() => new Promise((resolve) => requestAnimationFrame(() => resolve(undefined))),
-	);
+	expect(order).toEqual([1, 2, 3]);
 
-	const pinned = await cards.evaluateAll((elements) =>
-		elements.slice(0, 2).map((element) => element.getBoundingClientRect().top),
+	const frame = page.frameLocator("[data-lab-frame]");
+	await expect(frame.getByRole("heading", { name: "Sign in" })).toBeVisible();
+	await page.locator("[data-lab-build]").selectOption("classless");
+	await expect(page.locator("[data-lab-frame]")).toHaveAttribute(
+		"src",
+		/classless/,
 	);
-
-	expect(pinned[0]).toBeCloseTo(initial[0].stickyTop, 0);
-	expect(pinned[1]).toBeCloseTo(initial[1].stickyTop, 0);
-	expect(pinned[1] - pinned[0]).toBeLessThan(initial[0].height);
+	await expect(
+		frame.locator('link[rel="stylesheet"]'),
+	).toHaveAttribute("href", /cirth-lab-classless\.css/);
 });

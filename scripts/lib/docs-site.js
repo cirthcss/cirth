@@ -31,7 +31,13 @@ const assertDocsBuilt = (label) => {
 // re-audit whatever the toolchain thought a year ago, and any finding
 // would be unfixable by definition. The /next/ preview is excluded for the
 // opposite reason — it is this site, built twice.
-const excludedTopLevel = /^(v\d+\.\d+|next)$/;
+// Share-card/icon routes are deterministic rasterization sources, not
+// navigable documentation. The lab routes are isolated iframe targets and
+// intentionally omit the docs preset controls that generic page audits wait
+// for; their real form markup and builds are covered by the home comparison
+// and the underlying component suites.
+const excludedTopLevel =
+	/^(v\d+\.\d+|next|lab|social-preview|readme-preview-light|readme-preview-dark|favicon-preview)$/;
 
 /**
  * @param {string} [dir]

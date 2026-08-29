@@ -36,7 +36,7 @@ pitch:
       details: >-
         Contrast, visible focus rings, and 44px touch targets are checked
         in the source, not left to integrators to add later.
-    - value: 244 tokens
+    - value: 246 tokens
       details: >-
         Every color, spacing, radius, and font is a runtime
         <code>--cirth-</code> custom property, overridable without a
@@ -46,7 +46,8 @@ stack:
   eyebrow: What's in the box
   title: Small surface, finished defaults
   lede: >-
-    Keep scrolling — each card stays pinned until the next one covers it.
+    Six responsibilities, one stylesheet, and an explicit boundary between
+    browser behavior, Cirth defaults, and author composition.
   items:
     - title: Semantic HTML first
       details: >-

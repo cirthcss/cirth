@@ -1,167 +1,134 @@
 ---
 layout: base.njk
-bodyClass: docs-home
+bodyClass: docs-home-page
 ---
-<main id="main-content" class="docs-home">
-	<section class="docs-hero-panel">
-		<div class="container">
-			{#- .container is Cirth's own 3-track grid (gutter/content/gutter),
-			    keyed to --cirth-container-max-width. .docs-hero is a *different*
-			    grid (single centered column). Combining both on one element
-			    meant two competing display:grid/grid-template-columns
-			    declarations fighting for the same box, with .docs-hero-copy and
-			    .docs-hero-demo then implicitly auto-placed into whichever
-			    grid-template-columns actually won — fragile, and the likely
-			    cause of the hero rendering off-center in some browsers/
-			    viewports. Nesting instead of combining removes the ambiguity:
-			    .container centers its content track as designed, .docs-hero
-			    governs its own children inside that track, no shared box. -#}
-			<div class="docs-hero">
-				<div class="docs-hero-copy">
-					{% if hero.eyebrow %}<p class="docs-hero-eyebrow">{{ hero.eyebrow }}</p>{% endif %}
-					<hgroup>
-						<h1 class="docs-hero-title">
-							<img class="docs-hero-mark docs-logo-light" src="/logo_brand.svg" alt="" width="64" height="64" />
-							<img class="docs-hero-mark docs-logo-dark" src="/logo_brand_dark.svg" alt="" width="64" height="64" />
-							<span>{{ hero.name }}</span>
-						</h1>
-						<p>{{ hero.text }}</p>
-					</hgroup>
-					<p class="docs-hero-tagline">{{ hero.tagline }}</p>
-					<p class="docs-hero-actions">
-						{% for action in hero.actions %}
-							<a href="{{ action.link }}"{% if action.theme != "brand" %} class="secondary"{% endif %}>{{ action.text }}</a>
-						{% endfor %}
-					</p>
+<main id="main-content" class="docs-native-home">
+	<section class="docs-native-hero" aria-labelledby="home-title">
+		<div class="docs-native-grid">
+			<header class="docs-native-claim">
+				<p class="docs-coordinate"><span>N 00° / WEB</span><span>{{ versions.current.label }}</span></p>
+				<div class="docs-native-lockup" aria-hidden="true">
+					<img class="docs-logo-light" src="/logo_brand.svg" alt="" width="64" height="64" />
+					<img class="docs-logo-dark" src="/logo_brand_dark.svg" alt="" width="64" height="64" />
+					<span>{{ hero.name }}</span>
 				</div>
-				{#- The glow is a plain CSS radial-gradient behind the demo panel
-				    (see .docs-hero-glow), not an image — same spirit as Ruby's
-				    sunburst behind its diamond mark, at zero asset cost. -#}
-				<div class="docs-hero-demo-wrap">
-					<div class="docs-hero-glow" aria-hidden="true"></div>
-					<div class="docs-hero-demo">
-						{% include "home-demo.njk" %}
-					</div>
+				<p class="docs-hero-eyebrow">{{ hero.eyebrow }}</p>
+				<h1 id="home-title">Production-ready UI<br /><em>from semantic HTML.</em></h1>
+				<p class="docs-native-lede">{{ hero.tagline }}</p>
+				<p class="docs-hero-actions">
+					{% for action in hero.actions %}
+						<a href="{{ action.link }}"{% if action.theme != "brand" %} class="secondary outline"{% endif %}>{{ action.text }}</a>
+					{% endfor %}
+				</p>
+				<ul class="docs-primary-signals" aria-label="Primary product principles">
+					<li><span>01</span><strong>Semantic HTML</strong><small>Structure carries intent.</small></li>
+					<li><span>02</span><strong>Accessible baseline</strong><small>WCAG 2.2 AA checks are the floor.</small></li>
+				</ul>
+			</header>
+			<div class="docs-native-lab">
+				{% include "home-demo.njk" %}
+			</div>
+		</div>
+	</section>
+
+	<section class="docs-ledger" aria-labelledby="ledger-title">
+		<div class="docs-native-grid">
+			<header class="docs-ledger-intro">
+				<p class="docs-coordinate"><span>Ledger 01</span><span>Build evidence</span></p>
+				<p class="docs-eyebrow">{{ pitch.eyebrow }}</p>
+				<h2 id="ledger-title">Claims with a check path.</h2>
+				<p>{{ pitch.lede }}</p>
+			</header>
+			<div class="docs-ledger-table" role="table" aria-label="Cirth proof ledger">
+				<div class="docs-ledger-row docs-ledger-head" role="row">
+					<span role="columnheader">State</span><span role="columnheader">Claim</span><span role="columnheader">Evidence</span><span role="columnheader">Scope</span>
+				</div>
+				<div class="docs-ledger-row" role="row">
+					<span role="cell"><i class="is-verified" aria-hidden="true">✓</i><b>verified</b></span><strong role="cell">Semantic elements first</strong><span role="cell">Element selectors + semantic demos</span><a role="cell" href="/elements">inspect</a>
+				</div>
+				<div class="docs-ledger-row" role="row">
+					<span role="cell"><i class="is-verified" aria-hidden="true">✓</i><b>verified</b></span><strong role="cell">WCAG 2.2 AA baseline</strong><span role="cell">axe + resilience suites</span><a role="cell" href="/about#accessibility-baseline">method</a>
+				</div>
+				<div class="docs-ledger-row" role="row">
+					<span role="cell"><i class="is-covered" aria-hidden="true">●</i><b>covered</b></span><strong role="cell">0 B distributed JavaScript</strong><span role="cell">CSS-only package output</span><a role="cell" href="/about#zero-javascript">scope</a>
+				</div>
+				<div class="docs-ledger-row" role="row">
+					<span role="cell"><i class="is-covered" aria-hidden="true">●</i><b>covered</b></span><strong role="cell">&lt;14 KB gzipped</strong><span role="cell">Enforced budget; build fails over</span><a role="cell" href="https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js">script</a>
+				</div>
+				<div class="docs-ledger-row" role="row">
+					<span role="cell"><i class="is-enhanced" aria-hidden="true">+</i><b>runtime</b></span><strong role="cell">{{ proof.tokenCount }} design tokens</strong><span role="cell">Generated <code>--cirth-*</code> scan</span><a role="cell" href="/customization">override</a>
+				</div>
+				<div class="docs-ledger-row" role="row">
+					<span role="cell"><i class="is-enhanced" aria-hidden="true">+</i><b>choice</b></span><strong role="cell">{{ proof.buildCount }} build modes</strong><span role="cell">Default / classless / scoped</span><a role="cell" href="/get-started#choose-a-build">compare</a>
 				</div>
 			</div>
 		</div>
 	</section>
 
-	{% if pitch %}
-		<section class="docs-pitch">
-			<div class="container">
-				<header class="docs-section-header docs-reveal">
-					<p class="docs-eyebrow">{{ pitch.eyebrow }}</p>
-					<h2>{{ pitch.title }}</h2>
-					<p class="docs-section-lede">{{ pitch.lede }}</p>
+	{% if stack %}
+		<section class="docs-system-map" aria-labelledby="system-title">
+			<div class="docs-native-grid">
+				<header class="docs-system-intro">
+					<p class="docs-coordinate"><span>Fig. 02</span><span>Coverage map</span></p>
+					<p class="docs-eyebrow">{{ stack.eyebrow }}</p>
+					<h2 id="system-title">{{ stack.title }}</h2>
+					<p>{{ stack.lede }}</p>
 				</header>
-				<div class="docs-pitch-grid">
-					{% for card in pitch.items %}
-						<article class="docs-reveal" style="transition-delay: {{ loop.index0 * 60 }}ms">
-							<strong class="docs-pitch-value">{{ card.value }}</strong>
+				<ol class="docs-system-modules">
+					{% for card in stack.items %}
+						<li>
+							<span class="docs-module-index">{{ "0" if loop.index < 10 }}{{ loop.index }}</span>
+							<h3>{{ card.title }}</h3>
 							<p>{{ card.details | safe }}</p>
-						</article>
+							<ul class="docs-badge-row">
+								{% for badge in card.badges %}<li><code>{{ badge }}</code></li>{% endfor %}
+							</ul>
+						</li>
+					{% endfor %}
+				</ol>
+			</div>
+		</section>
+	{% endif %}
+
+	{% if showcase %}
+		<section class="docs-native-showcase" aria-labelledby="showcase-title">
+			<div class="docs-native-grid">
+				<header class="docs-showcase-intro">
+					<p class="docs-coordinate"><span>Fig. 03</span><span>Operating contexts</span></p>
+					<p class="docs-eyebrow">{{ showcase.eyebrow }}</p>
+					<h2 id="showcase-title">{{ showcase.title }}</h2>
+					<p>{{ showcase.lede }}</p>
+					<a href="{{ showcase.link }}" class="secondary">{{ showcase.linkText }} →</a>
+				</header>
+				<div class="docs-case-grid">
+					{% for item in showcase.items %}
+						<a class="docs-case" href="{{ item.link }}">
+							<span class="docs-case-toolbar"><i></i><i></i><i></i><small>Live composition / {{ loop.index }}</small></span>
+							<span class="docs-case-icon">{% icon item.icon, 32 %}</span>
+							<strong>{{ item.title }}</strong>
+							<span>{{ item.details }}</span>
+							<small>Default UI + shell layout</small>
+						</a>
 					{% endfor %}
 				</div>
 			</div>
 		</section>
 	{% endif %}
 
-	<div class="container">
-		{% if stack %}
-			{#- Sticky card stack (like FastHTML's "scales up and down"
-			    section): each card is position:sticky with an increasing
-			    `top`, so as you scroll, every card pins in place and the
-			    next one slides up to cover all but a sliver of it — pure
-			    CSS, the browser's own scroll position drives it, nothing to
-			    compute in JS. The offsets keep the full active card visible
-			    at mobile widths too, so the behavior is consistent across
-			    viewport sizes. -#}
-			<section class="docs-stack">
-				{#- position:sticky lives on a plain, unstyled wrapper div —
-				    never directly on an element that also has a background
-				    color, border-radius, or box-shadow. Safari/WebKit renders
-				    a visible concentric-ring repaint artifact right as a
-				    *styled* sticky element approaches its release point;
-				    splitting "what's sticky" (this wrapper) from "what's
-				    painted" (the header/card inside it) sidesteps the bug.
-				    Same pattern below for each card.
-
-				    The header's sticky wrapper additionally sits inside its
-				    own short .docs-stack-header-zone (see style.css) rather
-				    than spanning the whole section: a sticky element can only
-				    stay "stuck" within its own parent's height, so a short
-				    parent makes it release early — right after the first
-				    card or so — instead of clinging to the top all the way
-				    through and colliding with the *last* card's own release
-				    at the very end of the section (that collision is what
-				    made the lede line look detached, sliding away on its own
-				    under the final card). Same idea as fastht.ml's header,
-				    which releases via an explicit `bottom` offset — this is
-				    a container-height version of the same trick. -#}
-				<div class="docs-stack-header-zone">
-					<div class="docs-stack-sticky">
-						<header class="docs-section-header docs-reveal">
-							<p class="docs-eyebrow">{{ stack.eyebrow }}</p>
-							<h2>{{ stack.title }}</h2>
-							<p class="docs-section-lede">{{ stack.lede | safe }}</p>
-						</header>
-					</div>
-				</div>
-				<div class="docs-stack-list">
-					{% for card in stack.items %}
-						<div class="docs-stack-sticky docs-stack-card-sticky" style="top: calc(2rem + {{ loop.index0 * 1.25 }}rem)">
-							<article class="docs-stack-card">
-								<span class="docs-stack-index">{{ "0" if loop.index < 10 }}{{ loop.index }}</span>
-								<h3>{{ card.title }}</h3>
-								<p>{{ card.details | safe }}</p>
-								<ul class="docs-badge-row">
-									{% for badge in card.badges %}<li><code>{{ badge }}</code></li>{% endfor %}
-								</ul>
-							</article>
-						</div>
-					{% endfor %}
-				</div>
-			</section>
-		{% endif %}
-
-		{% if showcase %}
-			<section class="docs-showcase">
-				<header class="docs-section-header docs-reveal">
-					<p class="docs-eyebrow">{{ showcase.eyebrow }}</p>
-					<h2>{{ showcase.title }}</h2>
-					<p class="docs-section-lede">{{ showcase.lede }}</p>
-				</header>
-				<div class="docs-showcase-grid">
-					{% for item in showcase.items %}
-						<a class="docs-showcase-item docs-reveal" style="transition-delay: {{ loop.index0 * 70 }}ms" href="{{ item.link }}">
-							<span class="docs-showcase-icon">{% icon item.icon, 28 %}</span>
-							<strong>{{ item.title }}</strong>
-							<span>{{ item.details }}</span>
-						</a>
-					{% endfor %}
-				</div>
-				<p class="docs-showcase-cta">
-					<a href="{{ showcase.link }}" class="secondary">{{ showcase.linkText }}</a>
-				</p>
-			</section>
-		{% endif %}
-
-		{% if faq %}
-			<section class="docs-faq docs-reveal">
-				<header class="docs-section-header">
+	{% if faq %}
+		<section class="docs-native-faq" aria-labelledby="faq-title">
+			<div class="docs-native-grid">
+				<header>
+					<p class="docs-coordinate"><span>Reference</span><span>Author questions</span></p>
 					<p class="docs-eyebrow">{{ faq.eyebrow }}</p>
-					<h2>{{ faq.title }}</h2>
+					<h2 id="faq-title">{{ faq.title }}</h2>
 				</header>
 				<div class="docs-faq-list">
 					{% for item in faq.items %}
-						<details name="faq">
-							<summary>{{ item.q }}</summary>
-							<p>{{ item.a | safe }}</p>
-						</details>
+						<details name="faq"><summary>{{ item.q }}</summary><p>{{ item.a | safe }}</p></details>
 					{% endfor %}
 				</div>
-			</section>
-		{% endif %}
-	</div>
+			</div>
+		</section>
+	{% endif %}
 </main>

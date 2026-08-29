@@ -5,10 +5,20 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>{% if title %}{{ title }} — {{ nav.siteTitle }}{% else %}{{ nav.siteTitle }}{% endif %}</title>
 		<meta name="description" content="{{ description or nav.siteDescription }}" />
-		<link rel="icon" href="/logo_brand_app.svg" />
-		<link rel="icon" href="/logo_brand_app.svg" media="(prefers-color-scheme: light)" />
-		<link rel="icon" href="/logo_brand_app_dark.svg" media="(prefers-color-scheme: dark)" />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="{% if title %}{{ title }} — {{ nav.siteTitle }}{% else %}{{ nav.siteTitle }}{% endif %}" />
+		<meta property="og:description" content="{{ description or nav.siteDescription }}" />
+		<meta property="og:image" content="https://cirthcss.github.io/cirth/social-preview.png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content="Cirth: production-ready UI from semantic HTML, with a verified proof ledger." />
+		<meta name="twitter:card" content="summary_large_image" />
+		<link rel="icon" href="/favicon.svg" media="(prefers-color-scheme: light)" />
+		<link rel="icon" href="/favicon_dark.svg" media="(prefers-color-scheme: dark)" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/site.webmanifest" />
 		<link rel="stylesheet" href="/styles/style.css" />
+		{% if usesClassless %}<link rel="stylesheet" href="/styles/generated/cirth-docs-classless.css" />{% endif %}
 		<script>
 			// Set data-theme before first paint to avoid a light-mode flash.
 			(function () {
@@ -137,82 +147,6 @@
 				});
 			}
 
-			// Everything below is docs-site chrome, not the framework: it only
-			// touches elements these specific homepage sections render, so it's
-			// a harmless no-op on every other page. Cirth itself still ships
-			// zero JavaScript — this is the site *about* it, same as the copy-
-			// to-clipboard buttons and theme toggle above.
-			const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-			// Scroll-reveal: .docs-reveal-armed (the hidden starting state) is
-			// added here, right before observing — never in the shipped CSS or
-			// markup — so a JS failure, a browser without IntersectionObserver,
-			// or prefers-reduced-motion all leave content in its plain, fully
-			// visible default instead of stuck invisible.
-			const revealTargets = document.querySelectorAll(".docs-reveal");
-			if (!reduceMotion && revealTargets.length > 0 && "IntersectionObserver" in window) {
-				for (const el of revealTargets) el.classList.add("docs-reveal-armed");
-				const revealObserver = new IntersectionObserver(
-					(entries) => {
-						for (const entry of entries) {
-							if (!entry.isIntersecting) continue;
-							entry.target.classList.add("docs-reveal-visible");
-							revealObserver.unobserve(entry.target);
-						}
-					},
-					{ threshold: 0.15, rootMargin: "0px 0px -10% 0px" },
-				);
-				for (const el of revealTargets) revealObserver.observe(el);
-
-				// Safety net: headless full-page capture (screenshot tools, some
-				// print-to-PDF paths, link-preview crawlers) renders the entire
-				// document at once through the compositor without ever moving
-				// the real scroll position, so IntersectionObserver correctly
-				// reports "never intersected" for anything below the original
-				// viewport — which would otherwise leave it permanently at
-				// opacity:0. Force-reveal anything still unrevealed after a
-				// few seconds; a no-op for a normal visitor who scrolled there
-				// well within that window.
-				setTimeout(() => {
-					for (const el of revealTargets) el.classList.add("docs-reveal-visible");
-				}, 2500);
-			}
-
-			// Count-up: the pitch stats already carry their real final value as
-			// plain text (that's what no-JS visitors and assistive tech read),
-			// this only re-animates the first number substring it finds once
-			// the card scrolls into view — "<14KB gzipped" counts up the 14,
-			// "244 tokens" counts up the 244, "AA" has no digit and is left
-			// alone entirely.
-			const countTargets = document.querySelectorAll(".docs-pitch-value");
-			if (!reduceMotion && countTargets.length > 0 && "IntersectionObserver" in window) {
-				const countObserver = new IntersectionObserver(
-					(entries) => {
-						for (const entry of entries) {
-							if (!entry.isIntersecting) continue;
-							countObserver.unobserve(entry.target);
-							const el = entry.target;
-							const text = el.textContent ?? "";
-							const match = text.match(/\d+/);
-							if (!match) continue;
-							const to = Number(match[0]);
-							const before = text.slice(0, match.index);
-							const after = text.slice(match.index + match[0].length);
-							const duration = 700;
-							const start = performance.now();
-							const tick = (now) => {
-								const t = Math.min(1, (now - start) / duration);
-								const eased = 1 - (1 - t) * (1 - t);
-								el.textContent = `${before}${Math.round(to * eased)}${after}`;
-								if (t < 1) requestAnimationFrame(tick);
-							};
-							requestAnimationFrame(tick);
-						}
-					},
-					{ threshold: 0.6 },
-				);
-				for (const el of countTargets) countObserver.observe(el);
-			}
 		</script>
 	</body>
 </html>

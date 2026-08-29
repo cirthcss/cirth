@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{{ labLabel }} build — authentic Cirth output</title>
+		<script>
+			// Documentation-only enhancement: the stylesheet below remains the
+			// real Cirth build and the complete UI is readable without JavaScript.
+			// This script only mirrors the requested light/dark scheme before paint.
+			(function () {
+				var requested = new URLSearchParams(location.search).get("theme");
+				document.documentElement.setAttribute(
+					"data-theme",
+					requested === "dark" ? "dark" : "light",
+				);
+			})();
+		</script>
+		<link rel="stylesheet" href="/styles/generated/{{ labStylesheet }}" />
+	</head>
+	<body>
+		{% if labScoped %}<div class="cirth">{% endif %}
+		<header class="container">
+			<nav aria-label="Workspace">
+				<ul><li><strong>Access desk</strong></li></ul>
+				<ul><li><small>Baseline / live</small></li></ul>
+			</nav>
+		</header>
+		<main class="container">
+			<article>
+				<header>
+					<small>Account 04</small>
+					<h2>Sign in</h2>
+				</header>
+				<form>
+					<label>
+						Email
+						<input type="email" name="email" autocomplete="email" value="maintainer@example.dev" />
+					</label>
+					<label>
+						Password
+						<input type="password" name="password" autocomplete="current-password" value="baseline" />
+					</label>
+					<label><input type="checkbox" checked /> Remember this device</label>
+					<button type="button">Sign in</button>
+				</form>
+				<footer><small>Native controls · no component JavaScript</small></footer>
+			</article>
+		</main>
+		{% if labScoped %}</div>{% endif %}
+	</body>
+</html>

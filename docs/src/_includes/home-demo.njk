@@ -1,158 +1,128 @@
-{#- Homepage signature: plain semantic HTML is typed on the left and the
-    rendered result materializes on the right, one element at a time. The
-    full final state is server-rendered here, so no-JS visitors, search
-    engines, and screen readers always get the complete content; the
-    animation is a purely visual layer applied after load, and skipped
-    entirely under prefers-reduced-motion. -#}
-{%- set fullSource -%}
-<article>
-  <h2>Sign in</h2>
-  <form>
-    <label>
-      Email
-      <input type="email">
-    </label>
-    <label>
-      Password
-      <input type="password">
-    </label>
-    <label>
-      <input type="checkbox" checked>
-      Remember me
-    </label>
-    <button>Sign in</button>
-  </form>
-</article>
+{%- set defaultSource -%}
+<main class="container">
+  <article>
+    <h2>Sign in</h2>
+    <form>
+      <label>Email <input type="email"></label>
+      <label>Password <input type="password"></label>
+      <label><input type="checkbox" checked> Remember me</label>
+      <button>Sign in</button>
+    </form>
+  </article>
+</main>
 {%- endset -%}
-<div class="home-demo" aria-label="Live example: semantic HTML rendered by Cirth">
-	{#- The code pane is "the stone": it keeps Cirth's dark scheme in both
-	    site themes, so the markup always reads as carved into dark
-	    material while the rendered page sits on the site canvas. -#}
-	<div class="home-demo-code" data-theme="dark">
-		<div class="home-demo-code-bar">
-			<span class="home-demo-filename">index.html — no classes</span>
-		</div>
-		<pre aria-hidden="true"><code id="home-demo-typed">{{ fullSource }}</code></pre>
-		{#- Full source for assistive tech and no-JS, independent of the
-		    visual typing state above. -#}
-		<pre class="visually-hidden"><code>{{ fullSource }}</code></pre>
+
+<figure class="docs-transform-figure" aria-labelledby="transform-caption">
+	<figcaption id="transform-caption" class="docs-figure-caption">
+		<span><strong>Fig. 01</strong> Semantic source → native baseline</span>
+		<span class="docs-fidelity"><i aria-hidden="true"></i> High fidelity · live Cirth</span>
+	</figcaption>
+	<div class="docs-lab-toolbar">
+		<label>
+			<span>Build</span>
+			<select data-lab-build>
+				<option value="default">Default</option>
+				<option value="classless">Classless</option>
+				<option value="scoped">Scoped</option>
+				<option value="scoped-classless">Scoped + classless</option>
+			</select>
+		</label>
+		<label>
+			<span>Output theme</span>
+			<select data-lab-theme>
+				<option value="light">Light</option>
+				<option value="dark">Dark</option>
+			</select>
+		</label>
+		<small><strong>Docs JS</strong> changes the comparison only. Cirth ships none.</small>
 	</div>
-	{#- The rendered result is "the sheet": the inner <article> is a real
-	    Cirth card, overlapping the stone panel. -#}
-	<div class="home-demo-preview" id="home-demo-preview"><article><h2>Sign in</h2><form><label>Email <input type="email"></label><label>Password <input type="password"></label><label><input type="checkbox" checked> Remember me</label><button>Sign in</button></form></article></div>
-</div>
+	<div class="docs-transform-grid">
+		<section class="docs-source-panel" aria-labelledby="source-label">
+			<header>
+				<span id="source-label">01 / source</span>
+				<code>index.html</code>
+			</header>
+			<pre tabindex="0"><code data-lab-source>{{ defaultSource }}</code></pre>
+		</section>
+
+		<div class="docs-mechanism" aria-label="The selected Cirth stylesheet transforms semantic HTML into the rendered interface">
+			<span class="docs-mechanism-node" aria-hidden="true"></span>
+			<strong>02 / mechanism</strong>
+			<code data-lab-file>cirth.min.css</code>
+			<small>one stylesheet</small>
+		</div>
+
+		<section class="docs-output-panel" aria-labelledby="output-label">
+			<header>
+				<span id="output-label">03 / output</span>
+				<span><i aria-hidden="true"></i> authentic</span>
+			</header>
+			<iframe
+				title="Authentic Cirth default build rendering a semantic sign-in form"
+				src="/lab/default/?theme=light"
+				data-lab-frame
+				loading="eager"
+			></iframe>
+		</section>
+	</div>
+	<p class="docs-figure-note">
+		<span>Override declaration</span>
+		<strong>None inside the output frame.</strong>
+		The frame loads the selected build compiled directly from <code>src/</code>.
+	</p>
+</figure>
 
 <script>
 	(() => {
-		const segments = [
-			{
-				src: "<article>\n  <h2>Sign in</h2>\n",
-				snapshot: "<article><h2>Sign in</h2></article>",
-			},
-			{
-				src: '  <form>\n    <label>\n      Email\n      <input type="email">\n    </label>\n',
-				snapshot:
-					'<article><h2>Sign in</h2><form><label>Email <input type="email"></label></form></article>',
-			},
-			{
-				src: '    <label>\n      Password\n      <input type="password">\n    </label>\n',
-				snapshot:
-					'<article><h2>Sign in</h2><form><label>Email <input type="email"></label><label>Password <input type="password"></label></form></article>',
-			},
-			{
-				src: '    <label>\n      <input type="checkbox" checked>\n      Remember me\n    </label>\n',
-				snapshot:
-					'<article><h2>Sign in</h2><form><label>Email <input type="email"></label><label>Password <input type="password"></label><label><input type="checkbox" checked> Remember me</label></form></article>',
-			},
-			{
-				src: "    <button>Sign in</button>\n  </form>\n</article>",
-				snapshot:
-					'<article><h2>Sign in</h2><form><label>Email <input type="email"></label><label>Password <input type="password"></label><label><input type="checkbox" checked> Remember me</label><button>Sign in</button></form></article>',
-			},
-		];
-		const fullSource = segments.map((segment) => segment.src).join("");
+		const build = document.querySelector("[data-lab-build]");
+		const theme = document.querySelector("[data-lab-theme]");
+		const frame = document.querySelector("[data-lab-frame]");
+		const source = document.querySelector("[data-lab-source]");
+		const file = document.querySelector("[data-lab-file]");
+		if (!build || !theme || !frame || !source || !file) return;
 
-		const TYPE_MS = 18;
-		const NEWLINE_MS = 60;
-		const SEGMENT_RENDER_MS = 240;
-		const HOLD_FULL_MS = 3500;
-		const DELETE_MS = 9;
-		const HOLD_EMPTY_MS = 900;
-
-		const segmentEnds = [];
-		segments.reduce((acc, segment) => {
-			const end = acc + segment.src.length;
-			segmentEnds.push(end);
-			return end;
-		}, 0);
-
-		const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-		if (reduceMotion) return;
-
-		const typedEl = document.getElementById("home-demo-typed");
-		const previewEl = document.getElementById("home-demo-preview");
-		const cursor = document.createElement("span");
-		cursor.className = "home-demo-cursor";
-
-		let timers = [];
-		const clearTimers = () => {
-			for (const timer of timers) clearTimeout(timer);
-			timers = [];
+		const sources = {
+			default: `<main class="container">
+  <article>
+    <h2>Sign in</h2>
+    <form>…native controls…</form>
+  </article>
+</main>`,
+			classless: `<main>
+  <article>
+    <h2>Sign in</h2>
+    <form>…native controls…</form>
+  </article>
+</main>`,
+			scoped: `<div class="cirth">
+  <main class="container">
+    <article>…native controls…</article>
+  </main>
+</div>`,
+			"scoped-classless": `<div class="cirth">
+  <main>
+    <article>…native controls…</article>
+  </main>
+</div>`,
+		};
+		const files = {
+			default: "cirth.min.css",
+			classless: "cirth.classless.min.css",
+			scoped: "cirth.scoped.min.css",
+			"scoped-classless": "cirth.classless.scoped.min.css",
 		};
 
-		const setTyped = (text) => {
-			typedEl.textContent = text;
-			typedEl.append(cursor);
+		const render = () => {
+			const base = (document.documentElement.dataset.base || "/").replace(/\/$/, "");
+			frame.src = `${base}/lab/${build.value}/?theme=${theme.value}`;
+			frame.title = `Authentic Cirth ${build.options[build.selectedIndex].text} build in ${theme.value} mode`;
+			source.textContent = sources[build.value];
+			file.textContent = files[build.value];
 		};
 
-		// One full cycle: type each segment (rendering its preview as it
-		// lands), hold the finished page, delete backward (the preview
-		// un-building the same way), hold the blank pane, then schedule the
-		// next cycle.
-		const cycle = () => {
-			clearTimers();
-			setTyped("");
-			previewEl.innerHTML = "";
-			let at = 0;
-			let typed = "";
-
-			for (const segment of segments) {
-				for (const char of segment.src) {
-					at += char === "\n" ? NEWLINE_MS : TYPE_MS;
-					timers.push(
-						setTimeout(() => {
-							typed += char;
-							setTyped(typed);
-						}, at),
-					);
-				}
-				at += SEGMENT_RENDER_MS;
-				const snapshot = segment.snapshot;
-				timers.push(
-					setTimeout(() => {
-						previewEl.innerHTML = snapshot;
-					}, at),
-				);
-			}
-
-			at += HOLD_FULL_MS;
-
-			for (let length = fullSource.length - 1; length >= 0; length--) {
-				at += DELETE_MS;
-				const sliceTo = length;
-				timers.push(
-					setTimeout(() => {
-						setTyped(fullSource.slice(0, sliceTo));
-						const partial = segmentEnds.findIndex((end) => sliceTo < end);
-						previewEl.innerHTML = partial <= 0 ? "" : segments[partial - 1].snapshot;
-					}, at),
-				);
-			}
-
-			at += HOLD_EMPTY_MS;
-			timers.push(setTimeout(cycle, at));
-		};
-
-		timers.push(setTimeout(cycle, 600));
+		build.addEventListener("change", render);
+		theme.addEventListener("change", render);
+		theme.value = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+		render();
 	})();
 </script>
