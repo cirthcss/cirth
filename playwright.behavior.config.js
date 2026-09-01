@@ -14,6 +14,7 @@ module.exports = defineConfig({
 		"button-overflow.spec.js",
 		"docs-stack.spec.js",
 		"date-input-group.spec.js",
+		"flow-spacing.spec.js",
 		"form-sizing.spec.js",
 		"forms-validity.spec.js",
 		"framework-specimen.spec.js",
