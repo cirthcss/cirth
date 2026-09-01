@@ -53,7 +53,8 @@ const openPage = async (page, target, theme) => {
 	await waitForTheme(page, theme);
 	await page.evaluate(() => document.fonts.ready);
 	await page.evaluate(
-		() => new Promise((resolve) => requestAnimationFrame(() => resolve(undefined))),
+		() =>
+			new Promise((resolve) => requestAnimationFrame(() => resolve(undefined))),
 	);
 };
 
@@ -118,7 +119,8 @@ const measure = (page) =>
 
 				const hasDirectText = [...element.childNodes].some(
 					(node) =>
-						node.nodeType === Node.TEXT_NODE && Boolean(node.textContent?.trim()),
+						node.nodeType === Node.TEXT_NODE &&
+						Boolean(node.textContent?.trim()),
 				);
 				if (!hasDirectText) return false;
 
@@ -337,6 +339,29 @@ for (const theme of themeVariants) {
 				});
 				expect(focus.style).not.toBe("none");
 				expect(focus.width).toBeGreaterThan(0);
+
+				await openPage(page, "index.html", theme);
+				for (const target of [
+					page.locator(".docs-case").first(),
+					page.locator(".docs-faq-list summary").first(),
+				]) {
+					await page.keyboard.press("Tab");
+					await target.focus();
+					expect(
+						await target.evaluate((element) =>
+							element.matches(":focus-visible"),
+						),
+					).toBe(true);
+					const targetFocus = await target.evaluate((element) => {
+						const style = getComputedStyle(element);
+						return {
+							style: style.outlineStyle,
+							width: Number.parseFloat(style.outlineWidth),
+						};
+					});
+					expect(targetFocus.style).not.toBe("none");
+					expect(targetFocus.width).toBeGreaterThan(0);
+				}
 
 				await openPage(page, "components/loading/index.html", theme);
 				const spinnerColor = await page

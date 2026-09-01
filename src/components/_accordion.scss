@@ -5,23 +5,18 @@
    */
 
 #{$parent-selector} details {
-  display: block;
   margin-bottom: var(--cirth-spacing);
 
   summary {
-    line-height: var(--cirth-font-size-md);
+    line-height: var(--cirth-line-height-normal);
     list-style-type: none;
     cursor: pointer;
-    transition:
-      background-color var(--cirth-transition),
-      color var(--cirth-transition);
+    transition: color var(--cirth-transition);
 
-    &:hover:not([role]) {
-      background-color: color-mix(
-        in oklch,
-        var(--cirth-primary) 7%,
-        transparent
-      );
+    @media (hover: hover) and (pointer: fine) {
+      &:hover:not([role]) {
+        color: var(--cirth-accordion-active-summary-color);
+      }
     }
 
     &:not([role]) {
@@ -53,7 +48,7 @@
       // chevron in forms/_basics.scss cannot do this — a replaced element
       // has no pseudo-element to hang the mask on — so it keeps the baked
       // neutral and the two diverge under a custom theme (gh#82).
-      background-color: var(--cirth-muted-color);
+      background-color: currentColor;
       mask-image: var(--cirth-icon-chevron);
       mask-position: right center;
       mask-size: var(--cirth-font-size-md) auto;
@@ -78,8 +73,8 @@
     &:focus-visible {
       &:not([role]) {
         outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
-        outline-offset: calc(var(--cirth-spacing, var(--cirth-space-4)) * 0.5);
-        color: var(--cirth-primary);
+        outline-offset: calc(var(--cirth-outline-width) * -1);
+        color: var(--cirth-accordion-active-summary-color);
       }
     }
 
@@ -104,7 +99,7 @@
       margin-bottom: var(--cirth-spacing);
 
       &:not([role]) {
-        &:not(:focus) {
+        &:not(:focus, :hover) {
           color: var(--cirth-accordion-open-summary-color);
         }
       }
@@ -116,8 +111,17 @@
   }
 }
 
-// A resting disclosure is a quiet surface. Dropdowns already own a menu
+// A resting disclosure is a rule, not a box. Dropdowns already own a menu
 // frame, so class builds leave that specialised component untouched.
+// This used to be a card: border on all four sides, card surface, card
+// radius, a tinted summary band when open. A disclosure is not a card —
+// it is a row of text you can open, and a stack of them is a list. Boxing
+// each one turned a FAQ into a column of framed panels with the reading
+// order buried inside them, and it put a second container inside every
+// card that already held one. What is left is the one line that does the
+// work: a divider on the details item itself. Closed, it separates rows;
+// open, it follows the revealed content instead of cutting the trigger off
+// from the panel it controls.
 $surface-details: "details";
 
 @if $enable-classes {
@@ -125,20 +129,29 @@ $surface-details: "details";
 }
 
 #{$parent-selector} #{$surface-details} {
-  padding: var(--cirth-space-4);
-  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
-  border-block-end-width: var(--cirth-registration-width);
-  border-radius: var(--cirth-border-radius);
-  background: var(--cirth-card-background-color);
+  border-block-end: var(--cirth-border-width) solid
+    var(--cirth-muted-border-color);
 
   > summary {
+    min-block-size: 2.75rem;
+    padding-block: var(--cirth-space-2);
     font-weight: var(--cirth-font-weight-semibold);
   }
 
-  &[open] > summary {
-    padding-bottom: var(--cirth-space-3);
-    border-bottom: var(--cirth-border-width) solid
-      var(--cirth-card-border-color);
+  &[open] {
+    // The open panel's bottom gutter belongs to the disclosure, not to
+    // whatever happens to be last inside it. Hanging it on the last child's
+    // margin-bottom looked equivalent and was not: margins are the first
+    // thing content resets flatten, so any `p:last-child { margin: 0 }` in
+    // the page — or a last child that is a list, a figure, or a <pre> with
+    // its own margin — silently collapsed the panel onto its own divider.
+    // Owning it here makes the gutter unconditional and identical for every
+    // kind of content, and the reset below keeps the two from stacking.
+    padding-block-end: var(--cirth-space-4);
+  }
+
+  > :last-child:not(summary) {
+    margin-bottom: 0;
   }
 }
 

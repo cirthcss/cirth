@@ -10,6 +10,7 @@ module.exports = defineConfig({
 	testDir: "tests",
 	testMatch: [
 		"accessibility-resilience.spec.js",
+		"baseline-consistency.spec.js",
 		"button-overflow.spec.js",
 		"docs-stack.spec.js",
 		"date-input-group.spec.js",
@@ -28,6 +29,7 @@ module.exports = defineConfig({
 		"popover.spec.js",
 		"prefers-contrast.spec.js",
 		"print.spec.js",
+		"surface-derivation.spec.js",
 		"token-override.spec.js",
 	],
 	fullyParallel: true,

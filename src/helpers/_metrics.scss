@@ -1,0 +1,12 @@
+// Shared control geometry. This stays a Sass value so every emitted use
+// keeps its CSS var()/calc() relationship and therefore re-resolves local
+// line-height, spacing, and border overrides at runtime. A root custom
+// property would freeze those component-local slots when it computed.
+$control-block-size: max(
+  2.75rem,
+  calc(
+    (var(--cirth-font-size-md) * var(--cirth-line-height)) +
+      (var(--cirth-form-element-spacing-vertical) * 2) +
+      (var(--cirth-border-width) * 2)
+  )
+);

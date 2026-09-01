@@ -2,15 +2,12 @@
 // ––––––––––––––––––––
 // For the project that wants a conventional application look and no
 // decisions: a familiar blue accent, a plain white page, and headings in
-// the same face as the body text. It is deliberately the quietest colour
-// treatment Cirth ships; geometry, density, borders and interaction remain
-// shared with the default so Plain is still recognisably Cirth.
-// It is also the shorter half of a worked example. This preset changes
-// *only input tokens*: nothing below is a derived value. The accent's
-// background, hover, focus ring and underline tint are not set here
-// because they follow --cirth-primary on their own — which is the whole
-// point of the token model, and the reason this file is five declarations
-// rather than the forty it would have been.
+// the same face as the body text. It is deliberately the quietest treatment
+// Cirth ships: neutral surfaces, slightly squarer controls, and fast motion.
+// It is also the shorter half of a worked example. The root block is five
+// declarations: two public colour inputs and three role-level choices. The
+// accent states and the entire surface hierarchy are absent because they
+// derive from --cirth-primary and --cirth-canvas at runtime.
 // See src/presets/playroom.scss for the other half: a preset that
 // overrides broadly, including derived tokens where it wants to break a
 // relationship on purpose.
@@ -24,24 +21,22 @@
   // scheme too — no second block, no scheme wiring.
   --cirth-primary: light-dark(oklch(52% 0.17 258deg), oklch(72% 0.13 258deg));
 
-  // Plain white rather than the default's warm paper: the page should read
-  // as a document surface, not as the project's brand.
+  // Plain white rather than warm paper. Card, form, code, dropdown and
+  // popover keep their elevation/recession relationships and lose the warm
+  // cast automatically; no surface role is repeated here.
   --cirth-canvas: light-dark(oklch(98.5% 0 0deg), oklch(20% 0.008 264deg));
-  --cirth-card-background-color: light-dark(
-    oklch(100% 0 0deg),
-    oklch(22% 0.011 264deg)
-  );
-
-  // A followed link drains to neutral, as in the default theme, but from
-  // this accent rather than amber.
-  --cirth-link-visited-color: light-dark(
-    oklch(48% 0.02 258deg),
-    oklch(66% 0.02 258deg)
-  );
 
   // Keep headings in the body face even when the consumer has replaced the
   // display role independently.
   --cirth-font-family-display: var(--cirth-font-family);
+
+  // One geometry knob: component slots such as the card radius derive from
+  // it, so Plain stays square without enumerating containers.
+  --cirth-border-radius: var(--cirth-radius-xs);
+
+  // The fifth declaration keeps interaction brisk without changing the
+  // component state model.
+  --cirth-transition: var(--cirth-duration-fast) var(--cirth-ease-out);
 }
 
 // Increased contrast (prefers-contrast: more)

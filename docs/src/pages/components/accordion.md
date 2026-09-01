@@ -53,6 +53,9 @@ options are alternatives, not when they are a checklist.
 * `summary` color: `--cirth-accordion-close-summary-color` when closed,
   `--cirth-accordion-open-summary-color` when open (and not focused),
   `--cirth-accordion-active-summary-color` on hover/focus.
+* The single divider belongs to the `details` item, not to `summary`: when
+  open it follows the revealed content instead of separating that content
+  from its trigger.
 * `summary[role="button"]` (a `details` used as an accordion triggered by a
   button) becomes full width, aligned left, with its own marker sizing.
 * Grouping with `name` needs nothing from Cirth: the styling is per item,

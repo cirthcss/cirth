@@ -17,6 +17,20 @@ color groups.
 <a href="#" class="contrast">Contrast link</a>
 ```
 
+The second paragraph of that example is the `:visited` state, and it is the
+one state on this page that cannot be mocked up: a browser paints it only
+for a link you have really followed, and reports the unvisited colour to
+`getComputedStyle` so a page cannot read it back. So the example does the
+only honest thing — it asks you to follow the link and return — and prints
+the token's own colour beside it, which is always visible.
+
+If the followed link still looks unvisited when you come back, the browser
+is suppressing the state rather than Cirth failing to style it. Safari does
+this unconditionally. Chromium partitions visited state from 136 onward: a
+link is painted as visited only when *this* page is where you followed it
+from, so arriving at a page whose links you have opened from somewhere else
+shows none of them as visited. Firefox still applies it globally.
+
 ## Behavior
 
 * Color and underline come from `--cirth-primary` /
@@ -25,9 +39,12 @@ color groups.
   `aria-current="false"`) switch to the `-hover` variants and force an
   underline.
 * `:focus-visible` adds a focus ring in `--cirth-primary-focus`.
-* `:visited` drops the accent for `--cirth-link-visited-color`, a neutral
-  reading of the same palette, so a followed link in a long page shows as
-  already read. It applies to content links only: entries inside `nav` or a
+* `:visited` drops the accent for `--cirth-link-visited-color`, an
+  achromatic grey at the same lightness as the accent, so a followed link in
+  a long page shows as spent. Zero chroma on purpose: a *cool* grey read as
+  a cold cast against the warm paper canvas, and against a warm accent it
+  was a hue change at nearly the same lightness — the weakest available way
+  to say "you have been here". It applies to content links only: entries inside `nav` or a
   dropdown menu keep their color, since a menu that grays out one item at a
   time as the reader browses looks broken rather than oriented. `.secondary`
   and `.contrast` links stay in their own color group too, as do the states

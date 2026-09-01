@@ -1,4 +1,5 @@
 @use "../config" as *;
+@use "../helpers/metrics";
 
 /**
    * Button
@@ -61,15 +62,10 @@
   // floor stays put when the type does not, and matched by the same floor
   // on select and textarea in forms/_basics.scss. Navs opt down to the
   // AA minimum instead; see components/_nav.scss.
-  min-block-size: calc(
-    (var(--cirth-font-size-md) * var(--cirth-line-height)) +
-      (var(--cirth-form-element-spacing-vertical) * 2) +
-      var(--cirth-border-width) + var(--cirth-registration-width)
-  );
+  min-block-size: metrics.$control-block-size;
   padding: var(--cirth-form-element-spacing-vertical)
     var(--cirth-form-element-spacing-horizontal);
   border: var(--cirth-border-width) solid var(--cirth-border-color);
-  border-block-end-width: var(--cirth-registration-width);
   border-radius: var(--cirth-border-radius);
   outline: none;
   background-color: var(--cirth-background-color);
@@ -99,12 +95,25 @@
     --cirth-color: var(--cirth-primary-inverse);
   }
 
-  // Pressed feedback: a static 1px offset (not a transition), so it stays
-  // crisp and is equally valid under prefers-reduced-motion
+  // Pressed is one tonal step past hover. Painted as a wash over the
+  // variant's own background rather than as a separate colour per variant,
+  // so outline and ghost darken by the same amount a filled button does
+  // without either growing a fill it does not have.
   &:active {
-    transform: translateY(0.0625rem);
+    background-image: linear-gradient(rgb(0 0 0 / 12%) 0 0);
   }
+}
 
+// Keep ::file-selector-button out of this selector list. Firefox does not
+// support :focus-visible on that pseudo-element and therefore discards the
+// whole comma-separated rule, including the focus ring for ordinary buttons.
+// The file control receives its ring through the focused host input in
+// forms/_input-file.scss instead.
+#{$parent-selector} button,
+#{$parent-selector} [type="submit"],
+#{$parent-selector} [type="reset"],
+#{$parent-selector} [type="button"],
+#{$parent-selector} [role="button"] {
   &:focus-visible,
   &:is([aria-current]:not([aria-current="false"])):focus-visible {
     --cirth-box-shadow:
@@ -143,13 +152,27 @@
       --cirth-border-color: var(--cirth-secondary-hover-border);
       --cirth-color: var(--cirth-secondary-inverse);
     }
+  }
 
-    &:focus-visible,
-    &:is([aria-current]:not([aria-current="false"])):focus-visible {
-      --cirth-box-shadow:
-        var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
-        0 0 0 var(--cirth-outline-width) var(--cirth-secondary-focus);
-    }
+  #{$parent-selector}
+    :is(
+      button,
+      [type="submit"],
+      [type="button"],
+      [role="button"]
+    ).secondary:focus-visible,
+  #{$parent-selector}
+    :is(button, [type="submit"], [type="button"], [role="button"]).secondary:is(
+      [aria-current]:not([aria-current="false"])
+    ):focus-visible,
+  #{$parent-selector} [type="reset"]:focus-visible,
+  #{$parent-selector}
+    [type="reset"]:is(
+      [aria-current]:not([aria-current="false"])
+    ):focus-visible {
+    --cirth-box-shadow:
+      var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
+      0 0 0 var(--cirth-outline-width) var(--cirth-secondary-focus);
   }
 
   // Contrast
@@ -200,7 +223,6 @@
     :is(button, [type="submit"], [type="button"], [role="button"]).ghost,
   #{$parent-selector} [type="reset"].ghost {
     --cirth-background-color: transparent;
-    --cirth-box-shadow: none;
   }
 
   // Outline (primary)
@@ -345,12 +367,12 @@
       --cirth-border-color: var(--cirth-secondary-hover-border);
       --cirth-color: var(--cirth-secondary-inverse);
     }
+  }
 
-    &:focus-visible {
-      --cirth-box-shadow:
-        var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
-        0 0 0 var(--cirth-outline-width) var(--cirth-secondary-focus);
-    }
+  #{$parent-selector} [type="reset"]:focus-visible {
+    --cirth-box-shadow:
+      var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
+      0 0 0 var(--cirth-outline-width) var(--cirth-secondary-focus);
   }
 }
 

@@ -49,11 +49,9 @@
 #{$parent-selector} pre,
 #{$parent-selector} table,
 #{$parent-selector} ul {
-  margin-top: 0;
-  margin-bottom: var(--cirth-typography-spacing-vertical);
+  margin-block: 0 var(--cirth-typography-spacing-vertical);
   color: var(--cirth-color);
   font-style: normal;
-  font-weight: var(--cirth-font-weight);
 }
 
 // Avoid single orphaned words on the last line of a paragraph
@@ -70,8 +68,7 @@
 #{$parent-selector} h4,
 #{$parent-selector} h5,
 #{$parent-selector} h6 {
-  margin-top: 0;
-  margin-bottom: var(--cirth-typography-spacing-vertical);
+  margin-block: 0 calc(var(--cirth-typography-spacing-vertical) * 0.5);
   color: var(--cirth-color);
   font-weight: var(--cirth-font-weight);
   font-size: var(--cirth-font-size);
@@ -126,20 +123,13 @@
   }
 }
 
-// Paragraphs
-
-#{$parent-selector} p {
-  margin-bottom: var(--cirth-typography-spacing-vertical);
-}
-
 // Heading group
 
 #{$parent-selector} hgroup {
   margin-bottom: var(--cirth-typography-spacing-vertical);
 
   > * {
-    margin-top: 0;
-    margin-bottom: 0;
+    margin-block: 0;
   }
 
   > *:not(:first-child):last-child {
@@ -191,12 +181,16 @@
 // Blockquote
 
 #{$parent-selector} blockquote {
-  display: block;
   margin: var(--cirth-typography-spacing-vertical) 0;
   padding: var(--cirth-spacing);
   border-inline-start: var(--cirth-border-width-4) solid
     var(--cirth-blockquote-border-color);
   border-inline-end: none;
+
+  > :last-child,
+  > :has(+ footer) {
+    margin-bottom: 0;
+  }
 
   footer {
     margin-top: calc(var(--cirth-typography-spacing-vertical) * 0.5);

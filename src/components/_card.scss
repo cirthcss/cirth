@@ -9,10 +9,18 @@
   padding: var(--cirth-block-spacing-vertical)
     var(--cirth-block-spacing-horizontal);
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
-  border-block-end-width: var(--cirth-registration-width);
   border-radius: var(--cirth-card-border-radius);
   background: var(--cirth-card-background-color);
   box-shadow: var(--cirth-card-box-shadow);
+
+  // Container padding owns the final rhythm. Text and forms keep their
+  // normal flow spacing everywhere else, but do not stack a second gutter
+  // against the card edge. Adjacent body/footer margins already collapse to
+  // one rhythm step, so they need no selector or compensation here.
+  > :last-child:not(header, footer),
+  > :is(header, footer) > :last-child {
+    margin-bottom: 0;
+  }
 
   > header,
   > footer {
@@ -20,12 +28,6 @@
     padding: calc(var(--cirth-block-spacing-vertical) - var(--cirth-space-2))
       var(--cirth-block-spacing-horizontal);
     background-color: var(--cirth-card-sectioning-background-color);
-
-    // The last child's own bottom margin would stack on the section
-    // padding (upstream #611); the modal already resets this
-    > :last-child {
-      margin-bottom: 0;
-    }
   }
 
   > header {

@@ -20,9 +20,9 @@ optional `header`/`footer` sections, with no `.card` class.
 
 ## Behavior
 
-* Background: `--cirth-card-background-color`; shadow:
-  `--cirth-card-box-shadow` (defaults to `--cirth-box-shadow`); radius:
-  `--cirth-border-radius`.
+* Background: `--cirth-card-background-color`; optional elevation:
+  `--cirth-card-box-shadow` (flat by default); radius:
+  `--cirth-card-border-radius`.
 * A direct `header`/`footer` bleeds to the card's edges (negative margin
   cancels the card's own horizontal padding) and gets its own background,
   `--cirth-card-sectioning-background-color`, plus a border separating it

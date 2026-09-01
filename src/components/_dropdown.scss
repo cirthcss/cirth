@@ -1,4 +1,5 @@
 @use "../config" as *;
+@use "../helpers/metrics";
 
 @if $enable-classes {
   /**
@@ -71,20 +72,12 @@
   // inside container type accordion
   // ––––––––––––––––––––
   #{$parent-selector} details.dropdown > summary:not([role]) {
-    height: calc(
-      var(--cirth-font-size-md) *
-        var(--cirth-line-height) +
-        var(--cirth-form-element-spacing-vertical) *
-        2 +
-        var(--cirth-border-width) +
-        var(--cirth-registration-width)
-    );
+    height: metrics.$control-block-size;
     padding: var(--cirth-form-element-spacing-vertical)
       var(--cirth-form-element-spacing-horizontal);
     border: var(--cirth-border-width)
       solid
       var(--cirth-form-element-border-color);
-    border-block-end-width: var(--cirth-registration-width);
     border-radius: var(--cirth-border-radius);
     background-color: var(--cirth-form-element-background-color);
     color: var(--cirth-form-element-placeholder-color);
@@ -96,6 +89,16 @@
       border-color var(--cirth-transition),
       color var(--cirth-transition),
       box-shadow var(--cirth-transition);
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover:not(:active, :focus, [aria-invalid]) {
+        border-color: color-mix(
+          in oklch,
+          var(--cirth-form-element-border-color) 65%,
+          var(--cirth-form-element-color)
+        );
+      }
+    }
 
     &:active,
     &:focus {

@@ -4,21 +4,37 @@ layout: base.njk
 {% set pageHeaders = content | headings %}
 {% set pageIndex = nav.flatPages | findPageIndex(page.url) %}
 <main id="main-content" class="container docs-page-shell">
-	<details class="docs-mobile-nav">
-		<summary>Browse documentation</summary>
-		<nav aria-label="Mobile documentation navigation">
-			{% for group in nav.sidebar %}
-				<section>
-					<strong>{{ group.text }}</strong>
+	<div class="docs-mobile-tools">
+		<details class="docs-mobile-nav">
+			<summary>Browse documentation</summary>
+			<nav aria-label="Mobile documentation navigation">
+				{% for group in nav.sidebar %}
+					<section>
+						<strong>{{ group.text }}</strong>
+						<ul>
+							{% for item in group.items %}
+								<li><a href="{{ item.link }}"{% if page.url == (item.link | withSlash) %} aria-current="page"{% endif %}>{{ item.text }}</a></li>
+							{% endfor %}
+						</ul>
+					</section>
+				{% endfor %}
+			</nav>
+		</details>
+		{% if pageHeaders.length > 1 %}
+			<details class="docs-toc-top">
+				<summary>On this page</summary>
+				<nav aria-label="On this page">
 					<ul>
-						{% for item in group.items %}
-							<li><a href="{{ item.link }}"{% if page.url == (item.link | withSlash) %} aria-current="page"{% endif %}>{{ item.text }}</a></li>
+						{% for header in pageHeaders %}
+							<li class="docs-toc-level-{{ header.depth }}">
+								<a href="#{{ header.slug }}">{{ header.text }}</a>
+							</li>
 						{% endfor %}
 					</ul>
-				</section>
-			{% endfor %}
-		</nav>
-	</details>
+				</nav>
+			</details>
+		{% endif %}
+	</div>
 	<div class="docs-layout">
 		<aside class="docs-sidebar">
 			<nav aria-label="docs navigation">
@@ -37,20 +53,6 @@ layout: base.njk
 			</nav>
 		</aside>
 		<div class="docs-content" data-pagefind-body>
-			{% if pageHeaders.length > 1 %}
-				<details class="docs-toc-top">
-					<summary>On this page</summary>
-					<nav aria-label="On this page">
-						<ul>
-							{% for header in pageHeaders %}
-								<li class="docs-toc-level-{{ header.depth }}">
-									<a href="#{{ header.slug }}">{{ header.text }}</a>
-								</li>
-							{% endfor %}
-						</ul>
-					</nav>
-				</details>
-			{% endif %}
 			{{ content | safe }}
 			{% if pageIndex > -1 %}
 				{% set prevPage = nav.flatPages[pageIndex - 1] if pageIndex > 0 %}

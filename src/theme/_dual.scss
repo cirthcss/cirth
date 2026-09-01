@@ -51,7 +51,7 @@
   // name the components are not allowed to shadow. That is this one.
   --cirth-canvas: light-dark(
     #{$paper},
-    #{color.mix($neutral-950, $neutral-900, $method: oklch)}
+    #{color.mix($neutral-950, $neutral-900, $method: oklab)}
   );
 
   // Text color
@@ -64,9 +64,13 @@
   );
 
   // Muted colors
-  --cirth-muted-color: light-dark(#{$neutral-550}, #{$neutral-450});
+  // The dark value clears AA on the highest surface in the runtime graph.
+  // neutral-450 was only 4.33:1 on a card after the surface hierarchy gained
+  // enough separation to be legible; neutral-400 leaves useful rounding room
+  // across engines while remaining visibly secondary to the main ink.
+  --cirth-muted-color: light-dark(#{$neutral-550}, #{$neutral-400});
   --cirth-muted-border-color: light-dark(
-    #{color.mix($neutral-100, $neutral-50, $method: oklch)},
+    #{color.mix($neutral-100, $neutral-50, $method: oklab)},
     #{$neutral-850}
   );
 
@@ -93,7 +97,9 @@
   // token directly if you want to break the relationship on purpose.
   --cirth-primary: light-dark(#{$amber-550}, #{$amber-350});
 
-  // Secondary colors
+  // Secondary colors. This is the neutral family, not another input graph:
+  // its fixed scale keeps the public runtime relationships concentrated on
+  // primary, status, and surfaces.
   --cirth-secondary: light-dark(#{$neutral-550}, #{$neutral-350});
   --cirth-secondary-underline: light-dark(
     #{color.change($neutral-550, $alpha: 0.5)},
@@ -126,14 +132,23 @@
 
   // Visited links: the accent drained to neutral, so a followed link reads
   // as spent without leaving the palette. A step darker than
-  // --cirth-secondary so the two aren't the same color by accident.
-  // 5.96:1 on the paper canvas, 6.43:1 on a white card (WCAG 1.4.3 AA).
-  --cirth-link-visited-color: light-dark(#{$neutral-600}, #{$neutral-400});
+  // --cirth-secondary so the two aren't the same colour by accident.
+  // Drained means *achromatic*, not "the cool grey from the neutral scale".
+  // The scale's 600 step carries 0.03 of chroma at 264deg, which on the warm
+  // paper canvas read as a cold cast rather than as a spent link, and next
+  // to a warm accent it was a hue change at almost the same lightness —
+  // the weakest possible way to say "you have been here". Zero chroma says
+  // it with the one channel that is unambiguous. Lightness is unchanged, so
+  // is the contrast: 5.98:1 on the canvas, 6.31:1 on a card (WCAG 1.4.3 AA).
+  --cirth-link-visited-color: light-dark(
+    #{color.change($neutral-600, $chroma: 0)},
+    #{color.change($neutral-400, $chroma: 0)}
+  );
 
   // Box shadow
   --cirth-box-shadow: light-dark(
     #{functions.shadow($neutral-400)},
-    #{functions.shadow(color.mix($black, $neutral-950, $method: oklch))}
+    #{functions.shadow(color.mix($black, $neutral-950, $method: oklab))}
   );
 
   // Typography
@@ -150,18 +165,11 @@
   --cirth-h6-color: light-dark(#{$neutral-650}, #{$neutral-400});
   --cirth-mark-color: light-dark(#{$neutral-950}, #{$white});
 
-  // Code
-  --cirth-code-background-color: light-dark(
-    #{color.mix($neutral-50, $white, 75%, $method: oklch)},
-    #{color.mix($neutral-900, $neutral-850, 75%, $method: oklch)}
-  );
+  // Code ink. Its surface is derived from --cirth-canvas in the scheme
+  // mixins, alongside the other surface roles.
   --cirth-code-color: light-dark(#{$neutral-550}, #{$neutral-400});
 
   // Form elements
-  --cirth-form-element-background-color: light-dark(
-    #{color.mix($neutral-50, $white, 25%, $method: oklch)},
-    #{color.mix($neutral-900, $neutral-850, $method: oklch)}
-  );
   --cirth-form-element-selected-background-color: light-dark(
     #{$neutral-100},
     #{$neutral-800}
@@ -174,10 +182,6 @@
     #{$neutral-550}
   );
   --cirth-form-element-color: light-dark(#{$neutral-850}, #{$neutral-100});
-  --cirth-form-element-active-background-color: light-dark(
-    #{$white},
-    #{color.mix($neutral-900, $neutral-850, 75%, $method: oklch)}
-  );
 
   // Switch (input[type="checkbox"][role="switch"])
   // Unchecked track needs >= 3:1 against the page background so the
@@ -189,21 +193,6 @@
   --cirth-range-active-border-color: light-dark(
     #{$neutral-200},
     #{$neutral-800}
-  );
-
-  // Card (<article>)
-  // White, not the background token: on the paper canvas a card is a
-  // sheet — the one surface brighter than the page.
-  --cirth-card-background-color: light-dark(#{$white}, #{$neutral-900});
-  --cirth-card-sectioning-background-color: light-dark(
-    #{color.mix($neutral-50, $white, 25%, $method: oklch)},
-    #{color.mix($neutral-900, $neutral-850, 75%, $method: oklch)}
-  );
-  --cirth-dropdown-background-color: light-dark(#{$white}, #{$neutral-900});
-  --cirth-dropdown-border-color: light-dark(#{$neutral-50}, #{$neutral-850});
-  --cirth-dropdown-hover-background-color: light-dark(
-    #{$neutral-50},
-    #{$neutral-850}
   );
 
   // Progress

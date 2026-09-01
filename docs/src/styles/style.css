@@ -13,44 +13,64 @@
 /* The canvas itself (warm paper in light, near-black in dark) is the
    framework's own --cirth-background-color — nothing to override here. */
 :root {
-	/* Native Baseline shell tokens. These control only the documentation's
-	   composition and annotation layer; public components continue to read
-	   the --cirth-* contract. The 8px unit, 4px micro-unit, 12-column board
-	   and consistent surface behavior transfer across the documentation. */
-	--docs-unit: 0.5rem;
+	/* Shell tokens: the seven things this documentation needs a name for
+	   that the framework has no opinion about — how wide the rails and the
+	   reading column are, how wide the shell gets, the 4px sub-unit the
+	   annotation layer is set on, the shell's own transition, and the
+	   blueprint dot grid.
+
+	   There used to be seventeen. The other ten were aliases —
+	   --docs-board for the card surface, --docs-line for the muted border,
+	   --docs-signal for the accent, and so on — a second vocabulary with
+	   no semantic content of its own, laid over the first. It cost nothing
+	   at runtime and a great deal in reading: `background: var(--docs-board)`
+	   does not tell you the documentation is using the card surface, which
+	   is the single most important thing a page dogfooding a CSS framework
+	   has to communicate. Every one of them now reads as the --cirth-*
+	   token it always was. */
 	--docs-micro: 0.25rem;
 	--docs-shell-max: 92rem;
 	--docs-reading-max: 48rem;
 	--docs-rail-width: 15rem;
 	--docs-toc-width: 13rem;
-	--docs-paper: var(--cirth-background-color);
-	--docs-board: var(--cirth-card-background-color);
-	--docs-panel: var(--cirth-form-element-background-color);
-	--docs-ink: var(--cirth-color);
-	--docs-annotation: var(--cirth-muted-color);
-	--docs-line: var(--cirth-muted-border-color);
-	--docs-line-strong: var(--cirth-form-element-border-color);
-	--docs-signal: var(--cirth-primary);
-	--docs-signal-soft: var(--cirth-mark-background-color);
-	--docs-code-surface: var(--cirth-code-background-color);
-	--docs-status-verified: var(--cirth-ins-color);
-	--docs-card-shadow: 0.5rem 0.5rem 0 var(--docs-signal-soft);
 	--docs-motion-fast: 140ms;
 	--docs-grid-dots: radial-gradient(
 		circle,
-		var(--docs-line) 0.75px,
+		var(--cirth-muted-border-color) 0.75px,
 		transparent 0.9px
 	);
 }
 
-/* Header — product navigation | search | controls. The three regions use
-   equal outer tracks so search stays visually centred even when the
-   control cluster is wider than the navigation cluster. */
+/* Header — product navigation | search | controls.
+
+   The three regions used to sit on equal `1fr` outer tracks with the
+   search on `minmax(16rem, 32rem)` between them, so the search took its
+   full 32rem the moment there was room for it and left the outer tracks
+   whatever was over. Below 1440px "whatever was over" (363px at 1366)
+   stopped being enough for the control cluster (379px of GitHub link,
+   two selects and the theme toggle), which wrapped to a second row and
+   took the sticky header to 201px — a quarter of a 1280x800 viewport,
+   held there from 1366px all the way down to 1024px.
+
+   The tracks are content-sized now and the search absorbs the slack,
+   which is the intrinsic sizing the framework itself argues for: the two
+   clusters ask for exactly what they need, nobody wraps, and the search
+   still lands within a few pixels of centre because the two clusters are
+   within a few pixels of the same width. Regression-tested in
+   tests/baseline-consistency.spec.js. */
 .docs-header nav {
 	display: grid;
-	grid-template-columns: minmax(0, 1fr) minmax(16rem, 32rem) minmax(0, 1fr);
+	grid-template-columns: auto minmax(12rem, 1fr) auto;
 	align-items: center;
 	gap: var(--cirth-spacing);
+
+	/* The row is the shell's, not a page's: a header that reads as chrome
+	   should be shorter than a nav in running content. Read off the token
+	   rather than restated, so a preset that changes nav density changes
+	   this with it. */
+	--cirth-nav-element-spacing-vertical: var(--cirth-space-2);
+
+	min-height: 3.5rem;
 }
 
 .docs-header-start-group {
@@ -59,60 +79,126 @@
 	justify-content: flex-start;
 }
 
-.docs-header-search {
+.docs-header-actions {
+	display: flex;
+	align-items: center;
+	justify-self: center;
+	gap: var(--cirth-space-2);
 	width: 100%;
 	max-width: 32rem;
-	margin: 0;
-	justify-self: center;
 }
 
-.docs-search-trigger.docs-search-trigger {
+.docs-header-search {
+	flex: 1 1 auto;
+	width: 100%;
+	margin: 0;
+}
+
+.docs-search-trigger {
 	display: grid;
 	grid-template-columns: auto minmax(0, 1fr) auto;
 	align-items: center;
 	gap: var(--cirth-space-2);
 	width: 100%;
-	min-block-size: 2.75rem;
+	min-block-size: 2.5rem;
+	block-size: 2.5rem;
 	margin: 0;
-	padding: 0.5rem 0.625rem;
-	border-color: var(--docs-line-strong);
-	border-radius: var(--cirth-radius-sm);
-	background: var(--docs-board);
-	color: var(--docs-annotation);
-	font-size: var(--cirth-font-size-sm);
+	padding: 0.375rem 0.625rem;
+	border-color: var(--cirth-form-element-border-color);
+	border-radius: var(--cirth-border-radius);
+	background: var(--cirth-form-element-background-color);
+	box-shadow: none;
+
+	/* This is a button pretending to be a search field, so it is set at the
+	   size a search field is set at. Nothing the reader reads or types into
+	   gets shrunk to make a header fit.
+
+	   The text is a placeholder, and it has to be one in every property a
+	   placeholder has, not only in colour. The library sets a field's text
+	   through --cirth-font-weight (forms/_basics.scss) and a button's
+	   through that same slot re-bound to semibold (theme/_styles.scss) —
+	   which is correct for a button and wrong for this one, and is why the
+	   trigger was announcing "Search documentation" at 600 beside real
+	   placeholders at 400. Both ink and weight are re-bound at the slot,
+	   once. Everything below then reads exactly as the library's own field
+	   rule reads, and the states that follow inherit the placeholder
+	   instead of each restating it: this is not a second definition of
+	   what a placeholder looks like, it is the field's own metrics
+	   pointed at a button. */
+	--cirth-color: var(--cirth-form-element-placeholder-color);
+	--cirth-font-weight: var(--cirth-font-weight-regular);
+
+	color: var(--cirth-color);
+	font-family: inherit;
+	font-size: var(--cirth-font-size-md);
 	font-weight: var(--cirth-font-weight);
+	line-height: var(--cirth-line-height);
 	text-align: start;
 }
 
-.docs-search-trigger.docs-search-trigger:hover,
-.docs-search-trigger.docs-search-trigger:focus-visible {
-	border-color: var(--docs-signal);
-	background: color-mix(in oklch, var(--docs-board) 92%, var(--docs-signal-soft));
-	color: var(--docs-ink);
+/* The library rebinds --cirth-color on a hovered or active button, which
+   is right for a button and would drag this placeholder off the fields
+   beside it. Named where it applies rather than restated three times: one
+   declaration, every state, still the field's own token. Tracking is not
+   declared at all — a field does not declare it either, and inheriting is
+   what keeps the two the same thing. */
+.docs-search-trigger:is(:hover, :focus, :focus-visible, :active) {
+	--cirth-color: var(--cirth-form-element-placeholder-color);
+}
+
+/* Surface and border follow the form-control states — the same mix the
+   library applies to a hovered field (forms/_basics.scss) — while the
+   placeholder above stays the placeholder. Nothing here changes the
+   trigger's size in any state. */
+.docs-search-trigger:hover:not(:active, :focus-visible) {
+	border-color: color-mix(
+		in oklch,
+		var(--cirth-form-element-border-color) 65%,
+		var(--cirth-form-element-color)
+	);
+	background: var(--cirth-form-element-background-color);
+}
+
+.docs-search-trigger:is(:active, :focus-visible) {
+	border-color: var(--cirth-form-element-active-border-color);
+	background: var(--cirth-form-element-active-background-color);
+	box-shadow: 0 0 0 var(--cirth-outline-width)
+		var(--cirth-form-element-focus-color);
 }
 
 .docs-search-trigger kbd,
 .docs-search-help kbd {
 	margin: 0;
 	padding: 0.125rem 0.35rem;
-	border: 1px solid var(--docs-line);
-	border-radius: 0;
-	background: var(--docs-paper);
+	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	border-radius: var(--cirth-code-border-radius);
+	/* --cirth-canvas, not --cirth-background-color: a <button> rebinds the
+	   latter to its own fill (that is how a primary button paints itself),
+	   and this kbd lives inside the search trigger button — so the "page
+	   surface" it asked for resolved to amber. --cirth-canvas exists for
+	   exactly this: a name for the page that components are not allowed to
+	   shadow. Same trap the copy button hit further down. */
+	background: var(--cirth-canvas);
 	box-shadow: none;
-	color: var(--docs-annotation);
-	font-size: 0.625rem;
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-xs);
 	white-space: nowrap;
 }
 
+/* The dialog is a plate, not a card: its bands run edge to edge and the
+   list inside them carries the inset. It used to keep the card's own 20px
+   padding, so every hairline — the field's underline, the status bar, each
+   result row — stopped short of the panel edge and the panel read as a card
+   with a smaller card drawn inside it. */
 .docs-search-dialog > article {
 	width: min(calc(100% - 2rem), 48rem);
 	max-height: min(44rem, calc(100dvh - 2rem));
 	margin: 1rem;
+	padding: 0;
 	border: var(--cirth-border-width) solid var(--cirth-card-border-color);
-	border-block-end-width: var(--cirth-registration-width);
 	border-radius: var(--cirth-card-border-radius);
-	background: var(--docs-board);
-	box-shadow: var(--cirth-box-shadow);
+	background: var(--cirth-card-background-color);
+	box-shadow: none;
 	overflow: hidden;
 }
 
@@ -122,15 +208,17 @@
 	align-items: center;
 	gap: 0.75rem;
 	margin: 0;
-	padding: 0.75rem;
-	border-block-end: 1px solid var(--docs-line);
-	background: var(--docs-board);
+	padding: 0.5rem 1rem;
+	border-block-end: var(--cirth-border-width) solid
+		var(--cirth-card-border-color);
+	background: var(--cirth-card-background-color);
 }
 
 .docs-search-dialog > article > header input {
 	width: 100%;
 	min-block-size: 2.75rem;
 	margin: 0;
+	padding-inline: 0;
 	border: 0;
 	border-radius: 0;
 	background: transparent;
@@ -149,17 +237,29 @@
 
 .docs-search-status {
 	margin: 0;
-	padding: 0.625rem 1rem;
-	border-block-end: 1px solid var(--docs-line);
-	color: var(--docs-annotation);
+	padding: 0.5rem 1rem;
+	border-block-end: var(--cirth-border-width) solid
+		var(--cirth-card-border-color);
+
+	/* The canvas, not the card's sectioning tint: in the dark scheme that
+	   tint sits at L 23.4% and puts --cirth-muted-color at 4.46:1, a
+	   rounding error under AA. The canvas is 20.15% and gives 4.82:1 — and
+	   it reads as a stronger band besides, since it is the one surface on
+	   the page this panel is not made of. --cirth-canvas rather than
+	   --cirth-background-color for the usual reason: nothing can shadow it. */
+	background: var(--cirth-canvas);
+	color: var(--cirth-muted-color);
 	font-family: var(--cirth-font-family-mono);
-	font-size: 0.6875rem;
+	font-size: var(--cirth-font-size-xs);
 }
 
+/* The inset the article gave up: the list carries it, so result rows sit on
+   the same inline gutter as the field above them while the bands around the
+   list still reach the panel edge. */
 .docs-search-results {
 	max-height: min(28rem, 55dvh);
 	margin: 0;
-	padding: 0;
+	padding: 0.375rem 0.5rem;
 	overflow-y: auto;
 	list-style: none;
 }
@@ -176,17 +276,27 @@
 .docs-search-results a {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr) auto;
-	gap: 0.25rem 1rem;
-	padding: 0.875rem 1rem;
-	border-block-end: 1px solid var(--docs-line);
-	color: var(--docs-ink);
+	gap: 0.125rem 1rem;
+	padding: 0.625rem 0.5rem;
+	border-radius: var(--cirth-border-radius);
+
+	/* --cirth-contrast, not --cirth-color: on an <a> the latter is the slot
+	   the link component binds to the accent (same note as .docs-case).
+	   A results list wants a readable title; the accent's job here is the
+	   rail on the row being pointed at, below. */
+	color: var(--cirth-contrast);
 	text-decoration: none;
+}
+
+.docs-search-results li + li {
+	border-block-start: var(--cirth-border-width) solid
+		var(--cirth-muted-border-color);
 }
 
 .docs-search-results a:hover,
 .docs-search-results a:focus-visible {
-	background: var(--docs-signal-soft);
-	box-shadow: inset 0.25rem 0 0 var(--docs-signal);
+	background: var(--cirth-mark-background-color);
+	box-shadow: inset 0.1875rem 0 0 var(--cirth-primary);
 }
 
 .docs-search-results strong,
@@ -195,7 +305,7 @@
 }
 
 .docs-search-results span {
-	color: var(--docs-annotation);
+	color: var(--cirth-muted-color);
 	font-size: var(--cirth-font-size-sm);
 }
 
@@ -206,10 +316,11 @@
 .docs-search-results small {
 	grid-column: 2;
 	grid-row: 1 / span 2;
-	align-self: center;
-	color: var(--docs-annotation);
+	align-self: start;
+	color: var(--cirth-muted-color);
 	font-family: var(--cirth-font-family-mono);
-	font-size: 0.625rem;
+	font-size: var(--cirth-font-size-xs);
+	line-height: 1.7;
 	overflow-wrap: anywhere;
 }
 
@@ -219,11 +330,15 @@
 	flex-wrap: wrap;
 	gap: 0.5rem 1rem;
 	margin: 0;
-	padding: 0.625rem 1rem;
-	background: var(--docs-paper);
-	color: var(--docs-annotation);
+	padding: 0.5rem 1rem;
+	border-block-start: var(--cirth-border-width) solid
+		var(--cirth-card-border-color);
+
+	/* Same band, same reason as the status line above. */
+	background: var(--cirth-canvas);
+	color: var(--cirth-muted-color);
 	font-family: var(--cirth-font-family-mono);
-	font-size: 0.625rem;
+	font-size: var(--cirth-font-size-sm);
 	text-align: start;
 }
 
@@ -244,23 +359,57 @@
 	gap: var(--cirth-space-2);
 }
 
-/* Bigger wordmark lockup than a body-text nav link warrants (Ruby-style
-   header presence) — the mark and name carry more visual weight than
-   any single nav item. */
+.docs-control-label {
+	display: none;
+}
+
+/* Wordmark lockup: the mark and name carry more weight than any single
+   nav item, in the monospace voice the rest of the shell's annotation
+   layer uses.
+
+   Its height is not its own to choose. Bootstrap computes the brand's
+   vertical padding from the band the links already occupy —
+   $navbar-brand-padding-y: ($nav-link-height - $navbar-brand-height) / 2 —
+   so the lockup centres on that band rather than setting a taller one.
+   Here the band is --cirth-space-10, the 40px a nav gives a control
+   (components/_nav.scss), and the lockup was a 36px mark inside a link
+   that adds 8px above and below: 52px, twelve taller than every other
+   item on the bar, which the row then had to grow to hold. Same
+   computation as Bootstrap's, one token instead of two literals: set the
+   lockup's height, and the padding that centres it on the band follows.
+
+   The negative block margin mirrors the padding for the same reason the
+   library's nav link rule carries one — the link paints a box larger than
+   its text without changing where the row places it. */
 .docs-brand {
+	--docs-brand-height: 1.75rem;
+
 	display: inline-flex;
 	align-items: center;
 	gap: 0.6rem;
-	font-size: var(--cirth-font-size-lg);
+	margin-block: calc(
+		(var(--docs-brand-height) - var(--cirth-space-10)) / 2
+	);
+	padding-block: calc(
+		(var(--cirth-space-10) - var(--docs-brand-height)) / 2
+	);
+	font-family: var(--cirth-font-family-mono);
+	font-size: var(--cirth-font-size-md);
+	letter-spacing: var(--cirth-letter-spacing-tight);
 }
 
-.docs-brand:hover {
+/* Brand colour is one value in every state — Bootstrap sets
+   $navbar-light-brand-hover-color to the brand colour itself. The name of
+   the site does not brighten on the way past. */
+.docs-brand,
+.docs-brand:is(:hover, :focus, :active) {
+	color: var(--cirth-contrast);
 	text-decoration: none;
 }
 
 .docs-logo {
-	width: 3rem;
-	height: 3rem;
+	width: var(--docs-brand-height);
+	height: var(--docs-brand-height);
 }
 
 .docs-logo-dark,
@@ -273,53 +422,67 @@
 }
 
 /* Native <select>s, not custom dropdowns — full keyboard/AT support for
-   free. Overrides the form default (block, 100% width) down to something
-   that reads as a header control, matching the theme toggle beside them:
-   auto width, since their labels are short and fixed.
+   free. Only the width is this file's business: the form default is block
+   and 100% wide, and a header control is neither.
 
-   The height is asked for outright. These used to carry a reduced
-   padding-block and came out at 33px and 38px against the toggle's 44 —
-   this project undercutting, in its own chrome, the WCAG 2.5.5 target size
-   it verifies in its own source. Cirth's own floor does not supply it here:
-   a <nav> opts down to the AA minimum (see components/_nav.scss), which is
-   the right default for a compact navigation row but not for this header,
-   where these sit beside a 44px toggle. The small type stays. */
+   The height is not here any more, and that is the point. These used to
+   pin themselves to 2.75rem because the library's nav opted controls down
+   to a 24px *floor* — a limit, not a size — which left every real header
+   to invent a height and then fight the nav rule for it. Cirth's nav now
+   states 40px, the band a navigation bar actually wants, and this file
+   simply stops arguing. The reduced font-size is gone with it: a control
+   the reader types into or picks from should be set at reading size, and
+   shrinking the type is how the old 33px and 38px heights happened in the
+   first place. */
 .docs-preset-select,
 .docs-version-select {
 	width: auto;
-	min-block-size: 2.75rem;
 	margin-bottom: 0;
 	padding-inline: calc(var(--cirth-spacing) * 0.75)
 		calc(var(--cirth-spacing) * 1.75);
-	font-size: var(--cirth-font-size-sm);
+	border-radius: var(--cirth-radius-sm);
 }
 
 .docs-version-select {
-	width: 5.75rem;
+	width: 6.75rem;
 }
 
 .docs-preset-select {
-	width: 7rem;
+	width: 8rem;
 }
 
-/* Doubled class: nav's own `nav li button { height: auto; padding: ... }`
-   (components/_nav.scss) ties this rule's specificity at one class, and
-   wins on source order since it's the later declaration — verified by
-   removing it and watching padding/height apply correctly. Bumping to two
-   classes decisively outranks it instead of guessing at load order. */
-.docs-theme-toggle.docs-theme-toggle {
+/* This used to be written `.docs-theme-toggle.docs-theme-toggle`, with a
+   comment blaming nav's `nav li button { height: auto; padding: … }` for
+   tying it at one class. That was the wrong culprit — specificity is
+   computed per selector in a list, and `nav li button` is (0,0,3), which
+   one class outranks outright. What actually beats it is the next
+   selector along in the same list: the toggle is `<button type="button">`,
+   so `nav li [type=button]` matches at (0,1,2), and (0,1,2) beats
+   (0,1,0).
+
+   The fix is to say where the rule applies rather than to say the same
+   class twice. `.docs-header .docs-theme-toggle` is (0,2,0), it wins for
+   a reason a reader can check, and it is true: this treatment is for the
+   toggle in the site header, not for the class anywhere it turns up.
+   (The other two doubled classes on this page — the search trigger and
+   the copy button — turned out to be beating nothing at all, and are now
+   single. The search trigger is a button too, but it is not inside a
+   `nav li`, so that list never reaches it.) */
+.docs-header .docs-theme-toggle {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	/* 44px: same WCAG 2.5.5 target size the library's own controls use
-	   (see src/theme/_styles.scss) — this is a custom control outside
-	   Cirth's button system, so it doesn't inherit that floor for free. */
-	width: 2.75rem;
-	height: 2.75rem;
+	/* Square, on the same 40px band as the selects beside it — the height
+	   Cirth's nav now gives a control (components/_nav.scss). Clear of
+	   WCAG 2.5.8's 24px AA minimum with room; short of 2.5.5's 44px AAA
+	   target, which is the size a control takes in a *form*, not in a
+	   navigation bar. */
+	width: 2.5rem;
+	height: 2.5rem;
 	margin-bottom: 0;
 	padding: 0;
 	border: var(--cirth-border-width) solid transparent;
-	border-block-end-width: var(--cirth-registration-width);
+	border-radius: var(--cirth-radius-sm);
 	line-height: 1;
 }
 
@@ -338,6 +501,128 @@
 	white-space: nowrap;
 }
 
+/* The visited link colour, printed as itself. :visited is the one state the
+   documentation cannot demonstrate on demand — the browser paints it only
+   for a link the reader has really followed, and reports the unvisited
+   colour to getComputedStyle so the page cannot read it back either. A
+   swatch of the token is the honest substitute, and a named class is the
+   right shape for it: the alternative was an inline style buried in a demo
+   snippet that readers are invited to copy. */
+.docs-visited-swatch {
+	color: var(--cirth-link-visited-color);
+	font-family: var(--cirth-font-family-mono);
+	font-size: var(--cirth-font-size-sm);
+	text-decoration: underline;
+	text-underline-offset: var(--cirth-text-underline-offset);
+}
+
+/* An editorial accent on part of a heading. This is a class rather than a
+   one-off rule on `.docs-native-claim h1 em`, and that is the whole point:
+   a documentation shell earns far more from a handful of small named
+   utilities it can reuse than from a growing pile of selectors that each
+   describe one element on one page. The accent is doing an editorial job
+   here — emphasis in a title — which is a use the brand page names
+   explicitly rather than an exception to it. */
+.docs-accent {
+	color: var(--cirth-primary);
+}
+
+/* forced-colors strips author colour, so the emphasis has to survive as
+   something other than a hue. */
+@media (forced-colors: active) {
+	.docs-accent {
+		text-decoration: underline;
+		text-decoration-thickness: 0.08em;
+		text-underline-offset: 0.08em;
+	}
+}
+
+/* Compact-viewport menu toggle: a square icon button on the same 40px band
+   as search. The disclosure marker is suppressed so the hamburger remains
+   the single affordance. */
+.docs-menu-toggle {
+	display: inline-grid;
+	place-items: center;
+	width: 2.5rem;
+	height: 2.5rem;
+	padding: 0;
+	border-radius: var(--cirth-radius-sm);
+}
+
+/* `.docs-header .docs-menu-toggle` (0,2,0), not `.docs-menu-toggle` (0,1,0):
+   the rule it has to outrank is the library's own
+   `nav details.dropdown > summary::after` at (0,1,3). Saying where the rule
+   applies is how you win that, not saying the class twice. */
+.docs-header .docs-menu-toggle::after {
+	display: none;
+}
+
+.docs-header .docs-mobile-menu-panel {
+	inset-inline: auto 0;
+	width: min(20rem, calc(100vw - var(--cirth-space-8)));
+	max-height: calc(100dvh - var(--cirth-space-20));
+	overflow-y: auto;
+	white-space: normal;
+}
+
+.docs-mobile-controls {
+	border-block-start: var(--cirth-border-width) solid
+		var(--cirth-dropdown-border-color);
+}
+
+/* "Display" is a heading for the three controls the script moves in here.
+   If they are not in here — above the collapse breakpoint, or with the
+   script disabled, when all three are inert anyway — there is nothing for
+   it to head, and a heading over nothing is what the menu used to open
+   onto across the whole tablet range. The group is now structurally
+   incapable of being empty: it exists exactly when its contents do. */
+.docs-mobile-controls:not(:has([data-docs-header-control])) {
+	display: none;
+}
+
+.docs-mobile-controls > strong {
+	display: block;
+	padding: var(--cirth-space-2) var(--cirth-space-4) 0;
+	font-size: var(--cirth-font-size-xs);
+}
+
+.docs-header .docs-mobile-controls > ul {
+	display: grid;
+	margin: 0;
+	padding: var(--cirth-space-1) 0;
+}
+
+.docs-header .docs-mobile-controls [data-docs-header-control] {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	align-items: center;
+	gap: var(--cirth-space-3);
+	margin: 0;
+	padding: var(--cirth-space-2) var(--cirth-space-4);
+}
+
+/* Public nav list items carry a zero-width clearfix pseudo-element. These
+   moved utility rows are a docs-shell grid, so keep that artifact out of its
+   grid placement and assign both columns explicitly. */
+.docs-header .docs-mobile-controls [data-docs-header-control]::before {
+	display: none;
+	content: none;
+}
+
+.docs-mobile-controls .docs-control-label {
+	display: inline;
+	grid-column: 1;
+	font-size: var(--cirth-font-size-sm);
+}
+
+.docs-header
+	.docs-mobile-controls
+	[data-docs-header-control]
+	> :is(select, button) {
+	grid-column: 2;
+	justify-self: end;
+}
+
 /* Phosphor sun/moon: show the icon for the active scheme */
 .docs-theme-icon-moon,
 [data-theme="dark"] .docs-theme-icon-sun {
@@ -348,58 +633,76 @@
 	display: inline;
 }
 
-/* Hide secondary nav items on small screens; the sidebar still links
-   everything. */
+/* Collapsed navbar — one breakpoint, one row.
+   ------------------------------------------
+   Bootstrap's navbar has exactly two states, and one `.navbar-expand-*`
+   breakpoint decides which: expanded, everything on the bar; collapsed,
+   the toggler on the bar and everything collapsible inside the region it
+   controls. There is no width at which the toggler is showing and part of
+   the collapsible content is still out on the bar.
+
+   This shell had three states. The hamburger appeared at 1023px, but the
+   controls only moved into it at 575px, so from 1023px to 576px the menu
+   opened onto an empty "Display" heading while version, preset and theme
+   sat outside it — and the bar, unable to fit them next to the search,
+   wrapped the search and the toggler onto a second grid row: a 155px
+   sticky header, on every page, across the whole tablet range.
+
+   One breakpoint now, and it is the one that already governs everything
+   else that collapses here — the same 1023px that hides the in-header nav
+   items and the sidebar. Above it the navbar is expanded; at or below it
+   the bar carries the brand, the search and the toggler on a single row,
+   and the menu carries the rest. The script that moves the controls reads
+   this same query, so the transfer and the toggler's visibility can never
+   disagree again. */
 @media (max-width: 1023px) {
-	.docs-nav-item {
+	/* Collapsible content: it is inside the menu at these widths, and the
+	   menu is the only place it is. Nothing here is duplicated — the nav
+	   items and GitHub are re-listed in the panel markup, the three
+	   controls are moved into it, node for node. */
+	.docs-nav-item,
+	.docs-header-github,
+	.docs-header-controls-group {
 		display: none;
 	}
 
+	/* Two tracks, one row: the brand cluster, then the search and toggler
+	   pinned to the end. The search keeps a comfortable measure instead of
+	   stretching the width of a tablet. */
 	.docs-header nav {
 		grid-template-columns: auto minmax(0, 1fr);
 	}
 
-	.docs-header-search {
-		grid-column: 1 / -1;
-		grid-row: 2;
-		max-width: none;
-	}
-
-	.docs-header-github {
-		display: none;
+	.docs-header-actions {
+		justify-self: end;
+		max-width: 26rem;
 	}
 }
 
 @media (max-width: 575px) {
 	.docs-header nav {
-		grid-template-columns: minmax(0, 1fr) auto;
-		gap: 0.375rem;
+		gap: var(--cirth-space-2);
 	}
 
-	.docs-header-start-group,
-	.docs-header-controls-group {
-		justify-content: start;
+	.docs-header-actions {
+		gap: var(--cirth-space-2);
+		width: auto;
 	}
 
-	.docs-header-start-group {
-		justify-content: space-between;
-	}
-
-	.docs-header-controls-group {
-		grid-column: 1 / -1;
-		width: 100%;
-	}
-
+	/* Below this width the field-shaped trigger cannot hold its placeholder
+	   and still leave the brand room, so it becomes the icon it already
+	   carries. A presentation change on one control — not a second
+	   structural breakpoint: what lives in the menu is the same here as at
+	   1023px. */
 	.docs-header-search {
-		grid-column: 2;
-		grid-row: 1;
-		width: 2.75rem;
+		flex: 0 0 var(--cirth-space-10);
+		width: var(--cirth-space-10);
 	}
 
-	.docs-search-trigger.docs-search-trigger {
+	.docs-search-trigger {
 		grid-template-columns: 1fr;
 		place-items: center;
-		width: 2.75rem;
+		width: var(--cirth-space-10);
 		padding: 0;
 	}
 
@@ -449,32 +752,15 @@
 }
 
 /* Docs layout: sidebar + content, plus a page outline column on wide
-   screens (Laravel-docs style) */
+   screens. Column widths, sticky offsets, the prose measure and the
+   chapter separators are all set once, further down, with the rest of the
+   shell — this file used to declare each of them twice, an early pass and
+   a later one that quietly overrode it. */
 .docs-layout {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);
-	gap: calc(var(--cirth-spacing) * 2);
 	align-items: start;
-}
-
-@media (min-width: 1024px) {
-	.docs-layout {
-		grid-template-columns: 14rem minmax(0, 1fr);
-	}
-
-	.docs-sidebar {
-		position: sticky;
-		top: var(--cirth-spacing);
-		max-height: calc(100vh - var(--cirth-spacing) * 2);
-		overflow-y: auto;
-	}
-}
-
-@media (min-width: 1280px) {
-	.docs-layout {
-		grid-template-columns: 14rem minmax(0, 1fr) 14rem;
-		gap: calc(var(--cirth-spacing) * 3);
-	}
+	gap: clamp(1.5rem, 2.5vw, 3rem);
 }
 
 /* Docs prose: airier than the framework default, and capped at a
@@ -482,19 +768,11 @@
 .docs-content {
 	--cirth-line-height: var(--cirth-line-height-relaxed);
 	--cirth-typography-spacing-vertical: var(--cirth-space-5);
-	max-width: 50rem;
+
+	width: 100%;
+	max-width: var(--docs-reading-max);
 	min-width: 0;
-}
-
-/* Code blocks and demo frames breathe a little more vertically */
-.docs-content pre {
-	margin-block: 2rem;
-}
-
-/* Chapter separators: each h2 opens a new section */
-.docs-content h2 {
-	padding-top: var(--cirth-space-8);
-	border-top: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	margin-inline: auto;
 }
 
 /* Page outline, top variant (small screens): a plain list, no scroll-spy.
@@ -507,9 +785,6 @@
 
 .docs-toc-top {
 	margin-bottom: calc(var(--cirth-spacing) * 2);
-	padding: var(--cirth-spacing) calc(var(--cirth-spacing) * 1.5);
-	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-	border-radius: var(--cirth-border-radius);
 }
 
 @media (min-width: 1280px) {
@@ -559,9 +834,21 @@ nav.docs-toc-top ul {
 	list-style: none;
 }
 
+/* The horizontal-nav margins are reset for the *inline* axis only. The
+   inline-start margin is the outline's alignment: it pulls each entry back
+   by exactly the rail's stroke so the entry's own inline-start border lands
+   *on* the rail instead of beside it — which is what the sidebar does, and
+   what this rule used to undo. Zeroing all four margins here left the
+   active entry drawing a second 2px bar immediately to the right of the
+   list's, a double line the sidebar never had. */
 .docs-toc nav li a,
 nav.docs-toc-top li a {
-	margin: 0;
+	margin-block: 0;
+	margin-inline-end: 0;
+}
+
+nav.docs-toc-top li a {
+	margin-inline-start: 0;
 }
 
 /* Level-3 entries indent inside the list; in the aside the indent lives
@@ -571,7 +858,7 @@ nav.docs-toc-top li a {
 }
 
 .docs-toc .docs-toc-level-3 a {
-	padding-left: calc(var(--cirth-space-3) + var(--cirth-space-4));
+	padding-inline-start: calc(var(--cirth-space-3) + var(--cirth-space-4));
 }
 
 .docs-toc-top a {
@@ -587,64 +874,17 @@ nav.docs-toc-top li a {
 	text-decoration: underline;
 }
 
-/* Aside outline: a continuous muted rail on the list; the active entry
-   gets an amber bar over the rail and steps up to full text color
-   (Laravel-docs style — the highlight is the bar, not the text color) */
-.docs-toc nav > ul {
-	border-left: var(--cirth-border-width-2) solid
-		var(--cirth-muted-border-color);
-}
 
-.docs-toc a {
-	position: relative;
-	display: block;
-	padding: calc(var(--cirth-spacing) * 0.25) 0
-		calc(var(--cirth-spacing) * 0.25) var(--cirth-space-3);
-	color: var(--cirth-muted-color);
-	font-size: var(--cirth-font-size-sm);
-	text-decoration: none;
-	transition: color var(--cirth-transition);
-}
+/* No active styling here on purpose. The scroll-spy sets aria-current and
+   the framework paints its one registered edge on the inline-start rail.
+   The shell used to add a second amber bar as a ::before. */
 
-.docs-toc a:hover {
-	color: var(--cirth-contrast);
-}
-
-.docs-toc a.docs-toc-active {
-	color: var(--cirth-contrast);
-	font-weight: var(--cirth-font-weight-semibold);
-}
-
-.docs-toc a.docs-toc-active::before {
-	content: "";
-	position: absolute;
-	top: var(--cirth-space-1);
-	bottom: var(--cirth-space-1);
-	left: calc(var(--cirth-border-width-2) * -1);
-	width: var(--cirth-space-1);
-	border-radius: var(--cirth-radius-pill);
-	background-color: var(--cirth-primary);
-}
-
-/* Sidebar: same rail-and-bar language as the outline */
-.docs-sidebar details {
-	margin-bottom: var(--cirth-spacing);
-}
-
-/* Sigwork-style group labels: small caps-feel, muted, letterspaced */
-.docs-sidebar summary {
-	color: var(--cirth-muted-color);
-	font-weight: var(--cirth-font-weight-semibold);
-	font-size: var(--cirth-font-size-xs);
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
-}
-
+/* Sidebar structure only -- the list resets Cirth's horizontal-nav
+   defaults. Rail geometry, ink and the active state are set once, together
+   with the table of contents, further down. */
 .docs-sidebar nav ul {
 	margin: 0;
 	padding: 0;
-	border-left: var(--cirth-border-width-2) solid
-		var(--cirth-muted-border-color);
 	list-style: none;
 }
 
@@ -653,21 +893,6 @@ nav.docs-toc-top li a {
 	margin: 0;
 	padding: 0;
 	font-size: var(--cirth-font-size-sm);
-}
-
-.docs-sidebar nav li a {
-	position: relative;
-	display: block;
-	margin: 0;
-	padding: calc(var(--cirth-spacing) * 0.25) 0
-		calc(var(--cirth-spacing) * 0.25) var(--cirth-space-3);
-	color: var(--cirth-muted-color);
-	text-decoration: none;
-	transition: color var(--cirth-transition);
-}
-
-.docs-sidebar nav li a:hover {
-	color: var(--cirth-contrast);
 }
 
 /* Prev / next pagination */
@@ -704,12 +929,15 @@ nav.docs-toc-top li a {
 	}
 }
 
+/* Layout only. The ink comes from the library's own `.contrast` link
+   variant on the element, which is also what the header wordmark uses —
+   this file used to restate it as `color: var(--cirth-color)`, which on an
+   <a> resolves to the accent, because that is the slot the link component
+   binds. */
 .docs-footer-brand {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.5rem;
-	color: var(--cirth-color);
-	font-size: var(--cirth-font-size-lg);
 }
 
 .docs-footer-brand:hover {
@@ -788,7 +1016,21 @@ nav.docs-toc-top li a {
 	margin-left: 0.25em;
 	float: none;
 	opacity: 0;
-	transition: opacity var(--cirth-transition);
+}
+
+/* Every transition this shell declares lives behind the preference, not in
+   front of it. Cirth's own reduce-motion pass zeroes `transition-duration`
+   on `*:not([aria-busy="true"])`, which weighs (0,1,0) — so any docs rule
+   written at one class or more (all four of them were) quietly handed the
+   motion back to a reader who had asked for none. axe caught it as a
+   contrast failure, of all things: the playroom preset's slower transition
+   widened the window enough that a table-of-contents entry was still
+   crossfading between two themes' inks when the page was sampled.
+   Declaring them under `no-preference` means there is nothing to outrank. */
+@media (prefers-reduced-motion: no-preference) {
+	.header-anchor {
+		transition: opacity var(--cirth-transition);
+	}
 }
 
 :is(h1, h2, h3, h4, h5, h6):hover .header-anchor,
@@ -798,9 +1040,27 @@ nav.docs-toc-top li a {
 
 /* Every `pre` is a positioning context for the injected copy button
    (unconditional rather than `:has()` — the docs follow the framework's
-   own browser floor, and Firefox 113 lacks `:has()`). */
+   own browser floor, and Firefox 113 lacks `:has()`).
+
+   The fade under the button is painted here too, in the same rule rather
+   than in a second bare `pre` block 170 lines later. Why a background
+   gradient and not padding: a `padding-right` on the scrolled content
+   only clears space at the *end* of a long line, not at whatever is
+   currently under the button (the CDN snippet's href, unscrolled, at its
+   default position). A background is painted relative to the `pre` box,
+   not to the scrolling content, so it stays over the button's footprint
+   at any scroll offset. */
 pre {
 	position: relative;
+	background-image: linear-gradient(
+		to left,
+		var(--cirth-code-background-color) 0%,
+		var(--cirth-code-background-color) 40%,
+		transparent 100%
+	);
+	background-repeat: no-repeat;
+	background-position: top right;
+	background-size: 3.5rem 2.75rem;
 }
 
 /* Code blocks carry tabindex="0" (they scroll horizontally, so keyboard
@@ -859,7 +1119,7 @@ pre:focus-visible {
 
 .hljs-name,
 .hljs-tag .hljs-name {
-	color: #2a7d43;
+	color: #26783f;
 }
 
 .hljs-emphasis {
@@ -871,11 +1131,11 @@ pre:focus-visible {
 }
 
 /* Highlight.js theme — dark */
-/* Dark muted (neutral-450) is 4.46:1 on the code background — a hair
-   under AA; neutral-400 clears it at 5.3:1. */
+/* The shared muted role is already measured against the highest dark
+   surface, so comments can follow it without a docs-only palette step. */
 [data-theme="dark"] .hljs-comment,
 [data-theme="dark"] .hljs-quote {
-	color: oklch(65.7% 0.03 264deg);
+	color: var(--cirth-muted-color);
 }
 
 [data-theme="dark"] .hljs-keyword,
@@ -926,7 +1186,7 @@ pre:focus-visible {
 /* Copy button injected into every `pre > code` block; the click handler
    lives in the base layout's inline script (positioning context: the
    bare `pre` rule further up). */
-pre > button.copy.copy {
+pre > button.copy {
 	position: absolute;
 	top: 0.5rem;
 	right: 0.5rem;
@@ -944,7 +1204,12 @@ pre > button.copy.copy {
 	border-radius: var(--cirth-border-radius);
 	background-color: transparent;
 	cursor: pointer;
-	transition: background-color var(--cirth-transition);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	pre > button.copy {
+		transition: background-color var(--cirth-transition);
+	}
 }
 
 /* muted-border-color, not --cirth-background-color: Cirth's own button
@@ -954,39 +1219,20 @@ pre > button.copy.copy {
    has real contrast against the code panel — code-background-color
    would nearly vanish, since the button already sits on a fade to that
    same color (see the pre background-image below). */
-pre > button.copy.copy:hover,
-pre > button.copy.copy:focus-visible {
+pre > button.copy:hover,
+pre > button.copy:focus-visible {
 	background-color: var(--cirth-muted-border-color);
 }
 
-pre > button.copy.copy:focus-visible {
+pre > button.copy:focus-visible {
 	outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
 	outline-offset: -2px;
-}
-
-/* Fade code content out before the button's column instead of reserving
-   fixed padding: a `padding-right` on the scrolled content only clears
-   space at the *end* of a long line, not at whatever's currently under
-   the button (e.g. the CDN snippet's href, unscrolled, at its default
-   position). A background gradient is painted relative to the `pre` box
-   itself, not the scrolling content, so it stays put over the button's
-   footprint regardless of scroll position. */
-pre {
-	background-image: linear-gradient(
-		to left,
-		var(--cirth-code-background-color) 0%,
-		var(--cirth-code-background-color) 40%,
-		transparent 100%
-	);
-	background-repeat: no-repeat;
-	background-position: top right;
-	background-size: 3.5rem 2.75rem;
 }
 
 pre > button.copy::before {
 	content: "⧉";
 	color: var(--cirth-muted-color);
-	font-size: 1.125rem;
+	font-size: var(--cirth-font-size-lg);
 }
 
 pre > button.copy.copied::before {
@@ -1007,49 +1253,10 @@ pre > button.copy.copied::before {
 	margin-bottom: 0;
 }
 
-/* Live demo frames: white sheets on the paper canvas */
-.docs-demo {
-	margin: 2rem 0 2.5rem;
-	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-	border-radius: var(--cirth-radius-lg);
-	overflow: hidden;
-	background-color: var(--cirth-card-background-color);
-}
-
-.docs-demo-preview {
-	padding: calc(var(--cirth-spacing) * 2) calc(var(--cirth-spacing) * 1.5);
-}
-
+/* Live demo frames: a plate holding a caption band, the rendered
+   example, and its source. */
 .docs-demo-preview > :last-child {
 	margin-bottom: 0;
-}
-
-.docs-demo-source {
-	margin-bottom: 0;
-	border-top: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-	background-color: var(--cirth-code-background-color);
-}
-
-.docs-demo-source summary {
-	padding: 0.5rem 1rem;
-	color: var(--cirth-muted-color);
-	font-size: var(--cirth-font-size-sm);
-}
-
-.docs-demo-source summary::after {
-	height: calc(var(--cirth-font-size-md) * var(--cirth-line-height));
-}
-
-.docs-demo-source[open] > summary {
-	margin-bottom: 0;
-}
-
-.docs-demo-source pre {
-	margin: 0;
-	padding: 0 1rem 1rem;
-	border-radius: 0;
-	background: none;
-	font-size: var(--cirth-font-size-sm);
 }
 
 .docs-demo-source code {
@@ -1063,12 +1270,22 @@ pre > button.copy.copied::before {
    the light/dark variants render on their true backgrounds regardless of
    the site toggle. Fixed (not auto-fill) columns: the markup lists the
    three light variants before the three dark ones, and a fixed 3-column
-   grid is what turns that order into a light row over a dark row. */
+   grid is what turns that order into a light row over a dark row.
+
+   One block of specimens split by hairlines, not six floating boxes: the
+   grid gap is the border width and the container's background paints
+   through it, so the dividing lines and the card frame are the same
+   stroke. */
 .docs-brand-grid {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: var(--cirth-spacing);
+	gap: var(--cirth-border-width);
 	margin: 1.5rem 0;
+	padding: 0;
+	border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+	border-radius: var(--cirth-card-border-radius);
+	background: var(--cirth-card-border-color);
+	overflow: clip;
 }
 
 @media (min-width: 576px) {
@@ -1084,8 +1301,6 @@ pre > button.copy.copied::before {
 	gap: var(--cirth-spacing);
 	margin: 0;
 	padding: calc(var(--cirth-spacing) * 1.5) var(--cirth-spacing);
-	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-	border-radius: var(--cirth-border-radius);
 	background-color: var(--cirth-background-color);
 }
 
@@ -1114,12 +1329,14 @@ pre > button.copy.copied::before {
 	margin: 1.5rem 0;
 }
 
+/* A real <article>: surface, border, radius and shadow are the card's. Only
+   the padding is dropped, because the preview block runs edge to edge. */
 .docs-color-swatch {
 	display: flex;
 	flex-direction: column;
-	overflow: hidden;
-	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-	border-radius: var(--cirth-radius-md);
+	margin: 0;
+	padding: 0;
+	overflow: clip;
 }
 
 .docs-color-swatch-preview {
@@ -1140,8 +1357,7 @@ pre > button.copy.copied::before {
    qualifies the entire page under it and a reader arriving from a search
    result has no other signal. */
 .docs-next-banner {
-	border-bottom: var(--cirth-border-width) solid
-		var(--cirth-muted-border-color);
+	border-bottom: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 	background-color: var(--cirth-mark-background-color);
 	color: var(--cirth-mark-color);
 	text-align: center;
@@ -1196,37 +1412,23 @@ pre > button.copy.copied::before {
    composition while leaving Cirth's component layer visible and honest. */
 
 body {
-	background-color: var(--docs-paper);
+	background-color: var(--cirth-background-color);
 }
 
 .docs-header {
 	position: sticky;
 	inset-block-start: 0;
 	z-index: 50;
-	border-block-end: 1px solid var(--docs-line);
-	background: var(--docs-paper);
-}
+	border-block-end: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	background: var(--cirth-background-color);
 
-.docs-header nav {
-	min-height: 4rem;
-	padding-block: var(--docs-micro);
-}
-
-.docs-logo {
-	width: 2.25rem;
-	height: 2.25rem;
-}
-
-.docs-brand {
-	font-family: var(--cirth-font-family-mono);
-	font-size: var(--cirth-font-size-md);
-	letter-spacing: var(--cirth-letter-spacing-tight);
-}
-
-.docs-preset-select,
-.docs-version-select,
-.docs-theme-toggle.docs-theme-toggle {
-	border-radius: var(--cirth-radius-sm);
+	/* Bootstrap gives the navbar $spacer * .5 of vertical padding and lets
+	   the link band supply the rest of its height. This bar was taking the
+	   container's 16px on top of the nav's own 4px on top of a 56px band:
+	   99px of permanently sticky chrome, a ninth of a laptop viewport, to
+	   present a 40px row of controls. The band is unchanged; only the
+	   padding around it is now the navbar's own. */
+	padding-block: var(--cirth-space-2);
 }
 
 .docs-native-home {
@@ -1250,23 +1452,44 @@ body {
 	align-items: center;
 	justify-content: space-between;
 	gap: 1rem;
+	min-height: 2.5rem;
 	margin: 0;
-	color: var(--docs-annotation);
-	font-family: var(--cirth-font-family-mono);
-	font-size: 0.6875rem;
-	letter-spacing: 0.06em;
+	padding: 0.5rem 0.75rem;
+	border-block-end: var(--cirth-border-width) solid
+		var(--cirth-muted-border-color);
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-sm);
 	line-height: 1.35;
-	text-transform: uppercase;
 }
 
 .docs-native-hero {
 	padding-block: clamp(2rem, 5vw, 5rem) clamp(2.5rem, 5vw, 4.5rem);
-	border-block-end: 1px solid var(--docs-line);
+	border-block-end: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+}
+
+/* The hero splits on its own ratio, not on the section grid's column
+   count. It used to take 6 of 12 and the demo the other 6: a dead heat
+   between a headline that is 20ch wide by its own rule and a two-pane
+   code panel that has to show real markup and a real rendered form. At
+   1280 that bought the demo 590px, of which the source pane got 246 —
+   the first thing a reader sees of this project's own source was
+   `<main class="container">` and a scrollbar.
+
+   5/7 measured, not guessed: it is the coarsest ratio that gets the
+   source pane past the width of the longest line the panel is *for*
+   (`<input type="password" name="password" autocomplete="current-password">`
+   is 618px and always needed scrolling; the point is to stop truncating
+   the shape of the markup, not to fit the longest attribute), while
+   leaving the headline over 30ch and the lede over its 40ch cap. Stated
+   as fractions of the hero's own row, so it survives the 12 → 6 → 4
+   column changes the sections below make at each breakpoint. */
+.docs-native-hero .docs-native-grid {
+	grid-template-columns: 5fr 7fr;
 }
 
 .docs-native-claim {
 	position: relative;
-	grid-column: 1 / span 4;
+	grid-column: 1;
 	align-self: stretch;
 	padding-block-end: 1rem;
 }
@@ -1275,30 +1498,48 @@ body {
 	position: absolute;
 	inset-block: 0;
 	inset-inline-end: calc(clamp(1rem, 1.8vw, 2rem) * -0.5);
-	border-inline-end: 1px solid var(--docs-line);
+	border-inline-end: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 	content: "";
 }
 
-.docs-native-claim h1 {
-	max-width: 9ch;
-	margin: 0;
-	font-family: var(--cirth-font-family-sans);
-	font-size: clamp(2.75rem, 5.7vw, 6.5rem);
-	font-weight: 720;
-	letter-spacing: -0.052em;
-	line-height: 0.93;
-}
+/* The one place on this site that opts into display type — and it opts in
+   through --cirth-font-size, the slot every heading in the framework
+   already resolves through, reading its own bounds off the shipped scale.
+   Nothing here is a parallel typography.
 
-.docs-native-claim h1 em {
-	color: var(--docs-signal);
-	font-style: normal;
+   What this replaces was the argument against the claim the page makes.
+   The old rule set `font-size: clamp(2.75rem, 5.7vw, 6.5rem)` (73px at
+   1280), `font-weight: 720` and `letter-spacing: -0.052em` — three
+   literals, none of them anywhere else on the site, next to a product h1
+   the framework rendered at 44px/700. Two typographic voices, one system
+   claim.
+
+   The weight is the part that was actually broken rather than merely
+   inconsistent: on a system-font stack with no webfont, 720 is not a real
+   weight. macOS resolves it against SF's variable axis and renders ~720;
+   Segoe UI and Roboto snap to 700. The flagship headline was rendering at
+   a different weight depending on the reader's operating system. There is
+   no font-weight here at all now — an h1 is already
+   --cirth-font-weight-bold, which is a step on the scale and the same
+   step on every platform. */
+.docs-native-claim h1 {
+	--cirth-font-size: clamp(
+		var(--cirth-font-size-6xl),
+		2rem + 1.9vw,
+		var(--cirth-font-size-7xl)
+	);
+	--cirth-line-height: var(--cirth-line-height-none);
+	--cirth-letter-spacing: var(--cirth-letter-spacing-tight);
+
+	max-width: 20ch;
+	margin: 0;
 }
 
 .docs-native-lede {
 	max-width: 40ch;
 	margin-block: 1.5rem;
-	color: var(--docs-annotation);
-	font-size: clamp(1rem, 1.25vw, 1.125rem);
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-lg);
 }
 
 .docs-hero-actions {
@@ -1323,7 +1564,7 @@ body {
 	gap: 0;
 	margin: clamp(2rem, 5vw, 4rem) 0 0;
 	padding: 0;
-	border-block-start: 1px solid var(--docs-line);
+	border-block-start: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 	list-style: none;
 }
 
@@ -1335,32 +1576,29 @@ body {
 
 .docs-primary-signals li + li {
 	padding-inline-start: 1rem;
-	border-inline-start: 1px solid var(--docs-line);
+	border-inline-start: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
 .docs-primary-signals span,
 .docs-primary-signals small {
-	color: var(--docs-annotation);
+	color: var(--cirth-muted-color);
 	font-family: var(--cirth-font-family-mono);
-	font-size: 0.6875rem;
+	font-size: var(--cirth-font-size-xs);
 }
 
 .docs-primary-signals strong {
-	font-size: 0.875rem;
+	font-size: var(--cirth-font-size-sm);
 	line-height: 1.2;
 }
 
 .docs-native-lab {
 	position: relative;
-	grid-column: 5 / -1;
+	grid-column: 2;
 }
 
 .docs-transform-figure {
 	position: relative;
 	margin: 0;
-	border: 1px solid var(--docs-line-strong);
-	background: var(--docs-board);
-	box-shadow: var(--docs-card-shadow);
 }
 
 .docs-lab-toolbar {
@@ -1369,34 +1607,36 @@ body {
 	gap: 0.75rem;
 	align-items: end;
 	padding: 0.75rem 1rem;
-	border-block-end: 1px solid var(--docs-line);
+	border-block-end: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
 .docs-lab-toolbar label {
 	margin: 0;
-	font-size: 0.6875rem;
+	font-size: var(--cirth-font-size-sm);
 }
 
 .docs-lab-toolbar label > span {
 	display: block;
 	margin-block-end: 0.25rem;
-	color: var(--docs-annotation);
-	font-family: var(--cirth-font-family-mono);
-	letter-spacing: 0.04em;
-	text-transform: uppercase;
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-sm);
 }
 
 .docs-lab-toolbar select {
-	min-height: 2.5rem;
 	margin: 0;
 	padding-block: 0.375rem;
 	border-radius: var(--cirth-radius-sm);
-	font-size: 0.75rem;
 }
 
+/* Source and output share the panel nearly evenly. The old 0.9/1.25 sent
+   58% to a fixed-size iframe that had already finished laying its form
+   out, and 42% to the pane that had something to show. Horizontal scroll
+   stays — a long attribute is a real thing and this panel exists to show
+   the real thing, uncut — but it is now a fallback for one long line
+   rather than the only way to read any line. */
 .docs-transform-grid {
 	display: grid;
-	grid-template-columns: minmax(15rem, 0.9fr) minmax(20rem, 1.25fr);
+	grid-template-columns: minmax(18rem, 1fr) minmax(19rem, 1.05fr);
 	min-height: 31rem;
 }
 
@@ -1416,12 +1656,10 @@ body {
 	gap: 0.5rem;
 	min-height: 2.5rem;
 	padding: 0.5rem 0.75rem;
-	border-block-end: 1px solid var(--docs-line);
-	color: var(--docs-annotation);
+	border-block-end: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	color: var(--cirth-muted-color);
 	font-family: var(--cirth-font-family-mono);
-	font-size: 0.625rem;
-	letter-spacing: 0.05em;
-	text-transform: uppercase;
+	font-size: var(--cirth-font-size-xs);
 }
 
 .docs-source-panel pre {
@@ -1430,18 +1668,65 @@ body {
 	padding: 1rem;
 	border: 0;
 	border-radius: 0;
-	background: var(--docs-code-surface);
-	font-size: clamp(0.625rem, 0.8vw, 0.75rem);
+	background: var(--cirth-code-background-color);
+	font-size: var(--cirth-font-size-xs);
 	line-height: 1.65;
-	white-space: pre-wrap;
+
+	/* Scrolls rather than wraps, like every other code block on the site.
+	   Wrapping kept the whole snippet in view at the cost of breaking
+	   `autocomplete="current-password"` across two lines mid-attribute,
+	   which is the one thing a source panel must not do — the panel exists
+	   to show what the markup actually looks like. The <pre> already carries
+	   tabindex="0", so the scroll region is keyboard reachable. */
+	white-space: pre;
+	overflow-x: auto;
 }
 
 .docs-source-panel pre > button.copy {
 	display: none;
 }
 
+/* Progressive reveal for the hero demo (docs/src/_includes/home-demo.njk).
+   Every character of the highlighted source is in the DOM from the first
+   frame and stays there — only its ink changes. So the panel's height, its
+   scroll width, what a screen reader reads and what a copy gesture returns
+   are identical at every point in the cycle, and there is no second hidden
+   copy of the markup for assistive technology to read twice.
+   `inherit`, not a colour: a character span sits inside the highlight.js
+   token span that already coloured it, so the highlighting comes back
+   exactly as the build wrote it. */
+.docs-source-panel [data-lab-typing] .docs-lab-ch {
+	color: transparent;
+}
+
+.docs-source-panel [data-lab-typing] .docs-lab-ch.is-typed {
+	color: inherit;
+}
+
+/* Drawn on the leading edge of the next character and taken straight back
+   out of the flow: the mark that says "here" must not be able to move
+   anything. */
+.docs-source-panel [data-lab-typing] .docs-lab-ch.is-caret {
+	margin-inline-start: -1px;
+	border-inline-start: 1px solid var(--cirth-primary);
+}
+
+/* The script does not start a cycle under reduced motion, and this is the
+   same answer stated in CSS, for the case where a preference changes
+   between the split and the next frame. */
+@media (prefers-reduced-motion: reduce) {
+	.docs-source-panel .docs-lab-ch {
+		color: inherit;
+	}
+
+	.docs-source-panel .docs-lab-ch.is-caret {
+		margin-inline-start: 0;
+		border-inline-start: 0;
+	}
+}
+
 .docs-output-panel {
-	border-inline-start: 1px solid var(--docs-line);
+	border-inline-start: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
 .docs-output-frame {
@@ -1449,7 +1734,7 @@ body {
 	min-width: 0;
 	min-height: 0;
 	overflow: hidden;
-	background: var(--docs-paper);
+	background: var(--cirth-background-color);
 }
 
 .docs-output-panel iframe {
@@ -1460,7 +1745,7 @@ body {
 	height: 100%;
 	min-height: 0;
 	border: 0;
-	background: var(--docs-paper);
+	background: var(--cirth-background-color);
 }
 
 .docs-figure-note {
@@ -1470,10 +1755,9 @@ body {
 	margin: 0;
 	max-width: none;
 	padding: 0.625rem 1rem;
-	border-block-start: 1px solid var(--docs-line);
-	color: var(--docs-annotation);
-	font-family: var(--cirth-font-family-mono);
-	font-size: 0.625rem;
+	border-block-start: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-sm);
 }
 
 .docs-ledger,
@@ -1481,11 +1765,11 @@ body {
 .docs-native-showcase,
 .docs-native-faq {
 	padding-block: clamp(3rem, 7vw, 7rem);
-	border-block-end: 1px solid var(--docs-line);
+	border-block-end: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
 .docs-ledger {
-	background: var(--docs-board);
+	background: var(--cirth-card-background-color);
 }
 
 .docs-ledger-intro,
@@ -1495,84 +1779,123 @@ body {
 	grid-column: 1 / span 3;
 }
 
-.docs-native-home :where(.docs-ledger-intro, .docs-system-intro, .docs-showcase-intro, .docs-native-faq header) h2 {
+/* Section headings are the framework's h2 and nothing else. They used to
+   run to 56px on their own clamp, which is the same "the home page is a
+   different product" problem the hero had; only the spacing under them is
+   this page's business. */
+.docs-native-home
+	:where(
+		.docs-ledger-intro,
+		.docs-system-intro,
+		.docs-showcase-intro,
+		.docs-native-faq header
+	)
+	h2 {
 	margin-block: 0 1rem;
-	font-family: var(--cirth-font-family-sans);
-	font-size: clamp(2rem, 3.25vw, 3.5rem);
-	letter-spacing: -0.035em;
-	line-height: 1;
 }
 
-.docs-native-home :where(.docs-ledger-intro, .docs-system-intro, .docs-showcase-intro) > p:last-child {
-	color: var(--docs-annotation);
-	font-size: 0.9375rem;
+.docs-native-home
+	:where(.docs-ledger-intro, .docs-system-intro, .docs-showcase-intro)
+	> p:last-child {
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-md);
 }
 
 .docs-ledger-table {
 	grid-column: 5 / -1;
-	border-block-start: 2px solid var(--docs-ink);
+	max-inline-size: 100%;
+
+	/* Fallback only. Every column below wraps, so this catches an evidence
+	   string with nothing to break on rather than standing in for a layout
+	   — the same answer this site gives every other table it ships. */
+	overflow-x: auto;
 }
 
-.docs-ledger-row {
-	display: grid;
-	grid-template-columns: 7rem minmax(10rem, 1fr) minmax(12rem, 1.35fr) 4rem;
-	gap: 1rem;
-	align-items: center;
-	min-height: 4.25rem;
+.docs-ledger-table table {
+	width: 100%;
+	margin: 0;
+	border-block-start: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+}
+
+.docs-ledger-table :is(th, td) {
 	padding: 0.75rem;
-	border-block-end: 1px solid var(--docs-line);
-	font-size: 0.8125rem;
+	border-block-end: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	font-size: var(--cirth-font-size-sm);
+	text-align: start;
+	vertical-align: middle;
 }
 
-.docs-ledger-row > :first-child {
-	display: flex;
-	align-items: center;
-	gap: 0.45rem;
+/* The header row speaks in one voice, and it did not.
+   "State" was taking the state column's mono / uppercase / tracked
+   treatment, "Evidence" the evidence column's 14px mono, and "Claim" and
+   "Scope" whatever was left — four labels for four columns in three
+   different typefaces at two different sizes. The cause was that the
+   column rules were written against `:first-child` and `:nth-child(3)` of
+   every row, and the header row is a row. They are scoped to `tbody` now,
+   and the header states its own register once: the annotation voice the
+   rest of this site uses for technical labels, applied to all four cells
+   and to nothing else. */
+.docs-ledger-table thead th {
+	color: var(--cirth-muted-color);
 	font-family: var(--cirth-font-family-mono);
-	font-size: 0.625rem;
+	font-size: var(--cirth-font-size-xs);
+	font-weight: var(--cirth-font-weight-regular);
 	letter-spacing: 0.04em;
 	text-transform: uppercase;
 }
 
-.docs-ledger-row i {
-	display: inline-grid;
-	place-items: center;
-	width: 1.25rem;
-	height: 1.25rem;
-	border: 1px solid currentcolor;
-	font-style: normal;
+.docs-ledger-table thead th:first-child {
+	width: 7rem;
 }
 
-.docs-ledger-row .is-verified {
-	color: var(--docs-status-verified);
+.docs-ledger-table thead th:last-child {
+	width: 5rem;
 }
 
-.docs-ledger-row .is-covered {
-	color: var(--docs-signal);
+/* The claim is the row's subject and reads as one. */
+.docs-ledger-table tbody th {
+	font-weight: var(--cirth-font-weight-bold);
 }
 
-.docs-ledger-row .is-enhanced {
-	border-style: dashed;
-	color: var(--docs-annotation);
-}
-
-.docs-ledger-row > :nth-child(3) {
-	color: var(--docs-annotation);
+.docs-ledger-state {
 	font-family: var(--cirth-font-family-mono);
-	font-size: 0.6875rem;
-}
-
-.docs-ledger-head {
-	min-height: 2rem;
-	color: var(--docs-annotation);
-	font-family: var(--cirth-font-family-mono);
-	font-size: 0.625rem;
-	letter-spacing: 0.08em;
+	font-size: var(--cirth-font-size-xs);
+	letter-spacing: 0.04em;
 	text-transform: uppercase;
+	white-space: nowrap;
 }
 
-.docs-ledger-head > :first-child {
-	display: block;
+/* The states were three hard little squares — a bordered box holding a
+   tick, a bordered box holding a bullet, a dashed box holding a plus —
+   a shape that appears nowhere else on this site and reads as a form
+   control rather than as a mark. They are Phosphor glyphs now, from the
+   set the shell already ships (eleventy.config.js): no container, no
+   dashed edge, no new artwork, one 16px box for every state so the
+   column stays a column. Shape carries the state as much as colour does,
+   and the word beside it carries it in text: shield-check for what a
+   suite proves, layers for what the package guarantees, sliders for what
+   the reader can change. aria-hidden, because that word is already
+   there. */
+.docs-ledger-state svg {
+	margin-inline-end: 0.4rem;
+	vertical-align: -0.2em;
+}
+
+.docs-ledger-state .is-verified {
+	color: var(--cirth-ins-color);
+}
+
+.docs-ledger-state .is-covered {
+	color: var(--cirth-primary);
+}
+
+.docs-ledger-state .is-enhanced {
+	color: var(--cirth-muted-color);
+}
+
+.docs-ledger-table tbody td:nth-child(3) {
+	color: var(--cirth-muted-color);
+	font-family: var(--cirth-font-family-mono);
 }
 
 .docs-system-modules {
@@ -1599,13 +1922,13 @@ body {
 .docs-system-modules h3 {
 	margin-block: 1.5rem 0.75rem;
 	font-family: var(--cirth-font-family-sans);
-	font-size: 1.25rem;
+	font-size: var(--cirth-font-size-xl);
 	letter-spacing: -0.025em;
 }
 
 .docs-system-modules p {
-	color: var(--docs-annotation);
-	font-size: 0.8125rem;
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-sm);
 }
 
 .docs-system-modules .docs-badge-row {
@@ -1625,13 +1948,13 @@ body {
 
 .docs-system-modules .docs-badge-row code {
 	padding: 0.2rem 0.35rem;
-	border: 1px solid var(--docs-line);
-	border-radius: 0;
-	font-size: 0.5625rem;
+	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	border-radius: var(--cirth-code-border-radius);
+	font-size: var(--cirth-font-size-xs);
 }
 
 .docs-native-showcase {
-	background: var(--docs-board);
+	background: var(--cirth-card-background-color);
 }
 
 .docs-showcase-intro > a {
@@ -1646,30 +1969,48 @@ body {
 	gap: 1rem;
 }
 
+/* The card is a real <article>, so its surface, border, radius and padding
+   come from the framework — and so does its ink: a link wrapping a card
+   takes the container's --cirth-color rather than the accent
+   (content/_link.scss). The `color: var(--cirth-color)` this rule used to
+   carry was never doing what it looked like it was doing — on an <a> that
+   token is the slot the link component has just bound to --cirth-primary,
+   so every showcase card title on the home page rendered amber while the
+   stylesheet said "ink". */
 .docs-case {
+	display: block;
+	text-decoration: none;
+}
+
+.docs-case article {
 	display: grid;
 	grid-template-rows: 1fr auto auto auto;
 	min-height: 18rem;
-	padding: 0 1.25rem 1.25rem;
-	border: 1px solid var(--cirth-card-border-color);
-	border-block-end-width: var(--cirth-registration-width);
-	border-radius: var(--cirth-card-border-radius);
-	background: var(--docs-paper);
-	box-shadow: 0 0.125rem 0 var(--docs-line);
-	color: var(--docs-ink);
-	text-decoration: none;
-	transition:
-		border-color var(--docs-motion-fast) ease-out,
-		box-shadow var(--docs-motion-fast) ease-out,
-		transform var(--docs-motion-fast) ease-out;
+	height: 100%;
+	margin: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.docs-case article {
+		transition:
+			background-color var(--docs-motion-fast) ease-out,
+			border-color var(--docs-motion-fast) ease-out;
+	}
 }
 
 .docs-case:hover,
 .docs-case:focus-visible {
-	border-color: var(--docs-signal);
-	box-shadow: 0 0.375rem 0 var(--docs-signal-soft);
 	text-decoration: none;
-	transform: translate(-0.25rem, -0.25rem);
+}
+
+.docs-case:hover article,
+.docs-case:focus-visible article {
+	border-color: var(--cirth-primary);
+	background: color-mix(
+		in oklch,
+		var(--cirth-card-background-color) 94%,
+		var(--cirth-mark-background-color)
+	);
 }
 
 .docs-case-icon {
@@ -1677,31 +2018,27 @@ body {
 	place-items: center;
 	width: 4rem;
 	height: 4rem;
-	margin-block: 2rem 1.5rem;
-	color: var(--docs-signal);
+	margin-block: 0.5rem 1.5rem;
+	color: var(--cirth-primary);
 }
 
-.docs-case > strong {
-	font-size: 1.125rem;
+.docs-case strong {
+	font-size: var(--cirth-font-size-lg);
 }
 
-.docs-case > span:not(.docs-case-icon),
-.docs-case > small {
-	color: var(--docs-annotation);
-	font-size: 0.75rem;
+.docs-case span:not(.docs-case-icon),
+.docs-case small {
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-xs);
 }
 
-.docs-case > small {
+/* A card footnote, not a build target: sentence case in the product sans,
+   like the rest of the card. */
+.docs-case small {
 	margin-block-start: 1rem;
 	padding-block-start: 0.75rem;
-	border-block-start: 1px solid var(--docs-line);
-	font-family: var(--cirth-font-family-mono);
-	font-size: 0.5625rem;
-	text-transform: uppercase;
-}
-
-.docs-native-faq > .docs-native-grid > header {
-	grid-column: 1 / span 3;
+	border-block-start: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	font-size: var(--cirth-font-size-xs);
 }
 
 .docs-native-faq .docs-faq-list {
@@ -1716,34 +2053,14 @@ body {
 	margin-block-end: 0.75rem;
 }
 
-.docs-native-faq .docs-faq-list summary {
-	box-sizing: border-box;
-	inline-size: 100%;
-}
-
 .docs-native-faq .docs-faq-list details > p {
-	box-sizing: border-box;
-	inline-size: 100%;
 	max-width: none;
-	margin-block-end: 0;
-	color: var(--docs-annotation);
+	color: var(--cirth-muted-color);
 }
 
 @media (max-width: 1279px) {
 	.docs-native-grid {
 		grid-template-columns: repeat(6, minmax(0, 1fr));
-	}
-
-	.docs-native-claim {
-		grid-column: 1 / span 2;
-	}
-
-	.docs-native-lab {
-		grid-column: 3 / -1;
-	}
-
-	.docs-transform-grid {
-		grid-template-columns: minmax(12rem, 0.8fr) minmax(17rem, 1.2fr);
 	}
 
 	.docs-ledger-intro,
@@ -1764,43 +2081,58 @@ body {
 	.docs-case-grid {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
-
 }
 
-@media (max-width: 960px) {
+/* The hero stacks when the demo runs out of room, and that width is a
+   measurement rather than a round number. Source and output ask for
+   18rem + 19rem plus their divider — 594px — and the hero gives the demo
+   7 of its 12 parts, so the row stops honouring the ratio below about
+   1018px of content, which is this viewport. Under 1100px the old rule
+   kept both columns and simply took the difference out of the headline:
+   at 1024 the text column was down to 350px against a demo pinned at its
+   own minimum, a 37/63 split standing in for the 5/7 above it.
+
+   Stacking here also removes the jump the old 1023px boundary made. The
+   demo went from 472px to the full 962px in one pixel of viewport — the
+   same panel, twice the size, for a one-pixel drag. It now steps 594 →
+   736: the stacked demo is capped at a width the two panes can still be
+   read side by side at, instead of being handed the whole page because
+   nothing else is in the row. */
+@media (max-width: 1099px) {
 	.docs-native-hero .docs-native-grid {
+		grid-template-columns: minmax(0, 1fr);
 		row-gap: 2rem;
 	}
 
 	.docs-native-claim,
 	.docs-native-lab {
-		grid-column: 1 / -1;
+		grid-column: 1;
 	}
 
 	.docs-native-claim::after {
 		display: none;
 	}
 
-	.docs-native-claim h1 {
-		max-width: 13ch;
-		font-size: clamp(3.25rem, 10vw, 6rem);
+	.docs-native-lab {
+		max-width: 46rem;
+	}
+}
+
+@media (max-width: 1023px) {
+	.docs-ledger-table :is(th, td) {
+		padding: 0.75rem 0.5rem;
 	}
 
-	.docs-transform-grid {
-		grid-template-columns: minmax(14rem, 0.9fr) minmax(18rem, 1.2fr);
+	.docs-ledger-table thead th:first-child {
+		width: 6.5rem;
 	}
 
-	.docs-ledger-row {
-		grid-template-columns: 6.5rem minmax(8rem, 1fr) minmax(10rem, 1.2fr) 3.5rem;
-		gap: 0.75rem;
+	.docs-ledger-table thead th:last-child {
+		width: 4.5rem;
 	}
 }
 
 @media (max-width: 767px) {
-	.docs-header {
-		position: relative;
-	}
-
 	.docs-native-grid {
 		grid-template-columns: repeat(4, minmax(0, 1fr));
 		width: min(100% - 1.5rem, var(--docs-shell-max));
@@ -1808,10 +2140,6 @@ body {
 
 	.docs-native-hero {
 		padding-block: 1rem 2.5rem;
-	}
-
-	.docs-native-claim h1 {
-		font-size: clamp(2.75rem, 15vw, 4.75rem);
 	}
 
 	.docs-native-lede {
@@ -1871,34 +2199,28 @@ body {
 		margin-block-end: 2rem;
 	}
 
-	.docs-ledger-row {
-		grid-template-columns: 1fr auto;
-		gap: 0.35rem 1rem;
-		padding-block: 1rem;
+	/* The table stays a table here. The previous layout re-laid the cells
+	   out as stacked cards with `display: grid`, which on a real <table>
+	   would take the row and column semantics back out of the accessibility
+	   tree — undoing at 767px exactly what the native markup is for. It
+	   also dropped the header row, so the one width where the columns are
+	   hardest to tell apart was the width with no column labels. Four
+	   columns still fit at 320px once the padding is a phone's padding and
+	   the two prose columns are allowed to wrap. */
+	.docs-ledger-table :is(th, td) {
+		padding: 0.625rem 0.375rem;
 	}
 
-	.docs-ledger-row > :first-child {
-		grid-column: 1;
-		grid-row: 1;
+	.docs-ledger-table thead th:first-child {
+		width: 5.75rem;
 	}
 
-	.docs-ledger-row > :nth-child(2) {
-		grid-column: 1 / -1;
-		grid-row: 2;
+	.docs-ledger-table thead th:last-child {
+		width: 3.75rem;
 	}
 
-	.docs-ledger-row > :nth-child(3) {
-		grid-column: 1 / -1;
-		grid-row: 3;
-	}
-
-	.docs-ledger-row > :nth-child(4) {
-		grid-column: 2;
-		grid-row: 1;
-	}
-
-	.docs-ledger-head {
-		display: none;
+	.docs-ledger-state {
+		white-space: normal;
 	}
 
 	.docs-system-modules,
@@ -1912,17 +2234,6 @@ body {
 
 	.docs-case {
 		min-height: 17rem;
-	}
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.docs-case {
-		transition: none;
-	}
-
-	.docs-case:hover,
-	.docs-case:focus-visible {
-		transform: none;
 	}
 }
 
@@ -1957,7 +2268,7 @@ body {
 
 /* Documentation shell: region-based, compact and deliberately separate
    from the library component layer. */
-.docs-mobile-menu,
+.docs-header .docs-mobile-menu,
 .docs-mobile-nav {
 	display: none;
 }
@@ -1969,11 +2280,8 @@ body {
 }
 
 .docs-page-shell {
-	padding-block: clamp(1.5rem, 3vw, 3rem) 4rem;
-}
-
-.docs-layout {
-	gap: clamp(1.5rem, 2.5vw, 3rem);
+	padding-block: clamp(var(--cirth-space-4), 3vw, var(--cirth-space-12))
+		var(--cirth-space-16);
 }
 
 @media (min-width: 1024px) {
@@ -1985,13 +2293,15 @@ body {
 		top: 5.5rem;
 		max-height: calc(100vh - 7rem);
 		padding-inline-end: 1rem;
-		border-inline-end: 1px solid var(--docs-line);
+		border-inline-end: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 	}
 }
 
 @media (min-width: 1280px) {
 	.docs-layout {
-		grid-template-columns: var(--docs-rail-width) minmax(0, 1fr) var(--docs-toc-width);
+		grid-template-columns: var(--docs-rail-width) minmax(0, 1fr) var(
+				--docs-toc-width
+			);
 	}
 
 	.docs-toc {
@@ -2000,11 +2310,6 @@ body {
 	}
 }
 
-.docs-content {
-	max-width: var(--docs-reading-max);
-	width: 100%;
-	margin-inline: auto;
-}
 
 .docs-toc-top > summary {
 	font-family: var(--cirth-font-family-sans);
@@ -2033,24 +2338,113 @@ body {
 	margin: 0;
 }
 
-.docs-content > h1:first-child {
-	margin-block: 0 clamp(2rem, 4vw, 3.5rem);
-	padding-block: clamp(1.5rem, 3vw, 2.5rem) 1rem;
-	border-block-end: var(--cirth-registration-width) solid var(--docs-ink);
+/* Page title. No rule, no separator: the heading's own scale and the space
+   under it carry the hierarchy. Not keyed on :first-child -- the "On this
+   page" disclosure takes that slot on most pages, so a :first-child rule
+   silently applied to four pages and no others. */
+.docs-content > h1 {
+	margin-block: 0 clamp(var(--cirth-space-6), 4vw, var(--cirth-space-12));
 }
 
 .docs-content h2 {
-	margin-block-start: clamp(3rem, 5vw, 4.5rem);
-	padding-block-start: 0.75rem;
-	border-block-start: 1px solid var(--docs-line);
+	margin-block-start: clamp(var(--cirth-space-10), 5vw, var(--cirth-space-16));
+	padding-block-start: var(--cirth-space-3);
+	border-block-start: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
 .docs-content h3 {
-	margin-block-start: 2.25rem;
+	margin-block-start: var(--cirth-space-8);
+}
+
+/* The plate
+   ––––––––––––––––––––
+   Five surfaces on this site are grids of cells divided by hairlines
+   inside a frame: the hero's source/output figure, the live-demo frames,
+   the brand construction sheet, the proof ledger and the build
+   comparison. They used to be *almost* cards — card border, card radius,
+   card surface, card shadow — with headers that were not the card's
+   header at all: no sectioning tint, and 32px or 48px of padding against
+   the card contract's 12/20. Almost-a-card is the worst of the three
+   available answers, because the reader spends the whole page deciding
+   which one they are looking at.
+
+   They are not cards. A card is a container with a tinted header band
+   and a padded body; these are technical plates, and they say so with a
+   grammar of their own:
+
+     · ONE stroke, everywhere. The frame and every internal division use
+       --cirth-card-border-color. What made this read as broken before
+       was two greys inside one surface — the frame on the card border
+       (L 0.853) and the dividers on the muted border (L 0.939), a
+       visible step apart inside something that reads as one object.
+     · The plate itself has no padding. Every cell carries its own, and
+       the hairlines between cells are the grid gap or a cell edge.
+     · A plate's title band is a band, not a card header: the same
+       hairline underneath, the shell's own 20px rhythm (read off
+       --cirth-space-5, which is exactly the card's horizontal padding —
+       the plate agrees with the card about rhythm and disagrees with it
+       about structure), and no tint.
+
+   What they keep from the framework is the part that is brand rather
+   than component: the 1px hairline on all four edges and the 6px
+   container radius. See docs/brand.md — those are the marks that survive
+   a retheme, so a documentation surface that steps outside the component
+   layer still has to carry them. */
+.docs-plate,
+.docs-transform-figure,
+.docs-demo,
+.docs-brand-spec,
+.docs-proof-strip,
+.docs-build-comparison {
+	border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+	border-radius: var(--cirth-card-border-radius);
+	background: var(--cirth-card-background-color);
+	box-shadow: var(--cirth-card-box-shadow);
+	overflow: clip;
+}
+
+/* Every internal division of a plate is the frame's own stroke. */
+.docs-transform-figure :is(.docs-lab-toolbar, header, .docs-figure-note),
+.docs-demo :is(.docs-demo-caption, details.docs-demo-source),
+.docs-demo details.docs-demo-source pre,
+.docs-output-panel,
+.docs-brand-spec :is(.docs-brand-spec-header, figcaption, .docs-brand-measures),
+.docs-brand-construction figure,
+.docs-brand-measures > div,
+.docs-proof-strip :is(header, dl > div),
+.docs-build-comparison :is(header, figure, figcaption, > footer) {
+	border-color: var(--cirth-card-border-color);
+}
+
+/* Title band: the plate's own, on the card's horizontal rhythm but
+   without the card's tint or its heading treatment. */
+.docs-brand-spec-header,
+.docs-proof-strip > header,
+.docs-build-comparison > header {
+	padding: var(--cirth-space-5);
+	border-block-end: var(--cirth-border-width) solid
+		var(--cirth-card-border-color);
+}
+
+.docs-brand-spec-header h2,
+.docs-proof-strip > header h2,
+.docs-build-comparison > header h2 {
+	max-width: 30ch;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.docs-brand-spec-header > h2 + p,
+.docs-proof-strip > header > h2 + p,
+.docs-build-comparison > header > h2 + p {
+	max-width: 60ch;
+	margin-block: var(--cirth-space-2) 0;
+	color: var(--cirth-muted-color);
 }
 
 .docs-content pre {
-	margin-block: 1.5rem;
+	margin-block: var(--cirth-space-6);
 }
 
 .docs-content pre > button.copy {
@@ -2058,53 +2452,67 @@ body {
 }
 
 .docs-demo {
-	margin-block: 2rem 3rem;
-	border: 1px solid var(--cirth-card-border-color);
-	border-block-end-width: var(--cirth-registration-width);
-	border-radius: var(--cirth-card-border-radius);
-	background: var(--docs-board);
+	margin-block: var(--cirth-space-8) var(--cirth-space-12);
 }
 
-.docs-demo-caption {
-	min-height: 2.5rem;
-	padding: 0.5rem 0.75rem;
-	border-block-end: 1px solid var(--docs-line);
-}
 
 .docs-demo-caption strong {
-	color: var(--docs-ink);
+	color: var(--cirth-color);
 }
 
 .docs-demo-preview {
 	padding: clamp(1rem, 3vw, 2rem);
 }
 
-.docs-demo-source {
+/* The source panel is the demo card's last band: flush to the card's edge,
+   which clips its corners for it. */
+details.docs-demo-source {
 	margin: 0;
 	padding: 0;
 	border: 0;
-	border-block-start: 1px solid var(--docs-line);
+	border-block-start: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 	border-radius: 0;
-	background: var(--docs-code-surface);
+	background: var(--cirth-code-background-color);
 }
 
-.docs-demo-source summary {
+/* No colour here: the disclosure keeps the accordion summary ink the
+   framework gives it. Muting it dropped below 4.5:1 on the code surface in
+   the plain dark preset. */
+details.docs-demo-source > summary {
 	padding: 0.75rem 1rem;
-	font-family: var(--cirth-font-family-mono);
-	font-size: 0.6875rem;
-	letter-spacing: 0.05em;
-	text-transform: uppercase;
+	font-size: var(--cirth-font-size-sm);
 }
 
-.docs-demo-source pre {
+details.docs-demo-source > summary::after {
+	height: calc(var(--cirth-font-size-md) * var(--cirth-line-height));
+}
+
+details.docs-demo-source[open] {
+	padding-block-end: 0;
+}
+
+details.docs-demo-source pre {
 	margin: 0;
+	padding: 1rem;
 	border: 0;
-	border-block-start: 1px solid var(--docs-line);
+	border-block-start: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	border-radius: 0;
+	background: none;
 	box-shadow: none;
+	font-size: var(--cirth-font-size-sm);
 }
 
-.docs-demo-source pre::before {
+details.docs-demo-source pre::before {
 	display: none;
+}
+
+details.docs-demo-source[open] > summary {
+	margin-bottom: 0;
+	background: transparent;
+}
+
+details.docs-demo-source > :not(summary) {
+	padding-inline: 0;
 }
 
 .docs-sidebar details {
@@ -2114,40 +2522,71 @@ body {
 	background: transparent;
 }
 
-.docs-sidebar summary {
-	padding-block: 0.5rem;
+/* Group headers sit on the same inline gutter as the entries under them.
+   They used to be flush at 0 while every link was inset 12px, so the
+   heading hung outside the column it introduced and its hover area started
+   against the first letter. */
+.docs-sidebar details > summary {
+	padding: 0.5rem var(--cirth-space-3);
 	font-family: var(--cirth-font-family-sans);
 	font-size: var(--cirth-font-size-sm);
 	letter-spacing: normal;
 	text-transform: none;
 }
 
+.docs-sidebar details[open] > summary {
+	margin-bottom: 0;
+	background: transparent;
+}
+
+.docs-sidebar details > :not(summary),
+.docs-sidebar details[open] {
+	padding-inline: 0;
+	padding-block-end: 0;
+}
+
+/* One rail down both columns, and the active marker sits *in* it rather
+   than beside it. The list draws the rail at the stroke width the
+   framework's active marker uses, and every entry is pulled back by
+   exactly that width so its own inline-start border lands on top of the
+   rail: transparent at rest, amber when the framework paints aria-current.
+   One indicator, one continuous line, no pill with a bar stuck to it. */
 .docs-sidebar nav ul,
 .docs-toc nav > ul {
-	border-inline-start: 1px solid var(--docs-line);
+	border-inline-start: var(--cirth-border-width-2) solid var(--cirth-muted-border-color);
 }
 
 .docs-sidebar nav li a,
 .docs-toc a {
+	display: block;
+	margin: 0;
+	margin-inline-start: calc(var(--cirth-border-width-2) * -1);
 	padding-block: 0.35rem;
-	font-size: 0.75rem;
+	padding-inline: var(--cirth-space-3) 0;
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-xs);
+	text-decoration: none;
 }
 
-.docs-toc a.docs-toc-active::before {
-	width: 0.25rem;
-	border-radius: 0;
+@media (prefers-reduced-motion: no-preference) {
+	.docs-sidebar nav li a,
+	.docs-toc a {
+		transition: color var(--cirth-transition);
+	}
 }
 
-.docs-toc strong,
-.docs-toc-top strong {
-	font-family: var(--cirth-font-family-mono);
-	font-size: 0.625rem;
-	letter-spacing: 0.07em;
-	text-transform: uppercase;
+.docs-sidebar nav li a:hover,
+.docs-toc a:hover {
+	color: var(--cirth-contrast);
 }
 
-.docs-toc-top {
-	background: var(--docs-board);
+
+details.docs-toc-top {
+	background: var(--cirth-card-background-color);
+}
+
+details.docs-toc-top > :not(summary) {
+	padding-inline: 0;
 }
 
 .docs-table-scroll table {
@@ -2155,26 +2594,45 @@ body {
 }
 
 @media (max-width: 1023px) {
-	.docs-mobile-menu {
-		display: list-item;
-	}
-
-	.docs-mobile-nav {
+	.docs-header .docs-mobile-menu {
 		display: block;
-		margin: 0 0 1rem;
 	}
 
-	.docs-mobile-nav > summary {
+	.docs-mobile-tools {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--cirth-space-3);
+		margin-block-end: var(--cirth-space-3);
+	}
+
+	.docs-mobile-tools > details {
+		margin: 0;
+		background: var(--cirth-card-sectioning-background-color);
+	}
+
+	details.docs-mobile-nav {
+		display: block;
+	}
+
+	.docs-mobile-tools > details > summary {
 		font-family: var(--cirth-font-family-sans);
-		font-size: var(--cirth-font-size-sm);
+		font-size: var(--cirth-font-size-xs);
 	}
 
 	.docs-mobile-nav > nav {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 1rem;
-		padding: 1rem;
-		border-block-start: 1px solid var(--docs-line);
+		gap: var(--cirth-space-4);
+		padding: var(--cirth-space-4);
+		border-block-start: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	}
+
+details.docs-mobile-nav[open] > summary {
+	margin-bottom: 0;
+}
+
+	details.docs-mobile-nav > :not(summary) {
+		padding-inline: var(--cirth-space-4);
 	}
 
 	.docs-mobile-nav nav section {
@@ -2187,7 +2645,7 @@ body {
 
 	.docs-mobile-nav nav ul {
 		display: block;
-		margin: 0.5rem 0 0;
+		margin: var(--cirth-space-2) 0 0;
 		padding: 0;
 		list-style: none;
 	}
@@ -2200,8 +2658,8 @@ body {
 	.docs-mobile-nav nav a {
 		display: block;
 		margin: 0;
-		padding: 0.25rem 0;
-		font-size: 0.75rem;
+		padding: var(--cirth-space-1) 0;
+		font-size: var(--cirth-font-size-xs);
 	}
 
 	.docs-sidebar {
@@ -2213,39 +2671,22 @@ body {
 	.docs-header-start-group {
 		display: flex;
 		width: 100%;
-		justify-content: space-between;
+		justify-content: flex-start;
 	}
 
-	.docs-mobile-menu details {
+	.docs-header .docs-mobile-menu {
 		margin: 0;
-	}
-
-	.docs-mobile-menu {
-		list-style: none;
+		flex: 0 0 var(--cirth-space-10);
 	}
 
 	.docs-header nav {
-		gap: 0.375rem;
-		padding-block: 0.25rem;
+		gap: var(--cirth-space-2);
+		padding-block: var(--cirth-space-1);
 	}
 
 	.docs-header nav > ul > li {
 		margin: 0;
 		padding: 0;
-	}
-
-	.docs-header-controls-group {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
-		gap: 0.5rem;
-	}
-
-	.docs-header-controls-group select {
-		width: 100%;
-	}
-
-	.docs-header-search {
-		width: 2.75rem;
 	}
 
 	.docs-mobile-nav > nav {
@@ -2255,6 +2696,30 @@ body {
 	.docs-demo-caption {
 		align-items: flex-start;
 		flex-direction: column;
+	}
+}
+
+@media (max-width: 359px) {
+	.docs-mobile-tools {
+		grid-template-columns: 1fr;
+	}
+
+	/* Four columns of real content on a 320px screen: the state mark takes
+	   a line of its own so its column can be as narrow as the word, and the
+	   cells give back what padding they can. Whatever is still over stays
+	   inside the ledger's own scroll container rather than reaching the
+	   page. */
+	.docs-ledger-table :is(th, td) {
+		padding: 0.625rem 0.25rem;
+	}
+
+	.docs-ledger-state svg {
+		display: block;
+		margin: 0 0 0.15rem;
+	}
+
+	.docs-ledger-table thead th:first-child {
+		width: 4.75rem;
 	}
 }
 
@@ -2269,24 +2734,6 @@ body {
    experiment is presented as a measurable system, not a logo gallery. */
 .docs-brand-spec {
 	margin-block: 2rem 5rem;
-	border: 1px solid var(--docs-line-strong);
-	background: var(--docs-board);
-	box-shadow: var(--docs-card-shadow);
-}
-
-.docs-brand-spec-header {
-	padding: clamp(1.25rem, 4vw, 3rem);
-	border-block-end: 1px solid var(--docs-line);
-}
-
-.docs-brand-spec-header h2 {
-	max-width: 9ch;
-	margin: 0;
-	padding: 0;
-	border: 0;
-	font-size: clamp(2.5rem, 6vw, 5rem);
-	letter-spacing: -0.06em;
-	line-height: 0.9;
 }
 
 .docs-brand-construction {
@@ -2299,7 +2746,7 @@ body {
 	display: grid;
 	grid-template-rows: 1fr auto;
 	margin: 0;
-	border-inline-end: 1px solid var(--docs-line);
+	border-inline-end: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
 .docs-brand-construction figure:last-child {
@@ -2315,13 +2762,13 @@ body {
 	display: grid;
 	gap: 0.25rem;
 	padding: 0.75rem 1rem;
-	border-block-start: 1px solid var(--docs-line);
+	border-block-start: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 	font-family: var(--cirth-font-family-mono);
-	font-size: 0.625rem;
+	font-size: var(--cirth-font-size-xs);
 }
 
 .docs-brand-construction figcaption span {
-	color: var(--docs-annotation);
+	color: var(--cirth-muted-color);
 }
 
 .docs-mark-clearspace {
@@ -2330,7 +2777,7 @@ body {
 	place-items: center;
 	width: min(80%, 22rem);
 	aspect-ratio: 1;
-	border: 1px dashed var(--docs-signal);
+	border: 1px dashed var(--cirth-primary);
 	background-image: var(--docs-grid-dots);
 	background-size: 1rem 1rem;
 }
@@ -2338,9 +2785,9 @@ body {
 .docs-mark-clearspace::before,
 .docs-mark-clearspace::after {
 	position: absolute;
-	color: var(--docs-signal);
+	color: var(--cirth-primary);
 	font-family: var(--cirth-font-family-mono);
-	font-size: 0.5625rem;
+	font-size: var(--cirth-font-size-xs);
 	content: "0.5x";
 }
 
@@ -2361,7 +2808,7 @@ body {
 
 .docs-mark-clearspace i {
 	position: absolute;
-	background: var(--docs-line);
+	background: var(--cirth-muted-border-color);
 }
 
 .docs-mark-clearspace .axis-x {
@@ -2386,21 +2833,21 @@ body {
 	place-items: center;
 	width: 4rem;
 	height: 4rem;
-	border: 1px solid var(--docs-line);
-	background: var(--docs-paper);
+	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	background: var(--cirth-background-color);
 }
 
 .docs-brand-measures {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 	margin: 0;
-	border-block-start: 1px solid var(--docs-line);
+	border-block-start: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
 .docs-brand-measures > div {
 	padding: 1rem;
-	border-inline-end: 1px solid var(--docs-line);
-	border-block-end: 1px solid var(--docs-line);
+	border-inline-end: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	border-block-end: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
 .docs-brand-measures > div:nth-child(3n) {
@@ -2408,27 +2855,15 @@ body {
 }
 
 .docs-brand-measures dt {
-	color: var(--docs-annotation);
+	color: var(--cirth-muted-color);
 	font-family: var(--cirth-font-family-mono);
-	font-size: 0.625rem;
+	font-size: var(--cirth-font-size-xs);
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
 }
 
 .docs-brand-measures dd {
 	margin: 0.5rem 0 0;
-}
-
-.docs-brand-grid {
-	gap: 1px;
-	padding: 1px;
-	background: var(--docs-line);
-}
-
-.docs-brand-tile {
-	margin: 0;
-	border: 0;
-	border-radius: 0;
 }
 
 @media (max-width: 767px) {
@@ -2439,7 +2874,8 @@ body {
 	.docs-mark-blueprint {
 		grid-column: 1 / -1;
 		min-height: 24rem;
-		border-block-end: 1px solid var(--docs-line);
+		border-block-end: var(--cirth-border-width) solid
+			var(--cirth-muted-border-color);
 	}
 
 	.docs-brand-measures {
@@ -2447,26 +2883,11 @@ body {
 	}
 
 	.docs-brand-measures > div:nth-child(3n) {
-		border-inline-end: 1px solid var(--docs-line);
+		border-inline-end: var(--cirth-border-width) solid
+			var(--cirth-muted-border-color);
 	}
 
 	.docs-brand-measures > div:nth-child(2n) {
-		border-inline-end: 0;
-	}
-}
-
-@media (max-width: 420px) {
-	.docs-brand-construction,
-	.docs-brand-measures {
-		grid-template-columns: 1fr;
-	}
-
-	.docs-mark-blueprint {
-		grid-column: auto;
-	}
-
-	.docs-brand-construction figure,
-	.docs-brand-measures > div:nth-child(n) {
 		border-inline-end: 0;
 	}
 }
@@ -2475,31 +2896,6 @@ body {
 .docs-proof-strip,
 .docs-build-comparison {
 	margin-block: 2rem 5rem;
-	border: 1px solid var(--docs-line-strong);
-	background: var(--docs-board);
-}
-
-.docs-proof-strip {
-	box-shadow: var(--docs-card-shadow);
-}
-
-.docs-build-comparison {
-	border-block-end-width: var(--cirth-registration-width);
-	border-radius: var(--cirth-card-border-radius);
-}
-
-.docs-proof-strip > header,
-.docs-build-comparison > header {
-	padding: clamp(1.25rem, 3vw, 2rem);
-	border-block-end: 1px solid var(--docs-line);
-}
-
-.docs-proof-strip > header h2,
-.docs-build-comparison > header h2 {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	font-size: clamp(2rem, 5vw, 4rem);
 }
 
 .docs-proof-strip dl {
@@ -2513,8 +2909,8 @@ body {
 	gap: 0.75rem;
 	min-height: 10rem;
 	padding: 1rem;
-	border-inline-end: 1px solid var(--docs-line);
-	border-block-end: 1px solid var(--docs-line);
+	border-inline-end: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	border-block-end: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
 .docs-proof-strip dl > div:nth-child(3n) {
@@ -2522,11 +2918,8 @@ body {
 }
 
 .docs-proof-strip dt {
-	color: var(--docs-annotation);
-	font-family: var(--cirth-font-family-mono);
-	font-size: 0.625rem;
-	letter-spacing: 0.05em;
-	text-transform: uppercase;
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-sm);
 }
 
 .docs-proof-strip dd {
@@ -2537,19 +2930,18 @@ body {
 }
 
 .docs-proof-strip dd strong {
-	color: var(--docs-signal);
+	color: var(--cirth-primary);
 	font-family: var(--cirth-font-family-mono);
-	font-size: 1.25rem;
+	font-size: var(--cirth-font-size-xl);
 }
 
+/* The `sm` step, not `xs`: this line carries inline <code>, and code is
+   0.875em of its parent — a 12px container puts it at 10.5px. Twelve
+   pixels is the floor for *rendered* text, so any shell container that
+   holds a shrinking child (small, code, kbd, samp) starts at 14. */
 .docs-proof-strip dd small {
-	color: var(--docs-annotation);
-	font-size: 0.6875rem;
-}
-
-.docs-build-comparison > header > p:last-child {
-	max-width: 60ch;
-	color: var(--docs-annotation);
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-sm);
 }
 
 .docs-build-comparison > div {
@@ -2559,8 +2951,8 @@ body {
 
 .docs-build-comparison figure {
 	margin: 0;
-	border-inline-end: 1px solid var(--docs-line);
-	border-block-end: 1px solid var(--docs-line);
+	border-inline-end: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+	border-block-end: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
 .docs-build-comparison figure:nth-child(2n) {
@@ -2572,16 +2964,16 @@ body {
 	justify-content: space-between;
 	gap: 0.75rem;
 	padding: 0.65rem 0.75rem;
-	border-block-end: 1px solid var(--docs-line);
+	border-block-end: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 	font-family: var(--cirth-font-family-mono);
-	font-size: 0.625rem;
+	font-size: var(--cirth-font-size-sm);
 }
 
 .docs-build-comparison figcaption code {
 	max-width: 60%;
 	background: transparent;
 	color: var(--cirth-color);
-	font-size: 0.5625rem;
+	font-size: var(--cirth-font-size-xs);
 	overflow-wrap: anywhere;
 }
 
@@ -2590,14 +2982,14 @@ body {
 	width: 100%;
 	height: 30rem;
 	border: 0;
-	background: var(--docs-paper);
+	background: var(--cirth-background-color);
 }
 
 .docs-build-comparison > footer {
 	padding: 0.75rem 1rem;
-	color: var(--docs-annotation);
+	color: var(--cirth-muted-color);
 	font-family: var(--cirth-font-family-mono);
-	font-size: 0.625rem;
+	font-size: var(--cirth-font-size-xs);
 }
 
 @media (max-width: 767px) {
@@ -2606,7 +2998,7 @@ body {
 	}
 
 	.docs-proof-strip dl > div:nth-child(3n) {
-		border-inline-end: 1px solid var(--docs-line);
+		border-inline-end: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 	}
 
 	.docs-proof-strip dl > div:nth-child(2n) {
@@ -2622,17 +3014,6 @@ body {
 	}
 }
 
-@media (max-width: 420px) {
-	.docs-proof-strip dl {
-		grid-template-columns: 1fr;
-	}
-
-	.docs-proof-strip dl > div:nth-child(n) {
-		min-height: 8rem;
-		border-inline-end: 0;
-	}
-}
-
 .docs-theme-lab {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2642,8 +3023,7 @@ body {
 
 .docs-theme-lab figure {
 	margin: 0;
-	border: 1px solid var(--cirth-muted-border-color);
-	border-block-end-width: var(--cirth-registration-width);
+	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 	border-radius: var(--cirth-card-border-radius);
 	background: var(--cirth-background-color);
 	color: var(--cirth-color);
@@ -2655,13 +3035,13 @@ body {
 	justify-content: space-between;
 	gap: 0.75rem;
 	padding: 0.75rem;
-	border-block-end: 1px solid var(--cirth-muted-border-color);
+	border-block-end: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 	font-family: var(--cirth-font-family-mono);
-	font-size: 0.625rem;
+	font-size: var(--cirth-font-size-sm);
 }
 
 .docs-theme-lab figcaption code {
-	font-size: 0.5625rem;
+	font-size: var(--cirth-font-size-xs);
 }
 
 .docs-theme-sample {
@@ -2677,13 +3057,15 @@ body {
 	margin-block: 0.5rem;
 }
 
-.docs-theme-sample article h3 {
-	font-size: 1.25rem;
+/* No font-size on the heading: the point of this tile is to show what the
+   default theme does to an <article>, and the framework's own h3 step is
+   part of that. */
+.docs-theme-sample article p {
+	font-size: var(--cirth-font-size-sm);
 }
 
-.docs-theme-sample article p,
 .docs-theme-sample article small {
-	font-size: 0.75rem;
+	font-size: var(--cirth-font-size-xs);
 }
 
 .docs-theme-sample article button {
@@ -2694,7 +3076,7 @@ body {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	margin: 0;
-	border-block-start: 1px solid var(--cirth-muted-border-color);
+	border-block-start: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
 .docs-theme-lab dl > div {
@@ -2702,13 +3084,12 @@ body {
 }
 
 .docs-theme-lab dl > div + div {
-	border-inline-start: 1px solid var(--cirth-muted-border-color);
+	border-inline-start: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
 .docs-theme-lab dt {
-	font-family: var(--cirth-font-family-mono);
-	font-size: 0.5625rem;
-	text-transform: uppercase;
+	color: var(--cirth-muted-color);
+	font-size: var(--cirth-font-size-xs);
 }
 
 .docs-theme-lab dd {
@@ -2722,15 +3103,15 @@ body {
 	flex: 0 0 1rem;
 	width: 1rem;
 	height: 1rem;
-	border: 1px solid var(--cirth-muted-border-color);
+	border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
 .docs-theme-lab dd code {
-	font-size: 0.5rem;
+	font-size: var(--cirth-font-size-xs);
 	overflow-wrap: anywhere;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 767px) {
 	.docs-theme-lab {
 		grid-template-columns: 1fr;
 	}

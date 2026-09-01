@@ -15,6 +15,156 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Changed
 
+- **Buttons and one-line fields now share one control-height formula.** The
+  44px contract is unchanged, but its font, line-height, padding and border
+  arithmetic is no longer repeated across button, input, select, dropdown
+  trigger and modal close control. The old component-local line-height
+  compensation is gone, so equivalent controls align by construction while
+  author overrides still resolve at runtime.
+- **Resting fields are recognisably recessed on every surface.** Their
+  background now sits between code and canvas instead of sharing a raised
+  band; focus lifts the field to canvas while the existing accent edge and
+  ring carry the interaction. Card, modal and popover nesting therefore keep
+  both tonal and border separation in light, dark, Plain and Playroom.
+- **Text rhythm separates typographic and container spacing.** Headings keep
+  no top margin and use half the prose rhythm below; card caps, card bodies,
+  blockquotes and popovers no longer stack their own padding with a terminal
+  child margin. Table edges now alias the card edge, and dropdown border and
+  hover treatments derive from card and section surfaces instead of repeating
+  almost-identical formulas.
+
+- **Every heading reads the scales instead of literals.** `h1`–`h6` resolve
+  to 44 / 32 / 24 / 20 / 18 / 16 at the default root size — the same ladder
+  as before, but each bound now read off `--cirth-font-size-*` rather than
+  restated, and `h1`–`h3` fluid between two of its steps. Display type is an
+  opt-in on the element, through the same `--cirth-font-size` slot every
+  heading already resolves through, so a campaign page can ask for it
+  without moving the scale product screens read.
+  `--cirth-letter-spacing-tight` declared `-0.02em` while `h1`, `h2` and
+  `h3` each set a different hand-written value, so the token named a
+  relationship it did not govern and overriding it moved nothing: `h1`/`h2`
+  now read `-tight` (retuned to `-0.03em`, the tracking the largest step on
+  the scale actually wants) and `h3`/`h4` read `-snug`. `h1`–`h3` read the
+  line-height scale for the same reason.
+- **Active navigation is one registered edge, except in a navbar.** The
+  `[aria-current]` state drops its tint, accent ink, underline, and radius.
+  Horizontal navigation uses the bottom edge; vertical navigation moves the
+  same edge to its rail. Focus keeps its independent visible ring in every
+  context.
+
+  A `nav` that is a direct child of the page's banner `header` is a navbar,
+  and runs a four-step contrast ladder instead: `--cirth-muted-color` at
+  rest, an intermediate mix on hover and focus, `--cirth-contrast` plus
+  semibold for the current entry, and a further-attenuated step for
+  `aria-disabled="true"`, which also stops responding to the pointer. None
+  of the four is the accent — in chrome the accent belongs to actions, and
+  position is carried by contrast — and all four are derived at runtime
+  from tokens that already exist, so the ladder adds no new public token.
+  The navbar also wraps rather than overflowing and centres its items on
+  the same 40px band its links occupy, so a brand lockup, a search field
+  and a `details` toggler line up on one row; the toggler itself is
+  unfilled, with a sober border and its own focus ring.
+
+  The rule reaches the banner only. It previously matched `header nav li`,
+  which also claimed the `nav` inside a card's or an article's own
+  `header` — that nav is the section's own navigation, and it was silently
+  losing its current-entry accent to a rule about page shells.
+- **A disclosure is a rule, not a box.** `<details>` no longer draws a card:
+  the border, card surface, radius and the tinted summary band when open are
+  gone, replaced by a single divider on the `details` item. A stack of
+  disclosures now reads as a list, and one placed inside a card no longer
+  puts a second frame inside the first. `details.dropdown` is untouched — it
+  owns a menu frame for a reason.
+- **A focused field gets a ring as well as a border.** Fields used to pull
+  `--cirth-outline-width` down to 1px and paint the ring in the same colour
+  as the border underneath it, so focus produced an accent border and
+  nothing else. They now take the root's 2px, and
+  `--cirth-form-element-focus-color` is the translucent
+  `--cirth-primary-focus` in both schemes — a solid accent edge with a halo
+  around it. The separate rule that gave buttons, checkboxes and radios
+  exactly this is removed, since it is now the default.
+- **A visited link drains to a true grey.** `--cirth-link-visited-color`
+  carried 0.03 of chroma at 264deg, which read as a cold cast on the warm
+  paper canvas and, next to a warm accent, was a hue change at nearly the
+  same lightness — the weakest available way to say "you have been here".
+  Chroma is now zero in both schemes; lightness, and therefore contrast, is
+  unchanged (5.98:1 on the canvas, 6.31:1 on a card).
+- **`--cirth-card-border-radius` derives from `--cirth-border-radius`**
+  (× 1.5) rather than being a second, independent step. The documented
+  promise — one knob, and zeroing it squares everything — was only true of
+  the checkbox and code radii; cards stayed rounded. The container/control
+  radius pair is now a stated relationship, which is what
+  [the brand page](https://cirthcss.github.io/cirth/brand/) claims survives
+  a retheme.
+- **Navigation links use neutral hierarchy, not the accent.** A resting
+  `nav a` inherits `--cirth-color` instead of binding itself to
+  `--cirth-primary`; header links step down to `--cirth-muted-color` until
+  interaction. Outside headers the accent marks the active entry's edge and
+  returns on hover, focus and `:active` — but a product shell no longer
+  renders as eight brand-coloured menu entries beside one button that also
+  wanted the colour. The accent means *act on this* and *you are here*, and
+  nothing else.
+- **A link wrapped around a card keeps the card's ink.**
+  `a:has(article)` — the HTML-native clickable card — now inherits
+  `--cirth-color` rather than taking the accent, the same argument the
+  `:visited` rule already made one step later. A grid of clickable cards
+  came out entirely in the brand colour.
+- **Controls inside a `<nav>` sit on a 40px band.** The nav used to opt its
+  controls down to a 24px `min-block-size` — WCAG 2.5.8's AA minimum, which
+  is a floor rather than a size, so every real header invented a height and
+  then fought the nav rule for it. 40px is the height a navigation bar
+  wants; the 44px WCAG 2.5.5 target still applies everywhere outside a nav.
+- **One canvas input drives the complete surface hierarchy at runtime.**
+  Card, card band, resting and active fields, code, dropdown, and popover now
+  retain `var()` / relative `oklch()` relationships in the compiled CSS.
+  Light uses warm paper ordered as recessed code < canvas < band/control <
+  card; dark uses the same order on graphite, fixing code that previously
+  claimed to be recessed while rendering lighter than the canvas. Plain and
+  Playroom now change surface temperature with `--cirth-canvas` alone.
+- **The card and table borders stay in the neutral family.** They are mixed
+  `in oklab` rather than `in oklch`. A polar space interpolates the hue
+  angle, and the card surface is an authored `oklch()` whose hue is an
+  explicit `0deg` rather than a powerless one — so the 264deg field border
+  took the short way round the wheel and the most-used border in the library
+  resolved at **323.52deg**, a faint magenta with no other member of the
+  palette near it. Lightness and chroma are identical; only the hue is
+  corrected. Every compile-time mix that can meet an authored hue moved to
+  `oklab` for the same reason.
+- **The shipped presets change the dialect, not just the palette.** `plain`
+  and `playroom` now also move the radius pair, the spacing rhythm and the
+  transition — a preset is meant to be the worked example of what the token
+  surface can do, and one that moves a single hue demonstrates one token.
+  The structural signature is unchanged in both: one hairline on every
+  resting edge, the 44px control floor outside navigation, the card
+  header/body contract, and the container/control radius *pairing*.
+- **Buttons are flat.** Every variant — primary, secondary, contrast,
+  outline, ghost and destructive — now draws the same `--cirth-border-width`
+  on all four sides, in one colour. The thicker, darkened bottom edge and
+  the 1px `translateY` on `:active` are gone, so a filled button and an
+  outline button finally have identical geometry and nothing shifts under
+  the pointer. Hover, active and focus are carried by background, border and
+  foreground colour alone. The pressed wash remains an internal paint detail
+  rather than becoming a single-use public token. `--cirth-button-registration-width`, the role
+  token that sized that edge, is removed; it was added after v0.14.1 and
+  never shipped in a release.
+- **A link wrapped around a card keeps the card's ink once visited.**
+  `:visited` now stands aside for `:has(article)`, joining `nav a`, the
+  colour variants and the dropdown. Writing `<a href><article>…</article></a>`
+  — the HTML-native clickable card — used to drain the card's heading to the
+  visited neutral, so a grid of cards ended up in two colours as a record of
+  where the reader had been. The visited cue stays where it means something:
+  running text.
+- **The active item in a vertical nav squares off against its rail.**
+  `aside nav a[aria-current]` zeroes `border-start-start-radius` and
+  `border-end-start-radius`, so the accent reads as a continuous rail rather
+  than a rounded pill with a bar beside it. Logical corners, so RTL is
+  unaffected.
+- **An open `<details>` owns its bottom gutter.** The space under the last
+  element of an open disclosure moved from that element's `margin-bottom`
+  onto `padding-block-end` of the disclosure itself. The margin was the
+  first thing a content reset flattened, which collapsed the panel onto its
+  own border; the gutter is now unconditional and identical for a paragraph,
+  a list, a figure or a `<pre>`.
 - The default display role now uses the system sans stack, keeping product
   headings, UI, and documentation in one technical voice. Default control
   corners move from the `0.5rem` to `0.375rem` scale step; card corners

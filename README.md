@@ -148,9 +148,9 @@ top of the default theme. They're worked examples of restyling the system,
 not independently maintained themes — load one after the main stylesheet.
 
 - **`plain`** — the conventional application baseline: a familiar blue
-  accent, a plain white page, headings in the body face. Four declarations,
-  all of them input tokens: the accent's fill, hover, focus ring and
-  underline tint derive from `--cirth-primary` on their own.
+  accent, a plain white page, headings in the body face. Five declarations:
+  two colour inputs and three role choices. Accent states and the complete
+  surface ladder derive on their own.
 - **`playroom`** — the expressive end: a soft violet accent, surfaces
   tinted toward it, large radii, a rounded system face, generous spacing,
   springy motion. Reaches across colour, geometry, typography, motion and

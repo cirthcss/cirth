@@ -231,6 +231,11 @@ modes. Dialog and popover demos are audited once more while open. Since the
 component demos live on these pages, this continuously re-verifies the
 framework's own AA claim, not just the site around it.
 
+The shell-free framework and component-state specimens are audited separately
+in Amber, Plain, Playroom, and a custom blue primary. Light and dark additionally
+cover real hover, keyboard-focus, and pointer-active states; forced colors keeps
+the complete static specimen and the dedicated resilience checks below.
+
 axe's contrast algorithm cannot model the system-color remapping performed by
 forced-colors mode, so `color-contrast` remains enabled in light and dark and
 is disabled only for that emulation. The behavior suite covers the forced-
@@ -256,6 +261,11 @@ and open modal and popover states. The default theme gets the same open-state
 captures. Adding a preset therefore adds visual cases automatically; a missing
 stylesheet or docs-switcher option fails before a screenshot is accepted. Any
 unexplained pixel difference fails the check.
+
+A single representative Chromium board also compares real rest, hover, focus,
+active, disabled, closed, and open pixels across the four shell-free themes in
+light and dark. Multi-engine state parity remains a behavior assertion, avoiding
+hundreds of duplicate image baselines without replacing real interaction.
 
 Two things to know about the baselines:
 
@@ -297,8 +307,9 @@ updating baselines.
   visibility, and the 44px control target size are verified properties of
   the source; a PR that trades them away for aesthetics won't land. The
   target size is a floor, not a fixed height — controls may grow past it,
-  and `nav` opts down to WCAG 2.5.8's 24px — so the property to preserve is
-  that nothing drops below what it is entitled to.
+  and `nav` opts down to a 40px band that remains above WCAG 2.5.8's 24px
+  minimum — so the property to preserve is that nothing drops below what it
+  is entitled to.
 * **Stay on the spacing scale.** Spacing values are `--cirth-space-*`
   tokens (0.25rem steps to 1.5, 0.5 steps to 3, then whole rems). If a
   value isn't on the scale, that's a design smell worth flagging.

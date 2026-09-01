@@ -7,9 +7,8 @@ const { expect, test } = require("@playwright/test");
 // The first is target size, checked as a floor rather than as a
 // coincidence — and there are two thresholds, deliberately. Outside a nav
 // it is 44px, WCAG 2.5.5 Target Size (Enhanced), which this project treats
-// as a product requirement. Inside a nav it is 24px, WCAG 2.5.8 Target
-// Size (Minimum): a navigation row is compact by design, and Cirth lets it
-// opt down to the AA threshold rather than out of any threshold at all.
+// as a product requirement. Inside a nav it is a 40px compact band, still
+// above the 24px WCAG 2.5.8 Target Size (Minimum) threshold.
 //
 // An input is pinned to 44px by an explicit height. A select grows with its
 // longest option and a textarea with its rows, so neither can be pinned the
@@ -25,7 +24,7 @@ const css = fs.readFileSync(
 );
 
 const TARGET = 44;
-const TARGET_NAV = 24;
+const TARGET_NAV = 40;
 
 /** @param {import("@playwright/test").Page} page */
 const heightOf = (page, /** @type {string} */ id) =>
@@ -54,6 +53,70 @@ for (const fontSize of ["1rem", "0.875rem", "0.75rem"]) {
 				await heightOf(page, id),
 				`${id} meets the target size`,
 			).toBeGreaterThanOrEqual(TARGET);
+		}
+	});
+}
+
+for (const customMetrics of [false, true]) {
+	test(`equivalent controls share their geometry${
+		customMetrics ? " after a runtime metric override" : ""
+	}`, async ({ page }) => {
+		await page.setContent(
+			`<style>${css}</style>
+			<main class="container"${
+				customMetrics
+					? ' style="--cirth-line-height: 1.25; --cirth-form-element-spacing-vertical: 0.75rem"'
+					: ""
+			}>
+				<input id="text" type="text" value="Control">
+				<select id="select"><option>Control</option></select>
+				<textarea id="textarea" rows="1">Control</textarea>
+				<button id="button" type="button">Control</button>
+			</main>`,
+		);
+
+		const geometry = await page.evaluate(() =>
+			["text", "select", "textarea", "button"].map((id) => {
+				const element = document.getElementById(id);
+				if (!element) {
+					throw new Error(`missing ${id}`);
+				}
+				const style = getComputedStyle(element);
+				return {
+					id,
+					height: element.getBoundingClientRect().height,
+					fontSize: style.fontSize,
+					lineHeight: style.lineHeight,
+					paddingTop: style.paddingTop,
+					paddingBottom: style.paddingBottom,
+					borderTopWidth: style.borderTopWidth,
+					borderBottomWidth: style.borderBottomWidth,
+				};
+			}),
+		);
+
+		const reference = geometry[0];
+		for (const control of geometry) {
+			expect(control.height, `${control.id} keeps the 44px floor`).toBeGreaterThanOrEqual(
+				TARGET,
+			);
+			expect(control.height, `${control.id} aligns with the input`).toBeCloseTo(
+				reference.height,
+				1,
+			);
+			for (const property of /** @type {const} */ ([
+				"fontSize",
+				"lineHeight",
+				"paddingTop",
+				"paddingBottom",
+				"borderTopWidth",
+				"borderBottomWidth",
+			])) {
+				expect(
+					control[property],
+					`${control.id} shares ${property}`,
+				).toBe(reference[property]);
+			}
 		}
 	});
 }

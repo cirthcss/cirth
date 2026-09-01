@@ -21,7 +21,6 @@
 #{$parent-selector} :where(table) {
   width: 100%;
   border-collapse: collapse; // 1
-  border-spacing: 0;
   text-indent: 0; // 2
   border-color: currentcolor; // 3
 }
@@ -40,36 +39,9 @@
 #{$parent-selector} td {
   padding: calc(var(--cirth-spacing) / 2) var(--cirth-spacing);
   border-bottom: var(--cirth-border-width) solid var(--cirth-table-border-color);
-  color: var(--cirth-color);
   font-weight: var(--cirth-font-weight);
   font-variant-numeric: tabular-nums;
   text-align: start;
-}
-
-#{$parent-selector} thead th {
-  font-size: var(--cirth-font-size-sm);
-  line-height: var(--cirth-line-height-snug);
-}
-
-#{$parent-selector} tbody tr {
-  transition: background-color var(--cirth-transition);
-
-  &:hover {
-    background-color: color-mix(
-      in oklch,
-      var(--cirth-table-border-color) 28%,
-      transparent
-    );
-  }
-
-  &:is([aria-selected="true"], [aria-current]:not([aria-current="false"])) {
-    background-color: color-mix(in oklch, var(--cirth-primary) 9%, transparent);
-
-    > :first-child {
-      border-inline-start: var(--cirth-registration-width) solid
-        var(--cirth-primary-border);
-    }
-  }
 }
 
 // Footer

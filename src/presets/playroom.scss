@@ -5,7 +5,7 @@
 // face and softer colour make it approachable without replacing Cirth's
 // geometry, density or interaction model.
 // It is the longer half of a worked example. Where src/presets/plain.scss
-// changes five input tokens and lets the theme derive the rest, this one
+// changes five declarations and lets the theme derive the rest, this one
 // reaches across colour and typography while preserving the framework's
 // permanent silhouette. It also overrides two *derived* tokens on purpose, which is
 // the other thing worth demonstrating — see the note further down.
@@ -24,10 +24,10 @@
   // this chroma it reads as "warm paper, but violet", which is what keeps
   // the whole thing from feeling clinical.
   --cirth-canvas: light-dark(oklch(98% 0.012 300deg), oklch(24% 0.028 295deg));
-  --cirth-card-background-color: light-dark(
-    oklch(100% 0 0deg),
-    oklch(29% 0.032 295deg)
-  );
+
+  // The full surface hierarchy follows this canvas at runtime. Playroom no
+  // longer repeats card, form, code, dropdown, or popover merely to carry
+  // the violet temperature through the system.
   --cirth-color: light-dark(oklch(36% 0.03 295deg), oklch(93% 0.012 300deg));
   --cirth-muted-color: light-dark(
     oklch(52% 0.035 295deg),
@@ -65,6 +65,23 @@
     ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", system-ui,
     "Segoe UI", Roboto, sans-serif, var(--cirth-font-family-emoji);
   --cirth-font-family-display: var(--cirth-font-family);
+
+  // Geometry, density and motion
+  // The counterpart to plain.scss's five declarations, in the other direction,
+  // the reason both presets exist: the same tokens, moved the opposite way,
+  // produce an interface with a different character while every component
+  // rule, target size and border weight stays exactly where it was. Rounder
+  // than the default at both ends of the radius pair, roomier in the block
+  // rhythm, slower and softer in the transition. A rounded face on square
+  // corners reads as a mismatch, which is why the type and the geometry move
+  // together here.
+  // One knob: the card radius derives from it (theme/_styles.scss), so
+  // 8px controls give 12px containers without this file saying so.
+  --cirth-border-radius: var(--cirth-radius-lg);
+  --cirth-spacing: var(--cirth-space-5);
+  --cirth-typography-spacing-vertical: var(--cirth-space-5);
+  --cirth-line-height: var(--cirth-line-height-relaxed);
+  --cirth-transition: var(--cirth-duration-slow) var(--cirth-ease-in-out);
 
   // Deliberately breaking two relationships
   // The theme derives the hover state by mixing the accent toward black,

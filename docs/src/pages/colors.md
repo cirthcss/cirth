@@ -18,8 +18,8 @@ reasonably should.
 
 * **`plain`** is the conventional application baseline: a familiar blue
   accent and a plain white page. It is the whole point of the token model
-  in five declarations — it sets **only input tokens**, and the accent's fill,
-  hover, focus ring and underline tint follow on their own. Reach for it
+  in five declarations: two colour inputs and three role choices. The accent
+  states and the complete surface ladder follow on their own. Reach for it
   when you want an interface that looks unremarkable in the good sense.
 * **`playroom`** is the expressive end: a soft violet accent, surfaces
   tinted toward it, large radii, a rounded system face, generous spacing,
@@ -66,11 +66,12 @@ when you want to see how far one can go.
 
 ## Underlying palette
 
-The theme's color scales are Sass `oklch()` literals declared in
-`src/theme/_colors.scss` and consumed by `_light.scss` / `_dark.scss`. These
-Sass variables aren't part of the public CSS custom property surface; they
-only exist at build time to derive the semantic tokens (`--cirth-primary`,
-`--cirth-primary-hover`, …) baked into the compiled stylesheet.
+The theme's primitive color scales are Sass `oklch()` literals declared in
+`src/theme/_colors.scss` and consumed by `_dual.scss`, `_light.scss`, and
+`_dark.scss`. These Sass variables are not public CSS tokens. They seed the
+defaults for public inputs such as `--cirth-primary`; relationships from those
+inputs to derived semantic tokens remain in the compiled CSS as `var()`,
+`color-mix()`, and relative `oklch()` rather than being baked into literals.
 
 Scales are named for what they visually are (`$amber-*` the brand accent,
 `$neutral-*` the cool gray) except the status colors, which are named for
@@ -99,11 +100,11 @@ inconsistency between families.
 from the brand mark, so the theme's primary accent and the logo are the
 same color by construction rather than by manual matching.
 
-`plain` and `playroom` (`src/presets/`) declare only the `oklch()`
-literals their overridden tokens need. They don't duplicate the theme's
-full palette, component styles, or reset rules — and they no longer
-duplicate its scheme wiring either: each scheme difference is stated once
-as a `light-dark()` pair, which is why `plain` fits in five declarations.
+`plain` and `playroom` (`src/presets/`) declare only the values for the
+inputs and roles they intentionally change. They do not duplicate the theme's
+surface ladder, component styles, reset rules, or scheme wiring: each scheme
+difference is stated once as a `light-dark()` pair, which is why `plain` fits
+in five declarations.
 
 Cirth targets browsers with native `oklch()` support (see the `browserslist`
 field in `package.json`), so the compiled CSS ships `oklch()` directly rather

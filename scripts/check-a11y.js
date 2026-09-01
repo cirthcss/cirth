@@ -32,18 +32,12 @@ const updateBaseline = process.argv.includes("--update-baseline");
  *   page: string,
  *   theme: "default" | "plain" | "playroom" | "amber" | "blue",
  *   mode: "light" | "dark" | "forced-colors",
- *   state: "default" | "dialog-open" | "popover-open" | "search-open",
+ *   state: "default" | "dialog-open" | "popover-open" | "search-open" | "button-hover" | "button-focus" | "button-active" | "input-hover" | "input-focus" | "accordion-hover" | "accordion-focus" | "accordion-open",
  *   violation: import("axe-core").Result,
  * }} Finding
  */
 
-const wcagTags = [
-	"wcag2a",
-	"wcag2aa",
-	"wcag21a",
-	"wcag21aa",
-	"wcag22aa",
-];
+const wcagTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 /**
  * @type {{
  *   name: Finding["mode"],
@@ -202,9 +196,7 @@ const run = async () => {
 				}
 				await page.close();
 			};
-			await Promise.all(
-				Array.from({ length: concurrency }, worker),
-			);
+			await Promise.all(Array.from({ length: concurrency }, worker));
 
 			const statePage = await context.newPage();
 			for (const openState of openStates) {
@@ -257,6 +249,109 @@ const run = async () => {
 					state: "default",
 					violation,
 				});
+			}
+
+			const statePath = `specimen/states/${specimen}/index.html`;
+			const stateTarget = `${origin}/specimen/states/${specimen}/`;
+			await page.goto(stateTarget, { waitUntil: "load" });
+			const stateResults = await analyze(
+				page,
+				/** @type {Finding["mode"]} */ (mode.name),
+			);
+			for (const violation of stateResults.violations) {
+				found.push({
+					page: statePath,
+					theme: /** @type {Finding["theme"]} */ (specimen),
+					mode: /** @type {Finding["mode"]} */ (mode.name),
+					state: "default",
+					violation,
+				});
+			}
+
+			if (mode.name !== "forced-colors") {
+				const stateCases = [
+					{
+						name: "button-hover",
+						prepare: async () => {
+							await page.locator("[data-state-button]").hover();
+							await page.waitForTimeout(260);
+						},
+					},
+					{
+						name: "button-focus",
+						prepare: async () => {
+							await page.keyboard.press("Tab");
+							await page.waitForTimeout(260);
+						},
+					},
+					{
+						name: "button-active",
+						prepare: async () => {
+							await page.locator("[data-state-button]").hover();
+							await page.mouse.down();
+						},
+					},
+					{
+						name: "input-hover",
+						prepare: async () => {
+							await page.locator("[data-state-input]").hover();
+							await page.waitForTimeout(260);
+						},
+					},
+					{
+						name: "input-focus",
+						prepare: async () => {
+							await page.keyboard.press("Tab");
+							await page.locator("[data-state-input]").focus();
+							await page.waitForTimeout(260);
+						},
+					},
+					{
+						name: "accordion-hover",
+						prepare: async () => {
+							await page.locator("[data-state-accordion] > summary").hover();
+							await page.waitForTimeout(260);
+						},
+					},
+					{
+						name: "accordion-focus",
+						prepare: async () => {
+							await page.keyboard.press("Tab");
+							await page.locator("[data-state-accordion] > summary").focus();
+							await page.waitForTimeout(260);
+						},
+					},
+					{
+						name: "accordion-open",
+						prepare: async () => {
+							const summary = page.locator("[data-state-accordion] > summary");
+							await summary.click();
+							await summary.evaluate((element) => element.blur());
+						},
+					},
+				];
+
+				for (const stateCase of stateCases) {
+					await page.goto(stateTarget, { waitUntil: "load" });
+					await stateCase.prepare();
+					try {
+						const interactiveResults = await analyze(
+							page,
+							/** @type {Finding["mode"]} */ (mode.name),
+						);
+						for (const violation of interactiveResults.violations) {
+							found.push({
+								page: statePath,
+								theme: /** @type {Finding["theme"]} */ (specimen),
+								mode: /** @type {Finding["mode"]} */ (mode.name),
+								state: /** @type {Finding["state"]} */ (stateCase.name),
+								violation,
+							});
+						}
+					} finally {
+						if (stateCase.name === "button-active") await page.mouse.up();
+					}
+				}
 			}
 			await context.close();
 		}
@@ -313,7 +408,7 @@ run()
 				`\ncheck-a11y: ${fresh.length} new WCAG 2.0–2.2 A/AA ` +
 					`violation(s) across ${pages.length} pages × ${themeVariants.length} ` +
 					`themes × ${modes.length} modes plus ${openStates.length} open states and ` +
-					`${frameworkSpecimens.length} shell-free specimens ` +
+					`${frameworkSpecimens.length} shell-free specimens and state matrices ` +
 					`per theme/mode. Fix them or, ` +
 					`if accepted deliberately, run ` +
 					`\`node scripts/check-a11y.js --update-baseline\`.`,
@@ -325,7 +420,7 @@ run()
 			`✓ check-a11y: no new WCAG 2.0–2.2 A/AA violations across ` +
 				`${pages.length} pages × ${themeVariants.length} themes × ` +
 				`${modes.length} modes plus ${openStates.length} open states per ` +
-				`theme/mode and ${frameworkSpecimens.length} shell-free specimens` +
+				`theme/mode and ${frameworkSpecimens.length} shell-free specimens/state matrices` +
 				(baseline.size > 0 ? ` (${baseline.size} baselined)` : "") +
 				".",
 		);

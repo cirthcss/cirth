@@ -47,6 +47,9 @@ const iconPaths = {
 	zap: "M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17ZM109.37,214l10.47-52.38a8,8,0,0,0-5-9.06L62,132.71l84.62-90.66L136.16,94.43a8,8,0,0,0,5,9.06l52.8,19.8Z",
 	shield:
 		"M208,40H48A16,16,0,0,0,32,56v56c0,52.72,25.52,84.67,46.93,102.19,23.06,18.86,46,25.26,47,25.53a8,8,0,0,0,4.2,0c1-.27,23.91-6.67,47-25.53C198.48,196.67,224,164.72,224,112V56A16,16,0,0,0,208,40Zm0,72c0,37.07-13.66,67.16-40.6,89.42A129.3,129.3,0,0,1,128,223.62a128.25,128.25,0,0,1-38.92-21.81C61.82,179.51,48,149.3,48,112l0-56,160,0ZM82.34,141.66a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35a8,8,0,0,1,11.32,11.32l-56,56a8,8,0,0,1-11.32,0Z",
+	"dots-three":
+		"M156,128a28,28,0,1,1-28-28A28,28,0,0,1,156,128ZM48,100a28,28,0,1,0,28,28A28,28,0,0,0,48,100Zm160,0a28,28,0,1,0,28,28A28,28,0,0,0,208,100Z",
+	list: "M228,128a8,8,0,0,1-8,8H36a8,8,0,0,1,0-16H220A8,8,0,0,1,228,128ZM36,72H220a8,8,0,0,0,0-16H36a8,8,0,0,0,0,16ZM220,184H36a8,8,0,0,0,0,16H220a8,8,0,0,0,0-16Z",
 	sun: "M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z",
 };
 
@@ -211,10 +214,10 @@ module.exports = (eleventyConfig) => {
 		];
 		return `<div class="docs-colors-grid">${colors
 			.map(
-				(color) => `<div class="docs-color-swatch">
+				(color) => `<article class="docs-color-swatch">
 <div class="docs-color-swatch-preview" style="background-color: ${color.hex}"><span style="color: #fff; font-size: 0.75rem; font-weight: 600;">Aa</span></div>
 <div class="docs-color-swatch-label">${color.name} (${color.note})</div>
-</div>`,
+</article>`,
 			)
 			.join("")}</div>
 <section class="docs-theme-lab" aria-label="Default theme role comparison">
@@ -232,6 +235,18 @@ module.exports = (eleventyConfig) => {
 	});
 
 	// --- Filters ----------------------------------------------------------
+	// Syntax highlighting for HTML that is not coming through markdown: the
+	// home page's source panel, whose four build variants are swapped in by
+	// the build switcher. Same highlight.js pass and same .hljs-* classes
+	// the fenced-code pipeline above emits, so there is one highlighter in
+	// the build and none in the browser.
+	eleventyConfig.addFilter(
+		"highlightHtml",
+		(code) =>
+			hljs.highlight(String(code), { language: "html", ignoreIllegals: true })
+				.value,
+	);
+
 	// Page URLs always end in "/" (one <path>/index.html per page) while
 	// nav-config links don't — normalize before comparing for active state.
 	const withSlash = (link) => (link.endsWith("/") ? link : `${link}/`);

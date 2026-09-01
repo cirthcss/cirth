@@ -1,4 +1,5 @@
 @use "../config" as *;
+@use "../helpers/metrics";
 @use "../helpers/selectors";
 
 /**
@@ -66,14 +67,15 @@
       $close-selector: ".close, :is(a, button)[rel=prev]";
     }
 
+    // The close control grows invisibly to the size of a real button, so
+    // reproduce the button's whole block size -- including the 2.75rem
+    // WCAG 2.5.5 floor, not just the calc branch it happens to exceed at
+    // the default type scale (content/_button.scss). Taking the calc alone
+    // left the target a pixel short the moment the box got smaller than
+    // the floor.
+    $button-block-size: metrics.$control-block-size;
     $close-offset: calc(
-      (
-          (var(--cirth-font-size-md) * var(--cirth-line-height)) +
-            (var(--cirth-form-element-spacing-vertical) * 2) +
-            var(--cirth-border-width) +
-            var(--cirth-registration-width) - var(--cirth-font-size-md)
-        ) /
-        2
+      (#{$button-block-size} - var(--cirth-font-size-md)) / 2
     );
 
     width: min(

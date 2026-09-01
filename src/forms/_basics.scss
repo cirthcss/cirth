@@ -1,4 +1,5 @@
 @use "../config" as *;
+@use "../helpers/metrics";
 
 // Helper
 
@@ -91,11 +92,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 
 #{$parent-selector}
   input:not([type="checkbox"], [type="radio"], [type="range"]) {
-  height: calc(
-    (var(--cirth-font-size-md) * var(--cirth-line-height)) +
-      (var(--cirth-form-element-spacing-vertical) * 2) +
-      var(--cirth-border-width) + var(--cirth-registration-width)
-  );
+  height: metrics.$control-block-size;
 }
 
 // The same 44px target, as a floor rather than a fixed height. A select
@@ -110,11 +107,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 
 #{$parent-selector} select,
 #{$parent-selector} textarea {
-  min-block-size: calc(
-    (var(--cirth-font-size-md) * var(--cirth-line-height)) +
-      (var(--cirth-form-element-spacing-vertical) * 2) +
-      var(--cirth-border-width) + var(--cirth-registration-width)
-  );
+  min-block-size: metrics.$control-block-size;
 }
 
 // Fieldset
@@ -135,10 +128,6 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   margin-bottom: calc(var(--cirth-spacing) * 0.5);
   color: var(--cirth-color);
   font-weight: var(--cirth-form-label-font-weight, var(--cirth-font-weight));
-}
-
-#{$parent-selector} fieldset legend {
-  margin-bottom: calc(var(--cirth-spacing) * 0.5);
 }
 
 // Blocks, 100%
@@ -175,7 +164,6 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   --cirth-box-shadow: none;
 
   border: var(--cirth-border-width) solid var(--cirth-border-color);
-  border-block-end-width: var(--cirth-registration-width);
   border-radius: var(--cirth-border-radius);
   outline: none;
   background-color: var(--cirth-background-color);
@@ -243,24 +231,26 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 // weaken the 3:1 the resting border owes WCAG 1.4.11 — moving toward the
 // ink only ever increases the contrast against the field.
 
-#{$parent-selector}
-  input:not(
-    [type="submit"],
-    [type="button"],
-    [type="reset"],
-    [type="checkbox"],
-    [type="radio"],
-    [type="range"],
-    [type="file"],
-    [readonly]
-  ),
-#{$parent-selector} :where(select, textarea):not([readonly]) {
-  &:hover:not(:active, :focus, [disabled], [aria-invalid]) {
-    --cirth-border-color: color-mix(
-      in oklch,
-      var(--cirth-form-element-border-color) 65%,
-      var(--cirth-color)
-    );
+@media (hover: hover) and (pointer: fine) {
+  #{$parent-selector}
+    input:not(
+      [type="submit"],
+      [type="button"],
+      [type="reset"],
+      [type="checkbox"],
+      [type="radio"],
+      [type="range"],
+      [type="file"],
+      [readonly]
+    ),
+  #{$parent-selector} :where(select, textarea):not([readonly]) {
+    &:hover:not(:active, :focus, :disabled, [aria-invalid], :user-invalid) {
+      --cirth-border-color: color-mix(
+        in oklch,
+        var(--cirth-form-element-border-color) 65%,
+        var(--cirth-color)
+      );
+    }
   }
 }
 
@@ -473,7 +463,7 @@ $validation-any: "[aria-invalid], #{$invalid-native}";
   &:not([rows]) {
     min-block-size: calc(
       4lh + (var(--cirth-form-element-spacing-vertical) * 2) +
-        var(--cirth-border-width) + var(--cirth-registration-width)
+        (var(--cirth-border-width) * 2)
     );
   }
 
@@ -481,7 +471,7 @@ $validation-any: "[aria-invalid], #{$invalid-native}";
     --cirth-icon-height: calc(
       var(--cirth-font-size-md) * var(--cirth-line-height) +
         var(--cirth-form-element-spacing-vertical) * 2 +
-        var(--cirth-border-width) + var(--cirth-registration-width)
+        (var(--cirth-border-width) * 2)
     );
 
     background-position: top right var(--cirth-space-3);

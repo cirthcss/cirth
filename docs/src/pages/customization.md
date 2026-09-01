@@ -30,7 +30,7 @@ short.
 
 ## How the token system works
 
-Cirth's tokens are not one flat list. There are four kinds, and knowing
+Cirth's tokens are not one flat list. There are five kinds, and knowing
 which one you are looking at tells you what will happen when you set it.
 
 ### Inputs
@@ -104,6 +104,14 @@ control, a tint mixing toward the page — use `--cirth-canvas`. That is the
 page surface as a value, and no component is allowed to shadow it.
 `--cirth-background-color` defaults to it.
 
+### Roles
+
+Standalone semantic settings that a component reads directly. A role does
+not promise to drive a family of other tokens: `--cirth-modal-max-width`,
+`--cirth-code-color`, and `--cirth-form-element-border-color` each configure
+one responsibility. Set one when that responsibility is exactly what you
+want to change.
+
 ### Scales
 
 The raw ladders: `--cirth-space-*`, `--cirth-radius-*`,
@@ -126,7 +134,8 @@ these.
 | `--cirth-font-family` | Body text, and every control that inherits it |
 | `--cirth-border-radius` | Every radius, including the ones derived from it |
 
-The `plain` preset is those first two plus two more, and nothing else — see
+The `plain` preset is those first two plus three role choices, and nothing
+else — see
 [Colors](/colors) for what it looks like. It exists partly to prove the
 point: a coherent, accessible, light-and-dark theme in five declarations.
 
@@ -195,9 +204,33 @@ validity styling pairs colour with an icon for that reason.
 | Token | What it is |
 | --- | --- |
 | `--cirth-canvas` | The page |
-| `--cirth-card-background-color` | An `<article>`, a dropdown, a popover |
+| `--cirth-code-background-color` | A recessed band: `<pre>`, inline `<code>` |
+| `--cirth-form-element-background-color` | A field at rest |
+| `--cirth-card-sectioning-background-color` | A card's header and footer band |
+| `--cirth-card-background-color` | An `<article>`; a dropdown and a popover follow it |
+| `--cirth-form-element-active-background-color` | A focused field; rises back to the canvas |
 | `--cirth-muted-color` | Subordinate text |
 | `--cirth-muted-border-color` | Hairlines: tables, cards, blockquotes |
+
+`--cirth-canvas` is the only input in this family. The others are runtime
+relationships: code is the deepest recess, the resting field sits between it
+and the canvas, the band and card add lightness, and a focused field rises to
+the canvas. Dropdown and popover alias the card because they are floating
+sheets. Overriding any derived token directly still breaks its relationship
+on purpose.
+
+The ladder preserves the canvas hue and chroma, so warm paper stays warm,
+Plain becomes neutral, and Playroom carries its violet temperature without
+restating a parallel scale. Both schemes now tell the same semantic story:
+
+```
+light: code 95.5 < control 96.6 < canvas 97.4 < band 98.3 < card 99.2
+dark:  code 18.2 < control 19.4 < canvas 20.2 < band 22.7 < card 24.2
+```
+
+A single `--cirth-canvas` override therefore moves card, form, code, dropdown,
+and popover in light, dark, and forced-theme subtrees. Plain uses that one
+surface input; it does not enumerate the ladder.
 
 ### Light and dark
 
@@ -315,14 +348,29 @@ so moving a step still moves the heading:
 
 ```css
 :root {
-  --cirth-font-size-7xl: 3rem;   /* h1 stops growing sooner */
+  --cirth-font-size-6xl: 2.25rem;   /* h1 stops growing sooner */
+}
+```
+
+The shipped ladder is **44 / 32 / 24 / 20 / 18 / 16** at the default root
+size. If you want display type beyond that, ask for it on the element rather
+than moving the scale everyone else reads:
+
+```css
+/* a campaign page, opting in through the slot every heading resolves
+   through — no second API, and the rest of the site keeps product scale */
+.hero h1 {
+  --cirth-font-size: clamp(2.75rem, 2rem + 1.9vw, 3.5rem);
 }
 ```
 
 `--cirth-line-height`, `--cirth-font-weight` and `--cirth-letter-spacing`
 are slots: set at the root they change the page default, and elements that
-were given their own value keep it. `--cirth-form-label-font-weight` is
-separate so labels can be heavier than the prose around them.
+were given their own value keep it. The two tracking steps have consumers —
+`--cirth-letter-spacing-tight` on `h1`/`h2`, `--cirth-letter-spacing-snug`
+on `h3`/`h4` — so overriding one moves the headings that read it.
+`--cirth-form-label-font-weight` is separate so labels can be heavier than
+the prose around them.
 
 ## Spacing and layout
 
@@ -347,12 +395,15 @@ in a `.grid`, and the padding inside controls derive from it:
 | `--cirth-modal-max-width` | The fluid modal card's upper width bound |
 
 A note on control height: Cirth's controls are at least 44px tall — WCAG
-2.5.5's target size — and that floor is a `min-block-size`, not a fixed
-height, so a control grows with its content rather than clipping it. It is
-computed from `--cirth-font-size-md` and the control line-height, so
-changing the padding tokens changes the padding without dropping below the
-floor. Navigation opts down to 24px, WCAG 2.5.8's AA minimum, because a nav
-row is compact by design.
+2.5.5's target size. Button, input, select and one-line textarea share one
+runtime formula made from `--cirth-font-size-md`, line-height, vertical
+padding and border. Text inputs use that result as their fixed one-line
+height; controls that may legitimately grow use it as a floor. Changing the
+padding therefore changes their internal proportions without letting an
+equivalent control fall out of alignment. Navigation opts down to a 40px
+band — comfortably clear of WCAG 2.5.8's 24px AA minimum — because a nav row
+is compact by design and a header should not have to fight the framework for
+a height.
 
 ## Borders, radii and outlines
 
@@ -368,7 +419,7 @@ so they never read as circles — so zeroing it zeroes them too.
 
 | Token | Relationship |
 | --- | --- |
-| `--cirth-card-border-radius` | `--cirth-border-radius` × 1.5 |
+| `--cirth-card-border-radius` | `--cirth-border-radius` × 1.5 — the container/control pair |
 | `--cirth-checkbox-border-radius` | Capped at `--cirth-radius-sm` |
 | `--cirth-code-border-radius` | Capped at `--cirth-radius-sm` |
 | `--cirth-radius-pill` | Untouched by the knob — switches stay pills |
@@ -517,16 +568,16 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 
 | Token | Kind |
 | --- | --- |
-| `--cirth-contrast` | input |
-| `--cirth-contrast-background` | input |
+| `--cirth-contrast` | role |
+| `--cirth-contrast-background` | role |
 | `--cirth-contrast-border` | derived |
-| `--cirth-contrast-focus` | input |
-| `--cirth-contrast-hover` | input |
-| `--cirth-contrast-hover-background` | input |
+| `--cirth-contrast-focus` | role |
+| `--cirth-contrast-hover` | role |
+| `--cirth-contrast-hover-background` | role |
 | `--cirth-contrast-hover-border` | derived |
 | `--cirth-contrast-hover-underline` | derived |
-| `--cirth-contrast-inverse` | input |
-| `--cirth-contrast-underline` | input |
+| `--cirth-contrast-inverse` | role |
+| `--cirth-contrast-underline` | role |
 | `--cirth-error` | input |
 | `--cirth-error-active` | derived |
 | `--cirth-error-border` | derived |
@@ -540,18 +591,18 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-primary-hover-background` | derived |
 | `--cirth-primary-hover-border` | derived |
 | `--cirth-primary-hover-underline` | derived |
-| `--cirth-primary-inverse` | derived |
+| `--cirth-primary-inverse` | role |
 | `--cirth-primary-underline` | derived |
-| `--cirth-secondary` | input |
-| `--cirth-secondary-background` | derived |
+| `--cirth-secondary` | role |
+| `--cirth-secondary-background` | role |
 | `--cirth-secondary-border` | derived |
-| `--cirth-secondary-focus` | input |
-| `--cirth-secondary-hover` | input |
-| `--cirth-secondary-hover-background` | input |
+| `--cirth-secondary-focus` | role |
+| `--cirth-secondary-hover` | role |
+| `--cirth-secondary-hover-background` | role |
 | `--cirth-secondary-hover-border` | derived |
 | `--cirth-secondary-hover-underline` | derived |
-| `--cirth-secondary-inverse` | derived |
-| `--cirth-secondary-underline` | input |
+| `--cirth-secondary-inverse` | role |
+| `--cirth-secondary-underline` | role |
 | `--cirth-success` | input |
 | `--cirth-success-active` | derived |
 | `--cirth-success-border` | derived |
@@ -571,25 +622,25 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-blockquote-border-color` | derived |
 | `--cirth-blockquote-footer-color` | derived |
 | `--cirth-canvas` | input |
-| `--cirth-card-background-color` | input |
+| `--cirth-card-background-color` | derived |
 | `--cirth-card-border-color` | derived |
 | `--cirth-card-border-radius` | role |
-| `--cirth-card-box-shadow` | derived |
-| `--cirth-card-sectioning-background-color` | input |
-| `--cirth-code-background-color` | input |
+| `--cirth-card-box-shadow` | role |
+| `--cirth-card-sectioning-background-color` | derived |
+| `--cirth-code-background-color` | derived |
 | `--cirth-code-border-radius` | role |
-| `--cirth-code-color` | input |
+| `--cirth-code-color` | role |
 | `--cirth-code-kbd-background-color` | derived |
 | `--cirth-code-kbd-color` | derived |
 | `--cirth-color` | slot |
 | `--cirth-del-color` | derived |
 | `--cirth-ins-color` | derived |
-| `--cirth-link-visited-color` | input |
+| `--cirth-link-visited-color` | role |
 | `--cirth-mark-background-color` | derived |
-| `--cirth-mark-color` | input |
-| `--cirth-muted-border-color` | input |
-| `--cirth-muted-color` | input |
-| `--cirth-text-selection-color` | input |
+| `--cirth-mark-color` | role |
+| `--cirth-muted-border-color` | role |
+| `--cirth-muted-color` | role |
+| `--cirth-text-selection-color` | role |
 
 #### Typography
 
@@ -713,18 +764,18 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | Token | Kind |
 | --- | --- |
 | `--cirth-checkbox-border-radius` | role |
-| `--cirth-form-element-active-background-color` | input |
+| `--cirth-form-element-active-background-color` | derived |
 | `--cirth-form-element-active-border-color` | derived |
-| `--cirth-form-element-background-color` | input |
-| `--cirth-form-element-border-color` | input |
-| `--cirth-form-element-color` | input |
+| `--cirth-form-element-background-color` | derived |
+| `--cirth-form-element-border-color` | role |
+| `--cirth-form-element-color` | role |
 | `--cirth-form-element-disabled-opacity` | derived |
 | `--cirth-form-element-focus-color` | derived |
 | `--cirth-form-element-invalid-active-border-color` | derived |
 | `--cirth-form-element-invalid-border-color` | derived |
 | `--cirth-form-element-invalid-focus-color` | derived |
 | `--cirth-form-element-placeholder-color` | derived |
-| `--cirth-form-element-selected-background-color` | input |
+| `--cirth-form-element-selected-background-color` | role |
 | `--cirth-form-element-spacing-horizontal` | role |
 | `--cirth-form-element-spacing-vertical` | role |
 | `--cirth-form-element-valid-active-border-color` | derived |
@@ -732,35 +783,35 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-form-element-valid-focus-color` | derived |
 | `--cirth-form-label-font-weight` | role |
 | `--cirth-icon-checkbox` | role |
-| `--cirth-icon-chevron` | derived |
+| `--cirth-icon-chevron` | role |
 | `--cirth-icon-close` | role |
-| `--cirth-icon-date` | derived |
+| `--cirth-icon-date` | role |
 | `--cirth-icon-height` | role |
-| `--cirth-icon-invalid` | derived |
+| `--cirth-icon-invalid` | role |
 | `--cirth-icon-loading` | role |
 | `--cirth-icon-minus` | role |
 | `--cirth-icon-position` | role |
-| `--cirth-icon-search` | derived |
-| `--cirth-icon-time` | derived |
-| `--cirth-icon-valid` | derived |
+| `--cirth-icon-search` | role |
+| `--cirth-icon-time` | role |
+| `--cirth-icon-valid` | role |
 | `--cirth-icon-width` | role |
 | `--cirth-meter-background-color` | role |
 | `--cirth-meter-border-color` | role |
 | `--cirth-meter-even-less-good-color` | derived |
 | `--cirth-meter-optimum-color` | derived |
 | `--cirth-meter-suboptimum-color` | derived |
-| `--cirth-progress-background-color` | input |
-| `--cirth-progress-border-color` | input |
+| `--cirth-progress-background-color` | role |
+| `--cirth-progress-border-color` | role |
 | `--cirth-progress-color` | derived |
-| `--cirth-range-active-border-color` | input |
-| `--cirth-range-border-color` | input |
+| `--cirth-range-active-border-color` | role |
+| `--cirth-range-border-color` | role |
 | `--cirth-range-thumb-active-color` | derived |
 | `--cirth-range-thumb-border-color` | derived |
 | `--cirth-range-thumb-color` | derived |
-| `--cirth-switch-background-color` | input |
+| `--cirth-switch-background-color` | role |
 | `--cirth-switch-checked-background-color` | derived |
 | `--cirth-switch-color` | derived |
-| `--cirth-switch-thumb-box-shadow` | derived |
+| `--cirth-switch-thumb-box-shadow` | role |
 
 #### Components
 
@@ -769,18 +820,18 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-accordion-active-summary-color` | derived |
 | `--cirth-accordion-close-summary-color` | derived |
 | `--cirth-accordion-open-summary-color` | derived |
-| `--cirth-dropdown-background-color` | input |
-| `--cirth-dropdown-border-color` | input |
+| `--cirth-dropdown-background-color` | derived |
+| `--cirth-dropdown-border-color` | derived |
 | `--cirth-dropdown-box-shadow` | derived |
 | `--cirth-dropdown-color` | derived |
-| `--cirth-dropdown-hover-background-color` | input |
+| `--cirth-dropdown-hover-background-color` | derived |
 | `--cirth-group-box-shadow` | role |
 | `--cirth-group-box-shadow-focus-with-button` | role |
 | `--cirth-group-box-shadow-focus-with-input` | role |
 | `--cirth-modal-max-width` | role |
 | `--cirth-modal-overlay-backdrop-filter` | role |
 | `--cirth-modal-overlay-background-color` | derived |
-| `--cirth-popover-background-color` | role |
+| `--cirth-popover-background-color` | derived |
 | `--cirth-popover-border-color` | role |
 | `--cirth-popover-box-shadow` | role |
 | `--cirth-popover-color` | role |
@@ -790,7 +841,7 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-print-color` | role |
 | `--cirth-print-muted-color` | role |
 | `--cirth-table-border-color` | derived |
-| `--cirth-table-row-stripped-background-color` | derived |
+| `--cirth-table-row-stripped-background-color` | role |
 | `--cirth-text-decoration` | slot |
 | `--cirth-underline` | slot |
 
@@ -800,9 +851,9 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | --- | --- |
 | `--cirth-button-box-shadow` | derived |
 | `--cirth-button-hover-box-shadow` | derived |
-| `--cirth-h1-color` | input |
-| `--cirth-h2-color` | input |
-| `--cirth-h3-color` | input |
-| `--cirth-h4-color` | input |
-| `--cirth-h5-color` | input |
-| `--cirth-h6-color` | input |
+| `--cirth-h1-color` | role |
+| `--cirth-h2-color` | role |
+| `--cirth-h3-color` | role |
+| `--cirth-h4-color` | role |
+| `--cirth-h5-color` | role |
+| `--cirth-h6-color` | role |

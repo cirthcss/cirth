@@ -1,27 +1,4 @@
-{%- set defaultSource -%}
-<!-- Layout: container -->
-<main class="container">
-  <!-- Component: card -->
-  <article>
-    <h2>Sign in</h2>
-    <!-- Components: form controls -->
-    <form>
-      <label>
-        Email
-        <input type="email" name="email" autocomplete="email">
-      </label>
-      <label>
-        Password
-        <input type="password" name="password" autocomplete="current-password">
-      </label>
-      <label><input type="checkbox" checked> Remember this device</label>
-      <button type="button">Sign in</button>
-    </form>
-  </article>
-</main>
-{%- endset -%}
-
-<figure class="docs-transform-figure" aria-label="Semantic HTML source and authentic Cirth output">
+<figure class="docs-transform-figure" aria-label="Semantic HTML source and authentic Cirth output" data-lab-figure>
 	<div class="docs-lab-toolbar">
 		<label>
 			<span>Build</span>
@@ -45,7 +22,11 @@
 			<header>
 				<span id="source-label">Source</span>
 			</header>
-			<pre tabindex="0"><code data-lab-source>{{ defaultSource }}</code></pre>
+			<pre tabindex="0"><code class="hljs language-html" data-lab-source>{{ labSources.default | highlightHtml | safe }}</code></pre>
+			{#- Every variant, highlighted at build time. The switcher moves
+			    markup between these and the <code> above; nothing is
+			    highlighted in the browser. -#}
+			{% for name, source in labSources %}<template data-lab-source-for="{{ name }}">{{ source | highlightHtml | safe }}</template>{% endfor %}
 		</section>
 
 		<section class="docs-output-panel" aria-labelledby="output-label">
@@ -70,110 +51,318 @@
 
 <script>
 	(() => {
+		const figure = document.querySelector("[data-lab-figure]");
 		const build = document.querySelector("[data-lab-build]");
 		const theme = document.querySelector("[data-lab-theme]");
 		const frame = document.querySelector("[data-lab-frame]");
 		const source = document.querySelector("[data-lab-source]");
-		if (!build || !theme || !frame || !source) return;
+		const pre = source?.closest("pre");
+		if (!figure || !build || !theme || !frame || !source || !pre) return;
 
-		const sources = {
-			default: `<!-- Layout: container -->
-<main class="container">
-  <!-- Component: card -->
-  <article>
-    <h2>Sign in</h2>
-    <!-- Components: form controls -->
-    <form>
-      <label>
-        Email
-        <input type="email" name="email" autocomplete="email">
-      </label>
-      <label>
-        Password
-        <input type="password" name="password" autocomplete="current-password">
-      </label>
-      <label><input type="checkbox" checked> Remember this device</label>
-      <button type="button">Sign in</button>
-    </form>
-  </article>
-</main>`,
-			classless: `<!-- Layout: document flow -->
-<main>
-  <!-- Component: card -->
-  <article>
-    <h2>Sign in</h2>
-    <!-- Components: form controls -->
-    <form>
-      <label>
-        Email
-        <input type="email" name="email" autocomplete="email">
-      </label>
-      <label>
-        Password
-        <input type="password" name="password" autocomplete="current-password">
-      </label>
-      <label><input type="checkbox" checked> Remember this device</label>
-      <button type="button">Sign in</button>
-    </form>
-  </article>
-</main>`,
-			scoped: `<!-- Scope: .cirth -->
-<div class="cirth">
-  <!-- Layout: container -->
-  <main class="container">
-    <!-- Component: card -->
-    <article>
-      <h2>Sign in</h2>
-      <!-- Components: form controls -->
-      <form>
-        <label>
-          Email
-          <input type="email" name="email" autocomplete="email">
-        </label>
-        <label>
-          Password
-          <input type="password" name="password" autocomplete="current-password">
-        </label>
-        <label><input type="checkbox" checked> Remember this device</label>
-        <button type="button">Sign in</button>
-      </form>
-    </article>
-  </main>
-</div>`,
-			"scoped-classless": `<!-- Scope: .cirth -->
-<div class="cirth">
-  <!-- Layout: document flow -->
-  <main>
-    <!-- Component: card -->
-    <article>
-      <h2>Sign in</h2>
-      <!-- Components: form controls -->
-      <form>
-        <label>
-          Email
-          <input type="email" name="email" autocomplete="email">
-        </label>
-        <label>
-          Password
-          <input type="password" name="password" autocomplete="current-password">
-        </label>
-        <label><input type="checkbox" checked> Remember this device</label>
-        <button type="button">Sign in</button>
-      </form>
-    </article>
-  </main>
-</div>`,
+		// ---- Build and theme switching -----------------------------------
+		// Unchanged in substance: the <template>s hold every variant already
+		// highlighted at build time, so there is still exactly one copy of
+		// the sources in this project (docs/src/_data/labSources.js) and
+		// nothing is highlighted in the browser.
+		const applySource = () => {
+			const variant = document.querySelector(
+				`[data-lab-source-for="${build.value}"]`,
+			);
+			// innerHTML, not textContent: the payload is the build-time
+			// highlighted markup from the matching <template>, not user input.
+			if (variant) source.innerHTML = variant.innerHTML;
 		};
-		const render = () => {
+		const applyFrame = () => {
 			const base = (document.documentElement.dataset.base || "/").replace(/\/$/, "");
 			frame.src = `${base}/lab/${build.value}/?theme=${theme.value}`;
 			frame.title = `Authentic Cirth ${build.options[build.selectedIndex].text} build in ${theme.value} mode`;
-			source.textContent = sources[build.value];
 		};
 
-		build.addEventListener("change", render);
-		theme.addEventListener("change", render);
+		// ---- The typing demo ----------------------------------------------
+		// The source is revealed, not retyped. Every character of the
+		// highlighted markup is in the DOM from the first frame and stays
+		// there; only its colour changes. That single decision answers most
+		// of what an effect like this normally gets wrong:
+		//
+		//   - the highlighting survives, because the hljs spans are never
+		//     rebuilt — a character span takes `color: inherit` from the
+		//     token span it already sits inside;
+		//   - nothing reflows, because the untyped tail still occupies its
+		//     space, so the panel's height and its scroll width are the same
+		//     on the first frame as on the last;
+		//   - assistive technology always reads the complete source. There
+		//     is no partial text to announce and no second, hidden copy of
+		//     the markup to read out twice. Transparent text is still text;
+		//   - selection and copy return the whole snippet at any point.
+		//
+		// The output side is the real iframe, never reloaded to animate:
+		// its top-level elements are hidden and then revealed in step with
+		// the markup that produces them.
+		const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+		const MS = {
+			char: 18,
+			newline: 55,
+			stage: 200,
+			holdFull: 3200,
+			erase: 9,
+			holdEmpty: 800,
+			lead: 500,
+		};
+
+		/** @type {HTMLElement[]} */
+		let chars = [];
+		/** @type {number[]} */
+		let stops = [];
+		/** @type {HTMLElement[]} */
+		let stages = [];
+		let shown = 0;
+		let stage = 0;
+		let phase = "idle";
+		let frameId = 0;
+		let last = 0;
+		let wait = 0;
+		let paused = true;
+
+		// One <span> per character, created once per variant. The walker runs
+		// over the <code> only, so the hidden copy button beside it in the
+		// <pre> is never touched.
+		const splitCharacters = () => {
+			const walker = document.createTreeWalker(source, NodeFilter.SHOW_TEXT);
+			/** @type {Text[]} */
+			const texts = [];
+			for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+				texts.push(/** @type {Text} */ (node));
+			}
+			/** @type {HTMLElement[]} */
+			const cells = [];
+			for (const node of texts) {
+				const fragment = document.createDocumentFragment();
+				for (const character of node.data) {
+					const cell = document.createElement("span");
+					cell.className = "docs-lab-ch";
+					cell.textContent = character;
+					cells.push(cell);
+					fragment.append(cell);
+				}
+				node.replaceWith(fragment);
+			}
+			return cells;
+		};
+
+		// Where the output gains an element, read off the source text itself
+		// rather than from a second description of it: each staged element
+		// finishes at its own closing tag, and the tags appear in the same
+		// order as the elements they produce, in every build variant.
+		const findStops = (text) =>
+			Array.from(text.matchAll(/<\/(?:h2|label|button)>/g)).map(
+				(match) => match.index + match[0].length,
+			);
+
+		const collectStages = () => {
+			const doc = frame.contentDocument;
+			if (!doc || !doc.body) return [];
+			return Array.from(doc.querySelectorAll("article > h2, form > label, form > button"));
+		};
+
+		const applyStage = (next) => {
+			if (next === stage) return;
+			stage = next;
+			stages.forEach((element, index) => {
+				element.style.display = index < stage ? "" : "none";
+			});
+		};
+
+		const applyShown = (next) => {
+			const target = Math.max(0, Math.min(chars.length, next));
+			for (let index = Math.min(shown, target); index < Math.max(shown, target); index += 1) {
+				chars[index]?.classList.toggle("is-typed", index < target);
+			}
+			chars[shown]?.classList.remove("is-caret");
+			shown = target;
+			chars[shown]?.classList.add("is-caret");
+			let reached = 0;
+			while (reached < stops.length && shown >= stops[reached]) reached += 1;
+			applyStage(reached);
+		};
+
+		const showEverything = () => {
+			for (const cell of chars) cell.classList.add("is-typed");
+			for (const cell of chars) cell.classList.remove("is-caret");
+			shown = chars.length;
+			stage = -1;
+			applyStage(stages.length);
+			source.removeAttribute("data-lab-typing");
+			phase = "complete";
+		};
+
+		const stop = () => {
+			if (frameId) cancelAnimationFrame(frameId);
+			frameId = 0;
+			paused = true;
+		};
+
+		// A single rAF loop, so there is exactly one scheduler and no timer
+		// can outlive it. rAF also stops on its own while the tab is hidden;
+		// the observer below adds the same for a hero scrolled out of view.
+		const tick = (now) => {
+			frameId = 0;
+			if (paused) return;
+			const delta = Math.min(now - last, 250);
+			last = now;
+			wait -= delta;
+			while (wait <= 0 && !paused) {
+				if (phase === "typing") {
+					if (shown >= chars.length) {
+						phase = "full";
+						wait += MS.holdFull;
+						break;
+					}
+					const before = stage;
+					applyShown(shown + 1);
+					wait += chars[shown - 1]?.textContent === "\n" ? MS.newline : MS.char;
+					if (stage !== before) wait += MS.stage;
+				} else if (phase === "full") {
+					phase = "erasing";
+				} else if (phase === "erasing") {
+					if (shown <= 0) {
+						phase = "empty";
+						wait += MS.holdEmpty;
+						break;
+					}
+					applyShown(shown - 1);
+					wait += MS.erase;
+				} else if (phase === "empty") {
+					phase = "typing";
+				} else {
+					break;
+				}
+			}
+			frameId = requestAnimationFrame(tick);
+		};
+
+		const start = (delay) => {
+			stop();
+			if (reduce.matches || !chars.length) return;
+			paused = false;
+			wait = delay;
+			last = performance.now();
+			frameId = requestAnimationFrame(tick);
+		};
+
+		const restart = () => {
+			source.setAttribute("data-lab-typing", "");
+			phase = "typing";
+			stage = -1;
+			shown = chars.length;
+			applyShown(0);
+			start(MS.lead);
+		};
+
+		// Rebuilt on every build change: new markup, new character cells, new
+		// stop offsets. The previous loop is cancelled before anything is
+		// replaced, so two cycles can never share the panel.
+		const rebuild = () => {
+			stop();
+			applySource();
+			stops = findStops(source.textContent || "");
+			if (reduce.matches) {
+				chars = [];
+				source.removeAttribute("data-lab-typing");
+				for (const element of stages) element.style.display = "";
+				phase = "reduced";
+				return;
+			}
+			chars = splitCharacters();
+			restart();
+		};
+
+		// Reading the code beats watching it. Focus or a selection inside the
+		// panel completes the snippet and leaves it complete; the cycle picks
+		// up again once the reader has moved on.
+		const settle = () => {
+			stop();
+			showEverything();
+		};
+		figure.addEventListener("focusin", settle);
+		pre.addEventListener("selectstart", settle);
+		figure.addEventListener("focusout", () => {
+			if (figure.contains(document.activeElement)) return;
+			if (!document.getSelection()?.isCollapsed) return;
+			if (reduce.matches) return;
+			restart();
+		});
+
+		frame.addEventListener("load", () => {
+			stages = collectStages();
+			stage = -1;
+			if (phase === "complete" || phase === "reduced") {
+				applyStage(stages.length);
+				return;
+			}
+			let reached = 0;
+			while (reached < stops.length && shown >= stops[reached]) reached += 1;
+			applyStage(reached);
+		});
+
+		build.addEventListener("change", () => {
+			applyFrame();
+			rebuild();
+		});
+		theme.addEventListener("change", () => {
+			// Only the rendering changes: the markup is the same, so the
+			// cycle keeps its place instead of snapping back to an empty pane.
+			applyFrame();
+		});
+		reduce.addEventListener?.("change", rebuild);
+
+		if ("IntersectionObserver" in window) {
+			new IntersectionObserver((entries) => {
+				for (const entry of entries) {
+					if (entry.isIntersecting) {
+						if (phase === "typing" || phase === "erasing" || phase === "full" || phase === "empty") {
+							if (paused) start(0);
+						}
+					} else {
+						stop();
+					}
+				}
+			}, { threshold: 0 }).observe(figure);
+		}
+
 		theme.value = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
-		render();
+		applyFrame();
+		rebuild();
+
+		// Test surface. The suite drives the cycle instead of waiting it out:
+		// every phase is reachable in one call, so the specs are deterministic
+		// and take milliseconds rather than a full loop.
+		window.cirthLabDemo = {
+			get phase() {
+				return phase;
+			},
+			get typed() {
+				return shown;
+			},
+			get total() {
+				return chars.length;
+			},
+			get outputStage() {
+				return stage;
+			},
+			get stops() {
+				return stops.slice();
+			},
+			get running() {
+				return !paused;
+			},
+			seek(count) {
+				stop();
+				source.setAttribute("data-lab-typing", "");
+				applyShown(count);
+			},
+			complete: settle,
+			restart,
+			stop,
+		};
 	})();
 </script>

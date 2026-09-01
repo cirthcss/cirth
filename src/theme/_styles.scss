@@ -27,7 +27,14 @@
   // get a softer radius than the controls inside them, while small inline
   // elements (checkboxes, code) are capped so they never read as circles.
   --cirth-border-radius: var(--cirth-radius-sm);
-  --cirth-card-border-radius: var(--cirth-radius-md);
+
+  // Derived, not a second independent step. The pair — a container one step
+  // softer than the controls inside it — is one of the few things about
+  // Cirth that survives a retheme (see docs/brand.md), so it is stated as a
+  // relationship rather than as two numbers that happen to be 1.5 apart.
+  // It also makes the documented promise true: zeroing the knob used to
+  // zero the checkbox and code radii and leave every card rounded.
+  --cirth-card-border-radius: calc(var(--cirth-border-radius) * 1.5);
   --cirth-checkbox-border-radius: min(
     var(--cirth-border-radius),
     var(--cirth-radius-sm)
@@ -36,13 +43,13 @@
     var(--cirth-border-radius),
     var(--cirth-radius-sm)
   );
-  --cirth-border-width: var(--cirth-border-width-1);
 
-  // Cirth's quiet registration edge: controls and resting surfaces carry a
-  // slightly stronger baseline. In vertical navigation the same weight is
-  // rotated into a leading rail. The geometry, rather than the accent hue,
-  // is what makes the family recognisable across presets.
-  --cirth-registration-width: var(--cirth-border-width-2);
+  // One stroke for every resting edge. Buttons, fields, cards and popovers
+  // all take this width on all four sides: a control that reads as raised
+  // on one edge and flat on the others is the inconsistency, not the
+  // feature. Active navigation and selected rows still use the stroke
+  // scale directly, as two-dimensional markers rather than as relief.
+  --cirth-border-width: var(--cirth-border-width-1);
   --cirth-outline-width: var(--cirth-border-width-2);
 
   // The page surface slot, defaulting to the canvas input. Declared here
@@ -89,15 +96,11 @@
   }
 
   // Spacings for form elements and button
-  // Controls are 2.75rem (44px) tall — the WCAG 2.5.5 target size. Their
-  // compact 25px line box plus 2 × 0.5rem padding, a 1px top edge and the
-  // 2px registered baseline produces that height exactly.
-
-  // These values produce it; they do not guarantee it. Anything that moves
-  // a control's font-size moves the sum, so button, select and textarea
-  // each restate 44px as a min-block-size measured from
-  // --cirth-font-size-md instead of from their own text. A nav restates it at 24px, WCAG
-  // 2.5.8's AA minimum, because a navigation row is compact by design.
+  // Controls have a 2.75rem (44px) floor — the WCAG 2.5.5 target size.
+  // Component rules keep that floor independent from paint geometry, so a
+  // consumer can change the border width without silently shrinking an
+  // interactive target. A nav opts down to a 40px band, still clear of
+  // WCAG 2.5.8's 24px AA minimum, because a nav row is compact by design.
   --cirth-form-element-spacing-vertical: var(--cirth-space-2);
   --cirth-form-element-spacing-horizontal: var(--cirth-space-4);
 
@@ -111,6 +114,9 @@
   --cirth-group-box-shadow-focus-with-input: 0 0 0 var(--cirth-border-width-1)
     var(--cirth-form-element-border-color);
 
+  // Card (<article>)
+  --cirth-card-box-shadow: none;
+
   // Meter (<meter>)
   // The frame is progress's, borrowed rather than duplicated: same track,
   // same border, so the two read as a matched pair and retheming one
@@ -122,14 +128,8 @@
   --cirth-meter-border-color: var(--cirth-progress-border-color);
 
   // Popover ([popover])
-  // A floating sheet, so it borrows the card's surface and the muted
-  // hairline rather than declaring a parallel palette: one panel look
-  // across the library, and a preset that recolors cards recolors this
-  // with them. The border is the muted one, not the card's — in the dark
-  // scheme a card's border is its own background, which is the right
-  // answer for a card sitting on the page and the wrong one for a sheet
-  // floating above it.
-  --cirth-popover-background-color: var(--cirth-card-background-color);
+  // Its background aliases the card surface in the scheme mixins so the
+  // relationship re-resolves inside forced-theme subtrees.
   --cirth-popover-border-color: var(--cirth-muted-border-color);
   --cirth-popover-color: var(--cirth-color);
   --cirth-popover-box-shadow: var(--cirth-box-shadow);
@@ -149,7 +149,6 @@
   --cirth-nav-link-spacing-vertical: var(--cirth-space-2);
   --cirth-nav-link-spacing-horizontal: var(--cirth-space-2);
   --cirth-nav-breadcrumb-divider: ">";
-  --cirth-nav-active-color: var(--cirth-contrast);
 
   // Icons
   // Every icon below is a viewBox and nothing else: no width/height
@@ -206,9 +205,21 @@
   }
 
   // Headings
-  // Sizes are fluid (clamp on viewport width) now that the root font size
-  // no longer grows per breakpoint: display type keeps its presence on
-  // large screens while body text and control heights stay fixed.
+  // Calibrated for the interface Cirth is actually for: a dense internal
+  // tool, where an h1 sits above a form rather than above a hero. It used
+  // to top out at 2.75rem (44px at the shipped root size), which is a
+  // landing-page heading; every product page and this project's own
+  // documentation inherited that campaign scale by default and nobody
+  // asked for it. The ladder below runs 44 / 32 / 24 / 20 / 18 / 16 —
+  // six distinct steps read straight off the font-size scale, fluid down
+  // to h3, because that is where viewport width still makes a
+  // difference and below it a heading is just a label.
+  // A campaign scale is one declaration away and does not need a second
+  // API to reach: --cirth-font-size is the slot every heading resolves
+  // through, so `h1 { --cirth-font-size: clamp(2.75rem, 5vw, 4.5rem); }`
+  // opts one page into display type without moving the defaults for the
+  // application screens. The documentation's own home page is that
+  // worked example.
   h1,
   h2,
   h3 {
@@ -221,37 +232,49 @@
     --cirth-font-weight: var(--cirth-font-weight-semibold);
   }
 
+  // Tracking and leading come off the scales that exist for them rather
+  // than off literals. --cirth-letter-spacing-tight declared -0.02em while
+  // h1/h2/h3 each set a different hand-written value, so the token named a
+  // relationship it did not govern and overriding it did nothing to any
+  // heading on the page. Both tracking steps now have a consumer, and both
+  // keep the value they always declared.
+  h1,
+  h2 {
+    --cirth-letter-spacing: var(--cirth-letter-spacing-tight);
+  }
+
+  h3,
+  h4 {
+    --cirth-letter-spacing: var(--cirth-letter-spacing-snug);
+  }
+
   h1 {
-    // Decisive without turning every product page into a campaign page.
     --cirth-font-size: clamp(
-      var(--cirth-font-size-4xl),
-      1.65rem + 1.65vw,
+      var(--cirth-font-size-3xl),
+      1.31rem + 1.8vw,
       var(--cirth-font-size-6xl)
     );
-    --cirth-line-height: 1.08;
-    --cirth-letter-spacing: var(--cirth-letter-spacing-snug);
+    --cirth-line-height: var(--cirth-line-height-tight);
     --cirth-typography-spacing-top: var(--cirth-space-12);
   }
 
   h2 {
     --cirth-font-size: clamp(
       var(--cirth-font-size-2xl),
-      1.3rem + 1vw,
+      1.28rem + 0.9vw,
       var(--cirth-font-size-4xl)
     );
-    --cirth-line-height: 1.2;
-    --cirth-letter-spacing: var(--cirth-letter-spacing-snug);
+    --cirth-line-height: var(--cirth-line-height-snug);
     --cirth-typography-spacing-top: var(--cirth-space-12);
   }
 
   h3 {
     --cirth-font-size: clamp(
       var(--cirth-font-size-xl),
-      1.15rem + 0.5vw,
+      1.14rem + 0.45vw,
       var(--cirth-font-size-2xl)
     );
-    --cirth-line-height: 1.2;
-    --cirth-letter-spacing: var(--cirth-letter-spacing-snug);
+    --cirth-line-height: var(--cirth-line-height-snug);
     --cirth-typography-spacing-top: var(--cirth-space-10);
   }
 
@@ -287,7 +310,6 @@
     th,
     td {
       --cirth-font-weight: var(--cirth-font-weight-semibold);
-      --cirth-border-width: var(--cirth-registration-width);
     }
   }
 
@@ -312,21 +334,6 @@
     --cirth-font-weight: bolder;
   }
 
-  // Inputs and Selects
-  // The compact line-height is part of the 44px control-height math above.
-  input:not(
-    [type="submit"],
-    [type="button"],
-    [type="reset"],
-    [type="checkbox"],
-    [type="radio"],
-    [type="file"]
-  ),
-  :where(select, textarea) {
-    --cirth-outline-width: var(--cirth-border-width-1);
-    --cirth-line-height: 1.5625;
-  }
-
   [type="search"] {
     --cirth-border-radius: var(--cirth-radius-pill);
   }
@@ -337,23 +344,16 @@
     --cirth-border-radius: inherit;
   }
 
-  // Buttons
-  // Buttons share the same 25px line box and registered baseline as fields.
+  // Buttons and fields inherit the same normal line-height and share the
+  // 44px floor emitted from helpers/_metrics.scss. Their variants differ
+  // in colour, never in geometry.
   button,
   [type="submit"],
   [type="reset"],
   [type="button"],
   [role="button"] {
     --cirth-font-weight: var(--cirth-font-weight-semibold);
-    --cirth-line-height: 1.5625;
     --cirth-form-element-spacing-horizontal: var(--cirth-space-4);
-  }
-
-  // The file input only gets the line-height (for its ::file-selector-button,
-  // which inherits custom properties from the input) — not the button font
-  // weight, which would also embolden the filename text
-  [type="file"] {
-    --cirth-line-height: 1.5625;
   }
 
   // Checkboxes, Radios and Switches
