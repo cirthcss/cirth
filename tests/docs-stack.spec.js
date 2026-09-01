@@ -21,31 +21,36 @@ test.afterAll(() => {
 	server.close();
 });
 
-/** @param {import("@playwright/test").Page} page */
+/**
+ * The hero is two cards that overlap, not one panel split in two, so the
+ * geometry worth pinning is the relationship between them: the output
+ * reaches back over the source by a real, bounded amount, sits below it,
+ * and neither card leaves the stage. An overlap built out of flow rather
+ * than out of absolute positioning is exactly the thing that can quietly
+ * start clipping at some width, which is what this asserts against.
+ * @param {import("@playwright/test").Page} page
+ */
 const assertHeroDemoGeometry = async (page) => {
-	const figureBox = await page.locator(".docs-transform-figure").boundingBox();
-	const gridBox = await page.locator(".docs-transform-grid").boundingBox();
+	const stageBox = await page.locator(".docs-lab-stage").boundingBox();
+	const sourceBox = await page.locator(".docs-source-panel").boundingBox();
+	const outputBox = await page.locator(".docs-output-panel").boundingBox();
 	const frameBox = await page.locator("[data-lab-frame]").boundingBox();
 	const frameWrapperBox = await page
 		.locator(".docs-output-frame")
 		.boundingBox();
-	const outputBox = await page.locator(".docs-output-panel").boundingBox();
 	const noteBox = await page.locator(".docs-figure-note").boundingBox();
 	if (
-		!figureBox ||
-		!gridBox ||
+		!stageBox ||
+		!sourceBox ||
+		!outputBox ||
 		!frameBox ||
 		!frameWrapperBox ||
-		!outputBox ||
 		!noteBox
 	) {
-		throw new Error(
-			"Expected the hero figure, preview, and footer to be visible",
-		);
+		throw new Error("Expected both hero cards, the frame, and the note");
 	}
-	expect(
-		Math.abs(noteBox.x + noteBox.width - (figureBox.x + figureBox.width)),
-	).toBeLessThanOrEqual(1);
+
+	// The iframe fills its cell exactly: no letterbox, no overhang.
 	expect(Math.abs(frameBox.y - frameWrapperBox.y)).toBeLessThanOrEqual(1);
 	expect(
 		Math.abs(
@@ -54,12 +59,44 @@ const assertHeroDemoGeometry = async (page) => {
 				(frameWrapperBox.y + frameWrapperBox.height),
 		),
 	).toBeLessThanOrEqual(1);
-	expect(frameWrapperBox.y + frameWrapperBox.height).toBeLessThanOrEqual(
-		outputBox.y + outputBox.height + 1,
+
+	// Neither card escapes the stage on either edge, at any width.
+	expect(Math.min(sourceBox.x, outputBox.x)).toBeGreaterThanOrEqual(
+		stageBox.x - 1,
 	);
-	expect(gridBox.y + gridBox.height).toBeLessThanOrEqual(noteBox.y + 1);
-	expect(noteBox.y + noteBox.height).toBeLessThanOrEqual(
-		figureBox.y + figureBox.height + 1,
+	expect(
+		Math.max(sourceBox.x + sourceBox.width, outputBox.x + outputBox.width),
+	).toBeLessThanOrEqual(stageBox.x + stageBox.width + 1);
+
+	// Stacked is the case where the two cards share a column: same x, same
+	// width. Reading it off the vertical relation instead would get mobile
+	// backwards, where the output is ordered first and therefore sits
+	// entirely above the source.
+	const stacked =
+		Math.abs(outputBox.x - sourceBox.x) <= 1 &&
+		Math.abs(outputBox.width - sourceBox.width) <= 1;
+	if (!stacked) {
+		// Overlapping: the output reaches back over the source, and drops
+		// below it, by an amount you can see rather than by a hairline.
+		const overlapX = sourceBox.x + sourceBox.width - outputBox.x;
+		expect(overlapX).toBeGreaterThan(8);
+		expect(overlapX).toBeLessThan(sourceBox.width / 2);
+		expect(outputBox.y).toBeGreaterThan(sourceBox.y);
+		expect(outputBox.y + outputBox.height).toBeGreaterThan(
+			sourceBox.y + sourceBox.height,
+		);
+	} else {
+		// Stacked: the offset is unwound completely rather than shrunk, so
+		// the two cards read as a column and not as a misalignment.
+		expect(
+			Math.abs(outputBox.x + outputBox.width - (sourceBox.x + sourceBox.width)),
+		).toBeLessThanOrEqual(1);
+	}
+
+	// The note is about the pair, so it sits under both of them.
+	expect(noteBox.y).toBeGreaterThanOrEqual(
+		Math.max(sourceBox.y + sourceBox.height, outputBox.y + outputBox.height) -
+			1,
 	);
 };
 
@@ -780,239 +817,146 @@ test("the ledger is a native table with one voice in its header row", async ({
 	}
 });
 
-// --- The hero demo animates the source into the output ------------------
+// --- The hero composition -----------------------------------------------
 
 /**
- * @typedef {{
- *   phase: string,
- *   typed: number,
- *   total: number,
- *   outputStage: number,
- *   stops: number[],
- *   running: boolean,
- *   seek: (count: number) => void,
- *   complete: () => void,
- *   restart: () => void,
- *   stop: () => void,
- * }} LabDemo
- */
-
-/**
- * The demo exposes its own state on `window` so the suite can
- * drive it instead of waiting a cycle out: every phase is one call away,
- * and nothing here depends on a timer landing.
+ * What the hero has to be true about, now that the reveal is a CSS wipe
+ * over markup that never changes: the source is whole and highlighted at
+ * every moment, the output is the real build, and neither of those facts
+ * depends on JavaScript having run, on the animation having finished, or
+ * on a preference being set one way rather than the other.
  * @param {import("@playwright/test").Page} page
  */
-const labState = (page) =>
+const heroState = (page) =>
 	page.evaluate(() => {
-		const demo = /** @type {LabDemo} */ (
-			/** @type {any} */ (window).cirthLabDemo
-		);
 		const code = /** @type {HTMLElement} */ (
 			document.querySelector("[data-lab-source]")
 		);
 		const pre = /** @type {HTMLElement} */ (
 			document.querySelector(".docs-source-panel pre")
 		);
-		const doc = /** @type {HTMLIFrameElement} */ (
-			document.querySelector("[data-lab-frame]")
-		).contentDocument;
-		const staged = /** @type {HTMLElement[]} */ (
-			Array.from(
-				doc?.querySelectorAll("article > h2, form > label, form > button") ?? [],
-			)
-		);
 		return {
-			phase: demo.phase,
-			typed: demo.typed,
-			total: demo.total,
-			stage: demo.outputStage,
-			stops: demo.stops,
-			running: demo.running,
-			// What is painted, and what is in the document, are different
-			// questions here — that is the whole technique.
-			inked: code.querySelectorAll(".docs-lab-ch.is-typed").length,
 			text: code.textContent?.length ?? 0,
 			highlighted: code.querySelectorAll(".hljs-name, .hljs-attr").length,
-			outputShown: staged.filter((node) => node.style.display !== "none").length,
-			outputTotal: staged.length,
 			preHeight: Math.round(pre.getBoundingClientRect().height),
 			preScrollWidth: pre.scrollWidth,
 			cardHeight: Math.round(
 				/** @type {HTMLElement} */ (
-					document.querySelector(".docs-transform-figure")
+					document.querySelector(".docs-source-panel")
 				).getBoundingClientRect().height,
 			),
 		};
 	});
 
-test("the hero demo builds the output from the source and starts over", async ({
+test("the hero writes the source in without ever changing it", async ({
 	page,
 }) => {
 	await page.emulateMedia({ reducedMotion: "no-preference" });
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-	await page.waitForFunction(() => /** @type {any} */ (window).cirthLabDemo?.total > 0);
 
-	const start = await labState(page);
-	expect(start.total).toBeGreaterThan(300);
-	expect(start.stops).toHaveLength(5);
-	expect(start.outputTotal).toBe(5);
+	// Mid-animation.
+	const during = await heroState(page);
+	expect(during.text).toBeGreaterThan(300);
+	expect(during.highlighted).toBeGreaterThan(10);
 
-	// Empty start: nothing painted, everything present.
-	await page.evaluate(() => /** @type {any} */ (window).cirthLabDemo.seek(0));
-	const empty = await labState(page);
-	expect(empty.typed).toBe(0);
-	expect(empty.inked).toBe(0);
-	expect(empty.outputShown).toBe(0);
-	expect(empty.text).toBe(start.total);
-	expect(empty.highlighted).toBeGreaterThan(10);
+	const animation = await page
+		.locator(".docs-source-panel pre > code")
+		.evaluate((element) => {
+			const running = element.getAnimations();
+			return {
+				count: running.length,
+				// One pass and done: a hero that keeps re-typing itself is a
+				// thing to look away from, not a thing to read.
+				iterations: running.map(
+					(item) =>
+						/** @type {CSSAnimation & { effect: KeyframeEffect }} */ (item)
+							.effect.getTiming().iterations,
+				),
+			};
+		});
+	expect(animation.count).toBe(1);
+	expect(animation.iterations).toEqual([1]);
 
-	// Source advances, and the output gains exactly the elements the
-	// markup typed so far produces.
-	const seen = [];
-	for (const [index, stop] of start.stops.entries()) {
-		await page.evaluate((at) => /** @type {any} */ (window).cirthLabDemo.seek(at), stop);
-		const step = await labState(page);
-		expect(step.typed, `at stop ${index}`).toBe(stop);
-		expect(step.inked, `at stop ${index}`).toBe(stop);
-		expect(step.stage, `at stop ${index}`).toBe(index + 1);
-		expect(step.outputShown, `at stop ${index}`).toBe(index + 1);
-		// Highlighting survives the reveal; so does the whole source.
-		expect(step.highlighted, `at stop ${index}`).toBe(empty.highlighted);
-		expect(step.text, `at stop ${index}`).toBe(start.total);
-		seen.push(step);
-	}
+	// Let it finish, then compare. The wipe only ever changed the ink, so
+	// nothing about the pane — its height, its scroll extent, the card
+	// around it, the text inside it, or the highlighting — is allowed to
+	// differ between a half-written state and a finished one.
+	await page
+		.locator(".docs-source-panel pre > code")
+		.evaluate((element) =>
+			Promise.all(element.getAnimations().map((item) => item.finished)),
+		);
+	const after = await heroState(page);
+	expect(after).toEqual(during);
 
-	// Complete.
-	await page.evaluate(() => /** @type {any} */ (window).cirthLabDemo.seek(/** @type {any} */ (window).cirthLabDemo.total));
-	const full = await labState(page);
-	expect(full.typed).toBe(start.total);
-	expect(full.outputShown).toBe(5);
-
-	// Deletion runs the same ladder backwards.
-	await page.evaluate(() => /** @type {any} */ (window).cirthLabDemo.seek(/** @type {any} */ (window).cirthLabDemo.stops[2]));
-	expect((await labState(page)).outputShown).toBe(3);
-	await page.evaluate(() => /** @type {any} */ (window).cirthLabDemo.seek(0));
-	expect((await labState(page)).outputShown).toBe(0);
-
-	// Nothing moved. Not the panel, not its scroll extent, not the card:
-	// the untyped tail keeps its space, which is why.
-	const geometry = new Set(
-		[empty, ...seen, full].map(
-			(state) =>
-				`${state.preHeight}/${state.preScrollWidth}/${state.cardHeight}`,
-		),
+	// And the whole snippet is selectable and copyable throughout, because
+	// it was never taken out of the document to begin with.
+	await expect(page.locator("[data-lab-source]")).toContainText(
+		'<input type="password" name="password" autocomplete="current-password">',
 	);
-	expect([...geometry]).toHaveLength(1);
-
-	// Restart returns to an empty pane and runs again.
-	await page.evaluate(() => /** @type {any} */ (window).cirthLabDemo.restart());
-	const restarted = await labState(page);
-	expect(restarted.typed).toBe(0);
-	expect(restarted.phase).toBe("typing");
-	expect(restarted.running).toBe(true);
-	await expect
-		.poll(async () => (await labState(page)).typed, { timeout: 5000 })
-		.toBeGreaterThan(0);
 });
 
-test("changing build or theme mid-cycle leaves one loop running", async ({
-	page,
-}) => {
-	await page.emulateMedia({ reducedMotion: "no-preference" });
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-	await page.waitForFunction(() => /** @type {any} */ (window).cirthLabDemo?.total > 0);
-
-	const before = await labState(page);
-	await page.evaluate(() => /** @type {any} */ (window).cirthLabDemo.seek(/** @type {any} */ (window).cirthLabDemo.stops[2]));
-
-	// A build change is a different snippet: stop, swap, start over.
-	await page.locator("[data-lab-build]").selectOption("scoped");
-	await expect(page.locator("[data-lab-frame]")).toHaveAttribute(
-		"src",
-		/\/lab\/scoped\//,
-	);
-	const rebuilt = await labState(page);
-	expect(rebuilt.total).not.toBe(before.total);
-	expect(rebuilt.total).toBe(rebuilt.text);
-	expect(rebuilt.phase).toBe("typing");
-	// One cycle, advancing once — not two racing each other.
-	const samples = [];
-	for (let i = 0; i < 4; i += 1) {
-		samples.push((await labState(page)).typed);
-		await page.waitForTimeout(150);
-	}
-	for (let i = 1; i < samples.length; i += 1) {
-		expect(samples[i]).toBeGreaterThanOrEqual(samples[i - 1]);
-	}
-	expect(samples.at(-1)).toBeLessThanOrEqual(rebuilt.total);
-
-	// A theme change is the same markup rendered differently, so the cycle
-	// keeps its place rather than snapping back to an empty pane.
-	await page.evaluate(() => /** @type {any} */ (window).cirthLabDemo.seek(/** @type {any} */ (window).cirthLabDemo.stops[3]));
-	const held = await labState(page);
-	await page.locator("[data-lab-theme]").selectOption("dark");
-	await expect(page.locator("[data-lab-frame]")).toHaveAttribute(
-		"src",
-		/theme=dark/,
-	);
-	const after = await labState(page);
-	expect(after.typed).toBe(held.typed);
-	expect(after.total).toBe(held.total);
-	// The reloaded frame comes back showing exactly the stage it left on.
-	await expect
-		.poll(async () => (await labState(page)).outputShown, { timeout: 5000 })
-		.toBe(4);
-});
-
-test("the hero demo shows its finished state under reduced motion", async ({
-	page,
-}) => {
+test("the hero holds still under reduced motion", async ({ page }) => {
 	// The behavior project already runs reduced, which is what makes the
 	// screenshot suite deterministic; assert the contract rather than
 	// assume it.
 	await page.emulateMedia({ reducedMotion: "reduce" });
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-	await page.waitForFunction(() => /** @type {any} */ (window).cirthLabDemo);
-	await page.waitForTimeout(400);
 
-	const state = await labState(page);
-	expect(state.phase).toBe("reduced");
-	expect(state.running).toBe(false);
-	// No cycle was ever set up: the source is simply the source.
-	expect(state.total).toBe(0);
-	expect(state.outputShown).toBe(state.outputTotal);
-	await expect(page.locator("[data-lab-source]")).not.toHaveAttribute(
-		"data-lab-typing",
-		"",
+	const animations = await page.evaluate(() =>
+		document
+			.getAnimations()
+			.map((item) => /** @type {CSSAnimation} */ (item).animationName)
+			.filter(Boolean),
 	);
-	await expect(page.locator("[data-lab-source]")).toContainText(
-		'<input type="password" name="password" autocomplete="current-password">',
-	);
-	// Still no motion after a wait that would have covered several stops.
-	await page.waitForTimeout(600);
-	expect((await labState(page)).running).toBe(false);
-});
+	expect(animations).not.toContain("docs-lab-write");
+	expect(animations).not.toContain("docs-lab-render");
 
-test("reading the source stops the cycle and completes it", async ({ page }) => {
-	await page.emulateMedia({ reducedMotion: "no-preference" });
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-	await page.waitForFunction(() => /** @type {any} */ (window).cirthLabDemo?.total > 0);
-	await page.evaluate(() => /** @type {any} */ (window).cirthLabDemo.seek(20));
-
-	await page.locator(".docs-source-panel pre").focus();
-	const focused = await labState(page);
-	expect(focused.running).toBe(false);
-	expect(focused.phase).toBe("complete");
-	expect(focused.typed).toBe(focused.total);
-	expect(focused.outputShown).toBe(focused.outputTotal);
-	// The pane is keyboard reachable and scrollable, and the cycle is not
-	// moving under the reader's cursor.
+	// The finished composition is the resting state, so removing the
+	// animation removes nothing: full source, unclipped, output visible.
+	const state = await heroState(page);
+	expect(state.text).toBeGreaterThan(300);
+	expect(state.highlighted).toBeGreaterThan(10);
 	expect(
 		await page
-			.locator(".docs-source-panel pre")
-			.evaluate((element) => element.scrollWidth > element.clientWidth),
-	).toBe(true);
+			.locator(".docs-source-panel pre > code")
+			.evaluate((element) => getComputedStyle(element).clipPath),
+	).toBe("none");
+	await expect(page.locator(".docs-output-panel")).toBeVisible();
+	expect(
+		await page
+			.locator(".docs-output-panel")
+			.evaluate((element) => getComputedStyle(element).opacity),
+	).toBe("1");
+});
+
+test("switching build swaps the source and the rendered output together", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+
+	const before = await heroState(page);
+	await page.locator("[data-lab-build]").selectOption("scoped");
+	await expect(page.locator("[data-lab-frame]")).toHaveAttribute(
+		"src",
+		/\/lab\/scoped\//,
+	);
+	// A different snippet, still highlighted — the variants are rendered
+	// by the build, not by a highlighter in the browser.
+	const after = await heroState(page);
+	expect(after.text).not.toBe(before.text);
+	expect(after.highlighted).toBeGreaterThan(10);
+	await expect(page.locator("[data-lab-source]")).toContainText(
+		'<div class="cirth">',
+	);
+
+	// Theme changes the rendering and leaves the markup alone.
+	await page.locator("[data-lab-theme]").selectOption("dark");
+	await expect(page.locator("[data-lab-frame]")).toHaveAttribute(
+		"src",
+		/theme=dark/,
+	);
+	expect((await heroState(page)).text).toBe(after.text);
 });
 
 test.describe("without JavaScript", () => {

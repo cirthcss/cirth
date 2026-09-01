@@ -110,7 +110,9 @@ test("the hero demo surface uses the card radius and clips its panels", async ({
 }) => {
 	await page.goto(origin, { waitUntil: "networkidle" });
 
-	const figure = page.locator(".docs-transform-figure");
+	// One plate per region now; the source card is the one that has to clip
+	// a code pane running flush to its own edge.
+	const figure = page.locator(".docs-source-panel");
 	const style = await styleOf(figure, [
 		"borderTopLeftRadius",
 		"borderBottomRightRadius",

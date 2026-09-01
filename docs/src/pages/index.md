@@ -69,7 +69,6 @@ stack:
         - --cirth-primary
         - --cirth-spacing
         - --cirth-border-radius
-        - custom properties
     - title: Classless & scoped builds
       details: >-
         Ship the default build, a classless build for markup close to
@@ -99,10 +98,8 @@ stack:
         - "<dialog>"
     - title: Accessible by default
       details: >-
-        Visible focus rings that survive Windows High Contrast, 44px
-        touch targets, and <code>prefers-reduced-motion</code> /
-        <code>prefers-contrast</code> support are checked in the source,
-        not bolted on after.
+        Focus rings, touch targets and reduced-motion support are checked
+        in the source, not bolted on after.
       badges:
         - forced-colors
         - 44px targets

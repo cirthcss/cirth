@@ -13,9 +13,14 @@ bodyClass: docs-home-page
 						<a href="{{ action.link }}" role="button"{% if action.theme != "brand" %} class="secondary outline"{% endif %}>{{ action.text }}</a>
 					{% endfor %}
 				</p>
+				{#- Two principles, stated. They used to be numbered 01/02, which
+				    read as a metric next to a ledger of real ones further down
+				    the page — a counter that counts to two is not evidence, and
+				    this hero had two kinds of number in it. The labels carry the
+				    point on their own. -#}
 				<ul class="docs-primary-signals" aria-label="Primary product principles">
-					<li><span>01</span><strong>Semantic HTML</strong><small>Structure carries intent.</small></li>
-					<li><span>02</span><strong>Accessible baseline</strong><small>WCAG 2.2 AA checks are the floor.</small></li>
+					<li><strong>Semantic HTML</strong><small>Structure carries intent.</small></li>
+					<li><strong>Accessible baseline</strong><small>WCAG 2.2 AA checks are the floor.</small></li>
 				</ul>
 			</header>
 			<div class="docs-native-lab">
