@@ -96,7 +96,17 @@
   // Open
   &[open] {
     > summary {
-      margin-bottom: var(--cirth-spacing);
+      // --cirth-space-2, not --cirth-spacing. The summary already carries
+      // `padding-block: var(--cirth-space-2)` below (it is what lifts the
+      // trigger to the 2.75rem target), so a full rhythm step of margin on
+      // top of it measured 24px from the summary's text to the first line
+      // of the panel — one and a half times the step the same paragraph
+      // would get anywhere else in the document. Half a step of margin
+      // plus the padding that was already there is exactly one step, so
+      // the panel opens on the framework's own rhythm and the hit area is
+      // untouched. Dropdowns reset this to 0 in _dropdown.scss and are
+      // unaffected.
+      margin-bottom: var(--cirth-space-2);
 
       &:not([role]) {
         &:not(:focus, :hover) {
