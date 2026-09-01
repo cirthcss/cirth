@@ -22,6 +22,19 @@
     margin-bottom: 0;
   }
 
+  // The mirror of the rule above, on the axis it was missing. A heading
+  // that follows a block takes --cirth-typography-spacing-top so a new
+  // section separates itself from the prose above it — 32px to 48px,
+  // depending on the level. That is a document-flow measure, and a card's
+  // header or footer is not document flow: it is a band padded to
+  // `block-spacing-vertical - space-2`. An eyebrow above a title in a card
+  // header therefore opened a 40px hole inside a 12px band, three times
+  // the padding that defines it. Inside the band the rhythm is the
+  // ordinary one its own elements already carry.
+  > :is(header, footer) :is(h1, h2, h3, h4, h5, h6) {
+    margin-top: 0;
+  }
+
   > header,
   > footer {
     margin-inline: calc(var(--cirth-block-spacing-horizontal) * -1);
