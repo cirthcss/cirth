@@ -265,10 +265,10 @@ test("mobile navigation open", async ({ page }, testInfo) => {
 	);
 
 	await capture(page, "colors/index.html", defaultTheme);
-	const menu = page.locator("[data-docs-mobile-menu]");
-	await menu.locator(":scope > summary").click();
-	await expect(menu).toHaveAttribute("open", "");
-	await expect(menu.locator("[data-docs-mobile-controls]")).toBeVisible();
+	const drawer = page.locator("[data-docs-menu-drawer]");
+	await page.locator("[data-docs-menu-trigger]").click();
+	await expect(drawer).toHaveAttribute("open", "");
+	await expect(drawer.locator("[data-docs-mobile-controls]")).toBeVisible();
 	await expect(page).toHaveScreenshot("mobile-menu-open.png", {
 		fullPage: false,
 	});

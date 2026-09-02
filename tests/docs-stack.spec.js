@@ -21,42 +21,50 @@ test.afterAll(() => {
 	server.close();
 });
 
+// WebKit's sequential focus navigation visits form controls only: links
+// and buttons are excluded unless the reader turns on macOS Full Keyboard
+// Access (Safari's "Press Tab to highlight each item on a webpage"). It
+// is a platform preference, not a property of this page — a document
+// containing nothing but a link, a button and a summary behaves the same
+// way — so assertions about Tab *arriving* at a link or a button would be
+// asserting that setting. The controls themselves are still checked on
+// every engine; only the walk to them is skipped.
+//
+// Note this is why the menu toggle stopped being reachable by Tab on
+// default Safari when it became a <button>: as a <summary> it counted as
+// a control. That put it in the same position as the search trigger
+// beside it and every link in the bar, which is consistent, and a button
+// with aria-haspopup="dialog" is what actually opens a dialog.
+/** @param {string} browserName */
+const tabSkipsButtons = (browserName) => browserName === "webkit";
+
 /**
- * The hero is two cards that overlap, not one panel split in two, so the
- * geometry worth pinning is the relationship between them: the output
- * reaches back over the source by a real, bounded amount, sits below it,
- * and neither card leaves the stage. An overlap built out of flow rather
- * than out of absolute positioning is exactly the thing that can quietly
- * start clipping at some width, which is what this asserts against.
+ * The hero is a source card and the interface it produces, overlapping —
+ * not one panel split in two, and not two panels: only the source is in a
+ * frame. The geometry worth pinning is the relationship between them: the
+ * output reaches back over the source by a real, bounded amount, sits
+ * below it, and neither leaves the stage. An overlap built out of flow
+ * rather than out of absolute positioning is exactly the thing that can
+ * quietly start clipping at some width, which is what this asserts
+ * against.
  * @param {import("@playwright/test").Page} page
  */
 const assertHeroDemoGeometry = async (page) => {
 	const stageBox = await page.locator(".docs-lab-stage").boundingBox();
 	const sourceBox = await page.locator(".docs-source-panel").boundingBox();
-	const outputBox = await page.locator(".docs-output-panel").boundingBox();
+	const outputBox = await page.locator(".docs-output-frame").boundingBox();
 	const frameBox = await page.locator("[data-lab-frame]").boundingBox();
-	const frameWrapperBox = await page
-		.locator(".docs-output-frame")
-		.boundingBox();
-	const noteBox = await page.locator(".docs-figure-note").boundingBox();
-	if (
-		!stageBox ||
-		!sourceBox ||
-		!outputBox ||
-		!frameBox ||
-		!frameWrapperBox ||
-		!noteBox
-	) {
-		throw new Error("Expected both hero cards, the frame, and the note");
+	if (!stageBox || !sourceBox || !outputBox || !frameBox) {
+		throw new Error("Expected the source card and the output");
 	}
 
-	// The iframe fills its cell exactly: no letterbox, no overhang.
-	expect(Math.abs(frameBox.y - frameWrapperBox.y)).toBeLessThanOrEqual(1);
+	// The iframe fills its surface exactly: no letterbox, no overhang.
+	// The surface is the output itself now — there is no panel around it —
+	// so this is the frame against its own box.
+	expect(Math.abs(frameBox.y - outputBox.y)).toBeLessThanOrEqual(1);
 	expect(
 		Math.abs(
-			frameBox.y +
-				frameBox.height -
-				(frameWrapperBox.y + frameWrapperBox.height),
+			frameBox.y + frameBox.height - (outputBox.y + outputBox.height),
 		),
 	).toBeLessThanOrEqual(1);
 
@@ -93,8 +101,11 @@ const assertHeroDemoGeometry = async (page) => {
 		).toBeLessThanOrEqual(1);
 	}
 
-	// The note is about the pair, so it sits under both of them.
-	expect(noteBox.y).toBeGreaterThanOrEqual(
+	// Whatever follows the demo starts below both halves of it: the stage
+	// is intrinsically as tall as the taller of the two, which is the
+	// property an overlap built out of flow has and an absolutely
+	// positioned one does not.
+	expect(stageBox.y + stageBox.height).toBeGreaterThanOrEqual(
 		Math.max(sourceBox.y + sourceBox.height, outputBox.y + outputBox.height) -
 			1,
 	);
@@ -106,7 +117,7 @@ test("homepage keeps the source and authentic output comparison focused on mobil
 	await page.setViewportSize({ width: 390, height: 844 });
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
-	const output = page.locator(".docs-output-panel");
+	const output = page.locator(".docs-output-frame");
 	const source = page.locator(".docs-source-panel");
 	await expect(output).toHaveCount(1);
 	await expect(page.locator(".docs-mechanism")).toHaveCount(0);
@@ -115,7 +126,7 @@ test("homepage keeps the source and authentic output comparison focused on mobil
 		'<main class="container">',
 	);
 	await expect(source.locator("[data-lab-source]")).toContainText(
-		'<input type="email" name="email" autocomplete="email">',
+		'name="email"',
 	);
 	await expect(source.locator("[data-lab-source]")).not.toContainText("…");
 	await expect(
@@ -126,8 +137,12 @@ test("homepage keeps the source and authentic output comparison focused on mobil
 		"/examples",
 	);
 
+	// Source first, output second. Stacked, the two are read in sequence
+	// rather than compared side by side, and the sequence this page argues
+	// for is markup → interface: the output used to be ordered first, which
+	// put the result above its own cause.
 	const order = await Promise.all(
-		[output, source].map((locator) =>
+		[source, output].map((locator) =>
 			locator.evaluate((element) => Number(getComputedStyle(element).order)),
 		),
 	);
@@ -165,23 +180,30 @@ test("homepage keeps the source and authentic output comparison focused on mobil
 			scoped: true,
 		},
 	];
+	// The hero shows the default build and offers no switch, so each
+	// specimen is checked where it lives rather than through a control on
+	// the home page. The assertions are the ones that matter either way:
+	// every build's page is the real distributed stylesheet rendering the
+	// real markup, with the wrapper and the container class the build is
+	// supposed to have and nothing else.
 	for (const build of builds) {
-		await page.locator("[data-lab-build]").selectOption(build.name);
-		await expect(page.locator("[data-lab-frame]")).toHaveAttribute(
-			"src",
-			new RegExp(`/lab/${build.name}/`),
-		);
-		await expect(frame.locator('link[rel="stylesheet"]')).toHaveAttribute(
+		await page.goto(`${origin}/lab/${build.name}/`, {
+			waitUntil: "networkidle",
+		});
+		await expect(page.locator('link[rel="stylesheet"]')).toHaveAttribute(
 			"href",
 			build.stylesheet,
 		);
-		await expect(frame.locator(".cirth")).toHaveCount(build.scoped ? 1 : 0);
+		await expect(page.locator(".cirth")).toHaveCount(build.scoped ? 1 : 0);
 		if (build.mainClass) {
-			await expect(frame.locator("main")).toHaveClass(build.mainClass);
+			await expect(page.locator("main")).toHaveClass(build.mainClass);
 		} else {
-			await expect(frame.locator("main")).not.toHaveAttribute("class");
+			await expect(page.locator("main")).not.toHaveAttribute("class");
 		}
+		// A specimen, not an operable form: it is embedded as a picture.
+		await expect(page.locator("body")).toHaveAttribute("inert", "");
 	}
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
 	await assertHeroDemoGeometry(page);
 	await page.setViewportSize({ width: 1440, height: 900 });
@@ -338,32 +360,38 @@ test("header keeps navigation, search, and automatic versioning distinct", async
 
 test("compact header orders search before its complete keyboard menu", async ({
 	page,
+	browserName,
 }) => {
 	await page.setViewportSize({ width: 390, height: 844 });
 	await page.goto(`${origin}/colors/`, { waitUntil: "networkidle" });
 
 	const actions = page.locator(".docs-header-actions");
 	const search = page.locator("[data-docs-search-trigger]");
-	const menu = page.locator("[data-docs-mobile-menu]");
-	const trigger = menu.locator(":scope > summary");
-	const panel = menu.locator("#docs-mobile-menu-panel");
+	const menu = page.locator("[data-docs-menu-drawer]");
+	const trigger = page.locator("[data-docs-menu-trigger]");
+	const panel = menu;
 	const mobileControls = panel.locator("[data-docs-mobile-controls]");
 
 	expect(
 		await actions.evaluate((element) =>
 			Array.from(element.children).map((child) => child.className),
 		),
-	).toEqual(["docs-header-search", "dropdown docs-mobile-menu"]);
+	).toEqual(["docs-header-search", "ghost contrast docs-menu-toggle"]);
 	await expect(trigger).toHaveAttribute("aria-controls", "docs-mobile-menu-panel");
+	await expect(trigger).toHaveAttribute("aria-haspopup", "dialog");
 	await expect(trigger).toHaveAttribute("aria-expanded", "false");
 	await expect(page.locator(".docs-header-controls-group [data-docs-header-control]")).toHaveCount(0);
 	await expect(mobileControls.locator("[data-docs-header-control]")).toHaveCount(3);
 
 	await search.focus();
-	await page.keyboard.press("Tab");
-	await expect(trigger).toBeFocused();
+	if (!tabSkipsButtons(browserName)) {
+		await page.keyboard.press("Tab");
+		await expect(trigger).toBeFocused();
+	}
+	await trigger.focus();
 	await page.keyboard.press("Enter");
 	await expect(menu).toHaveAttribute("open", "");
+	expect(await menu.evaluate((element) => element.matches(":modal"))).toBe(true);
 	await expect(trigger).toHaveAttribute("aria-expanded", "true");
 	await expect(panel.getByRole("link", { name: "Docs", exact: true })).toBeVisible();
 	await expect(mobileControls.locator("[data-docs-version-select]")).toBeVisible();
@@ -400,7 +428,7 @@ test("compact header orders search before its complete keyboard menu", async ({
 	).toBeLessThanOrEqual(0);
 
 	await page.setViewportSize({ width: 1440, height: 900 });
-	await expect(menu).toBeHidden();
+	await expect(trigger).toBeHidden();
 	await expect(page.locator(".docs-header-controls-group [data-docs-header-control]")).toHaveCount(3);
 });
 
@@ -443,6 +471,13 @@ test("homepage cards and FAQ expose consistent interactive states", async ({
 		summary.evaluate((element) => element.getBoundingClientRect().width),
 	]);
 	await summary.click();
+	// Wait for the panel to actually be in layout before measuring it. The
+	// disclosure now animates open (::details-content starts at block-size
+	// 0), so reading straight after the click can catch the paragraph
+	// before it has a box — which under a loaded suite it intermittently
+	// did. The state being measured is "open", not "opening".
+	await expect(details).toHaveAttribute("open", "");
+	await expect(details.locator("p")).toBeVisible();
 	const openWidths = await Promise.all([
 		details.evaluate((element) => element.getBoundingClientRect().width),
 		summary.evaluate((element) => element.getBoundingClientRect().width),
@@ -546,7 +581,7 @@ test("the navbar collapses at a single breakpoint with a complete menu", async (
 				document.querySelector(".docs-header")
 			);
 			const menu = /** @type {HTMLElement} */ (
-				document.querySelector("[data-docs-mobile-menu]")
+				document.querySelector("[data-docs-menu-trigger]")
 			);
 			const group = document.querySelector(".docs-mobile-controls");
 			return {
@@ -594,6 +629,7 @@ test("the navbar collapses at a single breakpoint with a complete menu", async (
 
 test("the collapsed menu is complete, ordered, and returns focus", async ({
 	page,
+	browserName,
 }) => {
 	// 900px: squarely inside the range that used to be broken.
 	await page.setViewportSize({ width: 900, height: 800 });
@@ -601,9 +637,9 @@ test("the collapsed menu is complete, ordered, and returns focus", async ({
 
 	const actions = page.locator(".docs-header-actions");
 	const search = page.locator("[data-docs-search-trigger]");
-	const menu = page.locator("[data-docs-mobile-menu]");
-	const trigger = menu.locator(":scope > summary");
-	const panel = menu.locator("#docs-mobile-menu-panel");
+	const menu = page.locator("[data-docs-menu-drawer]");
+	const trigger = page.locator("[data-docs-menu-trigger]");
+	const panel = menu;
 	const controls = panel.locator("[data-docs-mobile-controls]");
 
 	// Search, then the toggler — in the DOM, so also in the tab order.
@@ -611,7 +647,7 @@ test("the collapsed menu is complete, ordered, and returns focus", async ({
 		await actions.evaluate((element) =>
 			Array.from(element.children).map((child) => child.className),
 		),
-	).toEqual(["docs-header-search", "dropdown docs-mobile-menu"]);
+	).toEqual(["docs-header-search", "ghost contrast docs-menu-toggle"]);
 	const [searchBox, triggerBox] = await Promise.all([
 		search.boundingBox(),
 		trigger.boundingBox(),
@@ -620,8 +656,11 @@ test("the collapsed menu is complete, ordered, and returns focus", async ({
 	expect(searchBox.x).toBeLessThan(triggerBox.x);
 
 	await search.focus();
-	await page.keyboard.press("Tab");
-	await expect(trigger).toBeFocused();
+	if (!tabSkipsButtons(browserName)) {
+		await page.keyboard.press("Tab");
+		await expect(trigger).toBeFocused();
+	}
+	await trigger.focus();
 	await expect(trigger).toHaveAttribute("aria-controls", "docs-mobile-menu-panel");
 	await expect(trigger).toHaveAttribute("aria-expanded", "false");
 	await page.keyboard.press("Enter");
@@ -643,10 +682,10 @@ test("the collapsed menu is complete, ordered, and returns focus", async ({
 	await expect(trigger).toBeFocused();
 
 	// Expanding again puts the controls back and closes the menu behind them.
-	await page.keyboard.press("Enter");
+	await trigger.press("Enter");
 	await expect(menu).toHaveAttribute("open", "");
 	await page.setViewportSize({ width: 1280, height: 800 });
-	await expect(menu).toBeHidden();
+	await expect(trigger).toBeHidden();
 	await expect(menu).not.toHaveAttribute("open", "");
 	await expect(
 		page.locator(".docs-header-controls-group [data-docs-header-control]"),
@@ -890,10 +929,9 @@ test("the hero writes the source in without ever changing it", async ({
 	expect(after).toEqual(during);
 
 	// And the whole snippet is selectable and copyable throughout, because
-	// it was never taken out of the document to begin with.
-	await expect(page.locator("[data-lab-source]")).toContainText(
-		'<input type="password" name="password" autocomplete="current-password">',
-	);
+	// it was never taken out of the document to begin with. The last line
+	// of the markup, so reaching it means none of it was cut.
+	await expect(page.locator("[data-lab-source]")).toContainText("</main>");
 });
 
 test("the hero holds still under reduced motion", async ({ page }) => {
@@ -922,41 +960,49 @@ test("the hero holds still under reduced motion", async ({ page }) => {
 			.locator(".docs-source-panel pre > code")
 			.evaluate((element) => getComputedStyle(element).clipPath),
 	).toBe("none");
-	await expect(page.locator(".docs-output-panel")).toBeVisible();
+	await expect(page.locator(".docs-output-frame")).toBeVisible();
 	expect(
 		await page
-			.locator(".docs-output-panel")
+			.locator(".docs-output-frame")
 			.evaluate((element) => getComputedStyle(element).opacity),
 	).toBe("1");
 });
 
-test("switching build swaps the source and the rendered output together", async ({
+test("the hero has no controls, and its output follows the page", async ({
 	page,
 }) => {
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
+	// The demo makes its argument by being read, not by being operated:
+	// the build and theme selects that used to sit in the two title bands
+	// are gone, and nothing replaced them.
+	await expect(page.locator(".docs-lab-stage select")).toHaveCount(0);
+	// The copy button stays: it belongs to the code block, is the same
+	// affordance every <pre> on the site carries, and asks nothing of a
+	// reader who ignores it.
+	await expect(
+		page.locator(".docs-lab-stage button:not(.copy)"),
+	).toHaveCount(0);
+
+	// The one thing markup cannot express: the framed document is a
+	// separate document and does not inherit the page's colour scheme. So
+	// it follows it, rather than asking the reader to pick.
 	const before = await heroState(page);
-	await page.locator("[data-lab-build]").selectOption("scoped");
 	await expect(page.locator("[data-lab-frame]")).toHaveAttribute(
 		"src",
-		/\/lab\/scoped\//,
+		/theme=light/,
 	);
-	// A different snippet, still highlighted — the variants are rendered
-	// by the build, not by a highlighter in the browser.
-	const after = await heroState(page);
-	expect(after.text).not.toBe(before.text);
-	expect(after.highlighted).toBeGreaterThan(10);
-	await expect(page.locator("[data-lab-source]")).toContainText(
-		'<div class="cirth">',
-	);
-
-	// Theme changes the rendering and leaves the markup alone.
-	await page.locator("[data-lab-theme]").selectOption("dark");
+	await page.locator(".docs-theme-toggle").click();
+	await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 	await expect(page.locator("[data-lab-frame]")).toHaveAttribute(
 		"src",
 		/theme=dark/,
 	);
-	expect((await heroState(page)).text).toBe(after.text);
+
+	// And the markup on the other side is untouched by any of it.
+	const after = await heroState(page);
+	expect(after.text).toBe(before.text);
+	expect(after.highlighted).toBeGreaterThan(10);
 });
 
 test.describe("without JavaScript", () => {
@@ -969,10 +1015,8 @@ test.describe("without JavaScript", () => {
 
 		const code = page.locator("[data-lab-source]");
 		await expect(code).toContainText('<main class="container">');
-		await expect(code).toContainText(
-			'<input type="password" name="password" autocomplete="current-password">',
-		);
-		await expect(code).toContainText("<button type=\"button\">Sign in</button>");
+		await expect(code).toContainText('name="password"');
+		await expect(code).toContainText("<button>Sign in</button>");
 		await expect(code).not.toContainText("…");
 		// Highlighted at build time, so it is highlighted here too.
 		expect(await code.locator("span").count()).toBeGreaterThan(10);

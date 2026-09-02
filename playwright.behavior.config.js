@@ -29,6 +29,7 @@ module.exports = defineConfig({
 		"nav-dropdown.spec.js",
 		"popover.spec.js",
 		"prefers-contrast.spec.js",
+		"shell-overlays.spec.js",
 		"print.spec.js",
 		"surface-derivation.spec.js",
 		"token-override.spec.js",
