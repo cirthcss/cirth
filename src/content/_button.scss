@@ -399,14 +399,11 @@
   pointer-events: none;
 }
 
-// Submit control of an invalid form
+// Submit control of a form the reader has made invalid
 // Visual only, deliberately not [disabled]/pointer-events: none — the
 // button stays clickable so a submit attempt still triggers the browser's
 // native constraint-validation UI (the "Please fill in this field"
 // bubbles), which a truly disabled/inert control could never surface.
-// A required-but-untouched form is :invalid from first paint, so this can
-// read as "disabled" before the user has done anything wrong; accepted as
-// a fair trade for zero-JS feedback once fields start getting filled in.
 // grayscale(), not opacity: a dimmed-but-clickable control gets no
 // disabled-state exemption from WCAG 1.4.3, and compositing the whole
 // button toward the canvas collapses its text/background contrast below
@@ -414,8 +411,19 @@
 // exactly as the theme defined it while still draining the "ready"
 // color from the control.
 
+// :has(:user-invalid), not :invalid. `form:invalid` is true from first
+// paint for any form holding a `required` field, so a login form nobody
+// has touched yet drew its submit in grey — the previous version of this
+// rule said so in a comment and accepted it. It does not have to be
+// accepted: the fields in the same form already wait for interaction
+// (forms/_basics.scss binds the invalid treatment to :user-invalid, not
+// :invalid), so the button was the one control in the group reacting to a
+// state the reader had not caused. Now the whole group agrees, and the
+// zero-JS feedback the rule exists for still arrives the moment a field
+// is actually left invalid.
+
 #{$parent-selector}
-  form:invalid
+  form:has(:user-invalid)
   :is(button:not([type="button"], [type="reset"]), [type="submit"]) {
   filter: grayscale(1);
 }

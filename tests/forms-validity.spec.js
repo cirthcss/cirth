@@ -241,3 +241,37 @@ test("WebKit/Safari keeps a user-valid range visually neutral", async ({
 	expect(state.borderColor).toBe(neutral.borderColor);
 	expect(state.borderColor).not.toBe(valid.borderColor);
 });
+
+test("the submit control waits for the reader before it dims", async ({
+	page,
+}) => {
+	// The form on this page holds two required, empty controls, so it is
+	// :invalid from first paint. That used to be enough to grey the submit
+	// button — a login form nobody had touched drew its primary action as
+	// if it were disabled, which is exactly what it looked like on the home
+	// page's hero demo. The fields in the same form already waited for
+	// :user-invalid before showing anything; the button now waits with
+	// them.
+	const submit = page.locator("#submit");
+	const filter = () =>
+		submit.evaluate((element) => getComputedStyle(element).filter);
+
+	expect(
+		await page.locator("#validation-form").evaluate((form) => form.matches(":invalid")),
+		"the fixture form must actually be invalid, or this proves nothing",
+	).toBe(true);
+	expect(await filter(), "untouched").toBe("none");
+
+	// Leaving a field invalid is the interaction that earns the feedback.
+	await page.locator("#form-email").fill("not-an-email");
+	await submit.focus();
+	await expect
+		.poll(filter, { message: "after leaving a field invalid" })
+		.toBe("grayscale(1)");
+
+	// And it is given back the moment the form is satisfiable again.
+	await page.locator("#form-email").fill("ada@example.com");
+	await page.locator("#required-select").selectOption("one");
+	await submit.focus();
+	await expect.poll(filter, { message: "after fixing it" }).toBe("none");
+});
