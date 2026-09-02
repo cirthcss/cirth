@@ -33,25 +33,19 @@
 			</div>
 			{#- Search precedes the menu in both DOM and visual order. At the
 			    collapse breakpoint the existing control nodes are moved into
-			    this panel — moved, never cloned, so there is only ever one of
-			    each in the document and the tab order stays the reading order. -#}
-			<details class="dropdown docs-mobile-menu" data-docs-mobile-menu>
-				<summary
-					class="docs-menu-toggle"
-					aria-controls="docs-mobile-menu-panel"
-					aria-expanded="false"
-				>
-					{% icon "list", 20 %}<span class="sr-only">Menu</span>
-				</summary>
-				<ul id="docs-mobile-menu-panel" class="docs-mobile-menu-panel">
-					{% for item in nav.topNav %}<li><a href="{{ item.link }}">{{ item.text }}</a></li>{% endfor %}
-					<li><a href="{{ nav.github }}" target="_blank" rel="noreferrer">GitHub ↗<span class="sr-only"> (opens in a new tab)</span></a></li>
-					<li class="docs-mobile-controls">
-						<strong>Display</strong>
-						<ul data-docs-mobile-controls></ul>
-					</li>
-				</ul>
-			</details>
+			    the drawer below — moved, never cloned, so there is only ever
+			    one of each in the document and the tab order stays the
+			    reading order. -#}
+			<button
+				type="button"
+				class="ghost contrast docs-menu-toggle"
+				aria-haspopup="dialog"
+				aria-controls="docs-mobile-menu-panel"
+				aria-expanded="false"
+				data-docs-menu-trigger
+			>
+				{% icon "dots-three-vertical", 20 %}<span class="sr-only">Menu</span>
+			</button>
 		</div>
 		<ul class="docs-header-controls-group">
 			<li class="docs-header-github">
@@ -135,13 +129,62 @@
 			</li>
 		</ul>
 	</nav>
+
+	{#- The compact-viewport menu, as an offcanvas drawer.
+
+	    It used to be `details.dropdown` — a 20rem panel hanging off the
+	    hamburger, capped at `100dvh - 5rem`, with the page behind it still
+	    scrollable and still in the tab order, and Escape wired by hand.
+	    That is a menu drawn as a dropdown; what a compact viewport wants is
+	    a surface.
+
+	    <dialog>, because this shell already made that choice once for
+	    search and because everything §11 asks for is what the element does
+	    natively: showModal() traps focus, makes the rest of the document
+	    inert, closes on Escape, and returns focus to the invoker. The
+	    alternative was rebuilding all four in script. The drawer is only
+	    docs shell — nothing here goes into the library (see the note in
+	    styles/style.css) — but what it is built out of is not: the nav is a
+	    Cirth <nav><ul>, the close control is the library's own .close, and
+	    the controls that move in keep the <select> and <button> they had in
+	    the bar. -#}
+	<dialog
+		id="docs-mobile-menu-panel"
+		class="docs-drawer"
+		aria-label="Site menu"
+		data-docs-menu-drawer
+	>
+		<article>
+			<header>
+				<span class="docs-brand docs-drawer-title">
+					<img class="docs-logo docs-logo-light" src="/logo_brand.svg" alt="" width="48" height="48" />
+					<img class="docs-logo docs-logo-dark" src="/logo_brand_dark.svg" alt="" width="48" height="48" />
+					<strong>{{ nav.siteTitle }}</strong>
+				</span>
+				<button type="button" class="close" aria-label="Close menu" data-docs-menu-close></button>
+			</header>
+			<nav aria-label="Site">
+				<ul>
+					{% for item in nav.topNav %}
+						<li><a href="{{ item.link }}"{% if page.url == (item.link | withSlash) %} aria-current="page"{% endif %}>{{ item.text }}</a></li>
+					{% endfor %}
+					<li><a href="{{ nav.github }}" target="_blank" rel="noreferrer">GitHub ↗<span class="sr-only"> (opens in a new tab)</span></a></li>
+				</ul>
+			</nav>
+			<section class="docs-mobile-controls">
+				<strong>Display</strong>
+				<ul data-docs-mobile-controls></ul>
+			</section>
+		</article>
+	</dialog>
 	<script>
 		(() => {
 			const header = document.currentScript?.closest(".docs-header");
-			const menu = header?.querySelector("[data-docs-mobile-menu]");
-			const trigger = menu?.querySelector(":scope > summary");
+			const drawer = header?.querySelector("[data-docs-menu-drawer]");
+			const trigger = header?.querySelector("[data-docs-menu-trigger]");
+			const closeButton = drawer?.querySelector("[data-docs-menu-close]");
 			const desktopControls = header?.querySelector(".docs-header-controls-group");
-			const mobileControls = menu?.querySelector("[data-docs-mobile-controls]");
+			const mobileControls = drawer?.querySelector("[data-docs-mobile-controls]");
 			// The one query that decides collapsed vs expanded. It is the same
 			// width the stylesheet uses to show this toggler, hide the in-header
 			// nav items and hide the sidebar: read from one place so the
@@ -152,7 +195,10 @@
 				: [];
 
 			const syncMenuState = () => {
-				trigger?.setAttribute("aria-expanded", menu?.open ? "true" : "false");
+				trigger?.setAttribute("aria-expanded", drawer?.open ? "true" : "false");
+			};
+			const closeDrawer = () => {
+				if (drawer?.open) drawer.close();
 			};
 			// Moving a node blurs whatever inside it had focus, so only move
 			// what is not already where it belongs, and hand focus back if the
@@ -173,15 +219,28 @@
 					}
 					refocus?.focus();
 				}
-				if (!compact.matches && menu) menu.open = false;
+				if (!compact.matches) closeDrawer();
 				syncMenuState();
 			};
 
-			menu?.addEventListener("toggle", syncMenuState);
-			document.addEventListener("keydown", (event) => {
-				if (event.key !== "Escape" || !menu?.open) return;
-				menu.open = false;
-				trigger?.focus();
+			trigger?.addEventListener("click", () => {
+				if (!drawer?.open) drawer?.showModal();
+				syncMenuState();
+			});
+			closeButton?.addEventListener("click", closeDrawer);
+			// Clicking the backdrop: the event target is the dialog itself
+			// only when the pointer misses the panel inside it.
+			drawer?.addEventListener("click", (event) => {
+				if (event.target === drawer) closeDrawer();
+			});
+			// Fires for the close button, for the backdrop, and for Escape,
+			// which the element handles on its own. Returning focus to the
+			// trigger explicitly rather than relying on the element's own
+			// restoration keeps this identical to the search dialog next to
+			// it, and correct when the drawer is closed by a resize.
+			drawer?.addEventListener("close", () => {
+				syncMenuState();
+				if (compact.matches) trigger?.focus();
 			});
 			compact.addEventListener?.("change", placeControls);
 			placeControls();

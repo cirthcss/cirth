@@ -44,7 +44,20 @@ bodyClass: docs-home-page
 			    navigation instead of a re-implementation of it, and keeps working
 			    if the CSS never arrives. The claim is the row's subject, so it is
 			    the row header. -#}
-			<div class="docs-ledger-table">
+			{#- The same scroll region every other table on this site gets
+			    (eleventy.config.js wraps markdown tables in exactly this).
+			    The ledger is hand-written, so it had been carrying a bare
+			    `overflow-x: auto` instead: a scroll container with no
+			    tabindex, no role and no name — which at 320px, where it
+			    genuinely does scroll, is a scrollable region a keyboard
+			    cannot reach. One treatment for "a real table that may not
+			    fit", not two. -#}
+			<div
+				class="overflow-auto docs-table-scroll docs-ledger-table"
+				tabindex="0"
+				role="region"
+				aria-label="Cirth proof ledger: State, Claim, Evidence, Scope"
+			>
 				<table>
 					<caption class="sr-only">Cirth proof ledger</caption>
 					<thead>

@@ -23,14 +23,27 @@ ${pad}<!-- Components: form controls -->
 ${pad}<form>
 ${pad}  <label>
 ${pad}    Email
-${pad}    <input type="email" name="email" autocomplete="email">
+${pad}    <input
+${pad}      type="email"
+${pad}      name="email"
+${pad}      autocomplete="email"
+${pad}      required
+${pad}     >
 ${pad}  </label>
 ${pad}  <label>
 ${pad}    Password
-${pad}    <input type="password" name="password" autocomplete="current-password">
+${pad}    <input
+${pad}      type="password"
+${pad}      name="password"
+${pad}      autocomplete="current-password"
+${pad}      required
+${pad}     >
 ${pad}  </label>
-${pad}  <label><input type="checkbox" checked> Remember this device</label>
-${pad}  <button type="button">Sign in</button>
+${pad}  <label>
+${pad}    <input type="checkbox" checked>
+${pad}    Remember me
+${pad}  </label>
+${pad}  <button>Sign in</button>
 ${pad}</form>`;
 };
 

@@ -18,7 +18,13 @@
 		</script>
 		<link rel="stylesheet" href="/styles/generated/{{ labStylesheet }}" />
 	</head>
-	<body>
+	{#- inert: these pages exist only to be embedded as a rendering
+	    specimen (layout: false, excluded from collections). Without it the
+	    sample sign-in form joins the host page's tab order — four focus
+	    stops inside a picture — and a screen reader announces a working
+	    sign-in form on the Cirth home page. The iframe's title carries the
+	    accurate description instead. -#}
+	<body inert>
 		{% if labScoped %}<div class="cirth">{% endif %}
 		<main{% if not labClassless %} class="container"{% endif %}>
 			<article>
@@ -26,14 +32,14 @@
 				<form>
 					<label>
 						Email
-						<input type="email" name="email" autocomplete="email" />
+						<input type="email" name="email" autocomplete="email" required />
 					</label>
 					<label>
 						Password
-						<input type="password" name="password" autocomplete="current-password" />
+						<input type="password" name="password" autocomplete="current-password" required />
 					</label>
-					<label><input type="checkbox" checked /> Remember this device</label>
-					<button type="button">Sign in</button>
+					<label><input type="checkbox" checked /> Remember me</label>
+					<button>Sign in</button>
 				</form>
 			</article>
 		</main>

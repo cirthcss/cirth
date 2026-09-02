@@ -1,96 +1,85 @@
-{#- Source → Output, in two cards that overlap.
+{#- Source → Output: a card, and the interface it produces, overlapping.
 
     The argument this page makes is one move long: semantic HTML on the
     left, the interface Cirth renders from it on the right, close enough
     together that the eye reads them as one object. Everything here is in
-    service of that and nothing else.
+    service of that and nothing else — including the fact that only one
+    of the two is in a frame. The source is a document being shown; the
+    output is the thing itself.
 
     What the composition deliberately does not have: a per-character
     reveal, an erase cycle, a rAF scheduler, output elements gated on
     offsets found in the source text, an IntersectionObserver, a
-    focus/selection settler, and a `window` test surface to drive it all.
+    focus/selection settler, a `window` test surface to drive it all —
+    and, now, any control at all. The build and theme selects that used to
+    sit in these two title bands were the last thing here asking to be
+    understood before the demo could be: a reader had to work out what
+    "Default / Classless / Scoped" meant to know what they were looking
+    at. The four builds are a link away in the ledger below, where the
+    reader who wants them is already looking for evidence.
+
     The write-in is a CSS wipe (docs/src/styles/style.css), so the whole
     snippet is in the DOM and complete at every frame — selection, copy,
     assistive technology and no-JS see the same finished source they
     always did, and the panel cannot reflow because nothing about it
-    changes. The script below is what is genuinely left: the two build
-    and theme controls, which are the one thing here that needs
-    JavaScript. -#}
+    changes. The script below is what is genuinely left: one thing markup
+    cannot say, which is that the framed document is a separate document
+    and has to be told which colour scheme the page is in. -#}
 <div class="docs-lab-stage">
 	<section class="docs-plate docs-source-panel" aria-labelledby="source-label">
 		<header>
 			<span id="source-label">Source</span>
-			<label>Build <select data-lab-build>
-				<option value="default">Default</option>
-				<option value="classless">Classless</option>
-				<option value="scoped">Scoped</option>
-				<option value="scoped-classless">Scoped + classless</option>
-			</select></label>
 		</header>
 		<pre tabindex="0"><code class="hljs language-html" data-lab-source>{{ labSources.default | highlightHtml | safe }}</code></pre>
-		{#- Every variant, highlighted at build time. The switcher moves
-		    markup between these and the <code> above; nothing is
-		    highlighted in the browser. -#}
-		{% for name, source in labSources %}<template data-lab-source-for="{{ name }}">{{ source | highlightHtml | safe }}</template>{% endfor %}
 	</section>
 
-	<section class="docs-plate docs-output-panel" aria-labelledby="output-label">
-		<header>
-			<span id="output-label">Output</span>
-			<label>Theme <select data-lab-theme>
-				<option value="light">Light</option>
-				<option value="dark">Dark</option>
-			</select></label>
-		</header>
-		<div class="docs-output-frame">
-			<iframe
-				title="Authentic Cirth default build rendering a semantic sign-in form"
-				src="/lab/default/?theme=light"
-				data-lab-frame
-				loading="eager"
-			></iframe>
-		</div>
-	</section>
+	{#- The output is not in a panel. It used to be a second .docs-plate
+	    with its own "Output" title band, which put the shell's frame
+	    around the one thing on this page that is not the shell: a card
+	    Cirth has already finished. Two frames, and the inner one — the
+	    real one — read as the contents of the outer one. What is left is
+	    the rendered page itself, lifted off the source and labelled by
+	    the iframe's title rather than by a band above it.
+
+	    tabindex="-1": the frame is a picture of what Cirth renders, not
+	    something to operate. Its document is inert and it has nothing to
+	    scroll, so the stop Chromium gives every iframe led nowhere and
+	    painted no ring. This removes a dead stop; it does not make
+	    anything focusable. -#}
+	<div class="docs-output-frame">
+		<iframe
+			title="Authentic Cirth default build rendering a semantic sign-in form"
+			src="/lab/default/?theme=light"
+			data-lab-frame
+			loading="eager"
+			tabindex="-1"
+		></iframe>
+	</div>
 </div>
-<p class="docs-figure-note">
-	<strong>Docs controls use JavaScript.</strong>
-	The output has no preview overrides.
-</p>
 
 <script>
 	(() => {
-		const build = document.querySelector("[data-lab-build]");
-		const theme = document.querySelector("[data-lab-theme]");
 		const frame = document.querySelector("[data-lab-frame]");
-		const source = document.querySelector("[data-lab-source]");
-		if (!build || !theme || !frame || !source) return;
+		if (!frame) return;
 
-		// The <template>s hold every variant already highlighted at build
-		// time, so there is still exactly one copy of the sources in this
-		// project (docs/src/_data/labSources.js) and nothing is highlighted
-		// in the browser.
-		const applySource = () => {
-			const variant = document.querySelector(
-				`[data-lab-source-for="${build.value}"]`,
-			);
-			// innerHTML, not textContent: the payload is the build-time
-			// highlighted markup from the matching <template>, not user input.
-			if (variant) source.innerHTML = variant.innerHTML;
+		// All that is left. The demo has no controls: a reader should be
+		// able to take the argument — semantic HTML on one side, the
+		// interface Cirth renders from it on the other — without being
+		// asked to operate anything first. The one thing that still cannot
+		// be expressed in markup is that the framed document is a separate
+		// document, so it does not inherit the page's colour scheme; this
+		// follows it instead of offering a switch for it. Everything else
+		// the switcher used to do is a link away in the ledger below.
+		const base = (document.documentElement.dataset.base || "/").replace(/\/$/, "");
+		const applyTheme = () => {
+			const dark = document.documentElement.getAttribute("data-theme") === "dark";
+			const next = `${base}/lab/default/?theme=${dark ? "dark" : "light"}`;
+			if (frame.getAttribute("src") !== next) frame.setAttribute("src", next);
 		};
 
-		const applyFrame = () => {
-			const base = (document.documentElement.dataset.base || "/").replace(/\/$/, "");
-			frame.src = `${base}/lab/${build.value}/?theme=${theme.value}`;
-			frame.title = `Authentic Cirth ${build.options[build.selectedIndex].text} build in ${theme.value} mode`;
-		};
-
-		build.addEventListener("change", () => {
-			applySource();
-			applyFrame();
+		applyTheme();
+		new MutationObserver(applyTheme).observe(document.documentElement, {
+			attributeFilter: ["data-theme"],
 		});
-		theme.addEventListener("change", applyFrame);
-
-		theme.value = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
-		applyFrame();
 	})();
 </script>

@@ -16,10 +16,10 @@ HTML" opens the exact source.
     <p>Each frame is isolated from the documentation shell and loads a stylesheet compiled directly from <code>src/</code>. No preview overrides are applied.</p>
   </header>
   <div>
-    <figure><figcaption><strong>Default</strong><code>cirth.min.css</code></figcaption><iframe title="Default Cirth build example" src="/lab/default/?theme=light"></iframe></figure>
-    <figure><figcaption><strong>Classless</strong><code>cirth.classless.min.css</code></figcaption><iframe title="Classless Cirth build example" src="/lab/classless/?theme=light"></iframe></figure>
-    <figure><figcaption><strong>Scoped</strong><code>cirth.scoped.min.css</code></figcaption><iframe title="Scoped Cirth build example" src="/lab/scoped/?theme=dark"></iframe></figure>
-    <figure><figcaption><strong>Scoped + classless</strong><code>cirth.classless.scoped.min.css</code></figcaption><iframe title="Scoped classless Cirth build example" src="/lab/scoped-classless/?theme=dark"></iframe></figure>
+    <figure><figcaption><strong>Default</strong><code>cirth.min.css</code></figcaption><iframe tabindex="-1" title="Default Cirth build example" src="/lab/default/?theme=light"></iframe></figure>
+    <figure><figcaption><strong>Classless</strong><code>cirth.classless.min.css</code></figcaption><iframe tabindex="-1" title="Classless Cirth build example" src="/lab/classless/?theme=light"></iframe></figure>
+    <figure><figcaption><strong>Scoped</strong><code>cirth.scoped.min.css</code></figcaption><iframe tabindex="-1" title="Scoped Cirth build example" src="/lab/scoped/?theme=dark"></iframe></figure>
+    <figure><figcaption><strong>Scoped + classless</strong><code>cirth.classless.scoped.min.css</code></figcaption><iframe tabindex="-1" title="Scoped classless Cirth build example" src="/lab/scoped-classless/?theme=dark"></iframe></figure>
   </div>
   <footer><strong>Documentation JavaScript:</strong> none required for these frames. Theme and build are separate static URLs.</footer>
 </section>
