@@ -2,12 +2,13 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
 
-// Two structural defaults, asserted as relationships rather than as
-// numbers: what a disclosure puts between its trigger and its panel, and
-// what a card's header band does with a heading inside it. Both were
-// found from the documentation home page and both were fixed in the
-// library, because both are wrong in any page that uses the component —
-// so both are pinned here, against the compiled stylesheet, with no
+// Three structural defaults, asserted as relationships rather than as
+// numbers: what a disclosure puts between its trigger and its panel, what
+// a card's header band does with a heading inside it, and where a
+// disclosure draws its focus ring. All three were found from the
+// documentation home page and all three were fixed in the library,
+// because all three are wrong in any page that uses the component — so
+// they are pinned here, against the compiled stylesheet, with no
 // documentation shell anywhere near them.
 
 const projectRoot = path.join(__dirname, "..");
@@ -177,5 +178,121 @@ for (const [build, css] of builds) {
 			await token(page, "#inflow", "--cirth-typography-spacing-top"),
 			1,
 		);
+	});
+
+	test(`${build}: a focused disclosure keeps its ring clear of the trigger text`, async ({
+		page,
+	}) => {
+		await render(
+			page,
+			css,
+			`<details open>
+				<summary id="trigger">Do I need to write any JavaScript?</summary>
+				<p id="panel">No.</p>
+			</details>`,
+		);
+
+		// Tab, not .focus(): :focus-visible is the state being measured, and
+		// only a keyboard interaction is guaranteed to produce it.
+		await page.keyboard.press("Tab");
+
+		const measured = await page.evaluate(() => {
+			const summary = /** @type {HTMLElement} */ (
+				document.getElementById("trigger")
+			);
+			if (document.activeElement !== summary) {
+				throw new Error("Tab did not reach the summary");
+			}
+			const style = getComputedStyle(summary);
+			const box = summary.getBoundingClientRect();
+			const offset = Number.parseFloat(style.outlineOffset);
+			const width = Number.parseFloat(style.outlineWidth);
+
+			// The ring is the border box grown by the offset; the glyphs are
+			// wherever the text actually starts, which is not the same edge.
+			const range = document.createRange();
+			range.selectNodeContents(summary);
+			const ink = range.getBoundingClientRect();
+
+			const panelRange = document.createRange();
+			panelRange.selectNodeContents(
+				/** @type {HTMLElement} */ (document.getElementById("panel")),
+			);
+
+			return {
+				width,
+				offset,
+				style: style.outlineStyle,
+				// Positive: the ring is outside the glyph. Negative: over it.
+				inlineClearance: ink.left - (box.left - offset),
+				blockClearance: ink.top - (box.top - offset),
+				triggerInkLeft: ink.left,
+				panelInkLeft: panelRange.getBoundingClientRect().left,
+			};
+		});
+
+		// A real ring, not a transparent forced-colors placeholder.
+		expect(measured.style).toBe("solid");
+		expect(measured.width).toBeGreaterThan(0);
+
+		// The defect this pins: a summary has no inline padding, so the
+		// border box and the first glyph share an edge and an inset ring was
+		// drawn straight over the text. The ring has to sit outside it by at
+		// least its own width, on both axes, or it reads as underlining the
+		// first character rather than enclosing the row.
+		expect(measured.offset).toBeGreaterThan(0);
+		expect(measured.inlineClearance).toBeGreaterThanOrEqual(measured.width);
+		expect(measured.blockClearance).toBeGreaterThanOrEqual(measured.width);
+
+		// And the clearance is bought with the offset, not with inline
+		// padding on the summary: a padded trigger would buy the same gap
+		// and cost the alignment that makes a disclosure read as one thing,
+		// indenting the question away from its own answer.
+		expect(measured.triggerInkLeft).toBeCloseTo(measured.panelInkLeft, 1);
+	});
+
+	test(`${build}: a disclosure marker points at what opening will reveal`, async ({
+		page,
+	}) => {
+		await render(
+			page,
+			css,
+			`<details id="shut"><summary>Closed</summary><p>Panel.</p></details>
+			<details id="open" open><summary>Open</summary><p>Panel.</p></details>`,
+		);
+
+		const measured = await page.evaluate(() => {
+			/** @param {string} id */
+			const marker = (id) => {
+				const summary = /** @type {HTMLElement} */ (
+					document.querySelector(`#${id} > summary`)
+				);
+				const style = getComputedStyle(summary, "::after");
+				const matrix = new DOMMatrixReadOnly(style.transform);
+				// The rotation the matrix encodes, in degrees, normalised to
+				// [0, 360). Read off the matrix rather than the declaration so
+				// this holds however the transform is written.
+				const degrees =
+					((Math.atan2(matrix.b, matrix.a) * 180) / Math.PI + 360) % 360;
+				return {
+					degrees: Math.round(degrees),
+					transition: style.transitionProperty,
+				};
+			};
+			return { shut: marker("shut"), open: marker("open") };
+		});
+
+		// Closed, the chevron points down — at the panel that is about to
+		// appear. It used to rest at -90deg, pointing along the row at
+		// nothing, and swing to 0 on open: the closed state said "more this
+		// way" and the open state said "more below" about content that was
+		// already below.
+		expect(measured.shut.degrees).toBe(0);
+
+		// Open, a half turn: it points back at the trigger that closes it.
+		expect(measured.open.degrees).toBe(180);
+
+		// And it turns rather than jumping.
+		expect(measured.shut.transition).toContain("transform");
 	});
 }

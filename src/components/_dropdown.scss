@@ -117,8 +117,14 @@
     // Reset the accordion's visible outline: the box-shadow ring above is
     // the indicator here. Kept transparent instead of none so forced-colors
     // mode (which strips box-shadow) still paints a system-color ring.
+    // The offset is reset too, and not left to inherit the accordion's: a
+    // disclosure row is a rule and holds its ring clear of the text, but a
+    // dropdown is a framed control whose real indicator is the box-shadow
+    // above, drawn at the border box. Anchoring the forced-colors outline
+    // to the same edge keeps the two modes showing the same ring.
     &:focus-visible {
       outline: var(--cirth-outline-width) solid transparent;
+      outline-offset: 0;
     }
 
     // Aria-invalid

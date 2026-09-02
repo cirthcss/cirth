@@ -41,7 +41,15 @@
         var(--cirth-spacing, var(--cirth-space-4)) * 0.5
       );
       float: right;
-      transform: rotate(-90deg);
+
+      // Resting: the chevron points down, which is where the panel is
+      // about to appear. It used to rest at -90deg — pointing along the
+      // row rather than at anything — and swing to 0 on open, so the
+      // closed state said "there is more this way" and the open state
+      // said "there is more below" about content already below. Down,
+      // then a half turn to up: closed points at what opening will
+      // reveal, open points back at the trigger that will close it.
+      transform: rotate(0deg);
 
       // Masked over a theme token rather than drawn with the icon's own
       // baked stroke, so the marker follows a retheme. The <select>
@@ -72,8 +80,19 @@
 
     &:focus-visible {
       &:not([role]) {
+        // Outset by a quarter step, not inset by the ring's own width.
+        // A summary carries `padding-block` but no `padding-inline` — the
+        // trigger text starts exactly where the panel text below it does,
+        // which is the alignment this component wants — so the border box
+        // and the first glyph share an edge. An inset ring was therefore
+        // drawn *over* the first character: measured, the gap from the
+        // ring to the text was 0px horizontally against 6px vertically.
+        // Offsetting outward buys the same 4px on all four sides without
+        // indenting the trigger away from its own panel. The row is a rule
+        // rather than a box, so there is no frame for the ring to collide
+        // with on the way out.
         outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
-        outline-offset: calc(var(--cirth-outline-width) * -1);
+        outline-offset: var(--cirth-space-1);
         color: var(--cirth-accordion-active-summary-color);
       }
     }
@@ -115,7 +134,7 @@
       }
 
       &::after {
-        transform: rotate(0);
+        transform: rotate(180deg);
       }
     }
   }
@@ -162,6 +181,44 @@ $surface-details: "details";
 
   > :last-child:not(summary) {
     margin-bottom: 0;
+  }
+}
+
+// Opening and closing, as a slide rather than a jump.
+
+// A <details> has no animatable box of its own: what appears is the
+// element's content, which until ::details-content had no selector to hang
+// a transition on. That pseudo-element is recent enough to be outside this
+// project's Browserslist floor, so the whole thing sits behind
+// `@supports selector(...)` and is a pure enhancement: where it is not
+// supported the disclosure opens and closes exactly as it does now, and
+// nothing about the resting state depends on it.
+
+// `interpolate-size: allow-keywords` is what makes `auto` an animatable
+// height — without it there is no way to transition to a height the
+// content decides. `content-visibility` with allow-discrete keeps the
+// panel rendered for the length of the close instead of vanishing on the
+// first frame, the same trick the modal uses for `display`.
+
+// Dropdowns are excluded with the rest of the surface rules: their menu is
+// positioned rather than in flow, so animating its height would move a
+// popover, not open a panel.
+@media (prefers-reduced-motion: no-preference) {
+  @supports selector(::details-content) {
+    #{$parent-selector} #{$surface-details} {
+      &::details-content {
+        block-size: 0;
+        overflow: hidden;
+        transition:
+          block-size var(--cirth-transition),
+          content-visibility var(--cirth-transition) allow-discrete;
+        interpolate-size: allow-keywords;
+      }
+
+      &[open]::details-content {
+        block-size: auto;
+      }
+    }
   }
 }
 
