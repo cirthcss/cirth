@@ -71,6 +71,14 @@
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
   overflow-x: auto;
 
+  // The block above is the deliberately scrollable one, which makes it a
+  // scroll container an author must expose to the keyboard. Same reason
+  // as .overflow-auto in layout/_overflow-auto.scss: ship the ring with
+  // the container instead of leaving every page to add it back.
+  &:focus-visible {
+    outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
+  }
+
   > code,
   > samp {
     display: block;
