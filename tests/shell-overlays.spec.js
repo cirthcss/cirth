@@ -118,10 +118,26 @@ test("the hero preview is a picture, not four tab stops", async ({ page }) => {
 		reached.filter((entry) => entry.tag === "iframe").length,
 		"the frame itself takes a stop",
 	).toBe(0);
-	expect(
-		reached.filter((entry) => entry.tag === "input").length,
-		"fields inside the preview take stops",
-	).toBe(0);
+
+	// The fields are in the frame's own document, and the walk above cannot
+	// see them: focus entering an iframe is reported on the host as the
+	// <iframe> element, which the assertion above already excludes. This
+	// used to be approximated by counting <input> stops on the host page,
+	// which held only while the home page happened to own no fields of its
+	// own — it now has several, in the section whose whole argument is that
+	// its controls *are* reachable. Asserted where it is true instead: the
+	// preview renders a real form, and nothing in it was ever focused.
+	const preview = await page
+		.locator("[data-lab-frame]")
+		.contentFrame()
+		.locator("body")
+		.evaluate((body) => ({
+			fields: body.querySelectorAll("input, button").length,
+			active: body.ownerDocument.activeElement?.tagName.toLowerCase() ?? null,
+		}));
+
+	expect(preview.fields, "the preview renders a real form").toBeGreaterThan(0);
+	expect(preview.active, "nothing in the preview took focus").toBe("body");
 });
 
 test("Shift+Tab walks the home page back out the way it came", async ({
@@ -351,17 +367,22 @@ test("the home page never scrolls sideways", async ({ page }) => {
 			0,
 		);
 
-		// The ledger is the one block wide enough to need it: whatever it
-		// cannot fit scrolls inside its own region, which carries a role, a
-		// name and a tabindex so it can be reached to do that.
-		const ledger = page.locator(".docs-ledger-table");
-		await expect(ledger).toHaveAttribute("role", "region");
-		await expect(ledger).toHaveAttribute("tabindex", "0");
-		expect(
-			await ledger.evaluate((element) =>
-				(element.getAttribute("aria-label") || "").trim().length,
-			),
-			"the scroll region is unnamed",
-		).toBeGreaterThan(0);
+		// The six-row ledger table that used to be the one block wide enough
+		// to need a scroll region is gone: its four measurements are a
+		// hairline strip that reflows, and the two claims left are a list
+		// that wraps. What still scrolls on this page is the code panes,
+		// and the reason they are allowed to is that a listing must not
+		// break an attribute across two lines — so the contract that
+		// survives is the same one, asserted where it is now true: anything
+		// that scrolls can be reached to scroll it.
+		const panes = page.locator(".docs-native-home pre");
+		const count = await panes.count();
+		expect(count, "the home page still shows source").toBeGreaterThan(0);
+		for (let index = 0; index < count; index++) {
+			await expect(
+				panes.nth(index),
+				`code pane ${index} at ${width}px is keyboard reachable`,
+			).toHaveAttribute("tabindex", "0");
+		}
 	}
 });

@@ -148,50 +148,63 @@ test("the colour swatches paint a surface, not the canvas", async ({
 	expect(surface.backgroundColor).not.toBe(canvas.backgroundColor);
 });
 
-test("the showcase cards all share one card contract", async ({ page }) => {
+// The home page used to close with three cards built by the shell; it now
+// renders its cards from the specimen strings the sections show the source
+// of, so the contract worth pinning is the same one and the subject is
+// stronger: these are <article> elements with no class on them at all, and
+// if any of them picks up a shell treatment the page stops being able to
+// claim the source beside it is all there is.
+test("the home page's specimen cards all share one card contract", async ({
+	page,
+}) => {
 	await page.goto(origin, { waitUntil: "networkidle" });
 
-	const cards = page.locator(".docs-case article");
-	const count = await cards.count();
-
-	expect(count).toBeGreaterThan(1);
-
-	const first = await styleOf(cards.first(), [
+	/** @type {Record<string, string>[]} */
+	const cards = [];
+	const properties = [
 		"borderTopWidth",
 		"borderTopLeftRadius",
 		"backgroundColor",
 		"boxShadow",
 		"padding",
-	]);
+	];
 
-	for (let index = 1; index < count; index++) {
-		expect(await styleOf(cards.nth(index), Object.keys(first))).toEqual(first);
+	// One example shows at a time, so each one is opened to be measured:
+	// a card in a panel nobody looked at is exactly where a shell
+	// treatment would go unnoticed.
+	for (const id of ["article", "details", "form"]) {
+		await page.locator(`[data-docs-tab="${id}"]`).click();
+		await expect(page.locator(`[data-docs-panel="${id}"]`)).toBeVisible();
+		cards.push(
+			await styleOf(
+				page.locator(`[data-docs-panel="${id}"] .docs-stage-preview article`),
+				properties,
+			),
+		);
 	}
+	cards.push(
+		await styleOf(
+			page.locator(".docs-theme-showcase .docs-stage-preview article"),
+			properties,
+		),
+	);
+
+	const [first, ...rest] = cards;
+	expect(cards.length).toBeGreaterThan(1);
+	for (const card of rest) expect(card).toEqual(first);
 
 	expect(first.boxShadow, "cards carry no decorative shadow").toBe("none");
 });
 
 // --- :visited must not repaint a card ----------------------------------
 
-test("a card title keeps its colour after the card has been visited", async ({
-	page,
-}) => {
-	// The scenario from the report: follow one of the three cards, come
-	// back, and the second title should not be the odd one out.
-	await page.goto(`${origin}/examples/#dashboard`, {
-		waitUntil: "networkidle",
-	});
-	await page.goto(origin, { waitUntil: "networkidle" });
-
-	const titles = await page
-		.locator(".docs-case strong")
-		.evaluateAll((elements) =>
-			elements.map((element) => getComputedStyle(element).color),
-		);
-
-	expect(titles.length).toBeGreaterThan(1);
-	expect(new Set(titles).size, `titles: ${titles.join(" | ")}`).toBe(1);
-});
+// The page-level half of this pair is gone with the three link-wrapped
+// cards it looked at, and removing it costs no coverage: getComputedStyle
+// reports the *unvisited* style for a visited link in every engine, by
+// design, so a test that read colours off the page could only ever observe
+// sameness whether the rule was right or wrong. The guarantee that does
+// survive is the one below — the selector excludes card links in the first
+// place — asserted against the built stylesheets.
 
 test("the visited rule stands aside for a link wrapping a card", () => {
 	// Asserted on the built stylesheets rather than through the page: the

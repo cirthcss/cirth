@@ -84,13 +84,29 @@ const assertHeroDemoGeometry = async (page) => {
 		Math.abs(outputBox.x - sourceBox.x) <= 1 &&
 		Math.abs(outputBox.width - sourceBox.width) <= 1;
 	if (!stacked) {
-		// Overlapping: the output reaches back over the source, and drops
-		// below it, by an amount you can see rather than by a hairline.
+		// Overlapping: the output reaches back over the source by an amount
+		// you can see rather than by a hairline.
 		const overlapX = sourceBox.x + sourceBox.width - outputBox.x;
 		expect(overlapX).toBeGreaterThan(8);
 		expect(overlapX).toBeLessThan(sourceBox.width / 2);
+
+		// And it is centred on the card it overlaps. It used to sit on the
+		// row's end edge, which put its middle 154px below the source's and
+		// read as a stack that had slipped. Measured against the *card*
+		// rather than the row, which is the whole point: a row-centred
+		// output would be 20px low, on the source's own bottom margin.
+		const sourceCentre = sourceBox.y + sourceBox.height / 2;
+		const outputCentre = outputBox.y + outputBox.height / 2;
+		expect(
+			Math.abs(outputCentre - sourceCentre),
+			"the output is optically centred on the source",
+		).toBeLessThanOrEqual(2);
+
+		// Which, the output being the shorter of the two, means it sits
+		// inside the source's span on both edges rather than hanging past
+		// it.
 		expect(outputBox.y).toBeGreaterThan(sourceBox.y);
-		expect(outputBox.y + outputBox.height).toBeGreaterThan(
+		expect(outputBox.y + outputBox.height).toBeLessThan(
 			sourceBox.y + sourceBox.height,
 		);
 	} else {
@@ -432,37 +448,17 @@ test("compact header orders search before its complete keyboard menu", async ({
 	await expect(page.locator(".docs-header-controls-group [data-docs-header-control]")).toHaveCount(3);
 });
 
-test("homepage cards and FAQ expose consistent interactive states", async ({
+test("the homepage FAQ exposes consistent interactive states", async ({
 	page,
 }) => {
 	await page.emulateMedia({ reducedMotion: "no-preference" });
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
-	const card = page.locator(".docs-case article").first();
-	const rest = await card.evaluate((element) => {
-		const style = getComputedStyle(element);
-		return {
-			background: style.backgroundColor,
-			border: style.borderColor,
-			boxShadow: style.boxShadow,
-			transform: style.transform,
-		};
-	});
-	await page.locator(".docs-case").first().hover();
-	await page.waitForTimeout(200);
-	const hover = await card.evaluate((element) => {
-		const style = getComputedStyle(element);
-		return {
-			background: style.backgroundColor,
-			border: style.borderColor,
-			boxShadow: style.boxShadow,
-			transform: style.transform,
-		};
-	});
-	expect(hover.background).not.toBe(rest.background);
-	expect(hover.border).not.toBe(rest.border);
-	expect(hover.boxShadow).toBe("none");
-	expect(hover.transform).toBe("none");
+	// The card half of this test went with the three shell-built cards it
+	// hovered. What replaced them renders from the specimen strings the
+	// page shows the source of, so it carries no shell hover treatment by
+	// design — its contract is "this is the library's card and nothing
+	// else", pinned in baseline-consistency.spec.js.
 
 	const details = page.locator(".docs-native-faq details").first();
 	const summary = details.locator("summary");
@@ -774,50 +770,97 @@ test("the navbar states are a contrast ladder, not the accent", async ({
 	expect(scoped.edgeColor).toBe(accent);
 });
 
-// --- The ledger is a table ----------------------------------------------
+// --- The proof band -----------------------------------------------------
 
-test("the ledger is a native table with one voice in its header row", async ({
+// Four claims and two more below them, and what is worth pinning is no
+// longer only that each has a path to check it: it is that each says what
+// kind of claim it is. A guarantee, a capability and a measurement age
+// differently, and a page that presents them identically is promising the
+// measurement.
+test("every claim says what kind it is, and how to check it", async ({
 	page,
 }) => {
 	await page.setViewportSize({ width: 1280, height: 900 });
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
-	const table = page.locator(".docs-ledger-table table");
-	// Real semantics, no ARIA re-implementation of them.
-	await expect(table).toHaveCount(1);
-	await expect(page.locator(".docs-ledger-table [role]")).toHaveCount(0);
-	await expect(table.locator("thead th[scope='col']")).toHaveCount(4);
-	await expect(table.locator("tbody tr")).toHaveCount(6);
-	await expect(table.locator("tbody th[scope='row']")).toHaveCount(6);
-	await expect(
-		page.getByRole("table", { name: "Cirth proof ledger" }),
-	).toBeVisible();
+	const cells = page.locator(".docs-proof-metrics > div");
+	await expect(cells).toHaveCount(4);
 
-	// State, Claim, Evidence and Scope were set in three different
-	// typefaces at two sizes, because the column rules matched the header
-	// row too. One voice, and it has to stay one.
-	const heads = await table.locator("thead th").evaluateAll((cells) =>
-		cells.map((cell) => {
-			const style = getComputedStyle(cell);
-			return [
-				style.fontFamily,
-				style.fontSize,
-				style.fontWeight,
-				style.letterSpacing,
-				style.textTransform,
-				style.color,
-				style.verticalAlign,
-			].join("|");
-		}),
-	);
-	expect(heads).toHaveLength(4);
-	expect(new Set(heads).size, `header cells differ: ${heads.join("\n")}`).toBe(1);
+	for (const value of [
+		"0 B JS runtime",
+		"WCAG 2.2 AA baseline",
+		"Flexible distribution",
+		"Small CSS footprint",
+	]) {
+		await expect(
+			page.locator(".docs-proof-metrics", { hasText: value }),
+			`${value} is stated`,
+		).toBeVisible();
+	}
 
-	// The state marks are icons from the shell's own set, one size for
-	// every state, hidden from assistive technology because the state is
-	// already a word beside them.
+	// Every cell: a kind, a claim, what it means, and a way to check it.
+	const count = await cells.count();
+	for (let index = 0; index < count; index++) {
+		const cell = cells.nth(index);
+		await expect(cell.locator("dt .docs-proof-state")).toHaveCount(1);
+		await expect(cell.locator("dd > strong")).toHaveCount(1);
+		await expect(cell.locator("dd small")).toHaveCount(1);
+		const link = cell.locator("dd a");
+		await expect(link, `cell ${index} has a check path`).toHaveCount(1);
+		expect(
+			(await link.getAttribute("href")) || "",
+			`cell ${index} path is real`,
+		).not.toBe("");
+	}
+
+	// The vocabulary is three words, used by both halves of the section —
+	// the strip and the list under it — so a reader learns it once.
+	const kinds = await page
+		.locator(".docs-proof .docs-proof-state")
+		.evaluateAll((marks) => marks.map((mark) => mark.textContent?.trim()));
+	expect(kinds).toEqual([
+		"Guarantee",
+		"Guarantee",
+		"Capability",
+		"Current fact",
+		"Guarantee",
+		"Capability",
+	]);
+
+	// The size is the one current fact, and it is stated as a measurement of
+	// this build rather than as a ceiling: a real number, in the caption
+	// that dates it, with the check beside it. A bare "<14 KB" headline is
+	// the shape of a promise, and the page does not make that one — the
+	// budget is a build guard, not a claim to a reader.
+	const size = cells.nth(3);
+	await expect(size.locator("dd > strong")).toHaveText("Small CSS footprint");
+	await expect(size.locator("dd small")).toContainText(/\d+(\.\d+)? KB/);
+	await expect(size.locator("dd small")).toContainText("this build");
+	await expect(page.locator(".docs-proof")).not.toContainText("<14 KB");
+
+	// No claim rests on a count of builds either. "4 builds" was accurate,
+	// and the promise it implied — that there will always be exactly four —
+	// is not one worth making when print sheets and presets already sit
+	// beside them.
+	await expect(page.locator(".docs-proof")).not.toContainText(/\d+ builds/);
+
+	// The two claims that are not about the package's shape are a list, not
+	// a second table of the four above.
+	const claims = page.locator(".docs-proof-claims li");
+	await expect(claims).toHaveCount(2);
+	await expect(page.locator(".docs-proof table")).toHaveCount(0);
+	for (const value of ["0 B JS", "WCAG 2.2", "footprint"]) {
+		await expect(
+			page.locator(".docs-proof-claims", { hasText: value }),
+			`${value} is not restated below the strip`,
+		).toHaveCount(0);
+	}
+
+	// The marks are still glyphs from the shell's own set: one size, no
+	// container, hidden from assistive technology because the word is right
+	// beside them.
 	const marks = await page
-		.locator(".docs-ledger-state svg")
+		.locator(".docs-proof-state svg")
 		.evaluateAll((nodes) =>
 			nodes.map((node) => ({
 				tag: node.tagName.toLowerCase(),
@@ -835,24 +878,47 @@ test("the ledger is a native table with one voice in its header row", async ({
 		expect(mark.height).toBe(16);
 		expect(Number.parseFloat(mark.border)).toBe(0);
 	}
-	for (const state of ["verified", "covered", "runtime", "choice"]) {
-		await expect(page.locator(".docs-ledger-state", { hasText: state }).first()).toBeVisible();
-	}
 
-	// It stays a table at every width — restacking it with `display: grid`
-	// is what would take the row and column semantics back out.
-	for (const width of [1023, 767, 390]) {
+	// The band has no frame of its own: the two showcases above are each a
+	// hairline plate, and a third would be the shape this page was rebuilt
+	// to stop having. Its tint is what separates it from them, and from the
+	// FAQ below — which is back on the canvas for the same reason.
+	const grounds = await page.evaluate(() => {
+		const read = (/** @type {string} */ selector) => {
+			const element = document.querySelector(selector);
+			if (!element) return null;
+			const style = getComputedStyle(element);
+			return {
+				background: style.backgroundColor,
+				border: Number.parseFloat(style.borderTopWidth),
+			};
+		};
+		return {
+			proof: read(".docs-proof"),
+			faq: read(".docs-native-faq"),
+			metrics: read(".docs-proof-metrics"),
+			showcase: read(".docs-showcase"),
+		};
+	});
+	expect(grounds.metrics?.border, "the metric strip has no frame").toBe(0);
+	expect(
+		grounds.proof?.background,
+		"the proof band is tinted away from its neighbours",
+	).not.toBe(grounds.faq?.background);
+	expect(grounds.proof?.background).not.toBe(grounds.showcase?.background);
+
+	// It stays a hairline grid at every width — two columns on a phone, four
+	// once the row can hold them, and never a set of stacked cards with the
+	// claims' relationship to each other taken out.
+	for (const width of [1440, 1023, 767, 390, 320]) {
 		await page.setViewportSize({ width, height: 900 });
-		const shape = await table.evaluate((element) => ({
-			display: getComputedStyle(element).display,
-			head: getComputedStyle(
-				/** @type {HTMLElement} */ (element.querySelector("thead th")),
-			).display,
-			overflow: document.documentElement.scrollWidth - window.innerWidth,
-		}));
-		expect(shape.display, `at ${width}px`).toBe("table");
-		expect(shape.head, `at ${width}px`).toBe("table-cell");
-		expect(shape.overflow, `at ${width}px`).toBeLessThanOrEqual(0);
+		const columns = await page
+			.locator(".docs-proof-metrics")
+			.evaluate(
+				(element) =>
+					getComputedStyle(element).gridTemplateColumns.split(" ").length,
+			);
+		expect(columns, `metric columns at ${width}px`).toBe(width >= 960 ? 4 : 2);
 	}
 });
 
@@ -1030,7 +1096,891 @@ test.describe("without JavaScript", () => {
 				name: "Sign in",
 			}),
 		).toBeVisible();
-		// And the ledger is readable without a line of script.
-		await expect(page.locator(".docs-ledger-table table tbody tr")).toHaveCount(6);
+		// And the proof band is readable without a line of script.
+		await expect(page.locator(".docs-proof-metrics > div")).toHaveCount(4);
+		await expect(page.locator(".docs-proof-claims li")).toHaveCount(2);
 	});
+
+	// The showcase's fallback is the whole reason its tab strip ships
+	// `hidden` rather than inert: with no script there is no tablist, so
+	// all three examples are served rendered, complete, and under their own
+	// headings. A row of buttons that cannot change anything would be the
+	// other outcome, and this page's own rule — stated on the preset select
+	// beside it — is that a choice which cannot be applied is not offered.
+	test("the showcase degrades to three complete examples", async ({ page }) => {
+		await page.goto(`${origin}/`, { waitUntil: "load" });
+
+		const strip = page.locator("[data-docs-switch]");
+		await expect(strip).toHaveCount(1);
+		await expect(strip).toBeHidden();
+		// No roles either: a tabpanel with no tablist anywhere would be a
+		// lie about the document, so the script that implements them is
+		// what puts them there.
+		await expect(page.locator('[role="tablist"], [role="tab"]')).toHaveCount(0);
+		await expect(page.locator('[role="tabpanel"]')).toHaveCount(0);
+
+		const panels = page.locator("[data-docs-panel]");
+		await expect(panels).toHaveCount(3);
+		for (let index = 0; index < 3; index++) {
+			await expect(panels.nth(index)).toBeVisible();
+			await expect(
+				panels.nth(index).locator(".docs-example-name"),
+				`example ${index} names itself without the tab`,
+			).toBeVisible();
+		}
+
+		// And the theme section is a listing and a finished interface, both
+		// served. The custom element never upgrades, so what renders is its
+		// own children — the same specimen, in the light DOM, painted by the
+		// page's Cirth. `:not(:defined)` is that state, and it is what
+		// carries the pane's padding while it lasts.
+		const listing = page.locator("[data-docs-theme-block]");
+		await expect(listing).toHaveCount(1);
+		await expect(listing).toContainText(".cirth {");
+		await expect(listing).toContainText("--cirth-primary");
+
+		const preview = page.locator("cirth-theme-preview");
+		await expect(preview).toBeVisible();
+		const fallback = await preview.evaluate((element) => ({
+			defined: element.matches(":not(:defined)"),
+			shadow: element.shadowRoot !== null,
+			children: element.children.length,
+			padding: Number.parseFloat(getComputedStyle(element).paddingTop),
+		}));
+		expect(fallback.defined, "the element never upgrades").toBe(true);
+		expect(fallback.shadow).toBe(false);
+		expect(fallback.children).toBe(1);
+		// The pane gave its padding to the element, so the un-upgraded
+		// element has to carry it — otherwise the specimen sits against the
+		// stage's own edge.
+		expect(fallback.padding).toBeGreaterThan(8);
+		await expect(
+			preview.locator("article button", { hasText: "Save changes" }),
+		).toBeVisible();
+
+		// The control that drives the sequence is not offered, because
+		// without script there is no sequence to pause.
+		await expect(page.locator("[data-docs-theme-toggle]")).toBeHidden();
+	});
+});
+
+
+// --- The home page's showcase sections ---------------------------------
+
+// Every specimen on this page is declared once in home.njk and used twice:
+// rendered into the page, and highlighted into the pane beside it. The
+// point of doing it that way is that the two cannot drift — the hero has
+// had exactly that bug before, a snippet declaring attributes the rendered
+// output no longer had — so the contract to pin is equality, not the
+// presence of either half.
+const normalizeMarkup = (/** @type {string} */ html) =>
+	html
+		.replace(/\s+/g, " ")
+		.replace(/>\s+</g, "><")
+		// `open` and `open=""` are the same attribute. The specimen writes
+		// the bare form, which is what an author writes and what the pane
+		// therefore lists; `outerHTML` always serialises the empty-string
+		// form. Normalising both sides the same way compares the markup
+		// rather than the serialiser.
+		.replace(/=""/g, "")
+		.trim();
+
+/** The three examples, in the order the strip offers them. */
+const showcaseExamples = ["article", "details", "form"];
+
+/**
+ * @param {import("@playwright/test").Page} page
+ * @param {string} id
+ */
+const openExample = async (page, id) => {
+	await page.locator(`[data-docs-tab="${id}"]`).click();
+	await expect(page.locator(`[data-docs-panel="${id}"]`)).toBeVisible();
+};
+
+test("each source pane is the markup that produced the specimen beside it", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+
+	// All three, not just the one that happens to be showing: an example
+	// nobody looks at is exactly where a listing drifts from its specimen.
+	for (const id of showcaseExamples) {
+		await openExample(page, id);
+		const scope = page.locator(`[data-docs-panel="${id}"]`);
+		const listed = await scope.locator(".docs-stage-code pre code").innerText();
+		const rendered = await scope
+			.locator(".docs-stage-preview article")
+			.evaluate((element) => element.outerHTML);
+
+		expect(
+			normalizeMarkup(listed),
+			`${id}: the pane lists what the page rendered`,
+		).toBe(normalizeMarkup(rendered));
+
+		// Highlighted at build time, like every other code block on the site.
+		expect(
+			await scope.locator("pre code span").count(),
+			`${id} is highlighted`,
+		).toBeGreaterThan(10);
+	}
+});
+
+// The strip is the WAI-ARIA tabs pattern or it is three buttons pretending:
+// one tab stop for the whole strip, arrows walking it, one panel showing,
+// and the panel named by the tab that opened it.
+test("the showcase strip is a real tablist", async ({ page }) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+
+	const strip = page.locator("[data-docs-switch]");
+	await expect(strip).toBeVisible();
+	await expect(strip).toHaveAttribute("role", "tablist");
+
+	const tabs = page.getByRole("tab");
+	await expect(tabs).toHaveCount(3);
+
+	/** Exactly one panel is in the document at a time. */
+	const assertOnlyOpen = async (/** @type {string} */ id) => {
+		for (const other of showcaseExamples) {
+			await expect(
+				page.locator(`[data-docs-panel="${other}"]`),
+				`${other} while ${id} is selected`,
+			)[other === id ? "toBeVisible" : "toBeHidden"]();
+		}
+		// Roving tabindex: one stop for the strip, on the selected tab.
+		expect(
+			await tabs.evaluateAll((items) =>
+				items.map((item) => `${item.getAttribute("aria-selected")}/${item.tabIndex}`),
+			),
+		).toEqual(
+			showcaseExamples.map((other) =>
+				other === id ? "true/0" : "false/-1",
+			),
+		);
+	};
+
+	await assertOnlyOpen("article");
+
+	// Each tab controls a panel, and each panel is named by its tab —
+	// which is what lets the heading in the panel be dropped once the
+	// strip is on without the panel losing its name.
+	for (const id of showcaseExamples) {
+		const tab = page.locator(`[data-docs-tab="${id}"]`);
+		const panel = page.locator(`[data-docs-panel="${id}"]`);
+		await expect(tab).toHaveAttribute("aria-controls", `panel-${id}`);
+		await expect(panel).toHaveAttribute("role", "tabpanel");
+		await expect(panel).toHaveAttribute("aria-labelledby", `tab-${id}`);
+		await expect(panel).toHaveAttribute("tabindex", "0");
+	}
+
+	// Arrow keys walk the strip and selection follows focus, because every
+	// panel is already in the document — nothing is fetched by arrowing.
+	await page.locator('[data-docs-tab="article"]').focus();
+	await page.keyboard.press("ArrowRight");
+	await assertOnlyOpen("details");
+	await expect(page.locator('[data-docs-tab="details"]')).toBeFocused();
+	await page.keyboard.press("End");
+	await assertOnlyOpen("form");
+	await page.keyboard.press("ArrowRight");
+	await assertOnlyOpen("article");
+	await page.keyboard.press("Home");
+	await assertOnlyOpen("article");
+
+	// The tab strip is the only control in this section, and it takes a
+	// ring like everything else the page asks a reader to operate.
+	expect(
+		await page
+			.locator('[data-docs-tab="article"]')
+			.evaluate((element) => {
+				const style = getComputedStyle(element);
+				return (
+					(style.outlineStyle !== "none" &&
+						Number.parseFloat(style.outlineWidth) > 0) ||
+					style.boxShadow !== "none"
+				);
+			}),
+		"the focused tab paints a ring",
+	).toBe(true);
+
+	// With the strip on, the panel's own heading is redundant with the tab
+	// above it and is taken out of the page rather than repeated.
+	await expect(page.locator(".docs-example-name").first()).toBeHidden();
+
+	// And the strip is the section's control, not a row of the stage's
+	// band: it sits outside the stage, above it, on the section's own
+	// column. In the band it read as part of the listing's toolbar, beside
+	// the file name and the copy affordance.
+	const stage = page.locator('[aria-labelledby="semantic-title"] .docs-stage');
+	expect(
+		await strip.evaluate((element) => element.closest(".docs-stage") !== null),
+		"the strip is outside the stage",
+	).toBe(false);
+	await expect(stage.locator(".docs-switch")).toHaveCount(0);
+
+	const [stripBox, stageBox] = await Promise.all([
+		strip.boundingBox(),
+		stage.boundingBox(),
+	]);
+	if (!stripBox || !stageBox) throw new Error("Expected the strip and stage");
+	expect(stripBox.y + stripBox.height).toBeLessThanOrEqual(stageBox.y + 1);
+	expect(Math.round(stripBox.x)).toBe(Math.round(stageBox.x));
+	// Close enough to read as attached to what it switches, and not so far
+	// that it reads as loose copy.
+	expect(stageBox.y - (stripBox.y + stripBox.height)).toBeLessThan(24);
+});
+
+// The two sections this one absorbed both claimed the browser does the
+// work. That claim now belongs to two of the three examples, and it has to
+// be true of the elements the page actually renders.
+test("the showcase's examples are the browser's own behaviour", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+
+	// 1 — an exclusive disclosure group. One `name`, so opening the second
+	// closes the first, and it is the browser doing it.
+	await openExample(page, "details");
+	const panel = page.locator('[data-docs-panel="details"]');
+	const rows = panel.locator("details");
+	await expect(rows).toHaveCount(2);
+	const names = await rows.evaluateAll((items) =>
+		items.map((item) => item.getAttribute("name")),
+	);
+	expect(new Set(names).size).toBe(1);
+	expect(names[0]).toBeTruthy();
+
+	await expect(rows.nth(0)).toHaveAttribute("open", "");
+	await rows.nth(1).locator("summary").click();
+	await expect(rows.nth(1)).toHaveAttribute("open", "");
+	await expect(rows.nth(0)).not.toHaveAttribute("open", "");
+
+	// 2 — the browser's own validity state, painted by the framework, and
+	// held back until the reader has caused it. `:user-invalid`, not
+	// `:invalid`: a required field is invalid on arrival, and nothing on
+	// this page is painted red before anyone has touched it.
+	await openExample(page, "form");
+	const email = page.locator('[data-docs-panel="form"] input[type="email"]');
+	expect(
+		await email.evaluate((el) => el.matches(":user-invalid")),
+		"nothing is invalid on arrival",
+	).toBe(false);
+	const resting = await email.evaluate(
+		(el) => getComputedStyle(el).borderColor,
+	);
+	await email.fill("not-an-address");
+	await email.blur();
+	expect(await email.evaluate((el) => el.matches(":user-invalid"))).toBe(true);
+	expect(
+		await email.evaluate((el) => getComputedStyle(el).borderColor),
+		"an invalid field is repainted",
+	).not.toBe(resting);
+
+	// And nothing in any of the three samples is wired to anything, which
+	// is the sentence under the heading. The switcher is in the band, not
+	// in a sample, and there is no inline handler anywhere in the section.
+	const section = page.locator('[aria-labelledby="semantic-title"]');
+	expect(
+		await section.locator(".docs-stage-deck :is(script, [onclick], [onchange], [onsubmit])").count(),
+	).toBe(0);
+
+	// No <form> in the samples either, and that is deliberate: a form with
+	// no action submits to this page, so a reader who filled the field in
+	// would be navigated off the home page by a demo whose claim is that
+	// nothing here is wired. Constraint validation does not need a form
+	// owner, which is why the example above still works.
+	expect(await section.locator("form").count()).toBe(0);
+});
+
+test("every control in the showcase specimens is reachable and takes a ring", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+
+	let checked = 0;
+	// Every example, not only the one showing: a control in a panel nobody
+	// opened is still a control a reader can reach.
+	for (const id of [...showcaseExamples, null]) {
+		if (id) await openExample(page, id);
+
+		// Form controls and summaries only, which is what every engine
+		// reaches with default settings (see the note at the top of this
+		// file). Visible ones, because a hidden panel's controls are out of
+		// the document's tab order by design.
+		const controls = page.locator(
+			".docs-example:not([hidden]) .docs-stage-preview :is(input, select, summary), .docs-theme-showcase .docs-stage-preview :is(input, select, summary)",
+		);
+		const count = await controls.count();
+		for (let index = 0; index < count; index++) {
+			const control = controls.nth(index);
+			// A Tab first, because opening an example is a click and every
+			// engine's `:focus-visible` heuristic remembers that the last
+			// interaction was a pointer — a programmatic focus after a click
+			// is deliberately not focus-visible. The keypress puts the
+			// browser back in the modality this assertion is about.
+			await page.keyboard.press("Tab");
+			await control.focus();
+			expect(
+				await control.evaluate((element) => element.matches(":focus-visible")),
+				`${id ?? "theme"} control ${index} takes focus`,
+			).toBe(true);
+			const ring = await control.evaluate((element) => {
+				const style = getComputedStyle(element);
+				return {
+					style: style.outlineStyle,
+					width: Number.parseFloat(style.outlineWidth),
+					shadow: style.boxShadow,
+				};
+			});
+			expect(
+				(ring.style !== "none" && ring.width > 0) || ring.shadow !== "none",
+				`${id ?? "theme"} control ${index} paints a focus ring`,
+			).toBe(true);
+			checked += 1;
+		}
+	}
+	expect(checked).toBeGreaterThanOrEqual(8);
+});
+
+// --- The theme section --------------------------------------------------
+
+/**
+ * The listing beside the preview and the stylesheet the preview is really
+ * carrying, normalised the same way. The listing breaks a `light-dark()`
+ * value over three lines to fit the pane; the applied declaration is one
+ * line. Collapsing whitespace — and the padding a broken line leaves
+ * inside the parentheses — compares the declarations rather than the two
+ * formattings of them.
+ * @param {string} css
+ */
+const normalizeCss = (css) =>
+	css
+		.replace(/\s+/g, " ")
+		.replace(/\(\s+/g, "(")
+		.replace(/\s+\)/g, ")")
+		.trim();
+
+/**
+ * What the demo is showing and what it is doing, read together.
+ * @param {import("@playwright/test").Page} page
+ */
+const themeState = (page) =>
+	page.evaluate(() => {
+		const element = document.querySelector("cirth-theme-preview");
+		const shadow = element?.shadowRoot;
+		const surface = shadow?.querySelector(".cirth");
+		const style = shadow?.querySelector("style[data-cirth-theme]");
+		const block = document.querySelector("[data-docs-theme-block]");
+		return {
+			applied: style?.textContent ?? "",
+			listed: block?.textContent ?? "",
+			marked: [...document.querySelectorAll(".docs-token.is-changed")].map(
+				(line) => line.getAttribute("data-token"),
+			),
+			// Resolved through the element, which is the only way to ask what
+			// the demo's own copy of Cirth thinks a token is.
+			accent: surface
+				? getComputedStyle(surface).getPropertyValue("--cirth-primary").trim()
+				: "",
+			radius: surface
+				? getComputedStyle(
+						/** @type {Element} */ (surface.querySelector("article")),
+					).borderTopLeftRadius
+				: "",
+			button: surface
+				? getComputedStyle(
+						/** @type {Element} */ (surface.querySelector("button")),
+					).backgroundColor
+				: "",
+			pageAccent: getComputedStyle(document.documentElement)
+				.getPropertyValue("--cirth-primary")
+				.trim(),
+			chip: getComputedStyle(
+				/** @type {Element} */ (
+					document.querySelector(
+						'.docs-token-legend li[data-token="--cirth-primary"] .docs-token-chip',
+					)
+				),
+			).backgroundColor,
+		};
+	});
+
+// The demo is a custom element with its own copy of Cirth in a shadow
+// root, and every claim this section makes rests on that: the declarations
+// it applies have to reach the preview and nothing else, and the listing
+// beside it has to be the stylesheet the preview is carrying rather than a
+// picture of one.
+test("the theme preview carries its own Cirth, in a shadow root", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+
+	const element = page.locator("cirth-theme-preview");
+	await expect(element).toHaveCount(1);
+
+	const shadow = await element.evaluate((host) => {
+		const root = host.shadowRoot;
+		const sheets = [...(root?.querySelectorAll("link[rel=stylesheet]") ?? [])];
+		return {
+			mode: root ? "open" : "none",
+			// The real compiled scoped build, not a look-alike written for
+			// the demo — the same artifact the /lab/ specimens load.
+			stylesheets: sheets.map((sheet) =>
+				String(sheet.getAttribute("href")).replace(/^.*\/styles\//, "styles/"),
+			),
+			// The theme comes after Cirth's own sheet: an ordinary stylesheet
+			// loaded after it, overriding custom properties at the same
+			// specificity, which is what the documentation tells an author to
+			// write. Before it, every declaration would lose.
+			themeAfterCirth:
+				[...(root?.children ?? [])].findIndex((child) =>
+					child.matches("style[data-cirth-theme]"),
+				) >
+				[...(root?.children ?? [])].findIndex((child) =>
+					child.matches("link[rel=stylesheet]"),
+				),
+			// The scoped build's theme root, which is what the listing names.
+			wrapper: root?.querySelector(".cirth")?.tagName.toLowerCase() ?? null,
+			specimen: root?.querySelector(".cirth > article")?.tagName.toLowerCase() ?? null,
+			// The fallback children were taken into the shadow root, not left
+			// behind as a second, unrendered copy of the same form.
+			lightChildren: host.children.length,
+		};
+	});
+	expect(shadow.mode).toBe("open");
+	expect(shadow.stylesheets).toEqual(["styles/generated/cirth-lab-scoped.css"]);
+	expect(shadow.themeAfterCirth).toBe(true);
+	expect(shadow.wrapper).toBe("div");
+	expect(shadow.specimen).toBe("article");
+	expect(shadow.lightChildren).toBe(0);
+
+	// The listing is the stylesheet. Not "shows the same values": the same
+	// text, which is the only version of this claim that cannot drift.
+	const state = await themeState(page);
+	expect(normalizeCss(state.listed)).toBe(normalizeCss(state.applied));
+	expect(state.applied).toContain(".cirth {");
+	for (const token of [
+		"--cirth-primary",
+		"--cirth-border-radius",
+		"--cirth-canvas",
+	]) {
+		expect(state.applied, `${token} is applied`).toContain(token);
+	}
+
+	// Nothing is marked before anything has moved, and the demo is served
+	// in the default theme — the page's own — so the section opens on
+	// agreement rather than on a difference the reader did not ask for.
+	expect(state.marked).toEqual([]);
+	expect(state.accent).toBe(state.pageAccent);
+
+	// The chip is painted by the value the preview is carrying, so a swatch
+	// cannot show one accent while the preview shows another.
+	expect(state.chip).toBe(state.button);
+});
+
+// The isolation, exercised rather than asserted: the site's own preset
+// switcher moves the page's tokens, and the demo — which has just been
+// given a different set of values — does not move with it. This is the
+// property the shadow root is for, and the reason the section can show a
+// page theme and a demo theme at the same time.
+test("the theme demo and the page keep separate themes", async ({ page }) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+
+	const toggle = page.locator("[data-docs-theme-toggle]");
+	await expect(toggle).toBeVisible();
+
+	// Step the demo off its opening state by hand. The suite runs under
+	// reduced motion, where nothing autoplays — which is the contract
+	// below, and here it means the sequence only moves when asked.
+	const opening = await themeState(page);
+	await toggle.click();
+	await expect
+		.poll(async () => (await themeState(page)).accent, {
+			message: "the demo takes a value of its own",
+			timeout: 15000,
+		})
+		.not.toBe(opening.accent);
+	await toggle.click();
+
+	const moved = await themeState(page);
+	// The demo moved; the page did not.
+	expect(moved.pageAccent).toBe(opening.pageAccent);
+	expect(moved.accent).not.toBe(moved.pageAccent);
+	// And the listing still is the stylesheet, mid-sequence.
+	expect(normalizeCss(moved.listed)).toBe(normalizeCss(moved.applied));
+
+	// Now the other direction: the site's preset switcher repaints the page
+	// and leaves the demo exactly where it was.
+	const header = page.locator("[data-cirth-preset-select]");
+	await header.selectOption("playroom");
+	await expect(page.locator("#cirth-preset-stylesheet")).toHaveAttribute(
+		"href",
+		/presets\/playroom\.css$/,
+	);
+	const after = await themeState(page);
+	expect(after.pageAccent).not.toBe(moved.pageAccent);
+	expect(after.accent, "the demo is not repainted by the page").toBe(
+		moved.accent,
+	);
+	expect(after.applied).toBe(moved.applied);
+
+	await header.selectOption("amber");
+});
+
+// The sequence itself: one token at a time, marked where it stands, and
+// the value that lands is the value the listing then shows. Every value in
+// it is read out of a compiled file at build time, so "no fake code" is a
+// property of the pipeline — what this checks is that the demo applies
+// what it prints, at every step.
+test("the token animation applies exactly what it prints", async ({ page }) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+
+	const toggle = page.locator("[data-docs-theme-toggle]");
+	const seen = new Set();
+
+	for (let step = 0; step < 4; step += 1) {
+		const before = await themeState(page);
+		await toggle.click();
+		await expect
+			.poll(async () => (await themeState(page)).applied, {
+				message: "a declaration moves",
+				timeout: 15000,
+			})
+			.not.toBe(before.applied);
+		await toggle.click();
+
+		const after = await themeState(page);
+		// The listing is still the stylesheet.
+		expect(normalizeCss(after.listed)).toBe(normalizeCss(after.applied));
+
+		// One declaration moved, and it is the one that is marked.
+		const changed = ["--cirth-primary", "--cirth-border-radius", "--cirth-canvas"]
+			.filter((token) => {
+				const read = (/** @type {string} */ css) =>
+					new RegExp(`${token}:([^;]+);`).exec(normalizeCss(css))?.[1];
+				return read(before.applied) !== read(after.applied);
+			});
+		expect(changed, `step ${step}: one declaration at a time`).toHaveLength(1);
+		expect(after.marked, `step ${step}: the moved line is marked`).toEqual(
+			changed,
+		);
+		seen.add(changed[0]);
+	}
+
+	// And the sequence walks the tokens rather than sitting on one of them.
+	expect(seen.size).toBeGreaterThan(1);
+});
+
+// Auto-updating content that is presented beside everything else needs a
+// way to stop it (WCAG 2.2.2), and a reader who has asked for reduced
+// motion should not have to use it: the demo holds its opening state and
+// the control is what starts the sequence.
+test("the theme demo holds still under reduced motion", async ({ page }) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+
+	const toggle = page.locator("[data-docs-theme-toggle]");
+	// The suite runs with reduced motion set (playwright.behavior.config).
+	await expect(toggle).toHaveText("Play");
+	await expect(toggle).toHaveAttribute("aria-label", /play/i);
+
+	const opening = await themeState(page);
+	await page.waitForTimeout(2500);
+	expect(
+		(await themeState(page)).applied,
+		"nothing autoplays with the preference set",
+	).toBe(opening.applied);
+
+	// It is still available on request, and the button says which state it
+	// is in rather than only what it does.
+	await toggle.click();
+	await expect(toggle).toHaveText("Pause");
+	await expect
+		.poll(async () => (await themeState(page)).applied, { timeout: 15000 })
+		.not.toBe(opening.applied);
+	await toggle.click();
+	await expect(toggle).toHaveText("Play");
+	const paused = await themeState(page);
+	await page.waitForTimeout(2500);
+	expect((await themeState(page)).applied, "pausing pauses it").toBe(
+		paused.applied,
+	);
+});
+
+// The control the section grew, and the trap the tab strip fell into once
+// already: a <button> rebinds `--cirth-color` and `--cirth-background-color`
+// to the pair the framework paints a filled button with, so a rule inside
+// the button reaching for either name gets white-on-accent. Hovering this
+// one turned it white on the band's own surface at 1.07:1 — caught by an
+// axe pass over the section, and pinned here because it comes back the
+// moment a state is left out of the rule.
+test("the theme demo's control keeps the band's ink in every state", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+
+	const toggle = page.locator("[data-docs-theme-toggle]");
+	// The band's own two inks, read off the band rather than restated here.
+	const band = await page
+		.locator(".docs-theme-showcase .docs-stage-band")
+		.evaluate((element) => {
+			const style = getComputedStyle(element);
+			return {
+				ink: style.getPropertyValue("--docs-band-color").trim(),
+				muted: style.getPropertyValue("--docs-band-muted").trim(),
+				surface: style.getPropertyValue("--docs-band-surface").trim(),
+			};
+		});
+
+	/** @param {import("@playwright/test").Locator} locator */
+	const paint = (locator) =>
+		locator.evaluate((element) => {
+			const style = getComputedStyle(element);
+			return { color: style.color, background: style.backgroundColor };
+		});
+	/** @param {string} value */
+	const resolve = (value) =>
+		page.evaluate((raw) => {
+			const probe = document.createElement("span");
+			probe.style.color = raw;
+			document.body.append(probe);
+			const resolved = getComputedStyle(probe).color;
+			probe.remove();
+			return resolved;
+		}, value);
+
+	const [ink, muted, surface] = await Promise.all(
+		[band.ink, band.muted, band.surface].map(resolve),
+	);
+
+	const rest = await paint(toggle);
+	expect(rest.color).toBe(muted);
+	expect(rest.background).toBe(surface);
+
+	await toggle.hover();
+	const hovered = await paint(toggle);
+	expect(hovered.color).toBe(ink);
+	expect(hovered.background).toBe(surface);
+
+	await toggle.focus();
+	const focused = await paint(toggle);
+	expect([ink, muted]).toContain(focused.color);
+	expect(focused.background).toBe(surface);
+
+	// And it takes a ring, like everything else this page asks a reader to
+	// operate.
+	await page.keyboard.press("Tab");
+	await toggle.focus();
+	expect(
+		await toggle.evaluate((element) => {
+			const style = getComputedStyle(element);
+			return (
+				(style.outlineStyle !== "none" &&
+					Number.parseFloat(style.outlineWidth) > 0) ||
+				style.boxShadow !== "none"
+			);
+		}),
+		"the focused control paints a ring",
+	).toBe(true);
+});
+
+// The one thing the old block-per-preset structure existed to protect: the
+// shell injects a copy button on every `pre > code` and copies
+// `textContent`, so anything hidden inside the block would be handed over
+// with it. One block whose values are replaced has nothing hidden in it.
+test("copying the theme listing hands over the declarations on screen", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+
+	const block = page.locator("[data-docs-theme-block]");
+	const copied = await block.innerText();
+	const state = await themeState(page);
+	expect(normalizeCss(copied)).toBe(normalizeCss(state.applied));
+	// One value per token, not every state's version of it.
+	expect(copied.match(/--cirth-primary/g)).toHaveLength(1);
+	expect(copied).toContain("--cirth-radius-sm");
+	expect(copied).not.toContain("--cirth-radius-lg");
+});
+
+test("the home page states its argument in one heading outline", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+
+	const outline = await page
+		.locator("main :is(h1, h2, h3, h4, h5, h6)")
+		.evaluateAll((headings) =>
+			headings.map((heading) => Number(heading.tagName.slice(1))),
+		);
+
+	expect(outline[0], "the page opens on its h1").toBe(1);
+	expect(outline.filter((level) => level === 1)).toHaveLength(1);
+	// No skipped levels: the specimen cards sit at h3 inside sections
+	// titled h2, and nothing on this page reaches for a level to get a
+	// size (axe: heading-order).
+	for (let index = 1; index < outline.length; index++) {
+		expect(
+			outline[index] - outline[index - 1],
+			`heading ${index} follows ${outline[index - 1]}`,
+		).toBeLessThanOrEqual(1);
+	}
+
+	// Five sections, because eight was the problem. "Native behavior stays
+	// native" and "You're already looking at Cirth" are examples and a
+	// sentence inside the showcase now; "Small surface, finished defaults"
+	// and "Claims with a check path" are one proof band.
+	const sections = await page
+		.locator("main > section")
+		.evaluateAll((items) => items.map((item) => item.className.split(" ")[0]));
+	expect(sections).toEqual([
+		"docs-native-hero",
+		"docs-showcase",
+		"docs-showcase",
+		"docs-proof",
+		"docs-native-faq",
+	]);
+	for (const gone of [
+		"Native behavior stays native",
+		"You're already looking at Cirth",
+		"Small surface, finished defaults",
+		"Claims with a check path",
+	]) {
+		await expect(
+			page.locator("main h2", { hasText: gone }),
+			`${gone} is not a section any more`,
+		).toHaveCount(0);
+	}
+});
+
+test("every showcase is one contained stage, not three loose columns", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+
+	const grid = await page
+		.locator(".docs-native-grid")
+		.first()
+		.evaluate((element) => element.getBoundingClientRect().width);
+
+	for (const section of ["semantic", "theme"]) {
+		const stage = page.locator(`[aria-labelledby="${section}-title"] .docs-stage`);
+		await expect(stage, `${section} has one stage`).toHaveCount(1);
+
+		// The stage spans the content column. What this replaced put the
+		// heading in a narrow rail and left the evidence at two thirds of the
+		// width, with the live half at under a third of it.
+		const width = await stage.evaluate(
+			(element) => element.getBoundingClientRect().width,
+		);
+		expect(Math.round(width), `${section} stage width`).toBeGreaterThanOrEqual(
+			Math.round(grid) - 1,
+		);
+
+		// Everything the demo needs is inside it: the band that names it and
+		// carries its control, and the panes, sharing one frame.
+		await expect(
+			stage.locator(":scope > .docs-stage-band"),
+			`${section} stage names itself`,
+		).toHaveCount(1);
+	}
+
+	// The live half is not a thumbnail: it takes at least as much of the row
+	// as the listing that explains it — and in the theme stage, where the
+	// cause is three declarations long, rather more.
+	for (const scope of [
+		'[data-docs-panel="article"]',
+		".docs-theme-showcase",
+	]) {
+		const [code, preview] = await Promise.all(
+			[".docs-stage-code", ".docs-stage-preview"].map((selector) =>
+				page
+					.locator(`${scope} ${selector}`)
+					.first()
+					.evaluate((element) => element.getBoundingClientRect().width),
+			),
+		);
+		expect(
+			preview / (code + preview),
+			`${scope}: the preview's share of the split`,
+		).toBeGreaterThanOrEqual(0.5);
+	}
+
+	// Switching examples must not move the page under the reader. The
+	// listings were levelled for this: at one element per line the article
+	// was 27 lines against the disclosure's 14, and the stage jumped 240px.
+	const heights = [];
+	for (const id of showcaseExamples) {
+		await openExample(page, id);
+		heights.push(
+			await page
+				.locator('[aria-labelledby="semantic-title"] .docs-stage')
+				.evaluate((element) => Math.round(element.getBoundingClientRect().height)),
+		);
+	}
+	expect(
+		Math.max(...heights) - Math.min(...heights),
+		`stage heights across examples: ${heights.join(", ")}`,
+	).toBeLessThanOrEqual(96);
+});
+
+// The section that used to make this claim in its own heading ("You're
+// already looking at Cirth") is gone, and the claim moved into one sentence
+// under the disclosure example. A sentence is cheaper than a section, so
+// the thing worth pinning is that it is still true: the questions at the
+// bottom of this page are the element the example is showing.
+test("the disclosure example is the element the FAQ below is made of", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	await openExample(page, "details");
+
+	/** @param {string} selector */
+	const shapeOf = (selector) =>
+		page.locator(selector).first().evaluate((element) => {
+			const summary = element.querySelector("summary");
+			const paragraph = element.querySelector("p");
+			return {
+				tag: element.tagName.toLowerCase(),
+				grouped: element.hasAttribute("name"),
+				classes: [
+					element.className,
+					summary?.className ?? "",
+					paragraph?.className ?? "",
+				].join("").trim(),
+				children: [...element.children].map((child) =>
+					child.tagName.toLowerCase(),
+				),
+				answerColor: paragraph && getComputedStyle(paragraph).color,
+				summaryColor: summary && getComputedStyle(summary).color,
+			};
+		});
+
+	const [specimen, question] = await Promise.all([
+		shapeOf('[data-docs-panel="details"] details'),
+		shapeOf(".docs-faq-list details"),
+	]);
+
+	// The same element, the same four parts, and no classes on any of
+	// them: `<details name>` + `<summary>` + `<p>`.
+	expect(specimen.tag).toBe("details");
+	expect(specimen).toEqual(question);
+	expect(specimen.classes, "the specimen wears no classes").toBe("");
+	expect(specimen.grouped, "and it is a group, like the FAQ is").toBe(true);
+
+	// The FAQ is a real list of questions, and the note under the example
+	// says so in a link a reader can follow.
+	await expect(page.locator(".docs-faq-list details")).not.toHaveCount(0);
+	await expect(
+		page.locator('[data-docs-panel="details"] .docs-example-note a'),
+	).toHaveAttribute("href", "#faq-title");
+
+	// Two groups on the page, and they are separate ones: the specimen is
+	// its own accordion, not a member of the FAQ's. The section this
+	// replaced shipped a specimen carrying `name="faq"`, so opening it
+	// closed an answer 2000px further down.
+	expect(
+		await page
+			.locator("main details[name]")
+			.evaluateAll((items) =>
+				[...new Set(items.map((item) => item.getAttribute("name")))].sort(),
+			),
+	).toEqual(["delivery", "faq"]);
 });
