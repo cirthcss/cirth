@@ -80,12 +80,29 @@ faq:
         <a href="/about#relationship-to-pico-css">the full comparison</a>.
     - q: Is Cirth affiliated with the Tolkien estate?
       a: >-
-        No. The name references the real-world Cirth runic alphabet as a
-        design metaphor for the framework's size constraints, not a
-        license or partnership — see <a href="/brand">Brand</a>.
+        No. The project is not affiliated with, endorsed by, or associated
+        with the Tolkien estate, the Tolkien Society, Amazon's Middle-earth
+        adaptations, or any other rights holder. The name points at the
+        Cirth runic alphabet — an angular script cut for carving, where
+        every letter is reduced to the strokes the material allows — because
+        that reduction is the constraint this framework is built around. It
+        is a reference, not a claim of license or partnership. The mark, the
+        wordmark and the rest of the project's identity are Cirth's own work
+        and are unrelated to Tolkien's; <a href="/brand">Brand</a> sets out
+        where they come from and how they may be used.
     - q: What license is Cirth under?
       a: >-
-        Apache License 2.0 for the code. The name and logo are separate
-        brand assets with their own terms, documented on the
-        <a href="/brand">Brand</a> page.
+        The code is under the
+        <a href="https://github.com/cirthcss/cirth/blob/master/LICENSE.md">Apache
+        License 2.0</a>, which is also what
+        <code>@cirthcss/cirth</code> declares on npm. You can use it in
+        commercial and closed-source work, modify it, and redistribute it,
+        including as part of a larger product, provided you keep the license
+        and copyright notices and state what you changed; it also grants a
+        patent license, and it comes with no warranty. Cirth is a fork of
+        Pico CSS, which was MIT —
+        <a href="https://github.com/cirthcss/cirth/blob/master/NOTICE.md">NOTICE.md</a>
+        records that history. The name and the logo are not covered by the
+        code license: they are brand assets with their own terms, set out on
+        the <a href="/brand">Brand</a> page.
 ---
