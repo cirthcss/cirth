@@ -3,9 +3,9 @@
  * generated from src/ by `node scripts/build-docs.js`. The classless
  * variant is scoped under `.cirth-classless` for the classless demos only.
  *
- * Everything below the imports is docs-shell CSS: page scaffolding and
- * glue for VitePress's markdown output (code blocks, header anchors).
- * It leans on Cirth's own custom properties and never restyles what the
+ * Everything below the import is docs-shell CSS: page scaffolding and glue
+ * for the Eleventy markdown pipeline (code blocks, header anchors). It
+ * leans on Cirth's own custom properties and never restyles what the
  * framework already styles.
  */
 @import "./generated/cirth-docs.css";
@@ -13,27 +13,26 @@
 /* The canvas itself (warm paper in light, near-black in dark) is the
    framework's own --cirth-background-color — nothing to override here. */
 :root {
-  /* Shell tokens: the seven things this documentation needs a name for
+  /* Shell tokens: the five things this documentation needs a name for
 	   that the framework has no opinion about — how wide the rails and the
-	   reading column are, how wide the shell gets, the 4px sub-unit the
-	   annotation layer is set on, the shell's own transition, and the
-	   blueprint dot grid.
+	   reading column are, how wide the shell gets, and the blueprint dot
+	   grid.
 
-	   There used to be seventeen. The other ten were aliases —
-	   --docs-board for the card surface, --docs-line for the muted border,
-	   --docs-signal for the accent, and so on — a second vocabulary with
-	   no semantic content of its own, laid over the first. It cost nothing
-	   at runtime and a great deal in reading: `background: var(--docs-board)`
-	   does not tell you the documentation is using the card surface, which
-	   is the single most important thing a page dogfooding a CSS framework
-	   has to communicate. Every one of them now reads as the --cirth-*
-	   token it always was. */
-  --docs-micro: 0.25rem;
+	   There used to be seventeen. Ten were aliases — --docs-board for the
+	   card surface, --docs-line for the muted border, --docs-signal for the
+	   accent, and so on — a second vocabulary with no semantic content of
+	   its own, laid over the first. It cost nothing at runtime and a great
+	   deal in reading: `background: var(--docs-board)` does not tell you
+	   the documentation is using the card surface, which is the single most
+	   important thing a page dogfooding a CSS framework has to
+	   communicate. Every one of them now reads as the --cirth-* token it
+	   always was. Two more — a 4px sub-unit and a 140ms transition — were
+	   declared for an annotation layer and a motion scale this shell never
+	   ended up writing against. */
   --docs-shell-max: 92rem;
   --docs-reading-max: 48rem;
   --docs-rail-width: 15rem;
   --docs-toc-width: 13rem;
-  --docs-motion-fast: 140ms;
   --docs-grid-dots: radial-gradient(
     circle,
     var(--cirth-muted-border-color) 0.75px,
@@ -545,7 +544,6 @@
    first place. */
 .docs-preset-select,
 .docs-version-select {
-  width: auto;
   margin-bottom: 0;
   padding-inline: calc(var(--cirth-spacing) * 0.75)
     calc(var(--cirth-spacing) * 1.75);
@@ -936,10 +934,6 @@ html:has(.docs-search-dialog[open]) {
 }
 
 @media (max-width: 575px) {
-  .docs-header nav {
-    gap: var(--cirth-space-2);
-  }
-
   .docs-header-actions {
     gap: var(--cirth-space-2);
     width: auto;
@@ -977,26 +971,6 @@ html:has(.docs-search-dialog[open]) {
   }
 }
 
-/* .container doesn't cap its own width — it's a 3-track grid whose
-   center track is capped via the --cirth-container-max-width custom
-   property (60rem), so overriding `max-width` on an individual .container
-   element is a no-op; the token is what needs overriding, and since it's
-   inherited, one override on `body` reaches every .container on the
-   page — header, doc content, footer — consistently, instead of each
-   picking its own width and drifting out of alignment with the others
-   (which is what happened when only the docs <main> was widened: the
-   header above it stayed at the framework default and the two no longer
-   lined up). 60rem is right for a single measure of prose, too narrow
-   for this site once a 14rem sidebar and a 14rem page outline sit on
-   either side of doc content: the reading column was landing at ~26rem
-   regardless of viewport width, well under .docs-content's own 50rem cap
-   below, which never got the chance to bind. */
-@media (min-width: 1024px) {
-  body {
-    --cirth-container-max-width: 76rem;
-  }
-}
-
 /* Docs layout: sidebar + content, plus a page outline column on wide
    screens. Column widths, sticky offsets, the prose measure and the
    chapter separators are all set once, further down, with the rest of the
@@ -1021,14 +995,10 @@ html:has(.docs-search-dialog[open]) {
   margin-inline: auto;
 }
 
-/* Page outline, top variant (small screens): a plain list, no scroll-spy.
-   It's a <nav>, which Cirth lays out horizontally by default — force the
-   nav and its list back to block flow. */
-.docs-toc-top,
-.docs-toc-top ul {
-  display: block;
-}
-
+/* Page outline, top variant (small screens): a disclosure, no scroll-spy.
+   Its structure is set with the rest of the compact shell further down;
+   what belongs here is the space it leaves under itself in the band
+   between the sidebar breakpoint and the outline column's. */
 .docs-toc-top {
   margin-bottom: calc(var(--cirth-spacing) * 2);
 }
@@ -1048,32 +1018,27 @@ html:has(.docs-search-dialog[open]) {
   .docs-toc {
     display: block;
     position: sticky;
-    top: var(--cirth-spacing);
-    max-height: calc(100vh - var(--cirth-spacing) * 2);
     overflow-y: auto;
   }
 }
 
-.docs-toc strong,
-.docs-toc-top strong {
+.docs-toc strong {
   display: block;
   margin-bottom: calc(var(--cirth-spacing) * 0.5);
   font-size: var(--cirth-font-size-sm);
 }
 
 /* Cirth's nav styles give lists and links negative margins (meant for
-   horizontal navs); inside the outline columns they push content out of
-   the clipping box and cut it off on the left. The `nav`-qualified
-   selectors match the framework's specificity so these resets win. */
-.docs-toc nav ul,
-nav.docs-toc-top ul {
+   horizontal navs); inside the outline column they push content out of
+   the clipping box and cut it off on the left. The `nav` in the selector
+   matches the framework's specificity so this reset wins. */
+.docs-toc nav ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.docs-toc li,
-.docs-toc-top li {
+.docs-toc li {
   display: block;
   margin: 0;
   padding: 0;
@@ -1087,14 +1052,9 @@ nav.docs-toc-top ul {
    what this rule used to undo. Zeroing all four margins here left the
    active entry drawing a second 2px bar immediately to the right of the
    list's, a double line the sidebar never had. */
-.docs-toc nav li a,
-nav.docs-toc-top li a {
+.docs-toc nav li a {
   margin-block: 0;
   margin-inline-end: 0;
-}
-
-nav.docs-toc-top li a {
-  margin-inline-start: 0;
 }
 
 /* Level-3 entries indent inside the list; in the aside the indent lives
@@ -1108,7 +1068,6 @@ nav.docs-toc-top li a {
 }
 
 .docs-toc-top a {
-  display: inline-block;
   padding: calc(var(--cirth-spacing) * 0.25) 0;
   color: var(--cirth-muted-color);
   font-size: var(--cirth-font-size-sm);
@@ -1196,12 +1155,6 @@ nav.docs-toc-top li a {
 
 .docs-footer-brand:hover {
   text-decoration: none;
-}
-
-.docs-footer-tagline {
-  margin: var(--cirth-spacing) 0 calc(var(--cirth-spacing) * 0.5);
-  color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-sm);
 }
 
 .docs-footer-credit {
@@ -1498,7 +1451,7 @@ pre > button.copy.copied::before {
 
 .docs-table-scroll > table {
   min-width: 100%;
-  margin-bottom: 0;
+  margin: 0;
 }
 
 /* Live demo frames: a plate holding a caption band, the rendered
@@ -1563,12 +1516,6 @@ pre > button.copy.copied::before {
   margin: 0;
 }
 
-.docs-brand-downloads [role="button"] {
-  margin-bottom: 0;
-  padding: 0.25rem 0.75rem;
-  font-size: var(--cirth-font-size-xs);
-}
-
 /* Color swatch grid, used by the Colors page */
 .docs-colors-grid {
   display: grid;
@@ -1617,40 +1564,6 @@ pre > button.copy.copied::before {
   padding: var(--cirth-space-2) var(--cirth-space-4);
   color: inherit;
   font-size: var(--cirth-font-size-sm);
-}
-
-/* Print: this site's half of the bargain
-   ––––––––––––––––––––
-   The framework's own print pass (src/utilities/_print.scss) flattens
-   Cirth's surfaces to ink on paper, but deliberately hides nothing —
-   which parts of a layout are chrome is something only the site knows.
-   Last in the file on purpose: these rules override the layout above by
-   source order, the same way the framework's pass overrides its own
-   components. */
-@media print {
-  /* Navigation, on-page outlines, the theme and preset controls, and the
-	   copy-to-clipboard buttons are all ways of moving around a page that
-	   is no longer being moved around. */
-  .docs-header,
-  .docs-sidebar,
-  .docs-toc,
-  .docs-toc-top,
-  .docs-prev-next,
-  .docs-footer,
-  pre > button.copy {
-    display: none;
-  }
-
-  /* With the side columns gone, the document takes the full measure of
-	   the sheet: the reading cap that keeps line length comfortable on
-	   screen would only narrow it further. */
-  .docs-layout {
-    display: block;
-  }
-
-  .docs-content {
-    max-width: none;
-  }
 }
 
 /* Native Baseline aesthetic experiment
@@ -2195,25 +2108,6 @@ body {
 .docs-stage-note code {
   background: none;
   font-size: inherit;
-}
-
-.docs-stage-control {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.docs-stage-control label {
-  margin: 0;
-  font-size: inherit;
-}
-
-.docs-stage-control select {
-  width: auto;
-  margin: 0;
-  padding-block: 0.25rem;
-  border-radius: var(--cirth-radius-sm);
-  font-size: var(--cirth-font-size-xs);
 }
 
 /* The panes, in their own grid. They are one row of the stage rather than
@@ -3020,16 +2914,6 @@ cirth-theme-preview:not(:defined) {
   }
 }
 
-@media print {
-  .docs-output-frame {
-    display: none;
-  }
-
-  .docs-lab-stage {
-    display: block;
-  }
-}
-
 /* Documentation shell: region-based, compact and deliberately separate
    from the library component layer. */
 .docs-header .docs-menu-toggle,
@@ -3037,6 +2921,17 @@ cirth-theme-preview:not(:defined) {
   display: none;
 }
 
+/* .container doesn't cap its own width — it's a 3-track grid whose centre
+   track is capped via the --cirth-container-max-width custom property
+   (60rem), so overriding `max-width` on an individual .container element is
+   a no-op; the token is what needs overriding, and since it inherits, one
+   override on `body` reaches every .container on the page — header, doc
+   content, footer — consistently, instead of each picking its own width and
+   drifting out of alignment with the others (which is what happened when
+   only the docs <main> was widened: the header above it stayed at the
+   framework default and the two no longer lined up). 60rem is right for a
+   single measure of prose and too narrow for this site once a rail and a
+   page outline sit on either side of doc content. */
 @media (min-width: 1024px) {
   body {
     --cirth-container-max-width: var(--docs-shell-max);
@@ -3085,16 +2980,11 @@ cirth-theme-preview:not(:defined) {
   padding: 0;
 }
 
-.docs-toc-top nav ul {
+.docs-toc-top nav :is(ul, li) {
   display: block;
   margin: 0;
   padding: 0;
   list-style: none;
-}
-
-.docs-toc-top nav li {
-  display: block;
-  margin: 0;
 }
 
 .docs-toc-top nav li a {
@@ -3352,10 +3242,6 @@ details.docs-toc-top > :not(summary) {
   padding-inline: 0;
 }
 
-.docs-table-scroll table {
-  margin: 0;
-}
-
 @media (max-width: 1023px) {
   .docs-header .docs-menu-toggle {
     display: inline-grid;
@@ -3435,11 +3321,9 @@ details.docs-toc-top > :not(summary) {
   .docs-header-start-group {
     display: flex;
     width: 100%;
-    justify-content: flex-start;
   }
 
   .docs-header .docs-menu-toggle {
-    margin: 0;
     flex: 0 0 var(--cirth-space-10);
   }
 
@@ -3466,13 +3350,6 @@ details.docs-toc-top > :not(summary) {
 @media (max-width: 359px) {
   .docs-mobile-tools {
     grid-template-columns: 1fr;
-  }
-}
-
-@media print {
-  .docs-mobile-nav,
-  .docs-demo-caption {
-    display: none;
   }
 }
 
@@ -3874,5 +3751,54 @@ details.docs-toc-top > :not(summary) {
 @media (max-width: 767px) {
   .docs-theme-lab {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Print: this site's half of the bargain
+   ––––––––––––––––––––
+   The framework's own print pass (src/utilities/_print.scss) flattens
+   Cirth's surfaces to ink on paper, but deliberately hides nothing —
+   which parts of a layout are chrome is something only the site knows.
+
+   Last in the file, and one block rather than three. It used to sit in the
+   middle with the same claim written above it, and the two later blocks that
+   grew after it meant "print is the last word" was true of some of these
+   rules and not others. Nothing overrode anything, so nothing was visibly
+   wrong; what was wrong was that you had to check. */
+@media print {
+  /* Navigation, on-page outlines, the theme and preset controls, and the
+	   copy-to-clipboard buttons are all ways of moving around a page that
+	   is no longer being moved around. */
+  .docs-header,
+  .docs-sidebar,
+  .docs-toc,
+  .docs-toc-top,
+  .docs-mobile-nav,
+  .docs-prev-next,
+  .docs-footer,
+  .docs-demo-caption,
+  pre > button.copy {
+    display: none;
+  }
+
+  /* The home page's demo is a live document in a frame. On paper the frame
+	   has nothing to show, so the stage keeps only its source half. */
+  .docs-output-frame {
+    display: none;
+  }
+
+  .docs-lab-stage {
+    display: block;
+  }
+
+  /* With the side columns gone, the document takes the full measure of
+	   the sheet: the reading cap that keeps line length comfortable on
+	   screen would only narrow it further. */
+  .docs-layout {
+    display: block;
+  }
+
+  .docs-content {
+    max-width: none;
   }
 }

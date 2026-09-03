@@ -548,8 +548,6 @@ bodyClass: docs-home-page
 	const ThemePreview = class extends HTMLElement {
 		/** @type {HTMLStyleElement | null} */
 		#theme = null;
-		/** @type {HTMLElement | null} */
-		#surface = null;
 
 		connectedCallback() {
 			if (this.shadowRoot) return;
@@ -608,7 +606,6 @@ bodyClass: docs-home-page
 
 			root.append(cirth, shell, theme, surface);
 			this.#theme = theme;
-			this.#surface = surface;
 
 			// One thing a stylesheet cannot say: a shadow tree is styled by
 			// its own sheet, so the scheme the page is in has to be handed to

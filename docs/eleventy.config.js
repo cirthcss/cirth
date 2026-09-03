@@ -432,7 +432,7 @@ module.exports = (eleventyConfig) => {
 		const html = fs.readFileSync(file, "utf8").trim();
 		const classlessClass = variant === "classless" ? " cirth-classless" : "";
 		const variantLabel = variant === "classless" ? "Classless build" : "Default build";
-		return `<figure class="docs-demo" data-demo-fidelity="live">
+		return `<figure class="docs-demo">
 <figcaption class="docs-demo-caption"><span><strong>Live UI</strong> · ${variantLabel}</span><span>Authentic Cirth · shell overrides declared in source</span></figcaption>
 <div class="docs-demo-preview${classlessClass}">${html}</div>
 <details class="docs-demo-source">

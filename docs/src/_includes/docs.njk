@@ -106,11 +106,15 @@ layout: base.njk
 				else break;
 			}
 			const activeSlug = current || (headings[0] ? headings[0].id : "");
+			// aria-current only: the framework paints its one registered
+			// edge on the inline-start rail from it, and the stylesheet
+			// deliberately adds no second marker of its own.
 			for (const link of links) {
-				const active = link.dataset.slug === activeSlug;
-				link.classList.toggle("docs-toc-active", active);
-				if (active) link.setAttribute("aria-current", "true");
-				else link.removeAttribute("aria-current");
+				if (link.dataset.slug === activeSlug) {
+					link.setAttribute("aria-current", "true");
+				} else {
+					link.removeAttribute("aria-current");
+				}
 			}
 		};
 
