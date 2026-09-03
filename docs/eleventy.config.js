@@ -15,6 +15,188 @@ const { listPresetNames, presetLabel } = require("../scripts/lib/presets");
 const docsRoot = __dirname;
 const demosFolder = path.join(docsRoot, "src/content/demos");
 
+// The theme preview's declarations, read out of the compiled stylesheets
+// rather than written here: the default theme's from the scoped build the
+// preview element actually loads, each preset's from its own compiled
+// file. A theme is literally a handful of custom properties, and this is
+// the honest way to show that — the listing beside the live preview is the
+// declaration the real file makes, and the same string is what the demo
+// applies.
+//
+// What this returns, per state, is one already-highlighted line per token
+// plus the single-line value to apply. The section shows one block and
+// swaps a line at a time, so the declaration that moved can be marked
+// where it stands and the two that did not are visibly the same two lines.
+// One block rather than one per state also means the shell's copy button —
+// which copies `textContent` — can only ever hand over the declarations
+// that are on screen.
+//
+// Whitespace inside a <pre> is content, so the block is assembled here in
+// JS where every newline is deliberate, rather than in a template where
+// tag boundaries would leak into the listing.
+const themePreview = () => {
+	const postcss = require("postcss");
+	// Preference order, intersected with reality below. Every token named
+	// here is one an author would actually write, and one whose effect is
+	// visible in the preview beside it.
+	const preferred = [
+		"--cirth-primary",
+		"--cirth-border-radius",
+		"--cirth-canvas",
+	];
+	const generated = path.join(docsRoot, "src/styles/generated");
+
+	// A theme root, and nothing else. The compiled files declare these same
+	// names in three other places — inside prefers-contrast and
+	// forced-colors blocks, and on components that rebind them locally
+	// (`.cirth [type=search] { --cirth-border-radius: … }`) — and none of
+	// those is what an author writes. Presets compile to `:root, :host`;
+	// the scoped build the preview loads puts the theme on `.cirth`.
+	const themeRootPattern = /^(:root|:host|\.cirth)$/;
+
+	/**
+	 * @param {string} file
+	 * @returns {Map<string, string>}
+	 */
+	const read = (file) => {
+		const found = new Map();
+		if (!fs.existsSync(file)) return found;
+		postcss.parse(fs.readFileSync(file, "utf8")).walkRules((rule) => {
+			if (rule.parent?.type !== "root") return;
+			if (
+				!rule.selector
+					.split(",")
+					.every((selector) => themeRootPattern.test(selector.trim()))
+			) {
+				return;
+			}
+			for (const declaration of rule.nodes ?? []) {
+				if (declaration.type !== "decl") continue;
+				if (!preferred.includes(declaration.prop)) continue;
+				// One line, and none of the compiled file's own padding: the
+				// default build writes `light-dark( a, b )` with the parens
+				// spaced and the preset files do not, and this value is both
+				// listed and applied — two formattings of one declaration
+				// would show up as the listing and the demo disagreeing.
+				found.set(
+					declaration.prop,
+					declaration.value
+						.replace(/\s+/g, " ")
+						.replace(/\(\s+/g, "(")
+						.replace(/\s+\)/g, ")"),
+				);
+			}
+		});
+		return found;
+	};
+
+	const states = [
+		{
+			name: "default",
+			label: "Default theme",
+			file: "cirth.scoped.css",
+			declarations: read(path.join(generated, "cirth-lab-scoped.css")),
+		},
+		...listPresetNames().map((name) => ({
+			name,
+			label: `${presetLabel(name)} preset`,
+			file: `presets/${name}.css`,
+			declarations: read(path.join(generated, `presets/${name}.css`)),
+		})),
+	];
+
+	// Only the tokens every state really declares. A line that one file does
+	// not set could only be filled with an inherited value or a blank, and
+	// both would be a listing describing something the file does not say —
+	// so the set of lines is the intersection, and it maintains itself: a
+	// preset that stops declaring one drops the line for all of them rather
+	// than inventing it for one.
+	const tokens = preferred.filter((prop) =>
+		states.every((state) => state.declarations.has(prop)),
+	);
+
+	// `light-dark(a, b)` is one long line — 700px of it at the pane's
+	// measure, which scrolls rather than reads. Broken at the comma the way
+	// the source file itself breaks it, so the pane shows the whole
+	// declaration instead of the first two thirds of one. The captures are
+	// lazy and eat their own padding: the compiled default writes
+	// `light-dark( a, b )` with the parens spaced, and a greedy `(.+)`
+	// carried that space into the reflowed line.
+	/** @param {string} value */
+	const reflow = (value) =>
+		value.length > 46 && value.startsWith("light-dark(")
+			? value.replace(
+					/^light-dark\(\s*(.+?)\s*,\s*(.+?)\s*\)$/,
+					"light-dark(\n    $1,\n    $2\n  )",
+				)
+			: value;
+
+	// Highlighted one declaration at a time. Checked against the whole
+	// block: highlight.js emits byte-identical markup for `  --prop: value;`
+	// on its own as it does for the same line inside a rule, so the listing
+	// is the same listing the fenced-code pipeline would produce.
+	/**
+	 * @param {string} prop
+	 * @param {string} value
+	 */
+	const declaration = (prop, value) =>
+		hljs.highlight(`  ${prop}: ${value};`, {
+			language: "css",
+			ignoreIllegals: true,
+		}).value;
+
+	// The selector the demo's own stylesheet really carries. The preview is
+	// a custom element holding the scoped build in a shadow root, so
+	// `.cirth` is the theme root in there — printing `:root` would be
+	// printing a rule the page does not apply anywhere.
+	const selector = ".cirth";
+
+	// The listing as served: one line group per token, so the script can
+	// swap a line where it stands. Assembled here rather than in the
+	// template because every newline between these spans is content of a
+	// <pre> — a tag boundary in a template leaks into the listing, and a
+	// <pre> that carries its line breaks in CSS copies out as one line.
+	/** @param {{ lines: Record<string, { value: string, html: string }> }} state */
+	const block = (state) =>
+		`${hljs.highlight(`${selector} {`, { language: "css" }).value}\n` +
+		`${tokens
+			.map(
+				(prop) =>
+					`<span class="docs-token" data-token="${prop}">` +
+					`${state.lines[prop].html}</span>`,
+			)
+			.join("\n")}\n}`;
+
+	const rendered = states.map((state) => ({
+		name: state.name,
+		label: state.label,
+		file: state.file,
+		lines: Object.fromEntries(
+			tokens.map((prop) => {
+				const value = String(state.declarations.get(prop));
+				return [prop, { value, html: declaration(prop, reflow(value)) }];
+			}),
+		),
+	}));
+
+	return {
+		selector,
+		tokens,
+		states: rendered,
+		block: block(rendered[0]),
+	};
+};
+
+// The shipped build modes, counted off the source entrypoints rather than
+// written down: only top-level `src/cirth*.scss` files compile, and the
+// print sheets are a companion to a build rather than a build to choose
+// between. Adding a fifth mode moves this number and the proof cell that
+// quotes it without anyone remembering to.
+const buildModeCount = () =>
+	fs
+		.readdirSync(path.join(docsRoot, "../src"))
+		.filter((file) => /^cirth(?!\.print)[.a-z]*\.scss$/.test(file)).length;
+
 const runtimeTokenCount = () => {
 	const generatedBuild = path.join(
 		docsRoot,
@@ -23,6 +205,74 @@ const runtimeTokenCount = () => {
 	if (!fs.existsSync(generatedBuild)) return 0;
 	const css = fs.readFileSync(generatedBuild, "utf8");
 	return new Set(css.match(/--cirth-[a-z0-9-]+/g) ?? []).size;
+};
+
+// The gzipped size of the default build, measured here rather than
+// written down: the home page states the size as a measurement taken on
+// this build, not as a ceiling the project promises never to cross, so the
+// number has to come off the file every time the site is built.
+// `scripts/check-css-size.js` gzips the same bytes at the same level, and
+// is what fails a build that grows past the current budget.
+//
+// dist/ is produced by `npm run build`, which runs before `docs:build`
+// everywhere it matters (CI, the deploy workflow, the release script). If
+// it is missing — a docs-only local run — the cell falls back to the
+// budget rather than printing a zero, and says which it is.
+const defaultBuildSize = () => {
+	const file = path.join(docsRoot, "../dist/cirth.min.css");
+	if (!fs.existsSync(file)) return null;
+	const bytes = require("node:zlib").gzipSync(fs.readFileSync(file), {
+		level: 9,
+	}).length;
+	return { bytes, label: `${(bytes / 1024).toFixed(1)} KB` };
+};
+
+// The supported browsers, read off the one place that decides them: the
+// Browserslist target in package.json, which is what Lightning CSS
+// compiles against and what scripts/check-browserslist.js holds to a
+// single engine floor. Written out as a sentence so the FAQ answer cannot
+// drift from the target the build actually uses — raising the floor
+// rewrites the answer.
+const browserTargets = () => {
+	const names = {
+		Chrome: "Chrome",
+		ChromeAndroid: "Chrome for Android",
+		Edge: "Edge",
+		Firefox: "Firefox",
+		FirefoxAndroid: "Firefox for Android",
+		iOS: "iOS Safari",
+		Opera: "Opera",
+		Safari: "Safari",
+		Samsung: "Samsung Internet",
+	};
+	const manifest = JSON.parse(
+		fs.readFileSync(path.join(docsRoot, "../package.json"), "utf8"),
+	);
+
+	/** @type {Map<string, string[]>} */
+	const byVersion = new Map();
+	for (const entry of manifest.browserslist ?? []) {
+		const match = /^([A-Za-z]+)\s*>=\s*([0-9.]+)$/.exec(String(entry));
+		if (!match) continue;
+		const [, family, version] = match;
+		byVersion.set(version, [
+			...(byVersion.get(version) ?? []),
+			names[family] ?? family,
+		]);
+	}
+
+	// Families that share a floor share a clause: "Chrome, Chrome for
+	// Android and Edge 123+" is one fact, and three clauses would read as
+	// three.
+	const clauses = [...byVersion.entries()].map(([version, families]) => {
+		const listed =
+			families.length > 1
+				? `${families.slice(0, -1).join(", ")} and ${families.at(-1)}`
+				: families[0];
+		return `${listed} ${version}+`;
+	});
+
+	return { sentence: clauses.join("; ") };
 };
 
 const escapeHtml = (value) =>
@@ -75,12 +325,15 @@ const pathPrefix = () => {
 module.exports = (eleventyConfig) => {
 	eleventyConfig.addGlobalData("proof", {
 		tokenCount: runtimeTokenCount(),
-		buildCount: 4,
+		buildCount: buildModeCount(),
+		size: defaultBuildSize(),
 	});
 	eleventyConfig.addGlobalData(
 		"presets",
 		listPresetNames().map((name) => ({ label: presetLabel(name), name })),
 	);
+	eleventyConfig.addGlobalData("themePreview", themePreview());
+	eleventyConfig.addGlobalData("browsers", browserTargets());
 
 	// --- Markdown pipeline ------------------------------------------------
 	// Fenced code: highlight.js token classes (same .hljs-* classes the docs
@@ -242,16 +495,17 @@ module.exports = (eleventyConfig) => {
 	});
 
 	// --- Filters ----------------------------------------------------------
-	// Syntax highlighting for HTML that is not coming through markdown: the
-	// home page's source panel, whose four build variants are swapped in by
-	// the build switcher. Same highlight.js pass and same .hljs-* classes
-	// the fenced-code pipeline above emits, so there is one highlighter in
-	// the build and none in the browser.
+	// Syntax highlighting for source that is not coming through markdown: the
+	// hero's source panel, and the specimens the home page declares once and
+	// renders twice (live, and highlighted into the pane beside it). Same
+	// highlight.js pass and same .hljs-* classes the fenced-code pipeline
+	// above emits, so there is one highlighter in the build and none in the
+	// browser. The language is a parameter because the theme section shows
+	// the stylesheet that moved the tokens, not markup.
 	eleventyConfig.addFilter(
-		"highlightHtml",
-		(code) =>
-			hljs.highlight(String(code), { language: "html", ignoreIllegals: true })
-				.value,
+		"highlight",
+		(code, language = "html") =>
+			hljs.highlight(String(code), { language, ignoreIllegals: true }).value,
 	);
 
 	// Page URLs always end in "/" (one <path>/index.html per page) while

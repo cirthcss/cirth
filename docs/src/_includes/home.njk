@@ -2,6 +2,187 @@
 layout: base.njk
 bodyClass: docs-home-page
 ---
+{#- The specimens below are declared once and used twice: rendered live, and
+    highlighted into the source pane beside them. One string, so the markup a
+    reader copies is the markup that produced what they are looking at — the
+    drift this page has had before (a snippet that declared attributes the
+    rendered output no longer had) cannot happen when there is only one copy.
+
+    They are written flush to the left margin on purpose: whitespace inside a
+    `set` block is captured verbatim, and this is the indentation that ends up
+    in the <pre>. -#}
+
+{#- 1 — Article + table. Structure, and the two axes of a real table
+    header. Rows on one line, which is how table rows are actually written
+    and what keeps the listing to a screenful: at one element per line this
+    was 27 lines against the next example's 14, so switching tabs moved the
+    page 240px and the "short" claim was made by a long listing. -#}
+{%- set articleSpecimen -%}
+<article>
+  <header><h3>Team</h3></header>
+
+  <table>
+    <thead>
+      <tr><th scope="col">Name</th><th scope="col">Role</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">Ada Lovelace</th><td>Engineer</td></tr>
+      <tr><th scope="row">Grace Hopper</th><td>Designer</td></tr>
+    </tbody>
+  </table>
+
+  <footer><button type="button">Invite</button></footer>
+</article>
+{%- endset -%}
+
+{#- 2 — Disclosure. `name` on a <details> is what makes the group
+    exclusive, and it is the browser doing it: the same four elements
+    render the questions under "Before you install" at the bottom of this
+    page. A plausible little interface rather than a specimen sheet — the
+    delivery options of a checkout. -#}
+{%- set detailsSpecimen -%}
+<article>
+  <header><h3>Delivery</h3></header>
+
+  <details name="delivery" open>
+    <summary>Standard delivery</summary>
+    <p>Three to five working days, tracked. Free.</p>
+  </details>
+  <details name="delivery">
+    <summary>Express delivery</summary>
+    <p>Next working day if ordered before 14:00.</p>
+  </details>
+</article>
+{%- endset -%}
+
+{#- 3 — Form controls + validation. `type="email"` and `required` are the
+    whole validation layer: the browser decides when the field is wrong and
+    `:user-invalid` decides when to say so, which is after the reader has
+    caused it rather than on load.
+
+    No <form> element and no submit button, which is a deliberate limit on
+    the sample rather than an omission from it. A <form> with no action
+    submits to this page, so a reader who filled the field in and pressed
+    Save would be navigated off the home page mid-demo — and the only ways
+    to stop that are an inline handler or a script, in the section whose
+    whole claim is that there is neither. Constraint validation does not
+    need a form owner: `required` and `type="email"` still make the control
+    invalid, and `:user-invalid` still waits for the reader to cause it,
+    which is the part Cirth paints and the part worth showing. -#}
+{%- set formSpecimen -%}
+<article>
+  <header><h3>Notifications</h3></header>
+
+  <label>
+    Email
+    <input type="email" name="email" placeholder="you@example.com" required>
+  </label>
+
+  <label>
+    <input type="checkbox" name="notes" role="switch" checked>
+    Send release notes
+  </label>
+
+  <button type="button">Save</button>
+</article>
+{%- endset -%}
+
+{#- The interface the theme showcase rethemes. Not one of the three above:
+    that section's subject is the stylesheet, so the sample has to hold the
+    surfaces a theme actually moves — a card edge, a control border, a
+    filled button, an accent. -#}
+{%- set themeSpecimen -%}
+<article>
+  <header>
+    <h3>Account settings</h3>
+  </header>
+
+  <label>
+    Display name
+    <input name="name" value="Ada Lovelace">
+  </label>
+
+  <label>
+    <input type="checkbox" role="switch" checked>
+    Email notifications
+  </label>
+
+  <footer>
+    <button type="button">Save changes</button>
+    <button type="button" class="secondary outline">Cancel</button>
+  </footer>
+</article>
+{%- endset -%}
+
+{#- One definition for the three examples, so the tab strip, the panels and
+    the source panes cannot disagree about how many there are or what they
+    are called. `note` is the sentence under each example: it is where the
+    behaviour, the accessibility and the dogfooding claims land now that
+    they are properties of a sample rather than sections of their own. -#}
+{%- set examples = [
+  {
+    id: "article",
+    tab: "Article",
+    name: "Article + table",
+    markup: articleSpecimen,
+    note: "Nine elements, no classes. <code>&lt;th scope&gt;</code> on both axes is what gives a screen reader real row and column navigation — an ARIA re-implementation of a table cannot be reached this way."
+  },
+  {
+    id: "details",
+    tab: "Details",
+    name: "Disclosure group",
+    markup: detailsSpecimen,
+    note: "Open one and the other closes: <code>name</code> makes the group exclusive and the browser runs it. The questions under <a href=\"#faq-title\">Before you install</a> are this same element, once per question."
+  },
+  {
+    id: "form",
+    tab: "Form",
+    name: "Form + validation",
+    markup: formSpecimen,
+    note: "Type an address that is not one, then leave the field. <code>required</code> and <code>type=\"email\"</code> are the whole validation layer — and <code>:user-invalid</code> holds the error styling back until the reader has caused it, so nothing is painted red on arrival."
+  }
+] -%}
+
+{#- What kind of claim each proof cell is making. One vocabulary for the
+    strip and the list below it, defined once so the two cannot drift into
+    saying the same thing with different words.
+
+    · guarantee — a property the project intends to keep; a break is a bug.
+    · capability — something Cirth lets you do. It says nothing about what
+      your application does with it.
+    · current fact — true of this build, measured, and free to move.
+
+    The glyphs are the shell's own (eleventy.config.js): shield-check for
+    what a suite holds, sliders for what the reader can change, and the
+    lightning bolt this site already uses for a measurement. aria-hidden,
+    because the word is right there. -#}
+{%- macro proofKind(kind) -%}
+{%- if kind == "guarantee" -%}
+<span class="docs-proof-state">{% icon "shield", 16, "is-verified" %}Guarantee</span>
+{%- elif kind == "capability" -%}
+<span class="docs-proof-state">{% icon "sliders", 16, "is-enhanced" %}Capability</span>
+{%- else -%}
+<span class="docs-proof-state">{% icon "zap", 16, "is-measured" %}Current fact</span>
+{%- endif -%}
+{%- endmacro -%}
+
+{#- The FAQ's disclosure, declared here rather than inline in the loop that
+    renders it, because the Details example above claims that this list is
+    the same element it is showing. One definition keeps that claim
+    checkable from one place.
+
+    The answers arrive already substituted (see the loop): two of them
+    quote a fact the build measures — the Browserslist target and the size
+    of this build — and front matter is data, not a template. A marker keeps
+    the answer readable in index.md and un-substitutable into nonsense: an
+    HTML comment reads as nothing at all if one ever survives. -#}
+{%- macro faqDisclosure(question, answer) -%}
+<details name="faq">
+  <summary>{{ question }}</summary>
+  <p>{{ answer | safe }}</p>
+</details>
+{%- endmacro -%}
+
 <main id="main-content" class="docs-native-home" data-pagefind-body>
 	<section class="docs-native-hero" aria-labelledby="home-title">
 		<div class="docs-native-grid">
@@ -13,15 +194,6 @@ bodyClass: docs-home-page
 						<a href="{{ action.link }}" role="button"{% if action.theme != "brand" %} class="secondary outline"{% endif %}>{{ action.text }}</a>
 					{% endfor %}
 				</p>
-				{#- Two principles, stated. They used to be numbered 01/02, which
-				    read as a metric next to a ledger of real ones further down
-				    the page — a counter that counts to two is not evidence, and
-				    this hero had two kinds of number in it. The labels carry the
-				    point on their own. -#}
-				<ul class="docs-primary-signals" aria-label="Primary product principles">
-					<li><strong>Semantic HTML</strong><small>Structure carries intent.</small></li>
-					<li><strong>Accessible baseline</strong><small>WCAG 2.2 AA checks are the floor.</small></li>
-				</ul>
 			</header>
 			<div class="docs-native-lab">
 				{% include "home-demo.njk" %}
@@ -29,135 +201,222 @@ bodyClass: docs-home-page
 		</div>
 	</section>
 
-	<section class="docs-ledger" aria-labelledby="ledger-title">
+	{#- The showcase. Three examples, one stage, and a strip above it — the
+	    arrangement FastHTML's "this home page is a FastHTML app" uses, for
+	    the reason it uses it: one example proves that the
+	    markup renders, three prove that *different* semantic markup renders
+	    a different finished interface, which is the actual claim.
+
+	    It absorbs three sections. "Native behavior stays native" was a row
+	    of three specimens with no source pane at all; its <details> group
+	    and its validated field are examples two and three here, each with
+	    its markup beside it and each shaped like a small plausible
+	    interface rather than a swatch. "You're already looking at Cirth"
+	    was a whole section restating that the FAQ below is a real
+	    component; it is one sentence under the Details example now, next to
+	    the element it is talking about.
+
+	    Every panel is served rendered and unhidden. The tab strip ships
+	    `hidden` and the script below turns it on, so without script this is
+	    three complete examples stacked under their own headings rather than
+	    a row of controls that cannot do anything — the same rule the pause
+	    control in the next section follows. -#}
+	<section class="docs-showcase" aria-labelledby="semantic-title">
 		<div class="docs-native-grid">
-			<header class="docs-ledger-intro">
-				<h2 id="ledger-title">Claims with a check path.</h2>
-				<p>{{ pitch.lede }}</p>
+			<header class="docs-showcase-lede">
+				<h2 id="semantic-title">Start with the HTML you already know.</h2>
+				<p>Standard elements carry the styling <em>and</em> the behaviour. Change the markup and you change the interface — there is no component API in between, and nothing in these three samples is wired to a script.</p>
 			</header>
-			{#- A real table, because it is a real table. This was six <div>s
-			    wearing role="table"/role="row"/role="cell", on the home page of a
-			    framework whose argument is that the element is the API: the one
-			    place on the site where the markup contradicted the pitch. Native
-			    <thead>/<th scope>/<td> carries the same information with no ARIA
-			    at all, gives every assistive technology real row and column
-			    navigation instead of a re-implementation of it, and keeps working
-			    if the CSS never arrives. The claim is the row's subject, so it is
-			    the row header. -#}
-			{#- The same scroll region every other table on this site gets
-			    (eleventy.config.js wraps markdown tables in exactly this).
-			    The ledger is hand-written, so it had been carrying a bare
-			    `overflow-x: auto` instead: a scroll container with no
-			    tabindex, no role and no name — which at 320px, where it
-			    genuinely does scroll, is a scrollable region a keyboard
-			    cannot reach. One treatment for "a real table that may not
-			    fit", not two. -#}
-			<div
-				class="overflow-auto docs-table-scroll docs-ledger-table"
-				tabindex="0"
-				role="region"
-				aria-label="Cirth proof ledger: State, Claim, Evidence, Scope"
-			>
-				<table>
-					<caption class="sr-only">Cirth proof ledger</caption>
-					<thead>
-						<tr>
-							<th scope="col">State</th>
-							<th scope="col">Claim</th>
-							<th scope="col">Evidence</th>
-							<th scope="col">Scope</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td class="docs-ledger-state">{% icon "shield", 16, "is-verified" %}verified</td>
-							<th scope="row">Semantic elements first</th>
-							<td>Element selectors + semantic demos</td>
-							<td><a href="/elements">inspect</a></td>
-						</tr>
-						<tr>
-							<td class="docs-ledger-state">{% icon "shield", 16, "is-verified" %}verified</td>
-							<th scope="row">WCAG 2.2 AA baseline</th>
-							<td>axe + resilience suites</td>
-							<td><a href="/about#accessibility-baseline">method</a></td>
-						</tr>
-						<tr>
-							<td class="docs-ledger-state">{% icon "layers", 16, "is-covered" %}covered</td>
-							<th scope="row">0 B distributed JavaScript</th>
-							<td>CSS-only package output</td>
-							<td><a href="/about#zero-javascript">scope</a></td>
-						</tr>
-						<tr>
-							<td class="docs-ledger-state">{% icon "layers", 16, "is-covered" %}covered</td>
-							<th scope="row">&lt;14 KB gzipped</th>
-							<td>Enforced budget; build fails over</td>
-							<td><a href="https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js">script</a></td>
-						</tr>
-						<tr>
-							<td class="docs-ledger-state">{% icon "sliders", 16, "is-enhanced" %}runtime</td>
-							<th scope="row">{{ proof.tokenCount }} design tokens</th>
-							<td>Generated <code>--cirth-*</code> scan</td>
-							<td><a href="/customization">override</a></td>
-						</tr>
-						<tr>
-							<td class="docs-ledger-state">{% icon "sliders", 16, "is-enhanced" %}choice</td>
-							<th scope="row">{{ proof.buildCount }} build modes</th>
-							<td>Default / classless / scoped</td>
-							<td><a href="/get-started#choose-a-build">compare</a></td>
-						</tr>
-					</tbody>
-				</table>
+			{#- The strip chooses what the section is about, so it sits with the
+			    section's own copy rather than inside the stage. In the band it
+			    read as part of the listing's toolbar — one row, beside a file
+			    name and above a copy affordance, which is where a reader looks
+			    for something belonging to the code block rather than for the
+			    editorial choice of which example is on. Above the stage it is
+			    what it is: three examples, pick one, and the whole object
+			    below follows. -#}
+			<div class="docs-switch" data-docs-switch aria-label="Example" hidden>
+				{% for example in examples %}
+					<button type="button" id="tab-{{ example.id }}" data-docs-tab="{{ example.id }}">{{ example.tab }}</button>
+				{% endfor %}
+			</div>
+			<div class="docs-stage">
+				<header class="docs-stage-band">
+					<span class="docs-stage-note">Try it with the keyboard</span>
+					<span class="docs-stage-note"><code>cirth.min.css</code></span>
+				</header>
+				<div class="docs-stage-deck">
+					{% for example in examples %}
+						<div class="docs-example" id="panel-{{ example.id }}" data-docs-panel="{{ example.id }}">
+							<h3 class="docs-example-name">{{ example.name }}</h3>
+							<div class="docs-stage-body docs-stage-split">
+								<div class="docs-stage-code">
+									<pre tabindex="0"><code class="hljs language-html">{{ example.markup | highlight | safe }}</code></pre>
+								</div>
+								<div class="docs-stage-preview"><div>{{ example.markup | safe }}</div></div>
+							</div>
+							<p class="docs-example-note">{{ example.note | safe }}</p>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+			<p class="docs-showcase-more"><a href="/examples">Browse the examples</a></p>
+		</div>
+	</section>
+
+	{#- The stylesheet and what it does, in one object, and the one section
+	    on this page where the code is the cause rather than the subject.
+
+	    The preview is a custom element, and the reason is isolation. This
+	    section has to move --cirth-* values around while the page it sits in
+	    keeps the theme the reader chose in the header, and the only honest
+	    way to do that is to give the demo its own copy of Cirth: the element
+	    attaches a shadow root, loads the scoped build into it, and applies
+	    the declarations there. Nothing in the page's cascade is touched, no
+	    selector on this page has to out-specify the framework, and the two
+	    themes are visible at once — the page's around the stage, the demo's
+	    inside it.
+
+	    The listing is the stylesheet the element really carries: one block,
+	    with one line group per token, and the script swaps a line and applies
+	    the same string it just wrote (themePreview() in
+	    docs/eleventy.config.js reads both out of the compiled files). One
+	    block rather than one per state is also what keeps the shell's copy
+	    button honest — it copies `textContent`, so a hidden variant inside
+	    the block would come along with it.
+
+	    No preset control. The selector this section used to carry drove the
+	    whole site's theme from inside a demo about theming, which made the
+	    page the demo — and left the reader to operate something before the
+	    section said anything. The header's switcher still does that job for
+	    the site; this section demonstrates instead of asking. -#}
+	<section class="docs-showcase docs-theme-showcase" aria-labelledby="theme-title">
+		<div class="docs-native-grid">
+			<header class="docs-showcase-lede">
+				<h2 id="theme-title">Your theme. Same HTML.</h2>
+				<p>Every colour, radius and font is a <code>--cirth-*</code> custom property. The markup on the right never changes and no class is added to it — the declarations on the left do, one at a time, and the finished interface follows them.</p>
+			</header>
+			<div class="docs-stage">
+				<header class="docs-stage-band">
+					<span class="docs-stage-note"><code>&lt;cirth-theme-preview&gt;</code> · its own Cirth, in a shadow root</span>
+					{#- Ships `hidden` and the script below turns it on: with no
+					    script nothing is playing, and a pause button for a demo that
+					    is not moving is a control that cannot be applied. -#}
+					<button type="button" class="docs-stage-toggle" data-docs-theme-toggle hidden>Pause</button>
+				</header>
+				<div class="docs-stage-body docs-stage-split docs-stage-split-narrow">
+					<div class="docs-stage-code">
+						<pre tabindex="0"><code class="hljs language-css" data-docs-theme-block>{{ themePreview.block | safe }}</code></pre>
+						{#- The chips carry the values the element is carrying, not the
+						    page's: the same declarations are set on this list, so a
+						    swatch cannot show one thing while the preview shows
+						    another. They are painted by the custom properties
+						    themselves — no script picks a colour. -#}
+						<ul class="docs-token-legend" data-docs-theme-legend>
+							{% for token in themePreview.tokens %}
+								<li data-token="{{ token }}"><span class="docs-token-chip" aria-hidden="true"></span><code>{{ token }}</code></li>
+							{% endfor %}
+						</ul>
+					</div>
+					{#- The specimen is served as the element's own children, which is
+					    what a reader without script gets: the page's Cirth renders it
+					    in the light DOM, finished, exactly as the section says it
+					    would. With script the element clones it into the shadow root,
+					    where the demo's stylesheet is — one markup source either
+					    way. -#}
+					<div class="docs-stage-preview">
+						<cirth-theme-preview data-docs-theme-preview>{{ themeSpecimen | safe }}</cirth-theme-preview>
+					</div>
+				</div>
+				<p class="docs-example-note">Real values, from the files that declare them: the default theme in <code>cirth.scoped.css</code>, and the <code>plain</code> and <code>playroom</code> presets compiled from <code>src/presets/</code>. In your own page the same declarations go on <code>:root</code> — <a href="/customization">every token, and how to override it</a>.</p>
 			</div>
 		</div>
 	</section>
 
-	{% if stack %}
-		<section class="docs-system-map" aria-labelledby="system-title">
-			<div class="docs-native-grid">
-				<header class="docs-system-intro">
-					<h2 id="system-title">{{ stack.title }}</h2>
-					<p>{{ stack.lede }}</p>
-				</header>
-				<ol class="docs-system-modules">
-					{% for card in stack.items %}
-						<li>
-							<article>
-								<h3>{{ card.title }}</h3>
-								<p>{{ card.details | safe }}</p>
-								<ul class="docs-badge-row">
-									{% for badge in card.badges %}<li><code>{{ badge }}</code></li>{% endfor %}
-								</ul>
-							</article>
-						</li>
-					{% endfor %}
-				</ol>
-			</div>
-		</section>
-	{% endif %}
+	{#- One proof section, and what each claim in it actually is.
 
-	{% if showcase %}
-		<section class="docs-native-showcase" aria-labelledby="showcase-title">
-			<div class="docs-native-grid">
-				<header class="docs-showcase-intro">
-					<h2 id="showcase-title">{{ showcase.title }}</h2>
-					<p>{{ showcase.lede }}</p>
-					<a href="{{ showcase.link }}" class="secondary">{{ showcase.linkText }} →</a>
-				</header>
-				<div class="docs-case-grid">
-					{% for item in showcase.items %}
-						<a class="docs-case" href="{{ item.link }}">
-							<article>
-								<span class="docs-case-icon">{% icon item.icon, 32 %}</span>
-								<strong>{{ item.title }}</strong>
-								<span>{{ item.details }}</span>
-								<small>Default UI and shell layout</small>
-							</article>
-						</a>
-					{% endfor %}
+	    Three kinds, said out loud in every cell, because they age
+	    differently. A *guarantee* is something the project intends to keep
+	    and would treat a break as a bug. A *capability* is something Cirth
+	    lets you do; it does not promise anything about your application. A
+	    *current fact* is true of this build and free to move — the size is
+	    the one on this page, and stating it as a permanent ceiling would
+	    make covering more HTML, or adding an accessibility default, look
+	    like a broken promise instead of a normal change.
+
+	    So no number is a claim by itself here. "4 builds" went for the same
+	    reason: the count was accurate and the promise it implied — that
+	    there will always be exactly four — is not one worth making, when
+	    what actually matters is that the distribution has classless and
+	    scoped forms and optional outputs beside them.
+
+	    No frame. The two showcases above are each a hairline stage on the
+	    canvas; this one is a tinted band with its cells divided by hairlines
+	    and nothing around them, so the page changes shape here rather than
+	    presenting a third bordered panel. -#}
+	<section class="docs-proof docs-band-tinted" aria-labelledby="proof-title">
+		<div class="docs-native-grid">
+			<header class="docs-showcase-lede">
+				<h2 id="proof-title">Every claim has a check path.</h2>
+				<p>{{ pitch.lede }}</p>
+			</header>
+			<dl class="docs-proof-metrics">
+				<div>
+					<dt>{{ proofKind("guarantee") }}</dt>
+					<dd>
+						<strong>0 B JS runtime</strong>
+						<small>No runtime shipped by Cirth. Your application can still use JavaScript for anything it needs.</small>
+						<a href="/about#how-it-works">Inspect</a>
+					</dd>
 				</div>
-			</div>
-		</section>
-	{% endif %}
+				<div>
+					<dt>{{ proofKind("guarantee") }}</dt>
+					<dd>
+						<strong>WCAG 2.2 AA baseline</strong>
+						<small>Automated checks over Cirth's own components and defaults — a floor to build on, not a verdict on your interface.</small>
+						<a href="/about#accessibility-baseline">Method</a>
+					</dd>
+				</div>
+				<div>
+					<dt>{{ proofKind("capability") }}</dt>
+					<dd>
+						<strong>Flexible distribution</strong>
+						<small>Classless and scoped builds, with print sheets and token presets as optional outputs beside them.</small>
+						<a href="/get-started#which-build-do-i-need">Compare</a>
+					</dd>
+				</div>
+				<div>
+					<dt>{{ proofKind("current") }}</dt>
+					<dd>
+						<strong>Small CSS footprint</strong>
+						{#- Measured off dist/cirth.min.css at build time, not written
+						    down: this cell says what today's build weighs, and the
+						    number moves when the stylesheet does. -#}
+						<small>{% if proof.size %}<strong class="docs-proof-figure">{{ proof.size.label }}</strong> gzipped in this build{% else %}Gzipped size measured{% endif %} — every bundle is measured on every build.</small>
+						<a href="https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js">Current size</a>
+					</dd>
+				</div>
+			</dl>
+			{#- The two claims that are not about the package's shape. A list,
+			    because two rows of four columns is a table's shape without a
+			    table's reason — the strip above is the part that compares. Same
+			    three kinds, same vocabulary. -#}
+			<ul class="docs-proof-claims">
+				<li>
+					{{ proofKind("guarantee") }}
+					<strong>Semantic elements first</strong>
+					<span>Element selectors and semantic demos, checked on every build</span>
+					<a href="/examples">Inspect</a>
+				</li>
+				<li>
+					{{ proofKind("capability") }}
+					<strong>Design tokens</strong>
+					<span>Every colour, space, radius and font is a <code>--cirth-*</code> property you can override at runtime</span>
+					<a href="/customization">Override</a>
+				</li>
+			</ul>
+		</div>
+	</section>
 
 	{% if faq %}
 		<section class="docs-native-faq" aria-labelledby="faq-title">
@@ -166,11 +425,375 @@ bodyClass: docs-home-page
 					<h2 id="faq-title">{{ faq.title }}</h2>
 				</header>
 				<div class="docs-faq-list">
+					{% set measuredSize = proof.size.label if proof.size else "under 14 KB" %}
 					{% for item in faq.items %}
-						<details name="faq"><summary>{{ item.q }}</summary><p>{{ item.a | safe }}</p></details>
+						{{ faqDisclosure(item.q, item.a | replace("<!--browsers-->", browsers.sentence) | replace("<!--size-->", measuredSize)) }}
 					{% endfor %}
 				</div>
 			</div>
 		</section>
 	{% endif %}
 </main>
+
+<script>
+	// The showcase's tab strip. Everything it needs is already in the page:
+	// three rendered examples, each with its own heading, served visible.
+	// This turns them into one tab panel at a time and turns the strip on —
+	// so a reader without script gets three complete examples rather than a
+	// row of buttons that do nothing, and the ARIA roles only ever exist
+	// while there is something implementing them.
+	(() => {
+		const strip = document.querySelector("[data-docs-switch]");
+		if (!strip) return;
+		const tabs = [...strip.querySelectorAll("[data-docs-tab]")];
+		const panels = tabs.map((tab) =>
+			document.querySelector(`[data-docs-panel="${tab.dataset.docsTab}"]`),
+		);
+		if (!tabs.length || panels.some((panel) => !panel)) return;
+
+		// Roles from here rather than from the template: without this script
+		// the strip is hidden and the panels are just three headed sections,
+		// and a `role="tabpanel"` with no tablist anywhere would be a lie
+		// about the document.
+		strip.setAttribute("role", "tablist");
+		for (const [index, tab] of tabs.entries()) {
+			const panel = /** @type {HTMLElement} */ (panels[index]);
+			tab.setAttribute("role", "tab");
+			tab.setAttribute("aria-controls", panel.id);
+			panel.setAttribute("role", "tabpanel");
+			panel.setAttribute("aria-labelledby", tab.id);
+			// Reachable, because a panel holding a scrollable <pre> and a form
+			// is content a reader arrives at from the tab.
+			panel.setAttribute("tabindex", "0");
+		}
+
+		/** @param {number} next @param {boolean} moveFocus */
+		const select = (next, moveFocus) => {
+			for (const [index, tab] of tabs.entries()) {
+				const current = index === next;
+				tab.setAttribute("aria-selected", String(current));
+				// Roving tabindex: one stop for the whole strip, and the arrow
+				// keys walk it (WAI-ARIA tabs pattern).
+				tab.tabIndex = current ? 0 : -1;
+				/** @type {HTMLElement} */ (panels[index]).hidden = !current;
+			}
+			if (moveFocus) /** @type {HTMLElement} */ (tabs[next]).focus();
+		};
+
+		strip.addEventListener("click", (event) => {
+			const tab = /** @type {HTMLElement} */ (event.target)?.closest?.(
+				"[data-docs-tab]",
+			);
+			if (tab) select(tabs.indexOf(/** @type {HTMLElement} */ (tab)), false);
+		});
+
+		// Selection follows focus, which is the pattern's default where every
+		// panel is already in the document: nothing is fetched or built by
+		// arrowing across the strip. There is no autoplay to interrupt — a
+		// panel that changed itself would take a <details> the reader had
+		// just opened, or a field they were typing in, out from under them,
+		// and no amount of pausing makes that worth having.
+		strip.addEventListener("keydown", (event) => {
+			const from = tabs.findIndex((tab) => tab === document.activeElement);
+			if (from < 0) return;
+			const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[
+				event.key
+			];
+			const to = step
+				? (from + step + tabs.length) % tabs.length
+				: event.key === "Home"
+					? 0
+					: event.key === "End"
+						? tabs.length - 1
+						: -1;
+			if (to < 0) return;
+			event.preventDefault();
+			select(to, true);
+		});
+
+		strip.hidden = false;
+		select(0, false);
+	})();
+
+	// <cirth-theme-preview> — the theme demo, with its own copy of Cirth.
+	//
+	// A documentation element, not a Cirth API: nothing in the published
+	// package knows about it, and the section it serves is the only place it
+	// exists. What it buys is isolation, which this particular demo cannot
+	// work without. The section changes --cirth-* values live; the page
+	// around it has to keep the theme the reader picked in the header; and
+	// the two have to be visible at the same time for the claim to land.
+	// Done in the page's own cascade that is a set of overrides fighting the
+	// framework for specificity, and every one of them a place where the
+	// demo and the documentation can disagree.
+	//
+	// A shadow root removes the fight instead of winning it:
+	//
+	//   · the page's element rules (article, button, input …) do not cross
+	//     the boundary, so nothing in here is styled by the site's build;
+	//   · custom properties do inherit in — and the scoped build re-declares
+	//     every one of them on `.cirth`, so the page's values are shadowed
+	//     for this subtree by the demo's own stylesheet rather than by a
+	//     more specific selector;
+	//   · the theme is one ordinary stylesheet after Cirth's, overriding
+	//     custom properties at the same specificity, which is exactly what
+	//     the Customization page tells an author to write.
+	//
+	// The stylesheet it loads is the real compiled scoped build — the same
+	// artifact the /lab/ specimens use, compiled from src/ with the public
+	// scoped switch — and the markup is the element's own children, served
+	// by the template and cloned in. Without script those children are what
+	// a reader gets: the page's Cirth renders the same specimen in the light
+	// DOM.
+	const ThemePreview = class extends HTMLElement {
+		/** @type {HTMLStyleElement | null} */
+		#theme = null;
+		/** @type {HTMLElement | null} */
+		#surface = null;
+
+		connectedCallback() {
+			if (this.shadowRoot) return;
+			const root = this.attachShadow({ mode: "open" });
+			const base = (document.documentElement.dataset.base || "/").replace(
+				/\/$/,
+				"",
+			);
+
+			const cirth = document.createElement("link");
+			cirth.rel = "stylesheet";
+			cirth.href = `${base}/styles/generated/cirth-lab-scoped.css`;
+
+			// The element's own layout — the part the docs shell owns. The
+			// padding lives in here rather than on the pane outside, so the
+			// surface --cirth-canvas paints is the whole half of the stage:
+			// when the demo's canvas moves, the page's canvas is right beside
+			// it across a hairline, which is the isolation being visible
+			// rather than described.
+			const shell = document.createElement("style");
+			shell.textContent = `
+				:host { display: grid; }
+				.cirth {
+					display: grid;
+					align-content: center;
+					padding: clamp(1rem, 2.5vw, 2rem);
+				}
+				.cirth > :first-child { margin-block-start: 0; }
+				.cirth > :last-child { margin-block-end: 0; }
+
+				/* The values change on their own, so the surfaces they paint
+				   move rather than cut. Subtractive, as everywhere else on
+				   this page: declared only under no-preference, and the
+				   sequence is correct without it. */
+				@media (prefers-reduced-motion: no-preference) {
+					.cirth, .cirth * {
+						transition:
+							background-color 0.3s ease,
+							border-color 0.3s ease,
+							color 0.3s ease,
+							border-radius 0.3s ease;
+					}
+				}
+			`;
+
+			// After Cirth's, and empty until the section writes to it.
+			const theme = document.createElement("style");
+			theme.dataset.cirthTheme = "";
+
+			// The fallback, moved rather than copied. Left behind it would be a
+			// second, unrendered copy of a form — invisible, unfocusable, and
+			// still matching every selector anything on this page looks with.
+			const surface = document.createElement("div");
+			surface.className = "cirth";
+			surface.append(...this.children);
+
+			root.append(cirth, shell, theme, surface);
+			this.#theme = theme;
+			this.#surface = surface;
+
+			// One thing a stylesheet cannot say: a shadow tree is styled by
+			// its own sheet, so the scheme the page is in has to be handed to
+			// it. The scoped build reads `data-theme` off the `.cirth`
+			// element itself, which is what this sets — the demo isolates the
+			// theme's tokens, not whether the site is in the dark.
+			const scheme = () => {
+				surface.dataset.theme =
+					document.documentElement.getAttribute("data-theme") === "dark"
+						? "dark"
+						: "light";
+			};
+			scheme();
+			new MutationObserver(scheme).observe(document.documentElement, {
+				attributeFilter: ["data-theme"],
+			});
+		}
+
+		/**
+		 * The demo's stylesheet, replaced whole. The caller passes the same
+		 * text the listing beside the preview is showing.
+		 * @param {string} css
+		 */
+		setTheme(css) {
+			if (this.#theme) this.#theme.textContent = css;
+		}
+	};
+
+	if (!customElements.get("cirth-theme-preview")) {
+		customElements.define("cirth-theme-preview", ThemePreview);
+	}
+
+	// The declarations, one at a time.
+	//
+	// Every value here is a real one, read out of a compiled file by
+	// themePreview() in docs/eleventy.config.js: the default theme as the
+	// scoped build declares it, and each preset as its own stylesheet
+	// declares it. The listing and the element are written from the same
+	// string in the same step, so the code on the left cannot be describing
+	// something the interface on the right is not doing.
+	//
+	// Deliberately not a type-out. The claim is "the values moved and the
+	// markup did not", and a terminal pretending to be typed says the
+	// opposite — that the stylesheet is a performance. A line is marked, its
+	// value is replaced, the element takes it, and the interface settles.
+	(() => {
+		const preview = document.querySelector("[data-docs-theme-preview]");
+		const block = document.querySelector("[data-docs-theme-block]");
+		const legend = document.querySelector("[data-docs-theme-legend]");
+		const toggle = document.querySelector("[data-docs-theme-toggle]");
+		if (!(preview instanceof ThemePreview)) return;
+		if (!(block instanceof HTMLElement) || !(toggle instanceof HTMLElement)) {
+			return;
+		}
+
+		const selector = {{ themePreview.selector | dump | safe }};
+		const tokens = {{ themePreview.tokens | dump | safe }};
+		const states = {{ themePreview.states | dump | safe }};
+
+		// What the element is carrying. It starts as the block the page was
+		// served with, which is the first state — so nothing moves on load.
+		const current = new Map(
+			tokens.map((token) => [token, states[0].lines[token]]),
+		);
+
+		const write = () => {
+			const declarations = tokens
+				.map((token) => `  ${token}: ${current.get(token).value};`)
+				.join("\n");
+			preview.setTheme(`${selector} {\n${declarations}\n}`);
+			// The chips take the same declarations. A swatch is a claim about
+			// a value, so it has to be painted by the value the preview has —
+			// left to the page's own tokens it would show the site's accent
+			// beside a preview carrying a different one.
+			if (legend) {
+				legend.setAttribute(
+					"style",
+					tokens
+						.map((token) => `${token}: ${current.get(token).value}`)
+						.join("; "),
+				);
+			}
+		};
+		write();
+
+		// The sequence: every state in turn, one token per step, and only
+		// where the value actually moves — a step that changes nothing would
+		// mark a line to say it had changed. It ends on the state it started
+		// from, so the loop closes without a jump.
+		const steps = [];
+		const running = new Map(current);
+		for (let round = 1; round <= states.length; round += 1) {
+			for (const token of tokens) {
+				const line = states[round % states.length].lines[token];
+				if (running.get(token).value === line.value) continue;
+				running.set(token, line);
+				steps.push({ token, line });
+			}
+		}
+
+		const LEAD = 380;
+		const DWELL = 1600;
+		let at = 0;
+		let timer = 0;
+		let generation = 0;
+		let playing = false;
+		let onscreen = false;
+
+		const pause = () => {
+			generation += 1;
+			clearTimeout(timer);
+			timer = 0;
+		};
+
+		/** @param {string} token */
+		const mark = (token) => {
+			for (const line of block.querySelectorAll(".docs-token")) {
+				line.classList.remove("is-changed");
+			}
+			const line = block.querySelector(`.docs-token[data-token="${token}"]`);
+			if (!(line instanceof HTMLElement)) return;
+			// Re-added after a forced reflow, because the same animation on
+			// the same element does not restart on its own.
+			void line.offsetWidth;
+			line.classList.add("is-changed");
+		};
+
+		const advance = () => {
+			const mine = generation;
+			const step = steps[at];
+			at = (at + 1) % steps.length;
+			mark(step.token);
+			timer = setTimeout(() => {
+				if (mine !== generation) return;
+				const line = block.querySelector(
+					`.docs-token[data-token="${step.token}"]`,
+				);
+				if (line) line.innerHTML = step.line.html;
+				current.set(step.token, step.line);
+				write();
+				timer = setTimeout(advance, DWELL);
+			}, LEAD);
+		};
+
+		const play = () => {
+			if (timer || !playing || !onscreen || steps.length === 0) return;
+			timer = setTimeout(advance, DWELL);
+		};
+
+		/** @param {boolean} next */
+		const setPlaying = (next) => {
+			playing = next;
+			toggle.textContent = next ? "Pause" : "Play";
+			toggle.setAttribute(
+				"aria-label",
+				next ? "Pause the theme demo" : "Play the theme demo",
+			);
+			if (next) play();
+			else pause();
+		};
+
+		toggle.hidden = false;
+		toggle.addEventListener("click", () => setPlaying(!playing));
+
+		// Nothing runs while the section is off screen: the demo exists to be
+		// watched, and a page that has never been scrolled this far has
+		// nothing to watch it.
+		new IntersectionObserver(
+			(entries) => {
+				onscreen = entries.some((entry) => entry.isIntersecting);
+				if (onscreen) play();
+				else pause();
+			},
+			{ threshold: 0.25 },
+		).observe(preview);
+
+		// Autoplay only where motion is welcome. With the preference set the
+		// section is served in its first state and holds there — and the
+		// control is still live, so the sequence is available on request,
+		// with the value changes landing immediately because the transitions
+		// are declared under no-preference only.
+		const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+		setPlaying(!calm.matches);
+		calm.addEventListener("change", () => {
+			if (calm.matches) setPlaying(false);
+		});
+	})();
+</script>

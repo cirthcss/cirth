@@ -2,13 +2,10 @@
 layout: home.njk
 
 hero:
-  eyebrow: HTML-native CSS framework
-  name: Cirth
-  text: Production-ready UI from semantic HTML.
   tagline: >-
     Cirth turns native HTML elements into accessible, themeable interfaces.
     Load one stylesheet, customize it with runtime design tokens, and ship
-    with zero JavaScript and no required build step.
+    an interface that needs no JavaScript runtime and no build step.
   actions:
     - theme: brand
       text: Get Started
@@ -18,150 +15,68 @@ hero:
       link: /examples
 
 pitch:
-  eyebrow: Proof, not promises
-  title: A production-ready baseline, out of the box.
   lede: >-
-    Every number below is checked automatically, on every build — not a
-    claim you have to take on faith.
-  items:
-    - value: <14KB gzipped
-      details: >-
-        The default stylesheet is a strict maximum limit for gzip compression during each build; failing that, the build fails.
-    - value: 0 JavaScript
-      details: >-
-        Accordions, dropdowns, and modals run on native
-        <code>&lt;details&gt;</code> and <code>&lt;dialog&gt;</code>
-        behavior. Nothing shipped, nothing to hydrate.
-    - value: WCAG 2.2 AA
-      details: >-
-        Contrast, visible focus rings, and 44px touch targets are checked
-        in the source, not left to integrators to add later.
-    - value: 246 tokens
-      details: >-
-        Every color, spacing, radius, and font is a runtime
-        <code>--cirth-</code> custom property, overridable without a
-        rebuild.
-
-stack:
-  eyebrow: What's in the box
-  title: Small surface, finished defaults
-  lede: >-
-    Six responsibilities, one stylesheet, and an explicit boundary between
-    browser behavior, Cirth defaults, and author composition.
-  items:
-    - title: Semantic HTML first
-      details: >-
-        Standard elements — <code>nav</code>, <code>article</code>,
-        <code>button</code>, <code>table</code>, <code>details</code> —
-        carry the styling. Add a class only where HTML semantics run out.
-      badges:
-        - "<nav>"
-        - "<article>"
-        - "<button>"
-        - "<table>"
-        - "<details>"
-    - title: Fully customizable theme
-      details: >-
-        Every color, spacing, radius, font, and shadow is a
-        <code>--cirth-</code> custom property. Override them after
-        loading the framework — no build step, no Sass.
-      badges:
-        - --cirth-primary
-        - --cirth-spacing
-        - --cirth-border-radius
-    - title: Classless & scoped builds
-      details: >-
-        Ship the default build, a classless build for markup close to
-        zero, or a scoped build that only styles inside a
-        <code>.cirth</code> container.
-      badges:
-        - Default
-        - Classless
-        - Scoped
-        - Scoped + classless
-    - title: Light and dark out of the box
-      details: >-
-        The default theme ships light and dark variants, switching
-        automatically with <code>prefers-color-scheme</code> or forced
-        with <code>data-theme</code>.
-      badges:
-        - prefers-color-scheme
-        - data-theme
-    - title: Interactive without JavaScript
-      details: >-
-        Accordions, dropdowns, and modals build on native
-        <code>&lt;details&gt;</code> and <code>&lt;dialog&gt;</code>
-        elements and their native behavior — no runtime, nothing to
-        hydrate.
-      badges:
-        - "<details>"
-        - "<dialog>"
-    - title: Accessible by default
-      details: >-
-        Focus rings, touch targets and reduced-motion support are checked
-        in the source, not bolted on after.
-      badges:
-        - forced-colors
-        - 44px targets
-        - prefers-contrast
-
-showcase:
-  eyebrow: Samples
-  title: See Cirth in action
-  lede: >-
-    Three interfaces built entirely from documented components — full HTML
-    source included.
-  items:
-    - icon: code
-      title: Documentation site
-      details: Sidebar nav, prose, code blocks
-      link: /examples#documentation
-    - icon: layers
-      title: Dashboard
-      details: Cards, tables, live retheming
-      link: /examples#dashboard
-    - icon: sliders
-      title: Settings form
-      details: Validation, scoped build
-      link: /examples#settings-form
-  link: /examples
-  linkText: View all examples
-
+    Not everything below is the same kind of statement. Some are
+    guarantees — properties the project intends to keep. Some are
+    capabilities: things Cirth lets you do, which say nothing about what
+    you build with them. One is a current fact, measured on this build and
+    free to move. Each cell says which it is, and how to check it.
 faq:
-  eyebrow: Questions
   title: Before you install
   items:
     - q: Do I need to write any JavaScript?
       a: >-
-        No. Cirth ships zero JavaScript. Accordions, dropdowns, and modals
-        are native <code>&lt;details&gt;</code> and
-        <code>&lt;dialog&gt;</code> elements, styled by the framework and
-        driven by the browser's own behavior.
+        Cirth itself does not require or ship any. The package is compiled
+        CSS, and the interactive patterns it styles — accordion, dropdown,
+        modal, popover — are native <code>&lt;details&gt;</code>,
+        <code>&lt;dialog&gt;</code> and <code>[popover]</code> elements
+        driven by the browser. Your application can still use JavaScript
+        wherever its own behavior needs it: data, state, routing, anything
+        it builds in the DOM. Cirth styles what is there, whoever put it
+        there.
     - q: Is a build step required?
       a: >-
-        No. Add one <code>&lt;link rel="stylesheet"&gt;</code> (or one
-        <code>import</code> in a bundler) and standard elements are
-        styled. SCSS exists in the repository to produce the compiled
-        output; it isn't a public Sass API you need to compile yourself.
+        No. One <code>&lt;link rel="stylesheet"&gt;</code> — or one
+        <code>import</code> where you already bundle — and standard
+        elements are styled. It also drops into a Vite, PostCSS or bundler
+        pipeline unchanged when you have one; neither way is the blessed
+        one. The SCSS in the repository is how the published CSS is
+        produced, not a Sass API you are expected to compile.
     - q: How big is the default stylesheet?
       a: >-
-        <14KB gzipped, currently. Every build is checked against that
-        budget on every commit by
+        <!--size--> gzipped in the build this site was made from. That is a
+        measurement, not a promise:
         <a href="https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js">a
-        script</a> that gzips the real output and fails the build if any
-        bundle crosses it.
+        script</a> gzips every bundle on every build and fails past the
+        current budget, so the number stays honest — and it is free to move
+        when covering more HTML, or a better accessibility default, is
+        worth the bytes.
     - q: Which browsers are supported?
       a: >-
-        The latest stable Chrome, Edge, Firefox, Opera and Safari, on
-        desktop and mobile — including Chrome and Firefox for Android and
-        Samsung Internet, together about 78% of global browser usage.
-        Compiled against that exact Browserslist target with Lightning
-        CSS. No version of Internet Explorer is supported.
+        <!--browsers-->. That is the Browserslist target in
+        <code>package.json</code> — what Lightning CSS compiles the output
+        against, and what
+        <a href="https://github.com/cirthcss/cirth/blob/master/scripts/check-browserslist.js">check-browserslist.js</a>
+        holds to one engine floor across every family, so a Chromium fork
+        left behind cannot quietly lower it. No version of Internet
+        Explorer is supported.
     - q: How is this different from Pico CSS?
       a: >-
-        Cirth started as a fork of Pico CSS. It now has its own package
-        name, a reduced single-theme color system, a runtime token
-        surface, and a WCAG 2.2 AA baseline checked in the source — see
+        Cirth began as a fork of Pico CSS and remains indebted to it, but
+        it is an independent framework now rather than a promise of
+        compatibility. What has moved since the fork: the published package
+        is CSS only, in classless and scoped forms — four builds today,
+        default, classless, scoped and scoped classless — with print sheets
+        and token presets as separate outputs beside them; the twenty inherited accent themes are one theme (amber)
+        plus <code>plain</code> and <code>playroom</code> as token-override
+        presets; <code>.grid</code> is now an intrinsically wrapping grid
+        and the single-row equal-column layout is
+        <a href="/layout/row"><code>.row</code></a>; the CSS-only
+        <code>[data-tooltip]</code> is gone, replaced by the native
+        <a href="/components/popover">popover</a>, because a message drawn
+        with <code>content: attr()</code> cannot be reached by assistive
+        technology; and a WCAG 2.2 AA baseline is verified in the source
+        with axe over every page, theme and mode. See
         <a href="/about#relationship-to-pico-css">the full comparison</a>.
     - q: Is Cirth affiliated with the Tolkien estate?
       a: >-
