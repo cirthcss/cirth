@@ -78,8 +78,38 @@
       --cirth-color: inherit;
 
       display: inline-block;
-      margin: calc(var(--cirth-nav-link-spacing-vertical) * -1)
-        calc(var(--cirth-nav-link-spacing-horizontal) * -1);
+
+      // The inline pull is the *item's* gutter, negated — not the link's.
+      // The two tokens carry the same 8px by default, so this was invisible
+      // and read as symmetry with the padding on the next line; it is not.
+      // The negative margin exists for one reason: to cancel the padding the
+      // <li> above pays, so a row's first link paints out to the list's edge
+      // and adjacent links tile with no seam. That padding is
+      // --cirth-nav-element-spacing-horizontal. Keyed to the link's own
+      // gutter, the two came apart the moment either token was retimed:
+      // measured with --cirth-nav-link-spacing-horizontal at 1rem, the first
+      // link's painted box started 16px outside a list pulled out by 8, and
+      // every pair of adjacent links overlapped by 16px.
+
+      // Keyed to the gutter it actually cancels, the chain closes at any
+      // value — and it closes to *nothing* at zero, which is what a nav
+      // that is not a bar needs. See the vertical nav at the end of this
+      // file: a stacked nav is a nav whose inline gutter is zero, and it is
+      // now expressed that way rather than by undoing three insets by hand.
+
+      // Two longhands, not the shorthand, and that is the difference
+      // between the token working and the token being a trap. A custom
+      // property is substituted at computed-value time, so
+      // `--cirth-nav-element-spacing-horizontal: 0` — the unitless zero
+      // anyone would write — leaves `calc(0 * -1)` a <number> where a
+      // <length> is required. In the shorthand that invalidates the whole
+      // declaration, block axis included: measured, every link in the stack
+      // lost its negative vertical margin and every row grew by 16px.
+      // Split, the block rhythm is untouched and the inline half falls back
+      // to its own initial value, which is 0 — exactly what a column asked
+      // for. So `0` and `0px` both do the right thing.
+      margin-block: calc(var(--cirth-nav-link-spacing-vertical) * -1);
+      margin-inline: calc(var(--cirth-nav-element-spacing-horizontal) * -1);
       padding: var(--cirth-nav-link-spacing-vertical)
         var(--cirth-nav-link-spacing-horizontal);
       border-block-end: var(--cirth-border-width-2) solid transparent;
@@ -148,9 +178,12 @@
       }
 
       a {
+        // Same correction as the link rule above: the pull cancels the
+        // item's gutter, so it is that gutter negated. Identical at the
+        // default scale, and it stays identical when either token moves.
         margin: calc(var(--cirth-nav-link-spacing-vertical) * -1) 0;
         margin-inline-start: calc(
-          var(--cirth-nav-link-spacing-horizontal) * -1
+          var(--cirth-nav-element-spacing-horizontal) * -1
         );
       }
 
@@ -284,7 +317,43 @@ $navbar-selector: "header:not(:is(article, aside, dialog, figure, li, nav, secti
 // stopped being generated, and the list also picked up the nav's item
 // padding. A prose list in an aside is a prose list.
 
+// A row pays its inline gutters forward and takes them back on the link:
+// the list pulls out by one gutter, the item pushes in by one, and the link
+// pulls out by one again, so a horizontal nav sits flush with its
+// container. Stacked, those three insets stop cancelling. Measured in a
+// 240px <aside>: the text landed correctly on the container's content edge,
+// but the *painted* box — the hover fill, and the border-inline-start this
+// block uses as the aria-current rail — ran from -8px to 248px. Eight
+// pixels outside, on both edges.
+
+// In the container this pattern actually exists for, a sticky sidebar with
+// `overflow-y: auto`, that is not a cosmetic overhang: the rail is clipped
+// away entirely and the framework's own current-page indicator is invisible
+// exactly where a reader needs it most.
+
+// All three insets are one gutter, and now all three read it from one
+// token, so a column releases them by naming the gutter it does not have.
+// That is the whole difference between a bar and a stack, said once:
+
+//   nav { --cirth-nav-element-spacing-horizontal: 0 }
+
+// It is a public token rather than a class, a new element trigger or an
+// aria-* attribute, because it is already the framework's own answer to
+// "change this" — it works in the classless build, it needs no invalid
+// ARIA (aria-orientation is not a supported property on role="navigation",
+// and an accessibility-first framework has no business teaching it as a
+// styling hook), and it does not guess from an ancestor. `:is(aside,
+// dialog) nav` was the obvious alternative and it is wrong twice: a dialog
+// can legitimately hold a horizontal tab bar, and it would still miss the
+// third place a stacked nav actually lives — a <details> disclosure, which
+// is where two of this repo's own three consumers are.
+
+// <aside> keeps the automatic trigger: a nav in a complementary region is
+// a rail, and it should not have to say so.
+
 #{$parent-selector} aside nav {
+  --cirth-nav-element-spacing-horizontal: 0;
+
   display: block;
 
   ol,
@@ -293,39 +362,8 @@ $navbar-selector: "header:not(:is(article, aside, dialog, figure, li, nav, secti
     display: block;
   }
 
-  // A row pays its inline gutters forward and takes them back on the link:
-  // the list pulls out by one gutter, the item pushes in by one, and the
-  // link pulls out by one again, so a horizontal nav sits flush with its
-  // container. Stacked, those three insets stop cancelling. Measured in a
-  // 240px <aside>: the text landed correctly on the container's content
-  // edge, but the *painted* box — the hover fill, and the
-  // border-inline-start this block uses as the aria-current rail — ran
-  // from -8px to 248px. Eight pixels outside, on both edges.
-
-  // In the container this pattern actually exists for, a sticky sidebar
-  // with `overflow-y: auto`, that is not a cosmetic overhang: the rail is
-  // clipped away entirely and the framework's own current-page indicator
-  // is invisible exactly where a reader needs it most.
-
-  // A column has no row to cancel against. The gutters belong to the link,
-  // which is the full-width box being painted, and nothing else pulls.
-  ol,
-  ul {
-    &:first-of-type {
-      margin-inline-start: 0;
-    }
-
-    &:last-of-type {
-      margin-inline-end: 0;
-    }
-  }
-
   li {
     padding: calc(var(--cirth-nav-element-spacing-vertical) * 0.5) 0;
-
-    :where(a, [role="link"]) {
-      margin-inline: 0;
-    }
 
     a {
       display: block;
