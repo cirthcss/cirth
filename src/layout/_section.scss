@@ -4,6 +4,15 @@
    * Section
    */
 
+// Reviewed and kept. A page of full-bleed bands does not want this gap, and
+// that is a real argument — but <article> carries the identical
+// margin-bottom in components/_card.scss, and HTML's two sectioning
+// containers should not disagree about whether they sit in document flow.
+// The value is a token, so a theme that re-times the document re-times this
+// with it; and a composition that wants no gap opts out in one declaration,
+// at zero added specificity (`.landing :where(section) { margin: 0 }`),
+// which is what this project's own front page does. See
+// docs/src/pages/layout/section.md.
 #{$parent-selector} section {
   margin-bottom: var(--cirth-block-spacing-vertical);
 }

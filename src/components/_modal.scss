@@ -150,8 +150,13 @@
       // --cirth-color: var(--cirth-primary-inverse) — white — because a
       // button is normally a filled accent surface. The close control keeps
       // the box but drops the fill, so currentColor would paint a white
-      // glyph on the dialog header. The muted ink is what the baked stroke
-      // was approximating anyway; the opacity above still carries the
+      // glyph on the dialog header.
+
+      // --cirth-ink is the general answer to that trap now (theme/_dual.scss:
+      // the page's ink under a name no component may rebind), but this
+      // control does not want the page's ink — it wants the subordinate one.
+      // The muted ink is what the baked stroke was approximating anyway, and
+      // nothing shadows it either; the opacity above still carries the
       // resting/hover distinction.
       &::before {
         display: block;

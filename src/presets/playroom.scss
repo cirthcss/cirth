@@ -28,7 +28,7 @@
   // The full surface hierarchy follows this canvas at runtime. Playroom no
   // longer repeats card, form, code, dropdown, or popover merely to carry
   // the violet temperature through the system.
-  --cirth-color: light-dark(oklch(36% 0.03 295deg), oklch(93% 0.012 300deg));
+  --cirth-ink: light-dark(oklch(36% 0.03 295deg), oklch(93% 0.012 300deg));
   --cirth-muted-color: light-dark(
     oklch(52% 0.035 295deg),
     oklch(70% 0.028 295deg)
@@ -122,7 +122,7 @@
       oklch(34% 0.16 300deg),
       oklch(92% 0.07 300deg)
     );
-    --cirth-color: light-dark(oklch(22% 0.02 295deg), oklch(98% 0.006 300deg));
+    --cirth-ink: light-dark(oklch(22% 0.02 295deg), oklch(98% 0.006 300deg));
     --cirth-muted-color: light-dark(
       oklch(40% 0.035 295deg),
       oklch(82% 0.02 295deg)

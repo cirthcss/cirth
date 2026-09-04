@@ -9,11 +9,91 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Added
 
+- **`--cirth-ink`, the page's text colour under a name no component can
+  rebind** — the exact twin of `--cirth-canvas`, which has always done this
+  for the page surface. `--cirth-color` is a *slot*: a `<button>` rebinds it
+  to the inverse ink its filled surface needs, a link to the accent, an
+  `<input>` and every heading to their own. Anything that means "the ink
+  this document is set in" therefore could not safely say `--cirth-color` —
+  a custom tab, toolbar or chip built on `<button>` that reached for it got
+  white on white. `--cirth-color` now defaults to `--cirth-ink`, so nothing
+  computes differently; there is simply a name for the role. Purely
+  additive.
 - `--cirth-container-gutter`, a fluid container-only gutter independent of
   the global spacing token, and `--cirth-modal-max-width`, a single runtime
   cap for modal cards.
 
+### Fixed
+
+- **The `<summary>` marker is centred on its own line.** The chevron floats,
+  and a float aligns to the *top* of the line box it joins, so a marker
+  shorter than the line sat high by half the difference: 4px at the default
+  type scale, and 10px at 24px type, because the marker was sized from the
+  root scale while the line followed the element. It is now `1lh` tall and
+  `1em` wide, so it is centred at any type size. `summary[role="button"]`
+  used to carry a version of this correction alone and no longer needs to.
+  This moves a pixel on every disclosure, so visual baselines were
+  regenerated.
+- **A vertical nav paints inside its own container.** A horizontal nav pays
+  its inline gutters forward and takes them back on the link, so the row
+  sits flush with its container; stacked in an `<aside>`, those three insets
+  stopped cancelling. Measured in a 240px sidebar, the text landed correctly
+  but the painted box — the hover fill, and the `border-inline-start` used
+  as the `aria-current` rail — ran from -8px to 248px. In a sticky sidebar
+  with `overflow-y: auto`, which is what the pattern is for, that clipped
+  the current-page indicator away entirely. Entries now carry their gutters
+  on the link alone; the box moves 8px and the rail is visible.
+- **A plain list inside an `<aside>` keeps its bullets.** The vertical-nav
+  block was keyed on `aside` rather than `aside nav`, so it forced `display:
+  block` — which is not `list-item` — onto the items of *any* list in a
+  complementary region, and their markers stopped being generated.
+- **The VoiceOver list-semantics workaround is out of flow under every
+  display type.** `:where(nav li)::before` carries a zero-width space so
+  Safari does not drop `list-style: none` navigation out of the
+  accessibility tree, and used `float` to keep it free. Flex and grid
+  containers ignore floats but still generate the box — as an item, before
+  every real one. A `nav li` made a two-column grid rendered its label and
+  its button out of order, on separate rows. It is now `position: absolute`,
+  which is out of flow everywhere, with the accessibility fix unchanged.
+- **`.sr-only-focusable` no longer moves the document.** It returned the
+  element to `position: static` on focus, so a skip link shoved the whole
+  page down by its own height — measured at +24px — the instant a keyboard
+  reader pressed Tab, on the first interaction anyone has with the page. It
+  now stays out of flow, and because that means it is painted over whatever
+  it lands on, the reveal brings `--cirth-canvas`, `--cirth-ink`, the shared
+  radius, a padding step and `--cirth-z-index-fixed` with it. Offsets stay
+  `auto`: where a skip link lands is the page's decision, not the library's.
+
 ### Changed
+
+- **`<dl>`, `<dt>` and `<dd>` arrive finished.** `<dd>` kept the user
+  agent's 40px indent, `<dt>` read at exactly the weight of its own
+  description, and consecutive pairs ran together — against `cirth.css`
+  alone a description list was the one thing on the page that still looked
+  like unstyled HTML. `<dt>` is now semibold, `<dd>` has no indent, and a
+  `<dt>` following a `<dd>` takes half a rhythm step. Deliberately no margin
+  on the `<div>` wrapper HTML allows around each pair, and no grid: that
+  wrapper exists so the author can lay the pairs out, and a framework margin
+  there would pull every cell of a gridded `<dl>` out of line with the
+  first. A metrics panel is `.grid` plus a `<dl>`, not a component.
+- **`<caption>` agrees with the rest of its table.** It arrived with the
+  user agent's `text-align: center`, in body ink, sitting directly on the
+  header row — above cells this framework deliberately aligns to `start`. It
+  now takes `start`, the muted ink, and half a rhythm step below, matching
+  what `content/_figure.scss` already does for `figcaption`. `<caption>` is
+  the native way to give a table an accessible name and the one WCAG
+  guidance prefers over an external heading, so it is worth finishing.
+- **The gzipped size budget is a per-bundle regression guard, not a
+  ceiling.** It was one number — 14 KiB — applied to every file in `dist/`,
+  which watched a single bundle (the print sheets could have grown
+  sixteenfold in silence) while reading publicly as a promise. By the end
+  that promise was the reason `<dl>` still carried a browser indent and a
+  disclosure marker sat off its own line. Each bundle now has its own
+  budget, set a few hundred bytes above what it measures, and an unbudgeted
+  bundle fails the check rather than shipping unwatched. Cirth is small
+  because its model is small, not because it rations correctness by the
+  byte. The default build is 13,905 B gzipped, up 78 B for everything
+  above.
 
 - **Buttons and one-line fields now share one control-height formula.** The
   44px contract is unchanged, but its font, line-height, padding and border

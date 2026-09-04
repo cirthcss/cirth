@@ -99,10 +99,26 @@ If you want the headings too, set the tokens the headings actually read
 page marks every token with its kind, so you can tell at a glance whether
 you are setting a value or a slot.
 
-When you need to refer to *the page itself* — an opaque background for a
-control, a tint mixing toward the page — use `--cirth-canvas`. That is the
-page surface as a value, and no component is allowed to shadow it.
-`--cirth-background-color` defaults to it.
+When you need to refer to *the page itself*, use the two page roles. They
+are values, not slots, and no component is allowed to shadow either of
+them:
+
+* `--cirth-canvas` — the page surface. Use it for an opaque background on
+  a control, or a tint mixing toward the page. `--cirth-background-color`
+  defaults to it.
+* `--cirth-ink` — the page text colour. Use it wherever you need the ink
+  the document is set in rather than the ink of whatever you happen to be
+  inside. `--cirth-color` defaults to it.
+
+The distinction matters most inside a `<button>`, a link, an `<input>` or a
+heading, because each of those rebinds `--cirth-color` for its own subtree.
+A custom control built on `<button>` — a tab, a toolbar, a chip — that
+reaches for `--cirth-color` gets the button's inverse ink, which on a
+button that has dropped its fill is white on white. Reach for
+`--cirth-ink` instead and you get the page's ink, whatever the theme is.
+
+`--cirth-contrast` is not the same thing: that is maximum-contrast ink, the
+role the `.contrast` variant is built on, not the ink of body text.
 
 ### Roles
 
@@ -203,7 +219,8 @@ validity styling pairs colour with an icon for that reason.
 
 | Token | What it is |
 | --- | --- |
-| `--cirth-canvas` | The page |
+| `--cirth-canvas` | The page surface |
+| `--cirth-ink` | The page text colour |
 | `--cirth-code-background-color` | A recessed band: `<pre>`, inline `<code>` |
 | `--cirth-form-element-background-color` | A field at rest |
 | `--cirth-card-sectioning-background-color` | A card's header and footer band |
@@ -212,7 +229,11 @@ validity styling pairs colour with an icon for that reason.
 | `--cirth-muted-color` | Subordinate text |
 | `--cirth-muted-border-color` | Hairlines: tables, cards, blockquotes |
 
-`--cirth-canvas` is the only input in this family. The others are runtime
+`--cirth-canvas` and `--cirth-ink` are the two inputs in this family — the
+page's surface and the page's ink. Set either and the tokens that alias it
+follow: `--cirth-background-color` and the surface ladder from the canvas,
+`--cirth-color` and the component inks (accordion summary, dropdown,
+popover, the `<kbd>` fill) from the ink. The others are runtime
 relationships: code is the deepest recess, the resting field sits between it
 and the canvas, the band and card add lightness, and a focused field rises to
 the canvas. Dropdown and popover alias the card because they are floating
@@ -634,6 +655,7 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-code-kbd-color` | derived |
 | `--cirth-color` | slot |
 | `--cirth-del-color` | derived |
+| `--cirth-ink` | input |
 | `--cirth-ins-color` | derived |
 | `--cirth-link-visited-color` | role |
 | `--cirth-mark-background-color` | derived |

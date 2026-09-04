@@ -54,8 +54,20 @@
     #{color.mix($neutral-950, $neutral-900, $method: oklab)}
   );
 
+  // The page ink, as an input of its own — the exact twin of --cirth-canvas
+  // above, and for the same reason. --cirth-color is the slot a component
+  // rebinds: a <button> sets it to the inverse ink its filled surface
+  // needs, a link sets it to the accent, an <input> to the field ink. Every
+  // one of those shadows the page role for the whole subtree, so anything
+  // that needs to mean *the page's ink* — a custom control built on
+  // <button>, a badge inside a link, a masked glyph that cannot use
+  // currentColor — needs a name components are not allowed to rebind.
+  // That is this one. --cirth-contrast is not it: that is maximum-contrast
+  // ink, the .contrast variant's role, not body ink.
+  --cirth-ink: light-dark(#{$neutral-750}, #{$neutral-200});
+
   // Text color
-  --cirth-color: light-dark(#{$neutral-750}, #{$neutral-200});
+  --cirth-color: var(--cirth-ink);
 
   // Text selection color
   --cirth-text-selection-color: light-dark(

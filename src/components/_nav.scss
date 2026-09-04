@@ -10,8 +10,25 @@
 
 // Prevent VoiceOver from ignoring list semantics in Safari (opinionated)
 
+// The zero-width space is the fix: `list-style: none` below is what makes
+// Safari drop the list out of the accessibility tree, and a generated
+// character puts it back. Taking that character *out of flow* is what
+// keeps it free, and `float` only does that in a block formatting context.
+
+// Floats are ignored on the children of a flex or grid container, but the
+// box is still generated — as a flex or grid *item*, before every real
+// one. Measured on a `nav li { display: grid; grid-template-columns: 1fr
+// auto }` holding a label and a button: the pseudo-element took the first
+// track, the label took the second, and the button wrapped onto a second
+// row at the inline start — the two children rendered out of order, on
+// separate rows, from correct markup.
+
+// `position: absolute` is out of flow under every display type, so the
+// character stays where assistive technology needs it and never becomes a
+// participant in the author's layout. Insets stay auto: the box lands at
+// its static position, and a zero-width space has nothing to paint there.
 #{$parent-selector} :where(nav li)::before {
-  float: left;
+  position: absolute;
   content: "\200B";
 }
 
@@ -260,17 +277,55 @@ $navbar-selector: "header:not(:is(article, aside, dialog, figure, li, nav, secti
 
 // Vertical Nav
 
-#{$parent-selector} aside {
-  nav,
+// `aside nav`, not `aside`. The trigger for a stacked nav is a nav inside
+// a complementary region, but the selector was reaching every list in the
+// <aside> — so a plain <ul> of related links in a sidebar had `display:
+// block` forced onto its items, which is not `list-item`: the markers
+// stopped being generated, and the list also picked up the nav's item
+// padding. A prose list in an aside is a prose list.
+
+#{$parent-selector} aside nav {
+  display: block;
+
   ol,
   ul,
   li {
     display: block;
   }
 
+  // A row pays its inline gutters forward and takes them back on the link:
+  // the list pulls out by one gutter, the item pushes in by one, and the
+  // link pulls out by one again, so a horizontal nav sits flush with its
+  // container. Stacked, those three insets stop cancelling. Measured in a
+  // 240px <aside>: the text landed correctly on the container's content
+  // edge, but the *painted* box — the hover fill, and the
+  // border-inline-start this block uses as the aria-current rail — ran
+  // from -8px to 248px. Eight pixels outside, on both edges.
+
+  // In the container this pattern actually exists for, a sticky sidebar
+  // with `overflow-y: auto`, that is not a cosmetic overhang: the rail is
+  // clipped away entirely and the framework's own current-page indicator
+  // is invisible exactly where a reader needs it most.
+
+  // A column has no row to cancel against. The gutters belong to the link,
+  // which is the full-width box being painted, and nothing else pulls.
+  ol,
+  ul {
+    &:first-of-type {
+      margin-inline-start: 0;
+    }
+
+    &:last-of-type {
+      margin-inline-end: 0;
+    }
+  }
+
   li {
-    padding: calc(var(--cirth-nav-element-spacing-vertical) * 0.5)
-      var(--cirth-nav-element-spacing-horizontal);
+    padding: calc(var(--cirth-nav-element-spacing-vertical) * 0.5) 0;
+
+    :where(a, [role="link"]) {
+      margin-inline: 0;
+    }
 
     a {
       display: block;

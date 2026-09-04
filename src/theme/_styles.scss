@@ -131,7 +131,7 @@
   // Its background aliases the card surface in the scheme mixins so the
   // relationship re-resolves inside forced-theme subtrees.
   --cirth-popover-border-color: var(--cirth-muted-border-color);
-  --cirth-popover-color: var(--cirth-color);
+  --cirth-popover-color: var(--cirth-ink);
   --cirth-popover-box-shadow: var(--cirth-box-shadow);
 
   // Wide enough for a panel or a menu, capped so a single long line cannot

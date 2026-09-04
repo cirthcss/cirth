@@ -29,6 +29,27 @@
 
 // ––––––––––––––––––––
 
+// Caption
+
+// The one part of a table that disagreed with the rest of it. `grep
+// caption src/` returned nothing, so a <caption> arrived with the user
+// agent's `text-align: center` above cells this framework deliberately
+// aligns to `start`, in body ink, with no space between it and the header
+// row it names.
+
+// It is worth finishing twice over: <caption> is the native way to give a
+// table an accessible name, and the one WCAG guidance prefers over a
+// heading outside the table. A framework claiming a verified WCAG 2.2 AA
+// baseline should make the element that baseline recommends pleasant to
+// use. Same three decisions content/_figure.scss already makes for
+// figcaption, which is the same problem one element over.
+
+#{$parent-selector} caption {
+  padding-block-end: calc(var(--cirth-spacing) * 0.5);
+  color: var(--cirth-muted-color);
+  text-align: start;
+}
+
 // Cells
 
 // Cells stay transparent so tables inherit the surface they sit on —

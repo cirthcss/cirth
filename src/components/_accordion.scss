@@ -35,8 +35,24 @@
     // Marker
     &::after {
       display: block;
-      width: var(--cirth-font-size-md);
-      height: var(--cirth-font-size-md);
+
+      // Sized in the summary's own type, and exactly one line box tall.
+
+      // A float aligns to the *top* of the line box it joins, so a marker
+      // shorter than the line sits high by half the difference: 16px of
+      // chevron in a 24px line put the glyph 4px above the optical centre
+      // of the first row, everywhere a disclosure appeared. At a larger
+      // body size the gap grew with the line — 10px at 24px type — because
+      // the box was pinned to the root scale (--cirth-font-size-md) while
+      // the line it had to centre in followed the element. `1lh` is that
+      // line, whatever the type scale or a local line-height says, and
+      // `1em` keeps the glyph proportional to the text it belongs to.
+
+      // summary[role="button"] used to carry this correction alone, which
+      // is why it was the only disclosure in the framework that landed
+      // right; the branch is gone now that the general rule is correct.
+      width: 1em;
+      height: 1lh;
       margin-inline-start: calc(
         var(--cirth-spacing, var(--cirth-space-4)) * 0.5
       );
@@ -59,7 +75,7 @@
       background-color: currentColor;
       mask-image: var(--cirth-icon-chevron);
       mask-position: right center;
-      mask-size: var(--cirth-font-size-md) auto;
+      mask-size: 1em auto;
       mask-repeat: no-repeat;
 
       @media (forced-colors: active) {
@@ -101,14 +117,6 @@
     &[role="button"] {
       width: 100%;
       text-align: start;
-
-      // Marker
-      &::after {
-        height: calc(
-          var(--cirth-font-size-md) *
-            var(--cirth-line-height, var(--cirth-line-height-normal))
-        );
-      }
     }
   }
 
@@ -222,12 +230,15 @@ $surface-details: "details";
   }
 }
 
+// RTL only has to move the float to the other edge. The old companion
+// declaration here was `background-position`, which never applied to a box
+// painted by a mask; and now that the marker box and the mask are both 1em
+// wide there is no slack for a mask-position to take up either way.
 [dir="rtl"] {
   #{$parent-selector} details {
     summary {
       &::after {
         float: left;
-        background-position: left center;
       }
     }
   }

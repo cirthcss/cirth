@@ -131,7 +131,7 @@
       $neutral-500,
       $alpha: 0.0375
     )};
-  --cirth-code-kbd-background-color: var(--cirth-color);
+  --cirth-code-kbd-background-color: var(--cirth-ink);
   --cirth-code-kbd-color: var(--cirth-background-color);
   --cirth-form-element-placeholder-color: #{$neutral-400};
   --cirth-form-element-active-border-color: var(--cirth-primary-border);
@@ -166,8 +166,8 @@
 
   // Accordion (<details>)
   --cirth-accordion-active-summary-color: var(--cirth-primary-hover);
-  --cirth-accordion-close-summary-color: var(--cirth-color);
-  --cirth-accordion-open-summary-color: var(--cirth-color);
+  --cirth-accordion-close-summary-color: var(--cirth-ink);
+  --cirth-accordion-open-summary-color: var(--cirth-ink);
   --cirth-card-border-color: color-mix(
     in oklab,
     var(--cirth-form-element-border-color) 46%,
@@ -177,7 +177,7 @@
   // Dropdown (details.dropdown)
   @if $enable-classes {
     --cirth-dropdown-box-shadow: var(--cirth-box-shadow);
-    --cirth-dropdown-color: var(--cirth-color);
+    --cirth-dropdown-color: var(--cirth-ink);
     --cirth-dropdown-border-color: var(--cirth-card-border-color);
     --cirth-dropdown-hover-background-color: var(
       --cirth-card-sectioning-background-color

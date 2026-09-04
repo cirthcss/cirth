@@ -26,13 +26,39 @@
   #{$parent-selector} .sr-only-focusable {
     &:focus,
     &:focus-within {
-      position: static;
+      // Note what is *not* here: `position: static`.
+
+      // Returning the element to normal flow is what made a skip link shove
+      // the entire document down by its own height the instant a keyboard
+      // reader pressed Tab — measured at +24px on the first element after
+      // it, on the very first interaction anyone has with the page. A
+      // layout jump on an accessibility affordance is a defect in the one
+      // control that exists to make the page easier to operate.
+
+      // Staying `absolute` (inherited from .sr-only) fixes it without
+      // deciding anything the page is entitled to decide. Insets stay auto,
+      // so the box lands at the static position it would have had, inside
+      // whatever positioned ancestor the author already has — this utility
+      // does not pin skip links to a viewport corner, and it is not only
+      // for skip links.
       width: auto;
       height: auto;
       margin: 0;
+      padding: var(--cirth-space-2) var(--cirth-space-4);
       overflow: visible;
       clip-path: none;
       white-space: normal;
+
+      // Out of flow means it is painted over whatever it lands on, so the
+      // utility has to bring a surface with it: text revealed on top of
+      // other text is not a successful reveal. The page's own canvas and
+      // ink — both roles no component can rebind, which is exactly why
+      // --cirth-ink exists — so this carries no colour of its own and
+      // follows a retheme. Above sticky chrome, below a modal.
+      z-index: var(--cirth-z-index-fixed);
+      border-radius: var(--cirth-border-radius);
+      background-color: var(--cirth-canvas);
+      color: var(--cirth-ink);
     }
   }
 }
