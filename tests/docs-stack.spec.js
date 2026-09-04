@@ -2003,3 +2003,575 @@ test("the disclosure example is the element the FAQ below is made of", async ({
 			),
 	).toEqual(["delivery", "faq"]);
 });
+
+// --- The boundary of a live example -------------------------------------
+
+// Every demo on this site is captioned "Authentic Cirth · shell overrides
+// declared in source", and the reading column around it used to make that
+// untrue in silence: `--cirth-line-height` and
+// `--cirth-typography-spacing-vertical` are inherited custom properties, so
+// the column's own rhythm crossed into every preview and re-timed every
+// example in it. Structure, colour, borders, radii and the type scale were
+// always right; the whole divergence was vertical rhythm, which is the one
+// thing a reader comparing a demo against their own page would not think to
+// doubt.
+test("a live example resolves the framework's own rhythm, not the reading column's", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/content/typography/`);
+
+	const readings = await page.evaluate(() => {
+		const read = (/** @type {Element} */ element, /** @type {string} */ name) =>
+			getComputedStyle(element).getPropertyValue(name).trim();
+		const root = document.documentElement;
+		const column = /** @type {HTMLElement} */ (
+			document.querySelector(".docs-content")
+		);
+		const preview = /** @type {HTMLElement} */ (
+			document.querySelector(".docs-demo-preview")
+		);
+		const names = ["--cirth-line-height", "--cirth-typography-spacing-vertical"];
+		return {
+			root: names.map((name) => read(root, name)),
+			column: names.map((name) => read(column, name)),
+			preview: names.map((name) => read(preview, name)),
+		};
+	});
+
+	// The column really is re-timed — this is not a test that passes because
+	// nothing was ever different.
+	expect(readings.column).not.toEqual(readings.root);
+	// And the preview hands both back.
+	expect(readings.preview).toEqual(readings.root);
+});
+
+// The same claim, made against the thing itself rather than against two
+// tokens: every element inside a preview renders exactly as it does on a
+// page that loads nothing but the compiled build.
+test("a demo renders the same as the same markup under cirth.css alone", async ({
+	page,
+}) => {
+	const fs = require("node:fs");
+	const path = require("node:path");
+	const root = path.join(__dirname, "..");
+	const build = fs.readFileSync(path.join(root, "dist/cirth.css"), "utf8");
+	const snippet = fs
+		.readFileSync(
+			path.join(root, "docs/src/content/demos/typography.html"),
+			"utf8",
+		)
+		.trim();
+
+	/** Every element in a subtree, positioned against its host's content box. */
+	const fingerprint = () => {
+		const host = /** @type {HTMLElement} */ (document.getElementById("probe"));
+		const style = getComputedStyle(host);
+		const box = host.getBoundingClientRect();
+		const originX =
+			box.left +
+			Number.parseFloat(style.paddingLeft) +
+			Number.parseFloat(style.borderLeftWidth);
+		const originY =
+			box.top +
+			Number.parseFloat(style.paddingTop) +
+			Number.parseFloat(style.borderTopWidth);
+		/** @type {string[]} */
+		const rows = [];
+		const last = host.lastElementChild;
+		const walk = (/** @type {Element} */ element) => {
+			const rect = element.getBoundingClientRect();
+			const own = getComputedStyle(element);
+			rows.push(
+				[
+					element.tagName,
+					(rect.left - originX).toFixed(2),
+					(rect.top - originY).toFixed(2),
+					rect.width.toFixed(2),
+					rect.height.toFixed(2),
+					own.marginTop,
+					// The frame closes the trailing margin of what it holds, the
+					// way the card contract does for <article>. It is the one
+					// shell declaration that reaches a node inside a preview, and
+					// it is asserted on its own below rather than folded in here.
+					element === last ? "(container contract)" : own.marginBottom,
+					own.lineHeight,
+					own.fontSize,
+					own.paddingTop,
+					own.borderTopWidth,
+					own.color,
+					own.backgroundColor,
+					own.borderRadius,
+				].join("|"),
+			);
+			for (const child of element.children) walk(child);
+		};
+		for (const child of host.children) walk(child);
+		return rows;
+	};
+
+	await page.goto(`${origin}/content/typography/`);
+	const width = await page.evaluate(
+		({ snippet }) => {
+			const content = /** @type {HTMLElement} */ (
+				document.querySelector(".docs-content")
+			);
+			content.innerHTML = `<figure class="docs-demo"><div class="docs-demo-preview" id="probe">${snippet}</div></figure>`;
+			const probe = /** @type {HTMLElement} */ (
+				document.getElementById("probe")
+			);
+			const style = getComputedStyle(probe);
+			return (
+				probe.getBoundingClientRect().width -
+				Number.parseFloat(style.paddingLeft) -
+				Number.parseFloat(style.paddingRight)
+			);
+		},
+		{ snippet },
+	);
+	const inDocs = await page.evaluate(fingerprint);
+
+	// The same markup, at the same content width, with nothing but the build.
+	await page.setContent(
+		`<!doctype html><style>${build}</style><body style="margin: 0"><div id="probe" style="width: ${width}px">${snippet}</div></body>`,
+	);
+	const bare = await page.evaluate(fingerprint);
+
+	expect(inDocs.length).toBeGreaterThan(4);
+	// Every node, every property: identical.
+	expect(inDocs).toEqual(bare);
+
+	// And the one exception, stated rather than hidden: the frame closes the
+	// trailing margin of its last child, which is what a padded container
+	// owes its contents and what the card contract already does for
+	// <article>. It is a property of the frame, not a restyle of the
+	// example's type.
+	await page.goto(`${origin}/content/typography/`);
+	const trailing = await page.evaluate(() => {
+		const host = /** @type {HTMLElement} */ (
+			document.querySelector(".docs-demo-preview")
+		);
+		return getComputedStyle(
+			/** @type {Element} */ (host.lastElementChild),
+		).marginBottom;
+	});
+	expect(trailing).toBe("0px");
+});
+
+// The documentation's chapter separators are the documentation's. As
+// descendant selectors they reached headings inside live examples: an <h2>
+// in the classless demo on /get-started/ took a 1px rule and 12px of
+// padding, and three <h3>s took 32px of editorial margin.
+test("no shell chapter rule or margin lands on a heading inside a live example", async ({
+	page,
+}) => {
+	for (const url of [
+		"/get-started/",
+		"/examples/",
+		"/layout/landmarks/",
+		"/colors/",
+	]) {
+		await page.goto(`${origin}${url}`);
+		const headings = await page.evaluate(() =>
+			[...document.querySelectorAll(".docs-demo-preview :is(h1,h2,h3,h4,h5,h6)")].map(
+				(heading) => {
+					const style = getComputedStyle(heading);
+					return {
+						tag: heading.tagName,
+						text: (heading.textContent ?? "").trim().slice(0, 24),
+						borderBlockStart: style.borderBlockStartWidth,
+						paddingBlockStart: style.paddingBlockStart,
+						marginBlockStart: style.marginBlockStart,
+					};
+				},
+			),
+		);
+		for (const heading of headings) {
+			expect(heading.borderBlockStart, `${url} ${heading.text}`).toBe("0px");
+			expect(heading.paddingBlockStart, `${url} ${heading.text}`).toBe("0px");
+			// The shell's h3 step is 2rem; the framework's own values for a
+			// heading in a specimen are 0 or its typography-spacing-top.
+			expect(
+				Number.parseFloat(heading.marginBlockStart),
+				`${url} ${heading.text}`,
+			).not.toBe(32);
+		}
+	}
+});
+
+// A <pre> inside a preview is the example, and the copy affordance is
+// chrome: the shell's positioning context, its fade and its injected button
+// used to be painted onto the one demo on the site that renders a code
+// block. The disclosure under that demo keeps its button, because that
+// listing is the shell's.
+test("the shell's code-block chrome stops at the edge of a live example", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/content/code/`);
+
+	const inside = await page.evaluate(() => {
+		const block = /** @type {HTMLElement} */ (
+			document.querySelector(".docs-demo-preview pre")
+		);
+		const style = getComputedStyle(block);
+		return {
+			position: style.position,
+			backgroundImage: style.backgroundImage,
+			buttons: block.querySelectorAll("button.copy").length,
+		};
+	});
+	expect(inside.position).toBe("static");
+	expect(inside.backgroundImage).toBe("none");
+	expect(inside.buttons).toBe(0);
+
+	// And the shell's own listing still has all three.
+	const shellBlock = await page.evaluate(() => {
+		const block = /** @type {HTMLElement} */ (
+			document.querySelector("details.docs-demo-source pre")
+		);
+		const style = getComputedStyle(block);
+		return {
+			position: style.position,
+			buttons: block.querySelectorAll("button.copy").length,
+		};
+	});
+	expect(shellBlock.position).toBe("relative");
+	expect(shellBlock.buttons).toBe(1);
+});
+
+// --- The shell consumes the library's own contracts ---------------------
+
+// Three stacked navs outside an <aside>, each with its own layout, all
+// released from the bar idiom by the one public token rather than by
+// undoing three framework insets by hand.
+test("every stacked nav in the shell paints inside its own container", async ({
+	page,
+}) => {
+	/**
+	 * @param {string} label
+	 * @param {string} container
+	 * @param {string} links
+	 */
+	const assertContained = async (label, container, links) => {
+		const geometry = await page.evaluate(
+			({ container, links }) => {
+				const host = /** @type {HTMLElement} */ (
+					document.querySelector(container)
+				);
+				const style = getComputedStyle(host);
+				const box = host.getBoundingClientRect();
+				const inner = {
+					start:
+						box.left +
+						Number.parseFloat(style.paddingLeft) +
+						Number.parseFloat(style.borderLeftWidth),
+					end:
+						box.right -
+						Number.parseFloat(style.paddingRight) -
+						Number.parseFloat(style.borderRightWidth),
+				};
+				const boxes = [...document.querySelectorAll(links)].map((link) => {
+					const rect = link.getBoundingClientRect();
+					return { left: rect.left, right: rect.right };
+				});
+				return { inner, boxes, gutter: style.getPropertyValue("--cirth-nav-element-spacing-horizontal").trim() };
+			},
+			{ container, links },
+		);
+
+		expect(geometry.boxes.length, `${label}: no links found`).toBeGreaterThan(0);
+		// Released through the token, not by undoing the framework by hand.
+		expect(geometry.gutter, `${label}: gutter not released`).toBe("0");
+		for (const box of geometry.boxes) {
+			expect(box.left, `${label}: a link paints before the container`).toBeGreaterThanOrEqual(
+				geometry.inner.start - 0.5,
+			);
+			expect(box.right, `${label}: a link paints past the container`).toBeLessThanOrEqual(
+				geometry.inner.end + 0.5,
+			);
+		}
+	};
+
+	await page.setViewportSize({ width: 1024, height: 900 });
+	await page.goto(`${origin}/components/nav/`);
+	await page.evaluate(() =>
+		document.querySelector(".docs-toc-top")?.setAttribute("open", ""),
+	);
+	await assertContained(
+		"page outline",
+		".docs-toc-top > nav",
+		".docs-toc-top nav a",
+	);
+
+	await page.setViewportSize({ width: 900, height: 900 });
+	await page.evaluate(() =>
+		document.querySelector(".docs-mobile-nav")?.setAttribute("open", ""),
+	);
+	await assertContained(
+		"mobile documentation menu",
+		".docs-mobile-nav > nav",
+		".docs-mobile-nav nav a",
+	);
+
+	await page.setViewportSize({ width: 390, height: 844 });
+	await page.evaluate(() => {
+		const toggle = /** @type {HTMLElement} */ (
+			document.querySelector(".docs-menu-toggle")
+		);
+		toggle.click();
+	});
+	await page.waitForTimeout(300);
+	await assertContained(
+		"drawer",
+		".docs-drawer > article > nav",
+		".docs-drawer > article > nav a",
+	);
+});
+
+// The sidebar still gets the same containment from <aside> alone, and its
+// aria-current rail is still a visible edge rather than one clipped off the
+// side of a scrolling column.
+test("the sidebar rail is a visible edge inside its aside", async ({ page }) => {
+	await page.setViewportSize({ width: 1440, height: 900 });
+	await page.goto(`${origin}/components/nav/`);
+
+	const current = await page.evaluate(() => {
+		const rail = /** @type {HTMLElement} */ (
+			document.querySelector(".docs-sidebar nav a[aria-current='page']")
+		);
+		const aside = /** @type {HTMLElement} */ (
+			document.querySelector(".docs-sidebar")
+		);
+		const style = getComputedStyle(rail);
+		const asideStyle = getComputedStyle(aside);
+		const asideBox = aside.getBoundingClientRect();
+		const box = rail.getBoundingClientRect();
+		return {
+			left: box.left,
+			innerStart:
+				asideBox.left +
+				Number.parseFloat(asideStyle.paddingLeft) +
+				Number.parseFloat(asideStyle.borderLeftWidth),
+			width: Number.parseFloat(style.borderInlineStartWidth),
+			color: style.borderInlineStartColor,
+		};
+	});
+
+	expect(current.left).toBeGreaterThanOrEqual(current.innerStart - 0.5);
+	expect(current.width).toBeGreaterThan(0);
+	expect(current.color).not.toBe("rgba(0, 0, 0, 0)");
+});
+
+// The flush card, dogfooded. The hero's Source panel and both overlay
+// panels are <article>s with the card's knobs moved, not hand-restated card
+// contracts — so the frame, the radius, the surface and the header's bleed
+// to the card's edges all arrive from components/_card.scss.
+test("the shell's flush panels are cards with their knobs moved", async ({
+	page,
+}) => {
+	/** @param {string} selector */
+	const readPanel = (selector) =>
+		page.evaluate((selector) => {
+			const panel = /** @type {HTMLElement} */ (
+				document.querySelector(selector)
+			);
+			const style = getComputedStyle(panel);
+			const header = /** @type {HTMLElement} */ (
+				panel.querySelector(":scope > header")
+			);
+			const headerBox = header.getBoundingClientRect();
+			const panelBox = panel.getBoundingClientRect();
+			return {
+				tag: panel.tagName,
+				horizontal: style.getPropertyValue("--cirth-block-spacing-horizontal").trim(),
+				vertical: style.getPropertyValue("--cirth-block-spacing-vertical").trim(),
+				padding: style.padding,
+				// The band bleeds to the frame, landing on the border and no
+				// further: the trap the Card page documents is a header hanging
+				// 19px outside because the *token* still read 1.25rem.
+				headerInset: headerBox.left - panelBox.left,
+				headerRule: getComputedStyle(header).borderBlockEndWidth,
+			};
+		}, selector);
+
+	await page.setViewportSize({ width: 1440, height: 900 });
+	await page.goto(`${origin}/`);
+	const source = await readPanel(".docs-source-panel");
+	expect(source.tag).toBe("ARTICLE");
+	expect(source.horizontal).toBe("0");
+	expect(source.vertical).toBe("0");
+	expect(source.padding).toBe("0px");
+	expect(source.headerInset).toBeCloseTo(1, 1);
+	expect(source.headerRule).toBe("1px");
+
+	await page.goto(`${origin}/components/nav/`);
+	await page.evaluate(() => {
+		const trigger = /** @type {HTMLElement} */ (
+			document.querySelector(".docs-search-trigger")
+		);
+		trigger.click();
+	});
+	await page.waitForTimeout(400);
+	const search = await readPanel(".docs-search-dialog > article");
+	expect(search.horizontal).toBe("0");
+	expect(search.vertical).toBe("0");
+	expect(search.padding).toBe("0px");
+	expect(search.headerInset).toBeCloseTo(1, 1);
+});
+
+// A metrics panel is `.grid` plus a <dl>, which is what the framework tells
+// everyone else to do — and the panel's cells are divided by the grid gap
+// with the container's colour showing through, which holds at any column
+// count without a :nth-child ladder to restate in a media query.
+test("the metrics panels are gridded description lists divided by their gap", async ({
+	page,
+}) => {
+	/**
+	 * @param {string} url
+	 * @param {string} selector
+	 */
+	const readPanel = async (url, selector) => {
+		await page.goto(`${origin}${url}`);
+		return page.evaluate((selector) => {
+			const panel = /** @type {HTMLElement} */ (
+				document.querySelector(selector)
+			);
+			const style = getComputedStyle(panel);
+			const cells = [...panel.children].map((cell) => {
+				const cellStyle = getComputedStyle(cell);
+				return {
+					tag: cell.tagName,
+					background: cellStyle.backgroundColor,
+					borders: [
+						cellStyle.borderTopWidth,
+						cellStyle.borderRightWidth,
+						cellStyle.borderBottomWidth,
+						cellStyle.borderLeftWidth,
+					].join(" "),
+					pairs: cell.querySelectorAll("dt, dd").length,
+				};
+			});
+			return {
+				tag: panel.tagName,
+				classes: panel.className,
+				display: style.display,
+				gap: style.gap,
+				// The stroke this shell draws its frames with, read off a frame
+				// rather than off a token, so the two are compared as rendered.
+				strokeWidth: Number.parseFloat(
+					getComputedStyle(
+						/** @type {HTMLElement} */ (
+							panel.closest(".docs-proof-strip, .docs-brand-spec") ??
+								document.documentElement
+						),
+					).borderTopWidth,
+				) || 1,
+				background: style.backgroundColor,
+				cells,
+			};
+		}, selector);
+	};
+
+	for (const [url, selector] of [
+		["/", ".docs-proof-metrics"],
+		["/brand/", ".docs-brand-measures"],
+		["/about/", ".docs-proof-strip dl"],
+	]) {
+		const panel = await readPanel(url, selector);
+		expect(panel.tag, selector).toBe("DL");
+		expect(panel.classes.split(/\s+/), selector).toContain("grid");
+		expect(panel.display, selector).toBe("grid");
+		// The gap is the divider: one stroke, the same on both axes.
+		const gaps = new Set(panel.gap.split(" "));
+		expect(gaps.size, selector).toBe(1);
+		expect(Number.parseFloat([...gaps][0]), selector).toBeCloseTo(
+			panel.strokeWidth,
+			1,
+		);
+		// Which only draws a line because the container paints under it.
+		expect(panel.background, selector).not.toBe("rgba(0, 0, 0, 0)");
+		expect(panel.cells.length, selector).toBeGreaterThan(2);
+		for (const cell of panel.cells) {
+			expect(cell.tag, selector).toBe("DIV");
+			// No cell draws its own divider, at any position in the grid.
+			expect(cell.borders, selector).toBe("0px 0px 0px 0px");
+			expect(cell.background, selector).not.toBe("rgba(0, 0, 0, 0)");
+			expect(cell.pairs, selector).toBeGreaterThan(1);
+		}
+	}
+});
+
+// The divider grid holds when the column count changes, which is the whole
+// point of spending it through the gap: the ladder it replaced had to be
+// re-derived by hand in a media query, and got it wrong in one direction.
+test("a divider grid keeps one stroke at every column count", async ({
+	page,
+}) => {
+	for (const width of [1440, 900, 640, 390]) {
+		await page.setViewportSize({ width, height: 900 });
+		await page.goto(`${origin}/about/`);
+		const reading = await page.evaluate(() => {
+			const panel = /** @type {HTMLElement} */ (
+				document.querySelector(".docs-proof-strip dl")
+			);
+			const plate = /** @type {HTMLElement} */ (
+				document.querySelector(".docs-proof-strip")
+			);
+			return {
+				columns: getComputedStyle(panel).gridTemplateColumns.split(" ").length,
+				divider: getComputedStyle(panel).backgroundColor,
+				frame: getComputedStyle(plate).borderTopColor,
+				cellBorders: [...panel.children].map((cell) =>
+					[
+						getComputedStyle(cell).borderTopWidth,
+						getComputedStyle(cell).borderRightWidth,
+						getComputedStyle(cell).borderBottomWidth,
+						getComputedStyle(cell).borderLeftWidth,
+					].join(" "),
+				),
+			};
+		});
+		// One stroke: the divider between cells is the frame around them.
+		expect(reading.divider, `at ${width}px`).toBe(reading.frame);
+		for (const borders of reading.cellBorders) {
+			expect(borders, `at ${width}px`).toBe("0px 0px 0px 0px");
+		}
+	}
+});
+
+// Shell chrome that is ordinary Cirth UI follows the knob a preset moves.
+// The stage a live example stands on is one: under `playroom` the example
+// re-times and the frame around it used to stay pinned.
+test("the demo stage follows the preset's spacing knob", async ({ page }) => {
+	const stagePadding = async (/** @type {string} */ preset) => {
+		await page.context().addInitScript((value) => {
+			sessionStorage.setItem("cirth-preset", value);
+		}, preset);
+		await page.goto(`${origin}/components/card/`);
+		await page.waitForFunction((name) => {
+			const select = document.querySelector("[data-cirth-preset-select]");
+			const link = document.getElementById("cirth-preset-stylesheet");
+			if (!(select instanceof HTMLSelectElement)) return false;
+			if (name === "amber") return link === null;
+			return link instanceof HTMLLinkElement && Boolean(link.sheet);
+		}, preset);
+		return page.evaluate(() => {
+			const stage = /** @type {HTMLElement} */ (
+				document.querySelector(".docs-demo-preview")
+			);
+			return {
+				padding: Number.parseFloat(getComputedStyle(stage).paddingLeft),
+				spacing: getComputedStyle(document.documentElement)
+					.getPropertyValue("--cirth-spacing")
+					.trim(),
+			};
+		});
+	};
+
+	const base = await stagePadding("amber");
+	const roomier = await stagePadding("playroom");
+
+	// The preset really does move the knob…
+	expect(roomier.spacing).not.toBe(base.spacing);
+	// …and the stage moves with it.
+	expect(roomier.padding).toBeGreaterThan(base.padding);
+});

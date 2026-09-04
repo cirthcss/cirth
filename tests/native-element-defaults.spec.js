@@ -209,6 +209,205 @@ for (const [name, css] of builds) {
 	});
 }
 
+// The same containment, in the three places a stacked nav actually lives
+// outside an <aside>: a drawer (<dialog>), a disclosure (<details>), and a
+// plain container. There is no ancestor the framework could key on — a
+// <dialog> can hold a horizontal tab bar and a <details> can hold anything
+// — so the contract is the gutter token, and it is the whole contract:
+// name it zero and all three of the bar's inline insets collapse together.
+for (const [name, css] of builds) {
+	for (const [shape, markup] of [
+		[
+			"drawer",
+			`<dialog open><article id="panel" style="inline-size: 320px">
+				<header>Menu</header>
+				<nav aria-label="Site" style="--cirth-nav-element-spacing-horizontal: 0; display: block; overflow: hidden">
+					<ul>
+						<li><a id="current" href="#a" aria-current="page">Docs</a></li>
+						<li><a id="other" href="#b">Examples</a></li>
+					</ul>
+				</nav>
+			</article></dialog>`,
+		],
+		[
+			"disclosure",
+			`<div style="inline-size: 320px"><details open id="panel">
+				<summary>Browse</summary>
+				<nav aria-label="Site" style="--cirth-nav-element-spacing-horizontal: 0; display: block; overflow: hidden">
+					<ul>
+						<li><a id="current" href="#a" aria-current="page">Docs</a></li>
+						<li><a id="other" href="#b">Examples</a></li>
+					</ul>
+				</nav>
+			</details></div>`,
+		],
+		[
+			"plain container",
+			`<div id="panel" style="inline-size: 320px; overflow: hidden">
+				<nav aria-label="Site" style="--cirth-nav-element-spacing-horizontal: 0; display: block">
+					<ul>
+						<li><a id="current" href="#a" aria-current="page">Docs</a></li>
+						<li><a id="other" href="#b">Examples</a></li>
+					</ul>
+				</nav>
+			</div>`,
+		],
+	]) {
+		test(`${name}: a stacked nav in a ${shape} paints inside its container`, async ({
+			page,
+		}) => {
+			await render(page, css, markup);
+
+			const geometry = await page.evaluate(() => {
+				const nav = /** @type {HTMLElement} */ (
+					document.querySelector("#panel nav")
+				);
+				const style = getComputedStyle(nav);
+				const box = nav.getBoundingClientRect();
+				const inner = {
+					start:
+						box.left +
+						Number.parseFloat(style.paddingLeft) +
+						Number.parseFloat(style.borderLeftWidth),
+					end:
+						box.right -
+						Number.parseFloat(style.paddingRight) -
+						Number.parseFloat(style.borderRightWidth),
+				};
+				const links = ["current", "other"].map((id) => {
+					const link = /** @type {HTMLElement} */ (
+						document.getElementById(id)
+					);
+					const rect = link.getBoundingClientRect();
+					const linkStyle = getComputedStyle(link);
+					return {
+						id,
+						left: rect.left,
+						right: rect.right,
+						railWidth: Number.parseFloat(linkStyle.borderInlineStartWidth),
+						railColor: linkStyle.borderInlineStartColor,
+					};
+				});
+				return { inner, links };
+			});
+
+			for (const link of geometry.links) {
+				expect(
+					link.left,
+					`${link.id}: painted box starts outside the panel`,
+				).toBeGreaterThanOrEqual(geometry.inner.start - 0.5);
+				expect(
+					link.right,
+					`${link.id}: painted box ends outside the panel`,
+				).toBeLessThanOrEqual(geometry.inner.end + 0.5);
+			}
+		});
+	}
+}
+
+// `0` is what an author writes, and a custom property is substituted at
+// computed-value time — so the gutter has to survive arriving without a
+// unit. Written into the `margin` shorthand it did not: `calc(0 * -1)` is a
+// <number> where a <length> is required, which invalidates the whole
+// declaration and takes the *block* margin with it, adding one link-gutter
+// of height to every row in the stack. Split across the two axes, the
+// inline half falls back to its own initial value and the block rhythm is
+// untouched.
+for (const [name, css] of builds) {
+	test(`${name}: releasing the nav gutter keeps the link's block rhythm, unit or not`, async ({
+		page,
+	}) => {
+		await render(
+			page,
+			css,
+			["0", "0px", "0rem"]
+				.map(
+					(zero, index) =>
+						`<div id="panel-${index}" style="inline-size: 280px; overflow: hidden">
+							<nav aria-label="Section ${index}" style="--cirth-nav-element-spacing-horizontal: ${zero}; display: block">
+								<ul><li><a href="#a" aria-current="page">Overview</a></li></ul>
+							</nav>
+						</div>`,
+				)
+				.join("") +
+				`<div id="bar" style="inline-size: 280px">
+					<nav aria-label="Bar"><ul><li><a href="#a">Overview</a></li></ul></nav>
+				</div>`,
+		);
+
+		const readings = await page.evaluate(() =>
+			["panel-0", "panel-1", "panel-2", "bar"].map((id) => {
+				const host = /** @type {HTMLElement} */ (document.getElementById(id));
+				const link = /** @type {HTMLElement} */ (host.querySelector("a"));
+				const style = getComputedStyle(link);
+				return {
+					id,
+					marginBlockStart: style.marginBlockStart,
+					marginInlineStart: style.marginInlineStart,
+					overhang:
+						host.getBoundingClientRect().left -
+						link.getBoundingClientRect().left,
+				};
+			}),
+		);
+
+		const bar = /** @type {(typeof readings)[number]} */ (readings.at(-1));
+		for (const reading of readings.slice(0, -1)) {
+			// The block rhythm is the bar's, whatever unit the zero arrived in.
+			expect(reading.marginBlockStart, reading.id).toBe(bar.marginBlockStart);
+			// And the inline bleed is gone.
+			expect(reading.marginInlineStart, reading.id).toBe("0px");
+			expect(reading.overhang, reading.id).toBeCloseTo(0, 1);
+		}
+		// The control: an untouched bar still bleeds by its gutter.
+		expect(bar.overhang).toBeGreaterThan(0);
+	});
+}
+
+// The inline pull is the item's gutter negated, not the link's own. Keyed to
+// the link gutter — which it was, invisibly, because the two carry the same
+// 8px by default — re-timing either token broke a plain horizontal bar: the
+// first link's painted box started outside a list pulled out by less, and
+// adjacent links overlapped by the difference.
+for (const [name, css] of builds) {
+	test(`${name}: a re-timed nav link gutter still tiles inside the container`, async ({
+		page,
+	}) => {
+		await render(
+			page,
+			css,
+			`<div id="bar" style="inline-size: 640px; --cirth-nav-link-spacing-horizontal: 1rem">
+				<nav aria-label="Site">
+					<ul>
+						<li><a id="one" href="#a">One</a></li>
+						<li><a id="two" href="#b">Two</a></li>
+					</ul>
+				</nav>
+			</div>`,
+		);
+
+		const geometry = await page.evaluate(() => {
+			const list = /** @type {HTMLElement} */ (
+				document.querySelector("#bar nav ul")
+			);
+			const rect = (/** @type {string} */ id) =>
+				/** @type {HTMLElement} */ (
+					document.getElementById(id)
+				).getBoundingClientRect();
+			return {
+				listLeft: list.getBoundingClientRect().left,
+				one: { left: rect("one").left, right: rect("one").right },
+				two: { left: rect("two").left, right: rect("two").right },
+			};
+		});
+
+		// The first link's box reaches the list's own edge and no further.
+		expect(geometry.one.left).toBeCloseTo(geometry.listLeft, 1);
+		// Adjacent links tile: they touch, and they do not overlap.
+		expect(geometry.two.left).toBeCloseTo(geometry.one.right, 1);
+	});
+}
+
 // --- 3. The page roles are not shadowable -------------------------------
 
 // --cirth-color is the slot a component rebinds: a <button> sets it to the
