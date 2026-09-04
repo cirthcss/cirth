@@ -19,7 +19,7 @@ integrations, and anywhere else the project is named.
     <a href="/specimen/plain/">the plain one</a> — same six measurements,
     different pigment.</p>
   </header>
-  <dl class="docs-brand-measures">
+  <dl class="grid docs-brand-measures">
     <div><dt>Container corner</dt><dd><code>9px</code> · <code>--cirth-card-border-radius</code></dd></div>
     <div><dt>Control corner</dt><dd><code>6px</code> · <code>--cirth-border-radius</code></dd></div>
     <div><dt>Resting edge</dt><dd><code>1px</code>, all four sides, every button variant</dd></div>
@@ -80,7 +80,7 @@ work, and why they are a guard rather than a promise.
       <figcaption><strong>Low fidelity</strong><span>Four-part optical mark · 16–23px</span></figcaption>
     </figure>
   </div>
-  <dl class="docs-brand-measures">
+  <dl class="grid docs-brand-measures">
     <div><dt>Base unit</dt><dd><code>8px</code></dd></div>
     <div><dt>Micro unit</dt><dd><code>4px</code></dd></div>
     <div><dt>Primary joint</dt><dd><code>45°</code></dd></div>

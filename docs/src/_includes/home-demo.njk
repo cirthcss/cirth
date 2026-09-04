@@ -26,12 +26,22 @@
     cannot say, which is that the framed document is a separate document
     and has to be told which colour scheme the page is in. -#}
 <div class="docs-lab-stage">
-	<section class="docs-plate docs-code-plate docs-source-panel" aria-labelledby="source-label">
+	{#- An <article>, not a <section class="docs-plate">. This panel is the
+	    thing the Card page documents under "A flush card": a self-contained
+	    composition whose frame, radius, surface, and the hairline under its
+	    title band all come from the card contract, with the two block-spacing
+	    tokens zeroed so the band bleeds to the edges and each cell carries
+	    its own padding. The five declarations the shell used to restate here
+	    — border, radius, background, shadow, clip — were the card's own
+	    values written out by hand on the most visible surface of a site whose
+	    argument is that you do not have to. The tokens are on the element
+	    because that is the API: the knob is the token, never the padding. -#}
+	<article class="docs-code-plate docs-source-panel" aria-labelledby="source-label">
 		<header>
 			<span id="source-label">Source</span>
 		</header>
 		<pre tabindex="0"><code class="hljs language-html" data-lab-source>{{ labSources.default | highlight | safe }}</code></pre>
-	</section>
+	</article>
 
 	{#- The output is not in a panel. It used to be a second .docs-plate
 	    with its own "Output" title band, which put the shell's frame

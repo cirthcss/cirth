@@ -484,12 +484,12 @@ module.exports = (eleventyConfig) => {
   <figure data-theme="light">
     <figcaption><strong>Light / warm paper</strong><code>data-theme="light"</code></figcaption>
     <div class="docs-theme-sample"><article><small>Verified state</small><h3>Semantic surface</h3><p>Canvas, card, text, border and amber signal are live theme roles.</p><button type="button">Primary action</button></article></div>
-    <dl><div><dt>Canvas</dt><dd><i style="background:var(--cirth-background-color)"></i><code>--cirth-background-color</code></dd></div><div><dt>Signal</dt><dd><i style="background:var(--cirth-primary)"></i><code>--cirth-primary</code></dd></div></dl>
+    <dl class="grid"><div><dt>Canvas</dt><dd><i style="background:var(--cirth-background-color)"></i><code>--cirth-background-color</code></dd></div><div><dt>Signal</dt><dd><i style="background:var(--cirth-primary)"></i><code>--cirth-primary</code></dd></div></dl>
   </figure>
   <figure data-theme="dark">
     <figcaption><strong>Dark / graphite</strong><code>data-theme="dark"</code></figcaption>
     <div class="docs-theme-sample"><article><small>Verified state</small><h3>Semantic surface</h3><p>Dark roles are designed values, not a mathematical inversion.</p><button type="button">Primary action</button></article></div>
-    <dl><div><dt>Canvas</dt><dd><i style="background:var(--cirth-background-color)"></i><code>--cirth-background-color</code></dd></div><div><dt>Signal</dt><dd><i style="background:var(--cirth-primary)"></i><code>--cirth-primary</code></dd></div></dl>
+    <dl class="grid"><div><dt>Canvas</dt><dd><i style="background:var(--cirth-background-color)"></i><code>--cirth-background-color</code></dd></div><div><dt>Signal</dt><dd><i style="background:var(--cirth-primary)"></i><code>--cirth-primary</code></dd></div></dl>
   </figure>
 </section>`;
 	});

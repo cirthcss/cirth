@@ -82,7 +82,13 @@
 				});
 			};
 
+			// Every code block the shell owns, and no others: a <pre> inside a
+			// live example is the example. Injecting a control into it would
+			// put a <button> in the reader's specimen that Cirth never ships,
+			// and the caption on every demo says the opposite. The disclosure
+			// under the demo keeps its button — that listing is the shell's.
 			for (const pre of document.querySelectorAll("pre")) {
+				if (pre.closest(".docs-demo-preview")) continue;
 				if (pre.querySelector(":scope > button.copy")) continue;
 				const code = pre.querySelector("code");
 				if (!code?.textContent) continue;

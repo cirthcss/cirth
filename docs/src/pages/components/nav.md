@@ -109,6 +109,40 @@ Two things follow from the trigger being `<aside>` rather than a class:
 * A plain `<ul>` of links inside an `<aside>` is still a plain list, with its
   markers. Only the `<nav>` becomes navigation.
 
+### A stacked nav that is not in an `<aside>`
+
+A drawer, an offcanvas menu, a disclosure, a footer column: a navigation
+that is a column but is not in a complementary region. Those are yours to
+lay out — a drawer is a block, a menu sheet may be a grid, and the framework
+has no way to guess which. What it does hand you is the one thing you would
+otherwise have to undo:
+
+```css
+.drawer nav {
+  --cirth-nav-element-spacing-horizontal: 0;
+
+  display: block; /* or grid, or whatever the panel wants */
+}
+```
+
+`--cirth-nav-element-spacing-horizontal` is the inline gutter, and a bar
+spends it three times: the list pulls out by one, the item pushes in by one,
+and the link pulls out by one, so the row sits flush with its container.
+Stacked, those three insets stop cancelling and the painted box — the hover
+fill, and the `border-inline-start` that carries `aria-current` — runs one
+gutter outside the container on *both* edges. In a panel with
+`overflow: hidden`, which most drawers have, that clips the current-page
+marker away entirely.
+
+Naming the gutter zero collapses all three at once, because all three read
+that one token. It is not a mode and not a class: a stacked nav is a nav
+with no inline gutter, and this says so. Everything else about the nav —
+its ink, its states, its `aria-current` treatment — is unchanged.
+
+There is no `.stack` or `.vertical` class, and no ARIA hook:
+`aria-orientation` is not a supported property on `role="navigation"`, and a
+styling hook is not a reason to write invalid ARIA.
+
 ## Behavior
 
 * Two lists inside one `nav` are pushed to opposite ends
@@ -123,9 +157,12 @@ Two things follow from the trigger being `<aside>` rather than a class:
   the clickable/hover area is slightly larger than the visible text.
 * In a bar, those two cancel: the list pulls out by one gutter, the item
   pushes in, and the link pulls out again, so the row sits flush with its
-  container. Stacked in an `<aside>` there is no row to cancel against, so
-  the gutters belong to the link alone and the painted box stays inside the
-  container.
+  container. All three insets are
+  `--cirth-nav-element-spacing-horizontal` — including the link's negative
+  margin, which cancels the item's padding rather than mirroring its own.
+  Stacked in an `<aside>` there is no row to cancel against, so the aside
+  names that gutter zero and the painted box stays inside the container.
+  Anywhere else, you name it zero yourself (above).
 * Buttons, `[role="button"]`, and form controls placed inside a nav `li`
   adapt their padding to match the nav's link rhythm instead of their usual
   button/form spacing.
