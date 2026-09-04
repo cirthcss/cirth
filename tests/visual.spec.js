@@ -38,6 +38,7 @@ const visualPages = [
 	"components/progress/index.html",
 	"content/button/index.html",
 	"content/code/index.html",
+	"content/description-list/index.html",
 	"content/embedded/index.html",
 	"content/figure/index.html",
 	"content/link/index.html",

@@ -231,7 +231,14 @@ test("homepage keeps the source and authentic output comparison focused on mobil
 			justifyContent: getComputedStyle(element).justifyContent,
 			textAlign: getComputedStyle(element).textAlign,
 		}));
-	expect(actionAlignment.justifyContent).toBe("flex-start");
+	// The contract is that the actions start flush with the column, not that
+	// a particular keyword is written down. `justify-content` used to be
+	// declared `flex-start` explicitly and was removed as redundant: on a row
+	// flex container the initial `normal` behaves as `stretch`, which for
+	// justify-content behaves as `flex-start`. Both spellings are accepted so
+	// the assertion survives that, and the geometry below is what actually
+	// pins the alignment.
+	expect(["flex-start", "normal"]).toContain(actionAlignment.justifyContent);
 	expect(actionAlignment.textAlign).toBe("start");
 	expect(actionAlignment.firstActionX).toBeCloseTo(
 		actionAlignment.containerX,
@@ -1723,15 +1730,21 @@ test("the theme demo's control keeps the band's ink in every state", async ({
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
 	const toggle = page.locator("[data-docs-theme-toggle]");
-	// The band's own two inks, read off the band rather than restated here.
+	// The framework's own page roles, read off the band rather than
+	// restated here. The shell used to capture all three into --docs-band-*
+	// aliases, because a <button> rebinds --cirth-color and a control
+	// reaching for it inside itself got the button's inverse ink. The
+	// library now names the page roles separately — --cirth-ink and
+	// --cirth-canvas, neither of which a component may rebind — so the
+	// control reads them directly and there is no alias left to drift.
 	const band = await page
 		.locator(".docs-theme-showcase .docs-stage-band")
 		.evaluate((element) => {
 			const style = getComputedStyle(element);
 			return {
-				ink: style.getPropertyValue("--docs-band-color").trim(),
-				muted: style.getPropertyValue("--docs-band-muted").trim(),
-				surface: style.getPropertyValue("--docs-band-surface").trim(),
+				ink: style.getPropertyValue("--cirth-ink").trim(),
+				muted: style.getPropertyValue("--cirth-muted-color").trim(),
+				surface: style.getPropertyValue("--cirth-canvas").trim(),
 			};
 		});
 
