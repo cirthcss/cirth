@@ -49,7 +49,7 @@ options are alternatives, not when they are a checklist.
 ## Behavior
 
 * The default disclosure triangle/marker is removed and replaced with a
-  chevron icon (`--cirth-icon-chevron`) that rotates 90° when open.
+  chevron icon (`--cirth-icon-chevron`) that rotates 180° when open.
 * `summary` color: `--cirth-accordion-close-summary-color` when closed,
   `--cirth-accordion-open-summary-color` when open (and not focused),
   `--cirth-accordion-active-summary-color` on hover/focus.

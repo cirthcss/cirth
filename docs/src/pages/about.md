@@ -16,7 +16,7 @@ already a finished, accessible baseline.
     <div><dt>Semantic baseline</dt><dd><strong>covered</strong><small>native element selectors</small></dd></div>
     <div><dt>Accessibility</dt><dd><strong>verified</strong><small>WCAG 2.2 AA floor</small></dd></div>
     <div><dt>Distributed runtime</dt><dd><strong>0 B JS</strong><small>CSS package only</small></dd></div>
-    <div><dt>Default budget</dt><dd><strong>&lt;14 KB</strong><small>gzip check blocks builds</small></dd></div>
+    <div><dt>Default footprint</dt><dd><strong>{{ proof.size.label }}</strong><small>gzipped, measured in this build</small></dd></div>
     <div><dt>Build modes</dt><dd><strong>{{ proof.buildCount }}</strong><small>default / classless / scoped</small></dd></div>
     <div><dt>Runtime surface</dt><dd><strong>{{ proof.tokenCount }}</strong><small><code>--cirth-*</code> tokens</small></dd></div>
   </dl>
@@ -60,26 +60,53 @@ accident:
 - **Runtime tokens, not build-time variables.** Every color, spacing,
   radius, font, and shadow is a `--cirth-` custom property, overridable
   after the stylesheet loads — no Sass, no rebuild.
-- **A fixed compressed size budget for the default stylesheet** (below).
+- **A monitored compressed size for every shipped stylesheet** (below).
 
-## The 14KB size budget
+## Size, and what it is a budget for
 
-The default stylesheet is held to a size budget of under 14KB gzipped,
-checked automatically on every build by
+The default stylesheet is **{{ proof.size.label }} gzipped in this build**,
+measured from `dist/cirth.min.css`. Every shipped bundle carries its own
+budget, checked automatically on every build by
 [`scripts/check-css-size.js`](https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js)
-against all four `dist/*.min.css` bundles.
+— the four root builds and the four print sheets, each a few hundred bytes
+above what it currently measures.
 
-14 KiB (14,336 bytes) is not an arbitrary round number: it approximates the
+### Why small matters here
+
+Around 14 KiB is a meaningful threshold, and it is why this project pays
+attention at all. It approximates the
 [initial congestion window](https://datatracker.ietf.org/doc/html/rfc6928)
 TCP and [QUIC](https://www.rfc-editor.org/rfc/rfc9002.html#section-7.2) use
-for a new connection — the data a server can send before it has to pause
-and wait for the client's first acknowledgment. Keeping the default
-stylesheet under that ceiling means it fits inside that first flight of
-data when network conditions allow it, rather than needing an extra round
-trip before the browser can start rendering styled content. This is a
-budget the CSS is written against, not a guarantee that any given request
-is delivered in a single round trip — actual delivery still depends on TLS
-overhead, HTTP version, prior congestion state, and the network path.
+for a new connection — the data a server can send before it has to pause and
+wait for the client's first acknowledgment. A stylesheet that fits inside
+that first flight can start rendering styled content without an extra round
+trip, when network conditions allow it. That was never a guarantee about any
+individual request: actual delivery depends on TLS overhead, HTTP version,
+prior congestion state, and the network path.
+
+### Why it is a guard and not a promise
+
+It used to be written as a single ceiling — "under 14 KB" — applied to every
+file in `dist/`. That number was doing two jobs, and doing both badly.
+
+As a guard it watched one bundle. The print sheets are under 900 bytes, so a
+shared 14 KB ceiling would have let them grow sixteenfold in silence, and the
+classless builds had two kilobytes of unwatched room. Only the scoped build
+was ever near the line.
+
+As a promise it was worse, because a round number a reader can hold you to
+starts buying the wrong things. By the end it was the reason `<dl>` still
+carried the browser's 40px indent, a disclosure marker sat four pixels above
+its own line, and a vertical nav painted its current-page rail outside the
+container that clipped it. Those are defects, and none of them was worth
+226 bytes.
+
+Cirth is small because its model is small: element selectors and custom
+properties, no component catalogue, and nothing to run. It is not small
+because it leaves native elements unfinished. So the number is now a
+per-bundle regression guard — cross a line and the build stops and asks —
+raised deliberately, in the change that needs it, with the reason in the
+commit.
 
 ## Accessibility baseline
 
@@ -118,7 +145,7 @@ Dwarves: angular signs shaped by the need to be carved into hard surfaces.
 
 The same principle guides the framework. Cirth starts from the structure
 the web already provides, removes unnecessary runtime and abstraction, and
-keeps its default stylesheet within a strict compressed size budget.
+keeps every shipped stylesheet within a monitored compressed size budget.
 
 Not minimalism for its own sake. Constraints used as an engineering tool.
 
@@ -146,8 +173,8 @@ compatibility. The most important differences for users are:
   official theme (amber), with `plain` and `playroom` published as optional
   token override presets; see [Colors](/colors).
 - A WCAG 2.2 AA baseline (contrast, focus visibility, target size) is
-  verified in the source, and the default stylesheet is held to a 14KB
-  gzipped size budget checked on every build.
+  verified in the source, and every shipped stylesheet is held to a gzipped
+  size budget checked on every build.
 
 ## Project and license
 

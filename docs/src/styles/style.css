@@ -13,10 +13,10 @@
 /* The canvas itself (warm paper in light, near-black in dark) is the
    framework's own --cirth-background-color — nothing to override here. */
 :root {
-  /* Shell tokens: the five things this documentation needs a name for
-	   that the framework has no opinion about — how wide the rails and the
-	   reading column are, how wide the shell gets, and the blueprint dot
-	   grid.
+  /* Shell tokens: the handful of things this documentation needs a name
+	   for that the framework has no opinion about — how wide the rails and
+	   the reading column are, how wide the shell gets, how square its
+	   chrome is, and the blueprint dot grid.
 
 	   There used to be seventeen. Ten were aliases — --docs-board for the
 	   card surface, --docs-line for the muted border, --docs-signal for the
@@ -29,6 +29,24 @@
 	   always was. Two more — a 4px sub-unit and a 140ms transition — were
 	   declared for an annotation layer and a motion scale this shell never
 	   ended up writing against. */
+  /* The shell's chrome is squarer than the content it frames: the header's
+     selects, the theme toggle, the example tabs and the stage toggle all
+     sit a step tighter than a card or a button. That was five copies of
+     `border-radius: var(--cirth-radius-sm)`, which is a *primitive* — a
+     fixed 4px — not the knob a preset moves. Under `plain`
+     (--cirth-border-radius: --cirth-radius-xs, 2px) the five pins stayed
+     at 4px and the rule inverted: the chrome came out rounder than the
+     content it was supposed to be tighter than.
+
+     Stated once, and derived from the knob so the relationship holds in
+     both directions: it follows a preset down and caps on the way up.
+     Same idiom the framework uses for --cirth-checkbox-border-radius and
+     --cirth-code-border-radius, and it leaves the default build's 4px
+     exactly where it was. */
+  --docs-chrome-radius: min(
+    var(--cirth-border-radius),
+    var(--cirth-radius-sm)
+  );
   --docs-shell-max: 92rem;
   --docs-reading-max: 48rem;
   --docs-rail-width: 15rem;
@@ -547,7 +565,7 @@
   margin-bottom: 0;
   padding-inline: calc(var(--cirth-spacing) * 0.75)
     calc(var(--cirth-spacing) * 1.75);
-  border-radius: var(--cirth-radius-sm);
+  border-radius: var(--docs-chrome-radius);
 }
 
 .docs-version-select {
@@ -589,19 +607,26 @@
   margin-bottom: 0;
   padding: 0;
   border: var(--cirth-border-width) solid transparent;
-  border-radius: var(--cirth-radius-sm);
+  border-radius: var(--docs-chrome-radius);
   line-height: 1;
 }
 
+/* Only where it lands. `.sr-only-focusable` used to return the link to
+   normal flow on focus, which shoved the whole document down 24px the
+   first time anyone pressed Tab, so this shell reimplemented the reveal:
+   out of flow, a surface, a radius, a padding and a ring. The utility now
+   stays out of flow on its own and brings the page canvas, the page ink,
+   a radius and a padding with it (utilities/_sr-only.scss).
+
+   What is left is genuinely this site's: the shell has a sticky header, so
+   the link is pinned to the viewport corner rather than left at the static
+   position the utility would otherwise give it. Where a skip link lands is
+   the application's decision, which is exactly why the library does not
+   make it. */
 .docs-skip-link:focus {
   position: fixed;
   inset-block-start: var(--cirth-space-3);
   inset-inline-start: var(--cirth-space-3);
-  z-index: 1000;
-  padding: var(--cirth-space-2) var(--cirth-space-3);
-  border-radius: var(--cirth-border-radius);
-  background: var(--cirth-card-background-color);
-  box-shadow: 0 0 0 var(--cirth-outline-width) var(--cirth-primary-focus);
 }
 
 .docs-external-mark {
@@ -696,17 +721,13 @@
   justify-content: flex-end;
 }
 
-/* A modal surface that lets the document behind it scroll is a modal
-   surface in name only: on a phone the drawer stays put while the page
-   slides underneath it, and the reader loses their place in the article
-   they were reading. Both of this shell's modal surfaces get it, because
-   both had the problem. `:has` on the root rather than a class toggled in
-   script — the dialog already knows whether it is open, so nothing needs
-   to be told. */
-html:has(.docs-drawer[open]),
-html:has(.docs-search-dialog[open]) {
-  overflow: hidden;
-}
+/* The scroll lock that used to be repeated here is the framework's:
+   `html:has(dialog:modal) { overflow: hidden }` in components/_modal.scss.
+   Both of this shell's modal surfaces are opened with showModal() — the
+   drawer in site-header.njk, the search dialog in search.js, which gates
+   the whole feature on showModal() existing — so `:modal` matches whenever
+   either is open and the shell had been restating a rule it already gets.
+   */
 
 /* The library animates a dialog in from above (components/_modal.scss),
    which is right for a centred panel and wrong for a surface anchored to
@@ -853,14 +874,6 @@ html:has(.docs-search-dialog[open]) {
   gap: var(--cirth-space-3);
   margin: 0;
   padding: var(--cirth-space-2) var(--cirth-space-4);
-}
-
-/* Public nav list items carry a zero-width clearfix pseudo-element. These
-   moved utility rows are a docs-shell grid, so keep that artifact out of its
-   grid placement and assign both columns explicitly. */
-.docs-header .docs-mobile-controls [data-docs-header-control]::before {
-  display: none;
-  content: none;
 }
 
 .docs-mobile-controls .docs-control-label {
@@ -1028,33 +1041,12 @@ html:has(.docs-search-dialog[open]) {
   font-size: var(--cirth-font-size-sm);
 }
 
-/* Cirth's nav styles give lists and links negative margins (meant for
-   horizontal navs); inside the outline column they push content out of
-   the clipping box and cut it off on the left. The `nav` in the selector
-   matches the framework's specificity so this reset wins. */
-.docs-toc nav ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
+/* Only the item padding is the shell's. The negative list and link margins
+   that used to be undone here — meant for a horizontal nav, and the reason
+   an outline in a clipping column had its left edge cut off — are zeroed by
+   `aside nav` in the framework itself now. */
 .docs-toc li {
-  display: block;
-  margin: 0;
   padding: 0;
-  list-style: none;
-}
-
-/* The horizontal-nav margins are reset for the *inline* axis only. The
-   inline-start margin is the outline's alignment: it pulls each entry back
-   by exactly the rail's stroke so the entry's own inline-start border lands
-   *on* the rail instead of beside it — which is what the sidebar does, and
-   what this rule used to undo. Zeroing all four margins here left the
-   active entry drawing a second 2px bar immediately to the right of the
-   list's, a double line the sidebar never had. */
-.docs-toc nav li a {
-  margin-block: 0;
-  margin-inline-end: 0;
 }
 
 /* Level-3 entries indent inside the list; in the aside the indent lives
@@ -1083,18 +1075,14 @@ html:has(.docs-search-dialog[open]) {
    the framework paints its one registered edge on the inline-start rail.
    The shell used to add a second amber bar as a ::before. */
 
-/* Sidebar structure only -- the list resets Cirth's horizontal-nav
-   defaults. Rail geometry, ink and the active state are set once, together
-   with the table of contents, further down. */
-.docs-sidebar nav ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
+/* Sidebar structure only. The horizontal-nav resets that used to be here —
+   the list's margins and padding, its list-style, the item's display and
+   margin — are what `aside nav` now ships (components/_nav.scss), so the
+   shell states only what is still its own: entries carry no item padding
+   because the link is the full-width box, and the rail's type size. Rail
+   geometry, ink and the active state are set once, together with the table
+   of contents, further down. */
 .docs-sidebar nav li {
-  display: block;
-  margin: 0;
   padding: 0;
   font-size: var(--cirth-font-size-sm);
 }
@@ -1572,10 +1560,6 @@ pre > button.copy.copied::before {
    explicit evidence. These rules supersede the former centered marketing
    composition while leaving Cirth's component layer visible and honest. */
 
-body {
-  background-color: var(--cirth-background-color);
-}
-
 .docs-header {
   position: sticky;
   inset-block-start: 0;
@@ -1707,17 +1691,9 @@ body {
 .docs-hero-actions {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   flex-wrap: wrap;
-  width: 100%;
-  max-width: none;
   gap: 0.5rem;
   margin: 1.5rem 0;
-  text-align: start;
-}
-
-.docs-hero-actions a {
-  border-radius: var(--cirth-radius-sm);
 }
 
 .docs-native-lab {
@@ -2007,12 +1983,30 @@ body {
    `is-covered` went with the four rows that moved into the metrics above:
    "the package guarantees this" is what a measured value with a check path
    already says. */
-.docs-proof-state {
+/* The annotation voice, defined once.
+   ––––––––––––––––––––
+   Muted, monospace, extra-small, uppercase, slightly tracked out: the label
+   this shell puts on a measurement, a claim type, or the name of a panel.
+   It is editorial voice rather than anything the framework should own — an
+   application does not want its <dt>s shouting in monospace — but it was
+   written out three times, and the tracking had drifted to 0.06em in one of
+   them. One rule, one tracking; each site adds only what is its own. */
+.docs-proof-state,
+.docs-example-name,
+.docs-brand-measures dt {
   color: var(--cirth-muted-color);
   font-family: var(--cirth-font-family-mono);
   font-size: var(--cirth-font-size-xs);
+  /* Stated, not inherited. <dt> now arrives semibold from the framework
+     (content/_typography.scss), which is right for a term in a description
+     list and wrong for a monospace annotation label — so the voice says
+     what weight it is rather than taking whatever element it lands on. */
+  font-weight: var(--cirth-font-weight-regular);
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.docs-proof-state {
   white-space: nowrap;
 }
 
@@ -2080,14 +2074,6 @@ body {
    plate grammar this shell already uses for the hero's Source panel: the
    frame's own stroke, the card's horizontal rhythm, no tint. */
 .docs-stage-band {
-  /* The page's own values, resolved here so a control inside the band can
-     inherit them as values. See .docs-stage-toggle for what happens when
-     one is read inside a <button> instead. */
-  --docs-band-color: var(--cirth-color);
-  --docs-band-muted: var(--cirth-muted-color);
-  --docs-band-surface: var(--cirth-canvas);
-  --docs-band-edge: var(--cirth-card-border-color);
-
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2388,24 +2374,19 @@ body {
    means every rule here has to describe the enhanced state only, and the
    deck's resting state has to be the readable one. */
 .docs-switch {
-  /* Captured here, on the strip, because a <button> rebinds
-     `--cirth-color` and `--cirth-background-color` to its own — that is
-     how the framework paints a filled button, and it means a tab reaching
-     for either of those names inside itself gets the button's colours
-     rather than the page's. (It did: the selected tab came out filled
-     primary with white text.) Substitution happens on the element that
-     declares the property, so the strip resolves the page's values and the
-     buttons inherit them as values rather than as references.
+  /* This used to capture the page's ink on the strip, because a <button>
+     rebinds `--cirth-color` to its own — that is how the framework paints
+     a filled button, and a tab reaching for that name inside itself got
+     the button's white rather than the page's ink. (It did: the selected
+     tab came out filled primary with white text.) The library now names
+     the page role separately — `--cirth-ink`, the twin of `--cirth-canvas`
+     — and nothing can rebind it, so the buttons below read the role
+     directly and the shell keeps no alias of its own.
 
-     `--cirth-card-background-color` is the band the strip now sits on top
-     of: out of the stage, the selected tab takes the surface of the object
-     it opens, so the strip reads as three cells with one of them attached
-     to what is below it. In the band it was the other way round — the
-     strip sat on the card surface and the selected tab took the canvas of
-     the panel. Same rule, read against the new ground. */
-  --docs-switch-color: var(--cirth-color);
-  --docs-switch-surface: var(--cirth-card-background-color);
-
+     `--cirth-card-background-color` is the band the strip sits on top of:
+     out of the stage, the selected tab takes the surface of the object it
+     opens, so the strip reads as three cells with one of them attached to
+     what is below it. Measured, no component shadows that one either. */
   /* Above the stage, and part of the section rather than of the listing's
      toolbar: it chooses which example the section is about. It is a
      section-level control, so it takes the section's type rather than the
@@ -2439,7 +2420,7 @@ body {
   margin: 0;
   padding: 0.25rem 0.75rem;
   border: var(--cirth-border-width) solid transparent;
-  border-radius: var(--cirth-radius-sm);
+  border-radius: var(--docs-chrome-radius);
   background: none;
   color: var(--cirth-muted-color);
   font-family: inherit;
@@ -2447,8 +2428,8 @@ body {
 }
 
 .docs-switch button:hover {
-  background: var(--docs-switch-surface);
-  color: var(--docs-switch-color);
+  background: var(--cirth-card-background-color);
+  color: var(--cirth-ink);
 }
 
 /* The selected tab is the one carrying the panel, so it takes the panel's
@@ -2456,8 +2437,8 @@ body {
    open onto what is below it. */
 .docs-switch button[aria-selected="true"] {
   border-color: var(--cirth-card-border-color);
-  background: var(--docs-switch-surface);
-  color: var(--docs-switch-color);
+  background: var(--cirth-card-background-color);
+  color: var(--cirth-ink);
 }
 
 .docs-stage-deck {
@@ -2494,12 +2475,6 @@ body {
   margin: 0;
   padding: 0.75rem;
   background: var(--cirth-card-background-color);
-  color: var(--cirth-muted-color);
-  font-family: var(--cirth-font-family-mono);
-  font-size: var(--cirth-font-size-xs);
-  font-weight: var(--cirth-font-weight-regular);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 /* What the example is demonstrating, under the example. This is where the
@@ -2582,16 +2557,16 @@ cirth-theme-preview:not(:defined) {
   min-height: 1.75rem;
   margin: 0;
   padding: 0.125rem 0.625rem;
-  border: var(--cirth-border-width) solid var(--docs-band-edge);
-  border-radius: var(--cirth-radius-sm);
-  background: var(--docs-band-surface);
-  color: var(--docs-band-muted);
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--docs-chrome-radius);
+  background: var(--cirth-canvas);
+  color: var(--cirth-muted-color);
   font-family: inherit;
   font-size: inherit;
 }
 
 .docs-stage-toggle:is(:hover, :active, :focus, :focus-visible) {
-  color: var(--docs-band-color);
+  color: var(--cirth-ink);
 }
 
 /* A theme's declarations, and what each one paints.
@@ -2971,7 +2946,6 @@ cirth-theme-preview:not(:defined) {
 }
 
 .docs-toc-top > summary {
-  font-family: var(--cirth-font-family-sans);
   font-size: var(--cirth-font-size-sm);
 }
 
@@ -3135,10 +3109,6 @@ details.docs-demo-source > summary {
   font-size: var(--cirth-font-size-sm);
 }
 
-details.docs-demo-source > summary::after {
-  height: calc(var(--cirth-font-size-md) * var(--cirth-line-height));
-}
-
 details.docs-demo-source[open] {
   padding-block-end: 0;
 }
@@ -3181,10 +3151,7 @@ details.docs-demo-source > :not(summary) {
    against the first letter. */
 .docs-sidebar details > summary {
   padding: 0.5rem var(--cirth-space-3);
-  font-family: var(--cirth-font-family-sans);
   font-size: var(--cirth-font-size-sm);
-  letter-spacing: normal;
-  text-transform: none;
 }
 
 .docs-sidebar details[open] > summary {
@@ -3480,14 +3447,6 @@ details.docs-toc-top > :not(summary) {
 
 .docs-brand-measures > div:nth-child(3n) {
   border-inline-end: 0;
-}
-
-.docs-brand-measures dt {
-  color: var(--cirth-muted-color);
-  font-family: var(--cirth-font-family-mono);
-  font-size: var(--cirth-font-size-xs);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 
 .docs-brand-measures dd {

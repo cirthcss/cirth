@@ -36,6 +36,7 @@ const sidebar = [
 		text: "Content",
 		items: [
 			{ text: "Typography", link: "/content/typography" },
+			{ text: "Description list", link: "/content/description-list" },
 			{ text: "Link", link: "/content/link" },
 			{ text: "Button", link: "/content/button" },
 			{ text: "Table", link: "/content/table" },

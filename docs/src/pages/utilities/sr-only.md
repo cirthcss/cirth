@@ -33,8 +33,31 @@ link pattern. Tab into the demo above to see it appear.
 
 `.sr-only` shrinks the element to a 1×1px box, clips it with
 `clip-path: inset(50%)`, and prevents wrapping — the modern equivalent of
-the old `clip: rect(0,0,0,0)` hack. `.sr-only-focusable` reverses all of
-that on `:focus`/`:focus-within`.
+the old `clip: rect(0,0,0,0)` hack.
+
+`.sr-only-focusable` undoes the clipping on `:focus`/`:focus-within` but
+deliberately **keeps the element out of normal flow**. Returning it to flow
+is what used to make a skip link push the whole document down by its own
+height the moment a keyboard reader pressed Tab — measured at 24px, on the
+first interaction anyone has with the page. Because it is out of flow it is
+painted over whatever is behind it, so the reveal brings a surface with it:
+`--cirth-canvas`, `--cirth-ink`, the shared border radius, a padding step,
+and `--cirth-z-index-fixed` so sticky chrome cannot swallow it.
+
+Offsets are left at `auto`, so the element appears where it would have been
+in the document, inside whatever positioned ancestor you already have. Where
+a skip link *lands* is a page decision, and pinning one to the viewport
+corner is one declaration:
+
+```css
+.skip-link:focus {
+  position: fixed;
+  inset-block-start: var(--cirth-space-3);
+  inset-inline-start: var(--cirth-space-3);
+}
+```
+
+That is the only rule this site adds to its own skip link.
 
 Available only in the default build with classes enabled (`$enable-classes:
 true`), not in the classless build.

@@ -50,9 +50,10 @@ carved "C". It references the project's namesake, the Cirth runic
 alphabet used by Tolkien's Dwarves, designed for carving into hard
 surfaces so every letter is reduced to the strokes the material allows.
 The same reduction — keep only what the medium requires — is the
-engineering constraint the framework itself is built around: a strict
-gzipped size budget on the default stylesheet. See
-[About Cirth](/about#the-14kb-size-budget) for how that budget works.
+engineering constraint the framework itself is built around: keep only
+what the medium requires, and watch the size of what is left. See
+[About Cirth](/about#size-and-what-it-is-a-budget-for) for how the budgets
+work, and why they are a guard rather than a promise.
 
 <section class="docs-brand-spec" aria-labelledby="brand-spec-title">
   <header class="docs-brand-spec-header">
@@ -220,7 +221,7 @@ logo hexes: the tokens are variants verified for WCAG. See
 The wordmark is "Cirth" set in the site's sans-serif voice, bold, with the
 mark at the cap height to its left — sans-serif is the primary typographic
 voice for product surfaces, headings, and UI chrome. Monospace is reserved
-for code, size metrics, and proof points (`<14KB`, `--cirth-primary`).
+for code, size metrics, and proof points (`13.6 KB`, `--cirth-primary`).
 Serif remains available as a primitive token for an author to opt into,
 but is not part of Cirth's product voice. There is no custom font to
 install: the brand uses the same system stacks the framework ships, on
@@ -259,14 +260,14 @@ Example headlines:
 
 - "Production-ready UI from semantic HTML."
 - "One stylesheet. Runtime tokens. Zero JavaScript."
-- "A 14KB size budget, checked on every build."
+- "A size budget on every bundle, checked on every build."
 
 Example one-line descriptions:
 
 - "Cirth turns native HTML elements into accessible, themeable
   interfaces, with zero shipped JavaScript."
 - "An HTML-native CSS framework with a runtime design token system and a
-  14KB gzipped size budget."
+  monitored gzipped size budget."
 
 ## Usage agreement
 

@@ -2,7 +2,7 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/readme-native-baseline-dark.png">
     <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/readme-native-baseline.png">
-    <img alt="Cirth — UI from semantic HTML; accessible baseline, zero JavaScript, under 14KB gzipped" src="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/readme-native-baseline.png" width="960" height="240">
+    <img alt="Cirth — UI from semantic HTML; accessible baseline, zero JavaScript, small and monitored" src="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/readme-native-baseline.png" width="960" height="240">
   </picture>
 </p>
 
@@ -15,7 +15,7 @@
 <p align="center">
   Cirth turns native HTML elements into accessible, themeable interfaces.
   Load one stylesheet, customize it with runtime design tokens, and ship
-  with zero JavaScript and no required build step. Under 14KB gzipped ·
+  with zero JavaScript and no required build step. Small and monitored ·
   0 JavaScript · WCAG 2.2 AA baseline.
 </p>
 
@@ -338,9 +338,11 @@ the structure, meaning, and styling burden before a class is needed.
   catalog.
 - Customize through runtime CSS custom properties, not a build step.
 - Ship zero JavaScript; interactive patterns use native element behavior.
-- Hold the default stylesheet to a 14KB gzipped size budget, checked on
-  every build. See [About Cirth](docs/src/pages/about.md#the-14kb-size-budget)
-  for why 14KB specifically.
+- Keep every shipped stylesheet under its own gzipped size budget, checked
+  on every build — a regression guard rather than a number to design
+  against. See
+  [About Cirth](docs/src/pages/about.md#size-and-what-it-is-a-budget-for)
+  for what the budget is for, and what it deliberately does not buy.
 
 ## License
 

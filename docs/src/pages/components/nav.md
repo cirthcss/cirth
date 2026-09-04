@@ -78,8 +78,9 @@ and not as a form control that wandered into the header.
 
 ## Vertical nav
 
-Nesting `nav` inside `aside` switches every list and list item to
-`display: block`, turning the same markup into a sidebar menu:
+A `<nav>` inside an `<aside>` is the vertical nav. This is the pattern —
+there is no class and no modifier, and the markup is the same markup as the
+bar above it:
 
 {% demo "nav-vertical" %}
 
@@ -94,6 +95,20 @@ Nesting `nav` inside `aside` switches every list and list item to
 </aside>
 ```
 
+Stacked, the entries become full-width rows and the current-page marker moves
+from the bottom edge to the inline-start one, where it reads as a rail. The
+rail is painted on the link's own box, so it is contained by the `<aside>` on
+both inline edges — a sidebar that scrolls (`position: sticky` plus
+`overflow-y: auto`, which is what most of them do) will not clip it away.
+
+Two things follow from the trigger being `<aside>` rather than a class:
+
+* Outside an `<aside>`, a `<nav>` is a **bar**. If a stacked menu is coming
+  out as a row, the nav is not inside a complementary region — that is the
+  thing to check first.
+* A plain `<ul>` of links inside an `<aside>` is still a plain list, with its
+  markers. Only the `<nav>` becomes navigation.
+
 ## Behavior
 
 * Two lists inside one `nav` are pushed to opposite ends
@@ -106,6 +121,11 @@ Nesting `nav` inside `aside` switches every list and list item to
 * `li` padding is `--cirth-nav-element-spacing-vertical`/`-horizontal`; a
   link inside gets its own smaller `--cirth-nav-link-spacing-*` padding so
   the clickable/hover area is slightly larger than the visible text.
+* In a bar, those two cancel: the list pulls out by one gutter, the item
+  pushes in, and the link pulls out again, so the row sits flush with its
+  container. Stacked in an `<aside>` there is no row to cancel against, so
+  the gutters belong to the link alone and the painted box stays inside the
+  container.
 * Buttons, `[role="button"]`, and form controls placed inside a nav `li`
   adapt their padding to match the nav's link rhythm instead of their usual
   button/form spacing.
