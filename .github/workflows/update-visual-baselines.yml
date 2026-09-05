@@ -26,8 +26,16 @@ on:
       - "src/**"
       - "docs/**"
       - "scripts/build*.js"
+      # process-css.js is the other half of the CSS pipeline — build.js
+      # shells out to it to transform and to minify — so a change there
+      # changes dist/ and therefore changes what every screenshot shows.
+      # It was missing from this list.
+      - "scripts/process-css.js"
       - "scripts/lib/**"
       - "tests/visual.spec.js"
+      # visual.spec.js composes its one setContent document through the
+      # shared helper, so the helper is part of what it renders.
+      - "tests/helpers/**"
       - "playwright.config.js"
       - "package.json"
       - "package-lock.json"
