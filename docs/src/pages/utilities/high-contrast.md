@@ -88,7 +88,7 @@ query. A bare `:root` covers both schemes:
 ```
 
 To part light from dark, name the scheme roots, exactly as on
-[Customization](/customization#overriding-a-color-in-one-scheme-only):
+[Customization](/customization#light-and-dark):
 
 ```css
 @media (prefers-contrast: more) {

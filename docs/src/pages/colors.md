@@ -59,7 +59,7 @@ during `npm run build`; see [Contributions](/contributions) for how the build wo
 
 If you only need a single custom accent, override the primary color group with
 your own values directly instead of loading a preset; see
-[Customization](/customization#primary-secondary-and-contrast). This is the
+[Customization](/customization#the-accent). This is the
 right tool when a single page or component needs a custom brand color; read
 `plain` when you want to see how little a retheme can be, and `playroom`
 when you want to see how far one can go.

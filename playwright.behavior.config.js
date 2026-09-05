@@ -12,6 +12,7 @@ module.exports = defineConfig({
 		"accessibility-resilience.spec.js",
 		"baseline-consistency.spec.js",
 		"button-overflow.spec.js",
+		"doc-links.spec.js",
 		"docs-stack.spec.js",
 		"date-input-group.spec.js",
 		"flow-spacing.spec.js",
