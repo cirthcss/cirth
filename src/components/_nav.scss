@@ -36,8 +36,23 @@
 
 // ––––––––––––––––––––
 
+// `ol` alongside `ul`. A breadcrumb is an ordered sequence and <ol> is the
+// element that says so, so this is the markup a careful author writes —
+// and it was the markup that rendered worse. Left out of the flex
+// contract the list fell back to `display: block` with `inline-block`
+// items, which is the one layout mode where the newlines between <li>
+// elements are *rendered*: measured on the same three-item trail, indented
+// the way any real source is, the <ul> came out 215.45px wide with items
+// tiling at the item gutter and the <ol> 183.83px with 4.19px of source
+// formatting wedged between each pair. How the file was indented was
+// visible on the page.
+
+// The divider was missing outright — `content` computed to `none` on every
+// separator, because the breadcrumb block further down was scoped to `ul`
+// as well. Both are the same omission: the `ol, ul` block immediately
+// below, and every rule under it, already treat the two elements as one.
 #{$parent-selector} nav,
-#{$parent-selector} nav ul {
+#{$parent-selector} nav :is(ol, ul) {
   display: flex;
 }
 
@@ -172,7 +187,7 @@
     align-items: center;
     justify-content: start;
 
-    & ul li {
+    & :is(ol, ul) li {
       &:not(:first-child) {
         margin-inline-start: var(--cirth-nav-link-spacing-horizontal);
       }

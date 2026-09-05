@@ -40,6 +40,10 @@ natively) between items and disables pointer events on the current page:
 </nav>
 ```
 
+Write it with `<ol>` if you prefer — a trail is an ordered sequence, and the
+two render identically. Every rule in this component, the divider included,
+matches `:is(ol, ul)`.
+
 ## Navbar
 
 A `nav` that is a direct child of the page's banner `header` is a navbar:

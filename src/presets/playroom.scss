@@ -75,11 +75,14 @@
   // rhythm, slower and softer in the transition. A rounded face on square
   // corners reads as a mismatch, which is why the type and the geometry move
   // together here.
-  // One knob: the card radius derives from it (theme/_styles.scss), so
-  // 8px controls give 12px containers without this file saying so.
+  // One knob at each end: the card radius derives from --cirth-border-radius
+  // (theme/_styles.scss), so 8px controls give 12px containers without this
+  // file saying so, and paragraph rhythm derives from --cirth-spacing, so
+  // the flow opens up without this file restating it either. Control and
+  // card padding stay where the default theme puts them, on purpose: this
+  // preset changes character, not target size.
   --cirth-border-radius: var(--cirth-radius-lg);
   --cirth-spacing: var(--cirth-space-5);
-  --cirth-typography-spacing-vertical: var(--cirth-space-5);
   --cirth-line-height: var(--cirth-line-height-relaxed);
   --cirth-transition: var(--cirth-duration-slow) var(--cirth-ease-in-out);
 

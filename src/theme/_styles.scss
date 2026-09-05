@@ -63,10 +63,23 @@
   --cirth-transition: var(--cirth-duration-normal) var(--cirth-ease-out);
 
   // Spacings
+  // --cirth-spacing is the *flow* knob, and that is the whole of its
+  // contract. It times the space between blocks, the gaps in a `.grid`,
+  // and the padding of the document-content blocks that are made of
+  // running text — <pre>, <blockquote>, table cells. It deliberately does
+  // not time the padding inside an interactive control or inside a card:
+  // those are the two families below, each pinned to the space scale
+  // directly, for reasons stated where they are declared. Setting it opens
+  // or tightens the rhythm of a page without moving a single target size.
   --cirth-spacing: var(--cirth-space-4);
 
   // Spacings for typography elements
-  --cirth-typography-spacing-vertical: var(--cirth-space-4);
+  // Derived, not a second independent step. Paragraph rhythm *is* flow
+  // spacing: with the two declared apart, a preset that opened the flow up
+  // moved grids and sections and left prose at the default unless it
+  // remembered to restate this token — and every future preset would have
+  // had to remember too. Identical to --cirth-space-4 at the default scale.
+  --cirth-typography-spacing-vertical: var(--cirth-spacing);
 
   // Spacings for body > header, body > main, body > footer, section, article
   --cirth-block-spacing-vertical: var(--cirth-spacing);
@@ -101,6 +114,13 @@
   // consumer can change the border width without silently shrinking an
   // interactive target. A nav opts down to a 40px band, still clear of
   // WCAG 2.5.8's 24px AA minimum, because a nav row is compact by design.
+
+  // Pinned to the scale rather than derived from --cirth-spacing, and that
+  // is the deliberate half of the flow knob's contract: this pair is what
+  // the one-line control height is computed from, so hanging it off a
+  // density knob would let "open the page up a little" walk a target size
+  // — the one measurement here that has a normative floor under it.
+  // Override the pair directly to change control density.
   --cirth-form-element-spacing-vertical: var(--cirth-space-2);
   --cirth-form-element-spacing-horizontal: var(--cirth-space-4);
 
@@ -300,6 +320,15 @@
   // Containers get a softer radius and more generous padding than the
   // controls that sit inside them
   article {
+    // The other half of the flow knob's contract. Both sides of this
+    // relationship are named on the space scale — space-5 here against the
+    // controls' space-4 — so a container stays one step more generous than
+    // the controls inside it at every setting of --cirth-spacing. Derived
+    // from the knob instead, the two would cross the moment a preset moved
+    // it: `calc(var(--cirth-spacing) * 1.25)` is an exact no-op at the
+    // default and lands on 25px under the playroom preset, off the scale
+    // entirely. A card's padding is a container decision, not a density
+    // one; override this pair to change it.
     --cirth-block-spacing-vertical: var(--cirth-space-5);
     --cirth-block-spacing-horizontal: var(--cirth-space-5);
   }

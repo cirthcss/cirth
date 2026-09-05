@@ -395,8 +395,9 @@ the prose around them.
 
 ## Spacing and layout
 
-`--cirth-spacing` is the knob. Everything vertical between blocks, the gaps
-in a `.grid`, and the padding inside controls derive from it:
+`--cirth-spacing` is the **flow** knob: it times the space *between* things
+and the padding of the document blocks that are made of running text. Set it
+at the root, which is where the tokens that derive from it are declared:
 
 ```css
 :root {
@@ -404,13 +405,33 @@ in a `.grid`, and the padding inside controls derive from it:
 }
 ```
 
+### What follows the knob
+
 | Token | What it moves |
 | --- | --- |
-| `--cirth-spacing` | The base rhythm |
+| `--cirth-typography-spacing-vertical` | Space between paragraphs, lists and tables |
 | `--cirth-block-spacing-vertical` | Space between landmarks and sections |
-| `--cirth-typography-spacing-vertical` | Space between paragraphs and lists |
-| `--cirth-form-element-spacing-vertical` | Padding inside a control |
-| `--cirth-container-gutter` | Fluid inline gutter for containers and classless landmarks |
+| `--cirth-grid-column-gap`, `--cirth-grid-row-gap` | The gaps in a `.grid` and a `.row` |
+
+Nothing else has to be restated to move with it. A few document blocks read
+`--cirth-spacing` directly for the same reason: `<pre>`, `<blockquote>` and
+table cells are running text with a box around it, so their padding is part
+of the same rhythm.
+
+### What deliberately does not
+
+| Token | Why it is separate |
+| --- | --- |
+| `--cirth-form-element-spacing-vertical` / `-horizontal` | The one-line control height is computed from this pair, and that height carries WCAG 2.5.5's 44px target size. A density knob must not be able to walk a target size, so control padding is named on the space scale and overridden directly. |
+| `--cirth-block-spacing-vertical` / `-horizontal` **on `<article>`** | A card's padding is a container decision. It is pinned one step above the controls' gutter on the same scale — `--cirth-space-5` against `--cirth-space-4` — so a container stays roomier than its contents at *every* setting of `--cirth-spacing`. Derived from the knob instead, the two would cross the first time a preset tightened it. |
+| `--cirth-container-gutter` | Page gutters follow the container, not the knob: opening a wide shell up must not also enlarge cards, controls and grid gaps. |
+
+To change control or card density, set those tokens. They are public, they
+are documented in the reference below, and overriding one of them is not a
+workaround — it is the second half of the same contract.
+
+| Token | What it moves |
+| --- | --- |
 | `--cirth-container-max-width` | The `.container` measure |
 | `--cirth-grid-min-column` | When `.grid` wraps to a new row |
 | `--cirth-modal-max-width` | The fluid modal card's upper width bound |
@@ -505,7 +526,19 @@ filled button has to clear 4.5:1 against it.
 }
 ```
 
-Controls keep their 44px floor: the padding shrinks, the target does not.
+That tightens the flow — prose, sections, grid gaps — and leaves controls
+and cards where they were. Add the control pair if you want the components
+to come in too:
+
+```css
+:root {
+  --cirth-form-element-spacing-vertical: 0.375rem;
+  --cirth-form-element-spacing-horizontal: 0.75rem;
+}
+```
+
+Controls keep their 44px floor either way: the padding shrinks, the target
+does not.
 
 ### Change the dark scheme only
 

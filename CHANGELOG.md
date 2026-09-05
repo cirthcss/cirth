@@ -23,8 +23,37 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   the global spacing token, and `--cirth-modal-max-width`, a single runtime
   cap for modal cards.
 
+### Changed
+
+- **`--cirth-typography-spacing-vertical` derives from `--cirth-spacing`.**
+  The knob was documented as the interface's rhythm and only moved half of
+  it: `.grid` gaps and section margins followed, paragraph rhythm did not,
+  because the typography token was declared as its own separate copy of
+  `--cirth-space-4`. The `playroom` preset had to restate it to stay
+  coherent, and every future preset would have had to remember. Identical at
+  the default scale, and unchanged for anyone who sets the typography token
+  directly; it moves for a page that sets `--cirth-spacing` at the root and
+  expected prose to follow, which is what it now does. The other half of the
+  contract is stated explicitly on the Customization page: control padding
+  and card padding are deliberately *not* on this knob — the first because
+  the 44px WCAG 2.5.5 target size is computed from it, the second because a
+  container's padding is pinned one step above the controls' on the space
+  scale so the relationship holds at every setting.
+
 ### Fixed
 
+- **A `<nav>` styles an `<ol>` the same way it styles a `<ul>`.** A
+  breadcrumb is an ordered sequence, so `<ol>` is the element for it — and
+  `<ol>` was the element the framework left out. `nav, nav ul { display:
+  flex }` left an ordered list at `display: block` with `inline-block`
+  items, the one layout mode that *renders* the newlines a source file has
+  between `<li>` elements: measured on the same three-item trail, the `<ul>`
+  came out 215.45px wide with items tiling at the item gutter and the `<ol>`
+  183.83px with 4.19px of source formatting wedged between each pair. The
+  breadcrumb block was scoped to `ul` as well, so an `<ol>` trail also had
+  no separators at all — `content` computed to `none` on every one of them.
+  Both are now `:is(ol, ul)`. This visibly changes every existing `<ol>`
+  breadcrumb, which is the point; visual baselines were regenerated.
 - **The `<summary>` marker is centred on its own line.** The chevron floats,
   and a float aligns to the *top* of the line box it joins, so a marker
   shorter than the line sat high by half the difference: 4px at the default
