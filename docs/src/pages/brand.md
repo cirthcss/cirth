@@ -259,7 +259,7 @@ origin story — and avoid unverifiable claims such as "nothing to break,"
 Example headlines:
 
 - "Production-ready UI from semantic HTML."
-- "One stylesheet. Runtime tokens. Zero JavaScript."
+- "One stylesheet. Runtime tokens. No JavaScript runtime."
 - "A size budget on every bundle, checked on every build."
 
 Example one-line descriptions:

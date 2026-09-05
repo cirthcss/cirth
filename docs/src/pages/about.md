@@ -29,8 +29,11 @@ already a finished, accessible baseline.
 - A runtime design token system: hundreds of `--cirth-` custom properties
   drive color, spacing, radius, type, and motion, overridable in plain CSS
   after the stylesheet loads.
-- Zero JavaScript. Interactive patterns — accordion, dropdown, modal — are
-  built on native `<details>` and `<dialog>` behavior, not a runtime.
+- No JavaScript runtime. Cirth ships none and requires none: interactive
+  patterns — accordion, dropdown, modal — are built on native `<details>`
+  and `<dialog>` behavior. It is a statement about what the package
+  contains, not about your application, which is free to use JavaScript for
+  anything it needs.
 - Four builds — default, classless, scoped, and scoped classless — so the
   same token system can style a page directly, style zero-class markup, or
   stay scoped inside a `.cirth` wrapper.

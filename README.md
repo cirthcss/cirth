@@ -2,7 +2,7 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/readme-native-baseline-dark.png">
     <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/readme-native-baseline.png">
-    <img alt="Cirth — UI from semantic HTML; accessible baseline, zero JavaScript, small and monitored" src="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/readme-native-baseline.png" width="960" height="240">
+    <img alt="Cirth — UI from semantic HTML; accessible baseline, 0 B JavaScript runtime, small and monitored" src="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/readme-native-baseline.png" width="960" height="240">
   </picture>
 </p>
 
@@ -15,8 +15,8 @@
 <p align="center">
   Cirth turns native HTML elements into accessible, themeable interfaces.
   Load one stylesheet, customize it with runtime design tokens, and ship
-  with zero JavaScript and no required build step. Small and monitored ·
-  0 JavaScript · WCAG 2.2 AA baseline.
+  with no JavaScript runtime and no required build step. Small and
+  monitored · 0 B JS runtime · WCAG 2.2 AA baseline.
 </p>
 
 <p align="center">
@@ -337,7 +337,9 @@ the structure, meaning, and styling burden before a class is needed.
 - Keep layout primitives small and structural, not a broad component
   catalog.
 - Customize through runtime CSS custom properties, not a build step.
-- Ship zero JavaScript; interactive patterns use native element behavior.
+- Ship no JavaScript runtime; interactive patterns use native element
+  behavior. The claim is about what the package contains, not about what an
+  application built on it may do.
 - Keep every shipped stylesheet under its own gzipped size budget, checked
   on every build — a regression guard rather than a number to design
   against. See
