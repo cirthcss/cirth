@@ -10,6 +10,60 @@
  */
 @import "./generated/cirth-docs.css";
 
+/* Breakpoints
+   ––––––––––––––––––––
+   There were twelve numbers in this file and five tiers. The difference
+   was bookkeeping: `min-width: 768px` and `max-width: 767px` are one
+   boundary written as two numbers, `60rem` was the same kind of number as
+   1024 wearing a different unit, and nothing said which of the twelve were
+   the same decision. Every width query below now names one of the seven
+   values in this table, in `rem`, with the range syntax — so the two sides
+   of a tier are the same number and a reader can grep for it.
+
+   `rem` rather than `px`, for all of them rather than one of them: a media
+   query's `rem` resolves against the browser's own default font size, so a
+   reader who has turned that up gets the layout that fits the text they
+   actually see. And `width < 48rem` closes a gap `max-width: 767px` left
+   open — at a fractional viewport width, which browser zoom produces
+   constantly, 767.5px matched neither the max nor the min.
+
+   Shell tiers — where the chrome itself changes shape:
+
+     22.5rem   360px   the narrowest phone: the header's two display
+                       controls stop sharing a row
+     36rem     576px   the search trigger becomes its icon and the brand
+                       cluster takes the full row
+     48rem     768px   phone/tablet: the footer, the brand grids, the proof
+                       strip, the build comparison and the theme lab all
+                       drop to their narrow column counts
+     64rem    1024px   desktop: the sidebar rail appears, the in-header nav
+                       comes back out of the drawer, and .container is let
+                       up from the 60rem reading measure to --docs-shell-max
+     80rem   1280px    wide: the page outline gets a column of its own and
+                       the home page's grid goes from 6 parts to 12
+
+   Content boundaries — measured against what is *in* the box, on the home
+   page, which has neither rail nor outline. They are not shell tiers and
+   are deliberately not rounded to one:
+
+     60rem     960px   the home page's stage split stops being intrinsic
+                       and takes its tuned 0.92/1.08 ratio, and the proof
+                       metrics go to four columns. Kept apart from 64rem
+                       because it governs a page with no rail: at 64rem the
+                       docs shell *narrows* its content column by 15rem,
+                       which is the opposite of the room these two need
+     77.5rem  1240px   the hero stacks. Swept at 20px steps against the
+                       source pane's longest line plus --docs-lab-overlap;
+                       see the table above that block. Not folded into
+                       80rem: that would stack the hero 40px early, which
+                       is a layout change rather than a consolidation
+
+   And one boundary on the other axis, which is why it is not in the ladder:
+
+     height <= 30rem    a phone held sideways. The search dialog takes the
+                        full surface for the same reason it does at 48rem
+*/
+
 /* The canvas itself (warm paper in light, near-black in dark) is the
    framework's own --cirth-background-color — nothing to override here. */
 :root {
@@ -98,9 +152,11 @@
   gap: var(--cirth-spacing);
 
   /* The row is the shell's, not a page's: a header that reads as chrome
-	   should be shorter than a nav in running content. Read off the token
-	   rather than restated, so a preset that changes nav density changes
-	   this with it. */
+	   should be shorter than a nav in running content. The library already
+	   halves this for a <nav> that is a *direct child* of the banner
+	   (src/components/_nav.scss); this selector also reaches the drawer's
+	   nav, which is inside the banner without being its child, so the token
+	   is not a restatement there. */
   --cirth-nav-element-spacing-vertical: var(--cirth-space-2);
 
   min-height: 3.5rem;
@@ -108,7 +164,6 @@
 
 .docs-header-start-group {
   min-width: 0;
-  flex-wrap: nowrap;
   justify-content: flex-start;
 }
 
@@ -124,7 +179,6 @@
 .docs-header-search {
   flex: 1 1 auto;
   width: 100%;
-  margin: 0;
 }
 
 .docs-search-trigger {
@@ -134,11 +188,9 @@
   gap: var(--cirth-space-2);
   width: 100%;
   min-block-size: 2.5rem;
-  block-size: 2.5rem;
   margin: 0;
   padding: 0.375rem 0.625rem;
   border-color: var(--cirth-form-element-border-color);
-  border-radius: var(--cirth-border-radius);
   background: var(--cirth-form-element-background-color);
   box-shadow: none;
 
@@ -152,20 +204,16 @@
 	   through that same slot re-bound to semibold (theme/_styles.scss) —
 	   which is correct for a button and wrong for this one, and is why the
 	   trigger was announcing "Search documentation" at 600 beside real
-	   placeholders at 400. Both ink and weight are re-bound at the slot,
-	   once. Everything below then reads exactly as the library's own field
-	   rule reads, and the states that follow inherit the placeholder
-	   instead of each restating it: this is not a second definition of
-	   what a placeholder looks like, it is the field's own metrics
-	   pointed at a button. */
+	   placeholders at 400.
+
+	   Two rebinds, and that is the whole of it. The colour, family, size,
+	   weight, line-height and radius that used to be restated underneath
+	   were the library's own button rule copied out — measured inert, every
+	   one of them — so the states that follow inherit the placeholder
+	   rather than each redefining what a placeholder looks like. */
   --cirth-color: var(--cirth-form-element-placeholder-color);
   --cirth-font-weight: var(--cirth-font-weight-regular);
 
-  color: var(--cirth-color);
-  font-family: inherit;
-  font-size: var(--cirth-font-size-md);
-  font-weight: var(--cirth-font-weight);
-  line-height: var(--cirth-line-height);
   text-align: start;
 }
 
@@ -201,10 +249,8 @@
 
 .docs-search-trigger kbd,
 .docs-search-help kbd {
-  margin: 0;
   padding: 0.125rem 0.35rem;
   border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-  border-radius: var(--cirth-code-border-radius);
   /* --cirth-canvas, not --cirth-background-color: a <button> rebinds the
 	   latter to its own fill (that is how a primary button paints itself),
 	   and this kbd lives inside the search trigger button — so the "page
@@ -212,7 +258,6 @@
 	   exactly this: a name for the page that components are not allowed to
 	   shadow. Same trap the copy button hit further down. */
   background: var(--cirth-canvas);
-  box-shadow: none;
   color: var(--cirth-muted-color);
   font-size: var(--cirth-font-size-xs);
   white-space: nowrap;
@@ -244,8 +289,6 @@
 
   width: min(calc(100% - 2rem), 48rem);
   max-height: min(44rem, calc(100dvh - 2rem));
-  margin: 1rem;
-  box-shadow: none;
   overflow: hidden;
 }
 
@@ -258,19 +301,19 @@
 }
 
 .docs-search-dialog > article > header input {
-  width: 100%;
   min-block-size: 2.75rem;
   margin: 0;
   padding-inline: 0;
   border: 0;
   border-radius: 0;
   background: transparent;
+
+  /* Every state, not two rules. The library gives a field a focus shadow,
+	   and this one is a bare row inside a panel that draws its own bands;
+	   an unconditional `none` says that once instead of being restated
+	   under :focus. */
   box-shadow: none;
   font-size: var(--cirth-font-size-lg);
-}
-
-.docs-search-dialog > article > header input:focus {
-  box-shadow: none;
 }
 
 .docs-search-dialog > article > header .close {
@@ -372,12 +415,10 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 0.5rem 1rem;
-  margin: 0;
   padding: 0.5rem 1rem;
-  border-block-start: var(--cirth-border-width) solid
-    var(--cirth-card-border-color);
 
-  /* Same band, same reason as the status line above. */
+  /* Same band, same reason as the status line above. The hairline above it
+	   and the cleared margin are the card's own footer contract. */
   background: var(--cirth-canvas);
   color: var(--cirth-muted-color);
   font-family: var(--cirth-font-family-mono);
@@ -421,7 +462,7 @@
    the floating panel wants 584px and is taller than the screen it floats
    in, so the same full-surface layout is the right answer there for the
    same reason it is at 390px of width. */
-@media (max-width: 767px), (max-height: 30rem) {
+@media (width < 48rem), (height <= 30rem) {
   .docs-search-dialog {
     align-items: stretch;
     justify-content: stretch;
@@ -442,7 +483,6 @@
     margin: 0;
     border: 0;
     border-radius: 0;
-    box-shadow: none;
   }
 
   /* The field row owns the top inset so the close button and the caret
@@ -546,7 +586,6 @@
   margin-block: calc((var(--docs-brand-height) - var(--cirth-space-10)) / 2);
   padding-block: calc((var(--cirth-space-10) - var(--docs-brand-height)) / 2);
   font-family: var(--cirth-font-family-mono);
-  font-size: var(--cirth-font-size-md);
   letter-spacing: var(--cirth-letter-spacing-tight);
 }
 
@@ -627,10 +666,12 @@
   align-items: center;
   justify-content: center;
   /* Square, on the same 40px band as the selects beside it — the height
-	   Cirth's nav now gives a control (components/_nav.scss). Clear of
-	   WCAG 2.5.8's 24px AA minimum with room; short of 2.5.5's 44px AAA
-	   target, which is the size a control takes in a *form*, not in a
-	   navigation bar. */
+	   Cirth's nav gives a control (components/_nav.scss). Clear of WCAG
+	   2.5.8's 24px AA minimum with room; short of 2.5.5's 44px AAA target,
+	   which is the size a control takes in a *form*, not in a navigation
+	   bar. Stated rather than inherited from that band: the same control is
+	   moved into the drawer at the collapse breakpoint, and there it sits in
+	   a plain list, outside any <nav>. */
   width: 2.5rem;
   height: 2.5rem;
   margin-bottom: 0;
@@ -708,8 +749,8 @@
    restated here against the same tokens the trigger above uses, so the two
    stay one band and one frame whatever the theme does. */
 /* No `display` here: `.docs-header .docs-menu-toggle` weighs more and
-   states it twice — none above 1023px, inline-grid below — so the base
-   declaration never won a cascade in its life. */
+   states it twice — none at and above the 64rem tier, inline-grid below —
+   so the base declaration never won a cascade in its life. */
 .docs-menu-toggle {
   place-items: center;
 
@@ -717,9 +758,9 @@
      bottom margin, and .docs-header-actions centres its children: a 40px
      control with 16px under it has a 56px margin box, so centring put the
      toggle's border box 8px above the search field's everywhere between
-     576px and 1023px — the exact range where both are on the bar. The
-     field's own rule already zeroed its margin; this one had only ever
-     zeroed it below 576px, which is why the two lined up on a phone and
+     the 36rem and 64rem tiers — the exact range where both are on the bar.
+     The field's own rule already zeroed its margin; this one had only ever
+     zeroed it below 36rem, which is why the two lined up on a phone and
      nowhere else.
 
      No frame: the header's buttons are ghost. This one briefly carried
@@ -729,7 +770,6 @@
      a second input beside the search. */
   width: 2.5rem;
   min-block-size: 2.5rem;
-  block-size: 2.5rem;
   margin: 0;
   padding: 0;
 }
@@ -801,7 +841,6 @@
   border-inline-start: var(--cirth-border-width) solid
     var(--cirth-card-border-color);
   border-radius: 0;
-  box-shadow: none;
   overflow: hidden;
 }
 
@@ -952,21 +991,22 @@
    controls. There is no width at which the toggler is showing and part of
    the collapsible content is still out on the bar.
 
-   This shell had three states. The hamburger appeared at 1023px, but the
-   controls only moved into it at 575px, so from 1023px to 576px the menu
-   opened onto an empty "Display" heading while version, preset and theme
-   sat outside it — and the bar, unable to fit them next to the search,
-   wrapped the search and the toggler onto a second grid row: a 155px
-   sticky header, on every page, across the whole tablet range.
+   This shell had three states. The hamburger appeared at the 64rem tier,
+   but the controls only moved into it at 36rem, so across the whole tablet
+   band the menu opened onto an empty "Display" heading while version,
+   preset and theme sat outside it — and the bar, unable to fit them next
+   to the search, wrapped the search and the toggler onto a second grid
+   row: a 155px sticky header, on every page, across the whole tablet
+   range.
 
    One breakpoint now, and it is the one that already governs everything
-   else that collapses here — the same 1023px that hides the in-header nav
-   items and the sidebar. Above it the navbar is expanded; at or below it
-   the bar carries the brand, the search and the toggler on a single row,
+   else that collapses here — the same 64rem tier that hides the in-header
+   nav items and the sidebar. Above it the navbar is expanded; below it the
+   bar carries the brand, the search and the toggler on a single row,
    and the menu carries the rest. The script that moves the controls reads
    this same query, so the transfer and the toggler's visibility can never
    disagree again. */
-@media (max-width: 1023px) {
+@media (width < 64rem) {
   /* Collapsible content: it is inside the menu at these widths, and the
 	   menu is the only place it is. Nothing here is duplicated — the nav
 	   items and GitHub are re-listed in the panel markup, the three
@@ -990,9 +1030,8 @@
   }
 }
 
-@media (max-width: 575px) {
+@media (width < 36rem) {
   .docs-header-actions {
-    gap: var(--cirth-space-2);
     width: auto;
   }
 
@@ -1000,7 +1039,14 @@
 	   and still leave the brand room, so it becomes the icon it already
 	   carries. A presentation change on one control — not a second
 	   structural breakpoint: what lives in the menu is the same here as at
-	   1023px. */
+	   the 64rem tier. */
+  /* The width is stated as well as the basis, and it is not tidy-uppable:
+	   Chromium sizes this flex item from the basis alone, but Gecko and
+	   WebKit compute the row's intrinsic width from the item's content, so
+	   without it the actions cluster came out 66px wide holding 88px of
+	   controls and the menu toggle hung 6px off a 320px screen. Measured in
+	   Firefox; caught by the reflow spec, which is the reason that spec
+	   runs on three engines. */
   .docs-header-search {
     flex: 0 0 var(--cirth-space-10);
     width: var(--cirth-space-10);
@@ -1063,7 +1109,7 @@
   margin-bottom: calc(var(--cirth-spacing) * 2);
 }
 
-@media (min-width: 1280px) {
+@media (width >= 80rem) {
   .docs-toc-top {
     display: none;
   }
@@ -1074,7 +1120,7 @@
   display: none;
 }
 
-@media (min-width: 1280px) {
+@media (width >= 80rem) {
   .docs-toc {
     display: block;
     position: sticky;
@@ -1171,7 +1217,7 @@
   padding-bottom: calc(var(--cirth-spacing) * 2);
 }
 
-@media (min-width: 768px) {
+@media (width >= 48rem) {
   .docs-footer-top {
     grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
     gap: calc(var(--cirth-spacing) * 4);
@@ -1184,8 +1230,6 @@
    <a> resolves to the accent, because that is the slot the link component
    binds. */
 .docs-footer-brand {
-  display: inline-flex;
-  align-items: center;
   gap: 0.5rem;
 }
 
@@ -1194,7 +1238,6 @@
 }
 
 .docs-footer-credit {
-  margin-bottom: var(--cirth-spacing);
   color: var(--cirth-muted-color);
   font-size: var(--cirth-font-size-sm);
 }
@@ -1256,7 +1299,6 @@
 /* Markdown header anchors (markdown-it-anchor emits .header-anchor links) */
 .header-anchor {
   margin-left: 0.25em;
-  float: none;
   opacity: 0;
 }
 
@@ -1375,14 +1417,9 @@ pre:not(.docs-demo-preview *) {
   font-weight: var(--cirth-font-weight-bold);
 }
 
-/* Highlight.js theme — dark */
-/* The shared muted role is already measured against the highest dark
-   surface, so comments can follow it without a docs-only palette step. */
-[data-theme="dark"] .hljs-comment,
-[data-theme="dark"] .hljs-quote {
-  color: var(--cirth-muted-color);
-}
-
+/* Highlight.js theme — dark. Comments are absent: --cirth-muted-color is a
+   light-dark() pair, so the light rule above already carries both values,
+   and the role is measured against the highest dark surface either way. */
 [data-theme="dark"] .hljs-keyword,
 [data-theme="dark"] .hljs-selector-tag,
 [data-theme="dark"] .hljs-doctag,
@@ -1435,20 +1472,17 @@ pre > button.copy {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  /* 44px: same WCAG 2.5.5 target size the library's own controls use
-	   (see src/theme/_styles.scss) — this is a custom control outside
-	   Cirth's button system, so it doesn't inherit that floor for free. */
+  /* Square on the 44px WCAG 2.5.5 target size. Only the width is stated:
+	   this is a <button>, so the library's own control floor gives it the
+	   height, and its radius and pointer cursor with it. */
   width: 2.75rem;
-  height: 2.75rem;
   margin: 0;
   padding: 0;
   /* Ghost: no border, transparent at rest — a background only shows up
 	   as a hover/focus affordance, matching the GitHub code-block copy
 	   button rather than the bordered/hover-revealed treatment before. */
   border: none;
-  border-radius: var(--cirth-border-radius);
   background-color: transparent;
-  cursor: pointer;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -1533,10 +1567,7 @@ pre > button.copy.copied::before {
 }
 
 .docs-demo-source code {
-  display: block;
   padding: 0;
-  background: none;
-  white-space: pre;
 }
 
 /* Brand page: logo variant tiles. Each tile carries its own data-theme so
@@ -1554,14 +1585,13 @@ pre > button.copy.copied::before {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--cirth-border-width);
   margin: 1.5rem 0;
-  padding: 0;
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
   border-radius: var(--cirth-card-border-radius);
   background: var(--cirth-card-border-color);
   overflow: clip;
 }
 
-@media (min-width: 576px) {
+@media (width >= 36rem) {
   .docs-brand-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -1691,11 +1721,9 @@ pre > button.copy.copied::before {
   justify-content: space-between;
   gap: 1rem;
   min-height: 2.5rem;
-  margin: 0;
   padding: 0.5rem 0.75rem;
   border-block-end: var(--cirth-border-width) solid
     var(--cirth-card-border-color);
-  color: var(--cirth-muted-color);
   font-size: var(--cirth-font-size-sm);
   line-height: 1.35;
 }
@@ -1767,7 +1795,6 @@ pre > button.copy.copied::before {
     var(--cirth-font-size-7xl)
   );
   --cirth-line-height: var(--cirth-line-height-none);
-  --cirth-letter-spacing: var(--cirth-letter-spacing-tight);
 
   max-width: 20ch;
   margin: 0;
@@ -1860,9 +1887,6 @@ pre > button.copy.copied::before {
   --cirth-card-sectioning-background-color: transparent;
 
   display: grid;
-  /* auto, not minmax(0, 1fr): the pane is as tall as the snippet, which
-     is what took the fixed height out of this file. See the <pre> rule. */
-  grid-template-rows: auto auto;
   min-width: 0;
   overflow: clip;
 }
@@ -1876,8 +1900,6 @@ pre > button.copy.copied::before {
   gap: 0.5rem;
   min-height: 2.5rem;
   padding: 0.375rem 0.75rem;
-  border-block-end: var(--cirth-border-width) solid
-    var(--cirth-card-border-color);
   color: var(--cirth-muted-color);
   font-family: var(--cirth-font-family-mono);
   font-size: var(--cirth-font-size-xs);
@@ -1898,24 +1920,19 @@ pre > button.copy.copied::before {
      source panel hiding a third of its source. A number that has to be
      re-derived from the content is the content's to set, so the pane is
      as tall as the markup and the hero is as tall as the pane. The cap
-     comes back on a phone (see the 767px block), where the full snippet
+     comes back on a phone (see the 48rem block), where the full snippet
      would be the whole screen. */
-  margin: 0;
   border: 0;
   border-radius: 0;
   background: var(--cirth-code-background-color);
   font-size: var(--cirth-font-size-xs);
   line-height: 1.65;
 
-  /* Scrolls rather than wraps, like every other code block on the site.
-	   Wrapping kept the whole snippet in view at the cost of breaking a
-	   long attribute across two lines mid-token, which is the one thing a
-	   source panel must not do — the panel exists to show what the markup
-	   actually looks like. The <pre> already carries tabindex="0", so the
-	   scroll region is keyboard reachable. */
-  white-space: pre;
-  overflow: auto;
-
+  /* Scrolls rather than wraps, like every other code block on the site —
+	   and it does so on the library's own `pre` rule, which is where the
+	   scroll container and its focus ring come from. Wrapping would break a
+	   long attribute mid-token, which is the one thing a source panel must
+	   not do. */
 }
 
 /* The hero has no controls in it at all, and the copy button is one. The
@@ -1950,19 +1967,13 @@ pre > button.copy.copied::before {
   min-width: 0;
   border-radius: var(--cirth-card-border-radius);
   background: var(--cirth-background-color);
-  box-shadow:
-    var(--cirth-card-box-shadow),
-    var(--cirth-card-box-shadow);
   overflow: clip;
 }
 
 .docs-output-frame iframe {
   position: absolute;
-  inset: 0;
-  display: block;
   width: 100%;
   height: 100%;
-  border: 0;
   background: var(--cirth-background-color);
 }
 
@@ -2065,7 +2076,6 @@ pre > button.copy.copied::before {
 
 .docs-native-home .docs-showcase-lede > p:last-child {
   color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-md);
 }
 
 /* The state mark, in the annotation voice the rest of this site uses for
@@ -2210,7 +2220,7 @@ pre > button.copy.copied::before {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
 }
 
-@media (min-width: 60rem) {
+@media (width >= 60rem) {
   .docs-stage-split {
     grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
   }
@@ -2258,12 +2268,6 @@ pre > button.copy.copied::before {
   background: none;
   font-size: var(--cirth-font-size-xs);
   line-height: 1.65;
-
-  /* Scrolls rather than wraps, like every other code block on the site: a
-     source pane must not break a long attribute mid-token. The <pre>
-     carries tabindex="0", so the scroll region stays keyboard reachable. */
-  white-space: pre;
-  overflow: auto;
 }
 
 /* The contextual way out to the examples page, which is the one thing the
@@ -2440,7 +2444,7 @@ pre > button.copy.copied::before {
   content: " →";
 }
 
-@media (min-width: 60rem) {
+@media (width >= 60rem) {
   .docs-proof-metrics {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -2507,7 +2511,6 @@ pre > button.copy.copied::before {
    is the shell's own compact control box, and the labels are one word each
    so three of them fit a 320px band without scrolling or a select. */
 .docs-switch button {
-  width: auto;
   min-height: 2.25rem;
   margin: 0;
   padding: 0.25rem 0.75rem;
@@ -2515,7 +2518,6 @@ pre > button.copy.copied::before {
   border-radius: var(--docs-chrome-radius);
   background: none;
   color: var(--cirth-muted-color);
-  font-family: inherit;
   font-size: inherit;
 }
 
@@ -2645,7 +2647,6 @@ cirth-theme-preview:not(:defined) {
    single class, so leaving one of them out hands that state back. */
 .docs-stage-toggle,
 .docs-stage-toggle:is(:hover, :active, :focus, :focus-visible) {
-  width: auto;
   min-height: 1.75rem;
   margin: 0;
   padding: 0.125rem 0.625rem;
@@ -2653,7 +2654,6 @@ cirth-theme-preview:not(:defined) {
   border-radius: var(--docs-chrome-radius);
   background: var(--cirth-canvas);
   color: var(--cirth-muted-color);
-  font-family: inherit;
   font-size: inherit;
 }
 
@@ -2821,7 +2821,7 @@ cirth-theme-preview:not(:defined) {
   grid-column: 5 / -1;
 }
 
-@media (max-width: 1279px) {
+@media (width < 80rem) {
   .docs-native-grid {
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }
@@ -2861,7 +2861,7 @@ cirth-theme-preview:not(:defined) {
    the stacked demo is capped at a width the two panes can still be read
    side by side at, rather than being handed the whole page because
    nothing else is in the row. */
-@media (max-width: 1239px) {
+@media (width < 77.5rem) {
   .docs-native-hero .docs-native-grid {
     grid-template-columns: minmax(0, 1fr);
     row-gap: 2rem;
@@ -2881,7 +2881,7 @@ cirth-theme-preview:not(:defined) {
   }
 }
 
-@media (max-width: 767px) {
+@media (width < 48rem) {
   .docs-native-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     width: min(100% - 1.5rem, var(--docs-shell-max));
@@ -2916,7 +2916,6 @@ cirth-theme-preview:not(:defined) {
   .docs-output-frame {
     order: 2;
     grid-column: 1;
-    align-self: auto;
 
     /* 26rem, not 31rem. The rendered page is 365–405px tall at every width
        in this range, so 496px left ~130px of empty lab canvas under the
@@ -2998,7 +2997,7 @@ cirth-theme-preview:not(:defined) {
    framework default and the two no longer lined up). 60rem is right for a
    single measure of prose and too narrow for this site once a rail and a
    page outline sit on either side of doc content. */
-@media (min-width: 1024px) {
+@media (width >= 64rem) {
   body {
     --cirth-container-max-width: var(--docs-shell-max);
   }
@@ -3009,13 +3008,15 @@ cirth-theme-preview:not(:defined) {
     var(--cirth-space-16);
 }
 
-@media (min-width: 1024px) {
+@media (width >= 64rem) {
   .docs-layout {
     grid-template-columns: var(--docs-rail-width) minmax(0, 1fr);
   }
 
+  /* No inset: this rail is not positioned. It was `position: sticky` once
+	   and stopped being so; the `top` that outlived it computed to nothing
+	   for as long as it stayed. */
   .docs-sidebar {
-    top: 5.5rem;
     max-height: calc(100vh - 7rem);
     padding-inline-end: 1rem;
     border-inline-end: var(--cirth-border-width) solid
@@ -3023,7 +3024,7 @@ cirth-theme-preview:not(:defined) {
   }
 }
 
-@media (min-width: 1280px) {
+@media (width >= 80rem) {
   .docs-layout {
     grid-template-columns: var(--docs-rail-width) minmax(0, 1fr) var(
         --docs-toc-width
@@ -3158,13 +3159,13 @@ cirth-theme-preview:not(:defined) {
     var(--cirth-card-border-color);
 }
 
+/* No padding or border reset: the chapter rule that used to reach these is
+   scoped with `>` to the level markdown emits it at, so it never has. */
 .docs-brand-spec-header h2,
 .docs-proof-strip > header h2,
 .docs-build-comparison > header h2 {
   max-width: 30ch;
   margin: 0;
-  padding: 0;
-  border: 0;
 }
 
 .docs-brand-spec-header > h2 + p,
@@ -3213,11 +3214,9 @@ cirth-theme-preview:not(:defined) {
    which clips its corners for it. */
 details.docs-demo-source {
   margin: 0;
-  padding: 0;
   border: 0;
   border-block-start: var(--cirth-border-width) solid
     var(--cirth-card-border-color);
-  border-radius: 0;
   background: var(--cirth-code-background-color);
 }
 
@@ -3234,15 +3233,12 @@ details.docs-demo-source[open] {
 }
 
 details.docs-demo-source pre {
-  margin: 0;
   padding: 1rem;
   border: 0;
   border-block-start: var(--cirth-border-width) solid
     var(--cirth-card-border-color);
   border-radius: 0;
   background: none;
-  box-shadow: none;
-  font-size: var(--cirth-font-size-sm);
 }
 
 details.docs-demo-source pre::before {
@@ -3256,7 +3252,6 @@ details.docs-demo-source[open] > summary {
 
 .docs-sidebar details {
   margin: 0 0 0.5rem;
-  padding: 0;
   border: 0;
   background: transparent;
 }
@@ -3302,14 +3297,12 @@ details.docs-demo-source > :not(summary) {
 
 .docs-sidebar nav li a,
 .docs-toc a {
-  display: block;
   margin: 0;
   margin-inline-start: calc(var(--cirth-border-width-2) * -1);
   padding-block: 0.35rem;
   padding-inline: var(--cirth-space-3) 0;
   color: var(--cirth-muted-color);
   font-size: var(--cirth-font-size-xs);
-  text-decoration: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -3328,7 +3321,7 @@ details.docs-toc-top {
   background: var(--cirth-card-background-color);
 }
 
-@media (max-width: 1023px) {
+@media (width < 64rem) {
   .docs-header .docs-menu-toggle {
     display: inline-grid;
   }
@@ -3373,7 +3366,6 @@ details.docs-toc-top {
   }
 
   details.docs-mobile-nav > :not(summary) {
-    padding-inline: var(--cirth-space-4);
   }
 
   .docs-mobile-nav nav section {
@@ -3410,9 +3402,8 @@ details.docs-toc-top {
   }
 }
 
-@media (max-width: 575px) {
+@media (width < 36rem) {
   .docs-header-start-group {
-    display: flex;
     width: 100%;
   }
 
@@ -3426,7 +3417,6 @@ details.docs-toc-top {
   }
 
   .docs-header nav > ul > li {
-    margin: 0;
     padding: 0;
   }
 
@@ -3440,7 +3430,7 @@ details.docs-toc-top {
   }
 }
 
-@media (max-width: 359px) {
+@media (width < 22.5rem) {
   .docs-mobile-tools {
     grid-template-columns: 1fr;
   }
@@ -3518,7 +3508,6 @@ details.docs-toc-top {
 
 .docs-mark-clearspace img {
   width: 54%;
-  height: 54%;
 }
 
 .docs-mark-clearspace i {
@@ -3569,7 +3558,7 @@ details.docs-toc-top {
   margin: 0.5rem 0 0;
 }
 
-@media (max-width: 767px) {
+@media (width < 48rem) {
   .docs-brand-construction {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -3642,8 +3631,9 @@ details.docs-toc-top {
 /* Four build panes, divided by the gap. The <figure> stays a <figure> —
    a captioned specimen is what the element is for — but its dividing lines
    are the container's, not four borders and a :nth-child(2n) to take one
-   of them back off. Dropping to a single column below 768px is now the
-   column count alone; it used to need a rule cancelling the ladder too. */
+   of them back off. Dropping to a single column below the 48rem tier is now
+   the column count alone; it used to need a rule cancelling the ladder
+   too. */
 .docs-build-comparison > div {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3678,7 +3668,6 @@ details.docs-toc-top {
   display: block;
   width: 100%;
   height: 30rem;
-  border: 0;
   background: var(--cirth-background-color);
 }
 
@@ -3689,7 +3678,7 @@ details.docs-toc-top {
   font-size: var(--cirth-font-size-xs);
 }
 
-@media (max-width: 767px) {
+@media (width < 48rem) {
   .docs-proof-strip dl {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -3810,7 +3799,7 @@ details.docs-toc-top {
   overflow-wrap: anywhere;
 }
 
-@media (max-width: 767px) {
+@media (width < 48rem) {
   .docs-theme-lab {
     grid-template-columns: 1fr;
   }
