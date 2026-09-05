@@ -123,6 +123,10 @@ npm run check:a11y    # axe WCAG 2.0–2.2 A/AA audit of every docs page
 npm run check:visual  # screenshot diff across docs pages and maintained presets
 ```
 
+Two more tools run on demand rather than in CI — a rendering fingerprint and
+a dead-CSS audit. See [On demand](#on-demand-the-rendering-fingerprint-and-the-dead-css-audit)
+below.
+
 The browser-based checks need the Playwright browsers once:
 `npx playwright install chromium firefox webkit`.
 
@@ -297,6 +301,93 @@ regression. Re-run the check (or wait for the bot commit and push again)
 once it lands. If `check:visual` fails and you *didn't* intend a visual
 change, that's the check working — fix the regression instead of
 updating baselines.
+
+### On demand: the rendering fingerprint and the dead-CSS audit
+
+Two tools that do not run in CI. They answer a question the gates above
+cannot: *is this refactor really a no-op, and is this rule really dead?*
+
+```sh
+node scripts/fingerprint-docs.js --out .cache/before.json
+# make the change, then:
+npm run docs:build
+node scripts/fingerprint-docs.js --compare .cache/before.json
+```
+
+`fingerprint-docs.js` walks the built site and records one hash per
+rendering: every page, at 1440, 1100, 900 and 390, in light and dark, twice
+over — as the page loads, and again with every `<details>`, `<dialog>` and
+popover opened. Both of those matter. A rule that only paints inside the
+drawer or the search dialog is invisible to anything that looks at a page
+that has just loaded; and the shell's tier ladder has seven boundaries, so
+sampling only 1440 and 390 leaves the whole tablet band unmeasured. 800
+renderings, about a minute, and `--compare` names the elements that moved
+rather than only telling you something did.
+
+Each element is hashed on two things: its box and its paint-bearing
+computed style, and separately the tag, the text it owns and the attributes
+that belong to the document rather than to its styling (`href`, `id`,
+`role`, `aria-*`, …). So a copy change is a finding even when nothing
+re-wraps — which is how it should have caught "Zero JavaScript" becoming
+"No JavaScript runtime". It renders under `prefers-reduced-motion: reduce`,
+because a measurement taken half way through a transition is noise, and it
+says so rather than pretending otherwise.
+
+```sh
+node scripts/audit-dead-css.js                       # the whole shell stylesheet
+node scripts/audit-dead-css.js --filter ".docs-toc"  # one family of selectors
+node scripts/audit-dead-css.js --explain-order       # show what it visits first, and why
+node scripts/audit-dead-css.js --json .cache/dead.json
+```
+
+`audit-dead-css.js` uses the same corpus to test declarations one at a
+time: take it out of the live CSSOM, re-measure, put it back. It surveys
+first — one pass that records which declarations each rendering can even
+see — and then probes richest-rendering-first, so a declaration proved live
+on the home page is never probed on the other forty-nine pages. Five
+verdicts:
+
+- **live** — removing it changed something, and the report names the first
+  rendering that noticed.
+- **inert** — its selector matched real elements, and removing it changed
+  nothing anywhere in the corpus. A candidate for deletion; read it before
+  you delete it.
+- **unmatched** — its selector never matched an element on any page. Read
+  this as a fact about the corpus too: it *opens* what a page keeps closed,
+  but it never types, hovers or clicks, so markup a script builds in
+  response to input — the search results Pagefind renders after a query —
+  lands here and is very much alive.
+- **not observable** — it sits under a media context the corpus does not
+  enter (`forced-colors`, `print`, `prefers-reduced-motion: no-preference`),
+  or behind a state it does not reach (`:hover`, `:focus`, `::backdrop`,
+  `::selection`), or it does something a still photograph cannot show: an
+  `env(safe-area-inset-*)` that resolves to zero on a machine without a
+  notch, an inset on a `position: sticky` box in a corpus that never
+  scrolls, a transition. **Not a finding.** These have not been shown to be
+  dead; they have not been looked at.
+- **unprobeable** — the declaration could not be taken out of the rule at
+  all, because it is a longhand of a shorthand written with `var()`, which
+  the engine stores whole. The experiment never ran, so there is no verdict.
+
+The last two categories are the reason to trust the first two. A report
+that cannot say "I did not measure this" will eventually persuade someone
+to delete a hover state.
+
+Two more things the corpus is not, both learned by acting on it and being
+caught: it is **one engine**, and Chromium's intrinsic sizing is not
+Gecko's — a `width` beside a `flex-basis` measured inert, and without it
+Firefox hung the menu toggle 6px off a 320px screen. And it is **one
+theme** — two declarations that resolve alike under the default need not
+under `playroom`. `check:behavior` runs three engines and `check:visual`
+renders the presets; run both after acting on this report, not instead of
+reading it.
+
+A whole-sheet run takes about an hour: it re-probes anything still
+undecided on every one of the 800 renderings, which is exactly what makes
+an "inert everywhere" verdict worth having. `--filter` narrows it to one
+selector family in a couple of minutes. Neither tool fails a build: an
+inert declaration is something for a person to look at, and a check that
+blocks a merge over one only teaches people to stop running it.
 
 ## What makes a good contribution
 

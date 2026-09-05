@@ -11,5 +11,10 @@
 		"skipLibCheck": true,
 		"resolveJsonModule": true
 	},
-	"include": ["scripts/**/*.js", "playwright.config.js", "tests/**/*.js"]
+	"include": [
+		"scripts/**/*.js",
+		"scripts/**/*.d.ts",
+		"playwright.config.js",
+		"tests/**/*.js"
+	]
 }
