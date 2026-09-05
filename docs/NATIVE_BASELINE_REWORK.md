@@ -28,6 +28,47 @@ The shell may compose components but must not silently restyle a live product
 example. Documentation JavaScript switches already-rendered build/theme labs;
 the initial example and all fundamental content remain available without it.
 
+### The declared exceptions inside a live example
+
+Every demo is captioned *Authentic Cirth · shell overrides declared in
+source*. That plural is two rules, and this is the list. Enumerated against
+the built site: no other shell declaration reaches a node inside a
+`.docs-demo-preview`.
+
+```css
+.docs-demo-preview > :last-child {
+  margin-bottom: 0;
+}
+```
+
+The frame's padding contract, not a restyle. A padded box closes the
+trailing margin of what it holds — exactly what `components/_card.scss`
+does for `<article>`, and what the Card page documents as the container's
+job. Without it, 172 demos carry a dead gutter between the last element and
+the frame's own padding. It stays in the shell and does **not** move into
+the core: the core's job is to give an element its rhythm, and closing that
+rhythm at a container's edge is the container's decision. `.docs-demo-preview`
+is a container the documentation invented, so it is the documentation that
+owes the contract.
+
+```css
+.docs-visited-swatch { … }
+```
+
+A shell class used inside one demo's own visible markup
+(`content/demos/links.html`), where the example is *about* the visited-link
+token and needs to show it inline. It styles a `<span>` the demo author
+wrote, not a framework element the demo is demonstrating, which is why it
+does not make the caption untrue.
+
+Two rules that used to reach in and no longer do are recorded here so the
+boundary is not re-crossed by accident: the reading column's
+`--cirth-line-height` and `--cirth-typography-spacing-vertical`, which are
+inherited custom properties and re-timed every example until the preview
+handed the framework's own values back, and the chapter rules on headings
+and code-block chrome, which are now scoped with `>` to the level markdown
+emits them at.
+
 ## System rules
 
 - 8 px base unit, with 4 px reserved for fine alignment and annotation.
