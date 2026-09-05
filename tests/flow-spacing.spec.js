@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
+const { setContent } = require("./helpers/render");
 
 // Three structural defaults, asserted as relationships rather than as
 // numbers: what a disclosure puts between its trigger and its panel, what
@@ -36,7 +37,7 @@ const builds = [
  * @param {string} markup
  */
 const render = (page, css, markup) =>
-	page.setContent(`<style>${css}</style><main>${markup}</main>`);
+	setContent(page, `<style>${css}</style><main>${markup}</main>`);
 
 /**
  * A token read off the element that resolves it. Several of these are

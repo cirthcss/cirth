@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
+const { setContent } = require("./helpers/render");
 
 // gh#75 — a long unbroken label (a URL, a token, a hash) used to grow a
 // button to its intrinsic width and carry it outside its container. The
@@ -71,7 +72,7 @@ const render = async (page, build) => {
 
 	const content = markup(build.name);
 
-	await page.setContent(
+	await setContent(page,
 		build.scope ? `<div class="${build.scope}">${content}</div>` : content,
 	);
 	await page.addStyleTag({ path: stylesheet });

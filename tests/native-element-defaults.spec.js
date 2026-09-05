@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
+const { setContent } = require("./helpers/render");
 
 // The defects the docs/core ownership audit found, pinned against the
 // compiled stylesheet with no documentation shell anywhere near them.
@@ -40,7 +41,7 @@ const defaultBuild = read("dist/cirth.css");
  * @param {string} markup
  */
 const render = (page, css, markup) =>
-	page.setContent(`<style>${css}</style><main>${markup}</main>`);
+	setContent(page, `<style>${css}</style><main>${markup}</main>`);
 
 // --- 1. The disclosure marker is centred on the line it belongs to ------
 
@@ -499,7 +500,7 @@ for (const preset of ["(none)", ...presetFiles]) {
 					preset === "(none)"
 						? ""
 						: `<style>${read(`dist/presets/${preset}`)}</style>`;
-				await page.setContent(
+				await setContent(page,
 					`<style>${defaultBuild}</style>${overlay}<main><p id="copy">Body copy.</p></main>`,
 				);
 
@@ -857,4 +858,334 @@ test("default: a table in .overflow-auto scrolls and takes a focus ring", async 
 	expect(await region.evaluate((element) => element.scrollLeft)).toBeGreaterThan(
 		0,
 	);
+});
+
+// --- 9. <ol> and <ul> are the same nav ----------------------------------
+
+// A breadcrumb is an ordered sequence, so <ol> is the element for it — and
+// <ol> was the element the framework did not style. `nav, nav ul { display:
+// flex }` left an ordered list at `display: block` with `inline-block`
+// items, which is the one layout mode that *renders* the newlines a source
+// file has between <li> elements, and the breadcrumb block was scoped to
+// `ul` as well, so the separator never had any content to draw. The more
+// correct markup got a narrower trail, whitespace between the items that
+// tracked the file's indentation, and no dividers at all.
+//
+// The assertion is a comparison, not a set of numbers: the two lists are
+// the same nav, so they must measure the same. Real newlines and tabs sit
+// between the items on purpose — without them the whitespace half of the
+// defect cannot appear.
+
+/** @type {{ file: string, name: string, wrapper: string }[]} */
+const scopedAndUnscoped = [
+	{ file: "dist/cirth.css", name: "default", wrapper: "" },
+	{ file: "dist/cirth.classless.css", name: "classless", wrapper: "" },
+	{ file: "dist/cirth.scoped.css", name: "scoped", wrapper: "cirth" },
+	{
+		file: "dist/cirth.classless.scoped.css",
+		name: "classless scoped",
+		wrapper: "cirth",
+	},
+];
+
+/** @param {"ol" | "ul"} tag @param {string} id */
+const trail = (tag, id) =>
+	`<nav id="${id}" aria-label="breadcrumb">
+		<${tag}>
+			<li><a href="/">Home</a></li>
+			<li><a href="/library/">Library</a></li>
+			<li><a href="/library/data/" aria-current="page">Data</a></li>
+		</${tag}>
+	</nav>`;
+
+for (const build of scopedAndUnscoped) {
+	test(`${build.name}: a breadcrumb measures the same as <ol> and as <ul>`, async ({
+		page,
+	}) => {
+		const markup = `${trail("ul", "as-ul")}${trail("ol", "as-ol")}`;
+		await setContent(
+			page,
+			`<style>${read(build.file)}</style><main>${
+				build.wrapper ? `<div class="${build.wrapper}">${markup}</div>` : markup
+			}</main>`,
+		);
+
+		const measured = await page.evaluate(() =>
+			["as-ul", "as-ol"].map((id) => {
+				const nav = /** @type {HTMLElement} */ (document.getElementById(id));
+				const list = /** @type {HTMLElement} */ (
+					nav.querySelector(":is(ol, ul)")
+				);
+				const items = /** @type {HTMLElement[]} */ ([
+					...list.querySelectorAll("li"),
+				]);
+				const round = (/** @type {number} */ value) =>
+					Number.parseFloat(value.toFixed(2));
+
+				return {
+					id,
+					display: getComputedStyle(list).display,
+					listWidth: round(list.getBoundingClientRect().width),
+					itemWidths: items.map((item) =>
+						round(item.getBoundingClientRect().width),
+					),
+					// Source formatting rendered as whitespace is the defect's
+					// signature: between flex items this is exactly the gutter.
+					seams: items
+						.slice(1)
+						.map((item, index) =>
+							round(
+								item.getBoundingClientRect().left -
+									items[index].getBoundingClientRect().right,
+							),
+						),
+					divider: getComputedStyle(items[0], "::after").content,
+				};
+			}),
+		);
+
+		const [asUl, asOl] = measured;
+
+		expect(asUl.display, "a nav list is a flex container").toBe("flex");
+		expect({ ...asOl, id: "as-ul" }, "<ol> renders differently from <ul>").toEqual(
+			asUl,
+		);
+
+		// And the separator is drawn — the half of this that no amount of
+		// comparing the two lists to each other would have caught.
+		expect(asOl.divider, "the breadcrumb divider is missing").not.toBe("none");
+
+		// Items tile on the list's own gutter, with no source formatting
+		// wedged between them.
+		for (const seam of asOl.seams) {
+			expect(seam, "whitespace between breadcrumb items").toBeLessThanOrEqual(
+				8.5,
+			);
+		}
+	});
+}
+
+// The same contract outside a breadcrumb: a plain navigation list and a
+// navbar both take the flex row whichever list element they are written
+// with, and a stacked nav releases it for both in the same way.
+for (const [name, css] of builds) {
+	test(`${name}: a nav list is a row as <ol> and as <ul>, stacked or not`, async ({
+		page,
+	}) => {
+		const list = (/** @type {"ol" | "ul"} */ tag) =>
+			`<${tag}>
+				<li><a href="#a">Overview</a></li>
+				<li><a href="#b">Tokens</a></li>
+			</${tag}>`;
+
+		await render(
+			page,
+			css,
+			["ol", "ul"]
+				.map(
+					(tag) => `<div id="bar-${tag}" style="inline-size: 640px">
+						<nav aria-label="Bar ${tag}">${list(/** @type {"ol"} */ (tag))}</nav>
+					</div>
+					<header id="navbar-${tag}" style="inline-size: 640px">
+						<nav aria-label="Navbar ${tag}">${list(/** @type {"ol"} */ (tag))}</nav>
+					</header>
+					<aside id="rail-${tag}" style="inline-size: 240px">
+						<nav aria-label="Rail ${tag}">${list(/** @type {"ol"} */ (tag))}</nav>
+					</aside>`,
+				)
+				.join(""),
+		);
+
+		const shapes = await page.evaluate(() =>
+			["bar", "navbar", "rail"].map((shape) => {
+				const read = (/** @type {"ol" | "ul"} */ tag) => {
+					const host = /** @type {HTMLElement} */ (
+						document.getElementById(`${shape}-${tag}`)
+					);
+					const inner = /** @type {HTMLElement} */ (
+						host.querySelector(":is(ol, ul)")
+					);
+					const first = /** @type {HTMLElement} */ (
+						inner.querySelector("li")
+					);
+					return {
+						display: getComputedStyle(inner).display,
+						width: Number.parseFloat(
+							inner.getBoundingClientRect().width.toFixed(2),
+						),
+						itemHeight: Number.parseFloat(
+							first.getBoundingClientRect().height.toFixed(2),
+						),
+					};
+				};
+
+				return { shape, ol: read("ol"), ul: read("ul") };
+			}),
+		);
+
+		for (const shape of shapes) {
+			expect(shape.ol, `${shape.shape}: <ol> and <ul> disagree`).toEqual(
+				shape.ul,
+			);
+		}
+
+		// The two shapes really are different, so the equality above is not
+		// passing because everything collapsed to the same thing.
+		const [bar, , rail] = shapes;
+		expect(bar.ul.display).toBe("flex");
+		expect(rail.ul.display).toBe("block");
+	});
+}
+
+// --- 10. --cirth-spacing is the flow knob, and only the flow knob --------
+
+// It reads as the density control and it was only half wired. `.grid` gaps
+// and section margins followed it; paragraph rhythm did not, because
+// --cirth-typography-spacing-vertical was declared as its own copy of
+// --cirth-space-4 — so the playroom preset had to restate it, and every
+// future preset would have had to remember. It is derived now.
+//
+// The other half of the contract is what deliberately does *not* follow:
+// control padding, which the 44px target-size floor is computed from, and
+// card padding, which is named on the space scale one step above the
+// controls so a container is more generous than its contents at every
+// setting of the knob. Both are asserted here, because "it did not move"
+// is a promise exactly as much as "it moved" is.
+//
+// Set at the root, which is where the documentation says to set it and the
+// only place it can work: every token that derives from it is declared at
+// the root too, so substitution happens there and the result inherits.
+
+/**
+ * @param {import("@playwright/test").Page} page
+ * @param {string} css
+ * @param {string} [spacing]
+ */
+const flowRhythm = async (page, css, spacing) => {
+	await setContent(
+		page,
+		`<style>${css}</style>` +
+			(spacing ? `<style>:root { --cirth-spacing: ${spacing} }</style>` : "") +
+			`<main>
+				<p id="copy">Body copy.</p>
+				<section id="section">A section.</section>
+				<article id="card">On a card.</article>
+				<input id="field" type="text">
+			</main>`,
+	);
+
+	return page.evaluate(() => {
+		const style = (/** @type {string} */ id) =>
+			getComputedStyle(
+				/** @type {Element} */ (document.getElementById(id)),
+			);
+		const root = getComputedStyle(document.documentElement);
+
+		return {
+			spacing: root.getPropertyValue("--cirth-spacing").trim(),
+			// Flow: follows the knob.
+			paragraph: style("copy").marginBottom,
+			section: style("section").marginBottom,
+			// Components: pinned, on purpose.
+			cardPadding: style("card").paddingTop,
+			fieldPadding: style("field").paddingTop,
+			fieldHeight: style("field").height,
+		};
+	});
+};
+
+for (const [name, css] of builds) {
+	for (const [spacing, expected] of [
+		["1.25rem", "20px"],
+		["0.75rem", "12px"],
+	]) {
+		test(`${name}: --cirth-spacing at ${spacing} retimes the flow and not the controls`, async ({
+			page,
+		}) => {
+			const control = await flowRhythm(page, css);
+			const dense = await flowRhythm(page, css, spacing);
+
+			// The token is unregistered, so it holds the literal it was given;
+			// what is asserted below is what the flow computed from it.
+			expect(dense.spacing).toBe(spacing);
+
+			expect(
+				dense.paragraph,
+				"paragraph rhythm did not follow --cirth-spacing",
+			).toBe(expected);
+			expect(dense.section, "section rhythm did not follow --cirth-spacing").toBe(
+				expected,
+			);
+			expect(dense.paragraph).not.toBe(control.paragraph);
+
+			expect(dense.cardPadding, "card padding followed the flow knob").toBe(
+				control.cardPadding,
+			);
+			expect(dense.fieldPadding, "control padding followed the flow knob").toBe(
+				control.fieldPadding,
+			);
+			expect(dense.fieldHeight, "a target size moved with the flow knob").toBe(
+				control.fieldHeight,
+			);
+		});
+	}
+}
+
+// A container stays more generous than the controls inside it at every
+// setting of the knob — the relationship the card's own comment claims.
+// Derived from --cirth-spacing rather than named on the scale, the two
+// would have crossed the first time a preset tightened it.
+for (const [name, css] of builds) {
+	test(`${name}: a card stays roomier than its controls at any --cirth-spacing`, async ({
+		page,
+	}) => {
+		for (const spacing of [undefined, "0.5rem", "2rem"]) {
+			const measured = await flowRhythm(page, css, spacing);
+			expect(
+				Number.parseFloat(measured.cardPadding),
+				`card vs control padding at --cirth-spacing: ${spacing ?? "default"}`,
+			).toBeGreaterThan(Number.parseFloat(measured.fieldPadding));
+		}
+	});
+}
+
+// And the reason the derivation was worth making: a preset that opens the
+// flow up no longer has to restate the typography token to be consistent.
+// Playroom does not declare it any more; measured against the default
+// build, prose and grid gaps move together under it.
+test("default: the playroom preset retimes prose through --cirth-spacing alone", async ({
+	page,
+}) => {
+	await setContent(
+		page,
+		`<style>${defaultBuild}</style><style>${read(
+			"dist/presets/playroom.css",
+		)}</style><main class="container">
+			<p id="copy">Body copy.</p>
+			<div class="grid" id="grid"><div>a</div><div>b</div></div>
+		</main>`,
+	);
+
+	const measured = await page.evaluate(() => {
+		const root = getComputedStyle(document.documentElement);
+		const copy = getComputedStyle(
+			/** @type {Element} */ (document.getElementById("copy")),
+		);
+		const grid = getComputedStyle(
+			/** @type {Element} */ (document.getElementById("grid")),
+		);
+		return {
+			spacing: root.getPropertyValue("--cirth-spacing").trim(),
+			typography: root
+				.getPropertyValue("--cirth-typography-spacing-vertical")
+				.trim(),
+			paragraph: copy.marginBottom,
+			columnGap: grid.columnGap,
+		};
+	});
+
+	// 1.25rem — space-5 — and prose, grid and the knob all read it.
+	expect(measured.typography).toBe(measured.spacing);
+	expect(measured.paragraph).toBe("20px");
+	expect(measured.columnGap).toBe("20px");
 });

@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
+const { setContent } = require("./helpers/render");
 
 // gh#64 — the modal no longer asks an integrator's script for anything.
 //
@@ -44,7 +45,7 @@ const markup = `
 `;
 
 /** @param {import("@playwright/test").Page} page */
-const render = (page) => page.setContent(`<style>${css}</style>${markup}`);
+const render = (page) => setContent(page, `<style>${css}</style>${markup}`);
 
 /** @param {import("@playwright/test").Page} page */
 const measureWidth = (page) =>
@@ -280,7 +281,7 @@ test("a closed dialog renders nothing", async ({ page }) => {
 test("the close button is a full-size target around a small icon", async ({
 	page,
 }) => {
-	await page.setContent(
+	await setContent(page,
 		`<style>${css}</style>
 		<dialog id="sheet" open>
 			<article>

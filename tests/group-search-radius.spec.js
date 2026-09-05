@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
+const { setContent } = require("./helpers/render");
 
 // gh#69 — a search field keeps its pill shape on its own and inside the
 // dedicated [role="search"] group, but inside a generic group it is one
@@ -56,7 +57,7 @@ const render = async (page, build) => {
 
 	const content = markup(build.name);
 
-	await page.setContent(
+	await setContent(page,
 		build.scope ? `<div class="${build.scope}">${content}</div>` : content,
 	);
 	await page.addStyleTag({ path: stylesheet });

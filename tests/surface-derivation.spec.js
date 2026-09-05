@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
+const { setContent } = require("./helpers/render");
 
 const projectRoot = path.join(__dirname, "..");
 
@@ -86,7 +87,7 @@ const render = async (page, build, override = "") => {
 	const markup = build.wrapper
 		? `<div class="${build.wrapper}">${content()}<section data-theme="dark">${content("-forced")}</section></div>`
 		: `${content()}<section data-theme="dark">${content("-forced")}</section>`;
-	await page.setContent(
+	await setContent(page,
 		`<style>${read(build.file)}</style><style>${override}</style>${markup}`,
 	);
 };

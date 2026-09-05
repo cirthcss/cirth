@@ -2,6 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
 const { contrastRatio, parseColor } = require("../scripts/lib/color");
+const { setContent } = require("./helpers/render");
 
 // gh#32 — the @media print pass (src/utilities/_print.scss).
 //
@@ -84,7 +85,7 @@ const markup = `
  */
 const render = async (page, { media = "print", scheme = "light" } = {}) => {
 	await page.emulateMedia({ colorScheme: scheme, media });
-	await page.setContent(`<style>${css}</style>${markup}`);
+	await setContent(page, `<style>${css}</style>${markup}`);
 };
 
 /**

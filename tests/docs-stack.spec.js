@@ -1,4 +1,5 @@
 const { expect, test } = require("@playwright/test");
+const { setContent } = require("./helpers/render");
 const {
 	assertDocsBuilt,
 	createServer,
@@ -2131,7 +2132,7 @@ test("a demo renders the same as the same markup under cirth.css alone", async (
 	const inDocs = await page.evaluate(fingerprint);
 
 	// The same markup, at the same content width, with nothing but the build.
-	await page.setContent(
+	await setContent(page,
 		`<!doctype html><style>${build}</style><body style="margin: 0"><div id="probe" style="width: ${width}px">${snippet}</div></body>`,
 	);
 	const bare = await page.evaluate(fingerprint);

@@ -1,4 +1,5 @@
 const { expect, test } = require("@playwright/test");
+const { setContent } = require("./helpers/render");
 const {
 	assertDocsBuilt,
 	createServer,
@@ -443,7 +444,7 @@ test("framework interactive state matrix", async ({ page }, testInfo) => {
 		)
 		.join("");
 	await page.setViewportSize({ width: 1600, height: 900 });
-	await page.setContent(`<!doctype html>
+	await setContent(page, `<!doctype html>
 		<style>
 			* { box-sizing: border-box; }
 			body { margin: 0; padding: 24px; background: #f4f2ed; color: #272934; font: 14px/1.4 system-ui, sans-serif; }

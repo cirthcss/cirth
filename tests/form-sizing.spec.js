@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
+const { setContent } = require("./helpers/render");
 
 // How tall form controls come out, which is two separate questions.
 //
@@ -38,7 +39,7 @@ for (const fontSize of ["1rem", "0.875rem", "0.75rem"]) {
 	test(`controls stay at least ${TARGET}px at font-size ${fontSize}`, async ({
 		page,
 	}) => {
-		await page.setContent(
+		await setContent(page,
 			`<style>${css}</style>
 			<main class="container" style="font-size: ${fontSize}">
 				<input id="text" type="text" style="font-size: inherit">
@@ -61,7 +62,7 @@ for (const customMetrics of [false, true]) {
 	test(`equivalent controls share their geometry${
 		customMetrics ? " after a runtime metric override" : ""
 	}`, async ({ page }) => {
-		await page.setContent(
+		await setContent(page,
 			`<style>${css}</style>
 			<main class="container"${
 				customMetrics
@@ -150,7 +151,7 @@ const rowsVisible = (page, /** @type {string} */ id) =>
 
 /** @param {import("@playwright/test").Page} page */
 const renderTextareas = (page) =>
-	page.setContent(
+	setContent(page,
 		`<style>${css}</style>
 		<main class="container">
 			<textarea id="default"></textarea>
@@ -201,7 +202,7 @@ test(`a nav may be compact, but never below ${TARGET_NAV}px`, async ({
 	// `height: auto` is how the nav escapes the input's fixed height, and it
 	// cannot escape a min-block-size the same way — so the nav restates the
 	// floor at the AA minimum instead of inheriting the AAA one.
-	await page.setContent(
+	await setContent(page,
 		`<style>${css}</style>
 		<nav style="font-size: 0.75rem">
 			<ul>
@@ -232,7 +233,7 @@ test("the file input's button is not forced past the input holding it", async ({
 	// content box of the 44px input it lives in, so it spilled out. The
 	// target here is the input — that is what the pointer is aimed at, and
 	// it meets the size on its own; the pseudo-element is a part of it.
-	await page.setContent(
+	await setContent(page,
 		`<style>${css}</style><main class="container"><input id="file" type="file"></main>`,
 	);
 

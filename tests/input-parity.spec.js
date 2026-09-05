@@ -2,6 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
 const { listPresetNames } = require("../scripts/lib/presets");
+const { setContent } = require("./helpers/render");
 
 // Pointer and keyboard input must reach the same native actions. This is
 // especially important for aria-busy: CSS once blocked pointer activation
@@ -72,7 +73,7 @@ const markup = `
  * @param {(typeof themes)[number]} theme
  */
 const render = (page, theme) =>
-	page.setContent(
+	setContent(page,
 		`<style>${css}</style><style>${theme.presetCss}</style>${markup}`,
 	);
 

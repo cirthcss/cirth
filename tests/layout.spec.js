@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
+const { setContent } = require("./helpers/render");
 
 const projectRoot = path.join(__dirname, "..");
 
@@ -25,7 +26,7 @@ const css = read("dist/cirth.css");
  * @param {string} [stylesheet]
  */
 const render = (page, markup, stylesheet = css) =>
-	page.setContent(`<style>${stylesheet}</style>${markup}`);
+	setContent(page, `<style>${stylesheet}</style>${markup}`);
 
 /**
  * @param {import("@playwright/test").Page} page

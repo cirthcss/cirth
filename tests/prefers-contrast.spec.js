@@ -3,6 +3,7 @@ const path = require("node:path");
 const { expect, test } = require("@playwright/test");
 const { contrastRatio, parseColor } = require("../scripts/lib/color");
 const { listPresetNames } = require("../scripts/lib/presets");
+const { setContent } = require("./helpers/render");
 
 // gh#34 — prefers-contrast: more (src/theme/_contrast.scss).
 //
@@ -78,7 +79,7 @@ const render = async (page, { more, preset = "", scheme }) => {
 		colorScheme: scheme,
 		contrast: more ? "more" : "no-preference",
 	});
-	await page.setContent(
+	await setContent(page,
 		`<style>${css}</style><style>${preset}</style>${markup}`,
 	);
 };
@@ -111,7 +112,7 @@ const reportsPreference = async (page) => {
 	await page.emulateMedia({ contrast: "more" });
 	// Both colors come from the stylesheet: an inline style would outrank
 	// the media block and make every engine look unsupported.
-	await page.setContent(
+	await setContent(page,
 		"<style>#s{color:rgb(255,0,0)}" +
 			"@media (prefers-contrast: more){#s{color:rgb(0,255,0)}}</style>" +
 			'<p id="s">sentinel</p>',
