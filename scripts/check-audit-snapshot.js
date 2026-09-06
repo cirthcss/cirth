@@ -9,6 +9,8 @@ const {
 	startServer,
 } = require("./lib/docs-site");
 const { openCorpus } = require("./lib/docs-fingerprint");
+const { watchSources } = require("./lib/source-guard");
+const { execFileSync } = require("node:child_process");
 
 // Proof that a docs build cannot change what the audit is measuring.
 //
@@ -278,6 +280,86 @@ const checkLiveCorpus = async () => {
 	passed("docs/dist is left as it was found");
 };
 
+// --- 4. The source guard ------------------------------------------------
+//
+// The snapshot above protects what the audit *measures*. This protects what
+// a person *acts on* afterwards: the sheet the report names declarations in.
+// Checked against a throwaway git repository, so all three verdicts —
+// unchanged, edited, restored — can be produced without touching this one.
+
+const checkSourceGuard = () => {
+	const root = fs.mkdtempSync(path.join(os.tmpdir(), "cirth-guard-"));
+	/** @param {readonly string[]} args */
+	const git = (args) =>
+		execFileSync("git", args, { cwd: root, stdio: ["ignore", "pipe", "pipe"] });
+
+	try {
+		const tracked = path.join(root, "sheet.css");
+		fs.writeFileSync(tracked, "p { color: rgb(1, 2, 3); }\n");
+		git(["init", "--quiet", "--initial-branch=main"]);
+		git(["config", "user.email", "check@example.invalid"]);
+		git(["config", "user.name", "check"]);
+		git(["add", "sheet.css"]);
+		git(["commit", "--quiet", "-m", "committed"]);
+		const committed = fs.readFileSync(tracked);
+
+		// A run nobody disturbed says nothing at all.
+		const quiet = watchSources({ files: ["sheet.css"], label: "quiet", root });
+		assert.equal(quiet.assertUnchanged(), true);
+		assert.deepEqual(quiet.changed(), []);
+		passed("an undisturbed run passes the source guard silently");
+
+		// An edited file throws, and the message names the file and the size
+		// it moved by — the two things needed to tell what happened.
+		const edited = watchSources({ files: ["sheet.css"], label: "edited", root });
+		fs.writeFileSync(tracked, "p { color: rgb(9, 9, 9); }\np { margin: 0; }\n");
+		assert.throws(
+			() => edited.assertUnchanged(),
+			(/** @type {Error} */ error) =>
+				error.message.includes("sheet.css") &&
+				error.message.includes("changed:") &&
+				/\(\+\d+\)/.test(error.message),
+			"an edited source did not fail loudly",
+		);
+		passed("an edited source fails the run, naming the file and the delta");
+
+		// The shape a concurrent session's cleanup actually takes: the file
+		// does not become something new, it becomes something committed.
+		const restored = watchSources({
+			files: ["sheet.css"],
+			label: "restored",
+			root,
+		});
+		fs.writeFileSync(tracked, committed);
+		const findings = restored.changed();
+		assert.equal(findings.length, 1);
+		assert.match(
+			findings[0].how,
+			/restored it rather than edited it/,
+			"a git restore was not told apart from an edit",
+		);
+		passed("content that matches a commit is reported as restored, not edited");
+
+		// A deleted source is its own verdict, not a crash.
+		const removed = watchSources({ files: ["sheet.css"], label: "removed", root });
+		fs.rmSync(tracked);
+		assert.deepEqual(removed.changed(), [
+			{ how: "was deleted", relative: "sheet.css" },
+		]);
+		passed("a deleted source is reported rather than thrown over");
+
+		// warnOnly is the escape hatch for a tool that still wants to print
+		// its result: it returns false and says so, instead of throwing.
+		fs.writeFileSync(tracked, committed);
+		const warned = watchSources({ files: ["sheet.css"], label: "warned", root });
+		fs.writeFileSync(tracked, "p { color: rgb(4, 4, 4); }\n");
+		assert.equal(warned.assertUnchanged({ warnOnly: true }), false);
+		passed("warnOnly reports without throwing");
+	} finally {
+		fs.rmSync(root, { force: true, recursive: true });
+	}
+};
+
 const run = async () => {
 	console.log(
 		"\n[@cirthcss/cirth] The audit measures an immutable copy of the build:\n",
@@ -286,9 +368,10 @@ const run = async () => {
 	checkIncompleteBuild();
 	checkCleanupOnError();
 	await checkLiveCorpus();
+	checkSourceGuard();
 
 	console.log(
-		`\n[@cirthcss/cirth] Audit build isolation verified — ${checks.length} checks passed\n`,
+		`\n[@cirthcss/cirth] Audit isolation and source guard verified — ${checks.length} checks passed\n`,
 	);
 	return 0;
 };

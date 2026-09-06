@@ -7,6 +7,7 @@ const {
 	openCorpus,
 	unmeasurable,
 } = require("./lib/docs-fingerprint");
+const { auditSources, watchSources } = require("./lib/source-guard");
 
 // Which declarations in the documentation shell's stylesheet are actually
 // doing something?
@@ -160,6 +161,11 @@ let unvisited = 0;
 
 const run = async () => {
 	const started = Date.now();
+	// Forty minutes is long enough for the sheet this report names
+	// declarations in to be edited by something else. If it is, the report
+	// is about a file that no longer exists and saying so is the only
+	// useful thing left to do with it.
+	const guard = watchSources({ files: auditSources, label: "audit-dead-css" });
 	const corpus = await openCorpus({ label: "audit-dead-css", pages: undefined });
 
 	try {
@@ -764,6 +770,10 @@ const run = async () => {
 						renderings,
 						seconds: Number(seconds),
 						sheet,
+						// The sheet this report is a claim about, by content, so
+						// verify-dead-css.js can refuse a report that describes a
+						// file somebody has since edited.
+						sources: guard.digests(),
 						...report,
 						verification: {
 							candidates: report.inert.map((declaration) => ({
@@ -785,7 +795,9 @@ const run = async () => {
 
 	// A reporting tool, not a gate: an inert declaration is a candidate for
 	// a human to look at, and failing the build on one would only teach
-	// people to stop running it.
+	// people to stop running it. The one thing it does fail on is a report
+	// that describes a file somebody has since changed.
+	guard.assertUnchanged();
 	return 0;
 };
 
