@@ -447,6 +447,17 @@ serves the copy, and removes it when the run ends — including when the run
 ends by throwing. `npm run check:tooling` is the proof: it rewrites
 `docs/dist` underneath an open corpus and checks the corpus never sees it.
 
+What they cannot copy is the source they are a claim about. A sweep ends
+with a list of declarations to delete from `docs/src/styles/style.css`, and
+that list only means anything for the file the sweep started with — so run
+one worker at a time against a working tree. Two editors, terminals or
+automated assistants sharing one checkout will eventually have one of them
+rewrite a file the other is half an hour into validating, and the result
+looks clean rather than wrong. Both tools hash the sources they depend on
+at the start and refuse the run if either has moved by the end, naming the
+file and saying whether it was edited or restored from a commit; a report
+produced from one tree is likewise refused against another.
+
 A whole-sheet run takes about forty minutes: it re-probes anything still
 undecided on every one of the 800 renderings, which is exactly what makes
 an "inert everywhere" verdict worth having, and an inert declaration is
