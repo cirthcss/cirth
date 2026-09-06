@@ -43,12 +43,20 @@ const classicScrollbar = 15;
 
 // Overlay scrollbars cannot be turned off in a Playwright browser on macOS
 // — not with a launch flag, not with `::-webkit-scrollbar`, not with
-// `scrollbar-gutter` — so the Linux geometry cannot be reproduced here
-// directly. It does not have to be. A classic scrollbar's only effect is
-// to make the layout viewport narrower than the window, and layout and
-// media queries both see nothing but the layout viewport. So a window of
-// `width - 15` with no scrollbar and a window of `width` with one are the
-// same document, and testing at both widths tests both platforms.
+// `scrollbar-gutter` — so the Linux geometry cannot be reproduced here.
+//
+// This does not reproduce it either, and it is worth being exact about
+// what it does. A classic scrollbar narrows the box content is laid out in
+// *without* narrowing what a width media query is evaluated against —
+// Chromium answers that one with the window — so a 390px window with a
+// scrollbar is not the same document as a 375px window without one. They
+// agree on layout and differ on which tier applies.
+//
+// What running every geometric assertion at both widths buys is therefore
+// breadth, not simulation: the overlay is checked against a box 15px
+// narrower than the window it was opened in, which is the shape of the
+// thing that broke, at a width the tier boundaries do not move at. Where a
+// tier *is* the question, ask matchMedia instead of arithmetic.
 /** @param {number} width */
 const withAndWithoutScrollbar = (width) => [width, width - classicScrollbar];
 

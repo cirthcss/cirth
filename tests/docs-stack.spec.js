@@ -5,10 +5,7 @@ const {
 	createServer,
 	startServer,
 } = require("../scripts/lib/docs-site");
-const {
-	layoutViewport,
-	withAndWithoutScrollbar,
-} = require("./helpers/viewport");
+const { withAndWithoutScrollbar } = require("./helpers/viewport");
 
 assertDocsBuilt("docs-stack.spec");
 
@@ -594,18 +591,15 @@ test("the navbar collapses at a single breakpoint with a complete menu", async (
 		await page.setViewportSize({ width, height: 800 });
 		await page.goto(`${origin}/get-started/`, { waitUntil: "networkidle" });
 
-		// 64rem against the browser's own default font size, measured on the
-		// box a media query is resolved against — see helpers/viewport.js for
-		// why that box is not `documentElement.clientWidth`.
-		const viewport = await layoutViewport(page);
+		// Ask the browser the question the stylesheet asks, rather than
+		// recomputing it from a width. Chromium evaluates a width media
+		// query against the window *including* a classic scrollbar while
+		// laying content out in the box without it, so at a 1024px window on
+		// the Linux runner `(width >= 64rem)` matches and the content box is
+		// 1009px. Any arithmetic here has to pick one of those two numbers
+		// and will be wrong about the other; matchMedia is neither.
 		const isExpanded = await page.evaluate(
-			(width) =>
-				width >=
-				64 *
-					Number.parseFloat(
-						getComputedStyle(document.documentElement).fontSize,
-					),
-			viewport.width,
+			() => matchMedia("(width >= 64rem)").matches,
 		);
 
 		const state = await page.evaluate(() => {
