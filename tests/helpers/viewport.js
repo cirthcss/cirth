@@ -60,4 +60,4 @@ const classicScrollbar = 15;
 /** @param {number} width */
 const withAndWithoutScrollbar = (width) => [width, width - classicScrollbar];
 
-module.exports = { classicScrollbar, layoutViewport, withAndWithoutScrollbar };
+module.exports = { layoutViewport, withAndWithoutScrollbar };
