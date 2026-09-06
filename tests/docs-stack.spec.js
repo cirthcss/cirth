@@ -5,7 +5,10 @@ const {
 	createServer,
 	startServer,
 } = require("../scripts/lib/docs-site");
-const { withAndWithoutScrollbar } = require("./helpers/viewport");
+const {
+	layoutViewport,
+	withAndWithoutScrollbar,
+} = require("./helpers/viewport");
 
 assertDocsBuilt("docs-stack.spec");
 
@@ -591,15 +594,18 @@ test("the navbar collapses at a single breakpoint with a complete menu", async (
 		await page.setViewportSize({ width, height: 800 });
 		await page.goto(`${origin}/get-started/`, { waitUntil: "networkidle" });
 
-		// 64rem against the browser's own default font size, which is what
-		// `width >= 64rem` resolves against.
+		// 64rem against the browser's own default font size, measured on the
+		// box a media query is resolved against — see helpers/viewport.js for
+		// why that box is not `documentElement.clientWidth`.
+		const viewport = await layoutViewport(page);
 		const isExpanded = await page.evaluate(
-			() =>
-				document.documentElement.clientWidth >=
+			(width) =>
+				width >=
 				64 *
 					Number.parseFloat(
 						getComputedStyle(document.documentElement).fontSize,
 					),
+			viewport.width,
 		);
 
 		const state = await page.evaluate(() => {

@@ -1,30 +1,40 @@
 // The box an overlay actually fills, and the one a width media query is
 // evaluated against.
 //
-// `window.innerWidth` is not that box. It is the window's content area,
-// classic scrollbar included. On a platform that draws overlay scrollbars —
-// macOS, and every phone — the two are the same number, and using either
-// works by accident. On a platform that draws classic ones — the GTK
-// Chromium that runs CI — the window is about 15px wider than the layout
-// viewport, and every assertion that compared a fixed-position box against
-// `innerWidth` was 15px out. That is what `modal.spec.js` and two tests in
-// `shell-overlays.spec.js` had been failing on since 2026-09-03.
+// Not `window.innerWidth`: that is the window's content area, classic
+// scrollbar included. On a platform that draws overlay scrollbars — macOS,
+// and every phone — the two are the same number, so using it works by
+// accident; on the GTK Chromium that runs CI the window is about 15px
+// wider than the box, and every assertion that compared a fixed-position
+// element against it was 15px out.
 //
-// `document.documentElement.clientWidth` is the layout viewport: the
-// initial containing block, what `inset: 0` and `width: 100%` resolve
-// against, and what media queries are evaluated against. It is the right
-// reference on both platforms, so the fix is not a tolerance — the
-// assertions stay exact, against the box they were always about.
+// And not `document.documentElement.clientWidth` either, which is the
+// obvious replacement and is also wrong. This library reserves the
+// scrollbar's space permanently with `scrollbar-gutter: stable`, and while
+// an overlay is open the framework's modal rule puts `overflow: hidden` on
+// the root — so there is no scrollbar to subtract, `clientWidth` answers
+// with the whole 390, and the reserved gutter has still taken 15px off the
+// box the overlay is laid out in. CI failed on exactly that: expected 390,
+// received 375.
+//
+// So ask the question in the terms the answer is given in — put a fixed
+// element in the box and measure it. `popover.spec.js` has done this since
+// it hit the same wall.
 
 /**
  * @param {import("@playwright/test").Page} page
  * @returns {Promise<{ height: number, width: number }>}
  */
 const layoutViewport = (page) =>
-	page.evaluate(() => ({
-		height: document.documentElement.clientHeight,
-		width: document.documentElement.clientWidth,
-	}));
+	page.evaluate(() => {
+		const probe = document.createElement("div");
+		probe.style.cssText =
+			"position: fixed; inset: 0; visibility: hidden; pointer-events: none";
+		document.body.append(probe);
+		const { height, width } = probe.getBoundingClientRect();
+		probe.remove();
+		return { height, width };
+	});
 
 // A classic scrollbar's inline size, as Chromium draws it on the Linux
 // runner. Nothing reads this at runtime: it is the offset used to build a
