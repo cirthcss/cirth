@@ -6,6 +6,8 @@ const {
 	openCorpus,
 	viewports,
 } = require("./lib/docs-fingerprint");
+const { measureTogether } = require("./lib/interaction");
+const { auditSources, watchSources } = require("./lib/source-guard");
 
 // The second half of the dead-CSS audit: re-probe the candidates in the
 // engines and under the preset the first sweep cannot see.
@@ -301,104 +303,9 @@ const measure = ({ needle, wanted }) => {
 // So the last thing this pass does is the thing the human is about to do:
 // remove every confirmed-inert declaration at once and re-measure. If
 // nothing moves, the whole deletion is safe together as well as
-// separately. If something moves, a leave-one-out pass names the members
-// that the movement depends on, and those go back on the keep list.
-/**
- * @param {{ needle: string, wanted: string[] }} input
- * @returns {{ essential: string[], moved: boolean, settled: number, unstable: boolean }}
- */
-const measureTogether = ({ needle, wanted }) => {
-	const audit = window.__cirthAudit;
-	const index = audit.index(needle);
-	if (!index) return { essential: [], moved: false, settled: 0, unstable: false };
-
-	/** @type {Map<string, number>} */
-	const seen = new Map();
-	/** @type {Map<string, typeof index[number]>} */
-	const byKey = new Map();
-	for (const entry of index) {
-		const base = `${entry.conditions.join(" && ")}|${entry.selector}|${entry.property}`;
-		const occurrence = seen.get(base) ?? 0;
-		seen.set(base, occurrence + 1);
-		byKey.set(`${base}#${occurrence}`, entry);
-	}
-
-	const here = wanted.filter((key) => byKey.has(key));
-	if (here.length === 0) return { essential: [], moved: false, settled: 0, unstable: false };
-
-	let base = audit.snapshot();
-
-	// How often the document had to be re-measured because a probe left it
-	// somewhere else. Removing twenty-odd declarations at once can collapse
-	// the header, and the shell's own script then moves the display
-	// controls into the drawer — permanently. Putting the CSS back does not
-	// put the DOM back, so the reference has to move with it.
-	let settled = 0;
-
-	// Remove a whole set at once, measure, and put every rule back exactly
-	// as it was. Grouped by rule, so a block's text is saved once and the
-	// restore is a single assignment per rule.
-	const sweep = (/** @type {string[]} */ keys) => {
-		// Always measured against a document that is where it says it is.
-		if (audit.differs(base)) {
-			base = audit.snapshot();
-			settled += 1;
-		}
-		/** @type {Map<string, { entries: typeof index, path: number[] }>} */
-		const byRule = new Map();
-		for (const key of keys) {
-			const entry = /** @type {typeof index[number]} */ (byKey.get(key));
-			const group = byRule.get(entry.path.join(".")) ?? {
-				entries: [],
-				path: entry.path,
-			};
-			group.entries.push(entry);
-			byRule.set(entry.path.join("."), group);
-		}
-
-		/** @type {{ rule: CSSStyleRule, saved: string }[]} */
-		const touched = [];
-		for (const { entries, path } of byRule.values()) {
-			const rule = audit.ruleAt(needle, path);
-			touched.push({ rule, saved: rule.style.cssText });
-			for (const entry of entries) rule.style.removeProperty(entry.property);
-		}
-		const moved = audit.differs(base);
-		for (const { rule, saved } of touched) rule.style.cssText = saved;
-		return moved;
-	};
-
-	const moved = sweep(here);
-	if (!moved) return { essential: [], moved: false, settled, unstable: false };
-
-	// Which members does the movement depend on? Put each one back and take
-	// all the rest out: if the page stops moving, that member was holding
-	// it up, and it is not safe to delete with the others.
-	//
-	// And then again on what is left. `differs` is one boolean for the whole
-	// document, so a second, independent pair would hide behind the first:
-	// leaving out one of *its* members still leaves the first pair moving
-	// the page, and it would never be named. Taking the members found so far
-	// off the set and re-asking is what separates them.
-	/** @type {string[]} */
-	const essential = [];
-	let set = here;
-	for (let round = 0; round < 8; round += 1) {
-		/** @type {string[]} */
-		const found = [];
-		for (const key of set) {
-			if (!sweep(set.filter((other) => other !== key))) found.push(key);
-		}
-		if (found.length === 0) break;
-		essential.push(...found);
-		set = set.filter((key) => !found.includes(key));
-		if (set.length === 0 || !sweep(set)) break;
-	}
-	// Unstable only if the page never held still long enough to be asked
-	// the same question twice: one re-baseline per sweep would mean every
-	// answer here was measured against a different document.
-	return { essential, moved: true, settled, unstable: settled > here.length };
-};
+// separately. If something moves, lib/interaction.js takes the movement
+// apart into the minimal groups it is made of, and those members go back
+// on the keep list.
 
 /**
  * @typedef {{
@@ -507,7 +414,15 @@ const verify = async (config, candidates, plan) => {
  * @param {ReturnType<typeof parseConfig>} config
  * @param {string[]} keys
  * @param {{ keys: string[], page: string, scheme: string, viewport: string }[]} plan
- * @returns {Promise<{ at: string, essential: string[], renderings: number, seconds: number, settled: number, unstable: number }>}
+ * @returns {Promise<{
+ *   at: string,
+ *   essential: string[],
+ *   renderings: number,
+ *   seconds: number,
+ *   settled: number,
+ *   unresolved: number,
+ *   unstable: number,
+ * }>}
  */
 const verifyTogether = async (config, keys, plan) => {
 	const started = Date.now();
@@ -523,6 +438,7 @@ const verifyTogether = async (config, keys, plan) => {
 	let at = "";
 	let renderings = 0;
 	let settled = 0;
+	let unresolved = 0;
 	let unstable = 0;
 	/** @type {Set<string>} */
 	const essential = new Set();
@@ -545,6 +461,7 @@ const verifyTogether = async (config, keys, plan) => {
 				});
 				settled += result.settled;
 				if (result.unstable) unstable += 1;
+				if (result.unresolved) unresolved += 1;
 				if (!result.moved) return;
 				if (!at) at = contextKey(context);
 				for (const key of result.essential) essential.add(key);
@@ -560,6 +477,7 @@ const verifyTogether = async (config, keys, plan) => {
 		renderings,
 		seconds: Number(((Date.now() - started) / 1000).toFixed(1)),
 		settled,
+		unresolved,
 		unstable,
 	};
 };
@@ -568,6 +486,7 @@ const verifyTogether = async (config, keys, plan) => {
 let sheet = "styles/style.css";
 
 const run = async () => {
+	const guard = watchSources({ files: auditSources, label: "verify-dead-css" });
 	const resolved = path.resolve(reportPath);
 	if (!fs.existsSync(resolved)) {
 		throw new Error(
@@ -578,6 +497,27 @@ const run = async () => {
 
 	const report = JSON.parse(fs.readFileSync(resolved, "utf8"));
 	sheet = report.sheet ?? sheet;
+
+	// The sweep records what it measured; this pass refuses to build on a
+	// report whose sheet has moved since. Reports written before that field
+	// existed carry no `sources` and are taken at their word.
+	if (report.sources) {
+		const now = watchSources({ files: Object.keys(report.sources), label: "" });
+		const current = now.digests();
+		const moved = Object.keys(report.sources).filter(
+			(file) => current[file] !== report.sources[file],
+		);
+		if (moved.length > 0) {
+			throw new Error(
+				`verify-dead-css: ${reportPath} was produced from a different ` +
+					`tree.\n\n  Changed since the sweep ran:\n` +
+					moved.map((file) => `    - ${file}`).join("\n") +
+					"\n\n  Its candidates name declarations by position in that " +
+					"sheet, so verifying\n  them against this one would check the " +
+					"wrong lines. Re-run the sweep.",
+			);
+		}
+	}
 	if (!report.verification) {
 		throw new Error(
 			`verify-dead-css: ${reportPath} predates the verification plan. ` +
@@ -725,7 +665,12 @@ const run = async () => {
 					(outcome.settled > 0
 						? ` · re-measured ${outcome.settled}× (the page moved under the probe)`
 						: "") +
-					(outcome.unstable > 0 ? ` · ${outcome.unstable} unstable` : ""),
+					(outcome.unresolved > 0
+						? ` · ${outcome.unresolved} rendering(s) moved without naming a group`
+						: "") +
+					(outcome.unstable > 0
+						? ` · ${outcome.unstable} rendering(s) UNSTABLE (a repeat disagreed)`
+						: ""),
 			);
 			if (outcome.at) {
 				together.set(config.label, outcome.essential);
@@ -862,7 +807,9 @@ const run = async () => {
 	}
 
 	// A reporting tool, like the sweep it follows: it says which candidates
-	// survived, and a person decides what to delete.
+	// survived, and a person decides what to delete — from the sheet this
+	// run actually read, which is what the guard is checking.
+	guard.assertUnchanged();
 	return 0;
 };
 
