@@ -54,22 +54,35 @@ const {
 // in the corpus contains this element" — a fact about the corpus as much as
 // about the rule.
 //
-// It is **one engine**. Chromium's intrinsic sizing is not Gecko's: a
-// `width` beside a `flex-basis` measured inert here and, taken out, left the
-// header's actions cluster 66px wide holding 88px of controls in Firefox,
-// hanging the menu toggle 6px off a 320px screen. `npm run check:behavior`
-// runs three engines and is what caught it.
+// This sweep is **one engine and one theme**: Chromium, default preset.
+// Both of those have already produced a false `inert`.
 //
-// It is **one theme**. Presets move tokens, and two declarations that
-// resolve to the same value under the default theme need not under
-// `playroom` — a `font-family: var(--cirth-font-family-sans)` pinning the
-// shell's chrome to the plain system stack is inert until a preset makes the
-// page face rounded. `npm run check:visual` renders the presets and is what
-// caught that one.
+//   - Chromium's intrinsic sizing is not Gecko's. A `width` beside a
+//     `flex-basis` measured inert here and, taken out, left the header's
+//     actions cluster 66px wide holding 88px of controls in Firefox,
+//     hanging the menu toggle 6px off a 320px screen.
+//   - Presets move tokens, and two declarations that resolve to the same
+//     value under the default theme need not under `playroom` — a
+//     `font-family: var(--cirth-font-family-sans)` pinning the shell's
+//     chrome to the plain system stack is inert until a preset makes the
+//     page face rounded.
 //
-// Neither gap is a reason to distrust the verdicts; both are a reason to run
-// the suites after acting on them. A cleanup of 71 declarations produced two
-// regressions, and both were caught before anything shipped.
+// Running the whole corpus on three engines and four presets would cost a
+// working day. It is also unnecessary: only the declarations this sweep
+// calls `inert` are candidates for deletion, and there are a few dozen of
+// them. So this run writes them out — with the handful of renderings that
+// can see each one — and a second, targeted pass re-probes exactly those:
+//
+//   node scripts/audit-dead-css.js --json .cache/dead-css.json
+//   node scripts/verify-dead-css.js --report .cache/dead-css.json
+//
+// which re-runs them in Firefox, in WebKit, and under `playroom`, and
+// turns `inert` into `inert`, `engine-dependent` or `preset-dependent`.
+// Nothing is deleted on this report alone.
+//
+// `npm run check:behavior` (three engines) and `npm run check:visual`
+// (presets) remain the net under both passes: they are what caught the two
+// regressions above, and they are what to run after acting on a report.
 
 const args = process.argv.slice(2);
 /** @param {string} name */
@@ -86,6 +99,12 @@ const explainOrder = args.includes("--explain-order");
 // --no-order walks the corpus in listPages() order, which is what this tool
 // did before, so the two runs differ in nothing else.
 const noOrder = args.includes("--no-order");
+// The same escape hatch for the other optimisation: --no-skip visits every
+// rendering in the corpus, including the ones the survey proved can see
+// nothing still undecided. It exists so the skip's value can be measured
+// against a run that differs in nothing else, rather than asserted — and
+// so a verdict can be reproduced without it if the survey is ever doubted.
+const noSkip = args.includes("--no-skip");
 
 /**
  * @typedef {{
@@ -133,6 +152,11 @@ const undecided = new Set();
 let renderings = 0;
 let probes = 0;
 let skipped = 0;
+// Renderings pass 2 measured, and renderings it did not have to open
+// because the survey had already proved they can see nothing still
+// undecided.
+let visited = 0;
+let unvisited = 0;
 
 const run = async () => {
 	const started = Date.now();
@@ -238,15 +262,15 @@ const run = async () => {
 				);
 
 				if (!result) {
-					// The sheet was not in document.styleSheets. Almost always
-					// this means docs/dist is being rewritten underneath the
-					// run — an eleventy passthrough copy replaces the file
-					// rather than editing it, so there is a window where the
-					// page loads without it. Reload once before giving up.
+					// The sheet was not in document.styleSheets. This used to
+					// mean a docs build was replacing docs/dist underneath the
+					// run; it cannot any more — the corpus serves an immutable
+					// copy taken at startup — so what is left is a real
+					// mismatch between --sheet and what the page links.
 					throw new Error(
 						`audit-dead-css: no stylesheet matching "${sheet}" on ${context.page}. ` +
-							"If a docs build was running at the same time, that is why: " +
-							"the run reads docs/dist and cannot see it change.",
+							"The run serves a snapshot of docs/dist taken at startup, so a " +
+							"concurrent docs build is not the cause: check --sheet.",
 					);
 				}
 
@@ -340,9 +364,37 @@ const run = async () => {
 		}
 
 		// --- Pass 2: probe, richest first --------------------------------
+		//
+		// Pass 1 recorded, per rendering, which declarations that rendering
+		// can see. Pass 2 uses it twice: to skip a navigation to a rendering
+		// that can see nothing still undecided, and to hand the page the
+		// short list of what to look at instead of the whole sheet. Neither
+		// changes a verdict — a rendering whose selectors do not match
+		// probes nothing when it gets there, and the page still checks that
+		// each selector matches before touching the rule — they just stop
+		// the run paying for the trip.
 
 		for (const { target } of order) {
+			let anything = false;
+			for (const id of seenBy(target)) {
+				if (undecided.has(id)) {
+					anything = true;
+					break;
+				}
+			}
+			if (!anything && !noSkip) {
+				unvisited += 1;
+				continue;
+			}
+
 			await corpus.visit(target, async (page, context) => {
+				const reachable = coverage.get(contextKey(context));
+				const pending = noSkip
+					? [...undecided]
+					: [...undecided].filter((id) => reachable?.has(id));
+				if (pending.length === 0) return;
+
+				visited += 1;
 				const result = await page.evaluate(
 					async ({ needle, pending }) => {
 						const audit = window.__cirthAudit;
@@ -477,7 +529,7 @@ const run = async () => {
 
 						return { changed, seen, tested, unprobeable, unstable };
 					},
-					{ needle: sheet, pending: [...undecided] },
+					{ needle: sheet, pending },
 				);
 
 				if (!result) {
@@ -530,6 +582,78 @@ const run = async () => {
 			}
 		}
 
+		// --- The hand-off to the second pass ------------------------------
+		//
+		// `id` is a rule path, and a rule path is a fact about *this* engine's
+		// parse of the sheet: another engine that drops a rule it cannot
+		// parse renumbers everything after it. So each declaration also gets
+		// a key made of what the source actually wrote — conditions,
+		// selector, property, and which occurrence of that trio it is — which
+		// is what verify-dead-css.js looks declarations up by.
+		/** @type {Map<string, string>} */
+		const keys = new Map();
+		/** @type {Map<string, number>} */
+		const seenKeys = new Map();
+		for (const [id, declaration] of declarations) {
+			const base = `${declaration.conditions.join(" && ")}|${declaration.selector}|${declaration.property}`;
+			const occurrence = seenKeys.get(base) ?? 0;
+			seenKeys.set(base, occurrence + 1);
+			keys.set(id, `${base}#${occurrence}`);
+		}
+
+		// Where the second pass has to look. Re-probing a few dozen
+		// candidates on all 800 renderings in three more configurations
+		// would cost more than the sweep that found them; probing them
+		// where pass 1 measured that their selector matches costs minutes.
+		//
+		// One cover per (viewport, scheme), not one overall: a declaration
+		// under `(width < 48rem)` is a different declaration at 390 than at
+		// 1440, and the whole reason the corpus has four widths is that a
+		// single sample per rule hid twelve of them.
+		/** @type {Set<string>} */
+		const candidateIds = new Set(report.inert.map((entry) => entry.id));
+		/** @type {{ keys: string[], page: string, scheme: string, viewport: string }[]} */
+		const plan = [];
+
+		/** @type {Map<string, (typeof corpus.visits)>} */
+		const bands = new Map();
+		for (const target of corpus.visits) {
+			const band = `${target.viewport}|${target.scheme}`;
+			bands.set(band, [...(bands.get(band) ?? []), target]);
+		}
+
+		for (const targets of bands.values()) {
+			const pool = targets.map((target) => ({
+				ids: new Set([...seenBy(target)].filter((id) => candidateIds.has(id))),
+				target,
+			}));
+			const need = new Set(pool.flatMap((entry) => [...entry.ids]));
+
+			while (need.size > 0) {
+				let bestAt = -1;
+				let bestGain = 0;
+				for (let at = 0; at < pool.length; at += 1) {
+					let gain = 0;
+					for (const id of pool[at].ids) if (need.has(id)) gain += 1;
+					if (gain > bestGain) {
+						bestGain = gain;
+						bestAt = at;
+					}
+				}
+				if (bestAt === -1) break;
+
+				const [chosen] = pool.splice(bestAt, 1);
+				const covered = [...chosen.ids].filter((id) => need.has(id));
+				for (const id of covered) need.delete(id);
+				plan.push({
+					keys: covered.map((id) => /** @type {string} */ (keys.get(id))),
+					page: chosen.target.page,
+					scheme: chosen.target.scheme,
+					viewport: chosen.target.viewport,
+				});
+			}
+		}
+
 		/** @param {Declaration} declaration */
 		const format = (declaration) =>
 			`  ${declaration.selector} { ${declaration.property}: ${declaration.value.trim()} }` +
@@ -541,6 +665,10 @@ const run = async () => {
 
 		console.log(
 			`\n[@cirthcss/cirth] ${declarations.size} declarations in ${sheet}, probed ${probes} times across ${renderings} renderings, in ${seconds}s (${surveyed}s of it surveying)\n`,
+		);
+		console.log(
+			`  ${visited} of the ${renderings} renderings were probed, and ${unvisited} navigation${unvisited === 1 ? "" : "s"} skipped:\n` +
+				"  the survey had already shown those visits can see nothing still undecided.\n",
 		);
 		console.log(`  live            ${live.size}`);
 		console.log(`  inert           ${report.inert.length}`);
@@ -607,6 +735,22 @@ const run = async () => {
 			console.log("");
 		}
 
+		if (report.inert.length > 0) {
+			const visits = new Set(
+				plan.map((entry) => `${entry.page}|${entry.viewport}|${entry.scheme}`),
+			).size;
+			console.log(
+				`Before deleting any of the ${report.inert.length} inert declarations above, run the\n` +
+					"second pass: they are inert *in Chromium, under the default theme*, and\n" +
+					"that has produced a false inert twice. It re-probes exactly these, on the\n" +
+					`${visits} rendering${visits === 1 ? "" : "s"} that can see them, in Firefox, in WebKit and under playroom:\n`,
+			);
+			console.log(
+				"  node scripts/audit-dead-css.js --json .cache/dead-css.json\n" +
+					"  node scripts/verify-dead-css.js --report .cache/dead-css.json\n",
+			);
+		}
+
 		if (jsonPath) {
 			const resolved = path.resolve(jsonPath);
 			fs.mkdirSync(path.dirname(resolved), { recursive: true });
@@ -621,6 +765,13 @@ const run = async () => {
 						seconds: Number(seconds),
 						sheet,
 						...report,
+						verification: {
+							candidates: report.inert.map((declaration) => ({
+								...declaration,
+								key: keys.get(declaration.id),
+							})),
+							plan,
+						},
 					},
 					null,
 					"\t",

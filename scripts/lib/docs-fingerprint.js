@@ -1,10 +1,16 @@
-const { chromium } = require("playwright");
+const { chromium, firefox, webkit } = require("playwright");
 const {
-	assertDocsBuilt,
 	createServer,
+	installTheme,
 	listPages,
+	snapshotDocs,
 	startServer,
+	themeVariants,
+	waitForTheme,
 } = require("./docs-site");
+
+/** The engines a corpus can be opened in, by the name Playwright uses. */
+const engines = { chromium, firefox, webkit };
 
 // The rendering corpus the CSS audit is measured against.
 //
@@ -52,6 +58,19 @@ const viewports = {
 	tablet: { width: 900, height: 900 },
 	mobile: { width: 390, height: 844 },
 };
+
+// One width below all four, for the second pass only.
+//
+// 390 is a phone; it is not the narrowest phone, and the difference has
+// already cost a regression. `.docs-header-search { width }` beside its
+// `flex: 0 0 …` is inert at 390 in all three engines — measured, not
+// assumed — and taking it out left Firefox holding 88px of controls in a
+// 66px cluster at 320. The sweep does not sample 320 because a fifth width
+// is a fifth more corpus on the pass that already runs for forty minutes;
+// the second pass probes a few dozen candidates on five pages and can
+// afford it. It is also the only width that enters the shell's own
+// 22.5rem tier.
+const narrowViewport = { squeeze: { width: 320, height: 844 } };
 
 /** @type {("light" | "dark")[]} */
 const schemes = ["light", "dark"];
@@ -351,7 +370,22 @@ window.__cirthAudit = (() => {
 		return null;
 	};
 
+	// Memoised for the life of the document. Building it walks every rule
+	// in the sheet and re-parses every block's cssText — a thousand
+	// declarations — and both the audit and the verification pass ask for it
+	// once per state, so half of that work was a rebuild of an answer that
+	// cannot have changed: probes edit declaration *values* and always put
+	// them back, and nothing here adds or removes a rule.
+	const indexes = new Map();
+
 	const index = (needle) => {
+		if (indexes.has(needle)) return indexes.get(needle);
+		const built = buildIndex(needle);
+		indexes.set(needle, built);
+		return built;
+	};
+
+	const buildIndex = (needle) => {
 		const sheet = sheetOf(needle);
 		if (!sheet) return null;
 		const declarations = [];
@@ -533,10 +567,12 @@ const contextKey = (context) =>
  * }} options
  */
 const walkSite = async ({ concurrency = 4, label, onPage, pages }) => {
-	assertDocsBuilt(label);
-
-	const targets = pages ?? listPages();
-	const server = createServer();
+	// Serve a copy, not the build directory: a docs build landing mid-run
+	// would otherwise replace the files this walk is measuring. See
+	// `snapshotDocs`.
+	const snapshot = snapshotDocs({ label });
+	const targets = pages ?? listPages(snapshot.root);
+	const server = createServer(snapshot.root);
 	const origin = await startServer(server);
 	const browser = await chromium.launch();
 
@@ -583,6 +619,7 @@ const walkSite = async ({ concurrency = 4, label, onPage, pages }) => {
 	} finally {
 		await browser.close();
 		server.close();
+		snapshot.dispose();
 	}
 };
 
@@ -604,22 +641,52 @@ const walkSite = async ({ concurrency = 4, label, onPage, pages }) => {
  * viewport and scheme; it yields both states, so this costs no more
  * navigations than the sweep does.
  *
- * @param {{ label: string, pages?: string[] }} options
+ * The engine and the preset are parameters because the audit's two blind
+ * spots are exactly those two axes: Chromium's intrinsic sizing is not
+ * Gecko's, and a declaration that resolves to the same value as its
+ * neighbour under the default theme need not under `playroom`. The second
+ * pass (`verify-dead-css.js`) reopens this same corpus in another engine
+ * or under a preset, over the handful of pages that can see the
+ * candidates — which is why they are options here rather than a fork of
+ * this file.
+ *
+ * @param {{
+ *   browserName?: "chromium" | "firefox" | "webkit",
+ *   label: string,
+ *   pages?: string[],
+ *   preset?: string,
+ *   widths?: Record<string, { height: number, width: number }>,
+ * }} options
  */
-const openCorpus = async ({ label, pages }) => {
-	assertDocsBuilt(label);
+const openCorpus = async ({
+	browserName = "chromium",
+	label,
+	pages,
+	preset = "default",
+	widths = viewports,
+}) => {
+	// See `snapshotDocs`: the run measures a copy of the build, so a docs
+	// build landing while it works cannot change what it is measuring.
+	const snapshot = snapshotDocs({ label });
+	const theme = themeVariants.find((variant) => variant.name === preset);
+	if (!theme) {
+		throw new Error(
+			`${label}: unknown preset "${preset}" — known: ` +
+				themeVariants.map((variant) => variant.name).join(", "),
+		);
+	}
 
-	const targets = pages ?? listPages();
-	const server = createServer();
+	const targets = pages ?? listPages(snapshot.root);
+	const server = createServer(snapshot.root);
 	const origin = await startServer(server);
-	const browser = await chromium.launch();
+	const browser = await engines[browserName].launch();
 
 	/** @type {Map<string, import("playwright").Page>} */
 	const sessions = new Map();
 	/** @type {{ page: string, viewport: Context["viewport"], scheme: Context["scheme"] }[]} */
 	const visits = [];
 
-	for (const [viewport, size] of Object.entries(viewports)) {
+	for (const [viewport, size] of Object.entries(widths)) {
 		for (const scheme of schemes) {
 			const context = await browser.newContext({
 				colorScheme: scheme,
@@ -628,6 +695,10 @@ const openCorpus = async ({ label, pages }) => {
 				viewport: size,
 			});
 			await context.addInitScript(pageAgent);
+			// The docs' own preset loader, driven the way check:a11y and the
+			// visual suite drive it, rather than a second mechanism that
+			// could disagree with them.
+			if (theme.name !== "default") await installTheme(context, theme);
 			sessions.set(`${viewport}|${scheme}`, await context.newPage());
 
 			for (const target of targets) {
@@ -653,6 +724,10 @@ const openCorpus = async ({ label, pages }) => {
 			sessions.get(`${visit.viewport}|${visit.scheme}`)
 		);
 		await page.goto(`${origin}/${visit.page}`, { waitUntil: "load" });
+		// Only when there is something to wait for: under the default theme
+		// this would add a round trip per navigation to the run that is
+		// already the slow one, and there is no stylesheet on its way in.
+		if (theme.name !== "default") await waitForTheme(page, theme);
 
 		for (const state of /** @type {const} */ (["loaded", "opened"])) {
 			if (state === "opened") {
@@ -668,9 +743,10 @@ const openCorpus = async ({ label, pages }) => {
 	const close = async () => {
 		await browser.close();
 		server.close();
+		snapshot.dispose();
 	};
 
-	return { close, visit, visits };
+	return { browserName, close, preset: theme.name, visit, visits };
 };
 
 /**
@@ -738,6 +814,7 @@ module.exports = {
 	contextKey,
 	insetProperty,
 	observable,
+	narrowViewport,
 	observableMediaFeatures,
 	openCorpus,
 	pageAgent,

@@ -73,9 +73,24 @@ const run = async () => {
 	if (outPath) {
 		const resolved = path.resolve(outPath);
 		fs.mkdirSync(path.dirname(resolved), { recursive: true });
+		// Renderings are keyed in the order the concurrent walk finished
+		// them, which is not the same order twice. The measurements were
+		// identical either way — `--compare` reads the map by key and has
+		// always said so — but the *file* was not, so the cheapest check
+		// anyone would reach for on a determinism claim (run it twice, hash
+		// both) reported a difference that was not there. Sorting on the
+		// way out costs nothing and makes the artefact diffable.
+		/** @type {Record<string, unknown>} */
+		const ordered = {};
+		for (const key of Object.keys(fingerprint).sort()) {
+			ordered[key] = fingerprint[key];
+		}
 		fs.writeFileSync(
 			resolved,
-			JSON.stringify({ createdAt: new Date().toISOString(), fingerprint }),
+			JSON.stringify({
+				createdAt: new Date().toISOString(),
+				fingerprint: ordered,
+			}),
 		);
 		console.log(`[@cirthcss/cirth] Wrote ${outPath}`);
 	}
