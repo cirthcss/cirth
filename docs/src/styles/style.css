@@ -217,6 +217,15 @@
   text-align: start;
 }
 
+/* No rule here for the placeholder's overflow: the <span> carries Cirth's
+   own `.truncate` (see site-header.njk), which is these three declarations
+   exactly. The header needed them — the placeholder was the only thing in
+   the bar free to wrap, and wrapping took the row from one line to two in
+   the narrow band a classic scrollbar puts a 1024px window into, measured
+   at 103px on Linux CI against a 100px assertion. Hand-rolling them here
+   instead clipped text with no class to say it was meant to, which the
+   reflow spec reads — correctly — as a WCAG 1.4.4 failure at 200%. */
+
 /* The library rebinds --cirth-color on a hovered or active button, which
    is right for a button and would drag this placeholder off the fields
    beside it. Named where it applies rather than restated three times: one

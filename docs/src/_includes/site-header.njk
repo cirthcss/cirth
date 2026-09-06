@@ -27,7 +27,14 @@
 					hidden
 				>
 					{% icon "search", 16 %}
-					<span>Search documentation</span>
+					{#- .truncate is the library's own utility, and it is the
+					     right one: the placeholder is the only thing in the bar
+					     free to wrap, and a wrapped placeholder takes the whole
+					     header from one row to two in the narrow band a classic
+					     scrollbar puts a 1024px window into. Cirth's class says
+					     the truncation is a decision rather than an accident,
+					     which is also how the reflow spec reads it. -#}
+					<span class="truncate">Search documentation</span>
 					<kbd><span data-docs-search-modifier>Ctrl</span> K</kbd>
 				</button>
 			</div>
