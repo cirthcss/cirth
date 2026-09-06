@@ -12,20 +12,15 @@
 
 /* Breakpoints
    ––––––––––––––––––––
-   There were twelve numbers in this file and five tiers. The difference
-   was bookkeeping: `min-width: 768px` and `max-width: 767px` are one
-   boundary written as two numbers, `60rem` was the same kind of number as
-   1024 wearing a different unit, and nothing said which of the twelve were
-   the same decision. Every width query below now names one of the seven
-   values in this table, in `rem`, with the range syntax — so the two sides
-   of a tier are the same number and a reader can grep for it.
+   Every width query below names one of these seven values, in `rem`, with
+   the range syntax: the two sides of a tier are then the same number, and
+   greppable.
 
-   `rem` rather than `px`, for all of them rather than one of them: a media
-   query's `rem` resolves against the browser's own default font size, so a
-   reader who has turned that up gets the layout that fits the text they
-   actually see. And `width < 48rem` closes a gap `max-width: 767px` left
-   open — at a fractional viewport width, which browser zoom produces
-   constantly, 767.5px matched neither the max nor the min.
+   `rem`, not `px`: a media query's `rem` resolves against the browser's
+   own default font size, so a reader who has turned that up gets the
+   layout that fits the text they see. Range syntax, not min/max pairs:
+   `max-width: 767px` and `min-width: 768px` leave 767.5px — which browser
+   zoom produces constantly — matching neither.
 
    Shell tiers — where the chrome itself changes shape:
 
@@ -46,17 +41,14 @@
    page, which has neither rail nor outline. They are not shell tiers and
    are deliberately not rounded to one:
 
-     60rem     960px   the home page's stage split stops being intrinsic
-                       and takes its tuned 0.92/1.08 ratio, and the proof
-                       metrics go to four columns. Kept apart from 64rem
-                       because it governs a page with no rail: at 64rem the
-                       docs shell *narrows* its content column by 15rem,
-                       which is the opposite of the room these two need
-     77.5rem  1240px   the hero stacks. Swept at 20px steps against the
-                       source pane's longest line plus --docs-lab-overlap;
-                       see the table above that block. Not folded into
-                       80rem: that would stack the hero 40px early, which
-                       is a layout change rather than a consolidation
+     60rem     960px   the home page's stage split takes its tuned
+                       0.92/1.08 ratio and the proof metrics go to four
+                       columns. Not 64rem: this governs a page with no
+                       rail, while at 64rem the docs shell *narrows* its
+                       content column by 15rem
+     77.5rem  1240px   the hero stacks, at the source pane's longest line
+                       plus --docs-lab-overlap. Not 80rem: that stacks it
+                       40px early
 
    And one boundary on the other axis, which is why it is not in the ladder:
 
@@ -67,43 +59,21 @@
 /* The canvas itself (warm paper in light, near-black in dark) is the
    framework's own --cirth-background-color — nothing to override here. */
 :root {
-  /* Shell tokens: the handful of things this documentation needs a name
-	   for that the framework has no opinion about — how wide the rails and
-	   the reading column are, how wide the shell gets, how square its
-	   chrome is, and the blueprint dot grid.
+  /* Shell tokens: the few things this documentation needs a name for that
+	   the framework has no opinion about. Nothing here may alias a
+	   --cirth-* token under a second name — on a site dogfooding the
+	   framework, `var(--cirth-card-sectioning-background-color)` has to
+	   stay readable as exactly that. */
+  /* The shell's chrome is a step squarer than the content it frames. It
+     has to derive from --cirth-border-radius rather than pin
+     --cirth-radius-sm: the pin is a fixed 4px, so under `plain` (2px) the
+     chrome came out *rounder* than the content it frames. min() follows a
+     preset down and caps on the way up.
 
-	   There used to be seventeen. Ten were aliases — --docs-board for the
-	   card surface, --docs-line for the muted border, --docs-signal for the
-	   accent, and so on — a second vocabulary with no semantic content of
-	   its own, laid over the first. It cost nothing at runtime and a great
-	   deal in reading: `background: var(--docs-board)` does not tell you
-	   the documentation is using the card surface, which is the single most
-	   important thing a page dogfooding a CSS framework has to
-	   communicate. Every one of them now reads as the --cirth-* token it
-	   always was. Two more — a 4px sub-unit and a 140ms transition — were
-	   declared for an annotation layer and a motion scale this shell never
-	   ended up writing against. */
-  /* The shell's chrome is squarer than the content it frames: the header's
-     selects, the theme toggle, the example tabs and the stage toggle all
-     sit a step tighter than a card or a button. That was five copies of
-     `border-radius: var(--cirth-radius-sm)`, which is a *primitive* — a
-     fixed 4px — not the knob a preset moves. Under `plain`
-     (--cirth-border-radius: --cirth-radius-xs, 2px) the five pins stayed
-     at 4px and the rule inverted: the chrome came out rounder than the
-     content it was supposed to be tighter than.
-
-     Stated once, and derived from the knob so the relationship holds in
-     both directions: it follows a preset down and caps on the way up.
-     Same idiom the framework uses for --cirth-checkbox-border-radius and
-     --cirth-code-border-radius, and it leaves the default build's 4px
-     exactly where it was.
-
-     Which is why its two consumers — .docs-switch button and
-     .docs-stage-toggle — read as dead to a dead-CSS sweep and are not: at
-     the default build min(4px, 4px) is the radius those controls would
-     have inherited anyway, and under playroom the core radius is 8px while
-     this stays 4. Measured under chromium/playroom by
-     scripts/verify-dead-css.js; a Chromium-only sweep calls both dead. */
+     Its two consumers, .docs-switch button and .docs-stage-toggle, look
+     inert at the default build, where min(4px, 4px) is the radius they
+     would inherit anyway. Under playroom the core radius is 8px and this
+     stays 4. Preset-dependent; keep. */
   --docs-chrome-radius: min(
     var(--cirth-border-radius),
     var(--cirth-radius-sm)
@@ -118,17 +88,14 @@
     transparent 0.9px
   );
 
-  /* The framework's own reading rhythm, captured before this shell
-     re-times it. Both of these are *inherited* custom properties, and the
-     reading column below sets them to values of its own — so every live
-     example, being a descendant of that column, was silently served a
-     rhythm the library does not ship. `.docs-demo-preview` hands them
-     back (see the preview rule further down).
+  /* The framework's own reading rhythm, captured before the reading column
+     below re-times it: both are *inherited*, so every live example inside
+     that column would otherwise be served a rhythm the library does not
+     ship. `.docs-demo-preview` hands them back.
 
-     Captured, not restated: `--cirth-line-height: 1.5` written out here
-     would be a second copy of a value src/ owns, free to drift the day the
-     framework changes its mind. Read off :root, it is whatever the loaded
-     build says it is — default, preset, or a reader's own override. */
+     Read off :root rather than written out, so this is whatever the loaded
+     build says — default, preset, or a reader's own override — instead of
+     a second copy of a value src/ owns. */
   --docs-cirth-line-height: var(--cirth-line-height);
   --docs-cirth-typography-spacing-vertical: var(
     --cirth-typography-spacing-vertical
@@ -137,20 +104,11 @@
 
 /* Header — product navigation | search | controls.
 
-   The three regions used to sit on equal `1fr` outer tracks with the
-   search on `minmax(16rem, 32rem)` between them, so the search took its
-   full 32rem the moment there was room for it and left the outer tracks
-   whatever was over. Below 1440px "whatever was over" (363px at 1366)
-   stopped being enough for the control cluster (379px of GitHub link,
-   two selects and the theme toggle), which wrapped to a second row and
-   took the sticky header to 201px — a quarter of a 1280x800 viewport,
-   held there from 1366px all the way down to 1024px.
-
-   The tracks are content-sized now and the search absorbs the slack,
-   which is the intrinsic sizing the framework itself argues for: the two
-   clusters ask for exactly what they need, nobody wraps, and the search
-   still lands within a few pixels of centre because the two clusters are
-   within a few pixels of the same width. Regression-tested in
+   The outer tracks are content-sized and the search absorbs the slack, so
+   the two clusters ask for exactly what they need and neither wraps. Equal
+   `1fr` outer tracks look tidier and are not: the search takes its full
+   width first and leaves the controls too little, which wraps the sticky
+   header to a second row across the whole 1024–1440px band. Pinned by
    tests/baseline-consistency.spec.js. */
 .docs-header nav {
   display: grid;
@@ -158,13 +116,6 @@
   align-items: center;
   gap: var(--cirth-spacing);
 
-  /* The row height token is not set here, and the reason it used to be is
-	   measurably wrong. The library halves it for a <nav> that is a direct
-	   child of the banner (src/components/_nav.scss), which is this one; and
-	   the drawer's nav — the case this rule was written to also reach — pays
-	   no item padding at all (`.docs-drawer > article > nav li`), so nothing
-	   there consumes it either. Removing it moves nothing, in any engine or
-	   preset. */
   min-height: 3.5rem;
 }
 
@@ -200,44 +151,32 @@
   background: var(--cirth-form-element-background-color);
   box-shadow: none;
 
-  /* This is a button pretending to be a search field, so it is set at the
-	   size a search field is set at. Nothing the reader reads or types into
-	   gets shrunk to make a header fit.
+  /* A button pretending to be a search field, so its text has to be a
+	   placeholder in every property a placeholder has, not only in colour.
+	   The library binds a button's weight to semibold through the same slot
+	   fields use for theirs, which is right for a button and would set this
+	   one 200 heavier than the real placeholders beside it.
 
-	   The text is a placeholder, and it has to be one in every property a
-	   placeholder has, not only in colour. The library sets a field's text
-	   through --cirth-font-weight (forms/_basics.scss) and a button's
-	   through that same slot re-bound to semibold (theme/_styles.scss) —
-	   which is correct for a button and wrong for this one, and is why the
-	   trigger was announcing "Search documentation" at 600 beside real
-	   placeholders at 400.
-
-	   Two rebinds, and that is the whole of it. The colour, family, size,
-	   weight, line-height and radius that used to be restated underneath
-	   were the library's own button rule copied out — measured inert, every
-	   one of them — so the states that follow inherit the placeholder
-	   rather than each redefining what a placeholder looks like. */
+	   Two rebinds and no more: everything else a field's text needs is
+	   already inherited, so the states below adjust the placeholder instead
+	   of each redefining one. */
   --cirth-color: var(--cirth-form-element-placeholder-color);
   --cirth-font-weight: var(--cirth-font-weight-regular);
 
   text-align: start;
 }
 
-/* No rule here for the placeholder's overflow: the <span> carries Cirth's
-   own `.truncate` (see site-header.njk), which is these three declarations
-   exactly. The header needed them — the placeholder was the only thing in
-   the bar free to wrap, and wrapping took the row from one line to two in
-   the narrow band a classic scrollbar puts a 1024px window into, measured
-   at 103px on Linux CI against a 100px assertion. Hand-rolling them here
-   instead clipped text with no class to say it was meant to, which the
-   reflow spec reads — correctly — as a WCAG 1.4.4 failure at 200%. */
+/* The placeholder must truncate — it is the only thing in the bar free to
+   wrap, and wrapping takes the header from one row to two in the narrow
+   band a classic scrollbar puts a 1024px window into. It is not done here:
+   the <span> carries Cirth's own `.truncate` (site-header.njk), which the
+   reflow spec exempts. Hand-rolled, the same three declarations clip text
+   with nothing declaring that it is meant to — a WCAG 1.4.4 failure at
+   200% zoom. */
 
 /* The library rebinds --cirth-color on a hovered or active button, which
    is right for a button and would drag this placeholder off the fields
-   beside it. Named where it applies rather than restated three times: one
-   declaration, every state, still the field's own token. Tracking is not
-   declared at all — a field does not declare it either, and inheriting is
-   what keeps the two the same thing. */
+   beside it. */
 .docs-search-trigger:is(:hover, :focus, :focus-visible, :active) {
   --cirth-color: var(--cirth-form-element-placeholder-color);
 }
@@ -266,37 +205,24 @@
 .docs-search-help kbd {
   padding: 0.125rem 0.35rem;
   border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-  /* --cirth-canvas, not --cirth-background-color: a <button> rebinds the
-	   latter to its own fill (that is how a primary button paints itself),
-	   and this kbd lives inside the search trigger button — so the "page
-	   surface" it asked for resolved to amber. --cirth-canvas exists for
-	   exactly this: a name for the page that components are not allowed to
-	   shadow. Same trap the copy button hit further down. */
+  /* --cirth-canvas, not --cirth-background-color: this kbd sits inside a
+	   <button>, which rebinds the latter to its own fill. --cirth-canvas is
+	   the name for the page that components may not shadow. */
   background: var(--cirth-canvas);
   color: var(--cirth-muted-color);
   font-size: var(--cirth-font-size-xs);
   white-space: nowrap;
 }
 
-/* The dialog is a flush card: its bands run edge to edge and the list
-   inside them carries the inset. It used to keep the card's own 20px
-   padding, so every hairline — the field's underline, the status bar, each
-   result row — stopped short of the panel edge and the panel read as a card
-   with a smaller card drawn inside it.
+/* A flush card: the bands run edge to edge and the list inside them
+   carries the inset.
 
-   The knob is the token, not the padding — which is the trap this site's
-   own Card page documents, and which this rule used to walk into. It set
-   `padding: 0` on the <article> and then repaired the consequences by hand:
-   a header bleeds to the card's edges with a negative inline margin of
-   --cirth-block-spacing-horizontal, and that token still read 1.25rem after
-   the padding was gone, so the band had to be pinned back with `margin: 0`
-   and its surface restated because the sectioning tint came with it.
-
-   Zero the two tokens instead and the frame, the radius, the surface, the
-   hairline under the header and the header's own bleed all arrive correct
-   from components/_card.scss: the padding and the bleed are reading the same
-   number again. Border, radius and background are gone from this rule for
-   the same reason — they were the card's values, restated. */
+   Zero the two spacing *tokens*, never `padding: 0`. A card's header
+   bleeds to the edge with a negative inline margin of
+   --cirth-block-spacing-horizontal, so zeroing the padding alone leaves
+   the bleed reading a 1.25rem that is no longer there — and every band
+   then has to be repaired by hand. This is the trap this site's own Card
+   page documents. */
 .docs-search-dialog > article {
   --cirth-block-spacing-horizontal: 0;
   --cirth-block-spacing-vertical: 0;
@@ -323,17 +249,14 @@
   border-radius: 0;
   background: transparent;
 
-  /* Every state, not two rules. The library gives a field a focus shadow,
-	   and this one is a bare row inside a panel that draws its own bands;
-	   an unconditional `none` says that once instead of being restated
-	   under :focus. */
+  /* Unconditional, so it covers :focus too: this field is a bare row in a
+	   panel that draws its own bands, and has no box to shadow. */
   box-shadow: none;
   font-size: var(--cirth-font-size-lg);
 }
 
-/* The margin only. This header is a grid, so the library's `float: right`
-   on a dialog's close control (components/_modal.scss) never applies to it
-   and there is nothing to cancel. */
+/* The margin only: this header is a grid, so the library's `float: right`
+   on a dialog's close control never applies here. */
 .docs-search-dialog > article > header .close {
   margin: 0;
 }
@@ -344,12 +267,8 @@
   border-block-end: var(--cirth-border-width) solid
     var(--cirth-card-border-color);
 
-  /* The canvas, not the card's sectioning tint: in the dark scheme that
-	   tint sits at L 23.4% and puts --cirth-muted-color at 4.46:1, a
-	   rounding error under AA. The canvas is 20.15% and gives 4.82:1 — and
-	   it reads as a stronger band besides, since it is the one surface on
-	   the page this panel is not made of. --cirth-canvas rather than
-	   --cirth-background-color for the usual reason: nothing can shadow it. */
+  /* The canvas, not the card's sectioning tint: in dark that tint puts
+	   --cirth-muted-color at 4.46:1, under AA. The canvas gives 4.82:1. */
   background: var(--cirth-canvas);
   color: var(--cirth-muted-color);
   font-family: var(--cirth-font-family-mono);
@@ -384,9 +303,8 @@
   border-radius: var(--cirth-border-radius);
 
   /* --cirth-contrast, not --cirth-color: on an <a> the latter is the slot
-	   the link component binds to the accent.
-	   A results list wants a readable title; the accent's job here is the
-	   rail on the row being pointed at, below. */
+	   the link component binds to the accent, and a result title wants to
+	   be readable. The accent's job here is the rail on the hovered row. */
   color: var(--cirth-contrast);
   text-decoration: none;
 }
@@ -434,8 +352,7 @@
   gap: 0.5rem 1rem;
   padding: 0.5rem 1rem;
 
-  /* Same band, same reason as the status line above. The hairline above it
-	   and the cleared margin are the card's own footer contract. */
+  /* Same band, same contrast reason as the status line above. */
   background: var(--cirth-canvas);
   color: var(--cirth-muted-color);
   font-family: var(--cirth-font-family-mono);
@@ -454,31 +371,20 @@
 }
 
 /* Search on a phone is a screen, not a panel that happens to be narrow.
+   The same nodes, re-laid out: one markup, one results list, one Pagefind
+   instance, so the state and the focus logic have one place to live.
 
-   Everything above describes one dialog; this block re-lays the same
-   nodes out. There is no second markup, no mobile-only input, no second
-   results list and no second Pagefind instance: the whole point of a
-   responsive dialog is that the state, the listeners and the focus logic
-   have only one place to live.
+   The article becomes the viewport and its rows become a grid. That is
+   what pins the field — a grid row cannot scroll away, so no `position:
+   sticky` — while the results row takes `minmax(0, 1fr)` and scrolls
+   inside itself, so a long result set never moves the field off screen.
 
-   What changes: the article stops being a floating card (no margin, no
-   radius, no border, no shadow, nothing to look "centred") and becomes
-   the viewport. The rows it already had — field, status, results — become
-   a three-row grid, which is what pins the field: a grid row cannot
-   scroll away, so `position: sticky` is not needed and neither is the
-   fragile part of it. The results row takes `minmax(0, 1fr)` and scrolls
-   inside itself, so a long result set never moves the field off screen
-   and the reader can always retype, clear or close without scrolling
-   back up.
+   100dvh, not 100vh: dvh follows the mobile chrome as it collapses, which
+   is the difference between the close button being reachable and being
+   under the URL bar.
 
-   100dvh, not 100vh: dvh follows the mobile browser chrome as it
-   collapses, which is the whole difference between the close button
-   being reachable and being under the URL bar.
-
-   The max-height branch is for a phone held sideways: at 390px of height
-   the floating panel wants 584px and is taller than the screen it floats
-   in, so the same full-surface layout is the right answer there for the
-   same reason it is at 390px of width. */
+   The height branch is a phone held sideways, where the floating panel
+   wants 584px of a 390px screen. */
 @media (width < 48rem), (height <= 30rem) {
   .docs-search-dialog {
     align-items: stretch;
@@ -533,14 +439,11 @@
       calc(0.5rem + env(safe-area-inset-right, 0px));
   }
 
-  /* Arrow keys, Enter and Esc on a touch device are advice about
-	   hardware the reader does not have, sitting where results should be.
-	   The hints go — `display: none`, not a smaller font, so the rows take
-	   their gaps with them — and the attribution stays: it is the one line
-	   in that band that is still true on a phone, and Pagefind should be
-	   credited on every viewport rather than only on the wide one. The
-	   band holds no focusable node and is already aria-hidden, so nothing
-	   leaves the tab order or the accessibility tree either way. */
+  /* Keyboard hints are advice about hardware this reader does not have,
+	   sitting where results go. `display: none`, not a smaller font, so
+	   the rows take their gaps with them. The attribution beside them
+	   stays — Pagefind is credited on every viewport. Nothing in the band
+	   is focusable, so the tab order is unaffected. */
   .docs-search-help span {
     display: none;
   }
@@ -556,11 +459,10 @@
     );
   }
 
-  /* Pagefind returns 18 words of context, which on a phone's measure is
-	   a paragraph: the excerpts ran to eight lines each and three results
-	   filled the screen, so the list stopped being a list. Three lines is
-	   enough to see why a page matched; the title and the path are never
-	   clamped, because those are what the reader is choosing between. */
+  /* Pagefind returns 18 words of context, which is a paragraph on a
+	   phone's measure. Three lines is enough to see why a page matched.
+	   The title and the path are never clamped — those are what the reader
+	   is choosing between. */
   .docs-search-results span {
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -581,24 +483,15 @@
   display: none;
 }
 
-/* Wordmark lockup: the mark and name carry more weight than any single
-   nav item, in the monospace voice the rest of the shell's annotation
-   layer uses.
+/* Wordmark lockup, in the monospace voice the shell's annotation layer
+   uses.
 
-   Its height is not its own to choose. Bootstrap computes the brand's
-   vertical padding from the band the links already occupy —
-   $navbar-brand-padding-y: ($nav-link-height - $navbar-brand-height) / 2 —
-   so the lockup centres on that band rather than setting a taller one.
-   Here the band is --cirth-space-10, the 40px a nav gives a control
-   (components/_nav.scss), and the lockup was a 36px mark inside a link
-   that adds 8px above and below: 52px, twelve taller than every other
-   item on the bar, which the row then had to grow to hold. Same
-   computation as Bootstrap's, one token instead of two literals: set the
-   lockup's height, and the padding that centres it on the band follows.
-
-   The negative block margin mirrors the padding for the same reason the
-   library's nav link rule carries one — the link paints a box larger than
-   its text without changing where the row places it. */
+   Its height is not its own to choose: it centres on the band the nav
+   links already occupy (--cirth-space-10) instead of setting a taller one,
+   or the whole row grows to hold it. Declare the lockup's height and the
+   padding that centres it follows. The negative block margin mirrors that
+   padding, so the link paints a box larger than its text without moving
+   the row — the same idiom the library's nav link rule uses. */
 .docs-brand {
   --docs-brand-height: 1.75rem;
 
@@ -611,19 +504,16 @@
   letter-spacing: var(--cirth-letter-spacing-tight);
 }
 
-/* Brand colour is one value in every state — Bootstrap sets
-   $navbar-light-brand-hover-color to the brand colour itself. The name of
-   the site does not brighten on the way past. */
+/* One value in every state: the name of the site does not brighten on the
+   way past. */
 .docs-brand,
 .docs-brand:is(:hover, :focus, :active) {
   color: var(--cirth-contrast);
   text-decoration: none;
 }
 
-/* Width only: the mark is a square <img> that carries width and height
-   attributes, and the library's own `img:where([width][height])` rule
-   (content/_embedded.scss) keeps `height: auto` so the ratio does the rest.
-   The second declaration was the same number arriving twice. */
+/* Width only: the mark carries width/height attributes, and the library's
+   `img:where([width][height])` rule keeps `height: auto`. */
 .docs-logo {
   width: var(--docs-brand-height);
 }
@@ -639,23 +529,13 @@
 
 /* Native <select>s, not custom dropdowns — full keyboard/AT support for
    free. Only the width is this file's business: the form default is block
-   and 100% wide, and a header control is neither.
+   and 100% wide, and a header control is neither. Height and font-size are
+   deliberately absent — the library's nav states the 40px band, and a
+   control the reader picks from stays at reading size.
 
-   The height is not here any more, and that is the point. These used to
-   pin themselves to 2.75rem because the library's nav opted controls down
-   to a 24px *floor* — a limit, not a size — which left every real header
-   to invent a height and then fight the nav rule for it. Cirth's nav now
-   states 40px, the band a navigation bar actually wants, and this file
-   simply stops arguing. The reduced font-size is gone with it: a control
-   the reader types into or picks from should be set at reading size, and
-   shrinking the type is how the old 33px and 38px heights happened in the
-   first place. */
-/* The stacking margin the library gives every form control, dropped. In
-   the header bar `nav li select` already drops it, which is why this rule
-   looked inert on 27 built pages; in the drawer the same two selects are
-   rows of a control group with no <nav> above them, and there the 16px is
-   real. The padding and radius that used to sit here were not: the width
-   rules and the nav control block already state both. */
+   The margin looks inert, because in the header `nav li select` already
+   drops it. In the drawer these same two selects sit outside any <nav>,
+   and there the 16px is real. */
 .docs-preset-select,
 .docs-version-select {
   margin-bottom: 0;
@@ -669,57 +549,32 @@
   width: 8rem;
 }
 
-/* This used to be written `.docs-theme-toggle.docs-theme-toggle`, with a
-   comment blaming nav's `nav li button { height: auto; padding: … }` for
-   tying it at one class. That was the wrong culprit — specificity is
-   computed per selector in a list, and `nav li button` is (0,0,3), which
-   one class outranks outright. What actually beats it is the next
-   selector along in the same list: the toggle is `<button type="button">`,
-   so `nav li [type=button]` matches at (0,1,2), and (0,1,2) beats
-   (0,1,0).
-
-   The fix is to say where the rule applies rather than to say the same
-   class twice. `.docs-header .docs-theme-toggle` is (0,2,0), it wins for
-   a reason a reader can check, and it is true: this treatment is for the
-   toggle in the site header, not for the class anywhere it turns up.
-   (The other two doubled classes on this page — the search trigger and
-   the copy button — turned out to be beating nothing at all, and are now
-   single. The search trigger is a button too, but it is not inside a
-   `nav li`, so that list never reaches it.) */
+/* Scoped to the header rather than doubled as
+   `.docs-theme-toggle.docs-theme-toggle`. It has to outweigh the library's
+   `nav li [type=button]` at (0,1,2) — not `nav li button`, which one class
+   already beats — and saying where the rule applies is both enough and
+   checkable. */
 .docs-header .docs-theme-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  /* Square, on the same 40px band as the selects beside it — the height
-	   Cirth's nav gives a control (components/_nav.scss). Clear of WCAG
-	   2.5.8's 24px AA minimum with room; short of 2.5.5's 44px AAA target,
-	   which is the size a control takes in a *form*, not in a navigation
-	   bar.
+  /* Square, on the same 40px band as the selects beside it. Clear of WCAG
+	   2.5.8's 24px AA minimum; short of 2.5.5's 44px AAA target, which is
+	   the size a control takes in a *form*, not a navigation bar.
 
-	   The width is stated and the height is not, and the difference is what
-	   was measured: in the bar the nav band already gives this control 40px,
-	   and in the drawer — outside any <nav>, which is the case the height
-	   used to be restated for — the library's own target size gives it 44px
-	   over the top of whatever this rule says. It was never the thing
-	   deciding the height in either place. */
+	   Width only: the nav band decides the height on the bar, and the
+	   library's target size decides it in the drawer. */
   width: 2.5rem;
   margin-bottom: 0;
   padding: 0;
   line-height: 1;
 }
 
-/* Only where it lands. `.sr-only-focusable` used to return the link to
-   normal flow on focus, which shoved the whole document down 24px the
-   first time anyone pressed Tab, so this shell reimplemented the reveal:
-   out of flow, a surface, a radius, a padding and a ring. The utility now
-   stays out of flow on its own and brings the page canvas, the page ink,
-   a radius and a padding with it (utilities/_sr-only.scss).
-
-   What is left is genuinely this site's: the shell has a sticky header, so
-   the link is pinned to the viewport corner rather than left at the static
-   position the utility would otherwise give it. Where a skip link lands is
-   the application's decision, which is exactly why the library does not
-   make it. */
+/* Only where it lands. `.sr-only-focusable` brings the reveal itself —
+   out of flow, canvas, ink, radius, padding. This shell has a sticky
+   header, so the link is pinned to the viewport corner instead of the
+   static position the utility leaves it at. Where a skip link lands is the
+   application's decision, which is why the library does not make it. */
 .docs-skip-link:focus {
   position: fixed;
   inset-block-start: var(--cirth-space-3);
@@ -730,13 +585,10 @@
   white-space: nowrap;
 }
 
-/* The visited link colour, printed as itself. :visited is the one state the
-   documentation cannot demonstrate on demand — the browser paints it only
-   for a link the reader has really followed, and reports the unvisited
-   colour to getComputedStyle so the page cannot read it back either. A
-   swatch of the token is the honest substitute, and a named class is the
-   right shape for it: the alternative was an inline style buried in a demo
-   snippet that readers are invited to copy. */
+/* The visited link colour, printed as itself. :visited is the one state
+   the documentation cannot demonstrate on demand — the browser paints it
+   only for a link really followed, and reports the unvisited colour to
+   getComputedStyle. A swatch of the token is the honest substitute. */
 .docs-visited-swatch {
   color: var(--cirth-link-visited-color);
   font-family: var(--cirth-font-family-mono);
@@ -745,13 +597,8 @@
   text-underline-offset: var(--cirth-text-underline-offset);
 }
 
-/* An editorial accent on part of a heading. This is a class rather than a
-   one-off rule on `.docs-native-claim h1 em`, and that is the whole point:
-   a documentation shell earns far more from a handful of small named
-   utilities it can reuse than from a growing pile of selectors that each
-   describe one element on one page. The accent is doing an editorial job
-   here — emphasis in a title — which is a use the brand page names
-   explicitly rather than an exception to it. */
+/* An editorial accent on part of a heading — a small named utility rather
+   than a selector describing one element on one page. */
 .docs-accent {
   color: var(--cirth-primary);
 }
@@ -767,74 +614,43 @@
 }
 
 /* Compact-viewport menu toggle: a square icon button on the same 40px band
-   as search, wearing the same frame.
-
-   It used to be a <details> summary, which meant the library dressed it as
-   a form control for free and it matched the search field beside it
-   without being told to. As a <button> — which is what opens a dialog —
-   that stopped being free twice over: `ghost` paints no frame, and a
-   button's block size floors at 2.75rem, so the pair went from two 40px
-   framed controls to a framed field beside a bare 44px glyph. Both are
-   restated here against the same tokens the trigger above uses, so the two
-   stay one band and one frame whatever the theme does. */
-/* No `display` here: `.docs-header .docs-menu-toggle` weighs more and
-   states it twice — none at and above the 64rem tier, inline-grid below —
-   so the base declaration never won a cascade in its life. */
+   as search. A ghost <button> paints no frame and floors its block size at
+   2.75rem, so the band is restated here against the same tokens the search
+   trigger uses — otherwise the pair reads as a framed field beside a bare
+   44px glyph. `display` is deliberately absent: the tier rules below state
+   it in both directions. */
 .docs-menu-toggle {
   place-items: center;
 
-  /* margin: 0 is a fix, not tidying. The library gives every button a
-     bottom margin, and .docs-header-actions centres its children: a 40px
-     control with 16px under it has a 56px margin box, so centring put the
-     toggle's border box 8px above the search field's everywhere between
-     the 36rem and 64rem tiers — the exact range where both are on the bar.
-     The field's own rule already zeroed its margin; this one had only ever
-     zeroed it below 36rem, which is why the two lined up on a phone and
-     nowhere else.
+  /* margin: 0 is a fix, not tidying. .docs-header-actions centres its
+     children, so the library's bottom margin on a button gives this one a
+     56px margin box and lifts its border box 8px above the search field's
+     across the whole band where both are on the bar.
 
-     No frame: the header's buttons are ghost. This one briefly carried
-     the search field's border and fill so the pair would match, which
-     solved the wrong half of the problem — the toggle is an action, not a
-     field, and it now reads as one beside the theme toggle instead of as
-     a second input beside the search. */
+     No frame, deliberately: the toggle is an action, not a field, and
+     reads as one beside the theme toggle. */
   width: 2.5rem;
   min-block-size: 2.5rem;
   margin: 0;
   padding: 0;
 }
 
-/* The offcanvas drawer. Shell only: this is the documentation site's
-   navigation surface, not a Cirth component, and nothing here is a
-   candidate for the library — a framework whose argument is native HTML
-   does not need to ship an .offcanvas. What it is *made of* is the
-   library's, though: a <dialog>, a <nav><ul>, the .close control, and the
-   same <select>/<button> controls the bar was already using.
-
-   The layout is Bootstrap's in one respect only, and deliberately: a
-   drawer gives the controls a column of real width instead of a dropdown's
-   hanging panel, so the version, preset and theme rows can be labelled and
-   stacked rather than squeezed. None of its colour, chrome or content
-   structure is copied. */
+/* The offcanvas drawer. Shell only, and not a candidate for the library:
+   a framework whose argument is native HTML does not need to ship an
+   .offcanvas. What it is *made of* is the library's — a <dialog>, a
+   <nav><ul>, the .close control, and the bar's own controls. */
 .docs-drawer {
   justify-content: flex-end;
 }
 
-/* The scroll lock that used to be repeated here is the framework's:
-   `html:has(dialog:modal) { overflow: hidden }` in components/_modal.scss.
-   Both of this shell's modal surfaces are opened with showModal() — the
-   drawer in site-header.njk, the search dialog in search.js, which gates
-   the whole feature on showModal() existing — so `:modal` matches whenever
-   either is open and the shell had been restating a rule it already gets.
-   */
+/* No scroll lock here: both of this shell's modal surfaces are opened with
+   showModal(), so the framework's `html:has(dialog:modal)` already holds.
 
-/* The library animates a dialog in from above (components/_modal.scss),
-   which is right for a centred panel and wrong for a surface anchored to
-   the inline edge — it arrived by dropping down the side of the screen.
-   Same two properties, one axis over. Declared only inside the
-   no-preference branch and subtracting from the resting state, so with
-   reduced motion the drawer is simply there, which is the house rule the
-   hero follows too. Not logical: transforms have no inline axis, and this
-   shell is LTR. */
+   The library animates a dialog in from above, which is right for a
+   centred panel and wrong for one anchored to the inline edge. Same two
+   properties, one axis over. Inside the no-preference branch and
+   subtracting from the resting state, so with reduced motion the drawer is
+   simply there. Not logical — transforms have no inline axis. */
 @media (prefers-reduced-motion: no-preference) {
   .docs-drawer[open] > article {
     @starting-style {
@@ -844,23 +660,18 @@
   }
 }
 
-/* A flush card anchored to the inline edge. The two block-spacing tokens
-   are the drawer's real statement — every band and group in this panel
-   carries its own padding to the panel's edge — and zeroing them is what
-   lets the header below bleed correctly instead of being pinned back by
-   hand; see the search dialog above for the trap, which this rule also used
-   to be in. What is left is the drawer's own geometry: full height, one
-   edge instead of a frame, square corners, and the surface it is given. */
+/* A flush card anchored to the inline edge: every band carries its own
+   padding to the panel edge. Zero the two spacing tokens, not the padding
+   — same trap as the search dialog above. */
 .docs-drawer > article {
   --cirth-block-spacing-horizontal: 0;
   --cirth-block-spacing-vertical: 0;
   --cirth-card-sectioning-background-color: transparent;
 
   display: grid;
-  /* Groups stack from the top and the last row absorbs what is left.
-	   Giving the nav the flexible row instead parked three links in the
-	   vertical middle of an empty panel and pinned the controls to the
-	   bottom edge, which is a footer, not a group. */
+  /* Groups stack from the top and the *last* row absorbs what is left.
+	   Give the nav the flexible row instead and the controls are pinned to
+	   the bottom edge, which reads as a footer rather than a group. */
   grid-template-rows: auto auto auto minmax(0, 1fr);
   width: min(22rem, calc(100vw - var(--cirth-space-10)));
   max-height: none;
@@ -874,9 +685,8 @@
 }
 
 /* Title band: the lockup names the surface and the close control sits on
-   the same line, which is the one thing a drawer needs that a dropdown
-   did not — a dropdown is dismissed by clicking away from it, a modal
-   surface has to say how to leave. The hairline under it is the card's. */
+   the same line. A dropdown is dismissed by clicking away from it; a modal
+   surface has to say how to leave. */
 .docs-drawer > article > header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -894,20 +704,12 @@
   margin: 0;
 }
 
-/* The library lays a <nav> out as a bar: flex, space-between, items centred
-   on the band. That is right in the header and wrong in a column 568px
-   tall, where it parked three links in the vertical middle of an empty
-   panel. A drawer's nav is a stack, and it says so the way the framework
-   asks: `--cirth-nav-element-spacing-horizontal: 0`.
-
-   That one declaration used to be four rules. A nav's three inline insets
-   — the list's negative margin, the item's padding, the link's negative
-   margin — are one gutter paid forward and taken back, and the library now
-   spends all three through the token that names it, so a column releases
-   them by saying it has no gutter (components/_nav.scss). What used to be
-   here was that release written out by hand, with a comment apologising
-   for it: "margin: 0 undoes the library's nav-link idiom, not its
-   styling." There is no idiom left to undo. */
+/* The library lays a <nav> out as a bar, which is right in the header and
+   wrong in a tall column. A drawer's nav is a stack, and it says so the way
+   the framework asks: `--cirth-nav-element-spacing-horizontal: 0`. That one
+   token releases all three of the nav's inline insets — the list's negative
+   margin, the item's padding, the link's negative margin — so none of them
+   needs undoing by hand. */
 .docs-drawer > article > nav {
   --cirth-nav-element-spacing-horizontal: 0;
 
@@ -930,12 +732,9 @@
 
 /* The drawer's own row rhythm: the item pays nothing and the link pays it
    all, so a row is exactly as tall as the link's box and the rows tile.
-   `margin-block: 0` belongs with that decision rather than against the
-   framework — the link's negative block margin exists to be cancelled by
-   the item's block padding, and this rule is where that padding was given
-   up. The *inline* half of the same idiom is gone from here entirely: the
-   gutter token above releases it, which is what four rules of `margin: 0`
-   and `padding: 0` used to be doing by hand. */
+   The link's `margin-block: 0` belongs with that — its negative block
+   margin exists to be cancelled by the item's block padding, and this is
+   where that padding was given up. */
 .docs-drawer > article > nav li {
   padding: 0;
 }
@@ -958,12 +757,10 @@
     var(--cirth-card-border-color);
 }
 
-/* "Display" is a heading for the three controls the script moves in here.
-   If they are not in here — above the collapse breakpoint, or with the
-   script disabled, when all three are inert anyway — there is nothing for
-   it to head, and a heading over nothing is what the menu used to open
-   onto across the whole tablet range. The group is now structurally
-   incapable of being empty: it exists exactly when its contents do. */
+/* "Display" heads the three controls the script moves in here. Above the
+   collapse breakpoint, or with no script, they are not here — so the group
+   exists exactly when its contents do, rather than opening onto a heading
+   over nothing. */
 .docs-mobile-controls:not(:has([data-docs-header-control])) {
   display: none;
 }
@@ -1017,41 +814,28 @@
 
 /* Collapsed navbar — one breakpoint, one row.
    ------------------------------------------
-   Bootstrap's navbar has exactly two states, and one `.navbar-expand-*`
-   breakpoint decides which: expanded, everything on the bar; collapsed,
-   the toggler on the bar and everything collapsible inside the region it
-   controls. There is no width at which the toggler is showing and part of
-   the collapsible content is still out on the bar.
+   Two states, and one tier decides which: above 64rem the navbar is
+   expanded; below it the bar carries the brand, the search and the toggler
+   on a single row and the menu carries the rest. There must be no width at
+   which the toggler shows and part of the collapsible content is still out
+   on the bar — that is what wrapped the sticky header to 155px across the
+   whole tablet band.
 
-   This shell had three states. The hamburger appeared at the 64rem tier,
-   but the controls only moved into it at 36rem, so across the whole tablet
-   band the menu opened onto an empty "Display" heading while version,
-   preset and theme sat outside it — and the bar, unable to fit them next
-   to the search, wrapped the search and the toggler onto a second grid
-   row: a 155px sticky header, on every page, across the whole tablet
-   range.
-
-   One breakpoint now, and it is the one that already governs everything
-   else that collapses here — the same 64rem tier that hides the in-header
-   nav items and the sidebar. Above it the navbar is expanded; below it the
-   bar carries the brand, the search and the toggler on a single row,
-   and the menu carries the rest. The script that moves the controls reads
-   this same query, so the transfer and the toggler's visibility can never
-   disagree again. */
+   64rem because it is the tier that already governs everything else that
+   collapses here. The script that moves the controls reads this same
+   query, so the transfer and the toggler cannot disagree. */
 @media (width < 64rem) {
-  /* Collapsible content: it is inside the menu at these widths, and the
-	   menu is the only place it is. Nothing here is duplicated — the nav
-	   items and GitHub are re-listed in the panel markup, the three
-	   controls are moved into it, node for node. */
+  /* Collapsible content: inside the menu at these widths, and nowhere
+	   else. The three controls are *moved* there node for node, not
+	   duplicated. */
   .docs-nav-item,
   .docs-header-github,
   .docs-header-controls-group {
     display: none;
   }
 
-  /* Two tracks, one row: the brand cluster, then the search and toggler
-	   pinned to the end. The search keeps a comfortable measure instead of
-	   stretching the width of a tablet. */
+  /* Two tracks, one row: brand cluster, then search and toggler pinned to
+	   the end. */
   .docs-header nav {
     grid-template-columns: auto minmax(0, 1fr);
   }
@@ -1067,24 +851,18 @@
     width: auto;
   }
 
-  /* Below this width the field-shaped trigger cannot hold its placeholder
-	   and still leave the brand room, so it becomes the icon it already
-	   carries. A presentation change on one control — not a second
-	   structural breakpoint: what lives in the menu is the same here as at
-	   the 64rem tier. */
-  /* The width is stated as well as the basis, and it is not tidy-uppable:
-	   Chromium sizes this flex item from the basis alone, but Gecko and
-	   WebKit compute the row's intrinsic width from the item's content, so
-	   without it the actions cluster came out 66px wide holding 88px of
-	   controls and the menu toggle hung 6px off a 320px screen. Measured in
-	   Firefox; caught by the reflow spec, which is the reason that spec
-	   runs on three engines.
+  /* Below this width the trigger cannot hold its placeholder and still
+	   leave the brand room, so it becomes the icon it already carries. A
+	   presentation change on one control, not a second structural tier.
 
-	   It is also the reason the audit gained a second pass that removes
-	   candidates *together*. This width and the trigger's below are inert
-	   one at a time in all three engines — take either out and the other
-	   still states the cluster — and not inert as a pair, which is exactly
-	   how a cleanup deletes them. scripts/verify-dead-css.js names both. */
+	   The width is stated as well as the basis, and neither it nor the
+	   trigger's width below may be tidied away. Chromium sizes this flex
+	   item from the basis alone; Gecko and WebKit take the row's intrinsic
+	   width from the item's own width, and without it the cluster comes out
+	   66px wide holding 88px of controls, hanging the menu toggle off a
+	   320px screen. Each is inert *alone* in all three engines — remove
+	   either and the other still states the cluster — and live as a pair,
+	   which is how a cleanup deletes them. */
   .docs-header-search {
     flex: 0 0 var(--cirth-space-10);
     width: var(--cirth-space-10);
@@ -1114,16 +892,12 @@
 
 /* Docs layout: sidebar + content, plus a page outline column on wide
    screens. Column widths, sticky offsets, the prose measure and the
-   chapter separators are all set once, further down, with the rest of the
-   shell — this file used to declare each of them twice, an early pass and
-   a later one that quietly overrode it.
+   chapter separators are all set once, further down.
 
-   The single `minmax(0, 1fr)` track is the exception, and it reads inert
-   in every engine and preset the audit reaches: a grid's default track is
-   already `auto`, and nothing in the corpus overflows it. It states the
-   floor a long <pre> or a wide table would otherwise push through, which
-   is a thing that has to be true before it is needed. Kept deliberately —
-   see scripts/verify-dead-css.js. */
+   `minmax(0, 1fr)` reads inert — a grid's default track is already `auto`,
+   and nothing in the corpus overflows it. It is the floor a long <pre> or
+   a wide table would push through, and has to be true before it is
+   needed. */
 .docs-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -1147,9 +921,8 @@
 }
 
 /* Page outline, top variant (small screens): a disclosure, no scroll-spy.
-   Its structure is set with the rest of the compact shell further down;
-   what belongs here is the space it leaves under itself in the band
-   between the sidebar breakpoint and the outline column's. */
+   Only the space it leaves under itself belongs here; its structure is set
+   with the rest of the compact shell further down. */
 .docs-toc-top {
   margin-bottom: calc(var(--cirth-spacing) * 2);
 }
@@ -1179,10 +952,8 @@
   font-size: var(--cirth-font-size-sm);
 }
 
-/* Only the item padding is the shell's. The negative list and link margins
-   that used to be undone here — meant for a horizontal nav, and the reason
-   an outline in a clipping column had its left edge cut off — are zeroed by
-   `aside nav` in the framework itself now. */
+/* Only the item padding is the shell's: `aside nav` already zeroes the
+   horizontal-nav insets that would clip an outline's left edge. */
 .docs-toc li {
   padding: 0;
 }
@@ -1197,10 +968,9 @@
   padding-inline-start: calc(var(--cirth-space-3) + var(--cirth-space-4));
 }
 
-/* `text-decoration: none` measures inert and stays: the corpus takes a
-   photograph and never puts a pointer on the link, and the underline this
-   suppresses is the one the library draws on :hover. A sweep that cannot
-   hover cannot see it. */
+/* `text-decoration: none` reads inert only because the audit photographs
+   the page and never hovers: the underline it suppresses is the one the
+   library draws on :hover. */
 .docs-toc-top a {
   margin-block: 0;
   padding: calc(var(--cirth-spacing) * 0.25) 0;
@@ -1214,17 +984,13 @@
   text-decoration: underline;
 }
 
-/* No active styling here on purpose. The scroll-spy sets aria-current and
-   the framework paints its one registered edge on the inline-start rail.
-   The shell used to add a second amber bar as a ::before. */
+/* No active styling here on purpose: the scroll-spy sets aria-current and
+   the framework paints the inline-start rail. A second bar drawn as a
+   ::before is one rail too many.
 
-/* Sidebar structure only. The horizontal-nav resets that used to be here —
-   the list's margins and padding, its list-style, the item's display and
-   margin — are what `aside nav` now ships (components/_nav.scss), so the
-   shell states only what is still its own: entries carry no item padding
-   because the link is the full-width box, and the rail's type size. Rail
-   geometry, ink and the active state are set once, together with the table
-   of contents, further down. */
+   Sidebar structure only — `aside nav` ships the horizontal-nav resets, so
+   what is left is the shell's: no item padding, because the link is the
+   full-width box, and the rail's type size. */
 .docs-sidebar nav li {
   padding: 0;
   font-size: var(--cirth-font-size-sm);
@@ -1247,11 +1013,9 @@
   border-top: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
-/* The margin is for a documentation page, where the prose simply stops
-   and the footer needs air of its own. The home page's last section
-   already ends on `clamp(3rem, 7vw, 7rem)` of its own padding, so the two
-   stacked to 176px of empty canvas above the rule. The section's padding
-   is the air. */
+/* The footer's own margin is air for a documentation page, where the prose
+   simply stops. The home page's last section already ends on its own
+   padding, and the two stack to 176px of empty canvas. */
 .docs-home-page .docs-footer {
   margin-top: 0;
 }
@@ -1273,11 +1037,9 @@
   }
 }
 
-/* Layout only. The ink comes from the library's own `.contrast` link
-   variant on the element, which is also what the header wordmark uses —
-   this file used to restate it as `color: var(--cirth-color)`, which on an
-   <a> resolves to the accent, because that is the slot the link component
-   binds. */
+/* Layout only: the ink is the library's `.contrast` link variant on the
+   element. `color: var(--cirth-color)` would not do it — on an <a> that
+   slot is the one the link component binds to the accent. */
 .docs-footer-brand {
   gap: 0.5rem;
 }
@@ -1351,15 +1113,11 @@
   opacity: 0;
 }
 
-/* Every transition this shell declares lives behind the preference, not in
-   front of it. Cirth's own reduce-motion pass zeroes `transition-duration`
-   on `*:not([aria-busy="true"])`, which weighs (0,1,0) — so any docs rule
-   written at one class or more (all four of them were) quietly handed the
-   motion back to a reader who had asked for none. axe caught it as a
-   contrast failure, of all things: the playroom preset's slower transition
-   widened the window enough that a table-of-contents entry was still
-   crossfading between two themes' inks when the page was sampled.
-   Declaring them under `no-preference` means there is nothing to outrank. */
+/* Every transition this shell declares goes behind the preference, never
+   in front of it. Cirth's reduce-motion pass zeroes `transition-duration`
+   at (0,1,0), so a docs rule written at one class or more outranks it and
+   hands the motion back to a reader who asked for none. Under
+   `no-preference` there is nothing to outrank. */
 @media (prefers-reduced-motion: no-preference) {
   .header-anchor {
     transition: opacity var(--cirth-transition);
@@ -1372,26 +1130,18 @@
 }
 
 /* Every `pre` this shell owns is a positioning context for the injected
-   copy button (unconditional rather than `:has()` — the docs follow the
-   framework's own browser floor, and Firefox 113 lacks `:has()`).
+   copy button. Unconditional rather than `:has()`: the docs follow the
+   framework's browser floor, and Firefox 113 has no `:has()`.
 
-   Every one this shell owns, and no others: a `<pre>` inside a live
-   example is the example, and the copy affordance is chrome. It used to
-   take the positioning context, the fade and the button itself — three
-   shell decisions painted onto the one demo on the site that renders a
-   code block. The disclosure under that demo still carries a copy button,
-   because that listing is the shell's. base.njk skips the same subtree
-   when it injects the buttons, so the exclusion is one decision made in
-   both places rather than a rule fighting a script.
+   The ones it owns and no others — a `<pre>` inside a live example *is*
+   the example, and the copy affordance is chrome. base.njk skips the same
+   subtree when it injects the buttons, so the exclusion is one decision
+   made in both places rather than a rule fighting a script.
 
-   The fade under the button is painted here too, in the same rule rather
-   than in a second bare `pre` block 170 lines later. Why a background
-   gradient and not padding: a `padding-right` on the scrolled content
-   only clears space at the *end* of a long line, not at whatever is
-   currently under the button (the CDN snippet's href, unscrolled, at its
-   default position). A background is painted relative to the `pre` box,
-   not to the scrolling content, so it stays over the button's footprint
-   at any scroll offset. */
+   The fade under the button is a background gradient, not padding:
+   `padding-right` clears space at the end of a long line, while the button
+   sits over whatever is under it at the current scroll offset. A
+   background is painted relative to the `pre` box, so it stays put. */
 pre:not(.docs-demo-preview *) {
   position: relative;
   background-image: linear-gradient(
@@ -1408,11 +1158,10 @@ pre:not(.docs-demo-preview *) {
 /* Highlight.js theme — light. GitHub-derived hues, adjusted to sit with
    Cirth's amber/neutral palette.
 
-   The comment hue is the one line here a dead-CSS sweep calls inert, and
-   only because the default palette's muted grey is the same colour this
-   text would fall back to. Under playroom it is not — oklch(52% 0.035 295)
-   against oklch(52.7% 0.032 264) — so the token is what keeps a comment
-   muted *in the reader's theme* rather than in this one. */
+   The comment hue reads inert only because the default palette's muted
+   grey is the colour this text would fall back to anyway. Under playroom
+   it is not, so the token is what keeps a comment muted in the reader's
+   theme rather than in this one. */
 .hljs-comment,
 .hljs-quote {
   color: var(--cirth-muted-color);
@@ -1527,21 +1276,18 @@ pre > button.copy {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  /* Square on the 44px WCAG 2.5.5 target size. Only the width is stated:
-	   this is a <button>, so the library's own control floor gives it the
-	   height, and its radius and pointer cursor with it. */
+  /* Square on the 44px WCAG 2.5.5 target size. Width only: the library's
+	   control floor gives a <button> the height, radius and cursor. */
   width: 2.75rem;
   margin: 0;
   padding: 0;
-  /* Ghost: no border, transparent at rest — a background only shows up
-	   as a hover/focus affordance, matching the GitHub code-block copy
-	   button rather than the bordered/hover-revealed treatment before.
+  /* Ghost: no border, transparent at rest, so a background reads purely as
+	   a hover/focus affordance.
 
-	   The audit lists `border-width: medium` and `border-image: initial`
-	   under this selector as inert. They are not written here: Chromium
-	   expands the shorthand into longhands and reports each one, and
-	   Firefox and WebKit do not even show them ("not in sheet"). There is
-	   nothing to delete but `border: none` itself, which is live. */
+	   An audit will report `border-width: medium` and `border-image:
+	   initial` here as inert. Neither is written: they are Chromium's
+	   expansion of this shorthand, and there is nothing to delete but
+	   `border: none` itself, which is live. */
   border: none;
   background-color: transparent;
 }
@@ -1552,13 +1298,10 @@ pre > button.copy {
   }
 }
 
-/* muted-border-color, not --cirth-background-color: Cirth's own button
-   rules redefine that custom property locally (as an alias for the
-   primary-action background) on every <button>, so referencing it here
-   resolved to amber instead of a neutral wash. muted-border-color also
-   has real contrast against the code panel — code-background-color
-   would nearly vanish, since the button already sits on a fade to that
-   same color (see the pre background-image below). */
+/* muted-border-color, not --cirth-background-color: a <button> rebinds the
+   latter to its own fill, so this resolved to amber. Nor
+   code-background-color, which would nearly vanish — the button already
+   sits on a fade to that colour. */
 pre > button.copy:hover,
 pre > button.copy:focus-visible {
   background-color: var(--cirth-muted-border-color);
@@ -1593,24 +1336,16 @@ pre > button.copy.copied::before {
   margin: 0;
 }
 
-/* Live demo frames: a plate holding a caption band, the rendered
-   example, and its source.
-
-   The boundary of a live example. Every demo on this site is captioned
-   "Authentic Cirth · shell overrides declared in source", and the reading
-   column above breaks that promise silently: `--cirth-line-height` and
-   `--cirth-typography-spacing-vertical` are inherited custom properties,
-   so the column's own rhythm crossed into the preview and re-timed every
-   example in it. Measured before this rule existed: paragraphs, tables and
-   lists spaced at 20px against the framework's 16, headings at 10 against
-   8, a <pre> 102.3px tall against 97, a form 459 against 451. Structure,
-   colour, borders, radii and type scale were byte-identical — the whole
-   divergence was vertical rhythm, which is the one thing a reader
-   comparing a demo against their own page would not think to doubt.
+/* The boundary of a live example. Every demo here is captioned "Authentic
+   Cirth", and the reading column would break that promise silently:
+   --cirth-line-height and --cirth-typography-spacing-vertical inherit, so
+   the column's own rhythm crosses into the preview and re-times every
+   example in it. Vertical rhythm only — structure, colour and type scale
+   are unaffected — which is the one divergence a reader comparing a demo
+   against their own page would not think to doubt.
 
    Handed back from the values captured at :root, so a preset or a reader's
-   own override still reaches the example: the demo shows what the loaded
-   build does, not what this file remembers it doing. */
+   override still reaches the example. */
 .docs-demo-preview {
   --cirth-line-height: var(--docs-cirth-line-height);
   --cirth-typography-spacing-vertical: var(
@@ -1618,11 +1353,10 @@ pre > button.copy.copied::before {
   );
 }
 
-/* The frame's own padding contract, not a restyle of the example: a padded
-   box closes the trailing margin of what it holds, exactly as the card
-   contract does for <article> (components/_card.scss). It is the one shell
-   declaration that reaches a node inside a preview, and it is declared
-   here rather than inherited invisibly. */
+/* The frame's padding contract, not a restyle of the example: a padded box
+   closes the trailing margin of what it holds, as the card contract does
+   for <article>. The one shell declaration that reaches inside a preview,
+   said out loud rather than inherited. */
 .docs-demo-preview > :last-child {
   margin-bottom: 0;
 }
@@ -1632,15 +1366,13 @@ pre > button.copy.copied::before {
 }
 
 /* Brand page: logo variant tiles. Each tile carries its own data-theme so
-   the light/dark variants render on their true backgrounds regardless of
-   the site toggle. Fixed (not auto-fill) columns: the markup lists the
-   three light variants before the three dark ones, and a fixed 3-column
-   grid is what turns that order into a light row over a dark row.
+   the variants render on their true backgrounds whatever the site toggle
+   says. Fixed columns, not auto-fill: the markup lists three light
+   variants then three dark ones, and only a fixed 3-column grid turns that
+   into a light row over a dark row.
 
-   One block of specimens split by hairlines, not six floating boxes: the
-   grid gap is the border width and the container's background paints
-   through it, so the dividing lines and the card frame are the same
-   stroke. */
+   The grid gap is the border width and the container's background paints
+   through it, so the dividing lines and the frame are one stroke. */
 .docs-brand-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1678,16 +1410,11 @@ pre > button.copy.copied::before {
   margin: 0;
 }
 
-/* Color swatch grid, used by the Colors page. Not `.grid`, and the
-   difference is the reason to say so: `.grid` is auto-fit, which collapses
-   the tracks a short row does not use and stretches the cells across them.
-   The groups on that page hold three swatches each, so under .grid every
-   swatch went from 180px to 245px and a group of two would have been wider
-   still — a swatch is a specimen, and specimens have to be the same size
-   to be compared. auto-fill keeps the track and leaves the gap.
-
-   The gap is the framework's, though: a grid gap is exactly what a preset
-   re-times, and this one was a literal 1rem that no preset could reach. */
+/* Color swatch grid. Not `.grid`: that is auto-fit, which collapses unused
+   tracks and stretches the cells across them, so a group of three swatches
+   and a group of two would draw different-sized specimens. auto-fill keeps
+   the track. The gap is the framework's, because a grid gap is exactly
+   what a preset re-times. */
 .docs-colors-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
@@ -1751,12 +1478,10 @@ pre > button.copy.copied::before {
     var(--cirth-muted-border-color);
   background: var(--cirth-background-color);
 
-  /* Bootstrap gives the navbar $spacer * .5 of vertical padding and lets
-	   the link band supply the rest of its height. This bar was taking the
-	   container's 16px on top of the nav's own 4px on top of a 56px band:
-	   99px of permanently sticky chrome, a ninth of a laptop viewport, to
-	   present a 40px row of controls. The band is unchanged; only the
-	   padding around it is now the navbar's own. */
+  /* The navbar's own padding, not the container's: the link band already
+	   supplies most of the bar's height, and stacking the container's inset
+	   on top of it takes permanently sticky chrome to 99px to present a
+	   40px row of controls. */
   padding-block: var(--cirth-space-2);
 }
 
@@ -1794,61 +1519,42 @@ pre > button.copy.copied::before {
 }
 
 /* The hero splits on its own ratio, not on the section grid's column
-   count. It used to take 6 of 12 and the demo the other 6: a dead heat
-   between a headline that is 20ch wide by its own rule and a two-pane
-   code panel that has to show real markup and a real rendered form. At
-   1280 that bought the demo 590px, of which the source pane got 246 —
-   the first thing a reader sees of this project's own source was
-   `<main class="container">` and a scrollbar.
+   count. An even 6/6 is a dead heat between a headline that is 20ch wide
+   by its own rule and a two-pane code panel that has to show real markup
+   and a real rendered form — the source pane lands at 246px, and the first
+   thing a reader sees of this project's source is a scrollbar.
 
-   5/7 measured, not guessed: it is the coarsest ratio that gets the
-   source pane past the width of the longest line the panel is *for*
-   (the snippet's longest line, once the autocomplete attributes came out
-   of it so that nothing runs under the overlapping Output card), while
-   leaving the headline over 30ch and the lede over its 40ch cap. Stated
-   as fractions of the hero's own row, so it survives the 12 → 6 → 4
-   column changes the sections below make at each breakpoint. */
+   5/7 is measured: the coarsest ratio that gets the source pane past the
+   snippet's longest line while leaving the headline over 30ch and the lede
+   over its 40ch cap. Stated as fractions of the hero's own row, so it
+   survives the 12 → 6 → 4 column changes below. */
 .docs-native-hero .docs-native-grid {
   grid-template-columns: 5fr 7fr;
 }
 
-/* No rule down the gutter. It was drawn when the demo was a single
-   full-height panel and the two columns met as two flat edges; the
-   composition on the right is now two overlapping cards with their own
-   frames, and a hairline running behind them separates nothing — there is
-   no discontinuity there, only a gap. The column gap is the separation. */
-/* Centred against the demo, not stretched beside it. The column used to
-   end with a two-cell signal grid that carried it most of the way down;
-   without that it is a headline, a sentence and two buttons against a
-   composition twice its height, and top-aligning them left the hero's
-   lower left quarter as the largest empty area on the page. Alignment
-   only — nothing in the hero is redrawn. */
+/* No rule down the gutter: the composition on the right is two
+   overlapping cards with their own frames, so a hairline behind them
+   separates nothing. The column gap is the separation.
+
+   Centred against the demo, not stretched beside it — a headline, a
+   sentence and two buttons against a composition twice their height leave
+   the hero's lower left quarter as the largest empty area on the page. */
 .docs-native-claim {
   grid-column: 1;
   align-self: center;
   padding-block-end: 1rem;
 }
 
-/* The one place on this site that opts into display type — and it opts in
-   through --cirth-font-size, the slot every heading in the framework
-   already resolves through, reading its own bounds off the shipped scale.
-   Nothing here is a parallel typography.
+/* The one place on this site that opts into display type, and it opts in
+   through --cirth-font-size — the slot every heading already resolves
+   through — reading its bounds off the shipped scale rather than declaring
+   a parallel typography beside it.
 
-   What this replaces was the argument against the claim the page makes.
-   The old rule set `font-size: clamp(2.75rem, 5.7vw, 6.5rem)` (73px at
-   1280), `font-weight: 720` and `letter-spacing: -0.052em` — three
-   literals, none of them anywhere else on the site, next to a product h1
-   the framework rendered at 44px/700. Two typographic voices, one system
-   claim.
-
-   The weight is the part that was actually broken rather than merely
-   inconsistent: on a system-font stack with no webfont, 720 is not a real
-   weight. macOS resolves it against SF's variable axis and renders ~720;
-   Segoe UI and Roboto snap to 700. The flagship headline was rendering at
-   a different weight depending on the reader's operating system. There is
-   no font-weight here at all now — an h1 is already
-   --cirth-font-weight-bold, which is a step on the scale and the same
-   step on every platform. */
+   No font-weight, deliberately. On a system-font stack with no webfont an
+   off-scale weight is not real: macOS resolves 720 against SF's variable
+   axis, while Segoe UI and Roboto snap to 700, so the flagship headline
+   renders at a different weight per operating system. An h1 is already
+   --cirth-font-weight-bold, which is the same step everywhere. */
 .docs-native-claim h1 {
   --cirth-font-size: clamp(
     var(--cirth-font-size-6xl),
@@ -1884,20 +1590,15 @@ pre > button.copy.copied::before {
    ––––––––––––––––––––
    The claim is one move long — this markup produces this interface — so
    the two halves are two cards that touch, not two panes of one panel.
-   What is gone with the single panel: a toolbar band spanning both, an
-   internal divider, and a fixed 31rem row that both sides had to agree on.
-   Each card now carries its own control in its own title band, which is
-   also where it belongs: Build changes the source, Theme changes the
-   rendering.
+   Each carries its own control in its own title band: Build changes the
+   source, Theme changes the rendering.
 
-   The overlap is expressed in the flow, not on top of it. Both cards are
-   ordinary grid items; the output is pulled back over the source by a
-   negative inline margin of exactly --docs-lab-overlap and dropped to the
-   row's end edge. Nothing is absolutely positioned, so the stage is
-   intrinsically as tall as the taller card, the overlap is a known
-   quantity rather than a residue of two heights, and there is no way for
-   the composition to clip or to overflow its column — the output moves
-   inward, never out. */
+   The overlap is expressed in the flow, not on top of it: both are
+   ordinary grid items and the output is pulled back by a negative inline
+   margin of exactly --docs-lab-overlap. Nothing is absolutely positioned,
+   so the stage is intrinsically as tall as the taller card and the
+   composition cannot overflow its column — the output moves inward,
+   never out. */
 .docs-lab-stage {
   --docs-lab-overlap: clamp(1.5rem, 3vw, 3rem);
 
@@ -1910,19 +1611,11 @@ pre > button.copy.copied::before {
   grid-column: 1;
 }
 
-/* Centred on the source card, not dropped to the end of the row.
-   ––––––––––––––––––––
-   The output used to sit on the row's end edge, which put its middle 154px
-   below the middle of the card it overlaps: the two read as a stack that
-   had slipped rather than as one object, and the weight of the pair sat in
-   the hero's bottom corner. Centring is measured against the *card*, which
-   is why the source's old 2.5rem bottom margin went with it — that margin
-   was room for an output hanging past the source, and while it was in the
-   row it pushed the centre of the row 20px below the centre of the card.
-
-   The overlap itself is untouched: the output still reaches back over the
-   source by --docs-lab-overlap, still out of flow arithmetic rather than
-   absolute positioning, and still moves inward only. */
+/* Centred on the source card, not dropped to the row's end edge — the two
+   have to read as one object rather than as a stack that has slipped. The
+   centring is measured against the *card*, so the source carries no bottom
+   margin: any margin there is inside the row and pushes the row's centre
+   below the card's. */
 .docs-output-frame {
   z-index: 1;
   grid-column: 2;
@@ -1930,19 +1623,14 @@ pre > button.copy.copied::before {
   margin-inline-start: calc(var(--docs-lab-overlap) * -1);
 }
 
-/* A source pane: a plate whose two rows are a title band and a code
-   block. The hero's Source panel was the only one of these; the showcase
-   sections below put the same object next to what it renders, so the
-   shape is named once here and the hero keeps only what is genuinely the
-   hero's (its column, its bottom margin, its animation, and the cap the
-   pane takes on a phone). */
+/* A source pane: a plate whose two rows are a title band and a code block.
+   The showcase sections below use the same object, so the shape is named
+   once here and the hero keeps only what is the hero's. */
 .docs-code-plate {
-  /* The flush-card knobs, straight off the Card page: the frame, the
-     radius, the surface and the hairline under the title band are the
-     card's, and zeroing the two block-spacing tokens is what puts the band
-     on the frame's own edges and hands the padding to each cell. `clip` is
-     the plate's own, not a restatement — a grid of cells inside a rounded
-     frame has to clip its corners, and the card has no opinion about that. */
+  /* The flush-card knobs, straight off the Card page: zeroing the two
+     block-spacing tokens puts the title band on the frame's own edges and
+     hands the padding to each cell. `clip` is the plate's own — a grid of
+     cells inside a rounded frame has to clip its corners. */
   --cirth-block-spacing-horizontal: 0;
   --cirth-block-spacing-vertical: 0;
   --cirth-card-sectioning-background-color: transparent;
@@ -1967,61 +1655,46 @@ pre > button.copy.copied::before {
 }
 
 /* A cell of the plate, not a code block standing on its own: the frame,
-   the corners and the outer margin belong to the card around it.
-   No padding here — the framework already pads `pre > code`, and this
-   pane had both, so the snippet sat 32px inside a 450px column. On the
-   code, which is where it belongs: the gutter then scrolls with the
-   markup instead of standing still while a long attribute passes under
-   it. */
+   the corners and the outer margin belong to the card around it. No
+   padding here either — the framework pads `pre > code`, which is where it
+   belongs, so the gutter scrolls with the markup instead of standing still
+   while a long attribute passes under it. */
 .docs-code-plate pre {
-  /* No block-size. It used to be 28rem, measured against a 20-line
-     snippet, with a comment saying to re-measure whenever the snippet
-     changed — and the snippet changed: at 33 lines the pane held 448px of
-     a 626px block and scrolled 178px at every desktop width, which is a
-     source panel hiding a third of its source. A number that has to be
-     re-derived from the content is the content's to set, so the pane is
-     as tall as the markup and the hero is as tall as the pane. The cap
-     comes back on a phone (see the 48rem block), where the full snippet
-     would be the whole screen. */
+  /* No block-size, deliberately: a height measured against the snippet has
+     to be re-derived every time the snippet changes, and a source panel
+     that scrolls is one hiding its source. The pane is as tall as the
+     markup. The cap comes back on a phone (the 48rem block), where the
+     full snippet would be the whole screen. */
   border: 0;
   border-radius: 0;
   background: var(--cirth-code-background-color);
   font-size: var(--cirth-font-size-xs);
   line-height: 1.65;
 
-  /* Scrolls rather than wraps, like every other code block on the site —
-	   and it does so on the library's own `pre` rule, which is where the
-	   scroll container and its focus ring come from. Wrapping would break a
-	   long attribute mid-token, which is the one thing a source panel must
-	   not do. */
+  /* Scrolls rather than wraps, on the library's own `pre` rule — which is
+	   where the scroll container and its focus ring come from. Wrapping
+	   would break a long attribute mid-token. */
 }
 
-/* The hero has no controls in it at all, and the copy button is one. The
-   showcase panes below keep theirs: their snippets exist to be taken, and
-   the button is the shell's own affordance on every other code block on
-   the site. */
+/* The hero has no controls in it, and the copy button is one. The showcase
+   panes below keep theirs — their snippets exist to be taken. */
 .docs-source-panel pre > button.copy {
   display: none;
 }
 
 /* The rendered page, lifted — not a plate.
 
-   It carries a radius and a shadow so it reads as sitting above the
-   source, and deliberately not the plate's hairline: the hairline is the
-   mark this shell puts on its own surfaces (see the plate rule further
-   down), and this is the one surface here that is not the shell's. The shadow is the
-   card's own, doubled in reach, because it has to separate two surfaces
-   rather than lift one off the page.
+   A radius and a shadow, so it reads as sitting above the source, and
+   deliberately not the plate's hairline: that hairline is the mark this
+   shell puts on its own surfaces, and this is the one surface here that is
+   not the shell's. The shadow is the card's, doubled in reach, because it
+   separates two surfaces rather than lifting one off the page.
 
-   The rendered sign-in card is 417px tall in the default build and 433px
-   in the scoped ones (the .cirth wrapper adds its own padding); 27.5rem
-   (440px) clears both. 27rem did not: it was one pixel under the scoped
-   builds, which made the frame a scroll container, which in turn kept a
-   tab stop alive on an iframe that has nothing to scroll to and paints no
-   focus ring. Sizing past the content is what removes that stop — not a
-   tabindex on the frame. A cropped Sign in button is the one thing this
-   half cannot show: it is the half of the page that has to look
-   finished. */
+   The height must clear the rendered content in every build — 433px in the
+   scoped ones, against 417px in the default. A frame one pixel short
+   becomes a scroll container, which keeps a tab stop alive on an iframe
+   that has nothing to scroll to and paints no focus ring. Sizing past the
+   content is what removes that stop; a tabindex is not. */
 .docs-output-frame {
   position: relative;
   block-size: 27.5rem;
@@ -2039,16 +1712,16 @@ pre > button.copy.copied::before {
 }
 
 /* Two beats: the markup arrives, then the interface it produces.
-   A wipe, not a rebuild. The source is complete in the DOM on the first
-   frame and never touched again, so the highlighting the build wrote is
-   the highlighting on screen, the panel's height and scroll extent are
-   the same before and after, and selection, copy and assistive technology
-   get the whole snippet whether or not the animation has run. `steps()`
-   because the unit being revealed is a line of markup, not a pixel.
 
-   Declared only under no-preference, and only ever *subtracting* from the
-   resting state: with the preference set, or with the animation never
-   applied, the finished composition is what the CSS already says. */
+   A wipe, not a rebuild — the source is complete in the DOM on the first
+   frame and never touched again, so the panel's height and scroll extent
+   are the same before and after, and selection, copy and assistive
+   technology get the whole snippet whether or not the animation has run.
+   `steps()` because the unit being revealed is a line of markup.
+
+   Under no-preference, and only ever *subtracting* from the resting state:
+   with the preference set, the finished composition is what the CSS
+   already says. */
 @media (prefers-reduced-motion: no-preference) {
   @keyframes docs-lab-write {
     from {
@@ -2081,42 +1754,30 @@ pre > button.copy.copied::before {
   }
 }
 
-/* No rules between the sections. Every boundary on this page was drawn
-   twice: the ledger and the showcase carry --cirth-card-background-color
-   and the hero, the system map and the FAQ carry the canvas, so each
-   section already begins where the tone changes — and a hairline was
-   drawn there as well. The last one was worse than redundant: the FAQ's
-   bottom rule and the footer's own top rule are two hairlines with
-   nothing between them but empty canvas, which is the double divider
-   above the footer. One signal per boundary; the tone change is the
-   signal, and the footer keeps the one rule it draws itself. */
-/* 3.5rem at the top of the range, down from 7 in two steps. The band was
-   measured against four sections and a page whose evidence was mostly
-   text; there are seven now, each holding a stage, and a stage carries its
-   own frame — the boundary is the object, so the gutter only has to keep
-   two of them apart. At 112px above and below, a heading, its sentence and
-   the top of its stage no longer fitted one 900px viewport together, which
-   is the measure that matters on a page whose argument is what it shows. */
+/* No rules between the sections: the tone alternates from one to the next,
+   so each already begins where the tone changes and a hairline there is a
+   second signal for one boundary. The footer keeps the one rule it draws
+   itself.
+
+   3.5rem at the top of the range, not 7: every section holds a stage and a
+   stage carries its own frame, so the gutter only has to keep two objects
+   apart. At 112px a heading, its sentence and the top of its stage stop
+   fitting one 900px viewport together — the measure that matters on a page
+   whose argument is what it shows. */
 .docs-proof,
 .docs-showcase,
 .docs-native-faq {
   padding-block: clamp(2rem, 3.5vw, 3.5rem);
 }
 
-/* The tone change is the boundary between sections (see the note above),
-   so it alternates down the page rather than belonging to any one
-   section. The ledger used to declare the tint itself, which was fine
-   while it sat second; it now sits seventh, and a section that carries
-   its own band colour cannot alternate with its neighbours. Stated as a
-   modifier instead.
+/* A modifier, not a property of any one section: the tone has to alternate
+   down the page, and a section that declares its own band colour cannot
+   alternate with its neighbours.
 
-   Only the proof band takes it, and it is the one section with no frame
-   of its own — which is why it can. The showcases each hold a stage, and a
-   stage is already a card-coloured plate on the canvas: tinting the band
-   behind one flattens the frame it depends on, so their boundary is the
-   stage itself. The FAQ is back on the canvas because the band above it is
-   tinted now, and two tinted sections in a row have no boundary between
-   them at all. */
+   Only the proof band takes it, because it is the one section with no
+   frame of its own. A showcase holds a stage, and a stage is already a
+   card-coloured plate on the canvas — tinting the band behind it flattens
+   the frame it depends on. */
 .docs-band-tinted {
   background: var(--cirth-card-background-color);
 }
@@ -2125,10 +1786,9 @@ pre > button.copy.copied::before {
   grid-column: 1 / span 3;
 }
 
-/* Section headings are the framework's h2 and nothing else. They used to
-   run to 56px on their own clamp, which is the same "the home page is a
-   different product" problem the hero had; only the spacing under them is
-   this page's business. */
+/* Section headings are the framework's h2 and nothing else — a clamp of
+   their own is the same "the home page is a different product" problem the
+   hero had. Only the spacing under them is this page's business. */
 .docs-native-home
   :where(.docs-showcase-lede, .docs-native-faq header)
   h2 {
@@ -2139,32 +1799,18 @@ pre > button.copy.copied::before {
   color: var(--cirth-muted-color);
 }
 
-/* The state mark, in the annotation voice the rest of this site uses for
-   technical labels. It carried a whole column of a six-row table; what it
-   labels now is the two claims under the measurements that are not
-   themselves a measurement, which is the one thing that table said that a
-   number does not — whether a claim is proven by a suite or offered to the
-   reader to change. Renamed with the section: nothing on this site is
-   called a ledger any more.
-
-   The glyphs are Phosphor, from the set the shell already ships
-   (eleventy.config.js): no container, no dashed edge, no new artwork, one
-   16px box for every state. Shape carries the state as much as colour
-   does, and the word beside it carries it in text — shield-check for what
-   a suite proves, sliders for what the reader can change. aria-hidden,
-   because that word is already there.
-
-   `is-covered` went with the four rows that moved into the metrics above:
-   "the package guarantees this" is what a measured value with a check path
-   already says. */
 /* The annotation voice, defined once.
    ––––––––––––––––––––
    Muted, monospace, extra-small, uppercase, slightly tracked out: the label
    this shell puts on a measurement, a claim type, or the name of a panel.
-   It is editorial voice rather than anything the framework should own — an
-   application does not want its <dt>s shouting in monospace — but it was
-   written out three times, and the tracking had drifted to 0.06em in one of
-   them. One rule, one tracking; each site adds only what is its own. */
+   Editorial voice rather than anything the framework should own — an
+   application does not want its <dt>s shouting in monospace — and one rule
+   rather than three, which is how the tracking drifted last time.
+
+   The state marks it carries are Phosphor glyphs from the set the shell
+   already ships: one 16px box per state, no container, no new artwork.
+   Shape carries the state as much as colour does, and the word beside it
+   carries it in text, so the glyph is aria-hidden. */
 .docs-proof-state,
 .docs-example-name,
 .docs-brand-measures dt {
@@ -2193,24 +1839,18 @@ pre > button.copy.copied::before {
   color: var(--cirth-ins-color);
 }
 
-/* Only the verified mark takes a colour of its own. A capability mark and
-   a measurement mark are already the muted ink they inherit from the strip
-   around them — two rules that named the value they were already given. */
+/* Only the verified mark takes a colour of its own: the others are already
+   the muted ink they inherit from the strip around them.
 
-/* Showcase sections: a heading, one sentence, and a stage.
+   Showcase sections: a heading, one sentence, and a stage.
    ––––––––––––––––––––
-   What this replaces spread three things — copy, source, result — across
-   three columns of the section grid. Measured at 1440, that put the live
-   half of each showcase at 28–43% of the content width and left the code
-   listing taller than the interface it was explaining, which is the
-   arrangement of a specimen sheet rather than of an example.
-
-   A stage is one object: a hairline container, a title band, and the panes
-   inside it. Related things share a frame, so the eye reads "one example"
-   rather than "three widgets" — the containment the Tailwind feature tiles
-   and the FastHTML component demo both rely on. The heading sits above it
-   at full width; the narrow left rail comes back for the ledger and the
-   FAQ, which are reference material and read better beside their title. */
+   A stage is one object — a hairline container, a title band, and the
+   panes inside it — so the eye reads "one example" rather than "three
+   widgets". The heading sits above it at full width. Spreading copy,
+   source and result across three columns of the section grid instead
+   leaves the live half at under half the content width and the listing
+   taller than the interface it explains, which is a specimen sheet rather
+   than an example. */
 .docs-showcase-lede {
   grid-column: 1 / -1;
   max-width: 52ch;
@@ -2228,19 +1868,18 @@ pre > button.copy.copied::before {
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
   border-radius: var(--cirth-card-border-radius);
 
-  /* The container's own colour is what shows through the grid gaps below,
-     which is where every divider in a stage comes from. One declaration
-     instead of a border rule per pane plus the nth-child arithmetic to
-     take it off again at the end of each row — and it stays correct at
-     any column count, which is what lets the panes reflow intrinsically. */
+  /* The container's own colour shows through the grid gaps, and that is
+     where every divider in a stage comes from. One declaration instead of
+     a border per pane and the nth-child arithmetic to take it off again,
+     and it stays correct at any column count — which is what lets the
+     panes reflow intrinsically. */
   background: var(--cirth-card-border-color);
   gap: var(--cirth-border-width);
   overflow: clip;
 }
 
-/* The band names the example and carries whatever operates it. It is the
-   plate grammar this shell already uses for the hero's Source panel: the
-   frame's own stroke, the card's horizontal rhythm, no tint. */
+/* The band names the example and carries whatever operates it — the same
+   plate grammar as the hero's Source panel. */
 .docs-stage-band {
   display: flex;
   align-items: center;
@@ -2260,12 +1899,11 @@ pre > button.copy.copied::before {
   font-size: inherit;
 }
 
-/* The panes, in their own grid. They are one row of the stage rather than
-   items of it: a band spanning `1 / -1` over an auto-fit track list keeps
-   the spare tracks from collapsing — they are not empty, the band is in
-   them — so three panels in a five-track row left two tracks' worth of the
-   container's own colour showing as a grey slab. Nested, nothing spans,
-   and auto-fit collapses what it should. */
+/* The panes get their own grid rather than being items of the stage: a
+   band spanning `1 / -1` over an auto-fit track list holds the spare
+   tracks open — they are not empty, the band is in them — and the unused
+   ones then show as a slab of the container's colour. Nested, nothing
+   spans, and auto-fit collapses what it should. */
 .docs-stage-body {
   display: grid;
   gap: var(--cirth-border-width);
@@ -2286,12 +1924,9 @@ pre > button.copy.copied::before {
     grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
   }
 
-  /* The theme stage's listing is three declarations. Given the same share
-     as a thirty-line specimen it was a narrow column of syntax against a
-     wide column of empty code surface, and the two showcases read as the
-     same object twice. The cause is short here, so it takes the space a
-     short thing takes and the interface it causes gets the rest —
-     declared after the split above, so it wins on order rather than on a
+  /* The theme stage's listing is three declarations, so it takes the space
+     a short thing takes and the interface it causes gets the rest.
+     Declared after the split above, so it wins on order rather than on a
      second class of specificity. */
   .docs-stage-split-narrow {
     grid-template-columns: minmax(0, 0.62fr) minmax(0, 1fr);
@@ -2308,11 +1943,10 @@ pre > button.copy.copied::before {
   background: var(--cirth-code-background-color);
 }
 
-/* The theme pane has two rows, and only one of them floats. The legend is
-   the pane's footer — its hairline is the pane's own bottom rule — so it
-   sits on the end edge and the listing centres in what is left. Centring
-   the pair together left the legend hanging in the middle of the pane with
-   its rule across nothing. */
+/* The theme pane has two rows and only one of them floats: the legend is
+   the pane's footer, so it sits on the end edge and the listing centres in
+   what is left. Centre the pair together and the legend hangs in the
+   middle of the pane with its rule across nothing. */
 .docs-theme-showcase .docs-stage-code {
   align-content: stretch;
   grid-template-rows: minmax(0, 1fr) auto;
@@ -2331,10 +1965,8 @@ pre > button.copy.copied::before {
   line-height: 1.65;
 }
 
-/* The contextual way out to the examples page, which is the one thing the
-   removed "See Cirth in action" section was still carrying that the hero's
-   CTA does not: a link at the point where a reader has just been shown the
-   page is real and might want more of it. A link in the flow, not a
+/* The contextual way out to the examples page, at the point where a reader
+   has just been shown that the page is real. A link in the flow, not a
    button — the page already asked twice at the top. */
 .docs-showcase-more {
   grid-column: 1 / -1;
@@ -2342,10 +1974,9 @@ pre > button.copy.copied::before {
   font-size: var(--cirth-font-size-sm);
 }
 
-/* The preview half is the canvas — the same decision the hero makes with
-   its output, and for the same reason: what is in here is a component the
-   framework has already finished, and a second frame around it would read
-   as the thing on the page instead of it. */
+/* The preview half is the canvas, like the hero's output: what is in here
+   is a component the framework has already finished, and a second frame
+   around it would read as the thing on the page instead of it. */
 .docs-stage-preview {
   display: grid;
   align-content: center;
@@ -2355,16 +1986,14 @@ pre > button.copy.copied::before {
 }
 
 /* The specimen is the page's, not the shell's: nothing in here restyles an
-   article, a table, a details, a control. The only declaration is the one
-   a container owes its contents — the first and last child should not push
-   against the pane's edges with margins document flow gave them. It is
-   addressed at the pane's flow root (see the wrapper in home.njk), so it
-   reaches the specimen's own first and last element.
+   article, a table, a details or a control. The only declaration is the
+   one a container owes its contents — the first and last child must not
+   push against the pane's edges with margins document flow gave them.
 
-   `:first-child` measures inert — every specimen the corpus renders
-   happens to open with an element that carries no block-start margin —
-   and stays, because which element opens a specimen is the page author's
-   choice, not this rule's assumption. */
+   `:first-child` reads inert because every specimen in the corpus happens
+   to open with an element carrying no block-start margin. Which element
+   opens a specimen is the page author's choice, not this rule's
+   assumption. */
 .docs-stage-preview > * > :first-child {
   margin-block-start: 0;
 }
@@ -2375,36 +2004,25 @@ pre > button.copy.copied::before {
 
 /* The proof band: measurements, then the two claims that are not one.
    ––––––––––––––––––––
-   This replaces two sections that said the same thing. "Small surface,
-   finished defaults" was four measured values a reader had no way to
-   check; "Claims with a check path" was a six-row table that restated all
-   four of them and added the path. One section, and the path is in the
-   cell with the number it belongs to.
+   A number and the way to verify it are one statement, so the check path
+   sits in the cell with the number rather than in a table of its own.
 
    No frame, deliberately. The two showcases above are each a hairline
    plate on the canvas, and a third would be the shape the page is being
    accused of — heading, sentence, bordered box, three times. The band's
-   own tint is the containment here, the cells are divided by hairlines and
-   nothing encloses them, so the page changes shape at this boundary
-   instead of repeating itself.
+   tint is the containment here.
 
-   Two columns, four once the row can hold them — and the dividers are the
-   gap, which is the house answer for a hairline grid (.docs-stage,
-   .docs-brand-grid, and now every one of them): the container paints the
-   divider colour, the cells paint over it, and what shows through the
-   grid gap is the line. It replaces a border on every cell plus the
-   nth-child arithmetic to take it back off at the end of each row and in
-   the last row — a ladder that had to be re-derived by hand every time
-   the column count changed, which is exactly what the media query below
-   used to do. At two columns and at four, this rule is the same rule.
+   The dividers are the gap, which is the house answer for a hairline grid
+   (see .docs-stage and .docs-brand-grid): the container paints the divider
+   colour, the cells paint over it, and what shows through is the line. A
+   border per cell needs nth-child arithmetic to take it off again at the
+   end of each row, re-derived by hand every time the column count changes.
+   At two columns and at four, this rule is the same rule.
 
-   `.grid` is the class, and the <dl> is the grid: the framework's own
-   answer to a metrics panel is a gridded description list, not a
-   component, and the pairs are already <div>s because that is the box
-   HTML gives an author to lay a pair out with. What the class supplies —
-   the grid, the min-width: 0 on cells that hold long values, the
-   form-control margin reset — is what this rule stops declaring; what is
-   left is the composition's own two decisions, its column count and its
+   `.grid` is the class and the <dl> is the grid: the framework's answer to
+   a metrics panel is a gridded description list, not a component. The
+   class supplies the grid, the min-width: 0 on cells holding long values
+   and the margin reset, so what is left here is the column count and the
    divider. */
 .docs-proof-metrics {
   gap: var(--cirth-border-width);
@@ -2421,19 +2039,10 @@ pre > button.copy.copied::before {
   background: var(--cirth-card-background-color);
 }
 
-/* What kind of claim the cell is making — guarantee, capability, or a fact
-   measured on this build. It used to be the cell's subject ("DEFAULT
-   BUILD"), which the value under it already said; what a reader could not
-   get from anywhere was whether the line was a promise or a measurement.
-   The mark is the shared one (see .docs-proof-state), so the strip and the
-   list below it classify with one vocabulary. No `margin: 0`: since the
-   core finished <dl>, a <dt> arrives with none and a <dd> arrives with
-   neither the user agent's 40px indent nor a stray block margin. Three
-   copies of that reset used to sit in this file. */
-
-/* The value leads, then what it measures, then how to check it. Three
-   lines, in that order, because that is the order the question arrives
-   in. */
+/* The value leads, then what it measures, then how to check it — the order
+   the question arrives in. No `margin: 0` anywhere in this block: the core
+   finished <dl>, so a <dt> arrives with no margin and a <dd> with neither
+   the user agent's 40px indent nor a stray block margin. */
 .docs-proof-metrics dd {
   display: grid;
   align-content: start;
@@ -2475,11 +2084,8 @@ pre > button.copy.copied::before {
 }
 
 /* The claims that are not a measurement. A list, because two rows of four
-   columns is a table's shape without a table's reason — the four numbers
-   above were the only part of that ledger that compared, and they are a
-   strip now. Each row is state, claim, evidence, path; it wraps rather
-   than scrolling, which a two-item list can afford and a six-row table
-   could not. */
+   columns is a table's shape without a table's reason. Each row is state,
+   claim, evidence, path, and it wraps rather than scrolling. */
 .docs-proof-claims {
   display: grid;
   gap: 0.75rem;
@@ -2516,45 +2122,29 @@ pre > button.copy.copied::before {
   }
 
   /* Nothing about the dividers here: the gap draws them, and it draws them
-     the same way at two columns and at four. The ladder this replaced said
-     something different at each count — at two, a line on both axes; at
-     four, verticals only, with the fourth cell keeping an inline edge that
-     landed on the container's own edge. Neither was a decision anyone made;
-     they were what the arithmetic came out to. */
+     the same way at two columns and at four. */
 }
 
 /* The switcher, the deck, and one example at a time.
    ––––––––––––––––––––
-   Three examples share one stage and the strip that chooses between them
-   sits in the stage's own band, beside the note — the same place the theme
-   stage keeps its preset control, because in both cases the control
-   belongs to the environment rather than to the sample.
+   Three examples share one stage, and the strip that chooses between them
+   sits in the stage's band beside the note: the control belongs to the
+   environment rather than to the sample.
 
-   The strip is served `hidden` and the script in home.njk turns it on, so
-   a reader without script gets three complete examples stacked under their
-   own headings rather than a row of buttons that cannot do anything. Which
-   means every rule here has to describe the enhanced state only, and the
-   deck's resting state has to be the readable one. */
+   The strip is served `hidden` and the script turns it on, so a reader
+   without script gets three complete examples stacked under their own
+   headings. Every rule here therefore describes the enhanced state only,
+   and the deck's resting state has to be the readable one. */
 .docs-switch {
-  /* This used to capture the page's ink on the strip, because a <button>
-     rebinds `--cirth-color` to its own — that is how the framework paints
-     a filled button, and a tab reaching for that name inside itself got
-     the button's white rather than the page's ink. (It did: the selected
-     tab came out filled primary with white text.) The library now names
-     the page role separately — `--cirth-ink`, the twin of `--cirth-canvas`
-     — and nothing can rebind it, so the buttons below read the role
-     directly and the shell keeps no alias of its own.
+  /* Above the stage and part of the section, not of the listing's toolbar:
+     it chooses which example the section is about, so it takes the
+     section's type rather than the band's monospace annotation voice.
 
-     `--cirth-card-background-color` is the band the strip sits on top of:
-     out of the stage, the selected tab takes the surface of the object it
-     opens, so the strip reads as three cells with one of them attached to
-     what is below it. Measured, no component shadows that one either. */
-  /* Above the stage, and part of the section rather than of the listing's
-     toolbar: it chooses which example the section is about. It is a
-     section-level control, so it takes the section's type rather than the
-     band's monospace annotation voice, and it sits close enough to the
-     stage to read as attached to it and far enough not to read as a row
-     inside it. */
+     The buttons below read `--cirth-ink` and
+     `--cirth-card-background-color` directly. Not `--cirth-color`: a
+     <button> rebinds that to its own fill, so a tab reaching for it inside
+     itself gets the button's white. `--cirth-ink` is the page role no
+     component can shadow. */
   grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
@@ -2563,19 +2153,17 @@ pre > button.copy.copied::before {
   font-size: var(--cirth-font-size-sm);
 }
 
-/* The strip ships `hidden` and the script unhides it, and `display: flex`
-   above beats the UA's `[hidden] { display: none }` — so without this the
-   attribute did nothing and a reader with no script got the one thing the
-   fallback exists to avoid: three buttons that cannot change anything.
+/* `display: flex` above beats the UA's `[hidden] { display: none }`, so
+   without this the attribute the strip ships with does nothing and a
+   reader with no script gets three buttons that cannot change anything.
    Same reason `.docs-example[hidden]` restates it below. */
 .docs-switch[hidden] {
   display: none;
 }
 
-/* Not tiny. A tab is the only thing a reader has to hit before the section
-   works, so it takes a control's height and a control's padding — 2.25rem
-   is the shell's own compact control box, and the labels are one word each
-   so three of them fit a 320px band without scrolling or a select. */
+/* Not tiny: a tab is the only thing a reader has to hit before the section
+   works, so it takes a control's height and padding. The labels are one
+   word each, so three fit a 320px band without scrolling. */
 .docs-switch button {
   min-height: 2.25rem;
   margin: 0;
@@ -2620,13 +2208,11 @@ pre > button.copy.copied::before {
   display: none;
 }
 
-/* The panel's own heading, which is what names it without script. With the
-   strip on, the tab says it — and a heading repeating the tab directly
-   above it is the section labelling itself twice. Out of the flow and out
-   of the accessibility tree, both, because the tab is a real
-   `aria-labelledby` target for the panel. Keyed on the grid rather than on
-   the stage, because the strip is a sibling of the stage now rather than a
-   row inside it. */
+/* The panel's own heading names it without script. With the strip on, the
+   tab says it, and a heading repeating the tab above it labels the section
+   twice — the tab is a real `aria-labelledby` target, so this leaves both
+   the flow and the accessibility tree. Keyed on the grid because the strip
+   is a sibling of the stage, not a row inside it. */
 .docs-native-grid:has(> .docs-switch:not([hidden])) .docs-example-name {
   display: none;
 }
@@ -2637,11 +2223,8 @@ pre > button.copy.copied::before {
   background: var(--cirth-card-background-color);
 }
 
-/* What the example is demonstrating, under the example. This is where the
-   two sections this one absorbed ended up: the behaviour claim, the
-   accessibility claim and the dogfooding claim are properties of a sample
-   now, written beside the sample they are true of, rather than three
-   headings with a paragraph each. */
+/* What the example is demonstrating, written beside the sample it is true
+   of rather than as a section of its own. */
 .docs-example-note {
   margin: 0;
   padding: 0.75rem;
@@ -2664,17 +2247,14 @@ pre > button.copy.copied::before {
 
 /* The theme demo's preview element.
    ––––––––––––––––––––
-   <cirth-theme-preview> holds its own copy of Cirth in a shadow root (see
-   home.njk). Almost nothing about it is styled from here, and that is the
-   point: the page's rules do not cross the boundary, so what is inside is
-   painted by the stylesheet the element loaded and by the declarations the
-   section is applying to it.
+   <cirth-theme-preview> holds its own copy of Cirth in a shadow root, and
+   almost nothing about it is styled from here — that is the point: what is
+   inside is painted by the stylesheet the element loaded.
 
-   What the page still owns is the box. The pane gives up its padding to
-   the element, which carries it inside the shadow root instead, so the
-   surface `--cirth-canvas` paints in there is the whole half of the stage:
-   the demo's ground and the page's ground meet across the stage's own
-   hairline, which is the isolation made visible rather than asserted. */
+   The page owns the box only. The pane gives up its padding to the
+   element, which carries it inside the shadow root instead, so the surface
+   painted in there is the whole half of the stage and the two grounds meet
+   across the stage's own hairline. */
 .docs-theme-showcase .docs-stage-preview {
   align-content: stretch;
   padding: 0;
@@ -2694,23 +2274,18 @@ cirth-theme-preview:not(:defined) {
   padding: clamp(1rem, 2.5vw, 2rem);
 }
 
-/* The band's control. It pauses a demo that changes on its own, which is
-   the one thing WCAG asks of anything that auto-updates beside other
-   content — so it is a real control in the band, at the band's size, not
-   an affordance that appears on hover.
+/* The band's control: it pauses a demo that changes on its own, which is
+   what WCAG asks of anything that auto-updates beside other content. A
+   real control in the band, at the band's size, not a hover affordance.
 
-   Its colours are captured on the band, exactly as the tab strip captures
-   its own (see .docs-switch): a <button> rebinds `--cirth-color` and
-   `--cirth-background-color` to the pair the framework paints a filled
-   button with, so a rule inside the button reaching for either name gets
-   white-on-accent rather than the page's ink. It did — hovering or
-   focusing this control turned it white on the band's own surface, at
-   1.07:1, which axe caught in the section's own audit. Resolved on the
-   band, inherited as values.
+   Its colours resolve on the band and are inherited as values, like the
+   tab strip's: a <button> rebinds --cirth-color and
+   --cirth-background-color to its own fill, so a rule inside the button
+   reaching for either gets white-on-accent — 1.07:1 against this band.
 
-   Every interactive state is pinned for the same reason: the framework's
-   `button:is(:hover, :active, :focus)` rules are more specific than a
-   single class, so leaving one of them out hands that state back. */
+   Every interactive state is pinned in the selector for the same reason:
+   the framework's `button:is(:hover, :active, :focus)` outweighs a single
+   class, so leaving one out hands that state back. */
 .docs-stage-toggle,
 .docs-stage-toggle:is(:hover, :active, :focus, :focus-visible) {
   min-height: 1.75rem;
@@ -2735,11 +2310,11 @@ cirth-theme-preview:not(:defined) {
    moved can be marked where it stands and a reader can see that the others
    did not move. */
 .docs-token.is-changed {
-  /* A declaration whose value wraps is one inline box across three line
-     boxes, so the mark is cloned onto each of them rather than opening on
-     the first line and closing on the last — which is what a highlighter
-     does, and what the alternative (a block-level line) cannot do without
-     taking the newlines out of the content and breaking copy). */
+  /* A declaration whose value wraps is one inline box across several line
+     boxes: cloned, the mark is drawn on each of them, the way a
+     highlighter works. The alternative is a block-level line, which cannot
+     be done without taking the newlines out of the content and breaking
+     copy. */
   box-decoration-break: clone;
   border-radius: var(--cirth-radius-xs);
   background: var(--cirth-mark-background-color);
@@ -2748,22 +2323,17 @@ cirth-theme-preview:not(:defined) {
 
 /* Switching an example, and marking a token that moved.
    ––––––––––––––––––––
-   Two beats, both short, both subtractive: declared only under
-   no-preference and only ever taking something away from a resting state
-   the CSS above already describes in full. With the preference set, the
-   panel simply is the new panel and the marked line simply stays marked.
+   Both beats are subtractive: under no-preference, and only ever taking
+   something away from a resting state the CSS above already describes in
+   full. With the preference set, the panel simply is the new panel and the
+   marked line simply stays marked.
 
-   The unit being revealed is a line of markup, so `steps()` on a
-   clip-path inset — the same device the hero uses to write its snippet in,
-   at a fifth of the duration, because this one answers a click. Explicitly
-   not a per-character type-out: the message is "different semantic HTML,
-   different finished interface", and a terminal pretending to be typed
-   says the opposite, that the markup is a performance.
+   `steps()` on a clip-path inset, because the unit being revealed is a
+   line of markup — deliberately not a per-character type-out, which says
+   the markup is a performance.
 
-   The mark is information rather than decoration, which is why it is
-   declared in the resting state and only its *fade* is motion. Under
-   reduced motion the line that changed stays marked until the next switch,
-   which is the same fact held still. */
+   The mark is information, not decoration, which is why it is declared in
+   the resting state and only its *fade* is motion. */
 @media (prefers-reduced-motion: no-preference) {
   @keyframes docs-example-enter {
     from {
@@ -2813,16 +2383,13 @@ cirth-theme-preview:not(:defined) {
   }
 }
 
-/* The chips are painted by the custom properties themselves. Nothing
-   scripts them: they retheme because the stylesheet changed, which is the
-   section's entire argument running on the section itself. A hairline on
-   every chip so that `--cirth-canvas`, which is a near-white against a
-   near-white code surface, still reads as a swatch. */
-/* One per line. The code column beside a live interface is the narrow half
-   of this stage by design, and three token names laid out as a wrapping row
-   broke after the second one — a legend with an orphan. A column also puts
-   the chips in a stack the eye can compare, and it lands in the space a
-   three-declaration listing leaves under itself. */
+/* The chips are painted by the custom properties themselves — nothing
+   scripts them, so they retheme because the stylesheet changed, which is
+   the section's argument running on the section itself.
+
+   One per line: this is the narrow half of the stage, and three token
+   names as a wrapping row break after the second. A column also stacks the
+   chips where the eye can compare them. */
 .docs-token-legend {
   display: grid;
   gap: 0.375rem;
@@ -2845,11 +2412,10 @@ cirth-theme-preview:not(:defined) {
   font-size: var(--cirth-font-size-xs);
 }
 
-/* 1.5rem, not 1rem. `--cirth-radius-lg` is 0.5rem, which on a 16px box is
-   exactly half of it — the radius chip came out a perfect circle for
-   Playroom and read as a different kind of mark rather than as a corner.
-   At 24px the same 8px is unmistakably a rounded square, and the two
-   smaller radii still differ from each other. */
+/* 1.5rem, not 1rem: at 16px a 0.5rem radius is half the box, so the chip
+   comes out a circle under Playroom and reads as a different kind of mark
+   rather than as a corner. At 24px the same radius is unmistakably a
+   rounded square. */
 .docs-token-chip {
   flex: none;
   inline-size: 1.5rem;
@@ -2872,17 +2438,11 @@ cirth-theme-preview:not(:defined) {
   background: var(--cirth-canvas);
 }
 
-/* Placement, and nothing else. The `color: var(--cirth-muted-color)` on
-   the answers is gone for good: the disclosure example in the showcase
-   above lists this element as its source, so a shell that tints the
-   paragraph would make that listing describe something the reader is not
-   looking at. The rest of this block was the framework's own answer
-   written out a second time — `inline-size: 100%` and `margin: 0` on a
-   stretched grid item and on a block-level <details>, `max-width: none`
-   on elements whose computed max-width is already none, and a
-   `margin-block-end` that tightened the disclosure's own rhythm by 4px.
-   A FAQ is the canonical use of this component; it should look like the
-   component. */
+/* Placement, and nothing else. A FAQ is the canonical use of the
+   disclosure component and should look like it — and the showcase above
+   lists this very element as its source, so anything the shell restyles
+   here makes that listing describe something the reader is not looking
+   at. */
 .docs-native-faq .docs-faq-list {
   grid-column: 5 / -1;
 }
@@ -2902,31 +2462,18 @@ cirth-theme-preview:not(:defined) {
 }
 
 /* The hero stacks when the demo runs out of room, and that width is a
-   measurement rather than a round number.
+   measurement of the *content*, not of the boxes.
 
-   It used to be 1099px, derived from the two panes' declared minimums —
-   18rem + 19rem plus their divider, 594px, against the 7 of 12 parts the
-   hero gives the demo. That derivation was about the boxes and not about
-   what is in them, and it stopped being true when the snippet grew: the
-   output overlaps the source by --docs-lab-overlap, and below a certain
+   The output overlaps the source by --docs-lab-overlap, so below some
    width the source pane is narrower than its own longest line plus that
-   overlap, so the floating output covers code. Swept, at 20px steps:
+   overlap and the floating output covers code. Swept at 20px steps, 1240px
+   is where the clearance between the end of the longest line and the edge
+   of the output becomes a gap rather than a coincidence — 29px, against
+   -10px at 1100. Below it the demo takes the full row, where the same
+   measurement reads 76px.
 
-     1100px  pane 342  overlap 32  →  -10px  covers `autocomplete=…`
-     1150px  pane 358  overlap 34  →    4px
-     1200px  pane 373  overlap 35  →   18px
-     1240px  pane 386  overlap 36  →   29px
-     1280px  pane 398  overlap 37  →   41px
-
-   1240px is where the gap between the end of the longest line and the
-   edge of the output becomes a gap rather than a coincidence. Below it
-   the demo takes the full row instead, where the pane is 426px and the
-   same measurement reads 76px.
-
-   Stacking here also keeps the property the 1099px rule was written for:
-   the stacked demo is capped at a width the two panes can still be read
-   side by side at, rather than being handed the whole page because
-   nothing else is in the row. */
+   Re-measure this if the snippet changes: a minimum derived from the
+   panes' declared widths says nothing about what is in them. */
 @media (width < 77.5rem) {
   .docs-native-hero .docs-native-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -2963,19 +2510,22 @@ cirth-theme-preview:not(:defined) {
 
   /* The overlap unwinds rather than shrinking: at one column there is no
 	   second column to reach into, and two cards offset by a few
-	   millimetres would read as a misalignment. Output first, as before —
-	   the rendered interface is the thing worth seeing on a phone, and the
-	   source is what you scroll to. */
+	   millimetres read as a misalignment. */
   .docs-lab-stage {
     grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
   }
 
-  /* Source first. Stacked, the two are read in sequence rather than
-     compared side by side, and the sequence this page argues for is
-     markup → interface: the result above its own cause read backwards.
-     The column is already 1, unconditionally, further up; only the order is
-     a decision this tier makes. */
+  /* Source first: stacked, the two are read in sequence rather than
+     compared, and the sequence this page argues for is markup → interface.
+     Only the order is this tier's decision — the column is already 1
+     unconditionally, further up.
+
+     Read this with `.docs-output-frame { order: 2 }` below; the two are one
+     statement. This half measures inert on its own, because 0 comes before
+     2 as surely as 1 does. Its sibling does not: drop that one and the
+     output sorts to 0, ahead of this at 1, and the phone shows the result
+     above its own cause. Remove both or neither. */
   .docs-source-panel {
     order: 1;
   }
@@ -2984,21 +2534,19 @@ cirth-theme-preview:not(:defined) {
     order: 2;
     grid-column: 1;
 
-    /* 26rem, not 31rem. The rendered page is 365–405px tall at every width
-       in this range, so 496px left ~130px of empty lab canvas under the
-       card — which read as a gap between the two halves of the demo,
-       because that is what it was. Measured against the tallest of them,
-       405px at 767px, with the container's own bottom padding in. */
+    /* Measured against the tallest rendering in this range — 405px at
+       767px, with the container's bottom padding in. Anything looser
+       leaves empty lab canvas under the card, which reads as a gap between
+       the two halves of the demo. */
     block-size: 26rem;
     margin-inline-start: 0;
   }
 
-  /* The cap the desktop pane gave up. Here the full snippet is 626px on a
-     844px screen — the source alone would be the viewport — so this is
-     the one place the pane is deliberately a window onto the markup
-     rather than all of it. 20rem, not the 14rem it was: at 224px the
-     window held nine of thirty-three lines and the panel read as a
-     scrollbar with some code in it. */
+  /* The cap the desktop pane gave up: here the full snippet is 626px on an
+     844px screen, so this is the one place the pane is deliberately a
+     window onto the markup rather than all of it. Not tighter than this —
+     at 14rem the window held nine of thirty-three lines and the panel read
+     as a scrollbar with some code in it. */
   .docs-source-panel pre {
     block-size: 20rem;
   }
@@ -3015,14 +2563,11 @@ cirth-theme-preview:not(:defined) {
 }
 
 @media (forced-colors: active) {
-  /* The selected tab is a background against a transparent one, and in
-     forced colors both resolve to Canvas — so the strip lost its selected
-     state entirely and the only cue left was `aria-selected`, which a
-     sighted reader does not get. Every button's transparent border is
-     forced to CanvasText too, so the border cannot carry it either.
-     `Highlight`/`HighlightText` is the pair the system reserves for
-     exactly this, and it is a real difference in both high-contrast
-     themes. */
+  /* The selected tab is a background against a transparent one, and forced
+     colors resolves both to Canvas — while every button's transparent
+     border is forced to CanvasText, so the border cannot carry the state
+     either. `Highlight`/`HighlightText` is the pair the system reserves
+     for exactly this. */
   .docs-switch button[aria-selected="true"] {
     background: Highlight;
     color: HighlightText;
@@ -3036,10 +2581,9 @@ cirth-theme-preview:not(:defined) {
     color: MarkText;
   }
 
-  /* Only the two surfaces that actually carry one. The five plates were in
-     this list because they restated `box-shadow: var(--cirth-card-box-shadow)`,
-     and that token is `none` in every theme and preset the project ships —
-     so the rule was removing a shadow that was never painted. */
+  /* Only the two surfaces that actually carry a shadow:
+     --cirth-card-box-shadow is `none` in every theme and preset the project
+     ships, so listing the plates here removes what was never painted. */
   .docs-output-frame,
   .docs-theme-lab figure {
     box-shadow: none;
@@ -3053,17 +2597,13 @@ cirth-theme-preview:not(:defined) {
   display: none;
 }
 
-/* .container doesn't cap its own width — it's a 3-track grid whose centre
-   track is capped via the --cirth-container-max-width custom property
-   (60rem), so overriding `max-width` on an individual .container element is
-   a no-op; the token is what needs overriding, and since it inherits, one
-   override on `body` reaches every .container on the page — header, doc
-   content, footer — consistently, instead of each picking its own width and
-   drifting out of alignment with the others (which is what happened when
-   only the docs <main> was widened: the header above it stayed at the
-   framework default and the two no longer lined up). 60rem is right for a
-   single measure of prose and too narrow for this site once a rail and a
-   page outline sit on either side of doc content. */
+/* `.container` does not cap its own width: it is a 3-track grid whose
+   centre track is capped by --cirth-container-max-width, so a `max-width`
+   on an individual .container is a no-op. The token is what to override,
+   and because it inherits, one override on `body` reaches the header, the
+   content and the footer together — override them separately and they stop
+   lining up. The framework's 60rem is a single measure of prose, and too
+   narrow here once a rail and an outline sit on either side. */
 @media (width >= 64rem) {
   body {
     --cirth-container-max-width: var(--docs-shell-max);
@@ -3080,9 +2620,8 @@ cirth-theme-preview:not(:defined) {
     grid-template-columns: var(--docs-rail-width) minmax(0, 1fr);
   }
 
-  /* No inset: this rail is not positioned. It was `position: sticky` once
-	   and stopped being so; the `top` that outlived it computed to nothing
-	   for as long as it stayed. */
+  /* No inset: this rail is not positioned, so a `top` here computes to
+	   nothing. */
   .docs-sidebar {
     max-height: calc(100vh - 7rem);
     padding-inline-end: 1rem;
@@ -3108,12 +2647,9 @@ cirth-theme-preview:not(:defined) {
   font-size: var(--cirth-font-size-sm);
 }
 
-/* A stacked nav outside an <aside>. The gutter token is the whole release:
-   a nav's inline insets — the list's negative margin, the item's padding
-   and the link's negative margin — are all one gutter, so naming it zero
-   drops the bar idiom in one declaration instead of undoing three by hand
-   (components/_nav.scss). What is left here is this outline's own layout
-   and nothing else. */
+/* A stacked nav outside an <aside>: naming the gutter token zero drops the
+   bar idiom in one declaration, since a nav's three inline insets are all
+   that one gutter. What is left is this outline's own layout. */
 .docs-toc-top > nav {
   --cirth-nav-element-spacing-horizontal: 0;
 
@@ -3130,23 +2666,19 @@ cirth-theme-preview:not(:defined) {
 }
 
 /* Page title. No rule, no separator: the heading's own scale and the space
-   under it carry the hierarchy. Not keyed on :first-child -- the "On this
-   page" disclosure takes that slot on most pages, so a :first-child rule
-   silently applied to four pages and no others. */
+   under it carry the hierarchy. Not `:first-child` — the "On this page"
+   disclosure takes that slot on most pages, so such a rule would apply to
+   four pages and no others. */
 .docs-content > h1 {
   margin-block: 0 clamp(var(--cirth-space-6), 4vw, var(--cirth-space-12));
 }
 
-/* Chapter separators, on the prose and nowhere else. `>`, not a descendant
-   combinator, for the same reason the page title above uses it: markdown
-   emits its headings as direct children of this column, and everything
-   deeper is either a live example or a plate's title band. As descendants
-   these two rules drew the documentation's own chapter rule *inside*
-   product examples — an <h2> in the classless demo on /get-started/ took a
-   1px rule and 12px of padding, and three <h3>s on /examples/ and
-   /layout/landmarks/ took 32px of editorial margin — and reached the <h2>
-   in every plate header, which then had to be neutralised again three
-   selectors further down. */
+/* Chapter separators, on the prose and nowhere else. `>`, never a
+   descendant combinator: markdown emits its headings as direct children of
+   this column, and everything deeper is either a live example or a plate's
+   title band. As descendants these rules draw the documentation's chapter
+   rule *inside* product examples, and reach the <h2> in every plate
+   header. */
 .docs-content > h2 {
   margin-block-start: clamp(var(--cirth-space-10), 5vw, var(--cirth-space-16));
   padding-block-start: var(--cirth-space-3);
@@ -3160,38 +2692,27 @@ cirth-theme-preview:not(:defined) {
 
 /* The plate
    ––––––––––––––––––––
-   Five surfaces on this site are grids of cells divided by hairlines
-   inside a frame: the hero's source/output figure, the live-demo frames,
-   the brand construction sheet, the proof ledger and the build
-   comparison. They used to be *almost* cards — card border, card radius,
-   card surface, card shadow — with headers that were not the card's
-   header at all: no sectioning tint, and 32px or 48px of padding against
-   the card contract's 12/20. Almost-a-card is the worst of the three
-   available answers, because the reader spends the whole page deciding
-   which one they are looking at.
-
-   They are not cards. A card is a container with a tinted header band
-   and a padded body; these are technical plates, and they say so with a
-   grammar of their own:
+   Four surfaces on this site are grids of cells divided by hairlines
+   inside a frame. They are not cards — a card is a container with a tinted
+   header band and a padded body — and almost-a-card is the worst available
+   answer, because the reader spends the page deciding which one they are
+   looking at. The grammar:
 
      · ONE stroke, everywhere. The frame and every internal division use
-       --cirth-card-border-color. What made this read as broken before
-       was two greys inside one surface — the frame on the card border
-       (L 0.853) and the dividers on the muted border (L 0.939), a
-       visible step apart inside something that reads as one object.
-     · The plate itself has no padding. Every cell carries its own, and
-       the hairlines between cells are the grid gap or a cell edge.
-     · A plate's title band is a band, not a card header: the same
-       hairline underneath, the shell's own 20px rhythm (read off
-       --cirth-space-5, which is exactly the card's horizontal padding —
-       the plate agrees with the card about rhythm and disagrees with it
-       about structure), and no tint.
+       --cirth-card-border-color. Two greys inside one surface (the card
+       border at L 0.853 against the muted border at L 0.939) is what makes
+       a plate read as broken.
+     · The plate itself has no padding. Every cell carries its own, and the
+       hairlines between cells are the grid gap or a cell edge.
+     · A title band is a band, not a card header: the same hairline
+       underneath, --cirth-space-5 of rhythm — which is exactly the card's
+       horizontal padding, so the plate agrees with the card about rhythm
+       and disagrees about structure — and no tint.
 
-   What they keep from the framework is the part that is brand rather
-   than component: the 1px hairline on all four edges and the 6px
-   container radius. See docs/brand.md — those are the marks that survive
-   a retheme, so a documentation surface that steps outside the component
-   layer still has to carry them. */
+   What they keep from the framework is the part that is brand rather than
+   component: the hairline on all four edges and the container radius. See
+   docs/brand.md — those survive a retheme, so a surface outside the
+   component layer still has to carry them. */
 .docs-demo,
 .docs-brand-spec,
 .docs-proof-strip,
@@ -3202,19 +2723,12 @@ cirth-theme-preview:not(:defined) {
   overflow: clip;
 }
 
-/* Every internal division of a plate is the frame's own stroke — said at
-   each division now, rather than once here in a rule that could not
-   reliably win.
-   `.docs-proof-strip :is(header, dl > div)` weighs (0,1,2) and so does
-   `.docs-proof-strip dl > div`, which came later in the file and drew its
-   dividers on the muted border. Measured: the frame at L 0.848 with its
-   cell dividers at L 0.9385 — the two greys inside one surface this very
-   rule exists to prevent, on three of the five plates, for as long as the
-   rule has been here. Same tie on `.docs-build-comparison figure` and
-   `figcaption`, same result; it won on `.docs-demo` only because the demo's
-   own selectors happen to be lighter. A repair rule that has to outrank
-   what it repairs is a rule that will lose again the next time a selector
-   grows, so the colour is now named where the line is drawn. */
+/* Every internal division of a plate is the frame's own stroke, and the
+   colour is named at each division rather than once in a blanket rule
+   here. A blanket rule ties on specificity with the per-plate selectors
+   that draw the lines, loses to whichever comes later, and will lose again
+   the next time one of them grows a selector — which is how three plates
+   ended up drawing their dividers on the muted border. */
 
 /* Title band: the plate's own, on the card's horizontal rhythm but
    without the card's tint or its heading treatment. */
@@ -3226,8 +2740,8 @@ cirth-theme-preview:not(:defined) {
     var(--cirth-card-border-color);
 }
 
-/* No padding or border reset: the chapter rule that used to reach these is
-   scoped with `>` to the level markdown emits it at, so it never has. */
+/* No padding or border reset needed: the chapter rule above is scoped with
+   `>` to the level markdown emits, so it does not reach here. */
 .docs-brand-spec-header h2,
 .docs-proof-strip > header h2,
 .docs-build-comparison > header h2 {
@@ -3263,12 +2777,9 @@ cirth-theme-preview:not(:defined) {
 }
 
 /* The stage the example stands on. Its padding is spent through
-   --cirth-spacing rather than through a literal, so a preset that re-times
-   the framework re-times the frame around the thing it is re-timing:
-   under `playroom` the stage goes 32px to 40px along with everything in
-   it, instead of holding the one measurement on the page that the preset
-   cannot reach. Identical in the default build, where --cirth-spacing is
-   the 1rem this clamp used to name. */
+   --cirth-spacing, not a literal, so a preset that re-times the framework
+   re-times the frame around the thing it is re-timing instead of leaving
+   the one measurement on the page it cannot reach. */
 .docs-demo-preview {
   padding: clamp(
     var(--cirth-spacing),
@@ -3287,9 +2798,8 @@ details.docs-demo-source {
   background: var(--cirth-code-background-color);
 }
 
-/* No colour here: the disclosure keeps the accordion summary ink the
-   framework gives it. Muting it dropped below 4.5:1 on the code surface in
-   the plain dark preset. */
+/* No colour here: the disclosure keeps the framework's accordion summary
+   ink. Muting it drops below 4.5:1 on the code surface under plain dark. */
 details.docs-demo-source > summary {
   padding: 0.75rem 1rem;
   font-size: var(--cirth-font-size-sm);
@@ -3323,10 +2833,9 @@ details.docs-demo-source[open] > summary {
   background: transparent;
 }
 
-/* Group headers sit on the same inline gutter as the entries under them.
-   They used to be flush at 0 while every link was inset 12px, so the
-   heading hung outside the column it introduced and its hover area started
-   against the first letter. */
+/* Group headers sit on the same inline gutter as the entries under them,
+   or the heading hangs outside the column it introduces and its hover area
+   starts against the first letter. */
 .docs-sidebar details > summary {
   padding: 0.5rem var(--cirth-space-3);
   font-size: var(--cirth-font-size-sm);
@@ -3353,10 +2862,9 @@ details.docs-demo-source[open] > summary {
     var(--cirth-muted-border-color);
 }
 
-/* Not tidying: the framework pads `pre > code`, and the demo's source
-   listing hands the inline gutter to the code so it scrolls with a long
-   line instead of standing still under it — the same reasoning the hero's
-   source pane carries. The <pre>'s own `padding: 1rem` supplies the block
+/* Not tidying: the framework pads `pre > code`, and this listing hands the
+   inline gutter to the code so it scrolls with a long line instead of
+   standing still under it. The <pre>'s `padding: 1rem` supplies the block
    half; this takes the inline half back off. */
 details.docs-demo-source > :not(summary) {
   padding-inline: 0;
@@ -3409,19 +2917,16 @@ details.docs-toc-top {
     display: block;
   }
 
-  /* The family is not a restatement: it pins this summary to the plain
-     system stack, which is what the page face already is at the default
-     build and is not once a preset makes it rounded. Inert in Chromium at
-     the default theme, live under playroom — measured, and the reason this
-     rule survived a cleanup that read the first report literally. */
+  /* Keep the shell's chrome on the system stack whatever a preset does to
+     the page face. Reads inert at the default build, where the two are the
+     same stack; preset-dependent. */
   .docs-mobile-tools > details > summary {
     font-family: var(--cirth-font-family-sans);
     font-size: var(--cirth-font-size-xs);
   }
 
-  /* The third stacked nav on this site, and the third to say so with the
-     gutter token rather than by undoing the bar idiom by hand — see the
-     drawer above. */
+  /* The third stacked nav here, and the third to say so with the gutter
+     token rather than undoing the bar idiom by hand. */
   .docs-mobile-nav > nav {
     --cirth-nav-element-spacing-horizontal: 0;
 
@@ -3435,9 +2940,6 @@ details.docs-toc-top {
 
   details.docs-mobile-nav[open] > summary {
     margin-bottom: 0;
-  }
-
-  details.docs-mobile-nav > :not(summary) {
   }
 
   .docs-mobile-nav nav section {
@@ -3457,11 +2959,9 @@ details.docs-toc-top {
     display: block;
   }
 
-  /* The inline gutter, on the link rather than on the item: with the bar
-     idiom released the row is the link's box, so the entry's fill spans its
-     column the way the sidebar's does instead of floating 8px inside it —
-     and the text stays exactly where it was, level with the group heading
-     above it. */
+  /* The inline gutter goes on the link, not the item: with the bar idiom
+     released the row *is* the link's box, so the fill spans its column
+     instead of floating inside it. */
   .docs-mobile-nav nav a {
     display: block;
     margin-block: 0;
@@ -3520,8 +3020,7 @@ details.docs-toc-top {
   min-height: 28rem;
 }
 
-/* No `margin: 0` — `figure { margin: 0 }` is the framework's
-   (content/_figure.scss), and this file had three copies of it. */
+/* No `margin: 0`: `figure { margin: 0 }` is the framework's. */
 .docs-brand-construction figure {
   display: grid;
   grid-template-rows: 1fr auto;
@@ -3608,17 +3107,13 @@ details.docs-toc-top {
   background: var(--cirth-background-color);
 }
 
-/* `.grid` plus a <dl>, divided by its own gap — see .docs-proof-metrics
-   for both halves of that. The block-start border stays: it is the seam
-   between this panel and the specimen above it, not a divider between
-   cells, so it is not the gap's job.
+/* `.grid` plus a <dl>, divided by its own gap — see .docs-proof-metrics.
+   The block-start border stays: it is the seam between this panel and the
+   specimen above it, not a divider between cells.
 
-   The column count is `.grid`'s own and is not restated: three items and
-   a 12rem minimum column mean auto-fit lands on exactly these three equal
-   tracks at every width from the 48rem tier up — swept at 8px steps from
-   768 to 1600, under default and playroom — and the narrow tier below
-   states its two explicitly, so the two rules meet at 768 with no band
-   between them. */
+   No column count here: `.grid`'s auto-fit already lands on three equal
+   tracks at every width from the 48rem tier up, and the narrow tier below
+   states its two, so the two meet at 768 with no band uncovered. */
 .docs-brand-measures {
   gap: var(--cirth-border-width);
   margin: 0;
@@ -3659,17 +3154,12 @@ details.docs-toc-top {
   margin-block: 2rem 5rem;
 }
 
-/* The third `.grid` + <dl> metrics panel, divided by its gap. This one is
-   why the technique is worth writing down: at three columns the ladder
-   suppressed :nth-child(3n), and the two-column media query below had to
-   put that border *back* and suppress :nth-child(2n) instead — the same
-   divider described twice, in terms of a column count stated somewhere
-   else. The gap has no count in it.
-
-   Nor does this rule, now: `.grid`'s auto-fit already lands on three equal
-   tracks at every width from the 48rem tier up — swept at 8px steps from
-   768 to 1600, under default and playroom — and the tier below still
-   states its two. */
+/* The third `.grid` + <dl> metrics panel, divided by its gap — and the one
+   that shows why the gap is worth the technique: a border ladder has to
+   suppress :nth-child(3n) here and :nth-child(2n) in the narrow tier, so
+   the same divider is described twice in terms of a column count declared
+   somewhere else. The gap has no count in it, and neither does this
+   rule. */
 .docs-proof-strip dl {
   gap: var(--cirth-border-width);
   margin: 0;
@@ -3701,22 +3191,16 @@ details.docs-toc-top {
   font-size: var(--cirth-font-size-xl);
 }
 
-/* Colour only. The size is the library's already: `small` is 0.875em of
-   its container (theme/_styles.scss) and this one sits at the root size, so
-   the shell's `sm` step was the same 14px written a second time — and it
-   tracks the container, which a rem step does not. (Fourteen is still the
-   floor for a shell container holding a shrinking child; that rule lives
-   where such a container is declared, not here.) */
+/* Colour only: `small` is already 0.875em of its container, which tracks
+   the container in a way a rem step does not. */
 .docs-proof-strip dd small {
   color: var(--cirth-muted-color);
 }
 
-/* Four build panes, divided by the gap. The <figure> stays a <figure> —
-   a captioned specimen is what the element is for — but its dividing lines
-   are the container's, not four borders and a :nth-child(2n) to take one
-   of them back off. Dropping to a single column below the 48rem tier is now
-   the column count alone; it used to need a rule cancelling the ladder
-   too. */
+/* Four build panes, divided by the gap. The <figure> stays a <figure> — a
+   captioned specimen is what the element is for — and its dividing lines
+   are the container's, so dropping to one column below the 48rem tier is
+   the column count alone. */
 .docs-build-comparison > div {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3739,9 +3223,8 @@ details.docs-toc-top {
   font-size: var(--cirth-font-size-sm);
 }
 
-/* No `overflow-wrap` here or below: the library gives every `code` element
-   `anywhere` (content/_code.scss), which is the guard these two captions
-   want and is already in force. */
+/* No `overflow-wrap`: the library already gives every `code` element
+   `anywhere`, which is the guard these captions want. */
 .docs-build-comparison figcaption code {
   max-width: 60%;
   background: transparent;
@@ -3809,14 +3292,13 @@ details.docs-toc-top {
 }
 
 /* The knob is the token, not the padding. This tile is a specimen of what
-   the default theme does to an <article>, so its padding has to arrive
-   through the card contract even when the tile asks for a tighter one:
-   a literal `padding` here would leave --cirth-block-spacing-horizontal
-   reading 1.25rem, and any band this specimen ever grows would bleed to a
-   gutter the card no longer has. Same 16px, owned by the card.
+   the default theme does to an <article>, so a tighter padding still has
+   to arrive through the card contract — a literal `padding` leaves
+   --cirth-block-spacing-horizontal reading 1.25rem, and any band the
+   specimen grows then bleeds to a gutter the card no longer has.
 
-   `margin: 0` stays: that is the tile closing the trailing margin of what
-   it holds, not a restyle of the specimen. */
+   `margin: 0` is the tile closing the trailing margin of what it holds,
+   not a restyle of the specimen. */
 .docs-theme-sample article {
   --cirth-block-spacing-horizontal: 1rem;
   --cirth-block-spacing-vertical: 1rem;
@@ -3843,9 +3325,8 @@ details.docs-toc-top {
   margin: 0.5rem 0 0;
 }
 
-/* The fourth `.grid` + <dl> on this site, divided by its gap like the other
-   three. The `div + div` border it replaces was the two-cell version of the
-   same ladder — correct at two columns and nowhere else. */
+/* The fourth `.grid` + <dl> here, divided by its gap like the other
+   three. */
 .docs-theme-lab dl {
   gap: var(--cirth-border-width);
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3872,12 +3353,10 @@ details.docs-toc-top {
   margin: 0.5rem 0 0;
 }
 
-/* The basis is the width. The swatch is empty, so there is no content for
-   an engine to size the box from and `flex: 0 0 1rem` decides it in
-   Chromium, Gecko and WebKit alike — measured in all three, alone and
-   alongside the rest of this cleanup. Not the same case as the header's
-   search field at the 36rem tier, which holds a control and is sized from
-   it. */
+/* The basis is the width, and no `width` beside it: this swatch is empty,
+   so there is no content for an engine to size the box from and the basis
+   decides it in all three. Not the header search field's case at the 36rem
+   tier — that one holds a control and is sized from it. */
 .docs-theme-lab dd i {
   flex: 0 0 1rem;
   height: 1rem;
@@ -3900,11 +3379,8 @@ details.docs-toc-top {
    Cirth's surfaces to ink on paper, but deliberately hides nothing —
    which parts of a layout are chrome is something only the site knows.
 
-   Last in the file, and one block rather than three. It used to sit in the
-   middle with the same claim written above it, and the two later blocks that
-   grew after it meant "print is the last word" was true of some of these
-   rules and not others. Nothing overrode anything, so nothing was visibly
-   wrong; what was wrong was that you had to check. */
+   Last in the file, and one block rather than three, so "print is the last
+   word" is true of all of it and nobody has to check. */
 @media print {
   /* Navigation, on-page outlines, the theme and preset controls, and the
 	   copy-to-clipboard buttons are all ways of moving around a page that
