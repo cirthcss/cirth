@@ -77,8 +77,16 @@ jobs:
       - name: Build docs
         run: npm run docs:build
 
+      # --retries, because this step is a *writer*, not a gate. A single
+      # flaky rendering — a WebKit page closing under the screencast, which
+      # is what failed the 2026-09-05 run after 786 of 804 renderings had
+      # already been regenerated — used to fail the step and so skip the
+      # commit below, leaving the branch with no Linux baselines at all and
+      # CI red for a reason that has nothing to do with the change being
+      # tested. A retry rewrites the one snapshot and the step goes green;
+      # a rendering that is genuinely broken still fails three times.
       - name: Regenerate baselines
-        run: npx playwright test --update-snapshots
+        run: npx playwright test --update-snapshots --retries=2
 
       # The push races anything else landing on the branch: regenerating
       # hundreds of screenshots takes minutes, and a second push in that
