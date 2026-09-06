@@ -5,6 +5,7 @@ const {
 	createServer,
 	startServer,
 } = require("../scripts/lib/docs-site");
+const { withAndWithoutScrollbar } = require("./helpers/viewport");
 
 assertDocsBuilt("docs-stack.spec");
 
@@ -436,7 +437,9 @@ test("compact header orders search before its complete keyboard menu", async ({
 		return {
 			headerPosition: getComputedStyle(header).position,
 			h1Y: heading.getBoundingClientRect().y,
-			overflow: document.documentElement.scrollWidth - window.innerWidth,
+			overflow:
+					document.documentElement.scrollWidth -
+					document.documentElement.clientWidth,
 		};
 	});
 	expect(compactGeometry.headerPosition).toBe("sticky");
@@ -445,7 +448,11 @@ test("compact header orders search before its complete keyboard menu", async ({
 
 	await page.setViewportSize({ width: 320, height: 720 });
 	expect(
-		await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth),
+		await page.evaluate(
+			() =>
+				document.documentElement.scrollWidth -
+				document.documentElement.clientWidth,
+		),
 	).toBeLessThanOrEqual(0);
 
 	await page.setViewportSize({ width: 1440, height: 900 });
@@ -570,12 +577,30 @@ test("the navbar collapses at a single breakpoint with a complete menu", async (
 	// to fit them beside the search, wrapped onto a second grid row: a
 	// 155px sticky header on every page. Both halves are asserted here,
 	// because either one alone can come back.
-	const expanded = [1440, 1280, 1100, 1024];
-	const collapsed = [1023, 900, 768, 576, 575, 390, 320];
+	// Every width, and the same width with a classic scrollbar taken out of
+	// it (helpers/viewport.js). Which side of the tier a window falls on is
+	// then read off the layout viewport rather than assumed from the number
+	// passed to setViewportSize: a 1024px window on a platform with classic
+	// scrollbars has a 1009px layout viewport, so it is a *collapsed* shell
+	// and the query below the 64rem tier is the one that applies.
+	const widths = [1440, 1280, 1100, 1024, 1023, 900, 768, 576, 575, 390, 320]
+		.flatMap(withAndWithoutScrollbar)
+		.sort((a, b) => b - a);
 
-	for (const width of [...expanded, ...collapsed]) {
+	for (const width of widths) {
 		await page.setViewportSize({ width, height: 800 });
 		await page.goto(`${origin}/get-started/`, { waitUntil: "networkidle" });
+
+		// 64rem against the browser's own default font size, which is what
+		// `width >= 64rem` resolves against.
+		const isExpanded = await page.evaluate(
+			() =>
+				document.documentElement.clientWidth >=
+				64 *
+					Number.parseFloat(
+						getComputedStyle(document.documentElement).fontSize,
+					),
+		);
 
 		const state = await page.evaluate(() => {
 			const header = /** @type {HTMLElement} */ (
@@ -599,11 +624,13 @@ test("the navbar collapses at a single breakpoint with a complete menu", async (
 				displayGroupVisible: group
 					? getComputedStyle(group).display !== "none"
 					: false,
-				overflow: document.documentElement.scrollWidth - window.innerWidth,
+				overflow:
+					document.documentElement.scrollWidth -
+					document.documentElement.clientWidth,
 			};
 		});
 
-		const at = `at ${width}px`;
+		const at = `at ${width}px (${isExpanded ? "expanded" : "collapsed"})`;
 		expect(state.total, `controls are duplicated ${at}`).toBe(3);
 		expect(state.overflow, `horizontal overflow ${at}`).toBeLessThanOrEqual(0);
 		// One row, at every width. 155px was two.
@@ -612,7 +639,7 @@ test("the navbar collapses at a single breakpoint with a complete menu", async (
 			`header is ${state.headerHeight}px ${at}`,
 		).toBeLessThan(100);
 
-		if (expanded.includes(width)) {
+		if (isExpanded) {
 			expect(state.menuVisible, `toggler shows ${at}`).toBe(false);
 			expect(state.onBar, `controls left the bar ${at}`).toBe(3);
 			expect(state.inMenu, `controls moved early ${at}`).toBe(0);

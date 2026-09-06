@@ -4,6 +4,10 @@ const {
 	createServer,
 	startServer,
 } = require("../scripts/lib/docs-site");
+const {
+	layoutViewport,
+	withAndWithoutScrollbar,
+} = require("./helpers/viewport");
 
 assertDocsBuilt("shell-overlays.spec");
 
@@ -187,39 +191,61 @@ test("search opens to the field, returns results, and gives focus back", async (
 test("search is a full surface on a phone, not a shrunken panel", async ({
 	page,
 }) => {
-	await page.setViewportSize({ width: 390, height: 844 });
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	// Both widths are the same phone. The second is what the first *is* on a
+	// platform that draws a classic scrollbar: the window keeps its 390, the
+	// layout viewport loses 15 to the scrollbar, and everything below —
+	// layout and media queries alike — sees only the layout viewport. See
+	// helpers/viewport.js.
+	/** @param {number} width */
+	const openSearchAt = async (width) => {
+		await page.setViewportSize({ width, height: 844 });
+		await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+		await page.locator("[data-docs-search-trigger]").click();
+		await page.locator("[data-docs-search-input]").fill("button");
+		await expect(
+			page.locator(".docs-search-results [data-docs-search-result]").first(),
+		).toBeVisible();
+	};
 
-	await page.locator("[data-docs-search-trigger]").click();
-	await page.locator("[data-docs-search-input]").fill("button");
-	await expect(
-		page.locator(".docs-search-results [data-docs-search-result]").first(),
-	).toBeVisible();
+	for (const width of withAndWithoutScrollbar(390)) {
+		await openSearchAt(width);
 
-	const panel = page.locator(".docs-search-dialog > article");
-	const geometry = await panel.evaluate((element) => {
-		const box = element.getBoundingClientRect();
-		const style = getComputedStyle(element);
-		return {
-			width: box.width,
-			height: box.height,
-			left: box.left,
-			top: box.top,
-			viewport: { width: window.innerWidth, height: window.innerHeight },
-			radius: Number.parseFloat(style.borderTopLeftRadius),
-			margin: Number.parseFloat(style.marginTop),
-		};
-	});
+		const viewport = await layoutViewport(page);
+		const panel = page.locator(".docs-search-dialog > article");
+		const geometry = await panel.evaluate((element) => {
+			const box = element.getBoundingClientRect();
+			const style = getComputedStyle(element);
+			return {
+				width: box.width,
+				height: box.height,
+				left: box.left,
+				top: box.top,
+				radius: Number.parseFloat(style.borderTopLeftRadius),
+				margin: Number.parseFloat(style.marginTop),
+			};
+		});
 
-	// The whole screen, with nothing of the page showing around it — the
-	// difference between a search mode and a dialog that happens to be
-	// narrow.
-	expect(geometry.width).toBeCloseTo(geometry.viewport.width, 0);
-	expect(geometry.height).toBeCloseTo(geometry.viewport.height, 0);
-	expect(geometry.left).toBe(0);
-	expect(geometry.top).toBe(0);
-	expect(geometry.radius).toBe(0);
-	expect(geometry.margin).toBe(0);
+		// The whole screen, with nothing of the page showing around it — the
+		// difference between a search mode and a dialog that happens to be
+		// narrow.
+		expect(geometry.width, `panel width at ${width}px`).toBeCloseTo(
+			viewport.width,
+			0,
+		);
+		expect(geometry.height, `panel height at ${width}px`).toBeCloseTo(
+			viewport.height,
+			0,
+		);
+		expect(geometry.left).toBe(0);
+		expect(geometry.top).toBe(0);
+		expect(geometry.radius).toBe(0);
+		expect(geometry.margin).toBe(0);
+		await page.keyboard.press("Escape");
+	}
+
+	// The rest of this test is about what the surface holds, not how big it
+	// is, so it runs once at the nominal phone width.
+	await openSearchAt(390);
 
 	// The keyboard-shortcut hints are advice about hardware this reader
 	// does not have, and they were sitting where results go. Gone, not
@@ -260,7 +286,9 @@ test("search is a full surface on a phone, not a shrunken panel", async ({
 
 	expect(
 		await page.evaluate(
-			() => document.documentElement.scrollWidth - window.innerWidth,
+			() =>
+				document.documentElement.scrollWidth -
+				document.documentElement.clientWidth,
 		),
 	).toBeLessThanOrEqual(0);
 });
@@ -340,28 +368,50 @@ test("the drawer is a modal surface with a way out of it", async ({ page }) => {
 	await expect(trigger).toBeFocused();
 
 	// A drawer with room in it: the full height of the screen, and wide
-	// enough to label its controls rather than squeeze them.
-	await trigger.click();
-	const panel = await drawer.locator("article").evaluate((element) => {
-		const box = element.getBoundingClientRect();
-		return {
-			height: box.height,
-			width: box.width,
-			right: box.right,
-			viewport: { width: window.innerWidth, height: window.innerHeight },
-		};
-	});
-	expect(panel.height).toBeCloseTo(panel.viewport.height, 0);
-	expect(panel.right).toBeCloseTo(panel.viewport.width, 0);
-	expect(panel.width).toBeGreaterThan(240);
+	// enough to label its controls rather than squeeze them. Measured
+	// against the layout viewport, which is the box the panel is pinned to
+	// — and checked again 15px narrower, which is that same phone on a
+	// platform with classic scrollbars (helpers/viewport.js).
+	for (const width of withAndWithoutScrollbar(390)) {
+		await page.setViewportSize({ width, height: 844 });
+		await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+		await trigger.click();
+		await expect(drawer).toHaveAttribute("open", "");
+
+		const viewport = await layoutViewport(page);
+		const panel = await drawer.locator("article").evaluate((element) => {
+			const box = element.getBoundingClientRect();
+			return { height: box.height, right: box.right, width: box.width };
+		});
+		expect(panel.height, `drawer height at ${width}px`).toBeCloseTo(
+			viewport.height,
+			0,
+		);
+		expect(panel.right, `drawer inline end at ${width}px`).toBeCloseTo(
+			viewport.width,
+			0,
+		);
+		expect(panel.width, `drawer width at ${width}px`).toBeGreaterThan(240);
+		await page.keyboard.press("Escape");
+	}
 });
 
 test("the home page never scrolls sideways", async ({ page }) => {
-	for (const width of [1440, 1280, 1024, 900, 768, 390, 320]) {
+	// Each nominal width and the same width with a classic scrollbar taken
+	// out of it. The second is not padding: comparing scrollWidth against
+	// window.innerWidth used to *hide* up to 15px of real overflow on a
+	// platform with classic scrollbars, because innerWidth is the wider of
+	// the two numbers. Against the layout viewport there is nowhere to hide.
+	const widths = [1440, 1280, 1024, 900, 768, 390, 320].flatMap(
+		withAndWithoutScrollbar,
+	);
+	for (const width of widths) {
 		await page.setViewportSize({ width, height: 900 });
 		await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 		const overflow = await page.evaluate(
-			() => document.documentElement.scrollWidth - window.innerWidth,
+			() =>
+				document.documentElement.scrollWidth -
+				document.documentElement.clientWidth,
 		);
 		expect(overflow, `horizontal overflow at ${width}px`).toBeLessThanOrEqual(
 			0,

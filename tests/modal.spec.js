@@ -2,6 +2,10 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
 const { setContent } = require("./helpers/render");
+const {
+	layoutViewport,
+	withAndWithoutScrollbar,
+} = require("./helpers/viewport");
 
 // gh#64 — the modal no longer asks an integrator's script for anything.
 //
@@ -182,10 +186,25 @@ test("the modal card sizes fluidly from one configurable cap", async ({
 	});
 
 	const article = page.locator("#sheet > article");
+	const spacing = 16;
 	await expect(article).toHaveCSS("width", "700px");
 
-	await page.setViewportSize({ width: 390, height: 720 });
-	await expect(article).toHaveCSS("width", "358px");
+	// Below the cap the card is the viewport less one --cirth-spacing on
+	// each side, and the viewport it means is the layout viewport — the box
+	// `width: 100%` resolves against. Asserting a literal 358px here read
+	// the 390 straight off setViewportSize(), which is the window; on a
+	// platform with classic scrollbars the layout viewport is 15px narrower
+	// and the card was correctly 343. Both phone widths below are that same
+	// phone (helpers/viewport.js), and the expected width is derived, so the
+	// relationship is still pinned exactly.
+	for (const width of withAndWithoutScrollbar(390)) {
+		await page.setViewportSize({ width, height: 720 });
+		const viewport = await layoutViewport(page);
+		await expect(article, `card width at ${width}px`).toHaveCSS(
+			"width",
+			`${viewport.width - spacing * 2}px`,
+		);
+	}
 
 	await page.addStyleTag({
 		content: ":root { --cirth-modal-max-width: 30rem; }",
