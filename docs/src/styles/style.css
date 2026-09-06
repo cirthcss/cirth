@@ -96,7 +96,14 @@
      both directions: it follows a preset down and caps on the way up.
      Same idiom the framework uses for --cirth-checkbox-border-radius and
      --cirth-code-border-radius, and it leaves the default build's 4px
-     exactly where it was. */
+     exactly where it was.
+
+     Which is why its two consumers — .docs-switch button and
+     .docs-stage-toggle — read as dead to a dead-CSS sweep and are not: at
+     the default build min(4px, 4px) is the radius those controls would
+     have inherited anyway, and under playroom the core radius is 8px while
+     this stays 4. Measured under chromium/playroom by
+     scripts/verify-dead-css.js; a Chromium-only sweep calls both dead. */
   --docs-chrome-radius: min(
     var(--cirth-border-radius),
     var(--cirth-radius-sm)
@@ -151,14 +158,13 @@
   align-items: center;
   gap: var(--cirth-spacing);
 
-  /* The row is the shell's, not a page's: a header that reads as chrome
-	   should be shorter than a nav in running content. The library already
-	   halves this for a <nav> that is a *direct child* of the banner
-	   (src/components/_nav.scss); this selector also reaches the drawer's
-	   nav, which is inside the banner without being its child, so the token
-	   is not a restatement there. */
-  --cirth-nav-element-spacing-vertical: var(--cirth-space-2);
-
+  /* The row height token is not set here, and the reason it used to be is
+	   measurably wrong. The library halves it for a <nav> that is a direct
+	   child of the banner (src/components/_nav.scss), which is this one; and
+	   the drawer's nav — the case this rule was written to also reach — pays
+	   no item padding at all (`.docs-drawer > article > nav li`), so nothing
+	   there consumes it either. Removing it moves nothing, in any engine or
+	   preset. */
   min-height: 3.5rem;
 }
 
@@ -325,8 +331,10 @@
   font-size: var(--cirth-font-size-lg);
 }
 
+/* The margin only. This header is a grid, so the library's `float: right`
+   on a dialog's close control (components/_modal.scss) never applies to it
+   and there is nothing to cancel. */
 .docs-search-dialog > article > header .close {
-  float: none;
   margin: 0;
 }
 
@@ -482,7 +490,12 @@
      article had three items for four rows and the attribution was placed
      into the results row — pinned to the top of 748px of nothing, halfway
      up the screen. Naming the rows keeps the band at the bottom whether or
-     not there are results to sit above it. */
+     not there are results to sit above it.
+
+     `block-size` is engine-dependent and stays: Chromium measures nothing
+     when it is removed, WebKit measures a difference — index.html, 390px,
+     light, with the panel open (scripts/verify-dead-css.js). A sweep that
+     runs on one engine calls it dead. */
   .docs-search-dialog > article {
     display: grid;
     grid-template-rows: auto auto minmax(0, 1fr) auto;
@@ -607,9 +620,12 @@
   text-decoration: none;
 }
 
+/* Width only: the mark is a square <img> that carries width and height
+   attributes, and the library's own `img:where([width][height])` rule
+   (content/_embedded.scss) keeps `height: auto` so the ratio does the rest.
+   The second declaration was the same number arriving twice. */
 .docs-logo {
   width: var(--docs-brand-height);
-  height: var(--docs-brand-height);
 }
 
 .docs-logo-dark,
@@ -678,11 +694,15 @@
 	   Cirth's nav gives a control (components/_nav.scss). Clear of WCAG
 	   2.5.8's 24px AA minimum with room; short of 2.5.5's 44px AAA target,
 	   which is the size a control takes in a *form*, not in a navigation
-	   bar. Stated rather than inherited from that band: the same control is
-	   moved into the drawer at the collapse breakpoint, and there it sits in
-	   a plain list, outside any <nav>. */
+	   bar.
+
+	   The width is stated and the height is not, and the difference is what
+	   was measured: in the bar the nav band already gives this control 40px,
+	   and in the drawer — outside any <nav>, which is the case the height
+	   used to be restated for — the library's own target size gives it 44px
+	   over the top of whatever this rule says. It was never the thing
+	   deciding the height in either place. */
   width: 2.5rem;
-  height: 2.5rem;
   margin-bottom: 0;
   padding: 0;
   line-height: 1;
@@ -868,8 +888,9 @@
   );
 }
 
+/* Same as the search dialog's: a grid item, so the library's float on it
+   is inert and only the margin is doing anything. */
 .docs-drawer > article > header .close {
-  float: none;
   margin: 0;
 }
 
@@ -974,12 +995,14 @@
   font-size: var(--cirth-font-size-sm);
 }
 
+/* The column, and nothing about alignment: that track is `auto`, so it is
+   already exactly as wide as the control standing in it and there is no
+   slack to justify into. */
 .docs-header
   .docs-mobile-controls
   [data-docs-header-control]
   > :is(select, button) {
   grid-column: 2;
-  justify-self: end;
 }
 
 /* Phosphor sun/moon: show the icon for the active scheme */
@@ -1055,7 +1078,13 @@
 	   without it the actions cluster came out 66px wide holding 88px of
 	   controls and the menu toggle hung 6px off a 320px screen. Measured in
 	   Firefox; caught by the reflow spec, which is the reason that spec
-	   runs on three engines. */
+	   runs on three engines.
+
+	   It is also the reason the audit gained a second pass that removes
+	   candidates *together*. This width and the trigger's below are inert
+	   one at a time in all three engines — take either out and the other
+	   still states the cluster — and not inert as a pair, which is exactly
+	   how a cleanup deletes them. scripts/verify-dead-css.js names both. */
   .docs-header-search {
     flex: 0 0 var(--cirth-space-10);
     width: var(--cirth-space-10);
@@ -1087,7 +1116,14 @@
    screens. Column widths, sticky offsets, the prose measure and the
    chapter separators are all set once, further down, with the rest of the
    shell — this file used to declare each of them twice, an early pass and
-   a later one that quietly overrode it. */
+   a later one that quietly overrode it.
+
+   The single `minmax(0, 1fr)` track is the exception, and it reads inert
+   in every engine and preset the audit reaches: a grid's default track is
+   already `auto`, and nothing in the corpus overflows it. It states the
+   floor a long <pre> or a wide table would otherwise push through, which
+   is a thing that has to be true before it is needed. Kept deliberately —
+   see scripts/verify-dead-css.js. */
 .docs-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -1161,6 +1197,10 @@
   padding-inline-start: calc(var(--cirth-space-3) + var(--cirth-space-4));
 }
 
+/* `text-decoration: none` measures inert and stays: the corpus takes a
+   photograph and never puts a pointer on the link, and the underline this
+   suppresses is the one the library draws on :hover. A sweep that cannot
+   hover cannot see it. */
 .docs-toc-top a {
   margin-block: 0;
   padding: calc(var(--cirth-spacing) * 0.25) 0;
@@ -1366,7 +1406,13 @@ pre:not(.docs-demo-preview *) {
 }
 
 /* Highlight.js theme — light. GitHub-derived hues, adjusted to sit with
-   Cirth's amber/neutral palette. */
+   Cirth's amber/neutral palette.
+
+   The comment hue is the one line here a dead-CSS sweep calls inert, and
+   only because the default palette's muted grey is the same colour this
+   text would fall back to. Under playroom it is not — oklch(52% 0.035 295)
+   against oklch(52.7% 0.032 264) — so the token is what keeps a comment
+   muted *in the reader's theme* rather than in this one. */
 .hljs-comment,
 .hljs-quote {
   color: var(--cirth-muted-color);
@@ -1489,7 +1535,13 @@ pre > button.copy {
   padding: 0;
   /* Ghost: no border, transparent at rest — a background only shows up
 	   as a hover/focus affordance, matching the GitHub code-block copy
-	   button rather than the bordered/hover-revealed treatment before. */
+	   button rather than the bordered/hover-revealed treatment before.
+
+	   The audit lists `border-width: medium` and `border-image: initial`
+	   under this selector as inert. They are not written here: Chromium
+	   expands the shorthand into longhands and reports each one, and
+	   Firefox and WebKit do not even show them ("not in sheet"). There is
+	   nothing to delete but `border: none` itself, which is live. */
   border: none;
   background-color: transparent;
 }
@@ -2307,7 +2359,12 @@ pre > button.copy.copied::before {
    a container owes its contents — the first and last child should not push
    against the pane's edges with margins document flow gave them. It is
    addressed at the pane's flow root (see the wrapper in home.njk), so it
-   reaches the specimen's own first and last element. */
+   reaches the specimen's own first and last element.
+
+   `:first-child` measures inert — every specimen the corpus renders
+   happens to open with an element that carries no block-start margin —
+   and stays, because which element opens a specimen is the page author's
+   choice, not this rule's assumption. */
 .docs-stage-preview > * > :first-child {
   margin-block-start: 0;
 }
@@ -2916,10 +2973,11 @@ cirth-theme-preview:not(:defined) {
 
   /* Source first. Stacked, the two are read in sequence rather than
      compared side by side, and the sequence this page argues for is
-     markup → interface: the result above its own cause read backwards. */
+     markup → interface: the result above its own cause read backwards.
+     The column is already 1, unconditionally, further up; only the order is
+     a decision this tier makes. */
   .docs-source-panel {
     order: 1;
-    grid-column: 1;
   }
 
   .docs-output-frame {
@@ -3351,6 +3409,11 @@ details.docs-toc-top {
     display: block;
   }
 
+  /* The family is not a restatement: it pins this summary to the plain
+     system stack, which is what the page face already is at the default
+     build and is not once a preset makes it rounded. Inert in Chromium at
+     the default theme, live under playroom — measured, and the reason this
+     rule survived a cleanup that read the first report literally. */
   .docs-mobile-tools > details > summary {
     font-family: var(--cirth-font-family-sans);
     font-size: var(--cirth-font-size-xs);
@@ -3548,10 +3611,16 @@ details.docs-toc-top {
 /* `.grid` plus a <dl>, divided by its own gap — see .docs-proof-metrics
    for both halves of that. The block-start border stays: it is the seam
    between this panel and the specimen above it, not a divider between
-   cells, so it is not the gap's job. */
+   cells, so it is not the gap's job.
+
+   The column count is `.grid`'s own and is not restated: three items and
+   a 12rem minimum column mean auto-fit lands on exactly these three equal
+   tracks at every width from the 48rem tier up — swept at 8px steps from
+   768 to 1600, under default and playroom — and the narrow tier below
+   states its two explicitly, so the two rules meet at 768 with no band
+   between them. */
 .docs-brand-measures {
   gap: var(--cirth-border-width);
-  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 0;
   border-block-start: var(--cirth-border-width) solid
     var(--cirth-card-border-color);
@@ -3595,10 +3664,14 @@ details.docs-toc-top {
    suppressed :nth-child(3n), and the two-column media query below had to
    put that border *back* and suppress :nth-child(2n) instead — the same
    divider described twice, in terms of a column count stated somewhere
-   else. The gap has no count in it. */
+   else. The gap has no count in it.
+
+   Nor does this rule, now: `.grid`'s auto-fit already lands on three equal
+   tracks at every width from the 48rem tier up — swept at 8px steps from
+   768 to 1600, under default and playroom — and the tier below still
+   states its two. */
 .docs-proof-strip dl {
   gap: var(--cirth-border-width);
-  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 0;
   background: var(--cirth-card-border-color);
 }
@@ -3628,13 +3701,14 @@ details.docs-toc-top {
   font-size: var(--cirth-font-size-xl);
 }
 
-/* The `sm` step, not `xs`: this line carries inline <code>, and code is
-   0.875em of its parent — a 12px container puts it at 10.5px. Twelve
-   pixels is the floor for *rendered* text, so any shell container that
-   holds a shrinking child (small, code, kbd, samp) starts at 14. */
+/* Colour only. The size is the library's already: `small` is 0.875em of
+   its container (theme/_styles.scss) and this one sits at the root size, so
+   the shell's `sm` step was the same 14px written a second time — and it
+   tracks the container, which a rem step does not. (Fourteen is still the
+   floor for a shell container holding a shrinking child; that rule lives
+   where such a container is declared, not here.) */
 .docs-proof-strip dd small {
   color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-sm);
 }
 
 /* Four build panes, divided by the gap. The <figure> stays a <figure> —
@@ -3665,12 +3739,14 @@ details.docs-toc-top {
   font-size: var(--cirth-font-size-sm);
 }
 
+/* No `overflow-wrap` here or below: the library gives every `code` element
+   `anywhere` (content/_code.scss), which is the guard these two captions
+   want and is already in force. */
 .docs-build-comparison figcaption code {
   max-width: 60%;
   background: transparent;
   color: var(--cirth-color);
   font-size: var(--cirth-font-size-xs);
-  overflow-wrap: anywhere;
 }
 
 .docs-build-comparison iframe {
@@ -3796,16 +3872,20 @@ details.docs-toc-top {
   margin: 0.5rem 0 0;
 }
 
+/* The basis is the width. The swatch is empty, so there is no content for
+   an engine to size the box from and `flex: 0 0 1rem` decides it in
+   Chromium, Gecko and WebKit alike — measured in all three, alone and
+   alongside the rest of this cleanup. Not the same case as the header's
+   search field at the 36rem tier, which holds a control and is sized from
+   it. */
 .docs-theme-lab dd i {
   flex: 0 0 1rem;
-  width: 1rem;
   height: 1rem;
   border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
 .docs-theme-lab dd code {
   font-size: var(--cirth-font-size-xs);
-  overflow-wrap: anywhere;
 }
 
 @media (width < 48rem) {
