@@ -121,10 +121,14 @@ npm run docs:build    # build this site (input for the browser checks below)
 npm run check:behavior # interaction, reflow, user styles, and input parity across three engines
 npm run check:a11y    # axe WCAG 2.0–2.2 A/AA audit of every docs page
 npm run check:visual  # screenshot diff across docs pages and maintained presets
+npm run check:tooling # the dead-CSS audit measures a frozen copy of the build
 ```
 
-Two more tools run on demand rather than in CI — a rendering fingerprint and
-a dead-CSS audit. See [On demand](#on-demand-the-rendering-fingerprint-and-the-dead-css-audit)
+`check:tooling` is the only one of these that checks a tool rather than the
+library; it is seconds, and it runs locally rather than in CI because it
+rewrites `docs/dist` on purpose. Two more tools run on demand — a rendering
+fingerprint and a dead-CSS audit. See
+[On demand](#on-demand-the-rendering-fingerprint-and-the-dead-css-audit)
 below.
 
 The browser-based checks need the Playwright browsers once:
@@ -338,7 +342,14 @@ node scripts/audit-dead-css.js                       # the whole shell styleshee
 node scripts/audit-dead-css.js --filter ".docs-toc"  # one family of selectors
 node scripts/audit-dead-css.js --explain-order       # show what it visits first, and why
 node scripts/audit-dead-css.js --json .cache/dead.json
+node scripts/audit-dead-css.js --no-order --no-skip   # both optimisations off, same verdicts
 ```
+
+`--no-order` and `--no-skip` turn off the two things the survey buys — the
+richest-first visit order, and skipping a rendering that provably cannot
+see anything still undecided. They exist so those two can be *measured*
+against a run that differs in nothing else, and so a verdict can be
+reproduced without them.
 
 `audit-dead-css.js` uses the same corpus to test declarations one at a
 time: take it out of the live CSSOM, re-measure, put it back. It surveys
@@ -373,21 +384,77 @@ The last two categories are the reason to trust the first two. A report
 that cannot say "I did not measure this" will eventually persuade someone
 to delete a hover state.
 
-Two more things the corpus is not, both learned by acting on it and being
-caught: it is **one engine**, and Chromium's intrinsic sizing is not
-Gecko's — a `width` beside a `flex-basis` measured inert, and without it
-Firefox hung the menu toggle 6px off a 320px screen. And it is **one
-theme** — two declarations that resolve alike under the default need not
-under `playroom`. `check:behavior` runs three engines and `check:visual`
-renders the presets; run both after acting on this report, not instead of
-reading it.
+The corpus is **one engine and one theme**: Chromium, default preset. Both
+halves of that have already produced a false `inert` — a `width` beside a
+`flex-basis` that Chromium ignores and Gecko and WebKit do not, and a
+`font-family` pinning the shell's chrome to the system stack, which does
+nothing until a preset makes the page face rounded. Both were caught by
+`check:behavior` and `check:visual`, *after* the declarations had been
+deleted.
 
-A whole-sheet run takes about an hour: it re-probes anything still
+So nothing is deleted on the sweep's word alone. The sweep writes its
+`inert` list out, with the smallest set of renderings that can see each
+one, and a second pass re-probes exactly those in the configurations the
+sweep cannot enter:
+
+```sh
+node scripts/audit-dead-css.js --json .cache/dead-css.json
+node scripts/verify-dead-css.js --report .cache/dead-css.json
+```
+
+`verify-dead-css.js` runs Firefox, WebKit and the `playroom` preset over
+that plan — a few dozen renderings rather than 800, minutes rather than
+hours — and turns each `inert` into one of:
+
+- **inert** — nothing moved in any configuration. This is the verdict that
+  makes a declaration safe to delete.
+- **engine-dependent** — Chromium measured nothing, Firefox or WebKit did.
+  Keep it, and name the engine in a comment beside it.
+- **preset-dependent** — the default theme measured nothing, `playroom`
+  did.
+- **unverified** — the configuration never entered the rule's media
+  condition, never matched its selector, or could not take the declaration
+  out of the rule at all. Looked for, not measured; it keeps the sweep's
+  verdict and gains no confirmation.
+- **interacting** — inert alone and not inert with the others. The pass
+  ends by removing everything it just confirmed *at once*, because that is
+  what a cleanup does and a one-at-a-time probe cannot see it: two
+  declarations can each be dead only because the other is alive.
+  `.docs-header-search { width }` and `.docs-search-trigger { width }` are
+  exactly that pair, in Firefox and WebKit, and deleting both together is
+  how the 320px regression shipped the first time.
+
+It also samples one width the sweep does not: 320px, below the shell's own
+22.5rem tier, which is where the original regression was seen and the only
+width that enters that tier at all. A fifth width costs a fifth of the
+sweep and almost nothing here. (It has not yet changed a verdict on its
+own — the pair above was caught at 1440. It is cheap insurance against the
+band nothing else samples.)
+
+It is not a third browser suite. It reuses the audit's corpus, its in-page
+measurement and its vocabulary, and it answers the audit's question — *does
+this declaration do anything?* — in more places. The other two keep their
+own: `check:behavior` is what a page does, `check:visual` is what it looks
+like. Run them after acting on a report, not instead of reading it.
+
+Both tools measure a **copy** of the built site. `docs/dist` is a build
+output, and `npm run docs:build` replaces files in it — eleventy's
+passthrough copy replaces `styles/style.css` rather than editing it, so
+there is a window in which a page loads with no stylesheet at all. A sweep
+that runs for the better part of an hour cannot ask everyone else not to
+build, so it copies the tree once at startup (8 MB, well under a second),
+serves the copy, and removes it when the run ends — including when the run
+ends by throwing. `npm run check:tooling` is the proof: it rewrites
+`docs/dist` underneath an open corpus and checks the corpus never sees it.
+
+A whole-sheet run takes about forty minutes: it re-probes anything still
 undecided on every one of the 800 renderings, which is exactly what makes
-an "inert everywhere" verdict worth having. `--filter` narrows it to one
-selector family in a couple of minutes. Neither tool fails a build: an
-inert declaration is something for a person to look at, and a check that
-blocks a merge over one only teaches people to stop running it.
+an "inert everywhere" verdict worth having, and an inert declaration is
+precisely the one that survives to be probed everywhere. `--filter` narrows
+it to one selector family in a couple of minutes and is the right tool for
+everyday work; the full sweep is for a cleanup pass. Neither tool fails a
+build: an inert declaration is something for a person to look at, and a
+check that blocks a merge over one only teaches people to stop running it.
 
 ## What makes a good contribution
 
