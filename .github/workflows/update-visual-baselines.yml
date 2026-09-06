@@ -86,7 +86,31 @@ jobs:
       # tested. A retry rewrites the one snapshot and the step goes green;
       # a rendering that is genuinely broken still fails three times.
       - name: Regenerate baselines
-        run: npx playwright test --update-snapshots --retries=2
+        run: npx playwright test --update-snapshots --retries=2 --reporter=list,json
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: .cache/baseline-report.json
+
+      # The other half of --retries: a step that goes green while something
+      # in it is unreliable hides the unreliability. Every rendering that
+      # needed a retry is named here, and annotated on the run, so a flake
+      # is visible without reading the log. Deliberately not a failure —
+      # one flaky screenshot is not a reason to discard the other eight
+      # hundred — and `always()` so it still reports when the step above
+      # failed for real.
+      - name: Name any rendering that needed a retry
+        if: always()
+        run: node scripts/report-flaky.js .cache/baseline-report.json
+
+      - name: Upload the run report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: baseline-run-report
+          path: |
+            .cache/baseline-report.json
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
 
       # The push races anything else landing on the branch: regenerating
       # hundreds of screenshots takes minutes, and a second push in that

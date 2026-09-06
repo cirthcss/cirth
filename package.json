@@ -62,7 +62,7 @@
 		"check:variables": "node scripts/check-css-variables.js",
 		"check:doc-links": "node scripts/check-doc-links.js",
 		"check:size": "node scripts/check-css-size.js",
-		"check:tooling": "node scripts/check-audit-snapshot.js",
+		"check:tooling": "node scripts/check-audit-snapshot.js && node scripts/check-interaction-model.js && node scripts/check-flaky-report.js",
 		"check:sri": "node scripts/update-sri.js --check",
 		"check:types": "tsc --noEmit",
 		"check:visual": "playwright test",
