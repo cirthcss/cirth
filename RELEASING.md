@@ -143,9 +143,9 @@ one. It composes what already exists — it is not a second release engine.
 ### The steps
 
 ```sh
-# 1 — tag the master commit the release PR produced
-git tag v0.15.0-beta.2 <sha>
-git push origin v0.15.0-beta.2
+# 1 — tag the master commit the release PR produced, on the remote
+gh api repos/cirthcss/cirth/git/refs \
+  -f ref=refs/tags/v0.15.0-beta.2 -f sha=<master sha>
 
 # 2 — GitHub Release and artifacts
 gh workflow run package.yml --ref master -f tag=v0.15.0-beta.2
@@ -154,6 +154,13 @@ gh workflow run package.yml --ref master -f tag=v0.15.0-beta.2
 gh workflow run npm-publish.yml --ref master \
   -f tag=v0.15.0-beta.2 -f channel=beta -f mode=stage
 ```
+
+The tag is created **on the remote, at a named `master` commit**, rather
+than pushed from a local one. That is not a workaround for the pre-push
+guard — it is why the guard refuses a local `v*` push at all. A tag pushed
+from a clone points wherever that clone's history happens to put it; a tag
+created against an explicit SHA cannot point anywhere else, and the `v*`
+ruleset still requires an admin to create it.
 
 Both workflows are dispatched **from `master` with the tag as an input**,
 never "from" the tag. A `workflow_dispatch` against a tag ref runs the
@@ -475,3 +482,4 @@ this repository would be switched off within a week.
 | `npm run setup:claude-hooks` | install the Claude Code PreToolUse guard |
 | `npm run check:hooks` | confirm the Git guard is active here |
 | `npm run check:guards` | assert both guards refuse the right things |
+| `gh api repos/cirthcss/cirth/git/refs -f ref=refs/tags/vX.Y.Z -f sha=<sha>` | create a release tag at a named master commit |
