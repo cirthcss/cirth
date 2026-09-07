@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# Git LFS, unchanged. It lives here only because core.hooksPath is
+# all-or-nothing: .githooks/ replaces .git/hooks/ wholesale, so every hook
+# `git lfs install` wrote has to be carried across or it stops running.
+# See .githooks/pre-push for why this directory exists at all.
+
+command -v git-lfs >/dev/null 2>&1 || {
+	printf >&2 "\n%s\n\n" "This repository is configured for Git LFS but 'git-lfs' was not found on your path. If you no longer wish to use Git LFS, remove this hook by deleting the 'post-checkout' file in the hooks directory (set by 'core.hookspath'; usually '.git/hooks')."
+	exit 2
+}
+git lfs post-checkout "$@"
