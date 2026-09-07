@@ -1,5 +1,6 @@
 const fs = require("node:fs");
 const path = require("node:path");
+const { checkBuiltLinks } = require("./lib/check-built-links");
 
 const projectRoot = path.join(__dirname, "..");
 
@@ -130,13 +131,35 @@ getTrackedFiles(projectRoot).forEach((filename) => {
 	}
 });
 
+// Check C — the built site, which is the only place most of this site's
+// links exist at all. See scripts/lib/check-built-links.js: it is a
+// separate module so tests/doc-links.spec.js can run it against a fixture
+// with links deliberately broken in each of the four ways.
+const built = checkBuiltLinks({
+	root: path.join(projectRoot, "docs/dist"),
+	reportRoot: projectRoot,
+});
+violations.push(...built.violations);
+
 if (violations.length > 0) {
 	console.error("[@cirthcss/cirth] Broken documentation references:\n");
 	violations.forEach((violation) => {
 		console.error(`- ${violation}`);
 	});
 
+	if (violations.some((violation) => violation.startsWith(`docs${path.sep}dist`))) {
+		// docs/dist is gitignored and is not rebuilt by `npm run lint`, so a
+		// finding there can be a stale build rather than a broken link.
+		console.error(
+			"\nFindings under docs/dist are read from the last build. If that build\nis older than your changes, run `npm run docs:build` and check again.",
+		);
+	}
+
 	process.exit(1);
 }
 
-console.log("[@cirthcss/cirth] Documentation links check passed");
+console.log(
+	built.checked === 0
+		? "[@cirthcss/cirth] Documentation links check passed (sources only — docs/dist is not built)"
+		: `[@cirthcss/cirth] Documentation links check passed (sources, and ${built.checked} built pages)`,
+);

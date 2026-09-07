@@ -84,6 +84,10 @@ $popover-selector: '[popover=""], [popover="auto"], [popover="hint"]';
     box-shadow: var(--cirth-popover-box-shadow);
     color: var(--cirth-popover-color);
 
+    > :last-child {
+      margin-bottom: 0;
+    }
+
     // Discrete transitions and @starting-style are what let an element
     // fade in and back out of display: none without a script toggling
     // classes for it. Both are inside the floor; prefers-reduced-motion is

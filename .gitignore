@@ -141,6 +141,15 @@ $RECYCLE.BIN/
 # Local working notes
 /TODO.md
 /ISSUES-PROPOSED.md
+/HANDOFF.md
+
+# Ad-hoc before/after review captures. Unlike docs/screenshots/native-baseline
+# (written by scripts/capture-brand-assets.js) and docs/screenshots/refinement,
+# these are one-off comparison dumps from a review pass: nothing in the build,
+# the docs, or a script reads them, so they are local evidence rather than
+# project assets.
+/docs/screenshots/consolidation/
+/docs/screenshots/native-baseline-consistency/
 
 # Ad-hoc manual QA scratch files (e.g. reproducing a reported bug's exact
 # markup to eyeball in a real browser) — local only, not the published

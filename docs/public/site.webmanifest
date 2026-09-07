@@ -1,0 +1,14 @@
+{
+  "name": "Cirth documentation",
+  "short_name": "Cirth",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#f8f6f3",
+  "background_color": "#f8f6f3",
+  "display": "standalone"
+}

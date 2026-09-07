@@ -1,0 +1,48 @@
+#!/bin/sh
+#
+# Refuses a direct push to a protected branch or a release tag, then hands
+# over to Git LFS.
+#
+# Two things share this file because `core.hooksPath` is all-or-nothing:
+# pointing it at .githooks/ stops Git from reading .git/hooks/ at all, and
+# that is where `git lfs install` put its own pre-push. This repository
+# keeps its visual baselines in LFS, so a guard that silently dropped the
+# LFS hook would stop uploading them — the push would succeed and the
+# objects would be missing. Every hook in this directory therefore ends by
+# calling the LFS one it replaced.
+#
+# Not a security boundary: `--no-verify` skips it, and so does repointing
+# core.hooksPath. It stops an accident and makes the canonical path the
+# easy one. GitHub rulesets are what actually refuse.
+
+set -e
+
+# The pre-push protocol feeds refs on stdin, and LFS needs them too, so
+# read once and replay.
+refs=$(cat)
+
+# The guard is written in Node so that it and the Claude Code hook share
+# one definition of what is protected. Without Node the guard cannot run,
+# and a guard that cannot run must refuse rather than wave the push
+# through — but it should say why, instead of "command not found".
+if ! command -v node >/dev/null 2>&1; then
+	printf >&2 "\n%s\n%s\n\n" \
+		"The Cirth pre-push guard needs Node, which is not on your PATH." \
+		"Install it, or skip this hook deliberately and knowingly."
+	exit 1
+fi
+
+if [ -n "$refs" ]; then
+	verdict=$(printf '%s\n' "$refs" | node "$(dirname "$0")/../scripts/pre-push-guard.js") || {
+		status=$?
+		[ -n "$verdict" ] && printf '%s\n' "$verdict" >&2
+		exit $status
+	}
+fi
+
+command -v git-lfs >/dev/null 2>&1 || {
+	printf >&2 "\n%s\n\n" "This repository is configured for Git LFS but 'git-lfs' was not found on your path. If you no longer wish to use Git LFS, remove this hook by deleting the 'pre-push' file in the hooks directory (set by 'core.hookspath'; usually '.git/hooks')."
+	exit 2
+}
+
+printf '%s\n' "$refs" | git lfs pre-push "$@"

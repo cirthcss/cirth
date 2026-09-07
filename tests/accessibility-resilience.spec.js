@@ -53,7 +53,8 @@ const openPage = async (page, target, theme) => {
 	await waitForTheme(page, theme);
 	await page.evaluate(() => document.fonts.ready);
 	await page.evaluate(
-		() => new Promise((resolve) => requestAnimationFrame(() => resolve(undefined))),
+		() =>
+			new Promise((resolve) => requestAnimationFrame(() => resolve(undefined))),
 	);
 };
 
@@ -118,7 +119,8 @@ const measure = (page) =>
 
 				const hasDirectText = [...element.childNodes].some(
 					(node) =>
-						node.nodeType === Node.TEXT_NODE && Boolean(node.textContent?.trim()),
+						node.nodeType === Node.TEXT_NODE &&
+						Boolean(node.textContent?.trim()),
 				);
 				if (!hasDirectText) return false;
 
@@ -337,6 +339,66 @@ for (const theme of themeVariants) {
 				});
 				expect(focus.style).not.toBe("none");
 				expect(focus.width).toBeGreaterThan(0);
+
+				await openPage(page, "index.html", theme);
+				for (const target of [
+					// A control inside one of the home page's live stages, the
+					// tab that chooses which stage that is, and a FAQ trigger:
+					// the shapes of focusable the page has outside the shell
+					// chrome. The stage control is taken from the theme
+					// showcase rather than the example deck, because the deck
+					// shows one example at a time and the one it opens on has
+					// no form control in it.
+					page.locator(".docs-theme-showcase .docs-stage-preview input").first(),
+					page.locator("[data-docs-tab]").first(),
+					page.locator(".docs-faq-list summary").first(),
+				]) {
+					await page.keyboard.press("Tab");
+					await target.focus();
+					expect(
+						await target.evaluate((element) =>
+							element.matches(":focus-visible"),
+						),
+					).toBe(true);
+					const targetFocus = await target.evaluate((element) => {
+						const style = getComputedStyle(element);
+						return {
+							style: style.outlineStyle,
+							width: Number.parseFloat(style.outlineWidth),
+						};
+					});
+					expect(targetFocus.style).not.toBe("none");
+					expect(targetFocus.width).toBeGreaterThan(0);
+				}
+
+				// The showcase strip says which example is showing with a
+				// background, and a background is the first thing forced
+				// colors takes away — both states came out Canvas, and the
+				// only cue left was `aria-selected`, which a sighted reader
+				// does not get. Every button's transparent border is forced
+				// to CanvasText as well, so the border cannot carry it
+				// either: the selected tab has to differ in a system colour.
+				const strip = await page
+					.locator("[data-docs-tab]")
+					.evaluateAll((tabs) =>
+						tabs.map((tab) => {
+							const style = getComputedStyle(tab);
+							return {
+								selected: tab.getAttribute("aria-selected") === "true",
+								paint: `${style.backgroundColor}|${style.color}`,
+							};
+						}),
+					);
+				const chosen = strip.filter((tab) => tab.selected);
+				const rest = strip.filter((tab) => !tab.selected);
+				expect(chosen, "one tab is selected").toHaveLength(1);
+				expect(rest.length).toBeGreaterThan(0);
+				for (const tab of rest) {
+					expect(
+						tab.paint,
+						`${theme}: the selected tab is distinguishable in forced colors`,
+					).not.toBe(chosen[0].paint);
+				}
 
 				await openPage(page, "components/loading/index.html", theme);
 				const spinnerColor = await page

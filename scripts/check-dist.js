@@ -3,7 +3,11 @@ const fs = require("node:fs");
 const path = require("node:path");
 const postcss = require("postcss");
 const selectorParser = require("postcss-selector-parser");
-const { listPresetNames } = require("./lib/presets");
+const {
+	presetBuilds,
+	rootBuilds,
+	scopeClass,
+} = require("./lib/dist-manifest");
 
 const projectRoot = path.join(__dirname, "..");
 const distDir = path.join(projectRoot, "dist");
@@ -20,30 +24,13 @@ const lightningcss = path.join(
 //   the single exception in the scoped variant);
 // - scoped builds must not emit any rule outside the `.cirth` subtree;
 // - presets must only override custom properties on theme roots.
-const scopeClass = "cirth";
+//
+// Which files exist at all is scripts/lib/dist-manifest.js: the same list
+// the npm tarball is checked against, so "the build produced it" and "the
+// package ships it" cannot come to mean different sets.
+const presets = presetBuilds();
 
-const rootBuilds = [
-	{ name: "cirth", classless: false, scoped: false },
-	{ name: "cirth.classless", classless: true, scoped: false },
-	{ name: "cirth.scoped", classless: false, scoped: true },
-	{ name: "cirth.classless.scoped", classless: true, scoped: true },
-	// The print pass ships separately (see src/cirth.print*.scss). It is a
-	// root build like the others and owes the same invariants: a classless
-	// print sheet must stay class-free, a scoped one must stay inside the
-	// wrapper. Nothing here treats it as optional — a print stylesheet that
-	// leaked a class selector would break the classless promise on paper
-	// just as surely as on screen.
-	{ name: "cirth.print", classless: false, scoped: false },
-	{ name: "cirth.print.classless", classless: true, scoped: false },
-	{ name: "cirth.print.scoped", classless: false, scoped: true },
-	{ name: "cirth.print.classless.scoped", classless: true, scoped: true },
-];
-
-const presetBuilds = listPresetNames().map((name) => ({
-	name: `presets/${name}`,
-}));
-
-const allFiles = [...rootBuilds, ...presetBuilds].flatMap(({ name }) => [
+const allFiles = [...rootBuilds, ...presets].flatMap(({ name }) => [
 	`${name}.css`,
 	`${name}.min.css`,
 ]);
@@ -257,7 +244,7 @@ const isPresetSelectorNode = (node) => {
 	}
 };
 
-for (const { name } of presetBuilds) {
+for (const { name } of presets) {
 	const file = `${name}.css`;
 	if (!fs.existsSync(path.join(distDir, file))) {
 		continue;

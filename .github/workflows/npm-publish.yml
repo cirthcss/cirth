@@ -1,44 +1,200 @@
 name: Publish npm
 
-# Deliberately dispatched against an already-pushed vX.Y.Z tag. Tag pushes do
-# not publish on their own: this keeps a delayed tag webhook from racing or
-# duplicating a release that was started manually (gh#100).
+# Dispatched from master with the tag as an input — never dispatched "from"
+# the tag itself.
+#
+# That distinction is the point of this file. A workflow_dispatch against a
+# tag ref runs the workflow file *as it exists on that tag*, so a tag cut on
+# a working branch would bring its own copy of these rules, and the branch
+# could simply delete the check that says it may not publish. Running from
+# master means the rules always come from master, and the tag is only data
+# to be validated.
+#
+# The tag is still not published on push: a release stays a deliberate act,
+# which also keeps a delayed tag webhook from racing or duplicating one
+# (gh#100).
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: npm dist-tag to publish with
+        description: Release tag to publish, e.g. v0.15.0-beta.1
         required: true
-        default: latest
+        type: string
+      channel:
+        description: >-
+          npm dist-tag. Must be the version's own prerelease identifier —
+          `latest` only for a version with no prerelease.
+        required: true
+        type: choice
+        options:
+          - beta
+          - rc
+          - latest
+      mode:
+        description: >-
+          stage = submit for approval (npm stage approve publishes it);
+          publish = go live immediately.
+        required: true
+        default: stage
+        type: choice
+        options:
+          - stage
+          - publish
 
 permissions:
   contents: read
+  # OIDC, for npm trusted publishing. No npm token is stored anywhere: the
+  # registry trusts this repository and this workflow filename, and the
+  # identity is minted per run. Provenance is generated automatically on
+  # this path, so `--provenance` is not passed.
   id-token: write
+  # Reading whether CI concluded successfully on the release commit.
+  actions: read
+
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
 
 jobs:
   publish:
-    name: Publish package
-    if: startsWith(github.ref, 'refs/tags/v')
+    name: Publish ${{ inputs.tag }} (${{ inputs.channel }})
     runs-on: ubuntu-latest
+    # A release may only be started from master. Everything below verifies
+    # the *commit*; this verifies the rules doing the verifying.
+    if: github.ref == 'refs/heads/master'
 
     steps:
-      - name: Checkout
+      - name: Checkout the tag
         uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag }}
+          # Full history, because the release gate is an ancestry question
+          # and a shallow clone cannot answer it.
+          fetch-depth: 0
+
+      - name: Fetch master
+        run: git fetch --no-tags origin master:refs/remotes/origin/master
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: "24.18"
-          package-manager-cache: false
+          cache: npm
           registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
         run: npm ci
 
+      # --- Gate 1: the release is what it claims to be --------------------
+      # Dispatch inputs reach the shell through the environment, never
+      # through `${{ }}` interpolation into a command line: a value that
+      # happened to contain shell syntax would otherwise be run, not read.
+      - name: Validate tag, version, channel and master ancestry
+        id: release
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+          RELEASE_CHANNEL: ${{ inputs.channel }}
+        run: >
+          npm run check:release --
+          --tag "$RELEASE_TAG"
+          --channel "$RELEASE_CHANNEL"
+          --base origin/master
+
+      # --- Gate 2: master was already green at this commit ----------------
+      # The browser suites — behavior, a11y, and the visual baselines, which
+      # are Linux-specific Git LFS objects — run on every push in CI. What
+      # matters for a release is that they passed *on this exact commit*, so
+      # this reads that result rather than spending twenty minutes
+      # reproducing it. If CI was cancelled or never ran, this fails and the
+      # fix is to re-run CI, not to lower the bar.
+      - name: Require a green CI run on the release commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMMIT: ${{ steps.release.outputs.commit }}
+        run: |
+          conclusions=$(gh api \
+            "repos/${GITHUB_REPOSITORY}/actions/workflows/ci.yml/runs?head_sha=${COMMIT}&status=completed&per_page=100" \
+            --jq '[.workflow_runs[].conclusion] | join(" ")')
+
+          echo "CI runs on ${COMMIT}: ${conclusions:-none}"
+
+          case " ${conclusions} " in
+            *" success "*)
+              echo "✓ CI concluded successfully on the release commit."
+              ;;
+            *)
+              echo "::error::No successful CI run for ${COMMIT}. A release" \
+                   "must come from a commit master has already proved green." >&2
+              exit 1
+              ;;
+          esac
+
+      # --- Gate 3: this tree still passes, in a clean checkout ------------
+      # Not a repeat of gate 2: these run against the tree npm is about to
+      # publish from, in a checkout with nothing left over from development.
+      - name: Lint
+        run: npm run lint
+
       - name: Build CSS
         run: npm run build
 
-      - name: Publish to npm
-        run: npm publish --access public --tag "${NPM_DIST_TAG}"
+      - name: Check dist invariants
+        run: npm run check:dist
+
+      - name: Check CSS size budget
+        run: npm run check:size
+
+      - name: Build docs
+        run: npm run docs:build
+
+      - name: Check release tooling
+        run: npm run check:tooling
+
+      # --- Gate 4: what npm would actually hand a consumer ---------------
+      - name: Check package contents
+        run: npm run check:package
+
+      - name: Install the tarball into a clean project
+        run: npm run check:consumer
+
+      # --- Publish --------------------------------------------------------
+      - name: Stage for approval
+        if: inputs.mode == 'stage'
         env:
-          NPM_DIST_TAG: ${{ github.event.inputs.tag || 'latest' }}
+          NPM_DIST_TAG: ${{ steps.release.outputs.dist-tag }}
+        run: |
+          npm stage publish --tag "${NPM_DIST_TAG}"
+          echo "::notice::Staged under the '${NPM_DIST_TAG}' dist-tag." \
+               "Nothing is live yet: run 'npm stage list @cirthcss/cirth'," \
+               "inspect it, then 'npm stage approve <id>' with 2FA."
+
+      - name: Publish
+        if: inputs.mode == 'publish'
+        env:
+          NPM_DIST_TAG: ${{ steps.release.outputs.dist-tag }}
+        run: npm publish --access public --tag "${NPM_DIST_TAG}"
+
+      - name: Summary
+        env:
+          NPM_DIST_TAG: ${{ steps.release.outputs.dist-tag }}
+          COMMIT: ${{ steps.release.outputs.commit }}
+          VERSION: ${{ steps.release.outputs.version }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          RELEASE_MODE: ${{ inputs.mode }}
+        run: |
+          {
+            echo "### ${RELEASE_TAG}"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| version | \`${VERSION}\` |"
+            echo "| commit | \`${COMMIT}\` |"
+            echo "| dist-tag | \`${NPM_DIST_TAG}\` |"
+            echo "| mode | \`${RELEASE_MODE}\` |"
+            echo
+            if [ "${RELEASE_MODE}" = "stage" ]; then
+              echo "Staged, not published. Approve it with 2FA to go live."
+            else
+              echo "Published. \`npm install @cirthcss/cirth@${NPM_DIST_TAG}\`"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

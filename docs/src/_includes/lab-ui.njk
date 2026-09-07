@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{{ labLabel }} build — authentic Cirth output</title>
+		<script>
+			// Documentation-only enhancement: the stylesheet below remains the
+			// real Cirth build and the complete UI is readable without JavaScript.
+			// This script only mirrors the requested light/dark scheme before paint.
+			(function () {
+				var requested = new URLSearchParams(location.search).get("theme");
+				document.documentElement.setAttribute(
+					"data-theme",
+					requested === "dark" ? "dark" : "light",
+				);
+			})();
+		</script>
+		<link rel="stylesheet" href="/styles/generated/{{ labStylesheet }}" />
+	</head>
+	{#- inert: these pages exist only to be embedded as a rendering
+	    specimen (layout: false, excluded from collections). Without it the
+	    sample sign-in form joins the host page's tab order — four focus
+	    stops inside a picture — and a screen reader announces a working
+	    sign-in form on the Cirth home page. The iframe's title carries the
+	    accurate description instead. -#}
+	<body inert>
+		{% if labScoped %}<div class="cirth">{% endif %}
+		<main{% if not labClassless %} class="container"{% endif %}>
+			<article>
+				<h2>Sign in</h2>
+				<form>
+					<label>
+						Email
+						<input type="email" name="email" autocomplete="email" required />
+					</label>
+					<label>
+						Password
+						<input type="password" name="password" autocomplete="current-password" required />
+					</label>
+					<label><input type="checkbox" checked /> Remember me</label>
+					<button>Sign in</button>
+				</form>
+			</article>
+		</main>
+		{% if labScoped %}</div>{% endif %}
+	</body>
+</html>

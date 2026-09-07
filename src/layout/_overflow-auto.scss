@@ -7,5 +7,16 @@
 
   #{$parent-selector} .overflow-auto {
     overflow: auto;
+
+    // A scroll container has to be keyboard reachable to be operable at
+    // all (WCAG 2.1.1; it is what axe's scrollable-region-focusable
+    // reports), so authors put `tabindex="0"` on this utility. Cirth
+    // shipped the container but not the indicator, and the browser's own
+    // 1px ring is the one focus treatment on the page that is not the
+    // framework's. Painting it here means the affordance the library asks
+    // for arrives finished.
+    &:focus-visible {
+      outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
+    }
   }
 }

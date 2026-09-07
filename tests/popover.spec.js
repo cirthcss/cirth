@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
+const { setContent } = require("./helpers/render");
 
 // gh#51 — [data-tooltip] is gone and [popover] took its place.
 //
@@ -42,7 +43,7 @@ const markup = `
 `;
 
 /** @param {import("@playwright/test").Page} page */
-const render = (page) => page.setContent(`<style>${css}</style>${markup}`);
+const render = (page) => setContent(page, `<style>${css}</style>${markup}`);
 
 /** @param {import("@playwright/test").Page} page @param {string} id @param {string} property */
 const styleOf = (page, id, property) =>
@@ -141,7 +142,7 @@ test("it is painted as a sheet, not as bare text", async ({ page }) => {
 });
 
 test("a manual popover is left to whoever is driving it", async ({ page }) => {
-	await page.setContent(
+	await setContent(page,
 		`<style>${css}</style><div id="chrome" popover="manual">Tooling overlay.</div>`,
 	);
 	await page.evaluate(() => document.getElementById("chrome")?.showPopover());
@@ -184,7 +185,7 @@ test("it stays centred even when page CSS zeroes its margin", async ({
 	// the popover happens to be it. An author who names the element outright
 	// still outranks the component, and should — that is them positioning it
 	// on purpose, not a layout rule catching it by accident.
-	await page.setContent(
+	await setContent(page,
 		`<style>${css}</style>
 		<style>.preview > :last-child { margin-block-end: 0; margin-inline-end: 0 }</style>
 		<div class="preview">

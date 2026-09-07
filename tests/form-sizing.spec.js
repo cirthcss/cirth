@@ -1,15 +1,15 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
+const { setContent } = require("./helpers/render");
 
 // How tall form controls come out, which is two separate questions.
 //
 // The first is target size, checked as a floor rather than as a
 // coincidence — and there are two thresholds, deliberately. Outside a nav
 // it is 44px, WCAG 2.5.5 Target Size (Enhanced), which this project treats
-// as a product requirement. Inside a nav it is 24px, WCAG 2.5.8 Target
-// Size (Minimum): a navigation row is compact by design, and Cirth lets it
-// opt down to the AA threshold rather than out of any threshold at all.
+// as a product requirement. Inside a nav it is a 40px compact band, still
+// above the 24px WCAG 2.5.8 Target Size (Minimum) threshold.
 //
 // An input is pinned to 44px by an explicit height. A select grows with its
 // longest option and a textarea with its rows, so neither can be pinned the
@@ -25,7 +25,7 @@ const css = fs.readFileSync(
 );
 
 const TARGET = 44;
-const TARGET_NAV = 24;
+const TARGET_NAV = 40;
 
 /** @param {import("@playwright/test").Page} page */
 const heightOf = (page, /** @type {string} */ id) =>
@@ -39,7 +39,7 @@ for (const fontSize of ["1rem", "0.875rem", "0.75rem"]) {
 	test(`controls stay at least ${TARGET}px at font-size ${fontSize}`, async ({
 		page,
 	}) => {
-		await page.setContent(
+		await setContent(page,
 			`<style>${css}</style>
 			<main class="container" style="font-size: ${fontSize}">
 				<input id="text" type="text" style="font-size: inherit">
@@ -54,6 +54,70 @@ for (const fontSize of ["1rem", "0.875rem", "0.75rem"]) {
 				await heightOf(page, id),
 				`${id} meets the target size`,
 			).toBeGreaterThanOrEqual(TARGET);
+		}
+	});
+}
+
+for (const customMetrics of [false, true]) {
+	test(`equivalent controls share their geometry${
+		customMetrics ? " after a runtime metric override" : ""
+	}`, async ({ page }) => {
+		await setContent(page,
+			`<style>${css}</style>
+			<main class="container"${
+				customMetrics
+					? ' style="--cirth-line-height: 1.25; --cirth-form-element-spacing-vertical: 0.75rem"'
+					: ""
+			}>
+				<input id="text" type="text" value="Control">
+				<select id="select"><option>Control</option></select>
+				<textarea id="textarea" rows="1">Control</textarea>
+				<button id="button" type="button">Control</button>
+			</main>`,
+		);
+
+		const geometry = await page.evaluate(() =>
+			["text", "select", "textarea", "button"].map((id) => {
+				const element = document.getElementById(id);
+				if (!element) {
+					throw new Error(`missing ${id}`);
+				}
+				const style = getComputedStyle(element);
+				return {
+					id,
+					height: element.getBoundingClientRect().height,
+					fontSize: style.fontSize,
+					lineHeight: style.lineHeight,
+					paddingTop: style.paddingTop,
+					paddingBottom: style.paddingBottom,
+					borderTopWidth: style.borderTopWidth,
+					borderBottomWidth: style.borderBottomWidth,
+				};
+			}),
+		);
+
+		const reference = geometry[0];
+		for (const control of geometry) {
+			expect(control.height, `${control.id} keeps the 44px floor`).toBeGreaterThanOrEqual(
+				TARGET,
+			);
+			expect(control.height, `${control.id} aligns with the input`).toBeCloseTo(
+				reference.height,
+				1,
+			);
+			for (const property of /** @type {const} */ ([
+				"fontSize",
+				"lineHeight",
+				"paddingTop",
+				"paddingBottom",
+				"borderTopWidth",
+				"borderBottomWidth",
+			])) {
+				expect(
+					control[property],
+					`${control.id} shares ${property}`,
+				).toBe(reference[property]);
+			}
 		}
 	});
 }
@@ -87,7 +151,7 @@ const rowsVisible = (page, /** @type {string} */ id) =>
 
 /** @param {import("@playwright/test").Page} page */
 const renderTextareas = (page) =>
-	page.setContent(
+	setContent(page,
 		`<style>${css}</style>
 		<main class="container">
 			<textarea id="default"></textarea>
@@ -138,7 +202,7 @@ test(`a nav may be compact, but never below ${TARGET_NAV}px`, async ({
 	// `height: auto` is how the nav escapes the input's fixed height, and it
 	// cannot escape a min-block-size the same way — so the nav restates the
 	// floor at the AA minimum instead of inheriting the AAA one.
-	await page.setContent(
+	await setContent(page,
 		`<style>${css}</style>
 		<nav style="font-size: 0.75rem">
 			<ul>
@@ -169,7 +233,7 @@ test("the file input's button is not forced past the input holding it", async ({
 	// content box of the 44px input it lives in, so it spilled out. The
 	// target here is the input — that is what the pointer is aimed at, and
 	// it meets the size on its own; the pseudo-element is a part of it.
-	await page.setContent(
+	await setContent(page,
 		`<style>${css}</style><main class="container"><input id="file" type="file"></main>`,
 	);
 

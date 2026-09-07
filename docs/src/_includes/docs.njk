@@ -3,7 +3,38 @@ layout: base.njk
 ---
 {% set pageHeaders = content | headings %}
 {% set pageIndex = nav.flatPages | findPageIndex(page.url) %}
-<main id="main-content" class="container">
+<main id="main-content" class="container docs-page-shell">
+	<div class="docs-mobile-tools">
+		<details class="docs-mobile-nav">
+			<summary>Browse documentation</summary>
+			<nav aria-label="Mobile documentation navigation">
+				{% for group in nav.sidebar %}
+					<section>
+						<strong>{{ group.text }}</strong>
+						<ul>
+							{% for item in group.items %}
+								<li><a href="{{ item.link }}"{% if page.url == (item.link | withSlash) %} aria-current="page"{% endif %}>{{ item.text }}</a></li>
+							{% endfor %}
+						</ul>
+					</section>
+				{% endfor %}
+			</nav>
+		</details>
+		{% if pageHeaders.length > 1 %}
+			<details class="docs-toc-top">
+				<summary>On this page</summary>
+				<nav aria-label="On this page">
+					<ul>
+						{% for header in pageHeaders %}
+							<li class="docs-toc-level-{{ header.depth }}">
+								<a href="#{{ header.slug }}">{{ header.text }}</a>
+							</li>
+						{% endfor %}
+					</ul>
+				</nav>
+			</details>
+		{% endif %}
+	</div>
 	<div class="docs-layout">
 		<aside class="docs-sidebar">
 			<nav aria-label="docs navigation">
@@ -21,19 +52,7 @@ layout: base.njk
 				{% endfor %}
 			</nav>
 		</aside>
-		<div class="docs-content">
-			{% if pageHeaders.length > 1 %}
-				<nav class="docs-toc-top" aria-label="On this page">
-					<strong>On this page</strong>
-					<ul>
-						{% for header in pageHeaders %}
-							<li class="docs-toc-level-{{ header.depth }}">
-								<a href="#{{ header.slug }}">{{ header.text }}</a>
-							</li>
-						{% endfor %}
-					</ul>
-				</nav>
-			{% endif %}
+		<div class="docs-content" data-pagefind-body>
 			{{ content | safe }}
 			{% if pageIndex > -1 %}
 				{% set prevPage = nav.flatPages[pageIndex - 1] if pageIndex > 0 %}
@@ -87,11 +106,15 @@ layout: base.njk
 				else break;
 			}
 			const activeSlug = current || (headings[0] ? headings[0].id : "");
+			// aria-current only: the framework paints its one registered
+			// edge on the inline-start rail from it, and the stylesheet
+			// deliberately adds no second marker of its own.
 			for (const link of links) {
-				const active = link.dataset.slug === activeSlug;
-				link.classList.toggle("docs-toc-active", active);
-				if (active) link.setAttribute("aria-current", "true");
-				else link.removeAttribute("aria-current");
+				if (link.dataset.slug === activeSlug) {
+					link.setAttribute("aria-current", "true");
+				} else {
+					link.removeAttribute("aria-current");
+				}
 			}
 		};
 

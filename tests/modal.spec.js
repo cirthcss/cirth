@@ -1,6 +1,11 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
+const { setContent } = require("./helpers/render");
+const {
+	layoutViewport,
+	withAndWithoutScrollbar,
+} = require("./helpers/viewport");
 
 // gh#64 — the modal no longer asks an integrator's script for anything.
 //
@@ -44,7 +49,7 @@ const markup = `
 `;
 
 /** @param {import("@playwright/test").Page} page */
-const render = (page) => page.setContent(`<style>${css}</style>${markup}`);
+const render = (page) => setContent(page, `<style>${css}</style>${markup}`);
 
 /** @param {import("@playwright/test").Page} page */
 const measureWidth = (page) =>
@@ -169,6 +174,45 @@ test("locking the page does not shift the layout", async ({ page }) => {
 	expect(await measureWidth(page)).toBe(before);
 });
 
+test("the modal card sizes fluidly from one configurable cap", async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 1280, height: 720 });
+	await render(page);
+	await page.evaluate(() => {
+		/** @type {HTMLDialogElement | null} */
+		const sheet = document.querySelector("#sheet");
+		sheet?.showModal();
+	});
+
+	const article = page.locator("#sheet > article");
+	const spacing = 16;
+	await expect(article).toHaveCSS("width", "700px");
+
+	// Below the cap the card is the viewport less one --cirth-spacing on
+	// each side, and the viewport it means is the layout viewport — the box
+	// `width: 100%` resolves against. Asserting a literal 358px here read
+	// the 390 straight off setViewportSize(), which is the window; on a
+	// platform with classic scrollbars the layout viewport is 15px narrower
+	// and the card was correctly 343. Both phone widths below are that same
+	// phone (helpers/viewport.js), and the expected width is derived, so the
+	// relationship is still pinned exactly.
+	for (const width of withAndWithoutScrollbar(390)) {
+		await page.setViewportSize({ width, height: 720 });
+		const viewport = await layoutViewport(page);
+		await expect(article, `card width at ${width}px`).toHaveCSS(
+			"width",
+			`${viewport.width - spacing * 2}px`,
+		);
+	}
+
+	await page.addStyleTag({
+		content: ":root { --cirth-modal-max-width: 30rem; }",
+	});
+	await page.setViewportSize({ width: 1280, height: 720 });
+	await expect(article).toHaveCSS("width", "480px");
+});
+
 // Every context in this suite runs under prefers-reduced-motion: reduce,
 // which is the right default and also collapses the very transitions these
 // two tests are about. The first opts out deliberately; the second checks
@@ -256,7 +300,7 @@ test("a closed dialog renders nothing", async ({ page }) => {
 test("the close button is a full-size target around a small icon", async ({
 	page,
 }) => {
-	await page.setContent(
+	await setContent(page,
 		`<style>${css}</style>
 		<dialog id="sheet" open>
 			<article>

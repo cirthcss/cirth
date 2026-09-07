@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
+const { setContent } = require("./helpers/render");
 
 // gh#76 — a nested list gets a small top margin and no bottom margin, so
 // the gap before the next parent item matches the rhythm inside the nested
@@ -55,7 +56,7 @@ const render = async (page, build) => {
 		);
 	}
 
-	await page.setContent(
+	await setContent(page,
 		build.scope ? `<div class="${build.scope}">${markup}</div>` : markup,
 	);
 	await page.addStyleTag({ path: stylesheet });

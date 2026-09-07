@@ -1,6 +1,5 @@
-@use "sass:map";
-@use "../breakpoints" as *;
 @use "../config" as *;
+@use "../helpers/metrics";
 @use "../helpers/selectors";
 
 /**
@@ -68,16 +67,21 @@
       $close-selector: ".close, :is(a, button)[rel=prev]";
     }
 
+    // The close control grows invisibly to the size of a real button, so
+    // reproduce the button's whole block size -- including the 2.75rem
+    // WCAG 2.5.5 floor, not just the calc branch it happens to exceed at
+    // the default type scale (content/_button.scss). Taking the calc alone
+    // left the target a pixel short the moment the box got smaller than
+    // the floor.
+    $button-block-size: metrics.$control-block-size;
     $close-offset: calc(
-      (
-          (var(--cirth-font-size-md) * var(--cirth-line-height)) +
-            (var(--cirth-form-element-spacing-vertical) * 2) +
-            (var(--cirth-border-width) * 2) - var(--cirth-font-size-md)
-        ) /
-        2
+      (#{$button-block-size} - var(--cirth-font-size-md)) / 2
     );
 
-    width: 100%;
+    width: min(
+      calc(100% - var(--cirth-spacing) * 2),
+      var(--cirth-modal-max-width)
+    );
 
     // dvh tracks mobile Safari's collapsing URL bar, so the footer stays
     // reachable (upstream #514); the vh line is the older-browser fallback
@@ -85,18 +89,6 @@
     max-height: calc(100dvh - var(--cirth-spacing) * 2);
     margin: var(--cirth-spacing);
     overflow: auto;
-
-    @if map.get($breakpoints, "sm") {
-      @media (min-width: map.get(map.get($breakpoints, "sm"), "breakpoint")) {
-        max-width: map.get(map.get($breakpoints, "sm"), "viewport");
-      }
-    }
-
-    @if map.get($breakpoints, "md") {
-      @media (min-width: map.get(map.get($breakpoints, "md"), "breakpoint")) {
-        max-width: map.get(map.get($breakpoints, "md"), "viewport");
-      }
-    }
 
     > header {
       > * {
@@ -158,8 +150,13 @@
       // --cirth-color: var(--cirth-primary-inverse) — white — because a
       // button is normally a filled accent surface. The close control keeps
       // the box but drops the fill, so currentColor would paint a white
-      // glyph on the dialog header. The muted ink is what the baked stroke
-      // was approximating anyway; the opacity above still carries the
+      // glyph on the dialog header.
+
+      // --cirth-ink is the general answer to that trap now (theme/_dual.scss:
+      // the page's ink under a name no component may rebind), but this
+      // control does not want the page's ink — it wants the subordinate one.
+      // The muted ink is what the baked stroke was approximating anyway, and
+      // nothing shadows it either; the opacity above still carries the
       // resting/hover distinction.
       &::before {
         display: block;

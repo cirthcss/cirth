@@ -2,9 +2,18 @@
 
 // Everything a :visited repaint has to stand aside for: the states that
 // own the link color while they last, the color variants that are already
-// a different color group, and navigation. Menu entries that gray out one
-// by one as someone browses read as broken rather than as oriented, so
-// the visited cue is for content links only (gh#58).
+// a different color group, navigation, and links that are components
+// rather than prose. Menu entries that gray out one by one as someone
+// browses read as broken rather than as oriented, so the visited cue is
+// for content links only (gh#58).
+// `:has(article)` is the same argument one level up: a link wrapped around
+// a card — the HTML-native way to make a whole card clickable — is a
+// surface with its own ink contract, not a phrase in a paragraph. Letting
+// the visited color inherit into it drains the card's heading to grey the
+// moment someone follows it, so a grid of cards ends up in two different
+// colors purely as a record of where the reader has been. The card keeps
+// the color its own component gave it, and the visited cue stays where it
+// carries meaning: in running text.
 // The color variants and the dropdown are class-based, so they only exist
 // to exclude in the builds that ship classes.
 $visited-class-exceptions: "";
@@ -14,7 +23,8 @@ $visited-class-exceptions: "";
 }
 
 $visited-exceptions: $visited-class-exceptions +
-  '[aria-current]:not([aria-current="false"]), :hover, :active, :focus, nav a';
+  '[aria-current]:not([aria-current="false"]), :hover, :active, :focus,' +
+  " nav a, :has(article)";
 
 /**
    * Link
@@ -99,6 +109,20 @@ $visited-exceptions: $visited-class-exceptions +
 #{$parent-selector}
   :where(a:not([role="button"])):visited:not(#{$visited-exceptions}) {
   color: var(--cirth-link-visited-color);
+}
+
+// A link wrapped around a card — the HTML-native way to make a whole card
+// clickable — takes the ink of the surface it wraps rather than the accent.
+// The argument is the one already made above for :visited, one step
+// earlier: a card is a surface with its own ink contract, not a phrase in a
+// paragraph, and painting the entire card in the brand colour is how a grid
+// of cards ends up reading as decoration instead of as content. The card's
+// affordance is its hover border and tint; the accent stays with actions.
+// `inherit`, not a token: there is nothing new to name — this is whatever
+// --cirth-color the container already had. Hover, focus and :active still
+// outrank this and still bring the accent back.
+#{$parent-selector} :where(a:not([role="button"])):has(article) {
+  --cirth-color: inherit;
 }
 
 #{$parent-selector} a {

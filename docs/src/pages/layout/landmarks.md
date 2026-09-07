@@ -37,5 +37,7 @@ with constrained width.
 When `$enable-classes` is disabled (the classless build), the same
 `body > header/main/footer` selector instead behaves like
 [`.container`](/layout/container): centered, constrained in width, and
-responsive at every breakpoint, because there's no `.container` class
-available to add. See [Get Started → Classless](/get-started#classless).
+fluid at every viewport size. It reads the same
+`--cirth-container-gutter` and `--cirth-container-max-width` tokens, but
+does not expose `.breakout` because there is no class with which to express
+that visual exception. See [Get Started → Classless](/get-started#classless).

@@ -1,6 +1,6 @@
 <header class="container docs-header">
 	<nav aria-label="main navigation">
-		<ul class="docs-header-brand-group">
+		<ul class="docs-header-start-group">
 			<li>
 				<a href="/" class="contrast docs-brand">
 					<img class="docs-logo docs-logo-light" src="/logo_brand.svg" alt="" width="48" height="48" />
@@ -8,48 +8,84 @@
 					<strong>{{ nav.siteTitle }}</strong>
 				</a>
 			</li>
-		</ul>
-		<ul class="docs-header-nav-group">
 			{% for item in nav.topNav %}
 				<li class="docs-nav-item">
 					<a href="{{ item.link }}"{% if page.url == (item.link | withSlash) %} aria-current="page"{% endif %}>{{ item.text }}</a>
 				</li>
 			{% endfor %}
-			<li class="docs-nav-item">
+		</ul>
+		<div class="docs-header-actions">
+			<div class="docs-header-search">
+				<button
+					type="button"
+					class="docs-search-trigger"
+					aria-haspopup="dialog"
+					aria-controls="docs-search-dialog"
+					aria-expanded="false"
+					aria-label="Search documentation"
+					data-docs-search-trigger
+					hidden
+				>
+					{% icon "search", 16 %}
+					{#- .truncate is the library's own utility, and it is the
+					     right one: the placeholder is the only thing in the bar
+					     free to wrap, and a wrapped placeholder takes the whole
+					     header from one row to two in the narrow band a classic
+					     scrollbar puts a 1024px window into. Cirth's class says
+					     the truncation is a decision rather than an accident,
+					     which is also how the reflow spec reads it. -#}
+					<span class="truncate">Search documentation</span>
+					<kbd><span data-docs-search-modifier>Ctrl</span> K</kbd>
+				</button>
+			</div>
+			{#- Search precedes the menu in both DOM and visual order. At the
+			    collapse breakpoint the existing control nodes are moved into
+			    the drawer below — moved, never cloned, so there is only ever
+			    one of each in the document and the tab order stays the
+			    reading order. -#}
+			<button
+				type="button"
+				class="ghost contrast docs-menu-toggle"
+				aria-haspopup="dialog"
+				aria-controls="docs-mobile-menu-panel"
+				aria-expanded="false"
+				data-docs-menu-trigger
+			>
+				{% icon "dots-three-vertical", 20 %}<span class="sr-only">Menu</span>
+			</button>
+		</div>
+		<ul class="docs-header-controls-group">
+			<li class="docs-header-github">
 				<a href="{{ nav.github }}" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
 			</li>
-		</ul>
-		<ul class="docs-header-controls-group">
 			{#- Documentation line switcher. The list is short by design: it
 			    gains an entry only when a release breaks something, so it
 			    answers "does what I am reading apply to the version I have?"
 			    rather than listing every patch. A native <select> for the
 			    same reason as the preset one below — keyboard and screen
 			    reader support for free. -#}
-			<li>
-				<form class="docs-version-picker" data-docs-version-form>
-					<select
-						class="docs-version-select"
-						aria-label="Documentation version"
-						data-docs-version-select
-					>
-						{% for line in versions.lines %}
-							<option value="{{ line.href }}"{% if line.current and not versions.isNext %} selected{% endif %}>{{ line.label }}</option>
-						{% endfor %}
-						{% if versions.isNext %}<option value="{{ versions.next }}" selected>unreleased</option>{% endif %}
-					</select>
-					<button type="submit" class="outline secondary docs-version-submit">Go</button>
-				</form>
+			<li data-docs-header-control>
+				<span class="docs-control-label" aria-hidden="true">Version</span>
+				<select
+					class="docs-version-select"
+					aria-label="Documentation version"
+					data-docs-version-select
+				>
+					{% for line in versions.lines %}
+						<option value="{{ line.href }}"{% if line.current and not versions.isNext %} selected{% endif %}>{{ line.shortLabel }}</option>
+					{% endfor %}
+					{% if versions.isNext %}<option value="{{ versions.next }}" selected>next</option>{% endif %}
+				</select>
 				<script>
+					(() => {
 					// Navigating between documentation lines is a page load, not
 					// a preference: each line is a separate build with its own
 					// pages, so there is nothing to remember or restore.
-					const versionForm = document.querySelector("[data-docs-version-form]");
-					versionForm?.addEventListener("submit", (event) => {
-						event.preventDefault();
-						const select = versionForm.querySelector("[data-docs-version-select]");
-						if (select?.value) window.location.assign(select.value);
-					});
+						const versionSelect = document.querySelector("[data-docs-version-select]");
+						versionSelect?.addEventListener("change", () => {
+							if (versionSelect.value) window.location.assign(versionSelect.value);
+						});
+					})();
 				</script>
 			</li>
 			{#- Live preset switcher (gh#80): lets anyone preview the presets —
@@ -60,7 +96,8 @@
 			    <select> on purpose, not a custom dropdown — full keyboard and
 			    screen-reader support for free, matching the theme toggle's own
 			    "smallest control that does the job" bar. -#}
-			<li>
+			<li data-docs-header-control>
+				<span class="docs-control-label" aria-hidden="true">Preset</span>
 				<select class="docs-preset-select" aria-label="Color preset" data-cirth-preset-select>
 					<option value="amber">Amber</option>
 					{% for preset in presets %}
@@ -68,32 +105,152 @@
 					{% endfor %}
 				</select>
 			</li>
-			<li>
+			<li data-docs-header-control>
+				<span class="docs-control-label" aria-hidden="true">Theme</span>
 				<button type="button" class="ghost contrast docs-theme-toggle" aria-label="Dark color scheme" aria-pressed="false">
 					{% icon "sun", 18, "docs-theme-icon-sun" %}
 					{% icon "moon", 18, "docs-theme-icon-moon" %}
 				</button>
 				<script>
+					(() => {
 					// Which icon is visible is driven entirely by CSS
 					// ([data-theme="dark"] .docs-theme-icon-*, see styles/style.css)
 					// — this script is only the click handler.
-					const themeToggle = document.querySelector(".docs-theme-toggle");
-					const syncThemeToggle = () => {
+						const themeToggle = document.querySelector(".docs-theme-toggle");
+						const syncThemeToggle = () => {
 						themeToggle?.setAttribute(
 							"aria-pressed",
 							document.documentElement.getAttribute("data-theme") === "dark" ? "true" : "false",
 						);
-					};
-					syncThemeToggle();
-					themeToggle?.addEventListener("click", () => {
+						};
+						syncThemeToggle();
+						themeToggle?.addEventListener("click", () => {
 						const next =
 							document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
 						document.documentElement.setAttribute("data-theme", next);
 						localStorage.setItem("cirth-theme", next);
-						syncThemeToggle();
-					});
+							syncThemeToggle();
+						});
+					})();
 				</script>
 			</li>
 		</ul>
 	</nav>
+
+	{#- The compact-viewport menu, as an offcanvas drawer.
+
+	    It used to be `details.dropdown` — a 20rem panel hanging off the
+	    hamburger, capped at `100dvh - 5rem`, with the page behind it still
+	    scrollable and still in the tab order, and Escape wired by hand.
+	    That is a menu drawn as a dropdown; what a compact viewport wants is
+	    a surface.
+
+	    <dialog>, because this shell already made that choice once for
+	    search and because everything §11 asks for is what the element does
+	    natively: showModal() traps focus, makes the rest of the document
+	    inert, closes on Escape, and returns focus to the invoker. The
+	    alternative was rebuilding all four in script. The drawer is only
+	    docs shell — nothing here goes into the library (see the note in
+	    styles/style.css) — but what it is built out of is not: the nav is a
+	    Cirth <nav><ul>, the close control is the library's own .close, and
+	    the controls that move in keep the <select> and <button> they had in
+	    the bar. -#}
+	<dialog
+		id="docs-mobile-menu-panel"
+		class="docs-drawer"
+		aria-label="Site menu"
+		data-docs-menu-drawer
+	>
+		<article>
+			<header>
+				<span class="docs-brand">
+					<img class="docs-logo docs-logo-light" src="/logo_brand.svg" alt="" width="48" height="48" />
+					<img class="docs-logo docs-logo-dark" src="/logo_brand_dark.svg" alt="" width="48" height="48" />
+					<strong>{{ nav.siteTitle }}</strong>
+				</span>
+				<button type="button" class="close" aria-label="Close menu" data-docs-menu-close></button>
+			</header>
+			<nav aria-label="Site">
+				<ul>
+					{% for item in nav.topNav %}
+						<li><a href="{{ item.link }}"{% if page.url == (item.link | withSlash) %} aria-current="page"{% endif %}>{{ item.text }}</a></li>
+					{% endfor %}
+					<li><a href="{{ nav.github }}" target="_blank" rel="noreferrer">GitHub ↗<span class="sr-only"> (opens in a new tab)</span></a></li>
+				</ul>
+			</nav>
+			<section class="docs-mobile-controls">
+				<strong>Display</strong>
+				<ul data-docs-mobile-controls></ul>
+			</section>
+		</article>
+	</dialog>
+	<script>
+		(() => {
+			const header = document.currentScript?.closest(".docs-header");
+			const drawer = header?.querySelector("[data-docs-menu-drawer]");
+			const trigger = header?.querySelector("[data-docs-menu-trigger]");
+			const closeButton = drawer?.querySelector("[data-docs-menu-close]");
+			const desktopControls = header?.querySelector(".docs-header-controls-group");
+			const mobileControls = drawer?.querySelector("[data-docs-mobile-controls]");
+			// The one query that decides collapsed vs expanded. It is the same
+			// width the stylesheet uses to show this toggler, hide the in-header
+			// nav items and hide the sidebar: read from one place so the
+			// transfer and the toggler's visibility cannot drift apart.
+			const compact = window.matchMedia("(max-width: 1023px)");
+			const controls = desktopControls
+				? Array.from(desktopControls.querySelectorAll(":scope > [data-docs-header-control]"))
+				: [];
+
+			const syncMenuState = () => {
+				trigger?.setAttribute("aria-expanded", drawer?.open ? "true" : "false");
+			};
+			const closeDrawer = () => {
+				if (drawer?.open) drawer.close();
+			};
+			// Moving a node blurs whatever inside it had focus, so only move
+			// what is not already where it belongs, and hand focus back if the
+			// element that had it travelled. Crossing the breakpoint with the
+			// preset select focused should not drop the reader at the top of
+			// the document.
+			const placeControls = () => {
+				const target = compact.matches ? mobileControls : desktopControls;
+				if (target) {
+					const active = document.activeElement;
+					let refocus = null;
+					for (const control of controls) {
+						if (control.parentElement === target) continue;
+						if (active instanceof HTMLElement && control.contains(active)) {
+							refocus = active;
+						}
+						target.append(control);
+					}
+					refocus?.focus();
+				}
+				if (!compact.matches) closeDrawer();
+				syncMenuState();
+			};
+
+			trigger?.addEventListener("click", () => {
+				if (!drawer?.open) drawer?.showModal();
+				syncMenuState();
+			});
+			closeButton?.addEventListener("click", closeDrawer);
+			// Clicking the backdrop: the event target is the dialog itself
+			// only when the pointer misses the panel inside it.
+			drawer?.addEventListener("click", (event) => {
+				if (event.target === drawer) closeDrawer();
+			});
+			// Fires for the close button, for the backdrop, and for Escape,
+			// which the element handles on its own. Returning focus to the
+			// trigger explicitly rather than relying on the element's own
+			// restoration keeps this identical to the search dialog next to
+			// it, and correct when the drawer is closed by a resize.
+			drawer?.addEventListener("close", () => {
+				syncMenuState();
+				if (compact.matches) trigger?.focus();
+			});
+			compact.addEventListener?.("change", placeControls);
+			placeControls();
+		})();
+	</script>
 </header>

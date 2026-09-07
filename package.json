@@ -21,7 +21,8 @@
 		"./package.json": "./package.json"
 	},
 	"files": [
-		"dist"
+		"dist",
+		"NOTICE.md"
 	],
 	"license": "Apache-2.0",
 	"engines": {
@@ -58,10 +59,20 @@
 		"check:a11y": "node scripts/check-a11y.js",
 		"check:browserslist": "node scripts/check-browserslist.js",
 		"check:behavior": "playwright test --config=playwright.behavior.config.js",
+		"check:consumer": "node scripts/smoke-consumer.js",
 		"check:dist": "node scripts/check-dist.js",
+		"check:package": "node scripts/check-package-surface.js",
 		"check:variables": "node scripts/check-css-variables.js",
 		"check:doc-links": "node scripts/check-doc-links.js",
 		"check:size": "node scripts/check-css-size.js",
+		"check:tooling": "node scripts/check-audit-snapshot.js && node scripts/check-interaction-model.js && node scripts/check-flaky-report.js && node scripts/check-guards.js",
+		"check:guards": "node scripts/check-guards.js",
+		"check:hooks": "node scripts/setup-git-hooks.js --check",
+		"check:release": "node scripts/check-release.js",
+		"release:prepare": "node scripts/release-prepare.js",
+		"release:status": "node scripts/release-status.js",
+		"setup:hooks": "node scripts/setup-git-hooks.js",
+		"setup:claude-hooks": "node scripts/setup-claude-hooks.js",
 		"check:sri": "node scripts/update-sri.js --check",
 		"check:types": "tsc --noEmit",
 		"check:visual": "playwright test",
@@ -74,7 +85,8 @@
 		"docs:archive": "node scripts/archive-docs.js",
 		"docs:assets": "node scripts/build-docs.js",
 		"docs:dev": "npm run docs:assets && eleventy --config=docs/eleventy.config.js --serve",
-		"docs:build": "npm run docs:assets && eleventy --config=docs/eleventy.config.js"
+		"docs:build": "npm run docs:assets && eleventy --config=docs/eleventy.config.js && node scripts/check-doc-links.js",
+		"docs:brand-assets": "node scripts/capture-brand-assets.js"
 	},
 	"devDependencies": {
 		"@11ty/eleventy": "^3.1.6",
@@ -85,6 +97,7 @@
 		"highlight.js": "^11.11.1",
 		"lightningcss-cli": "^1.33.0",
 		"markdown-it-anchor": "^9.2.1",
+		"pagefind": "^1.5.2",
 		"playwright": "^1.61.1",
 		"postcss": "^8.5.20",
 		"postcss-selector-parser": "^7.1.4",

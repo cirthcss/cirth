@@ -33,8 +33,8 @@ $black: oklch(0% 0 0deg);
 $white: oklch(100% 0 0deg);
 
 // Canvas — warm paper. The light theme's page background: white pulled
-// faintly toward the brand hue (69.35deg), far short of cream, so white
-// surfaces (cards, dropdowns) read as sheets lying on it. Off the
+// faintly toward the brand hue (69.35deg), far short of cream, so the
+// derived near-white surfaces read as sheets lying on it. Off the
 // 19-step ladder on purpose: it's a surface color, not a scale step.
 // Verified against WCAG AA: every text token keeps >= 4.5:1 and every
 // 3:1 non-text claim in _light.scss still holds on this background.

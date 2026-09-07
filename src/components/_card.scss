@@ -8,9 +8,32 @@
   margin-bottom: var(--cirth-block-spacing-vertical);
   padding: var(--cirth-block-spacing-vertical)
     var(--cirth-block-spacing-horizontal);
-  border-radius: var(--cirth-border-radius);
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-card-border-radius);
   background: var(--cirth-card-background-color);
   box-shadow: var(--cirth-card-box-shadow);
+
+  // Container padding owns the final rhythm. Text and forms keep their
+  // normal flow spacing everywhere else, but do not stack a second gutter
+  // against the card edge. Adjacent body/footer margins already collapse to
+  // one rhythm step, so they need no selector or compensation here.
+  > :last-child:not(header, footer),
+  > :is(header, footer) > :last-child {
+    margin-bottom: 0;
+  }
+
+  // The mirror of the rule above, on the axis it was missing. A heading
+  // that follows a block takes --cirth-typography-spacing-top so a new
+  // section separates itself from the prose above it — 32px to 48px,
+  // depending on the level. That is a document-flow measure, and a card's
+  // header or footer is not document flow: it is a band padded to
+  // `block-spacing-vertical - space-2`. An eyebrow above a title in a card
+  // header therefore opened a 40px hole inside a 12px band, three times
+  // the padding that defines it. Inside the band the rhythm is the
+  // ordinary one its own elements already carry.
+  > :is(header, footer) :is(h1, h2, h3, h4, h5, h6) {
+    margin-top: 0;
+  }
 
   > header,
   > footer {
@@ -18,12 +41,6 @@
     padding: calc(var(--cirth-block-spacing-vertical) - var(--cirth-space-2))
       var(--cirth-block-spacing-horizontal);
     background-color: var(--cirth-card-sectioning-background-color);
-
-    // The last child's own bottom margin would stack on the section
-    // padding (upstream #611); the modal already resets this
-    > :last-child {
-      margin-bottom: 0;
-    }
   }
 
   > header {
@@ -31,15 +48,15 @@
     margin-bottom: var(--cirth-block-spacing-vertical);
     border-bottom: var(--cirth-border-width) solid
       var(--cirth-card-border-color);
-    border-top-right-radius: var(--cirth-border-radius);
-    border-top-left-radius: var(--cirth-border-radius);
+    border-top-right-radius: var(--cirth-card-border-radius);
+    border-top-left-radius: var(--cirth-card-border-radius);
   }
 
   > footer {
     margin-top: var(--cirth-block-spacing-vertical);
     margin-bottom: calc(var(--cirth-block-spacing-vertical) * -1);
     border-top: var(--cirth-border-width) solid var(--cirth-card-border-color);
-    border-bottom-right-radius: var(--cirth-border-radius);
-    border-bottom-left-radius: var(--cirth-border-radius);
+    border-bottom-right-radius: var(--cirth-card-border-radius);
+    border-bottom-left-radius: var(--cirth-card-border-radius);
   }
 }

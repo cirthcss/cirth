@@ -49,11 +49,9 @@
 #{$parent-selector} pre,
 #{$parent-selector} table,
 #{$parent-selector} ul {
-  margin-top: 0;
-  margin-bottom: var(--cirth-typography-spacing-vertical);
+  margin-block: 0 var(--cirth-typography-spacing-vertical);
   color: var(--cirth-color);
   font-style: normal;
-  font-weight: var(--cirth-font-weight);
 }
 
 // Avoid single orphaned words on the last line of a paragraph
@@ -70,8 +68,7 @@
 #{$parent-selector} h4,
 #{$parent-selector} h5,
 #{$parent-selector} h6 {
-  margin-top: 0;
-  margin-bottom: var(--cirth-typography-spacing-vertical);
+  margin-block: 0 calc(var(--cirth-typography-spacing-vertical) * 0.5);
   color: var(--cirth-color);
   font-weight: var(--cirth-font-weight);
   font-size: var(--cirth-font-size);
@@ -126,20 +123,13 @@
   }
 }
 
-// Paragraphs
-
-#{$parent-selector} p {
-  margin-bottom: var(--cirth-typography-spacing-vertical);
-}
-
 // Heading group
 
 #{$parent-selector} hgroup {
   margin-bottom: var(--cirth-typography-spacing-vertical);
 
   > * {
-    margin-top: 0;
-    margin-bottom: 0;
+    margin-block: 0;
   }
 
   > *:not(:first-child):last-child {
@@ -179,6 +169,43 @@
   list-style: square;
 }
 
+// Description lists
+
+// The last content element still arriving with the user agent's own idea
+// of itself. <dd> kept a 40px indent that is a browser default rather than
+// a typographic decision; <dt> read at exactly the weight of the <dd>
+// under it, so the pairing was invisible; and consecutive pairs ran
+// together with no rhythm between them. Against cirth.css alone a <dl> was
+// the one thing on the page that still looked like unstyled HTML, in a
+// framework whose claim is that native elements arrive finished. Order
+// metadata, product specs, a detail panel, a glossary: every application
+// has one.
+
+#{$parent-selector} dt {
+  font-weight: var(--cirth-font-weight-semibold);
+}
+
+#{$parent-selector} dd {
+  margin-inline-start: 0;
+}
+
+// Rhythm between pairs, not inside them.
+
+// Only the flat dt/dd sequence, which is the shape a <dl> has in running
+// prose. HTML also lets a <div> wrap each pair, and that wrapper exists
+// precisely so the author can lay the pairs out — in practice by making
+// the <dl> a grid, which is also what this framework recommends (.grid
+// plus a <dl>, rather than a column component nobody asked for). A
+// framework margin on that box would land on grid items and pull every
+// cell after the first out of alignment with the first, so it would have
+// to be undone before the wrapper could be used for the one thing it is
+// for. The elements inside it are styled either way; the box is the
+// author's.
+
+#{$parent-selector} dl > dd + dt {
+  margin-top: calc(var(--cirth-typography-spacing-vertical) * 0.5);
+}
+
 // Highlighted text
 
 #{$parent-selector} mark {
@@ -191,12 +218,16 @@
 // Blockquote
 
 #{$parent-selector} blockquote {
-  display: block;
   margin: var(--cirth-typography-spacing-vertical) 0;
   padding: var(--cirth-spacing);
   border-inline-start: var(--cirth-border-width-4) solid
     var(--cirth-blockquote-border-color);
   border-inline-end: none;
+
+  > :last-child,
+  > :has(+ footer) {
+    margin-bottom: 0;
+  }
 
   footer {
     margin-top: calc(var(--cirth-typography-spacing-vertical) * 0.5);

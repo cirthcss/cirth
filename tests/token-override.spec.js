@@ -2,6 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
 const { listPresetNames } = require("../scripts/lib/presets");
+const { setContent } = require("./helpers/render");
 
 // gh#92 — the documented customization path: a `:root` rule in a
 // stylesheet loaded after Cirth changes the token, everywhere.
@@ -105,7 +106,7 @@ const painted = (page) =>
  */
 const render = async (page, { build, override, preset, scheme }) => {
 	await page.emulateMedia({ colorScheme: scheme });
-	await page.setContent(
+	await setContent(page,
 		`<style>${read(build.file)}</style>` +
 			(preset ? `<style>${read(`dist/presets/${preset}.css`)}</style>` : "") +
 			`<style>${override}</style>` +
@@ -173,7 +174,7 @@ test("a root override reaches into a subtree that forces a scheme", async ({
 	// be the documented exception people worked around by repeating the
 	// override on the scheme selectors.
 	await page.emulateMedia({ colorScheme: "light" });
-	await page.setContent(
+	await setContent(page,
 		`<style>${read("dist/cirth.css")}</style>` +
 			`<style>:root { --cirth-color: rgb(4, 5, 6); }</style>` +
 			`<div data-theme="dark"><p id="text">Body copy.</p></div>`,
@@ -199,7 +200,7 @@ test("a forced scheme still switches the tokens it was not given", async ({
 	// color-scheme rather than the root's, which is the whole reason the
 	// pairs can live at the root at all.
 	await page.emulateMedia({ colorScheme: "light" });
-	await page.setContent(
+	await setContent(page,
 		`<style>${read("dist/cirth.css")}</style>` +
 			`<p id="outside">Light.</p>` +
 			`<div data-theme="dark"><p id="inside">Dark.</p></div>`,

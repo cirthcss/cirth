@@ -2,6 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
 const { listPresetNames } = require("../scripts/lib/presets");
+const { setContent } = require("./helpers/render");
 const {
 	assertDocsBuilt,
 	createServer,
@@ -163,7 +164,7 @@ test("the presets carry their own visited color", () => {
 const render = async (page, css, body) => {
 	await page.goto(`${origin}${visitedPath}`, { waitUntil: "networkidle" });
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-	await page.setContent(`<style>${css}</style>${body}`);
+	await setContent(page, `<style>${css}</style>${body}`);
 };
 
 /** @param {import("@playwright/test").Page} page @param {string} id */

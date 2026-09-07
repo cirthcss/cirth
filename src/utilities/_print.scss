@@ -65,6 +65,13 @@ $print-root-selector: "body";
 
     // Text, in every role the schemes give it. The heading ramp collapses
     // onto the body ink: six shades of near-black is a screen luxury.
+
+    // --cirth-ink first, and not only for symmetry with --cirth-canvas: it
+    // is the page's ink role, so the tokens that mean "body ink" read it
+    // rather than the slot (an accordion summary, a dropdown, a popover,
+    // the kbd fill). Overriding only --cirth-color here would flatten the
+    // <body> and leave those four printing the screen's near-black.
+    --cirth-ink: var(--cirth-print-color);
     --cirth-color: var(--cirth-print-color);
     --cirth-h1-color: var(--cirth-print-color);
     --cirth-h2-color: var(--cirth-print-color);

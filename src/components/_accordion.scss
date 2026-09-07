@@ -5,14 +5,19 @@
    */
 
 #{$parent-selector} details {
-  display: block;
   margin-bottom: var(--cirth-spacing);
 
   summary {
-    line-height: var(--cirth-font-size-md);
+    line-height: var(--cirth-line-height-normal);
     list-style-type: none;
     cursor: pointer;
     transition: color var(--cirth-transition);
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover:not([role]) {
+        color: var(--cirth-accordion-active-summary-color);
+      }
+    }
 
     &:not([role]) {
       color: var(--cirth-accordion-close-summary-color);
@@ -30,23 +35,47 @@
     // Marker
     &::after {
       display: block;
-      width: var(--cirth-font-size-md);
-      height: var(--cirth-font-size-md);
+
+      // Sized in the summary's own type, and exactly one line box tall.
+
+      // A float aligns to the *top* of the line box it joins, so a marker
+      // shorter than the line sits high by half the difference: 16px of
+      // chevron in a 24px line put the glyph 4px above the optical centre
+      // of the first row, everywhere a disclosure appeared. At a larger
+      // body size the gap grew with the line — 10px at 24px type — because
+      // the box was pinned to the root scale (--cirth-font-size-md) while
+      // the line it had to centre in followed the element. `1lh` is that
+      // line, whatever the type scale or a local line-height says, and
+      // `1em` keeps the glyph proportional to the text it belongs to.
+
+      // summary[role="button"] used to carry this correction alone, which
+      // is why it was the only disclosure in the framework that landed
+      // right; the branch is gone now that the general rule is correct.
+      width: 1em;
+      height: 1lh;
       margin-inline-start: calc(
         var(--cirth-spacing, var(--cirth-space-4)) * 0.5
       );
       float: right;
-      transform: rotate(-90deg);
+
+      // Resting: the chevron points down, which is where the panel is
+      // about to appear. It used to rest at -90deg — pointing along the
+      // row rather than at anything — and swing to 0 on open, so the
+      // closed state said "there is more this way" and the open state
+      // said "there is more below" about content already below. Down,
+      // then a half turn to up: closed points at what opening will
+      // reveal, open points back at the trigger that will close it.
+      transform: rotate(0deg);
 
       // Masked over a theme token rather than drawn with the icon's own
       // baked stroke, so the marker follows a retheme. The <select>
       // chevron in forms/_basics.scss cannot do this — a replaced element
       // has no pseudo-element to hang the mask on — so it keeps the baked
       // neutral and the two diverge under a custom theme (gh#82).
-      background-color: var(--cirth-muted-color);
+      background-color: currentColor;
       mask-image: var(--cirth-icon-chevron);
       mask-position: right center;
-      mask-size: var(--cirth-font-size-md) auto;
+      mask-size: 1em auto;
       mask-repeat: no-repeat;
 
       @media (forced-colors: active) {
@@ -67,9 +96,20 @@
 
     &:focus-visible {
       &:not([role]) {
+        // Outset by a quarter step, not inset by the ring's own width.
+        // A summary carries `padding-block` but no `padding-inline` — the
+        // trigger text starts exactly where the panel text below it does,
+        // which is the alignment this component wants — so the border box
+        // and the first glyph share an edge. An inset ring was therefore
+        // drawn *over* the first character: measured, the gap from the
+        // ring to the text was 0px horizontally against 6px vertically.
+        // Offsetting outward buys the same 4px on all four sides without
+        // indenting the trigger away from its own panel. The row is a rule
+        // rather than a box, so there is no frame for the ring to collide
+        // with on the way out.
         outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
-        outline-offset: calc(var(--cirth-spacing, var(--cirth-space-4)) * 0.5);
-        color: var(--cirth-primary);
+        outline-offset: var(--cirth-space-1);
+        color: var(--cirth-accordion-active-summary-color);
       }
     }
 
@@ -77,41 +117,128 @@
     &[role="button"] {
       width: 100%;
       text-align: start;
-
-      // Marker
-      &::after {
-        height: calc(
-          var(--cirth-font-size-md) *
-            var(--cirth-line-height, var(--cirth-line-height-normal))
-        );
-      }
     }
   }
 
   // Open
   &[open] {
     > summary {
-      margin-bottom: var(--cirth-spacing);
+      // --cirth-space-2, not --cirth-spacing. The summary already carries
+      // `padding-block: var(--cirth-space-2)` below (it is what lifts the
+      // trigger to the 2.75rem target), so a full rhythm step of margin on
+      // top of it measured 24px from the summary's text to the first line
+      // of the panel — one and a half times the step the same paragraph
+      // would get anywhere else in the document. Half a step of margin
+      // plus the padding that was already there is exactly one step, so
+      // the panel opens on the framework's own rhythm and the hit area is
+      // untouched. Dropdowns reset this to 0 in _dropdown.scss and are
+      // unaffected.
+      margin-bottom: var(--cirth-space-2);
 
       &:not([role]) {
-        &:not(:focus) {
+        &:not(:focus, :hover) {
           color: var(--cirth-accordion-open-summary-color);
         }
       }
 
       &::after {
-        transform: rotate(0);
+        transform: rotate(180deg);
       }
     }
   }
 }
 
+// A resting disclosure is a rule, not a box. Dropdowns already own a menu
+// frame, so class builds leave that specialised component untouched.
+// This used to be a card: border on all four sides, card surface, card
+// radius, a tinted summary band when open. A disclosure is not a card —
+// it is a row of text you can open, and a stack of them is a list. Boxing
+// each one turned a FAQ into a column of framed panels with the reading
+// order buried inside them, and it put a second container inside every
+// card that already held one. What is left is the one line that does the
+// work: a divider on the details item itself. Closed, it separates rows;
+// open, it follows the revealed content instead of cutting the trigger off
+// from the panel it controls.
+$surface-details: "details";
+
+@if $enable-classes {
+  $surface-details: "details:not(.dropdown)";
+}
+
+#{$parent-selector} #{$surface-details} {
+  border-block-end: var(--cirth-border-width) solid
+    var(--cirth-muted-border-color);
+
+  > summary {
+    min-block-size: 2.75rem;
+    padding-block: var(--cirth-space-2);
+    font-weight: var(--cirth-font-weight-semibold);
+  }
+
+  &[open] {
+    // The open panel's bottom gutter belongs to the disclosure, not to
+    // whatever happens to be last inside it. Hanging it on the last child's
+    // margin-bottom looked equivalent and was not: margins are the first
+    // thing content resets flatten, so any `p:last-child { margin: 0 }` in
+    // the page — or a last child that is a list, a figure, or a <pre> with
+    // its own margin — silently collapsed the panel onto its own divider.
+    // Owning it here makes the gutter unconditional and identical for every
+    // kind of content, and the reset below keeps the two from stacking.
+    padding-block-end: var(--cirth-space-4);
+  }
+
+  > :last-child:not(summary) {
+    margin-bottom: 0;
+  }
+}
+
+// Opening and closing, as a slide rather than a jump.
+
+// A <details> has no animatable box of its own: what appears is the
+// element's content, which until ::details-content had no selector to hang
+// a transition on. That pseudo-element is recent enough to be outside this
+// project's Browserslist floor, so the whole thing sits behind
+// `@supports selector(...)` and is a pure enhancement: where it is not
+// supported the disclosure opens and closes exactly as it does now, and
+// nothing about the resting state depends on it.
+
+// `interpolate-size: allow-keywords` is what makes `auto` an animatable
+// height — without it there is no way to transition to a height the
+// content decides. `content-visibility` with allow-discrete keeps the
+// panel rendered for the length of the close instead of vanishing on the
+// first frame, the same trick the modal uses for `display`.
+
+// Dropdowns are excluded with the rest of the surface rules: their menu is
+// positioned rather than in flow, so animating its height would move a
+// popover, not open a panel.
+@media (prefers-reduced-motion: no-preference) {
+  @supports selector(::details-content) {
+    #{$parent-selector} #{$surface-details} {
+      &::details-content {
+        block-size: 0;
+        overflow: hidden;
+        transition:
+          block-size var(--cirth-transition),
+          content-visibility var(--cirth-transition) allow-discrete;
+        interpolate-size: allow-keywords;
+      }
+
+      &[open]::details-content {
+        block-size: auto;
+      }
+    }
+  }
+}
+
+// RTL only has to move the float to the other edge. The old companion
+// declaration here was `background-position`, which never applied to a box
+// painted by a mask; and now that the marker box and the mask are both 1em
+// wide there is no slack for a mask-position to take up either way.
 [dir="rtl"] {
   #{$parent-selector} details {
     summary {
       &::after {
         float: left;
-        background-position: left center;
       }
     }
   }

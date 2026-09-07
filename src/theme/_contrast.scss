@@ -29,8 +29,10 @@
 
 @mixin light {
   // Text: 15.9:1 on paper, and the heading ramp collapses onto it rather
-  // than fading out over six steps.
-  --cirth-color: #{$neutral-900};
+  // than fading out over six steps. Set as --cirth-ink, the page role:
+  // --cirth-color aliases it at the root, so the slot follows, and so does
+  // anything else reading the page's ink.
+  --cirth-ink: #{$neutral-900};
   --cirth-h1-color: var(--cirth-color);
   --cirth-h2-color: var(--cirth-color);
   --cirth-h3-color: var(--cirth-color);
@@ -95,7 +97,7 @@
 
 @mixin dark {
   // 15.3:1 on a card, the worst surface in this scheme.
-  --cirth-color: #{$neutral-50};
+  --cirth-ink: #{$neutral-50};
   --cirth-h1-color: var(--cirth-color);
   --cirth-h2-color: var(--cirth-color);
   --cirth-h3-color: var(--cirth-color);

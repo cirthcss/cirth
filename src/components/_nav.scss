@@ -10,8 +10,25 @@
 
 // Prevent VoiceOver from ignoring list semantics in Safari (opinionated)
 
+// The zero-width space is the fix: `list-style: none` below is what makes
+// Safari drop the list out of the accessibility tree, and a generated
+// character puts it back. Taking that character *out of flow* is what
+// keeps it free, and `float` only does that in a block formatting context.
+
+// Floats are ignored on the children of a flex or grid container, but the
+// box is still generated — as a flex or grid *item*, before every real
+// one. Measured on a `nav li { display: grid; grid-template-columns: 1fr
+// auto }` holding a label and a button: the pseudo-element took the first
+// track, the label took the second, and the button wrapped onto a second
+// row at the inline start — the two children rendered out of order, on
+// separate rows, from correct markup.
+
+// `position: absolute` is out of flow under every display type, so the
+// character stays where assistive technology needs it and never becomes a
+// participant in the author's layout. Insets stay auto: the box lands at
+// its static position, and a zero-width space has nothing to paint there.
 #{$parent-selector} :where(nav li)::before {
-  float: left;
+  position: absolute;
   content: "\200B";
 }
 
@@ -19,8 +36,23 @@
 
 // ––––––––––––––––––––
 
+// `ol` alongside `ul`. A breadcrumb is an ordered sequence and <ol> is the
+// element that says so, so this is the markup a careful author writes —
+// and it was the markup that rendered worse. Left out of the flex
+// contract the list fell back to `display: block` with `inline-block`
+// items, which is the one layout mode where the newlines between <li>
+// elements are *rendered*: measured on the same three-item trail, indented
+// the way any real source is, the <ul> came out 215.45px wide with items
+// tiling at the item gutter and the <ol> 183.83px with 4.19px of source
+// formatting wedged between each pair. How the file was indented was
+// visible on the page.
+
+// The divider was missing outright — `content` computed to `none` on every
+// separator, because the breadcrumb block further down was scoped to `ul`
+// as well. Both are the same omission: the `ol, ul` block immediately
+// below, and every rule under it, already treat the two elements as one.
 #{$parent-selector} nav,
-#{$parent-selector} nav ul {
+#{$parent-selector} nav :is(ol, ul) {
   display: flex;
 }
 
@@ -56,15 +88,60 @@
     // alone — with both, the negative link margins misalign it vertically
     // (upstream #568)
     :where(a:not([role="button"]), [role="link"]) {
+      // Navigation is position, not action. At rest an entry takes the ink
+      // of its container; hover and focus still use the link state contract.
+      --cirth-color: inherit;
+
       display: inline-block;
-      margin: calc(var(--cirth-nav-link-spacing-vertical) * -1)
-        calc(var(--cirth-nav-link-spacing-horizontal) * -1);
+
+      // The inline pull is the *item's* gutter, negated — not the link's.
+      // The two tokens carry the same 8px by default, so this was invisible
+      // and read as symmetry with the padding on the next line; it is not.
+      // The negative margin exists for one reason: to cancel the padding the
+      // <li> above pays, so a row's first link paints out to the list's edge
+      // and adjacent links tile with no seam. That padding is
+      // --cirth-nav-element-spacing-horizontal. Keyed to the link's own
+      // gutter, the two came apart the moment either token was retimed:
+      // measured with --cirth-nav-link-spacing-horizontal at 1rem, the first
+      // link's painted box started 16px outside a list pulled out by 8, and
+      // every pair of adjacent links overlapped by 16px.
+
+      // Keyed to the gutter it actually cancels, the chain closes at any
+      // value — and it closes to *nothing* at zero, which is what a nav
+      // that is not a bar needs. See the vertical nav at the end of this
+      // file: a stacked nav is a nav whose inline gutter is zero, and it is
+      // now expressed that way rather than by undoing three insets by hand.
+
+      // Two longhands, not the shorthand, and that is the difference
+      // between the token working and the token being a trap. A custom
+      // property is substituted at computed-value time, so
+      // `--cirth-nav-element-spacing-horizontal: 0` — the unitless zero
+      // anyone would write — leaves `calc(0 * -1)` a <number> where a
+      // <length> is required. In the shorthand that invalidates the whole
+      // declaration, block axis included: measured, every link in the stack
+      // lost its negative vertical margin and every row grew by 16px.
+      // Split, the block rhythm is untouched and the inline half falls back
+      // to its own initial value, which is 0 — exactly what a column asked
+      // for. So `0` and `0px` both do the right thing.
+      margin-block: calc(var(--cirth-nav-link-spacing-vertical) * -1);
+      margin-inline: calc(var(--cirth-nav-element-spacing-horizontal) * -1);
       padding: var(--cirth-nav-link-spacing-vertical)
         var(--cirth-nav-link-spacing-horizontal);
+      border-block-end: var(--cirth-border-width-2) solid transparent;
       border-radius: var(--cirth-border-radius);
 
       &:not(:hover) {
         text-decoration: none;
+      }
+
+      &:is([aria-current]:not([aria-current="false"]), [aria-selected="true"]) {
+        // One registered edge is the complete active-state signal: keep the
+        // text neutral and suppress the generic link underline/tint stack.
+        --cirth-color: inherit;
+        --cirth-text-decoration: none;
+
+        border-radius: 0;
+        border-block-end-color: var(--cirth-primary-border);
       }
     }
 
@@ -87,10 +164,14 @@
       // A nav is a row of compact controls by design, so it opts out of the
       // 44px floor the same way it opts out of the fixed height above —
       // `height: auto` alone cannot, since a min-block-size survives it.
-      // It opts down, not out: 24px is WCAG 2.5.8 Target Size (Minimum),
-      // the AA threshold, where 44px is 2.5.5's AAA one. Compact stays
-      // possible; smaller than a thumb does not.
-      min-block-size: var(--cirth-space-6);
+      // It opts down, not out. 40px is the height a navigation bar wants:
+      // the same band Bootstrap's navbar controls sit in, comfortably clear
+      // of WCAG 2.5.8's 24px AA minimum, and visibly shorter than the 44px
+      // AAA target the same control takes in a form. 24px was the floor
+      // itself, which is a limit rather than a size — it left every real
+      // header to pick a height of its own and fight this rule for it,
+      // which is exactly what this project's own documentation was doing.
+      min-block-size: var(--cirth-space-10);
       margin-inline: inherit;
       margin-bottom: 0;
       padding: calc(
@@ -106,15 +187,18 @@
     align-items: center;
     justify-content: start;
 
-    & ul li {
+    & :is(ol, ul) li {
       &:not(:first-child) {
         margin-inline-start: var(--cirth-nav-link-spacing-horizontal);
       }
 
       a {
+        // Same correction as the link rule above: the pull cancels the
+        // item's gutter, so it is that gutter negated. Identical at the
+        // default scale, and it stays identical when either token moves.
         margin: calc(var(--cirth-nav-link-spacing-vertical) * -1) 0;
         margin-inline-start: calc(
-          var(--cirth-nav-link-spacing-horizontal) * -1
+          var(--cirth-nav-element-spacing-horizontal) * -1
         );
       }
 
@@ -135,6 +219,7 @@
 
     // Minimal support for aria-current
     & a[aria-current]:not([aria-current="false"]) {
+      border-block-end-color: transparent;
       background-color: transparent;
       color: inherit;
       text-decoration: none;
@@ -143,10 +228,149 @@
   }
 }
 
+// Navbar
+// Bootstrap draws a line between `.nav` — a generic navigation component —
+// and `.navbar`, the application chrome that lives in a page header, and
+// gives the two different state ladders. Cirth draws the same line from
+// semantics instead of classes: a <nav> that is a direct child of the
+// page's banner <header> is a navbar. Every other nav keeps the language
+// above, registered position indicator included.
+
+// `header nav li` was too wide on both counts. It reached any depth, and
+// it claimed the <nav> inside a card's or an article's own <header> —
+// that nav is the section's own navigation, not the site's chrome, and it
+// was quietly losing its current-item accent to a rule about page shells.
+// The exclusion list is HTML's sectioning content plus the elements a
+// component header sits inside: a <header> whose nearest sectioning
+// ancestor is <body> is the banner, which is precisely the element that
+// carries the implicit banner role.
+$navbar-selector: "header:not(:is(article, aside, dialog, figure, li, nav, section, td) *) > nav";
+
+#{$parent-selector} #{$navbar-selector} {
+  // Bootstrap: `padding: $navbar-padding-y 0`, $navbar-padding-y being half
+  // a spacer — chrome is denser than a nav in running content. Spent
+  // through the nav's own density token rather than as a literal, so a
+  // preset that re-times navigation re-times the navbar with it.
+  --cirth-nav-element-spacing-vertical: var(--cirth-space-2);
+
+  // `flex-wrap: wrap` + `align-items: center`, as on `.navbar`: items
+  // centre on the link band, and a collapsed region can take a line of its
+  // own instead of overflowing the row.
+  flex-wrap: wrap;
+  align-items: center;
+
+  li :where(a:not([role="button"]), [role="link"]) {
+    // The navbar ladder is four distinct steps — Bootstrap's navbar
+    // colour, hover colour, active colour and disabled colour, at
+    // 65% / 80% / 100% / 30% of the emphasis ink. None of them is the
+    // accent: in chrome the accent belongs to actions, and position is
+    // carried by contrast alone. Derived at runtime from the two ink
+    // tokens that already exist rather than registered as four new ones.
+    --cirth-color: var(--cirth-muted-color);
+    --cirth-text-decoration: none;
+
+    border-block-end: 0;
+    border-radius: 0;
+
+    &:is(:hover, :focus, :active) {
+      --cirth-color: color-mix(
+        in oklch,
+        var(--cirth-muted-color),
+        var(--cirth-contrast)
+      );
+    }
+
+    // Full ink for the current entry, and weight along with it: a state a
+    // reader has to compare two greys to notice is a state carried by
+    // colour alone.
+    &:is([aria-current]:not([aria-current="false"]), [aria-selected="true"]) {
+      --cirth-color: var(--cirth-contrast);
+
+      font-weight: var(--cirth-font-weight-semibold);
+    }
+
+    // Below the resting step, and out of the pointer's reach. Attenuated
+    // toward transparent rather than toward a named surface, which is what
+    // Bootstrap's own `rgba(emphasis, .3)` does: the step then holds on
+    // whatever the navbar is actually sitting on, instead of assuming the
+    // page canvas is behind it.
+    &[aria-disabled="true"] {
+      --cirth-color: color-mix(
+        in oklch,
+        var(--cirth-muted-color) 55%,
+        transparent
+      );
+
+      pointer-events: none;
+    }
+  }
+}
+
+// Toggler. Bootstrap's `.navbar-toggler` is deliberately unfilled —
+// `background-color: transparent`, a sober border, and a focus ring of its
+// own — so the control reads as chrome rather than as a form field that
+// wandered into the header. Here it is a <summary>, because the collapse is
+// <details>: native, and still zero JavaScript in the library.
+// Inside the same `@if` the dropdown component itself lives in: `.dropdown`
+// is a class, and the classless build is not allowed to emit one.
+@if $enable-classes {
+  #{$parent-selector}
+    #{$navbar-selector}
+    details.dropdown
+    > summary:not([role]) {
+    border-color: var(--cirth-muted-border-color);
+    background-color: transparent;
+  }
+}
+
 // Vertical Nav
 
-#{$parent-selector} aside {
-  nav,
+// `aside nav`, not `aside`. The trigger for a stacked nav is a nav inside
+// a complementary region, but the selector was reaching every list in the
+// <aside> — so a plain <ul> of related links in a sidebar had `display:
+// block` forced onto its items, which is not `list-item`: the markers
+// stopped being generated, and the list also picked up the nav's item
+// padding. A prose list in an aside is a prose list.
+
+// A row pays its inline gutters forward and takes them back on the link:
+// the list pulls out by one gutter, the item pushes in by one, and the link
+// pulls out by one again, so a horizontal nav sits flush with its
+// container. Stacked, those three insets stop cancelling. Measured in a
+// 240px <aside>: the text landed correctly on the container's content edge,
+// but the *painted* box — the hover fill, and the border-inline-start this
+// block uses as the aria-current rail — ran from -8px to 248px. Eight
+// pixels outside, on both edges.
+
+// In the container this pattern actually exists for, a sticky sidebar with
+// `overflow-y: auto`, that is not a cosmetic overhang: the rail is clipped
+// away entirely and the framework's own current-page indicator is invisible
+// exactly where a reader needs it most.
+
+// All three insets are one gutter, and now all three read it from one
+// token, so a column releases them by naming the gutter it does not have.
+// That is the whole difference between a bar and a stack, said once:
+
+//   nav { --cirth-nav-element-spacing-horizontal: 0 }
+
+// It is a public token rather than a class, a new element trigger or an
+// aria-* attribute, because it is already the framework's own answer to
+// "change this" — it works in the classless build, it needs no invalid
+// ARIA (aria-orientation is not a supported property on role="navigation",
+// and an accessibility-first framework has no business teaching it as a
+// styling hook), and it does not guess from an ancestor. `:is(aside,
+// dialog) nav` was the obvious alternative and it is wrong twice: a dialog
+// can legitimately hold a horizontal tab bar, and it would still miss the
+// third place a stacked nav actually lives — a <details> disclosure, which
+// is where two of this repo's own three consumers are.
+
+// <aside> keeps the automatic trigger: a nav in a complementary region is
+// a rail, and it should not have to say so.
+
+#{$parent-selector} aside nav {
+  --cirth-nav-element-spacing-horizontal: 0;
+
+  display: block;
+
   ol,
   ul,
   li {
@@ -154,11 +378,19 @@
   }
 
   li {
-    padding: calc(var(--cirth-nav-element-spacing-vertical) * 0.5)
-      var(--cirth-nav-element-spacing-horizontal);
+    padding: calc(var(--cirth-nav-element-spacing-vertical) * 0.5) 0;
 
     a {
       display: block;
+      border-inline-start: var(--cirth-border-width-2) solid transparent;
+
+      // The horizontal rule above already squares the box and drops the
+      // fill; a vertical nav only has to move the accent from the bottom
+      // edge to the inline-start one, where it reads as a rail.
+      &:is([aria-current]:not([aria-current="false"]), [aria-selected="true"]) {
+        border-block-end-color: transparent;
+        border-inline-start-color: var(--cirth-primary-border);
+      }
     }
 
     // Minimal support for links as buttons

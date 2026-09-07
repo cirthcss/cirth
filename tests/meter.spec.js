@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { expect, test } = require("@playwright/test");
+const { setContent } = require("./helpers/render");
 
 // gh#59 — <meter> is styled as progress's matched pair, and paints one of
 // three colors depending on which region low/high/optimum put the value
@@ -87,7 +88,7 @@ const markup = regions
  */
 const render = async (page, scheme) => {
 	await page.emulateMedia({ colorScheme: scheme });
-	await page.setContent(`<style>${css}${flatten}</style>${markup}`);
+	await setContent(page, `<style>${css}${flatten}</style>${markup}`);
 };
 
 for (const scheme of /** @type {const} */ (["light", "dark"])) {

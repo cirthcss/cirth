@@ -1,8 +1,8 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/public/logo_brand_app_dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="docs/public/logo_brand_app.svg">
-    <img alt="Cirth" src="docs/public/logo_brand_app.svg" width="120" height="120">
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/readme-native-baseline-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/readme-native-baseline.png">
+    <img alt="Cirth — UI from semantic HTML; accessible baseline, 0 B JavaScript runtime, small and monitored" src="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/readme-native-baseline.png" width="960" height="240">
   </picture>
 </p>
 
@@ -15,8 +15,8 @@
 <p align="center">
   Cirth turns native HTML elements into accessible, themeable interfaces.
   Load one stylesheet, customize it with runtime design tokens, and ship
-  with zero JavaScript and no required build step. Under 14KB gzipped ·
-  0 JavaScript · WCAG 2.2 AA baseline.
+  with no JavaScript runtime and no required build step. Small and
+  monitored · 0 B JS runtime · WCAG 2.2 AA baseline.
 </p>
 
 <p align="center">
@@ -148,9 +148,9 @@ top of the default theme. They're worked examples of restyling the system,
 not independently maintained themes — load one after the main stylesheet.
 
 - **`plain`** — the conventional application baseline: a familiar blue
-  accent, a plain white page, headings in the body face. Four declarations,
-  all of them input tokens: the accent's fill, hover, focus ring and
-  underline tint derive from `--cirth-primary` on their own.
+  accent, a plain white page, headings in the body face. Five declarations:
+  two colour inputs and three role choices. Accent states and the complete
+  surface ladder derive on their own.
 - **`playroom`** — the expressive end: a soft violet accent, surfaces
   tinted toward it, large radii, a rounded system face, generous spacing,
   springy motion. Reaches across colour, geometry, typography, motion and
@@ -278,7 +278,8 @@ setup, the source layout, the package exports, and the project constraints
 that matter most when changing Cirth.
 
 For pull requests, issue triage, and the exact collaboration workflow, read
-[`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md). If your change touches
+[`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md); for how a version
+reaches npm, [`RELEASING.md`](RELEASING.md). If your change touches
 the visual identity, check [Brand](docs/src/pages/brand.md) first; if it changes the
 public package surface, update [CHANGELOG.md](CHANGELOG.md) in the same
 branch.
@@ -337,10 +338,14 @@ the structure, meaning, and styling burden before a class is needed.
 - Keep layout primitives small and structural, not a broad component
   catalog.
 - Customize through runtime CSS custom properties, not a build step.
-- Ship zero JavaScript; interactive patterns use native element behavior.
-- Hold the default stylesheet to a 14KB gzipped size budget, checked on
-  every build. See [About Cirth](docs/src/pages/about.md#the-14kb-size-budget)
-  for why 14KB specifically.
+- Ship no JavaScript runtime; interactive patterns use native element
+  behavior. The claim is about what the package contains, not about what an
+  application built on it may do.
+- Keep every shipped stylesheet under its own gzipped size budget, checked
+  on every build — a regression guard rather than a number to design
+  against. See
+  [About Cirth](docs/src/pages/about.md#size-and-what-it-is-a-budget-for)
+  for what the budget is for, and what it deliberately does not buy.
 
 ## License
 

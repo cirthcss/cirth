@@ -12,6 +12,69 @@ documentation — the selector in the header switches between them.
 After 1.0 the same boundary becomes a major release, and this page keeps
 working the way it already does.
 
+## Unreleased, from v0.14.x
+
+The public class list stays the same, but containers and modals now size
+continuously instead of stepping through a shared viewport table. Check the
+few cases below if your CSS depended on the old implementation details.
+
+### Container gutters have their own token
+
+`.container`, `.container-fluid`, and the classless `header`/`main`/`footer`
+landmarks now use `--cirth-container-gutter`, whose default is
+`clamp(1rem, 4%, 3rem)`. Changing `--cirth-spacing` no longer changes their
+inline gutter; it remains the flow knob — prose rhythm, section margins and
+grid gaps. (Control and card padding have never followed it either; see
+[Spacing and layout](/customization#spacing-and-layout) for which tokens do
+and which deliberately do not.)
+
+Move an intentional page-gutter override to the new role token:
+
+```css
+/* before */
+:root { --cirth-spacing: 1.5rem; }
+
+/* after */
+:root { --cirth-container-gutter: 1.5rem; }
+```
+
+### `.breakout` belongs directly to `.container`
+
+The selector is now `.container > .breakout`, backed by named `content` and
+`full` grid lines. This prevents the utility from unexpectedly spanning an
+unrelated grid. If an existing breakout is wrapped, put the class on the
+direct child or move `.container` to the element that owns the content:
+
+```html
+<!-- before: the figure is not a direct grid item -->
+<section class="container">
+  <div><figure class="breakout">…</figure></div>
+</section>
+
+<!-- after -->
+<section class="container">
+  <figure class="breakout">…</figure>
+</section>
+```
+
+Code that used `.breakout` as a generic `grid-column: 1 / -1` utility outside
+`.container` needs a local rule instead. That broad behavior was never the
+documented purpose of the class and is no longer global.
+
+### Modal width has one runtime cap
+
+The modal card no longer switches between the old `sm` and `md` widths. It
+uses the available width up to `--cirth-modal-max-width` (default `43.75rem`):
+
+```css
+:root {
+  --cirth-modal-max-width: 36rem;
+}
+```
+
+No HTML changes are required. Override the token only if the former stepped
+widths were part of your design.
+
 ## To v0.14.0, from v0.13.x
 
 One behaviour change, on an attribute that was doing more than it says.
@@ -123,7 +186,7 @@ To vary a token by scheme, write the pair rather than two rules:
 The pair is resolved wherever the token is used, against the color scheme in
 effect at that point, so one line covers the page and any subtree that
 forces a scheme. See
-[Customization](/customization#overriding-a-color-in-one-scheme-only).
+[Customization](/customization#light-and-dark).
 
 ### The presets are renamed and redesigned
 
@@ -294,7 +357,7 @@ Worth grepping your stylesheets for `--cirth-` before upgrading. Two
 things to know: a bare `:root` override now applies to **both** color
 schemes, and anything written against the old workaround
 (`:root:not([data-theme="dark"])`, `[data-theme="dark"]`) is more specific
-and keeps winning. [Customization](/customization#overriding-a-color-in-one-scheme-only)
+and keeps winning. [Customization](/customization#light-and-dark)
 covers overriding one scheme at a time.
 
 ### The browser floor moved

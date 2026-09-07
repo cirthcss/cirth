@@ -1,4 +1,5 @@
 @use "../config" as *;
+@use "../helpers/metrics";
 
 /**
    * Button
@@ -61,11 +62,7 @@
   // floor stays put when the type does not, and matched by the same floor
   // on select and textarea in forms/_basics.scss. Navs opt down to the
   // AA minimum instead; see components/_nav.scss.
-  min-block-size: calc(
-    (var(--cirth-font-size-md) * var(--cirth-line-height)) +
-      (var(--cirth-form-element-spacing-vertical) * 2) +
-      (var(--cirth-border-width) * 2)
-  );
+  min-block-size: metrics.$control-block-size;
   padding: var(--cirth-form-element-spacing-vertical)
     var(--cirth-form-element-spacing-horizontal);
   border: var(--cirth-border-width) solid var(--cirth-border-color);
@@ -98,12 +95,25 @@
     --cirth-color: var(--cirth-primary-inverse);
   }
 
-  // Pressed feedback: a static 1px offset (not a transition), so it stays
-  // crisp and is equally valid under prefers-reduced-motion
+  // Pressed is one tonal step past hover. Painted as a wash over the
+  // variant's own background rather than as a separate colour per variant,
+  // so outline and ghost darken by the same amount a filled button does
+  // without either growing a fill it does not have.
   &:active {
-    transform: translateY(0.0625rem);
+    background-image: linear-gradient(rgb(0 0 0 / 12%) 0 0);
   }
+}
 
+// Keep ::file-selector-button out of this selector list. Firefox does not
+// support :focus-visible on that pseudo-element and therefore discards the
+// whole comma-separated rule, including the focus ring for ordinary buttons.
+// The file control receives its ring through the focused host input in
+// forms/_input-file.scss instead.
+#{$parent-selector} button,
+#{$parent-selector} [type="submit"],
+#{$parent-selector} [type="reset"],
+#{$parent-selector} [type="button"],
+#{$parent-selector} [role="button"] {
   &:focus-visible,
   &:is([aria-current]:not([aria-current="false"])):focus-visible {
     --cirth-box-shadow:
@@ -142,13 +152,27 @@
       --cirth-border-color: var(--cirth-secondary-hover-border);
       --cirth-color: var(--cirth-secondary-inverse);
     }
+  }
 
-    &:focus-visible,
-    &:is([aria-current]:not([aria-current="false"])):focus-visible {
-      --cirth-box-shadow:
-        var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
-        0 0 0 var(--cirth-outline-width) var(--cirth-secondary-focus);
-    }
+  #{$parent-selector}
+    :is(
+      button,
+      [type="submit"],
+      [type="button"],
+      [role="button"]
+    ).secondary:focus-visible,
+  #{$parent-selector}
+    :is(button, [type="submit"], [type="button"], [role="button"]).secondary:is(
+      [aria-current]:not([aria-current="false"])
+    ):focus-visible,
+  #{$parent-selector} [type="reset"]:focus-visible,
+  #{$parent-selector}
+    [type="reset"]:is(
+      [aria-current]:not([aria-current="false"])
+    ):focus-visible {
+    --cirth-box-shadow:
+      var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
+      0 0 0 var(--cirth-outline-width) var(--cirth-secondary-focus);
   }
 
   // Contrast
@@ -174,7 +198,7 @@
 
   // Outline and ghost
   // Two quiet variants that differ in one thing: whether the control owns
-  // an opaque surface. Outline does — it paints the page colour, so it
+  // an opaque surface. Outline does — it paints the control colour, so it
   // stays a control wherever it sits instead of letting the backdrop show
   // through — and it draws a border. Ghost owns neither, and only becomes
   // visible when the pointer arrives.
@@ -192,14 +216,13 @@
   #{$parent-selector}
     :is(button, [type="submit"], [type="button"], [role="button"]).outline,
   #{$parent-selector} [type="reset"].outline {
-    --cirth-background-color: var(--cirth-canvas);
+    --cirth-background-color: var(--cirth-form-element-background-color);
   }
 
   #{$parent-selector}
     :is(button, [type="submit"], [type="button"], [role="button"]).ghost,
   #{$parent-selector} [type="reset"].ghost {
     --cirth-background-color: transparent;
-    --cirth-box-shadow: none;
   }
 
   // Outline (primary)
@@ -213,7 +236,7 @@
       --cirth-background-color: color-mix(
         in oklch,
         var(--cirth-primary) 12%,
-        var(--cirth-canvas)
+        var(--cirth-form-element-background-color)
       );
       --cirth-color: var(--cirth-primary-hover);
       --cirth-border-color: var(--cirth-primary-hover);
@@ -236,7 +259,7 @@
       --cirth-background-color: color-mix(
         in oklch,
         var(--cirth-secondary) 12%,
-        var(--cirth-canvas)
+        var(--cirth-form-element-background-color)
       );
       --cirth-color: var(--cirth-secondary-hover);
       --cirth-border-color: var(--cirth-secondary-hover);
@@ -259,7 +282,7 @@
       --cirth-background-color: color-mix(
         in oklch,
         var(--cirth-contrast) 12%,
-        var(--cirth-canvas)
+        var(--cirth-form-element-background-color)
       );
       --cirth-color: var(--cirth-contrast-hover);
       --cirth-border-color: var(--cirth-contrast-hover);
@@ -344,12 +367,12 @@
       --cirth-border-color: var(--cirth-secondary-hover-border);
       --cirth-color: var(--cirth-secondary-inverse);
     }
+  }
 
-    &:focus-visible {
-      --cirth-box-shadow:
-        var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
-        0 0 0 var(--cirth-outline-width) var(--cirth-secondary-focus);
-    }
+  #{$parent-selector} [type="reset"]:focus-visible {
+    --cirth-box-shadow:
+      var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
+      0 0 0 var(--cirth-outline-width) var(--cirth-secondary-focus);
   }
 }
 
@@ -376,14 +399,11 @@
   pointer-events: none;
 }
 
-// Submit control of an invalid form
+// Submit control of a form the reader has made invalid
 // Visual only, deliberately not [disabled]/pointer-events: none — the
 // button stays clickable so a submit attempt still triggers the browser's
 // native constraint-validation UI (the "Please fill in this field"
 // bubbles), which a truly disabled/inert control could never surface.
-// A required-but-untouched form is :invalid from first paint, so this can
-// read as "disabled" before the user has done anything wrong; accepted as
-// a fair trade for zero-JS feedback once fields start getting filled in.
 // grayscale(), not opacity: a dimmed-but-clickable control gets no
 // disabled-state exemption from WCAG 1.4.3, and compositing the whole
 // button toward the canvas collapses its text/background contrast below
@@ -391,8 +411,19 @@
 // exactly as the theme defined it while still draining the "ready"
 // color from the control.
 
+// :has(:user-invalid), not :invalid. `form:invalid` is true from first
+// paint for any form holding a `required` field, so a login form nobody
+// has touched yet drew its submit in grey — the previous version of this
+// rule said so in a comment and accepted it. It does not have to be
+// accepted: the fields in the same form already wait for interaction
+// (forms/_basics.scss binds the invalid treatment to :user-invalid, not
+// :invalid), so the button was the one control in the group reacting to a
+// state the reader had not caused. Now the whole group agrees, and the
+// zero-JS feedback the rule exists for still arrives the moment a field
+// is actually left invalid.
+
 #{$parent-selector}
-  form:invalid
+  form:has(:user-invalid)
   :is(button:not([type="button"], [type="reset"]), [type="submit"]) {
   filter: grayscale(1);
 }

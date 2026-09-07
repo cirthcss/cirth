@@ -54,8 +54,10 @@ behavior specific to each input type.
 * Controls are at least 44px tall (the WCAG 2.5.5 target size) whatever
   font size you set on them — buttons, `select` and `textarea` each hold
   that floor independently of the type scale. Inside a `nav` the floor
-  drops to 24px (WCAG 2.5.8's AA minimum), since a navigation row is
-  meant to be compact.
+  becomes a compact 40px band, still above WCAG 2.5.8's 24px AA minimum.
+  Equivalent one-line controls share the same font, line-height, padding,
+  border and height formula, so an input, select and adjacent button align
+  without per-component offsets.
 * A `small` immediately after a form control becomes helper/hint text:
   block, muted, with a small negative top margin to sit tight under the
   field.
@@ -87,9 +89,10 @@ behavior specific to each input type.
   is useful. Range inputs are excluded from automatic validity styling, and a
   native-invalid `select` stays neutral while focused so merely opening it
   does not show an error. An explicit `aria-invalid` always wins.
-* **`:focus`** adds a box shadow ring in `--cirth-form-element-focus-color` (or
-  the valid/invalid focus variant when an explicit `aria-invalid` or matching
-  `:user-invalid` state applies).
+* **`:focus`** lifts the recessed field surface back to the canvas, adds an
+  accent border, and adds a box shadow ring in
+  `--cirth-form-element-focus-color` (or the valid/invalid focus variant when
+  an explicit `aria-invalid` or matching `:user-invalid` state applies).
 * **`[disabled]`** (or an ancestor `fieldset[disabled]`) applies opacity
   `--cirth-form-element-disabled-opacity`, pointer events off.
 * **`::placeholder`** is colored with `--cirth-form-element-placeholder-color`.

@@ -1,23 +1,38 @@
 name: Package
 
-# Deliberately dispatched against an already-pushed vX.Y.Z tag. Keeping the
-# GitHub Release and npm publish manual makes their order observable and
-# prevents late tag webhooks from starting duplicate release runs (gh#100).
+# The GitHub half of a release: build artifacts and the GitHub Release
+# itself. Dispatched from master with the tag as an input, for the same
+# reason Publish npm is — see the note at the top of npm-publish.yml.
+#
+# Keeping this separate from the npm publish makes their order observable
+# and prevents late tag webhooks from starting duplicate release runs
+# (gh#100).
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to build artifacts for, e.g. v0.15.0-beta.1
+        required: true
+        type: string
 
 permissions:
   contents: write
 
 jobs:
   package:
-    name: Build release artifacts
-    if: startsWith(github.ref, 'refs/tags/v')
+    name: Build release artifacts for ${{ inputs.tag }}
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
 
     steps:
-      - name: Checkout
+      - name: Checkout the tag
         uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+
+      - name: Fetch master
+        run: git fetch --no-tags origin master:refs/remotes/origin/master
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
@@ -28,22 +43,40 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # A GitHub Release is a public statement about a commit, so it owes
+      # the same ancestry rule as the npm publish: no channel is requested
+      # here because this job publishes to no registry.
+      - name: Validate tag, version and master ancestry
+        id: release
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          npm run check:release -- --tag "$RELEASE_TAG" --base origin/master
+
       - name: Build CSS
         run: npm run build
+
+      - name: Check package contents
+        run: npm run check:package
 
       - name: Pack npm package
         run: npm pack
 
       - name: Pack dist archive
-        run: tar -czf "cirth-dist-${GITHUB_REF_NAME:-manual}.tar.gz" dist
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: tar -czf "cirth-dist-${RELEASE_TAG}.tar.gz" dist
 
       - name: Prepare release notes
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
         run: |
-          notes=".github/releases/${GITHUB_REF_NAME}.md"
+          notes=".github/releases/${RELEASE_TAG}.md"
           if [ -f "$notes" ]; then
             cp "$notes" release-notes.md
           else
-            printf "# %s\n\nSee the generated changelog for included changes.\n" "$GITHUB_REF_NAME" > release-notes.md
+            printf "# %s\n\nSee the generated changelog for included changes.\n" \
+              "$RELEASE_TAG" > release-notes.md
           fi
 
       - name: Upload dist artifact
@@ -65,6 +98,12 @@ jobs:
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
+          # github.ref is master here, so the tag has to be named outright.
+          tag_name: ${{ inputs.tag }}
+          # A beta is marked a prerelease, which keeps it out of "Latest
+          # release" on the repository front page and out of the feed that
+          # tooling reads to decide what the current version is.
+          prerelease: ${{ steps.release.outputs.prerelease == 'true' }}
           body_path: release-notes.md
           files: |
             cirth-dist-*.tar.gz

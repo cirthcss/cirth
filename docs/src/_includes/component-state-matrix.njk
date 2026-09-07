@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{{ specimenTitle }} component states — Cirth</title>
+		<link rel="stylesheet" href="/styles/generated/cirth-lab-default.css" />
+		{% if specimenPreset %}<link rel="stylesheet" href="/styles/generated/presets/{{ specimenPreset }}.css" />{% endif %}
+		{% if specimenPrimary %}<style>:root { --cirth-primary: {{ specimenPrimary }}; }</style>{% endif %}
+	</head>
+	<body>
+		<header class="container">
+			<h1>Interface state matrix</h1>
+			<p>{{ specimenTitle }} · public default stylesheet only · no documentation shell</p>
+		</header>
+		<main class="container">
+			<section aria-labelledby="button-states-title">
+				<h2 id="button-states-title">Button states</h2>
+				<article>
+					<header><strong>One silhouette, ordered emphasis</strong></header>
+					<p><button type="button" data-state-button>Primary action</button></p>
+					<p>
+						<button class="secondary" type="button">Secondary</button>
+						<button class="contrast" type="button">Contrast</button>
+						<button class="outline" type="button" data-state-outline>Outline</button>
+						<button class="ghost" type="button" data-state-ghost>Ghost</button>
+						<button type="button" disabled data-state-disabled-button>Disabled</button>
+					</p>
+				</article>
+			</section>
+
+			<section aria-labelledby="form-states-title">
+				<h2 id="form-states-title">Form control states</h2>
+				<article>
+					<form>
+						<div class="grid">
+							<label>Input<input data-state-input name="name" value="Release coordinator" /></label>
+							<label>Search<input type="search" name="query" placeholder="Find a release" /></label>
+							<label>Select<select name="environment"><option>Staging</option><option>Production</option></select></label>
+							<label>File<input type="file" name="attachment" /></label>
+							<label>Date<input type="date" name="date" value="2026-08-30" /></label>
+							<label>Time<input type="time" name="time" value="14:32" /></label>
+						</div>
+						<div role="group">
+							<input type="search" name="grouped-query" aria-label="Search release queue" placeholder="Search queue" />
+							<button type="button">Find</button>
+						</div>
+						<label>Textarea<textarea name="notes" rows="3">Coordinate the database migration with the deployment window.</textarea></label>
+						<div class="grid">
+							<label>Valid<input name="valid" value="RQ-184" aria-invalid="false" /><small>Reference verified.</small></label>
+							<label>Invalid<input name="invalid" value="19" aria-invalid="true" /><small>Use the six-digit approval code.</small></label>
+							<label>Readonly<input name="readonly" value="Locked after approval" readonly /></label>
+							<label>Disabled<input name="disabled" value="Unavailable" disabled /></label>
+						</div>
+						<fieldset>
+							<legend>Native choices</legend>
+							<label><input type="checkbox" checked /> Run automated checks</label>
+							<label><input type="radio" name="window" checked /> Current window</label>
+							<label><input type="checkbox" role="switch" checked /> Notify maintainers</label>
+						</fieldset>
+					</form>
+				</article>
+			</section>
+
+			<section aria-labelledby="accordion-states-title">
+				<h2 id="accordion-states-title">Accordion states</h2>
+				<details data-state-accordion>
+					<summary>Closed disclosure</summary>
+					<p>Only the header reacts to pointer and keyboard interaction.</p>
+				</details>
+				<details open>
+					<summary>Open disclosure</summary>
+					<p>The content uses a separate inner gutter and the container keeps one uniform border.</p>
+				</details>
+				<details>
+					<summary>A multiline disclosure title that remains a full-width target on a narrow viewport</summary>
+					<p>The marker keeps its own column while the label wraps.</p>
+				</details>
+			</section>
+
+			<section aria-labelledby="surface-states-title">
+				<h2 id="surface-states-title">Flat surfaces</h2>
+				<div class="grid">
+					<article data-state-card>
+						<h3>Standard article</h3>
+						<p>Background, a uniform border and spacing create the hierarchy without elevation.</p>
+					</article>
+					<article>
+						<header><strong>Article with nested form</strong></header>
+						<label>Owner<input name="nested-owner" value="Marta Costa" /></label>
+						<footer><button type="button">Save owner</button></footer>
+					</article>
+				</div>
+				<pre data-state-code><code>&lt;article&gt;Flat, semantic surface&lt;/article&gt;</code></pre>
+			</section>
+		</main>
+		<footer class="container"><small>Cirth component-state specimen · {{ specimenTitle }}</small></footer>
+	</body>
+</html>
