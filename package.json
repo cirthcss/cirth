@@ -65,6 +65,7 @@
 		"check:variables": "node scripts/check-css-variables.js",
 		"check:doc-links": "node scripts/check-doc-links.js",
 		"check:size": "node scripts/check-css-size.js",
+		"check:release": "node scripts/check-release.js",
 		"check:sri": "node scripts/update-sri.js --check",
 		"check:types": "tsc --noEmit",
 		"check:visual": "playwright test",
