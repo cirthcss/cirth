@@ -66,6 +66,8 @@
 		"check:doc-links": "node scripts/check-doc-links.js",
 		"check:size": "node scripts/check-css-size.js",
 		"check:release": "node scripts/check-release.js",
+		"release:prepare": "node scripts/release-prepare.js",
+		"release:status": "node scripts/release-status.js",
 		"check:sri": "node scripts/update-sri.js --check",
 		"check:types": "tsc --noEmit",
 		"check:visual": "playwright test",
