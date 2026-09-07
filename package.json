@@ -21,7 +21,8 @@
 		"./package.json": "./package.json"
 	},
 	"files": [
-		"dist"
+		"dist",
+		"NOTICE.md"
 	],
 	"license": "Apache-2.0",
 	"engines": {
@@ -58,11 +59,12 @@
 		"check:a11y": "node scripts/check-a11y.js",
 		"check:browserslist": "node scripts/check-browserslist.js",
 		"check:behavior": "playwright test --config=playwright.behavior.config.js",
+		"check:consumer": "node scripts/smoke-consumer.js",
 		"check:dist": "node scripts/check-dist.js",
+		"check:package": "node scripts/check-package-surface.js",
 		"check:variables": "node scripts/check-css-variables.js",
 		"check:doc-links": "node scripts/check-doc-links.js",
 		"check:size": "node scripts/check-css-size.js",
-		"check:tooling": "node scripts/check-audit-snapshot.js && node scripts/check-interaction-model.js && node scripts/check-flaky-report.js",
 		"check:sri": "node scripts/update-sri.js --check",
 		"check:types": "tsc --noEmit",
 		"check:visual": "playwright test",

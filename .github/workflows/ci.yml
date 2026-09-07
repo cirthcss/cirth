@@ -86,8 +86,15 @@ jobs:
             echo "::notice::No Linux visual baselines committed yet — the update-visual-baselines workflow will generate and commit them."
           fi
 
+      # `npm pack --dry-run` used to run here and prove only that packing
+      # did not crash. These two assert the result: that the tarball holds
+      # exactly the build's output plus its metadata, and that a clean
+      # project can install it and reach every documented entry point.
       - name: Check package contents
-        run: npm pack --dry-run
+        run: npm run check:package
+
+      - name: Install the tarball into a clean project
+        run: npm run check:consumer
 
       - name: Check tracked files
         run: git diff --exit-code
