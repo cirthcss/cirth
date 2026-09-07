@@ -172,7 +172,7 @@ Version and hash are rewritten together by `npm run sri` at release time,
 then verified against the bytes jsDelivr actually serves with
 `npm run check:sri -- --from-cdn` after publishing. Editing either by hand
 is how you ship a snippet that every browser refuses to load; the
-[releasing section of `.github/CONTRIBUTING.md`](https://github.com/cirthcss/cirth/blob/master/.github/CONTRIBUTING.md#releasing)
+[`RELEASING.md`](https://github.com/cirthcss/cirth/blob/master/RELEASING.md)
 has the full sequence.
 
 ### Browser target — `check:browserslist`

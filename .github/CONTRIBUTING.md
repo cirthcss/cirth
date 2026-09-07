@@ -76,86 +76,44 @@ should be partials or internal modules pulled in through `@use`.
 
 The npm package ships compiled CSS only. SCSS remains repository source and
 build infrastructure, not part of the published package surface.
-
 ## Releasing
 
-Releases are cut on `master` from a `vX.Y.Z` tag. Tag pushes do not publish
-anything by themselves. The Package workflow (release artifacts and the
-GitHub release) and Publish npm workflow are dispatched deliberately against
-that tag; both rebuild `dist/` from the tagged source, so the published files
-are whatever that source compiles to.
+The complete process lives in one place: [`RELEASING.md`](../RELEASING.md)
+at the repository root. It is the canonical version — nothing here or in
+`AGENTS.md` restates it, so there is never a second copy to fall out of
+date.
 
-### Which number to bump
+The rule it exists to enforce:
 
-Cirth is pre-1.0, so the minor slot carries everything a 1.0 project would
-split between major and minor:
+> **Develop anywhere. Release only from `master`. Publish only through the
+> release workflow.**
 
-- **Minor** (`0.X.0`) for a new feature, a new public custom property, any
-  breaking change, and any change to how existing markup renders by
-  default. A visited-link color that repaints every site's links is a
-  minor, even though it removes nothing.
-- **Patch** (`0.x.Y`) only for changes that bring behavior back to what
-  was already documented or intended: bug fixes, and internal or tooling
-  work with no effect on the published CSS.
+What that means for a contributor:
 
-Minor numbers are not scarce, and 0.9.0 is not obliged to be the last stop
-before 1.0. When a release is a close call, bump the minor: a caret range
-(`^0.8.0` resolves to `>=0.8.0 <0.9.0`) means a patch reaches everyone
-automatically, and the version number is the only warning most people get.
-v0.8.1 is the counterexample to learn from: it shipped as a patch while
-carrying a change its own changelog entry labels breaking.
+- Your branch does not need to be `develop`, and does not need to be
+  anything in particular. A fix can go straight to a pull request against
+  `master`.
+- No version tag is cut on a feature, experiment, or `develop` branch, and
+  no npm version originates from one. The release workflows refuse a
+  commit that is not already reachable from `origin/master`.
+- The version in `package.json` is changed by the release process, not by
+  a feature branch. If your change needs a version bump, say so in the
+  pull request and leave the number alone.
+- `dist/` is generated and gitignored. Never commit it.
 
-### Cutting the release
+Two local guards refuse the dangerous release commands, and a fresh clone
+has neither until you install them:
 
-1. If the release breaks something, freeze the outgoing documentation line
-   first: `npm run docs:archive -- <previous tag> <dir>` (e.g.
-   `v0.10.0 v0.10`), then move `current: true` onto the new entry in
-   `docs/src/_data/versions.js` and write the migration on the Upgrading
-   page. Doing it before the version bump means the archive captures the
-   line as it was actually published.
-2. Update `CHANGELOG.md` (turn `[Unreleased]` into the new version, refresh
-   the compare links) and write the release notes in
-   `.github/releases/vX.Y.Z.md`.
-3. Bump the version: `npm version --no-git-tag-version x.y.z`.
-4. `npm run build`, to compile the source the release will publish.
-5. `npm run sri`, **after the last change to the CSS** — it hashes what is
-   in `dist/` at the moment it runs, so anything that touches the source
-   afterwards leaves the documented snippets pointing at a build that will
-   never be published, and browsers will refuse the file. It repins the
-   documented CDN snippets to the new version and rewrites their
-   `integrity` hashes from the built `dist/` files. The rewritten
-   `README.md` and `docs/src/pages/get-started.md` belong in the release
-   commit.
-6. `npm run lint && npm run check:dist && npm run check:size`.
-7. Commit as `chore(release): prepare vX.Y.Z`, push that commit to `master`,
-   then tag it `vX.Y.Z` and push the tag. Wait until GitHub shows the tag
-   before dispatching either release workflow.
-8. Dispatch Package against the tag and wait for it to create the GitHub
-   release successfully:
-   `gh workflow run package.yml --ref vX.Y.Z`. Then dispatch Publish npm
-   against the same tag:
-   `gh workflow run npm-publish.yml --ref vX.Y.Z -f tag=latest`. The Actions
-   UI is equivalent, but the selected ref must be the release tag; both jobs
-   refuse to run from a branch.
-9. Once npm has the version and jsDelivr has fetched it (a minute or two),
-   verify the documented hashes against reality:
-   `npm run check:sri -- --from-cdn`.
+```sh
+npm run setup:hooks           # Git pre-push guard
+npm run setup:claude-hooks    # only when using Claude Code
+```
 
-### Subresource Integrity
+They can be bypassed by whoever owns the machine and are not a security
+boundary — the GitHub rulesets on `master` and on `v*` tags, and npm's own
+staged approval, are what actually refuse. `RELEASING.md` explains both.
 
-The CDN snippets carry a `sha384` `integrity` hash and
-`crossorigin="anonymous"`, so a browser refuses a jsDelivr response whose
-bytes are not the ones documented here. A hash only means anything next to
-the version it was taken from, which is why `npm run sri` rewrites the
-version pin and the hash in one pass: never bump one by hand.
-
-`npm run check:sri` runs as part of `npm run lint`. It is offline and
-structural: every snippet pins the version in `package.json`, carries a
-well-formed hash, and sets `crossorigin`. It cannot tell whether the hash
-matches the published file, because between releases `dist/` has already
-moved past the version the snippets pin. Step 7 above is the check that
-compares against the real published bytes.
-
-If step 9 disagrees, the release build was not reproducible: regenerate
-from the published files with `npm run sri -- --from-cdn` and commit the
-correction, then look into why the two builds differed.
+If a change of yours affects how Cirth is packaged or published — the
+`exports` map, `files`, the build outputs — run `npm run check:package`
+and `npm run check:consumer` before opening the pull request. Both also
+run in CI.

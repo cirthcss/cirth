@@ -278,7 +278,8 @@ setup, the source layout, the package exports, and the project constraints
 that matter most when changing Cirth.
 
 For pull requests, issue triage, and the exact collaboration workflow, read
-[`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md). If your change touches
+[`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md); for how a version
+reaches npm, [`RELEASING.md`](RELEASING.md). If your change touches
 the visual identity, check [Brand](docs/src/pages/brand.md) first; if it changes the
 public package surface, update [CHANGELOG.md](CHANGELOG.md) in the same
 branch.
