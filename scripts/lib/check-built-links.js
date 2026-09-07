@@ -87,10 +87,36 @@ const routesFor = (root, file) => {
 };
 
 /**
- * @param {{ root: string, reportRoot?: string }} options
+ * Absolute hrefs carry the prefix the site is served from; the files on
+ * disk do not. Under /cirth/ a link to /cirth/colors has to be looked up
+ * as /colors, or every absolute link in the site reads as broken — which
+ * is exactly what happened the first time this ran on GitHub Pages.
+ *
+ * A link outside the prefix is left alone, and will be reported: under a
+ * prefix, an absolute link that does not carry it does not belong to this
+ * build.
+ *
+ * @param {string} prefix
+ * @returns {(route: string) => string}
+ */
+const withoutPrefix = (prefix) => {
+	if (prefix === "/") {
+		return (route) => route;
+	}
+	const bare = prefix.replace(/\/$/, "");
+	return (route) => {
+		if (route === bare) return "/";
+		if (route.startsWith(prefix)) return `/${route.slice(prefix.length)}`;
+		return route;
+	};
+};
+
+/**
+ * @param {{ root: string, reportRoot?: string, pathPrefix?: string }} options
  * @returns {{ checked: number, pages: number, violations: string[] }}
  */
-const checkBuiltLinks = ({ root, reportRoot = root }) => {
+const checkBuiltLinks = ({ root, reportRoot = root, pathPrefix = "/" }) => {
+	const stripPrefix = withoutPrefix(pathPrefix);
 	/** @type {string[]} */
 	const violations = [];
 	const htmlFiles = listHtml(root);
@@ -153,9 +179,9 @@ const checkBuiltLinks = ({ root, reportRoot = root }) => {
 			const resolved =
 				target === ""
 					? route
-					: new URL(target, `http://docs${route}`).pathname.replace(
-							/\/{2,}/g,
-							"/",
+					: stripPrefix(
+							new URL(target, `http://docs${pathPrefix.slice(0, -1)}${route}`)
+								.pathname.replace(/\/{2,}/g, "/"),
 						);
 
 			if (excludedRoute.test(resolved)) continue;
