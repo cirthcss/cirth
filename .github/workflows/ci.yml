@@ -50,8 +50,25 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium firefox webkit
 
+      # --retries=2, for the same reason the baseline workflow uses it: a
+      # WebKit flake failing the whole run is worse than a flake, and it
+      # stops the release pipeline over something that passes on the next
+      # attempt. A deterministic failure still fails all three times.
+      #
+      # The other half of --retries is the step below. A run that goes
+      # green while something in it is unreliable hides the unreliability,
+      # so every test that needed a retry is named and annotated on its own
+      # file and line.
       - name: Browser interaction regression tests
-        run: npm run check:behavior
+        run: >
+          npx playwright test --config=playwright.behavior.config.js
+          --retries=2 --reporter=list,json
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: .cache/behavior-report.json
+
+      - name: Name any test that needed a retry
+        if: always()
+        run: node scripts/report-flaky.js .cache/behavior-report.json
 
       - name: Check all themes accessibility (axe, WCAG 2.0–2.2 A/AA)
         run: npm run check:a11y
@@ -90,6 +107,12 @@ jobs:
       # did not crash. These two assert the result: that the tarball holds
       # exactly the build's output plus its metadata, and that a clean
       # project can install it and reach every documented entry point.
+      # check:tooling had never run anywhere but a developer machine, which
+      # is how the v0.15.0-beta.1 publish discovered it needs a browser.
+      # Here the browsers are already installed, so it costs seconds.
+      - name: Check tooling
+        run: npm run check:tooling
+
       - name: Check package contents
         run: npm run check:package
 
