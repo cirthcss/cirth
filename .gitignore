@@ -142,6 +142,7 @@ $RECYCLE.BIN/
 /TODO.md
 /ISSUES-PROPOSED.md
 /HANDOFF.md
+/RELEASE-PLAN.md
 
 # Ad-hoc before/after review captures. Unlike docs/screenshots/native-baseline
 # (written by scripts/capture-brand-assets.js) and docs/screenshots/refinement,
