@@ -27,8 +27,8 @@ otherwise releasing a version of Cirth:
 
    ```sh
    git push origin master
-   git tag …
-   git push origin <tag>
+   git tag …                 # release tags are created on the remote,
+   git push origin <tag>     # at a named master SHA — see RELEASING.md
    npm publish
    npm stage publish
    npm stage approve

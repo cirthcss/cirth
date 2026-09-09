@@ -17,6 +17,10 @@ const fixture = path.join(__dirname, "fixtures/doc-links");
 
 const run = () => checkBuiltLinks({ root: fixture, reportRoot: fixture });
 
+// A second fixture whose absolute hrefs carry a path prefix, the way
+// Eleventy writes them when the site is served from a subdirectory.
+const prefixed = path.join(__dirname, "fixtures/doc-links-prefixed");
+
 test("the built-link check reads every page in the fixture", () => {
 	const { checked, pages } = run();
 	expect(pages).toBe(3);
@@ -80,4 +84,31 @@ test("every violation names a file and a line", () => {
 
 test("the fixture breaks in exactly the five ways it is meant to", () => {
 	expect(run().violations).toHaveLength(5);
+});
+
+// The site is served from the root in every local build and from /cirth/
+// on GitHub Pages, so the second spelling is only exercised on the deploy
+// — where a mistake is a failed deployment rather than a failed check.
+// It happened: the checker resolved /cirth/colors against a tree whose
+// pages are at /colors, and reported the entire site as missing.
+test("absolute links resolve under the prefix the site is served from", () => {
+	const { pages, violations } = checkBuiltLinks({
+		root: prefixed,
+		reportRoot: prefixed,
+		pathPrefix: "/cirth/",
+	});
+	expect(pages).toBe(2);
+	expect(violations).toEqual([]);
+});
+
+test("the same site read without its prefix is all broken", () => {
+	const { violations } = checkBuiltLinks({
+		root: prefixed,
+		reportRoot: prefixed,
+	});
+	// Not an assertion about a number, but about the failure being total:
+	// every absolute href in the fixture is prefixed, and none of them can
+	// resolve against routes that are not.
+	expect(violations.length).toBeGreaterThan(0);
+	expect(violations.join("\n")).toContain("/cirth/deep/page/");
 });

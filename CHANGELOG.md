@@ -7,6 +7,8 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+## [0.15.0-beta.1] - 2026-09-08
+
 ### Added
 
 - **`--cirth-ink`, the page's text colour under a name no component can
@@ -1616,6 +1618,7 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
+[0.15.0-beta.1]: https://github.com/cirthcss/cirth/compare/v0.14.1...v0.15.0-beta.1
 [0.14.1]: https://github.com/cirthcss/cirth/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/cirthcss/cirth/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/cirthcss/cirth/compare/v0.12.0...v0.13.0

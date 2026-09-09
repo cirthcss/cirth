@@ -18,6 +18,21 @@ const themeVariants = [
 	...listPresetNames().map((name) => ({ name, storageValue: name })),
 ];
 
+// Where a build of this site is served from. The released site sits at
+// the root; on GitHub Pages it sits under the repository name, and the
+// preview of the unreleased branch beside it under /next/.
+//
+// Both the Eleventy config and the built-link checker need this, and they
+// have to agree: Eleventy stamps the prefix into every absolute href it
+// emits, and a checker that did not know about it would find the whole
+// site missing. It did, once — see tests/doc-links.spec.js.
+const docsPathPrefix = () => {
+	if (process.env.GITHUB_PAGES !== "true") {
+		return "/";
+	}
+	return process.env.DOCS_VARIANT === "next" ? "/cirth/next/" : "/cirth/";
+};
+
 /** @param {string} label */
 const assertDocsBuilt = (label) => {
 	if (!fs.existsSync(path.join(docsDist, "index.html"))) {
@@ -281,6 +296,7 @@ const waitForTheme = (page, theme) =>
 	);
 
 module.exports = {
+	docsPathPrefix,
 	assertDocsBuilt,
 	createServer,
 	docsDist,

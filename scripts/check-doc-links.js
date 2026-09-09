@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { checkBuiltLinks } = require("./lib/check-built-links");
+const { docsPathPrefix } = require("./lib/docs-site");
 
 const projectRoot = path.join(__dirname, "..");
 
@@ -138,6 +139,8 @@ getTrackedFiles(projectRoot).forEach((filename) => {
 const built = checkBuiltLinks({
 	root: path.join(projectRoot, "docs/dist"),
 	reportRoot: projectRoot,
+	// The same prefix the build stamped into every absolute href.
+	pathPrefix: docsPathPrefix(),
 });
 violations.push(...built.violations);
 
@@ -151,7 +154,15 @@ if (violations.length > 0) {
 		// docs/dist is gitignored and is not rebuilt by `npm run lint`, so a
 		// finding there can be a stale build rather than a broken link.
 		console.error(
-			"\nFindings under docs/dist are read from the last build. If that build\nis older than your changes, run `npm run docs:build` and check again.",
+			"\nFindings under docs/dist are read from the last build, which this\n" +
+				"check does not run. Two ways that build can disagree with what is\n" +
+				"being checked:\n" +
+				"  - it is older than your changes;\n" +
+				`  - it was built for a different path prefix. This run assumed ` +
+				`\`${docsPathPrefix()}\`, and a site built with GITHUB_PAGES=true is\n` +
+				"    served from /cirth/ instead, so every absolute link in it reads\n" +
+				"    as missing.\n" +
+				"Either way: run `npm run docs:build` and check again.",
 		);
 	}
 
