@@ -147,6 +147,13 @@ jobs:
       - name: Build docs
         run: npm run docs:build
 
+      # check:tooling drives a real browser: the audit-isolation checks open
+      # the docs corpus, and the interaction fixtures are served to the same
+      # page agent the dead-CSS sweep uses. A release checkout has no
+      # browsers until one is fetched.
+      - name: Install Chromium for the tooling checks
+        run: npx playwright install --with-deps chromium
+
       - name: Check release tooling
         run: npm run check:tooling
 
