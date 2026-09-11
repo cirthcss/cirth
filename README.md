@@ -111,7 +111,7 @@ The main generated stylesheets are:
 | `dist/cirth.scoped.min.css` | Scoped build for embedding Cirth under `.cirth`. |
 | `dist/cirth.classless.scoped.min.css` | Scoped classless build. |
 
-All four builds share Cirth's one official theme (amber), with light and
+All four builds share Cirth's one official theme (copper), with light and
 dark variants. `plain` and `playroom` are optional presets, not separate theme
 builds — see [Presets](#presets) below and [Colors](docs/src/pages/colors.md).
 

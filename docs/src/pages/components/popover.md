@@ -69,7 +69,7 @@ be clipped by an ancestor's `overflow`, the top layer is not:
 <button type="button" popovertarget="legend">What do these colors mean?</button>
 
 <article id="legend" popover>
-  <p>Green is within range, amber is borderline, red is out of range.</p>
+  <p>Green is within range, gold is borderline, red is out of range.</p>
 </article>
 ```
 

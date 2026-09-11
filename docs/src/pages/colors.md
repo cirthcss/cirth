@@ -5,7 +5,7 @@ layout: docs.njk
 
 # Colors
 
-Cirth has one official theme: amber, with hand tuned light and dark
+Cirth has one official theme: copper, with hand tuned light and dark
 variants. `plain` and `playroom` are optional **presets**: stylesheets that
 override CSS custom properties on top of the default theme. No component
 styles, reset rules, or light/dark switching logic are duplicated.
@@ -73,10 +73,10 @@ defaults for public inputs such as `--cirth-primary`; relationships from those
 inputs to derived semantic tokens remain in the compiled CSS as `var()`,
 `color-mix()`, and relative `oklch()` rather than being baked into literals.
 
-Scales are named for what they visually are (`$amber-*` the brand accent,
-`$neutral-*` the cool gray) except the status colors, which are named for
+Scales are named for what they visually are (`$copper-*` the brand accent,
+`$neutral-*` the graphite) except the status colors, which are named for
 the role they play instead of their hue: `$error-*`, `$success-*`, and
-`$warning-*`, not `$red-*`, `$jade-*`, or `$gold-*`, because that's what
+`$warning-*`, not `$red-*`, `$moss-*`, or `$gold-*`, because that's what
 they actually mean everywhere they're used (invalid/valid form state,
 deleted/inserted text, the `<mark>` highlight).
 
@@ -84,21 +84,43 @@ All five scales share one lightness ladder with 19 steps, from 950
 (darkest) to 50 (lightest) in increments of 50 and evenly spaced from 18%
 to 96%. Every family defines every step, and picking one is the same
 exercise regardless of which family you're in. Chroma is derived rather
-than chosen by hand:
-`$neutral-*` holds a small, symmetric chroma bell peaking at the 500 step;
-each accent scale (`$amber-*`, `$error-*`, `$success-*`, `$warning-*`) is
-pinned to one fixed hue and set to a constant 85% of that hue's own
-maximum sRGB chroma within the gamut at every step. The four accent scales
-don't peak at the same step because sRGB's gamut boundary shape differs per
-hue. For example, red orange's ceiling sits at a darker lightness than
-green's, but every
-step of every scale sits at the same fraction of what's actually
-displayable, so the shape difference is the gamut talking, not an
-inconsistency between families.
+than chosen by hand.
 
-`$amber-*`'s hue (69.35deg) isn't an arbitrary pick; it's lifted directly
+Each chromatic scale is pinned to one hue and held at a constant fraction
+of that hue's own maximum sRGB chroma within the gamut at every step. The
+fraction is the family's voice. `$error-*`, `$success-*` and `$warning-*`
+sit at 85%: a status color has to be recognisable at a glance in a small,
+rare mark. `$copper-*` sits at 70%, because the brand accent is the
+opposite case — it covers whole surfaces and appears on every screen, so
+the fraction that makes a status mark legible would make the accent shout.
+The families don't peak at the same step because sRGB's gamut boundary
+shape differs per hue. For example, red's ceiling sits at a darker
+lightness than green's, but every step of every scale sits at the same
+fraction of what's actually displayable, so the shape difference is the
+gamut talking, not an inconsistency between families.
+
+`$neutral-*` is derived differently, because it isn't an accent. Its chroma
+is a bell that peaks mid-ladder and fades to nothing at the pale end — a
+light grey needs more chroma than a dark one to read as cool rather than as
+plain grey, and a large pale surface needs none at all — but it doesn't
+return to zero at the dark end. It floors at 70% of the peak, because the
+dark scheme builds its canvas out of the two darkest steps, and a bell that
+closed symmetrically left that canvas achromatic whatever hue the family
+was given.
+
+The neutral's hue does real work: at 280deg it is predominantly blue with a
+violet lift, and it sits 124deg from the brand hue. That distance is the
+point. Copper is only legible *as* a warm signal against something cool, so
+the graphite is what the accent is measured against rather than a bystander
+— move the family round toward plum and the page loses its blue, leaving
+every surface, ink and signal reading as one temperature.
+
+`$copper-*`'s hue (44deg) isn't an arbitrary pick; it's lifted directly
 from the brand mark, so the theme's primary accent and the logo are the
-same color by construction rather than by manual matching.
+same color by construction rather than by manual matching. `$error-*` sits
+a deliberate 22deg away from it: a destructive action and a primary one
+share a page, and the palette has to keep them apart without either raising
+its voice.
 
 `plain` and `playroom` (`src/presets/`) declare only the values for the
 inputs and roles they intentionally change. They do not duplicate the theme's
@@ -115,5 +137,8 @@ than converting it to a `hex` / `lab()` fallback.
 Cirth previously inherited a set of twenty accent color themes from Pico CSS, then
 briefly maintained three full themes (azure, jade, slate). That has been
 reduced further to a single official theme plus two token override presets,
-`plain` and `playroom`; see [About Cirth](/about) for the project philosophy
-and [Contributions](/contributions) before proposing color system changes.
+`plain` and `playroom`. The official theme's accent was an amber until
+0.15; it is now the copper described above, with the neutral, surface and
+status families rebuilt around it rather than adapted to it. See
+[About Cirth](/about) for the project philosophy and
+[Contributions](/contributions) before proposing color system changes.

@@ -10,12 +10,12 @@ integrations, and anywhere else the project is named.
 <section class="docs-brand-spec" aria-labelledby="signature-title">
   <header class="docs-brand-spec-header">
     <h2 id="signature-title">The part that survives a retheme.</h2>
-    <p>Cirth's identity is not the amber. The accent is the first token any
+    <p>Cirth's identity is not the copper. The accent is the first token any
     adopter replaces, and a framework whose character lives entirely in one
     hue has no character left the moment it is adopted. What stays is
     below: proportions, strokes and target sizes that hold in every preset,
     every scheme and every build. Compare
-    <a href="/specimen/amber/">the amber specimen</a> with
+    <a href="/specimen/default/">the default specimen</a> with
     <a href="/specimen/plain/">the plain one</a> — same six measurements,
     different pigment.</p>
   </header>
@@ -85,7 +85,7 @@ work, and why they are a guard rather than a promise.
     <div><dt>Micro unit</dt><dd><code>4px</code></dd></div>
     <div><dt>Primary joint</dt><dd><code>45°</code></dd></div>
     <div><dt>Clearspace</dt><dd><code>0.5 × mark width</code></dd></div>
-    <div><dt>Signal hue</dt><dd><code>69.35°</code></dd></div>
+    <div><dt>Signal hue</dt><dd><code>44°</code></dd></div>
     <div><dt>Minimum size</dt><dd><code>16px optical</code></dd></div>
   </dl>
 </section>
@@ -98,7 +98,7 @@ writing system, not a claim of license or partnership.
 
 <div class="docs-brand-grid">
   <figure class="docs-brand-tile" data-theme="light">
-    <img src="/logo_brand.svg" alt="Cirth brand mark, amber on light" width="96" height="96" />
+    <img src="/logo_brand.svg" alt="Cirth brand mark, copper on light" width="96" height="96" />
     <figcaption>Brand · light</figcaption>
     <p class="docs-brand-downloads">
       <a class="secondary" href="/logo_brand.svg" download>SVG</a>
@@ -122,7 +122,7 @@ writing system, not a claim of license or partnership.
     </p>
   </figure>
   <figure class="docs-brand-tile" data-theme="dark">
-    <img src="/logo_brand_dark.svg" alt="Cirth brand mark, amber on dark" width="96" height="96" />
+    <img src="/logo_brand_dark.svg" alt="Cirth brand mark, copper on dark" width="96" height="96" />
     <figcaption>Brand · dark</figcaption>
     <p class="docs-brand-downloads">
       <a class="secondary" href="/logo_brand_dark.svg" download>SVG</a>
@@ -151,7 +151,7 @@ Every variant is downloadable above as SVG (preferred) or PNG; the full
 set also lives in
 [`docs/public/`](https://github.com/cirthcss/cirth/tree/master/docs/public).
 
-Use the **brand** (amber) mark wherever color is available, matching the
+Use the **brand** (copper) mark wherever color is available, matching the
 variant to the background. Use **mono** in one color contexts such as print,
 badges, embossing. The **icon** variants sit on their own background
 tile; use them where the mark needs to fill a square: favicons, social
@@ -177,40 +177,49 @@ unnecessarily blunt.
 
 ## Color
 
-The brand color is amber, and in an interface it has exactly two jobs:
+The brand color is copper, and in an interface it has exactly two jobs:
 **action** and **current position**. A primary button, a focus ring and a
 link in running prose are actions. The rail beside the page you are on, the
 edge on an active in-page nav item and a selected control are position.
 Header navbars are quieter chrome: they use ink and weight rather than an
-accent edge. Nothing else in a Cirth interface is amber.
+accent edge. Nothing else in a Cirth interface is copper.
 
 Editorial typography is the one place outside those two, and it is a
 deliberate exception rather than a leak: a word or phrase set in the accent
 inside a heading, the way this site's home page sets *semantic HTML*. It is
 a single named class, applied by hand, in prose — not a component state.
 
-It used to do five. Navigation links were amber at rest, which meant a menu
-of eight entries was eight brand-coloured words next to one button that also
-wanted the colour, and the accent stopped meaning "act on this" and started
-meaning "this is a Cirth screen". Navigation now takes the ink of whatever
-it sits in and the accent marks only where you are — so the one thing amber
-still says, it says alone.
+It used to do five. Navigation links carried the accent at rest, which meant
+a menu of eight entries was eight brand-coloured words next to one button
+that also wanted the colour, and the accent stopped meaning "act on this"
+and started meaning "this is a Cirth screen". Navigation now takes the ink
+of whatever it sits in and the accent marks only where you are — so the one
+thing copper still says, it says alone.
 
-The light theme's base surface is warm paper rather than white, and the card
-sheet carries the same temperature: the page is not neutral, but the warmth
-is a surface property, not a wash of the accent. In dark the base is
-graphite. Neither scheme paints the brand hue across backgrounds.
+The light theme's base surface is a mineral paper rather than white, and the
+card sheet carries the same temperature: the page is not neutral, but the
+warmth is a surface property, not a wash of the accent. In dark the base is
+a graphite carrying the same stone tint as the neutral scale. Neither scheme
+paints the brand hue across backgrounds.
 
-The mark's hue, **69.35°** in oklch, is the exact hue the framework's
-entire amber scale is generated from; the logo sits brighter than the UI
-tokens because it's an identity color, not a text color.
+The mark's hue, **44°** in oklch, is the exact hue the framework's entire
+copper scale is generated from; the logo sits brighter and more saturated
+than the UI tokens because it is an identity color, not a text color. The
+scale holds the accent at 70% of its own gamut ceiling so it can cover whole
+surfaces without shouting; the mark, which covers a monogram, is free to sit
+at 85%.
 
 | Role | Value |
 | --- | --- |
-| Mark, light backgrounds | `#CA8216` (`oklch(66.6% 0.139 69.35deg)`) |
-| Mark, dark backgrounds | `#DC8E18` (`oklch(71% 0.149 69.35deg)`) |
-| UI primary (light theme) | `oklch(52.7% 0.097 69.35deg)`, from `$amber-550` |
-| UI primary (dark theme) | `oklch(70% 0.129 69.35deg)`, from `$amber-350` |
+| Mark, light backgrounds | `#BD5928` (`oklch(58% 0.143 44deg)`) |
+| Mark, dark backgrounds | `#E16B31` (`oklch(66% 0.163 44deg)`) |
+| UI primary (light theme) | `oklch(52.7% 0.107 44deg)`, from `$copper-550` |
+| UI primary (dark theme) | `oklch(65.7% 0.134 44deg)`, from `$copper-400` |
+
+The dark UI primary is one ladder step deeper than a mirror of the light one
+would be. Copper's gamut ceiling climbs steeply past 65% lightness, so the
+mirroring step comes out an orange; a step down keeps it reading as metal
+and still clears AA on every surface in the scheme.
 
 In interfaces, always use the `--cirth-primary*` tokens rather than the
 logo hexes: the tokens are variants verified for WCAG. See
@@ -234,7 +243,7 @@ is `@cirthcss/cirth`.
 
 The mark is built to survive small, high-contrast, low-color placements:
 READMEs, npm listings, CI badges, terminal output headers, favicons. Use
-the **mono** variant wherever a single flat color is preferable to amber
+the **mono** variant wherever a single flat color is preferable to copper
 (badges, print, embossing, low-color terminals), and the **icon** tile
 wherever the mark needs to fill a square container. Don't pair the mark
 with fantasy-styled illustration, parchment or stone textures, or

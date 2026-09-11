@@ -23,8 +23,8 @@ colors, including an animated indeterminate state.
 
 * Track: `--cirth-progress-background-color`; value/bar:
   `--cirth-progress-color` (defaults to `--cirth-primary-background` in
-  light mode; dark mode uses a lighter amber step so the bar keeps a 3:1
-  contrast against the track).
+  light mode; dark mode uses a lighter step of the accent so the bar keeps
+  a 3:1 contrast against the track).
 * Border: `--cirth-progress-border-color` outlines the track so the
   component's extent stays perceivable against the page background
   (WCAG 1.4.11); the track fill itself is deliberately subtle.

@@ -240,7 +240,7 @@ component demos live on these pages, this continuously re-verifies the
 framework's own AA claim, not just the site around it.
 
 The shell-free framework and component-state specimens are audited separately
-in Amber, Plain, Playroom, and a custom blue primary. Light and dark additionally
+in Default, Plain, Playroom, and a custom blue primary. Light and dark additionally
 cover real hover, keyboard-focus, and pointer-active states; forced colors keeps
 the complete static specimen and the dedicated resilience checks below.
 
