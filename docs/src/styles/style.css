@@ -1155,8 +1155,15 @@ pre:not(.docs-demo-preview *) {
   background-size: 3.5rem 2.75rem;
 }
 
-/* Highlight.js theme — light. GitHub-derived hues, adjusted to sit with
-   Cirth's amber/neutral palette.
+/* Highlight.js theme — light. A cool ramp — plum, violet, steel, teal,
+   mineral green — chosen to sit outside the hue range the framework's own
+   palette signals in (copper at 44deg through the warning gold at 89.5).
+   A keyword that shared a hue with the accent would read as a link, and one
+   that shared it with the error family would read as a mistake. Every value
+   clears AA on the code surface it sits on.
+
+   Docs-owned on purpose: syntax highlighting is editorial composition, not
+   a library concern, and nothing in src/ derives from these.
 
    The comment hue reads inert only because the default palette's muted
    grey is the colour this text would fall back to anyway. Under playroom
@@ -1173,14 +1180,14 @@ pre:not(.docs-demo-preview *) {
 .hljs-doctag,
 .hljs-template-tag,
 .hljs-deletion {
-  color: #c2413b;
+  color: #6b3991;
 }
 
 .hljs-string,
 .hljs-regexp,
 .hljs-addition,
 .hljs-meta .hljs-string {
-  color: #274f8f;
+  color: #335d62;
 }
 
 .hljs-title,
@@ -1190,7 +1197,7 @@ pre:not(.docs-demo-preview *) {
 .hljs-selector-class,
 .hljs-selector-id,
 .hljs-selector-pseudo {
-  color: #6b40b6;
+  color: #3744b7;
 }
 
 .hljs-attr,
@@ -1205,12 +1212,12 @@ pre:not(.docs-demo-preview *) {
 .hljs-built_in,
 .hljs-type,
 .hljs-meta {
-  color: #1d5fb4;
+  color: #31587d;
 }
 
 .hljs-name,
 .hljs-tag .hljs-name {
-  color: #26783f;
+  color: #33604c;
 }
 
 .hljs-emphasis {
@@ -1229,14 +1236,14 @@ pre:not(.docs-demo-preview *) {
 [data-theme="dark"] .hljs-doctag,
 [data-theme="dark"] .hljs-template-tag,
 [data-theme="dark"] .hljs-deletion {
-  color: #ff8d84;
+  color: #c1a2dd;
 }
 
 [data-theme="dark"] .hljs-string,
 [data-theme="dark"] .hljs-regexp,
 [data-theme="dark"] .hljs-addition,
 [data-theme="dark"] .hljs-meta .hljs-string {
-  color: #a8d3ff;
+  color: #79bfc7;
 }
 
 [data-theme="dark"] .hljs-title,
@@ -1246,7 +1253,7 @@ pre:not(.docs-demo-preview *) {
 [data-theme="dark"] .hljs-selector-class,
 [data-theme="dark"] .hljs-selector-id,
 [data-theme="dark"] .hljs-selector-pseudo {
-  color: #d5b1ff;
+  color: #a2afdd;
 }
 
 [data-theme="dark"] .hljs-attr,
@@ -1261,12 +1268,12 @@ pre:not(.docs-demo-preview *) {
 [data-theme="dark"] .hljs-built_in,
 [data-theme="dark"] .hljs-type,
 [data-theme="dark"] .hljs-meta {
-  color: #83c2ff;
+  color: #8db6dd;
 }
 
 [data-theme="dark"] .hljs-name,
 [data-theme="dark"] .hljs-tag .hljs-name {
-  color: #86e39b;
+  color: #79c3a1;
 }
 
 /* Copy button injected into every `pre > code` block; the click handler
@@ -1299,7 +1306,7 @@ pre > button.copy {
 }
 
 /* muted-border-color, not --cirth-background-color: a <button> rebinds the
-   latter to its own fill, so this resolved to amber. Nor
+   latter to its own fill, so this resolved to the accent. Nor
    code-background-color, which would nearly vanish — the button already
    sits on a fade to that colour. */
 pre > button.copy:hover,
@@ -2854,7 +2861,8 @@ details.docs-demo-source[open] > summary {
    than beside it. The list draws the rail at the stroke width the
    framework's active marker uses, and every entry is pulled back by
    exactly that width so its own inline-start border lands on top of the
-   rail: transparent at rest, amber when the framework paints aria-current.
+   rail: transparent at rest, the accent when the framework paints
+   aria-current.
    One indicator, one continuous line, no pill with a bar stuck to it. */
 .docs-sidebar nav ul,
 .docs-toc nav > ul {
