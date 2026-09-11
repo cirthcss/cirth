@@ -39,10 +39,14 @@
   // Primary colors
   // --cirth-primary is the input. Everything below derives from it, so
   // setting that one token rethemes the whole accent — hover, focus, the
-  // underline tint and the fill follow without being restated. The resting
-  // ratio preserves the shipped amber ladder; the hover ratio additionally
-  // protects the inverse-text contrast across the shipped presets. Override
-  // any derived token directly if you want to break the relationship.
+  // underline tint and the fill follow without being restated. Both fill
+  // ratios are bounded by the same constraint: they have to keep white
+  // legible on the fill when --cirth-primary is replaced by the shipped
+  // Plain value or by the documented custom blue, which are lighter than
+  // the default copper and so darken less for the same ratio. Raising the
+  // resting one to land on a ladder step drops Plain's inverse to 4.36:1,
+  // under AA — that is why it is not a round number. Override any derived
+  // token directly if you want to break the relationship.
 
   --cirth-primary-background: color-mix(
     in oklch,
@@ -69,7 +73,18 @@
 
   // Focus rings composite to >= 3:1 against the page background (WCAG
   // 1.4.11 as applied to focus indicators) — don't lower these alphas.
-  --cirth-primary-focus: oklch(from var(--cirth-primary) l c h / 70%);
+  // 80%, where the light scheme uses 75%: this scheme's accent sits a step
+  // deeper on the ladder (see theme/_dual.scss), so the same alpha would
+  // have left the ring at 3.11:1 on a card. At 80% it composites to
+  // 3.68:1 there and 3.93:1 on the canvas.
+  --cirth-primary-focus: oklch(from var(--cirth-primary) l c h / 80%);
+
+  // Text selection — see theme/_light.scss for why this is derived rather
+  // than pinned. The accent already sits high on the ladder in this scheme,
+  // so the lift is small and the alpha carries the rest.
+  --cirth-text-selection-color: oklch(
+    from var(--cirth-primary) calc(l * 1.065) c h / 18.75%
+  );
   --cirth-primary-inverse: #{$white};
 
   // Surface model. Code is deeply recessed below the graphite canvas and
@@ -157,8 +172,8 @@
 
   // Thumb matches button text color rather than a hardcoded white — see
   // the matching comment in _light.scss. Verified >= 3:1 (WCAG 1.4.11):
-  // 5.35:1 unchecked (white on neutral-550), 5.46:1 checked (white on
-  // amber-550).
+  // 5.37:1 unchecked (white on neutral-550), 6.44:1 checked (white on the
+  // derived primary fill).
   --cirth-switch-color: var(--cirth-primary-inverse);
   --cirth-range-thumb-border-color: var(--cirth-background-color);
   --cirth-range-thumb-color: var(--cirth-secondary-background);
@@ -168,6 +183,13 @@
   --cirth-accordion-active-summary-color: var(--cirth-primary-hover);
   --cirth-accordion-close-summary-color: var(--cirth-ink);
   --cirth-accordion-open-summary-color: var(--cirth-ink);
+
+  // The surface goes in whole here, unlike the light scheme: this canvas and
+  // the neutral scale share a hue, so there is no second temperature for the
+  // mix to average toward, and keeping the surface's chroma leaves the edge
+  // with the stone tint the rest of the scheme carries. See theme/_light.scss
+  // for what happens when the two hues differ, and for the fix if a theme
+  // moves this canvas off the neutral's hue.
   --cirth-card-border-color: color-mix(
     in oklab,
     var(--cirth-form-element-border-color) 46%,
@@ -195,7 +217,7 @@
   // Meter (<meter>)
   // Same three readings, and the same trick inverted: on a dark track the
   // weight has to come from lightness, so each step down the scale is a
-  // *lighter* color. 5.12:1, 5.61:1, 6.32:1 against the track
+  // *lighter* color. 5.18:1, 5.69:1, 6.34:1 against the track
   // (WCAG 1.4.11).
   --cirth-meter-optimum-color: var(--cirth-success);
   --cirth-meter-suboptimum-color: var(--cirth-warning);
@@ -203,7 +225,7 @@
 
   // Progress is part of the active-control language, not a brand specimen.
   // Following the public primary keeps Plain, Playroom and custom themes
-  // recognisable as the same framework without leaking the default amber.
+  // recognisable as the same framework without leaking the default copper.
   --cirth-progress-color: var(--cirth-primary);
 
   // Icons painted as background-image on replaced form controls. They

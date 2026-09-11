@@ -69,12 +69,6 @@
   // Text color
   --cirth-color: var(--cirth-ink);
 
-  // Text selection color
-  --cirth-text-selection-color: light-dark(
-    #{color.change($amber-400, $alpha: 0.25)},
-    #{color.change($amber-350, $alpha: 0.1875)}
-  );
-
   // Muted colors
   // The dark value clears AA on the highest surface in the runtime graph.
   // neutral-450 was only 4.33:1 on a card after the surface hierarchy gained
@@ -91,10 +85,10 @@
   // Setting one input rethemes every status treatment that reads from it:
   // the solid fill a meter paints, the ink <del>/<ins> use, the border a
   // field takes when it validates, and the tint a <mark> sits on. The
-  // ratios reproduce the hand-picked ladder steps these replaced exactly,
-  // so introducing the relationship changed no colour. The status hues are
-  // deliberately not fixed constants: a theme whose brand overlaps a
-  // conventional status hue is expected to move them (see gh#84).
+  // status hues are deliberately not fixed constants: a theme whose brand
+  // overlaps a conventional status hue is expected to move them (see
+  // gh#84). The default keeps error a full 22deg off the brand hue for
+  // exactly that reason — see the note in theme/_colors.scss.
   --cirth-error: light-dark(#{$error-650}, #{$error-300});
   --cirth-success: light-dark(#{$success-550}, #{$success-400});
   --cirth-warning: light-dark(#{$warning-600}, #{$warning-350});
@@ -102,12 +96,15 @@
   // Primary colors
   // --cirth-primary is the input. Everything below derives from it, so
   // setting that one token rethemes the whole accent — hover, focus, the
-  // underline tint and the fill follow without being restated. The ratios
-  // are not arbitrary: they reproduce the shipped amber ladder step for
-  // step (verified pixel-identical against the values they replaced), so
-  // introducing the relationship changed no colour. Override any derived
-  // token directly if you want to break the relationship on purpose.
-  --cirth-primary: light-dark(#{$amber-550}, #{$amber-350});
+  // underline tint and the fill follow without being restated. Override
+  // any derived token directly if you want to break the relationship on
+  // purpose.
+  // The dark anchor is 400, not the 350 that would mirror the light 550:
+  // copper's gamut ceiling climbs steeply above L 65%, so the mirror step
+  // comes out an orange rather than a metal. One step deeper keeps the
+  // family reading as copper on a graphite page and still clears AA on
+  // every surface in the scheme (4.97:1 on a card, the worst of them).
+  --cirth-primary: light-dark(#{$copper-550}, #{$copper-400});
 
   // Secondary colors. This is the neutral family, not another input graph:
   // its fixed scale keeps the public runtime relationships concentrated on
@@ -145,13 +142,12 @@
   // Visited links: the accent drained to neutral, so a followed link reads
   // as spent without leaving the palette. A step darker than
   // --cirth-secondary so the two aren't the same colour by accident.
-  // Drained means *achromatic*, not "the cool grey from the neutral scale".
-  // The scale's 600 step carries 0.03 of chroma at 264deg, which on the warm
-  // paper canvas read as a cold cast rather than as a spent link, and next
-  // to a warm accent it was a hue change at almost the same lightness —
-  // the weakest possible way to say "you have been here". Zero chroma says
-  // it with the one channel that is unambiguous. Lightness is unchanged, so
-  // is the contrast: 5.98:1 on the canvas, 6.31:1 on a card (WCAG 1.4.3 AA).
+  // Drained means *achromatic*, not "the grey from the neutral scale".
+  // The scale's own steps carry the graphite tint, which next to a warm
+  // accent is a hue change at almost the same lightness — the weakest
+  // possible way to say "you have been here". Zero chroma says it with the
+  // one channel that is unambiguous. Lightness is unchanged, so is the
+  // contrast: 6.00:1 on the canvas, 6.30:1 on a card (WCAG 1.4.3 AA).
   --cirth-link-visited-color: light-dark(
     #{color.change($neutral-600, $chroma: 0)},
     #{color.change($neutral-400, $chroma: 0)}

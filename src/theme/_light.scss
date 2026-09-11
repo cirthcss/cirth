@@ -34,7 +34,7 @@
   --cirth-primary-underline: oklch(from var(--cirth-primary) l c h / 50%);
 
   // 83.5% and 91.7% of the accent mixed toward black land exactly on
-  // $amber-650 and $amber-600 — the ladder is proportional in L and C at
+  // $copper-650 and $copper-600 — the ladder is proportional in L and C at
   // this end, so a single mix reproduces a step.
   --cirth-primary-hover: color-mix(in oklch, var(--cirth-primary) 83.5%, black);
   --cirth-primary-hover-background: color-mix(
@@ -49,6 +49,15 @@
   // 1.4.11 as applied to focus indicators) — don't lower these alphas.
   --cirth-primary-focus: oklch(from var(--cirth-primary) l c h / 75%);
   --cirth-primary-inverse: #{$white};
+
+  // Text selection. Derived, not pinned to a scale step: this used to be a
+  // literal from the brand family, which meant every preset — a blue Plain
+  // page, a violet Playroom one — highlighted text in the default theme's
+  // accent. The ratio lifts the accent to the lightness the wash needs so
+  // the page's ink stays legible through it (8.0:1 with the shipped value).
+  --cirth-text-selection-color: oklch(
+    from var(--cirth-primary) calc(l * 1.247) c h / 25%
+  );
 
   // Surface model. --cirth-canvas is the only public input; every role
   // keeps its relationship at runtime, so changing the canvas temperature
@@ -108,9 +117,9 @@
   // oklab, not oklch, and the reason is the card surface. A
   // polar space interpolates the *hue angle*, and an author-written
   // `oklch(L 0 0)` carries an explicit 0deg hue rather than a powerless
-  // one — so mixing the 264deg field border toward it took the short way
-  // round the wheel and landed the result at ~325deg, a faint magenta
-  // outside the palette. (`black`/`white` keywords are safe: they convert
+  // one — so mixing the field border toward it took the short way round the
+  // wheel and landed the result at ~325deg, a faint magenta outside the
+  // palette. (`black`/`white` keywords are safe: they convert
   // with a missing hue, which is carried from the other colour. A literal
   // is not.) A rectangular space has no hue to rotate: L and C come out
   // identical, the tint stays in the neutral family, and the border keeps
@@ -148,9 +157,9 @@
   // Thumb matches button text color rather than a hardcoded white, so a
   // customized --cirth-primary-inverse stays consistent everywhere it
   // implies "text/icon on top of the primary color". Verified >= 3:1
-  // (WCAG 1.4.11) against both tracks with the shipped values: 3.75:1
-  // unchecked (white on neutral-450), 5.46:1 checked (white on
-  // amber-550) — the tightest of the two is the one to re-check if
+  // (WCAG 1.4.11) against both tracks with the shipped values: 3.77:1
+  // unchecked (white on neutral-450), 5.60:1 checked (white on
+  // copper-550) — the tightest of the two is the one to re-check if
   // --cirth-primary-inverse or --cirth-switch-background-color changes.
   --cirth-switch-color: var(--cirth-primary-inverse);
   --cirth-range-thumb-border-color: var(--cirth-background-color);
@@ -163,10 +172,24 @@
   --cirth-accordion-open-summary-color: var(--cirth-ink);
 
   // Rectangular mix — see the note on --cirth-table-border-color above.
+  // The card surface goes in with its chroma zeroed, so it contributes
+  // lightness and nothing else. Rectangular space stops a hue from
+  // *rotating*, but it does not stop two hues from averaging: this scheme's
+  // canvas is warm (the brand hue) while the neutral scale is a cool stone,
+  // and once the neutral's chroma decays toward the pale end the two
+  // contributions are the same order of magnitude. Mixed whole they cancel
+  // into a hue two thirds of the way to magenta — 349deg, against a 308deg
+  // field border — which is the same failure the oklch mix used to produce,
+  // arrived at by addition instead of rotation. With the surface hueless the
+  // result is the field border's own hue at 38% of its chroma, whatever
+  // temperature a consumer gives the canvas. Lightness, and so the measured
+  // contrast, is unchanged. The dark scheme mixes the surface whole because
+  // there its canvas and the neutral share a hue and there is nothing to
+  // average; a theme that moves them apart needs this formulation there too.
   --cirth-card-border-color: color-mix(
     in oklab,
     var(--cirth-form-element-border-color) 38%,
-    var(--cirth-card-background-color)
+    oklch(from var(--cirth-card-background-color) l 0 h)
   );
 
   // Dropdown (details.dropdown)
@@ -188,11 +211,11 @@
     )};
 
   // Meter (<meter>)
-  // Green / amber / red, the reading every browser's own meter already
+  // Green / gold / red, the reading every browser's own meter already
   // teaches — but with the hue backed by weight: each step down the scale
   // is also a darker color, so the same signal survives a reader who
   // cannot separate the hues. All three clear 3:1 against the track
-  // (WCAG 1.4.11) with room: 3.97:1, 5.11:1, 6.55:1. A meter whose author
+  // (WCAG 1.4.11) with room: 3.97:1, 5.05:1, 6.57:1. A meter whose author
   // declared no low/high/optimum is entirely optimum, so it prints as one
   // flat green bar — which is what it means.
   --cirth-meter-optimum-color: var(--cirth-success);
