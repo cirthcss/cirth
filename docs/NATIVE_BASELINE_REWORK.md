@@ -291,7 +291,7 @@ text on the light canvas:
 The shipped accent uses 0.107, well under its own ceiling, so there is
 deliberate headroom left if the accent ever needs to speak louder.
 
-## Verification state
+## Verification state: chromatic rework
 
 Everything below was run on this branch after the rework.
 
@@ -310,69 +310,210 @@ Everything below was run on this branch after the rework.
 The size increase is entirely the two new derivations. Both replaced literals
 with relationships.
 
+## Native maturity convergence, 2026-09-11
+
+This pass was performed as an independent review of the chromatic work above.
+The primary evidence was a framework-only specimen rendered before and after
+the pass, not the documentation shell.
+
+### Independent aesthetic verdict
+
+The direction is confirmed: **mineral paper + cool graphite + copper signal**
+is credible, durable, and substantially more identifiable than the earlier
+amber baseline.
+
+The reservation is specific rather than directional. At compact button scale,
+copper can approach ochre or brown when it is viewed without the paper/graphite
+context. It does not read as generic orange in the complete page, and increasing
+its coverage would make that risk worse rather than better. The identity still
+comes from the warm-surface/cool-ink counterweight; copper confirms it.
+
+The pure-framework dark specimen reads as cool graphite. The documentation can
+look slightly more violet because it presents much larger contiguous surfaces,
+but it does not cross into a themed purple UI. Light and dark retain the same
+surface hierarchy, density, type, and signal behavior and read as the same
+product. No palette rebuild was justified by the renders.
+
+Compared directly:
+
+- the earlier amber build is competent but anonymous;
+- graphite/copper before this pass is distinctive, with several native-element
+  edges still visibly less resolved than the docs;
+- graphite/copper after this pass keeps the identity and closes the most visible
+  semantic, state, and rhythm gaps.
+
+### Framework maturity before
+
+The existing core was already mature on forms, cards, tables, disclosures,
+surface derivation, focus, nested lists, and description lists. The expanded
+specimen exposed five weaker edges: `<mark>` still looked like a browser warning
+highlight; the dark range thumb did not clear the non-text contrast floor and
+the range host was only thumb-height; a primary and a destructive action had no
+visual distinction; top-level sections accumulated like ordinary blocks; and
+captions did not step down from body copy.
+
+Those deficiencies mattered more in the framework-only view because the docs'
+editorial plate, larger chapter spacing, annotations, and source/output framing
+were no longer available to lend them hierarchy.
+
+### Docs to core ownership decisions
+
+No documentation selector was copied literally and no shell rule was deleted
+for the sake of an override count. Two relationships demonstrated by the docs
+were generalized instead:
+
+1. The docs gives chapters a larger beat while keeping nested application
+   regions compact. Core now gives adjacent direct `<main>` sections
+   `--cirth-space-8`; the ordinary `<section>` rhythm is unchanged, so nested
+   regions and full-bleed compositions retain their existing contract.
+2. The docs consistently makes captions read as metadata. Core `figcaption` and
+   table `caption` now use the small type role with normal leading, while their
+   existing muted color and placement remain semantic defaults.
+
+The docs continues to set a relaxed line height and `--cirth-space-5` prose
+rhythm on `.docs-content`. That is a long-form reading-mode decision, and live
+examples still hand those inherited values back at their boundary. Homepage
+band padding, annotations, proof ledgers, source panes, syntax color, copy
+controls, TOC, sidebar, responsive ordering, and stage geometry also remain
+editorial composition.
+
+### Mark
+
+Before, `<mark>` used `--cirth-warning-surface`: relevance and warning were the
+same visual role, and a multiline highlight looked like a pale browser-default
+gold stripe.
+
+Now its surface is an Oklab mix of `--cirth-primary` and `--cirth-canvas` (18%
+accent in light, 24% in dark). The foreground remains the high-contrast mark
+role, inline padding remains small, and cloned box decoration keeps each wrapped
+line intentional without producing a chip. Text selection continues to paint
+with its own selection role. Forced colors uses `Mark`/`MarkText`; print uses a
+conventional pale highlight with exact color adjustment, independent of the
+active screen scheme. The result follows every preset and no longer consumes a
+semantic status family.
+
+### Range
+
+Before, the dark thumb was 2.37:1 against the track and the range host was only
+20 px high. Changing the neutral architecture would have been disproportionate.
+
+The resting thumb now reads `--cirth-secondary`, raising the default relationship
+to 4.20:1 in light and 5.70:1 in dark. The host uses the shared 44 px control
+floor; the visible thumb remains 20 px. Hover strengthens track and thumb,
+active retains the accent and enlarged thumb, focus-visible gains an external
+ring, and disabled remains inert. The outcome, rather than pseudo-element pixel
+parity, is checked in Chromium, Firefox, and WebKit across both schemes and all
+specimens.
+
+### Copper, danger, and CVD
+
+The original risk was real: the default filled action and a destructive action
+had the same copper fill because HTML has no destructive button type. Moving the
+brand was not the smallest correct fix.
+
+The class build now exposes `.danger`, including `.outline.danger` and
+`.ghost.danger`. It reuses the existing error input and focus family rather than
+adding a parallel token graph. The dark filled variant is deliberately deeper,
+keeping white labels at AA and increasing lightness separation from copper.
+
+The adjacency specimen places primary, destructive, error, warning, success,
+and keyboard focus together. Labels, element semantics, revision treatment or
+meter shape, borders, and the focus ring carry meaning before hue does. A
+repeatable Machado-matrix audit simulates full protanopia and deuteranopia in
+linear sRGB, then measures the rendered fills in Oklab. Across default, Plain,
+Playroom, the documented blue override, both schemes, and all three engines,
+primary/danger distance stays at or above 0.06 and both labels stay at or above
+4.5:1. For the default pair the smallest simulated distance is 0.085. The copper
+palette therefore remains unchanged.
+
+### Typography, rhythm, semantic HTML, and controls
+
+The heading ramp, paragraph/list rhythm, nested content, blockquotes, code,
+description lists, details, fieldsets, tables, and card/form rhythm survived the
+framework-only review without needing more decoration. The changes were the two
+caption roles and the top-level section beat above. They improve hierarchy while
+leaving application density and preset spacing control intact.
+
+The permanent shell-free specimen now covers the full heading range, prose and
+inline semantics, nested and description lists, quotation/citation, rules,
+code/pre/kbd/samp, mark/ins/del, table/caption, figure/figcaption, landmarks,
+article/section, details, dialog, popover, search, forms, all common input types,
+file, range, progress, meter, readonly, disabled, validity, selection, and focus.
+It contains no docs classes, imagery, or docs stylesheet. Existing native
+checkbox, radio, switch, select, file, date/time, search, number, validation,
+readonly, progress, and meter behavior proved intentional; range was the only
+control needing a core change.
+
+### Framework versus docs after
+
+The remaining delta is **healthy and intentional**. A semantic Cirth page now
+has the hierarchy, state clarity, native-control finish, and material palette
+needed to look like a designed product rather than a colored reset. The docs is
+still visibly richer because it has a documentation job: navigation, editorial
+bands, proof grammar, measurements, diagrams, and source/output tooling. It no
+longer appears better because a warning token is standing in for a highlight, a
+native control lacks a target or state, or ordinary chapters and captions have
+no hierarchy.
+
+### API impact
+
+The only new public API is the `.danger` button modifier in class-enabled
+builds. It is justified by a semantic gap HTML cannot infer and by a tested
+brand/status collision in real adjacency. It composes with the existing outline
+and ghost silhouettes and adds no public custom property. Classless builds do
+not guess destructive intent from text or form position.
+
+### Verification: native maturity convergence
+
+The final tree was copied into an isolated checkout for every command that
+generates `dist/` or `docs/dist/`; neither generated directory was edited in the
+working tree. The macOS visual baselines were regenerated there, inspected at
+desktop and mobile sizes, and then verified by a complete non-update run. Their
+Git LFS content matches the tracked baseline set, so this pass adds no binary
+snapshot churn. Linux remains a CI follow-up, as recorded below.
+
+| check | final result |
+| --- | --- |
+| `lint`, `build`, `docs:build` | clean; 49 searchable pages and 66 built pages |
+| `check:dist`, `check:size` | 20 non-empty parseable files; all eight gzip budgets green |
+| `check:package`, `check:consumer` | 24 packed files, 13 package entry points; clean tarball install with 12 runtime entry points and 5 sealed internal paths |
+| `check:behavior` | 1,056 passed, 9 expected skips, 0 failed across Chromium, Firefox, and WebKit |
+| `check:a11y` | no new WCAG 2.0–2.2 A/AA violations across 50 pages × 3 themes × 3 modes, open states, and shell-free specimens |
+| `check:visual` | 787 passed, 17 expected skips, 0 failed across 12 browser/viewport/scheme projects |
+| `check:tooling`, `check:hooks` | audit isolation, interaction model, flake reporting, 16 release guards, and installed Git hooks all clean |
+| rendered CVD adjacency | primary/danger labels ≥ 4.5:1 and Oklab distance ≥ 0.06 under normal, full protanopia, and full deuteranopia simulation |
+| gzip delta across the eight builds | **+807 B total**; full build **+258 B** at 14,177 B, with 323 B remaining |
+
+The range state assertions exercise real hover, active, keyboard focus, and
+disabled behavior rather than only reading declarations. Mark contrast is
+checked on screen, under `prefers-contrast: more`, in forced colors, and in
+print. Section spacing is checked in both default and classless builds, with a
+separate assertion that nested regions remain compact.
+
 ## Open questions and next steps
 
-Ordered by what blocks what. Nothing here is started.
+### 1. Linux visual baselines
 
-### 1. Linux visual baselines — blocking CI
+The previously missing Linux regeneration exists upstream as commit `6721d991`;
+this local branch started one commit behind it and the working tree was not
+rewritten to pull it underneath an in-flight pass. This pass changes rendered
+output again, so its Linux baselines must be regenerated by the repository's
+`Update visual baselines` workflow after the branch is pushed. Do not synthesize
+them on macOS.
 
-The twelve `specimen-amber.png` files were renamed to `specimen-default.png`
-but their **content is still the amber build**. Linux baselines are not
-generated on macOS. Run the `Update visual baselines` workflow so the bot
-regenerates them on Linux, as in CI #103. Until then `check:visual` is only
-green locally.
+### 2. Human brand sign-off
 
-### 2. Independent review of the direction
+The independent review above resolves the earlier self-review gap, but it is not
+human brand approval. gh#78 still needs the maintainer's sign-off on the copper
+assets and the restrained compact-scale reading.
 
-The copper palette was designed and assessed in the same session by the same
-author. That assessment is not independent, and no amount of further
-self-review fixes that.
+### 3. Competitive-data qualification
 
-The amber build is reproducible for comparison: check out `src/theme/` from
-before the rework, `npm run build && npm run docs:build`, and capture the same
-pages in both schemes. What is worth having is a blind comparison by someone
-who did not build either one — particularly on the two questions self-review is
-worst at, namely whether the copper reads as brown at small sizes and whether
-the dark canvas reads as violet rather than as graphite.
+Radix Themes' default accent remains asserted at medium confidence. The prop
+file defaults `accentColor` to an empty string with the fallback in CSS. Confirm
+from the compiled theme if the comparison is ever published.
 
-### 3. Color-vision-deficiency testing — the real risk
-
-Copper (44°) and danger (22°) are 22° apart. Separation currently rests on
-chroma and lightness rather than hue: ΔE 17.8 in light, 14.2 in dark, measured
-in Oklab. Those numbers are trichromat numbers. Under protanopia and deuteranopia
-the hue difference largely disappears and only the lightness difference remains.
-This has **not** been tested and it is the one finding that could force a change
-to the palette rather than to a component. Test the adjacency page
-(primary action / destructive action / form error / warning / focus on one
-screen) under simulation before the direction is considered settled.
-
-### 4. The framework/documentation identity gap
-
-The documentation has built a visual identity — proof ledger, numbered figures,
-construction grid, specimens — that the framework itself does not have. An
-adopter gets the stylesheet, not the technical plate. The layer contract above
-declares the split deliberately, so this is not an accident, but it does mean
-the positioning currently rests on the docs more than on the product. Decide
-whether that is acceptable, or whether some of the plate grammar belongs in the
-library. This is a product decision, not a palette one.
-
-### 5. Smaller items
-
-- **Range thumb, dark: 2.37:1 against a 3:1 non-text floor.** Pre-existing, not
-  introduced by the rework (it was 2.36:1 before). The thumb separates via its
-  page-colored ring rather than against the track. Worth a focused fix; changing
-  a neutral relationship for it would be the wrong lever.
-- **`<mark>` is still the most default-browser gesture in the palette.** The
-  surface is a pale gold from the warning family, which is coherent, but the
-  treatment has had no design attention.
-- **Radix Themes' default accent is asserted at medium confidence.** The prop
-  file defaults `accentColor` to an empty string with the fallback in CSS.
-  Confirm from the compiled theme if the comparison is ever published.
-- **gh#78 (brand sign-off)** now has a candidate answer rather than an open
-  question. `TODO.md` was updated from "whether amber" to "whether copper"; the
-  sign-off itself is still outstanding and now also covers the recolored assets.
-
-### 6. Do not do
+### 4. Do not do
 
 Recorded so they are not revisited by accident:
 

@@ -47,6 +47,8 @@
 #{$parent-selector} caption {
   padding-block-end: calc(var(--cirth-spacing) * 0.5);
   color: var(--cirth-muted-color);
+  font-size: var(--cirth-font-size-sm);
+  line-height: var(--cirth-line-height-normal);
   text-align: start;
 }
 

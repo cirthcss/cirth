@@ -118,6 +118,12 @@ $print-root-selector: "body";
     --cirth-table-row-stripped-background-color: transparent;
     --cirth-modal-overlay-background-color: transparent;
 
+    // A screen highlight follows the active theme accent. On paper, use the
+    // conventional pale highlight so relevance survives without turning a
+    // dark-scheme accent/canvas mix into a dark printed block.
+    --cirth-mark-background-color: #{$warning-100};
+    --cirth-mark-color: var(--cirth-print-color);
+
     @if $enable-classes {
       --cirth-dropdown-background-color: transparent;
       --cirth-dropdown-box-shadow: none;

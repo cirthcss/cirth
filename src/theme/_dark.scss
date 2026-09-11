@@ -119,8 +119,13 @@
   --cirth-contrast-hover-border: var(--cirth-contrast-hover-background);
   --cirth-contrast-hover-underline: var(--cirth-contrast-hover);
 
-  // Highlighted text (<mark>)
-  --cirth-mark-background-color: var(--cirth-warning-surface);
+  // Highlighted text (<mark>) — same semantic relationship as light, with
+  // enough accent in the mix to remain visible on the graphite canvas.
+  --cirth-mark-background-color: color-mix(
+    in oklab,
+    var(--cirth-primary) 24%,
+    var(--cirth-canvas)
+  );
 
   // Inserted (<ins>) & Deleted (<del>)
   --cirth-ins-color: var(--cirth-success-text);
@@ -176,7 +181,7 @@
   // derived primary fill).
   --cirth-switch-color: var(--cirth-primary-inverse);
   --cirth-range-thumb-border-color: var(--cirth-background-color);
-  --cirth-range-thumb-color: var(--cirth-secondary-background);
+  --cirth-range-thumb-color: var(--cirth-secondary);
   --cirth-range-thumb-active-color: var(--cirth-primary-background);
 
   // Accordion (<details>)

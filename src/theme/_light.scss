@@ -93,8 +93,14 @@
   --cirth-contrast-hover-border: var(--cirth-contrast-hover-background);
   --cirth-contrast-hover-underline: var(--cirth-secondary-hover);
 
-  // Highlighted text (<mark>)
-  --cirth-mark-background-color: var(--cirth-warning-surface);
+  // Highlighted text (<mark>). Relevance follows the theme's accent rather
+  // than the warning family: a highlighted phrase is selected evidence, not
+  // a caution state. The canvas keeps the fill quiet enough for running text.
+  --cirth-mark-background-color: color-mix(
+    in oklab,
+    var(--cirth-primary) 18%,
+    var(--cirth-canvas)
+  );
 
   // Inserted (<ins>) & Deleted (<del>)
   --cirth-ins-color: var(--cirth-success-text);
@@ -163,7 +169,7 @@
   // --cirth-primary-inverse or --cirth-switch-background-color changes.
   --cirth-switch-color: var(--cirth-primary-inverse);
   --cirth-range-thumb-border-color: var(--cirth-background-color);
-  --cirth-range-thumb-color: var(--cirth-secondary-background);
+  --cirth-range-thumb-color: var(--cirth-secondary);
   --cirth-range-thumb-active-color: var(--cirth-primary-background);
 
   // Accordion (<details>)

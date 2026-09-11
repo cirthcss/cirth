@@ -200,14 +200,16 @@ Three inputs, each driving four roles:
 
 | Role | Used by |
 | --- | --- |
-| `--cirth-error` | The solid reading — a `<meter>` in its worst band |
+| `--cirth-error` | The solid reading — a worst-band `<meter>` and the `.danger` button fill |
 | `--cirth-error-text` | `<del>`, and status text on the page |
 | `--cirth-error-border` | An `[aria-invalid="true"]` field |
 | `--cirth-error-active` | That field while it has focus |
 | `--cirth-error-surface` | A tint to sit status content on |
 
-`--cirth-success` and `--cirth-warning` are identical in shape.
-`--cirth-warning-surface` is what a `<mark>` sits on.
+`--cirth-success` and `--cirth-warning` are identical in shape. A `<mark>`
+does not imply warning: its background is derived from `--cirth-primary`, so
+highlighted evidence follows the chosen accent while status content stays on
+the explicit `*-surface` families.
 
 Status hues are deliberately not fixed constants. If your brand overlaps a
 conventional status hue, move the status family rather than avoiding the

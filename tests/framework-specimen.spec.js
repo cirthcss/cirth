@@ -4,6 +4,13 @@ const {
 	createServer,
 	startServer,
 } = require("../scripts/lib/docs-site");
+const {
+	contrastColors,
+	contrastRatio,
+	oklabDistance,
+	parseColor,
+	simulateCvd,
+} = require("../scripts/lib/color");
 
 assertDocsBuilt("framework-specimen.spec");
 
@@ -35,10 +42,67 @@ for (const specimen of specimens) {
 		).toHaveCount(0);
 		await expect(page.locator("img, svg")).toHaveCount(0);
 		await expect(page.locator("nav")).toHaveCount(3);
-		await expect(page.locator("article")).toHaveCount(2);
-		await expect(
-			page.locator("form, table, details, progress, dialog"),
-		).toHaveCount(5);
+
+		// This is the maturity specimen, not a hand-picked component demo. If
+		// one of these disappears, the visual suite would otherwise keep
+		// passing while an entire native category silently left the audit.
+		const publicSurface = [
+			"h1",
+			"h2",
+			"h3",
+			"h4",
+			"h5",
+			"h6",
+			"p",
+			"small",
+			"a",
+			"strong",
+			"em",
+			"abbr",
+			"mark",
+			"ins",
+			"del",
+			"code",
+			"pre",
+			"kbd",
+			"samp",
+			"var",
+			"sub",
+			"sup",
+			"ul ul",
+			"ol",
+			"dl",
+			"blockquote",
+			"cite",
+			"hr",
+			"figure",
+			"figcaption",
+			"table caption",
+			"form",
+			"search",
+			"fieldset",
+			"textarea",
+			"select",
+			'input[type="search"]',
+			'input[type="number"]',
+			'input[type="date"]',
+			'input[type="time"]',
+			'input[type="datetime-local"]',
+			'input[type="file"]',
+			'input[type="range"]',
+			'input[type="checkbox"]',
+			'input[type="radio"]',
+			'input[role="switch"]',
+			"meter",
+			"progress",
+			"details",
+			"dialog",
+			"[popover]",
+		];
+		const missing = await page.evaluate((selectors) =>
+			selectors.filter((selector) => !document.querySelector(selector)),
+		publicSurface);
+		expect(missing, `${specimen}: missing native specimen coverage`).toEqual([]);
 
 		// The radius is a *pair*, not a number: a container is one step
 		// softer than the controls inside it, so a card reads as a sheet
@@ -80,6 +144,168 @@ for (const specimen of specimens) {
 		expect(buttonGeometry.bottom).toBe(buttonGeometry.top);
 		expect(Number.parseFloat(buttonGeometry.height)).toBeGreaterThanOrEqual(44);
 	});
+}
+
+const deficiencies = /** @type {const} */ ([
+	"protanopia",
+	"deuteranopia",
+]);
+
+for (const specimen of specimens) {
+	for (const scheme of /** @type {const} */ (["light", "dark"])) {
+		test(`${specimen} ${scheme} keeps native highlights, range, and semantic actions distinct`, async ({
+			page,
+		}) => {
+			await page.emulateMedia({ colorScheme: scheme });
+			await page.goto(`${origin}/specimen/${specimen}/`);
+
+			const evidence = await page.evaluate(() => {
+				/** @param {string} property */
+				const resolve = (property) => {
+					const probe = document.createElement("span");
+					probe.style.backgroundColor = `var(${property})`;
+					document.body.append(probe);
+					const value = getComputedStyle(probe).backgroundColor;
+					probe.remove();
+					return value;
+				};
+				/** @param {string} selector */
+				const styles = (selector) => {
+					const element = document.querySelector(selector);
+					if (!element) throw new Error(`missing ${selector}`);
+					const style = getComputedStyle(element);
+					return {
+						background: style.backgroundColor,
+						color: style.color,
+					};
+				};
+				const range = document.querySelector('#controls input[type="range"]');
+				const mark = document.querySelector("mark");
+				if (!range || !mark) throw new Error("native evidence is unavailable");
+				const markStyle = /** @type {CSSStyleDeclaration & { webkitBoxDecorationBreak?: string }} */ (
+					getComputedStyle(mark)
+				);
+
+				return {
+					danger: styles("button.danger"),
+					mark: {
+						background: markStyle.backgroundColor,
+						boxDecorationBreak:
+							markStyle.boxDecorationBreak || markStyle.webkitBoxDecorationBreak,
+						color: markStyle.color,
+					},
+					primary: styles('#semantic-states [role="group"] button:first-child'),
+					range: {
+						height: range.getBoundingClientRect().height,
+						thumb: resolve("--cirth-range-thumb-color"),
+						track: resolve("--cirth-range-border-color"),
+					},
+					warningSurface: resolve("--cirth-warning-surface"),
+				};
+			});
+
+			expect(evidence.mark.background).not.toBe(evidence.warningSurface);
+			expect(evidence.mark.boxDecorationBreak).toBe("clone");
+			expect(
+				contrastRatio(evidence.mark.color, evidence.mark.background),
+				`${specimen} ${scheme}: mark text`,
+			).toBeGreaterThanOrEqual(4.5);
+			expect(evidence.range.height).toBeGreaterThanOrEqual(44);
+			expect(
+				contrastRatio(evidence.range.thumb, evidence.range.track),
+				`${specimen} ${scheme}: range thumb against track`,
+			).toBeGreaterThanOrEqual(3);
+
+			const pairs = [
+				{
+					name: "normal",
+					transform:
+						/** @param {ReturnType<typeof parseColor>} color */ (color) => color,
+				},
+				...deficiencies.map((deficiency) => ({
+					name: deficiency,
+					transform:
+						/** @param {ReturnType<typeof parseColor>} color */ (color) =>
+							simulateCvd(color, deficiency),
+				})),
+			];
+			for (const { name, transform } of pairs) {
+				const primaryFill = transform(parseColor(evidence.primary.background));
+				const dangerFill = transform(parseColor(evidence.danger.background));
+				const primaryText = transform(parseColor(evidence.primary.color));
+				const dangerText = transform(parseColor(evidence.danger.color));
+				expect(
+					contrastColors(primaryText, primaryFill),
+					`${specimen} ${scheme} ${name}: primary label`,
+				).toBeGreaterThanOrEqual(4.5);
+				expect(
+					contrastColors(dangerText, dangerFill),
+					`${specimen} ${scheme} ${name}: danger label`,
+				).toBeGreaterThanOrEqual(4.5);
+				// A label carries the meaning; this modest perceptual-distance floor
+				// additionally prevents copper and destructive red collapsing into
+				// one fill when red/green discrimination is reduced.
+				expect(
+					oklabDistance(primaryFill, dangerFill),
+					`${specimen} ${scheme} ${name}: primary/danger distance`,
+				).toBeGreaterThanOrEqual(0.06);
+			}
+
+			const range = page.locator('#controls input[type="range"]').first();
+			const rest = await range.screenshot();
+			await range.hover();
+			const hover = await range.screenshot();
+			expect(hover.equals(rest), `${specimen} ${scheme}: range hover`).toBe(false);
+			await page.mouse.down();
+			try {
+				const active = await range.screenshot();
+				expect(
+					active.equals(hover),
+					`${specimen} ${scheme}: range active`,
+				).toBe(false);
+			} finally {
+				await page.mouse.up();
+			}
+			await focusVisibly(page, range);
+			expect(
+				Number.parseFloat(
+					await range.evaluate(
+						(element) => getComputedStyle(element).outlineWidth,
+					),
+				),
+			).toBeGreaterThan(0);
+
+			const disabledRange = page.locator("#risk-disabled");
+			/** @param {import("@playwright/test").Locator} locator */
+			const disabledStyle = (locator) =>
+				locator.evaluate((element) => {
+					const style = getComputedStyle(element);
+					return {
+						opacity: style.opacity,
+						pointerEvents: style.pointerEvents,
+						thumb: style.getPropertyValue("--cirth-range-thumb-color"),
+						track: style.getPropertyValue("--cirth-range-border-color"),
+					};
+				});
+			const disabledRest = await disabledStyle(disabledRange);
+			const disabledBox = await disabledRange.boundingBox();
+			if (!disabledBox) throw new Error("disabled range geometry is unavailable");
+			// Disabled controls intentionally opt out of pointer events. Moving
+			// the pointer to its painted box verifies the inert result without
+			// asking Playwright to perform an action the element must reject.
+			await page.mouse.move(
+				disabledBox.x + disabledBox.width / 2,
+				disabledBox.y + disabledBox.height / 2,
+			);
+			const disabledHover = await disabledStyle(disabledRange);
+			expect(
+				disabledHover,
+				`${specimen} ${scheme}: disabled range is inert`,
+			).toEqual(disabledRest);
+			expect(disabledRest.pointerEvents).toBe("none");
+			expect(Number.parseFloat(disabledRest.opacity)).toBeLessThan(1);
+		});
+	}
 }
 
 // A preset changes the dialect, not the grammar.

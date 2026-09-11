@@ -213,6 +213,17 @@
   background-color: var(--cirth-mark-background-color);
   color: var(--cirth-mark-color);
   vertical-align: baseline;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+@media (forced-colors: active) {
+  // System mark colors preserve relevance when forced colors removes the
+  // accent wash; text selection keeps the platform's separate highlight.
+  #{$parent-selector} mark {
+    background-color: Mark;
+    color: MarkText;
+  }
 }
 
 // Blockquote

@@ -196,6 +196,44 @@
     }
   }
 
+  // Danger
+  // HTML has no destructive button type, but destructive and primary
+  // actions routinely share a decision surface. Reusing the primary fill
+  // makes their meaning depend on wording alone; this modifier connects the
+  // action to the existing error input without adding a parallel color API.
+  // The dark fill is deliberately deeper than the bright error input so a
+  // white label keeps AA and copper/error retain a lightness difference when
+  // red/green hue discrimination is reduced.
+  #{$parent-selector}
+    :is(button, [type="submit"], [type="button"], [role="button"]).danger {
+    --cirth-background-color: light-dark(
+      var(--cirth-error),
+      color-mix(in oklch, var(--cirth-error) 55%, black)
+    );
+    --cirth-border-color: var(--cirth-background-color);
+    --cirth-color: var(--cirth-primary-inverse);
+
+    &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
+      --cirth-background-color: light-dark(
+        color-mix(in oklch, var(--cirth-error) 85%, black),
+        color-mix(in oklch, var(--cirth-error) 50%, black)
+      );
+      --cirth-border-color: var(--cirth-background-color);
+      --cirth-color: var(--cirth-primary-inverse);
+    }
+
+    &:focus-visible,
+    &:is([aria-current]:not([aria-current="false"])):focus-visible {
+      --cirth-box-shadow:
+        var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
+        0
+          0
+          0
+          var(--cirth-outline-width)
+          var(--cirth-form-element-invalid-focus-color);
+    }
+  }
+
   // Outline and ghost
   // Two quiet variants that differ in one thing: whether the control owns
   // an opaque surface. Outline does — it paints the control colour, so it
@@ -349,6 +387,49 @@
         transparent
       );
       --cirth-color: var(--cirth-contrast-hover);
+      --cirth-border-color: transparent;
+    }
+  }
+
+  // Danger composes with the two quiet silhouettes. These rules sit after
+  // the primary/secondary/contrast variants because the semantic role is the
+  // final color decision, while outline/ghost still decide the surface.
+  #{$parent-selector}
+    :is(
+      button,
+      [type="submit"],
+      [type="button"],
+      [role="button"]
+    ).outline.danger {
+    --cirth-background-color: var(--cirth-form-element-background-color);
+    --cirth-color: var(--cirth-error-text);
+    --cirth-border-color: var(--cirth-error-border);
+
+    &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
+      --cirth-background-color: var(--cirth-error-surface);
+      --cirth-color: var(--cirth-error-text);
+      --cirth-border-color: var(--cirth-error-active);
+    }
+  }
+
+  #{$parent-selector}
+    :is(
+      button,
+      [type="submit"],
+      [type="button"],
+      [role="button"]
+    ).ghost.danger {
+    --cirth-background-color: transparent;
+    --cirth-color: var(--cirth-error-text);
+    --cirth-border-color: transparent;
+
+    &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
+      --cirth-background-color: color-mix(
+        in oklch,
+        var(--cirth-error) 12%,
+        transparent
+      );
+      --cirth-color: var(--cirth-error-text);
       --cirth-border-color: transparent;
     }
   }

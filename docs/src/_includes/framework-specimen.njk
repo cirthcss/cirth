@@ -73,6 +73,7 @@
 						<h2>Current activity</h2>
 						<div class="overflow-auto" tabindex="0" role="region" aria-label="Current release requests">
 							<table>
+								<caption>Requests in the current maintenance window</caption>
 								<thead><tr><th scope="col">Request</th><th scope="col">Owner</th><th scope="col">State</th><th scope="col">Progress</th></tr></thead>
 								<tbody>
 									<tr aria-selected="true"><th scope="row">RQ-184</th><td>Marta Costa</td><td>Review</td><td>75%</td></tr>
@@ -94,17 +95,149 @@
 						<summary>Access and audit requirements</summary>
 						<p>Production changes require an owner, an approval record and a retained audit event.</p>
 					</details>
-
-					<button class="outline" type="button" data-open-dialog>Review confirmation dialog</button>
-					<dialog aria-labelledby="confirmation-title">
-						<article>
-							<h2 id="confirmation-title">Confirm approval</h2>
-							<p>This records your identity and releases the request to production.</p>
-							<footer><button type="button" data-close-dialog>Cancel</button> <button type="button">Confirm</button></footer>
-						</article>
-					</dialog>
 				</section>
 			</div>
+
+			<hr />
+
+			<section id="native-elements" aria-labelledby="native-elements-title">
+				<h2 id="native-elements-title">Native element baseline</h2>
+				<p>This section is deliberately uncomposed: semantic HTML, the public Cirth build, and no documentation shell.</p>
+
+				<div class="grid">
+					<section aria-labelledby="type-title">
+						<h3 id="type-title">Typography and rhythm</h3>
+						<p>A paragraph establishes the reading measure. It includes a <a href="#activity">local link</a>, <strong>strong importance</strong>, <em>emphasis</em>, and <small>supporting text</small>.</p>
+						<h4>Heading after prose</h4>
+						<p>Relevance is shown with a <mark>highlight that can wrap across more than one line without turning into a badge or warning</mark>. Revisions keep <ins>inserted text</ins> distinct from <del>removed text</del>.</p>
+						<h5>Inline technical notation</h5>
+						<p>Press <kbd>⌘</kbd> + <kbd>K</kbd>, inspect <code>--cirth-primary</code>, and expect <samp>checks passed</samp>. A variable such as <var>n</var><sub>1</sub> can be raised to <var>x</var><sup>2</sup>.</p>
+						<h6>Quiet final level</h6>
+						<p><abbr title="Coordinated Universal Time">UTC</abbr> is used for every audit timestamp.</p>
+					</section>
+
+					<section aria-labelledby="lists-title">
+						<h3 id="lists-title">Lists and definitions</h3>
+						<ul>
+							<li>Prepare the release window.</li>
+							<li>Run checks.
+								<ul>
+									<li>Behavior in supported engines</li>
+									<li>Accessibility in both schemes</li>
+								</ul>
+							</li>
+							<li>Record the decision.</li>
+						</ul>
+						<ol>
+							<li>Review</li>
+							<li>Approve</li>
+							<li>Deploy</li>
+						</ol>
+						<dl>
+							<dt>Owner</dt><dd>The person accountable for the change.</dd>
+							<dt>Window</dt><dd>The period in which the change may ship.</dd>
+							<dt>Evidence</dt><dd>The checks attached to the decision.</dd>
+						</dl>
+					</section>
+				</div>
+
+				<figure>
+					<blockquote>
+						<p>A baseline is mature when ordinary markup looks deliberate before a component layer arrives.</p>
+						<footer><cite>Operations handbook</cite></footer>
+					</blockquote>
+					<figcaption>Figure 1. A semantic quotation inside an unstyled figure.</figcaption>
+				</figure>
+
+				<pre tabindex="0"><code>const request = {
+  id: "RQ-184",
+  state: "review",
+  checks: ["behavior", "accessibility", "visual"]
+};</code></pre>
+			</section>
+
+			<section id="controls" aria-labelledby="controls-title">
+				<h2 id="controls-title">Native controls</h2>
+				<p>The browser retains each control's behavior while Cirth supplies a shared hierarchy, geometry, and state language.</p>
+				<article>
+					<form>
+						<search>
+							<label for="specimen-search">Search requests</label>
+							<div role="group">
+								<input id="specimen-search" type="search" name="query" placeholder="Request ID or owner" />
+								<button type="submit">Search</button>
+							</div>
+						</search>
+
+						<div class="grid">
+							<label>Number<input type="number" name="limit" value="25" min="1" max="100" /></label>
+							<label>Date<input type="date" name="date" value="2026-09-11" /></label>
+							<label>Time<input type="time" name="time" value="14:32" /></label>
+							<label>Date and time<input type="datetime-local" name="datetime" value="2026-09-11T14:32" /></label>
+						</div>
+
+						<label>Attachments<input type="file" name="evidence" /></label>
+						<label for="risk">Risk tolerance</label>
+						<input id="risk" type="range" name="risk" min="0" max="100" value="38" />
+						<label for="risk-disabled">Disabled range</label>
+						<input id="risk-disabled" type="range" min="0" max="100" value="62" disabled />
+
+						<label for="capacity">Capacity</label>
+						<meter id="capacity" min="0" max="100" low="35" high="75" optimum="20" value="68">68%</meter>
+						<label for="completion">Completion</label>
+						<progress id="completion" max="100" value="72">72%</progress>
+
+						<div class="grid">
+							<label>Valid reference<input name="valid-reference" value="RQ-184" aria-invalid="false" /><small>Reference verified.</small></label>
+							<label>Invalid approval<input name="invalid-approval" value="19" aria-invalid="true" /><small>Use the six-digit approval code.</small></label>
+							<label>Readonly state<input name="readonly-state" value="Locked after approval" readonly /></label>
+							<label>Disabled state<input name="disabled-state" value="Unavailable" disabled /></label>
+						</div>
+
+						<fieldset>
+							<legend>Notification policy</legend>
+							<label><input type="checkbox" checked /> Release checks</label>
+							<label><input type="radio" name="notification-window" checked /> Current window</label>
+							<label><input type="radio" name="notification-window" /> Next window</label>
+							<label><input type="checkbox" role="switch" /> Notify observers</label>
+						</fieldset>
+					</form>
+				</article>
+			</section>
+
+			<section id="semantic-states" aria-labelledby="semantic-states-title">
+				<h2 id="semantic-states-title">Semantic state adjacency</h2>
+				<p>Hue is never the only cue: actions carry labels, validation has an icon and helper, and state text keeps its own semantics.</p>
+				<div role="group" aria-label="Action comparison">
+					<button type="button">Approve request</button>
+					<button class="danger" type="button">Delete request</button>
+					<button class="outline" type="button" data-focus-target>Keyboard focus</button>
+				</div>
+				<div class="grid">
+					<p><strong>Error</strong><br /><del>Approval code rejected.</del></p>
+					<p><strong>Warning</strong><br /><meter min="0" max="100" low="35" high="75" optimum="20" value="68" aria-label="Elevated maintenance risk">68%</meter><small>Maintenance window closes soon.</small></p>
+					<p><strong>Success</strong><br /><ins>Automated checks passed.</ins></p>
+				</div>
+			</section>
+
+			<section aria-labelledby="top-layer-title">
+				<h2 id="top-layer-title">Top-layer surfaces</h2>
+				<p>
+					<button type="button" popovertarget="command-menu">Open command popover</button>
+					<button class="outline" type="button" data-open-dialog>Review confirmation dialog</button>
+				</p>
+				<div id="command-menu" popover>
+					<strong>Quick actions</strong>
+					<p>Assign the request or open its audit record.</p>
+				</div>
+				<dialog aria-labelledby="confirmation-title">
+					<article>
+						<h2 id="confirmation-title">Confirm approval</h2>
+						<p>This records your identity and releases the request to production.</p>
+						<footer><button type="button" data-close-dialog>Cancel</button> <button type="button">Confirm</button></footer>
+					</article>
+				</dialog>
+			</section>
 		</main>
 		<footer class="container"><small>Operations workspace · Last synchronized 14:32 UTC</small></footer>
 		<script>

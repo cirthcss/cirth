@@ -15,6 +15,7 @@ same button styling, with no `.btn` class required.
 <button type="button">Primary</button>
 <button type="button" class="secondary">Secondary</button>
 <button type="button" class="contrast">Contrast</button>
+<button type="button" class="danger">Danger</button>
 <button type="button" class="outline">Primary outline</button>
 <button type="button" class="ghost">Primary ghost</button>
 <button type="button" disabled>Disabled</button>
@@ -30,12 +31,21 @@ Modifier classes (default build only) swap which color group a button reads
 | *(none)* | Primary |
 | `.secondary` | Secondary |
 | `.contrast` | Contrast |
+| `.danger` | Error, filled for a destructive action |
 | `.outline` | Primary, on the page surface |
 | `.outline.secondary` | Secondary, on the page surface |
 | `.outline.contrast` | Contrast, on the page surface |
+| `.outline.danger` | Error, on the page surface |
 | `.ghost` | Primary, no surface and no border |
 | `.ghost.secondary` | Secondary, no surface and no border |
 | `.ghost.contrast` | Contrast, no surface and no border |
+| `.ghost.danger` | Error, no surface and no border |
+
+Use `.danger` for a destructive action that needs to remain visibly distinct
+beside the primary action. It reuses the existing error family and keeps the
+action's explicit label as a second cue; colour alone must not carry the
+meaning. Like the other colour modifiers, `.danger` is available in builds
+with `$enable-classes`; classless builds do not infer intent from button text.
 
 ### Quiet variants
 

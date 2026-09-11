@@ -84,7 +84,7 @@
   // Three inputs — error, success and warning — each driving four roles.
   // Setting one input rethemes every status treatment that reads from it:
   // the solid fill a meter paints, the ink <del>/<ins> use, the border a
-  // field takes when it validates, and the tint a <mark> sits on. The
+  // field takes when it validates, and the surface status content sits on. The
   // status hues are deliberately not fixed constants: a theme whose brand
   // overlaps a conventional status hue is expected to move them (see
   // gh#84). The default keeps error a full 22deg off the brand hue for

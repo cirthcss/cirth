@@ -61,6 +61,34 @@ const token = (page, selector, name) =>
 	);
 
 for (const [build, css] of builds) {
+	test(`${build}: top-level sections get a chapter beat without opening nested regions`, async ({
+		page,
+	}) => {
+		await render(
+			page,
+			css,
+			`<section><h2>First chapter</h2><section id="nested">Nested region</section></section>
+			<section id="chapter"><h2>Second chapter</h2></section>`,
+		);
+
+		const measured = await page.evaluate(() => {
+			const chapter = document.getElementById("chapter");
+			const nested = document.getElementById("nested");
+			if (!chapter || !nested) throw new Error("section fixtures are unavailable");
+
+			return {
+				chapter: Number.parseFloat(getComputedStyle(chapter).marginTop),
+				nested: Number.parseFloat(getComputedStyle(nested).marginTop),
+			};
+		});
+
+		expect(measured.chapter).toBeCloseTo(
+			await token(page, "#chapter", "--cirth-space-8"),
+			1,
+		);
+		expect(measured.nested).toBe(0);
+	});
+
 	test(`${build}: an open disclosure puts its panel one rhythm step under its trigger`, async ({
 		page,
 	}) => {

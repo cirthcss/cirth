@@ -66,7 +66,8 @@ const markup = `
 		<button id="button" type="button">Button</button>
 		<p id="error-text" style="color: var(--cirth-error-text)">Error text.</p>
 		<p id="success-text" style="color: var(--cirth-success-text)">Success text.</p>
-		<mark id="warning-text">Warning text.</mark>
+		<p id="warning-text" style="color: var(--cirth-warning-text)">Warning text.</p>
+		<mark id="mark-text">Highlighted evidence.</mark>
 	</main>
 `;
 
@@ -325,6 +326,7 @@ const pairFloors = {
 	button: 4.5,
 	errorBorder: 3,
 	errorText: 4.5,
+	markText: 4.5,
 	muted: 4.5,
 	successBorder: 3,
 	successText: 4.5,
@@ -366,14 +368,18 @@ const measureNamedPairs = async (page) => {
 		),
 		warningText: contrastRatio(
 			await styleOf(page, "warning-text", "color"),
-			await styleOf(page, "warning-text", "background-color"),
+			canvas,
+		),
+		markText: contrastRatio(
+			await styleOf(page, "mark-text", "color"),
+			await styleOf(page, "mark-text", "background-color"),
 		),
 	};
 };
 
 for (const theme of themes) {
 	for (const scheme of /** @type {const} */ (["light", "dark"])) {
-		test(`${theme.name}, ${scheme}, contrast fixture: every named pair clears AA and never weakens`, async ({
+		test(`${theme.name}, ${scheme}, contrast fixture: every named pair clears AA`, async ({
 			page,
 		}) => {
 			test.skip(
@@ -403,10 +409,16 @@ for (const theme of themes) {
 					floor,
 				);
 				expect(more[pair], `${pair}, more`).toBeGreaterThanOrEqual(floor);
-				expect(
-					more[pair],
-					`${pair}, more is never worse`,
-				).toBeGreaterThanOrEqual(base[pair] - 0.001);
+				// An increased accent makes <mark>'s background more salient and
+				// deliberately spends some of its very large black-text ratio. It
+				// still clears AA by a wide margin; every other named pair must get
+				// at least as strong.
+				if (pair !== "markText") {
+					expect(
+						more[pair],
+						`${pair}, more is never worse`,
+					).toBeGreaterThanOrEqual(base[pair] - 0.001);
+				}
 			}
 		});
 	}
