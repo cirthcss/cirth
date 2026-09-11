@@ -14,7 +14,7 @@ const projectRoot = path.join(__dirname, "../..");
 const docsDist = path.join(projectRoot, "docs/dist");
 
 const themeVariants = [
-	{ name: "default", storageValue: "amber" },
+	{ name: "default", storageValue: "default" },
 	...listPresetNames().map((name) => ({ name, storageValue: name })),
 ];
 

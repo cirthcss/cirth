@@ -392,7 +392,7 @@ test("the card and table borders keep a neutral hue in every theme", async ({
 	// rotate. This asserts the outcome, not the mechanism: whatever the
 	// derivation, the result has to stay in the family its inputs are in.
 	for (const [preset, storage] of [
-		["default", "amber"],
+		["default", "default"],
 		["plain", "plain"],
 		["playroom", "playroom"],
 	]) {
@@ -520,7 +520,7 @@ test("navigation links reserve the accent for position, while header chrome uses
 	// the hover step, hover below the current entry, and the current entry
 	// at the emphasis ink rather than at whatever the header happens to
 	// inherit. Neither convention paints membership with the action colour.
-	for (const variant of ["amber", "plain", "playroom"]) {
+	for (const variant of ["default", "plain", "playroom"]) {
 		await page.goto(`${origin}/specimen/${variant}/`, {
 			waitUntil: "networkidle",
 		});

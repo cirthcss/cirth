@@ -73,7 +73,7 @@ const representativePresetPages = [
 ];
 
 // No docs shell or logo: the public theme has to carry the family resemblance.
-const frameworkSpecimens = ["amber", "plain", "playroom", "blue"];
+const frameworkSpecimens = ["default", "plain", "playroom", "blue"];
 
 /**
  * @type {{

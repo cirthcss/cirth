@@ -7,7 +7,7 @@ const {
 
 assertDocsBuilt("framework-specimen.spec");
 
-const specimens = ["amber", "plain", "playroom", "blue"];
+const specimens = ["default", "plain", "playroom", "blue"];
 /** @type {import("node:http").Server} */
 let server;
 /** @type {string} */
@@ -382,7 +382,7 @@ for (const specimen of specimens) {
 
 test("multiline accordion keeps its full target at 320px", async ({ page }) => {
 	await page.setViewportSize({ width: 320, height: 720 });
-	await page.goto(`${origin}/specimen/states/amber/`);
+	await page.goto(`${origin}/specimen/states/default/`);
 	const summary = page.locator("details").nth(2).locator("summary");
 	const details = page.locator("details").nth(2);
 	const [summaryBox, detailsBox] = await Promise.all([
@@ -422,7 +422,7 @@ test("dark progress follows each public primary instead of default amber", async
 test("dialog behavior is specimen-only and keyboard reachable", async ({
 	page,
 }) => {
-	await page.goto(`${origin}/specimen/amber/`);
+	await page.goto(`${origin}/specimen/default/`);
 	await page
 		.getByRole("button", { name: "Review confirmation dialog" })
 		.click();
