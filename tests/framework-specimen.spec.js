@@ -622,7 +622,7 @@ test("multiline accordion keeps its full target at 320px", async ({ page }) => {
 	expect(Math.abs(summaryBox.width - detailsBox.width)).toBeLessThanOrEqual(2);
 });
 
-test("dark progress follows each public primary instead of default amber", async ({
+test("dark progress follows each public primary instead of one fixed accent", async ({
 	page,
 }) => {
 	await page.emulateMedia({ colorScheme: "dark" });

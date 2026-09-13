@@ -458,7 +458,7 @@ test("framework interactive state matrix", async ({ page }, testInfo) => {
 			img { display: block; max-width: 100%; height: auto; }
 		</style>
 		<h1>Cirth interactive state matrix</h1>
-		<p>Real browser states · Amber, Plain, Playroom and custom blue · light and dark</p>
+		<p>Real browser states · Default, Plain, Playroom and custom blue · light and dark</p>
 		<div class="matrix">${cells}</div>`);
 	await expect(page).toHaveScreenshot(
 		"framework-interactive-state-matrix.png",
