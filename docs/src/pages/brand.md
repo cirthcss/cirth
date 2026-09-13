@@ -147,9 +147,12 @@ writing system, not a claim of license or partnership.
   </figure>
 </div>
 
-Every variant is downloadable above as SVG (preferred) or PNG; the full
-set also lives in
-[`docs/public/`](https://github.com/cirthcss/cirth/tree/master/docs/public).
+Each variant above is downloadable as SVG (preferred) or PNG. The full set
+lives in
+[`docs/public/`](https://github.com/cirthcss/cirth/tree/master/docs/public),
+including the two combinations this grid does not show — the mono mark on
+its own background tile, light and dark, for square containers that have to
+stay one colour.
 
 Use the **brand** (copper) mark wherever color is available, matching the
 variant to the background. Use **mono** in one color contexts such as print,
@@ -225,16 +228,70 @@ In interfaces, always use the `--cirth-primary*` tokens rather than the
 logo hexes: the tokens are variants verified for WCAG. See
 [Colors](/colors) for the full system.
 
-## Wordmark and typography
+## The lockup
 
-The wordmark is "Cirth" set in the site's sans-serif voice, bold, with the
-mark at the cap height to its left — sans-serif is the primary typographic
-voice for product surfaces, headings, and UI chrome. Monospace is reserved
-for code, size metrics, and proof points (`13.6 KB`, `--cirth-primary`).
-Serif remains available as a primitive token for an author to opt into,
-but is not part of Cirth's product voice. There is no custom font to
-install: the brand uses the same system stacks the framework ships, on
-purpose.
+The horizontal lockup is the mark with the name beside it: "Cirth" in the
+sans voice, bold, with the mark sized to the cap height and sitting on the
+same baseline. Use it where the name has to travel with the mark and there
+is room for both — a third-party README, a talk slide, a conference badge,
+a social post.
+
+<div class="docs-brand-grid docs-lockup-grid">
+  <figure class="docs-brand-tile" data-theme="light">
+    <img src="/wordmark.svg" alt="Cirth horizontal lockup, copper mark and graphite name on light" width="240" height="57" />
+    <figcaption>Lockup · light</figcaption>
+    <p class="docs-brand-downloads">
+      <a class="secondary" href="/wordmark.svg" download>SVG</a>
+      <a class="secondary" href="/wordmark.png" download>PNG</a>
+    </p>
+  </figure>
+  <figure class="docs-brand-tile" data-theme="dark">
+    <img src="/wordmark_dark.svg" alt="Cirth horizontal lockup, copper mark and paper name on dark" width="240" height="57" />
+    <figcaption>Lockup · dark</figcaption>
+    <p class="docs-brand-downloads">
+      <a class="secondary" href="/wordmark_dark.svg" download>SVG</a>
+      <a class="secondary" href="/wordmark_dark.png" download>PNG</a>
+    </p>
+  </figure>
+</div>
+
+<p>A one-colour lockup is available as
+<a class="secondary" href="/wordmark_mono.svg" download><code>wordmark_mono.svg</code></a>
+for print, badges and embossing. It paints with <code>currentColor</code>, so
+inline it to give it your own ink; loaded through <code>&lt;img&gt;</code> it
+falls back to black, the same as the mono mark.</p>
+
+**The name is live text, not outlines.** The lockup carries `<text>` in the
+system sans stack the framework itself ships, which is the whole of the
+typographic claim: there is no font to install, and nothing to license. The
+cost is that the word's width moves a little between platforms — SF Pro sets
+it narrowest, Helvetica and Arial about 2.5% wider — so the box reserves
+room for the widest face in the stack and a narrower one leaves a little air
+on the right. That is the intended behaviour, not a mis-export.
+
+### Which asset, at which size
+
+| Context | Asset | Why |
+| --- | --- | --- |
+| Name and mark together, 128px wide and up | Lockup | Below 128px the mark inside it drops under its own 24px floor |
+| Square container: favicon, avatar, app tile | Icon tile | The mark fills the square; the lockup cannot |
+| Inline beside text, 24px and up | Full mark | Five-part mark at medium fidelity |
+| 16–23px | Optical small mark | Fewer parts, tighter box |
+
+The lockup does not replace the mark at small sizes. Shrinking it until the
+name is legible makes the mark illegible first; at that point the mark alone
+is the correct asset and the name belongs in the text next to it.
+
+## Typography
+
+Sans-serif is the primary typographic voice for product surfaces, headings,
+and UI chrome, and it is the voice the lockup is set in. Monospace is
+reserved for code, size metrics, and proof points (`13.6 KB`,
+`--cirth-primary`), and for the site's own chrome, where the name appears as
+a navigational label rather than as the wordmark. Serif remains available as
+a primitive token for an author to opt into, but is not part of Cirth's
+product voice. There is no custom font to install: the brand uses the same
+system stacks the framework ships, on purpose.
 
 Write the name as **Cirth** (capitalized, never uppercase); the npm scope
 is `@cirthcss/cirth`.
@@ -309,4 +366,5 @@ When you do use the mark:
 * use the responsive small-size asset from 16–23px;
 * pick the brand or mono variant that keeps contrast on your background;
 * don't recolor, outline, rotate, add effects, or redraw the strokes,
-  and don't set the wordmark in another typeface.
+  and don't set the wordmark in another typeface — use
+  [the lockup](#the-lockup) rather than re-typesetting the name.

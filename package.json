@@ -86,7 +86,8 @@
 		"docs:assets": "node scripts/build-docs.js",
 		"docs:dev": "npm run docs:assets && eleventy --config=docs/eleventy.config.js --serve",
 		"docs:build": "npm run docs:assets && eleventy --config=docs/eleventy.config.js && node scripts/check-doc-links.js",
-		"docs:brand-assets": "node scripts/capture-brand-assets.js",
+		"docs:brand-assets": "node scripts/build-brand-lockup.js && node scripts/capture-brand-assets.js",
+		"docs:lockup": "node scripts/build-brand-lockup.js",
 		"check:tree-noise": "node scripts/check-tree-noise.js"
 	},
 	"devDependencies": {

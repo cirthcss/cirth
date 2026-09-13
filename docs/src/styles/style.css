@@ -1417,6 +1417,24 @@ pre > button.copy.copied::before {
   margin: 0;
 }
 
+/* The lockup is wide where the mark is square, so it takes the same frame
+   on a two-track grid instead of the mark grid's three. The tile caps the
+   asset's width rather than letting it fill: a lockup shown edge to edge
+   reads as a banner, and the point of the specimen is the proportion. */
+.docs-lockup-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (width >= 36rem) {
+  .docs-lockup-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.docs-lockup-grid img {
+  width: min(100%, 15rem);
+}
+
 /* Color swatch grid. Not `.grid`: that is auto-fit, which collapses unused
    tracks and stretches the cells across them, so a group of three swatches
    and a group of two would draw different-sized specimens. auto-fill keeps
