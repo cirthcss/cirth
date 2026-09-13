@@ -28,21 +28,6 @@ If you cloned before installing [Git LFS](https://git-lfs.com), the
 screenshot baselines under `tests/__screenshots__/` are small pointer
 files instead of images; `git lfs pull` fetches the real ones.
 
-This repository currently lives in iCloud Drive. A sync racing a fast build
-or checkout can leave conflict copies such as `name 2.js` and `image 2.png`
-beside the real files. They are ignored by Git, but they are not harmless:
-Eleventy can publish a copied page and Playwright can collect a copied spec.
-If they appear, stop the process that is writing the tree and remove only
-those numbered copies:
-
-```sh
-find . -name '* 2.*' -not -path './node_modules/*' -delete
-```
-
-Do not rename one over its unsuffixed neighbour; the unsuffixed file is the
-tracked source. Moving the repository outside a synced folder prevents the
-copies at the source.
-
 The commands you'll actually use:
 
 ```sh
@@ -113,7 +98,7 @@ review attention. Each one is enforced by an automated check that runs
 in CI on every push, and the same checks run locally:
 
 ```sh
-npm run lint          # stylelint + custom property audit + browser target + doc links + CDN hashes
+npm run lint          # tree noise + stylelint + custom property audit + browser target + doc links + CDN hashes
 npm run build         # compile src/ to dist/
 npm run check:dist    # structural invariants of every generated dist file
 npm run check:size    # ≤ 14 KiB gzipped per root bundle
