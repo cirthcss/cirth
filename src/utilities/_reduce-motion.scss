@@ -18,6 +18,8 @@
 
 // 4. Remove transitions when motion is reduced (opinionated)
 
+// 5. Neutralize the transition token so control interiors follow (see below)
+
 @media (prefers-reduced-motion: reduce) {
   #{$parent-selector} *:not([aria-busy="true"]),
   #{$parent-selector} :not([aria-busy="true"])::before,
@@ -29,5 +31,18 @@
     scroll-behavior: auto; // 3
     transition-delay: var(--cirth-duration-instant); // 4
     transition-duration: var(--cirth-duration-instant); // 4
+
+    // 5. `transition-duration` above reaches elements, ::before and ::after,
+    //    and nothing else — so the engine pseudo-elements that make up a
+    //    control's interior kept animating. Measured in Firefox with the
+    //    playroom preset: the host input went to 0s while
+    //    ::-moz-range-track and ::-moz-range-thumb stayed at 0.3s. Those
+    //    cannot be added to the list above, because a selector list
+    //    containing one engine's pseudo-element is discarded whole by the
+    //    other engine. The token can: custom properties inherit into these
+    //    pseudo-elements, which is how they already read their own colours,
+    //    so neutralising it here reaches every transition built from it —
+    //    including any a consumer writes.
+    --cirth-transition: var(--cirth-duration-instant) var(--cirth-ease-out); // 5
   }
 }
