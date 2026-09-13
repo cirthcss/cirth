@@ -228,7 +228,9 @@ const createServer = (root = docsDist) =>
 		);
 		let filePath = path.join(root, pathname);
 
-		if (!filePath.startsWith(root)) {
+		// `startsWith(root)` alone would also accept a sibling whose name
+		// merely begins with the root's, so compare on a path boundary.
+		if (filePath !== root && !filePath.startsWith(root + path.sep)) {
 			response.writeHead(403).end();
 			return;
 		}
@@ -238,7 +240,18 @@ const createServer = (root = docsDist) =>
 			filePath = `${filePath}.html`;
 		}
 
-		if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+		// One stat, not an existsSync/statSync pair: two syscalls asking the
+		// same question is one more chance for the answer to change between
+		// them, and this runs for every asset of every page under three
+		// engines at once.
+		let stats;
+		try {
+			stats = fs.statSync(filePath);
+		} catch {
+			response.writeHead(404).end("Not found");
+			return;
+		}
+		if (stats.isDirectory()) {
 			response.writeHead(404).end("Not found");
 			return;
 		}
@@ -247,7 +260,18 @@ const createServer = (root = docsDist) =>
 			"content-type":
 				contentTypes[path.extname(filePath)] ?? "application/octet-stream",
 		});
-		fs.createReadStream(filePath).pipe(response);
+
+		// An unhandled stream error used to leave the response hanging until
+		// the browser gave up, which surfaces as a stylesheet that never
+		// arrives and a test asserting against unstyled values. EMFILE is the
+		// realistic trigger: the whole behaviour suite streams assets from
+		// three engines in parallel workers.
+		const stream = fs.createReadStream(filePath);
+		stream.on("error", () => {
+			response.destroy();
+		});
+		response.on("close", () => stream.destroy());
+		stream.pipe(response);
 	});
 
 // Listens on an ephemeral port; resolves to the origin URL.
