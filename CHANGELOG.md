@@ -7,6 +7,62 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+## [0.15.0-beta.2] - 2026-09-14
+
+### Added
+
+- **`.danger`, a destructive button modifier** in class-enabled builds. HTML
+  has no destructive button type, and a primary and a destructive action
+  routinely share one decision surface, where reusing the primary fill leaves
+  their difference resting on the wording alone. It derives from the existing
+  error family rather than introducing a parallel colour API, adds no custom
+  property, and composes with `.outline` and `.ghost`. Classless builds do not
+  infer destructive intent from an element's text or its position in a form.
+
+### Changed
+
+- **The palette is rebuilt around copper and graphite.** The accent is a
+  copper at 44° in oklch, the neutral family a graphite at 280°, and the light
+  canvas a warm mineral paper rather than white; dark mode is that graphite
+  rather than near-black. Each chromatic family sits at a stated fraction of
+  its own sRGB gamut ceiling — 85% for status, 70% for the brand — instead of
+  being picked, and the neutral is held at least 120° from the accent as an
+  invariant. The public custom property surface is unchanged: the theme
+  declares the same 241 properties it did in `0.15.0-beta.1`, with none added,
+  removed or renamed. Only their values moved.
+- **`<mark>` derives from the accent** instead of borrowing the warning
+  family, so highlighted text and a validation message are no longer the same
+  colour.
+- **Syntax highlighting was retuned** against the new neutral.
+- **A focus ring is drawn at once instead of fading in.** Every ring is a
+  `box-shadow`, and `box-shadow` was transitioned, so the indicator grew into
+  place over 200ms — 1.04px at 39% opacity after 50ms, against the 2px
+  `--cirth-outline-width` specifies. A keyboard user moving at speed never saw
+  the indicator the token describes. `:focus-visible` now takes
+  `--cirth-duration-instant`; focus still relaxes on the way out.
+- **A `<dialog>`'s content settles rather than arriving from off-screen.** Its
+  entrance was `translateY(-100%)` — the dialog's own height — and is now
+  `-0.5rem`.
+- **The built-in theme's identifier is `default`, not `amber`**, which moves
+  two documentation URLs. No package entry point changed.
+- Top-level `<main>` sections and the two caption roles gained the hierarchy
+  they lacked.
+
+### Fixed
+
+- **`prefers-reduced-motion: reduce` now reaches inside a native control.**
+  The rule sets `transition-duration` on elements, `::before` and `::after`,
+  and the engine pseudo-elements a control is built from are none of those —
+  so `::-moz-range-track` and `::-moz-range-thumb` went on easing at the
+  preset's full duration while the input that owns them had already stopped.
+  They cannot be added to that selector list, because a list containing one
+  engine's pseudo-element is discarded whole by the other; `--cirth-transition`
+  is neutralized in the reduced-motion block instead. Anything built from the
+  token now follows the preference, including a transition written by a
+  consumer.
+- **The dark range thumb was at 2.37:1 against its track** and is now at
+  5.70:1, with the control on the same 44px target floor as every other one.
+
 ## [0.15.0-beta.1] - 2026-09-08
 
 ### Added
@@ -1618,6 +1674,7 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
+[0.15.0-beta.2]: https://github.com/cirthcss/cirth/compare/v0.15.0-beta.1...v0.15.0-beta.2
 [0.15.0-beta.1]: https://github.com/cirthcss/cirth/compare/v0.14.1...v0.15.0-beta.1
 [0.14.1]: https://github.com/cirthcss/cirth/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/cirthcss/cirth/compare/v0.13.0...v0.14.0
