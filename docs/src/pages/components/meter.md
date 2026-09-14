@@ -47,7 +47,7 @@ measurement at all, neither element applies.
 | Region | Variable | Light | Dark |
 | --- | --- | --- | --- |
 | Optimum | `--cirth-meter-optimum-color` | green | green |
-| Suboptimal | `--cirth-meter-suboptimum-color` | amber | amber |
+| Suboptimal | `--cirth-meter-suboptimum-color` | gold | gold |
 | Even less good | `--cirth-meter-even-less-good-color` | red | red |
 
 * Those names are the HTML spec's own, and match the pseudo-elements each

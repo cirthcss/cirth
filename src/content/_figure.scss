@@ -12,5 +12,7 @@
   figcaption {
     padding: calc(var(--cirth-spacing) * 0.5) 0;
     color: var(--cirth-muted-color);
+    font-size: var(--cirth-font-size-sm);
+    line-height: var(--cirth-line-height-normal);
   }
 }

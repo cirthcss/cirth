@@ -16,3 +16,10 @@
 #{$parent-selector} section {
   margin-bottom: var(--cirth-block-spacing-vertical);
 }
+
+// Adjacent top-level sections are chapters, not consecutive paragraphs.
+// Keep the general section margin compact for nested application regions,
+// then add one extra beat only where <main> establishes the page outline.
+#{$parent-selector} main > section + section {
+  margin-block-start: var(--cirth-space-8);
+}

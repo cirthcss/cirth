@@ -46,7 +46,8 @@
   // recognisable — a red-orange error, a green success, an amber warning —
   // but sit at the same softness as the accent instead of cutting through
   // it. Each is an input: the field borders, meter readings, <ins>/<del>
-  // inks and <mark> tint all follow from these three.
+  // inks and status surfaces all follow from these three. <mark> follows
+  // the primary accent instead, because relevance is not a warning state.
   // The error anchor sits where the default theme's does (a 44%-ish
   // lightness): the invalid border derives *lighter* than its input, so an
   // anchor picked for how it reads as a fill leaves the border under the

@@ -195,6 +195,18 @@
 }
 
 @include selectors.scope {
+  // A focus indicator is a state marker, not an animation. Every ring in
+  // Cirth is a box-shadow, and box-shadow is transitioned, so the ring used
+  // to grow into place: measured on a default button, 1.0px at 39% opacity
+  // after 50ms and 1.7px at 63% after 100ms, against the 2px
+  // `--cirth-outline-width` specifies. A keyboard user moving at speed
+  // never saw the indicator the token describes. Focus therefore arrives at
+  // once and only relaxes on the way out, where the element no longer
+  // matches and the transition applies again.
+  :focus-visible {
+    transition-duration: var(--cirth-duration-instant);
+  }
+
   // Responsive spacings
 
   // Link

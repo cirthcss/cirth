@@ -67,6 +67,7 @@ const markup = `
 		<h1 id="heading">Heading</h1>
 		<article id="card">
 			<p id="text">Body copy.</p>
+			<p><mark id="mark">Highlighted evidence.</mark></p>
 			<p><a id="link" href="${externalHref}">External link</a></p>
 			<figure><figcaption id="caption">Caption</figcaption></figure>
 			<table><thead id="head"><tr><th id="cell">Header</th></tr></thead>
@@ -194,6 +195,16 @@ test("state-bearing color opts back in", async ({ page }) => {
 	await render(page);
 
 	expect(await styleOf(page, "box", "print-color-adjust")).toBe("exact");
+	expect(await styleOf(page, "mark", "print-color-adjust")).toBe("exact");
+	expect(parseColor(await styleOf(page, "mark", "background-color")).alpha).toBe(
+		1,
+	);
+	expect(
+		contrastRatio(
+			await styleOf(page, "mark", "background-color"),
+			"rgb(255, 255, 255)",
+		),
+	).toBeLessThan(1.5);
 });
 
 test("nothing is clipped or torn by the fold", async ({ page }) => {

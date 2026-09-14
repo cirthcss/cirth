@@ -1663,7 +1663,7 @@ test("the theme demo and the page keep separate themes", async ({ page }) => {
 	);
 	expect(after.applied).toBe(moved.applied);
 
-	await header.selectOption("amber");
+	await header.selectOption("default");
 });
 
 // The sequence itself: one token at a time, marked where it stands, and
@@ -2579,7 +2579,7 @@ test("the demo stage follows the preset's spacing knob", async ({ page }) => {
 			const select = document.querySelector("[data-cirth-preset-select]");
 			const link = document.getElementById("cirth-preset-stylesheet");
 			if (!(select instanceof HTMLSelectElement)) return false;
-			if (name === "amber") return link === null;
+			if (name === "default") return link === null;
 			return link instanceof HTMLLinkElement && Boolean(link.sheet);
 		}, preset);
 		return page.evaluate(() => {
@@ -2595,7 +2595,7 @@ test("the demo stage follows the preset's spacing knob", async ({ page }) => {
 		});
 	};
 
-	const base = await stagePadding("amber");
+	const base = await stagePadding("default");
 	const roomier = await stagePadding("playroom");
 
 	// The preset really does move the knob…

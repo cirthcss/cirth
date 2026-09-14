@@ -262,8 +262,10 @@ Neither of these is breaking, but both change what you have to write:
    — unless you meant them to diverge, in which case they still do.
 * **Status colors exist.** `--cirth-error`, `--cirth-success` and
   `--cirth-warning` drive the validation borders, the meter readings, the
-  `<ins>`/`<del>` inks and the `<mark>` tint. Retuning a status treatment
-  used to mean finding each consumer; now it is one token per family.
+  `<ins>`/`<del>` inks and status surfaces. Retuning a status treatment used
+  to mean finding each consumer; now it is one token per family. `<mark>`
+  follows `--cirth-primary` instead: relevance no longer borrows the warning
+  family.
 * **`--cirth-canvas` is new**: the page surface as a value of its own.
   `--cirth-background-color` is the slot components paint through — a
   button rebinds it to its own fill — so it was never a reliable way to

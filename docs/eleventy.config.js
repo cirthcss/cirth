@@ -454,10 +454,14 @@ module.exports = (eleventyConfig) => {
 	});
 
 	// Light-mode --cirth-primary swatches for the default theme and each
-	// preset (values from src/theme/_light.scss and src/presets/*.scss).
+	// preset (values from src/theme/_dual.scss and src/presets/*.scss).
+	// A data URI cannot read a custom property, and neither can a swatch that
+	// has to sit next to the preset it names while the page is in another
+	// preset — so these are literals, and they have to be re-read from source
+	// when the default accent moves.
 	eleventyConfig.addShortcode("colorSwatches", () => {
 		const colors = [
-			{ name: "amber", hex: "#8f6023", note: "default theme" },
+			{ name: "default", hex: "#9D5434", note: "default theme" },
 			{ name: "plain", hex: "#1c65c8", note: "preset" },
 			{ name: "playroom", hex: "#7347af", note: "preset" },
 		];
@@ -471,8 +475,8 @@ module.exports = (eleventyConfig) => {
 			.join("")}</div>
 <section class="docs-theme-lab" aria-label="Default theme role comparison">
   <figure data-theme="light">
-    <figcaption><strong>Light / warm paper</strong><code>data-theme="light"</code></figcaption>
-    <div class="docs-theme-sample"><article><small>Verified state</small><h3>Semantic surface</h3><p>Canvas, card, text, border and amber signal are live theme roles.</p><button type="button">Primary action</button></article></div>
+    <figcaption><strong>Light / mineral paper</strong><code>data-theme="light"</code></figcaption>
+    <div class="docs-theme-sample"><article><small>Verified state</small><h3>Semantic surface</h3><p>Canvas, card, text, border and copper signal are live theme roles.</p><button type="button">Primary action</button></article></div>
     <dl class="grid"><div><dt>Canvas</dt><dd><i style="background:var(--cirth-background-color)"></i><code>--cirth-background-color</code></dd></div><div><dt>Signal</dt><dd><i style="background:var(--cirth-primary)"></i><code>--cirth-primary</code></dd></div></dl>
   </figure>
   <figure data-theme="dark">

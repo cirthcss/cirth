@@ -152,7 +152,7 @@ keeps every shipped stylesheet within a monitored compressed size budget.
 
 Not minimalism for its own sake. Constraints used as an engineering tool.
 
-The visual identity built on that idea — the rune-form mark, the amber
+The visual identity built on that idea — the rune-form mark, the copper
 hue, and the wordmark — is documented on the [Brand](/brand) page. Cirth
 is not affiliated with the Tolkien estate or any rights holder; the name
 is a reference, not a claim of association.
@@ -173,7 +173,7 @@ compatibility. The most important differences for users are:
 - Scoped builds target a `.cirth` wrapper, including custom properties,
   document styles, color schemes, and modal states.
 - The inherited set of twenty accent themes has been reduced to a single
-  official theme (amber), with `plain` and `playroom` published as optional
+  official theme (copper), with `plain` and `playroom` published as optional
   token override presets; see [Colors](/colors).
 - A WCAG 2.2 AA baseline (contrast, focus visibility, target size) is
   verified in the source, and every shipped stylesheet is held to a gzipped

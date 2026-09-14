@@ -30,15 +30,11 @@ const toLinear = (value) =>
 
 /**
  * @param {number} lightness 0..1
- * @param {number} chroma
- * @param {number} hue degrees
+ * @param {number} a green/red axis
+ * @param {number} b blue/yellow axis
  * @returns {{ r: number, g: number, b: number }}
  */
-const oklchToSrgb = (lightness, chroma, hue) => {
-	const radians = (hue * Math.PI) / 180;
-	const a = chroma * Math.cos(radians);
-	const b = chroma * Math.sin(radians);
-
+const oklabToSrgb = (lightness, a, b) => {
 	const long = (lightness + 0.3963377774 * a + 0.2158037573 * b) ** 3;
 	const medium = (lightness - 0.1055613458 * a - 0.0638541728 * b) ** 3;
 	const short = (lightness - 0.0894841775 * a - 1.291485548 * b) ** 3;
@@ -58,6 +54,21 @@ const oklchToSrgb = (lightness, chroma, hue) => {
 			),
 		),
 	};
+};
+
+/**
+ * @param {number} lightness 0..1
+ * @param {number} chroma
+ * @param {number} hue degrees
+ * @returns {{ r: number, g: number, b: number }}
+ */
+const oklchToSrgb = (lightness, chroma, hue) => {
+	const radians = (hue * Math.PI) / 180;
+	return oklabToSrgb(
+		lightness,
+		chroma * Math.cos(radians),
+		chroma * Math.sin(radians),
+	);
 };
 
 /** @param {string} token @param {number} [scale] */
@@ -98,6 +109,18 @@ const parseColor = (value) => {
 		};
 	}
 
+	if (input.startsWith("oklab(")) {
+		const [lightness, a, b] = parts;
+		return {
+			...oklabToSrgb(
+				number(lightness),
+				Number.parseFloat(a),
+				Number.parseFloat(b),
+			),
+			alpha,
+		};
+	}
+
 	if (input.startsWith("rgb(") || input.startsWith("rgba(")) {
 		const [red, green, blue, legacyAlpha] = parts;
 		return {
@@ -133,6 +156,79 @@ const luminance = (color) =>
 	0.0722 * toLinear(color.b);
 
 /**
+ * Machado et al.'s 100% severity matrices, applied to linear-light sRGB.
+ * Keeping the simulation here makes the semantic-colour audit repeatable;
+ * it is still an approximation of perception, not a substitute for labels,
+ * icons, or shape.
+ */
+const cvdMatrices = {
+	deuteranopia: [
+		[0.367322, 0.860646, -0.227968],
+		[0.280085, 0.672501, 0.047413],
+		[-0.01182, 0.04294, 0.968881],
+	],
+	protanopia: [
+		[0.152286, 1.052583, -0.204868],
+		[0.114503, 0.786281, 0.099216],
+		[-0.003882, -0.048116, 1.051998],
+	],
+};
+
+/**
+ * @param {Color} color
+ * @param {keyof typeof cvdMatrices} deficiency
+ * @returns {Color}
+ */
+const simulateCvd = (color, deficiency) => {
+	const matrix = cvdMatrices[deficiency];
+	const channels = [toLinear(color.r), toLinear(color.g), toLinear(color.b)];
+	const transformed = matrix.map((row) =>
+		row.reduce((sum, coefficient, index) => sum + coefficient * channels[index], 0),
+	);
+
+	return {
+		alpha: color.alpha,
+		b: toGamma(clamp01(transformed[2])),
+		g: toGamma(clamp01(transformed[1])),
+		r: toGamma(clamp01(transformed[0])),
+	};
+};
+
+/** @param {Color} color */
+const srgbToOklab = (color) => {
+	const red = toLinear(color.r);
+	const green = toLinear(color.g);
+	const blue = toLinear(color.b);
+	const long = Math.cbrt(0.4122214708 * red + 0.5363325363 * green + 0.0514459929 * blue);
+	const medium = Math.cbrt(0.2119034982 * red + 0.6806995451 * green + 0.1073969566 * blue);
+	const short = Math.cbrt(0.0883024619 * red + 0.2817188376 * green + 0.6299787005 * blue);
+
+	return {
+		a: 1.9779984951 * long - 2.428592205 * medium + 0.4505937099 * short,
+		b: 0.0259040371 * long + 0.7827717662 * medium - 0.808675766 * short,
+		lightness:
+			0.2104542553 * long + 0.793617785 * medium - 0.0040720468 * short,
+	};
+};
+
+/** @param {Color} first @param {Color} second */
+const oklabDistance = (first, second) => {
+	const a = srgbToOklab(first);
+	const b = srgbToOklab(second);
+	return Math.hypot(a.lightness - b.lightness, a.a - b.a, a.b - b.b);
+};
+
+/** @param {Color} foreground @param {Color} background */
+const contrastColors = (foreground, background) => {
+	const front = over(foreground, background);
+	const [lighter, darker] = [luminance(front), luminance(background)].sort(
+		(a, b) => b - a,
+	);
+
+	return (lighter + 0.05) / (darker + 0.05);
+};
+
+/**
  * WCAG contrast ratio between a foreground and an opaque background. A
  * translucent foreground is composited over that background first.
  *
@@ -142,12 +238,15 @@ const luminance = (color) =>
  */
 const contrastRatio = (foreground, background) => {
 	const back = parseColor(background);
-	const front = over(parseColor(foreground), back);
-	const [lighter, darker] = [luminance(front), luminance(back)].sort(
-		(a, b) => b - a,
-	);
-
-	return (lighter + 0.05) / (darker + 0.05);
+	return contrastColors(parseColor(foreground), back);
 };
 
-module.exports = { contrastRatio, luminance, over, parseColor };
+module.exports = {
+	contrastColors,
+	contrastRatio,
+	luminance,
+	oklabDistance,
+	over,
+	parseColor,
+	simulateCvd,
+};

@@ -67,7 +67,7 @@ faq:
         compatibility. What has moved since the fork: the published package
         is CSS only, in classless and scoped forms — four builds today,
         default, classless, scoped and scoped classless — with print sheets
-        and token presets as separate outputs beside them; the twenty inherited accent themes are one theme (amber)
+        and token presets as separate outputs beside them; the twenty inherited accent themes are one theme (copper)
         plus <code>plain</code> and <code>playroom</code> as token-override
         presets; <code>.grid</code> is now an intrinsically wrapping grid
         and the single-row equal-column layout is

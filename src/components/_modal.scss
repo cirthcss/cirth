@@ -48,8 +48,15 @@
     }
 
     > article {
+      // A settle, not an arrival from off-screen. This used to be
+      // `translateY(-100%)` — the dialog's own height, 420px for a typical
+      // one — which is travel the rest of the system does not use: the
+      // documentation shell moves an entering block 6px to 12px for the
+      // same job. Distance here carries no information the fade does not
+      // already carry, and the longer the throw the more the dialog reads
+      // as an effect rather than as something that is now in front.
       @starting-style {
-        transform: translateY(-100%);
+        transform: translateY(-0.5rem);
         opacity: 0;
       }
     }

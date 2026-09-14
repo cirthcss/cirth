@@ -1,4 +1,5 @@
 const { expect, test } = require("@playwright/test");
+const { contrastRatio } = require("../scripts/lib/color");
 const {
 	assertDocsBuilt,
 	createServer,
@@ -324,7 +325,7 @@ for (const theme of themeVariants) {
 				await auditAllPages(page, theme);
 			});
 
-			test("focus, loading, dialog, and popover affordances remain visible", async ({
+			test("focus, mark, loading, dialog, and popover affordances remain visible", async ({
 				page,
 			}) => {
 				await openPage(page, "forms/index.html", theme);
@@ -399,6 +400,20 @@ for (const theme of themeVariants) {
 						`${theme}: the selected tab is distinguishable in forced colors`,
 					).not.toBe(chosen[0].paint);
 				}
+
+				await page.goto(`${origin}/specimen/default/`);
+				const markColors = await page.locator("mark").first().evaluate((element) => {
+					const style = getComputedStyle(element);
+					return {
+						background: style.backgroundColor,
+						canvas: getComputedStyle(document.body).backgroundColor,
+						color: style.color,
+					};
+				});
+				expect(markColors.background).not.toBe(markColors.canvas);
+				expect(
+					contrastRatio(markColors.color, markColors.background),
+				).toBeGreaterThanOrEqual(4.5);
 
 				await openPage(page, "components/loading/index.html", theme);
 				const spinnerColor = await page

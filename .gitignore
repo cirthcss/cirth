@@ -1,5 +1,6 @@
 # Dependencies
 /node_modules/
+/docs/node_modules/
 /.pnp/
 .pnp.*
 
@@ -23,7 +24,6 @@ pnpm-debug.log*
 /dist/
 /docs/src/styles/generated/
 /docs/dist/
-/docs/node_modules/
 
 # Local caches
 /.cache/
@@ -138,9 +138,9 @@ $RECYCLE.BIN/
 # tooling, not part of the published project. See .agent-harness/README.md.
 /.agent-harness/
 
-# Local working notes
-/TODO.md
-/ISSUES-PROPOSED.md
+# Local working notes. HANDOFF.md is the in-flight branch's status note
+# (see AGENTS.md). RELEASE-PLAN.md is a guard rather than a pointer to an
+# existing file — release process lives in RELEASING.md and nowhere else.
 /HANDOFF.md
 /RELEASE-PLAN.md
 
@@ -157,9 +157,18 @@ $RECYCLE.BIN/
 # examples gallery (see docs/examples.md, tracked separately under gh#29).
 /examples/
 
-# iCloud Drive sync duplicates. This repository lives in a synced folder,
-# and a fast rebuild can race the sync into leaving "name 2.js" beside
-# "name.js" — which Eleventy will happily publish as a page and Playwright
-# will happily collect as a spec.
+# Duplicate files left beside real ones as "name 2.png", "name 3.png" —
+# Eleventy would publish them as pages and Playwright would collect them as
+# specs, so they are ignored rather than tolerated.
+#
+# This used to say iCloud Drive was the cause. It is not: the repository is
+# not under a File Provider root, no file carries the `dataless` flag, and
+# `fileproviderctl` lists no provider covering this path. What does create
+# them is still unidentified — tracked as gh#102, which also holds the
+# count and the cleanup decision.
+#
+# Note the breadth: this also ignores any legitimate file whose name
+# contains a space followed by a digit ("Figure 1.svg"). Nothing in the
+# project is named that way today; check here first if a file you added
+# silently fails to appear in `git status`.
 * [0-9]*
-* [0-9]*.*

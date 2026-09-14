@@ -30,7 +30,7 @@ const updateBaseline = process.argv.includes("--update-baseline");
 /**
  * @typedef {{
  *   page: string,
- *   theme: "default" | "plain" | "playroom" | "amber" | "blue",
+ *   theme: "default" | "plain" | "playroom" | "blue",
  *   mode: "light" | "dark" | "forced-colors",
  *   state: "default" | "dialog-open" | "popover-open" | "search-open" | "button-hover" | "button-focus" | "button-active" | "input-hover" | "input-focus" | "accordion-hover" | "accordion-focus" | "accordion-open",
  *   violation: import("axe-core").Result,
@@ -103,7 +103,7 @@ const openStates = [
 ];
 const viewport = { width: 1440, height: 900 };
 const concurrency = 4;
-const frameworkSpecimens = ["amber", "plain", "playroom", "blue"];
+const frameworkSpecimens = ["default", "plain", "playroom", "blue"];
 
 try {
 	assertDocsBuilt("check-a11y");
