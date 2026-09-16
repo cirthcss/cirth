@@ -10,11 +10,13 @@ const {
 	waitForTheme,
 } = require("../scripts/lib/docs-site");
 
-// Full-page screenshots of the docs, compared against the committed
-// per-platform baselines (see playwright.config.js). The default theme keeps
-// broad page coverage. Every maintained preset adds a compact representative
-// set plus open interactive surfaces, so a new preset discovered from
-// src/presets/ cannot bypass visual verification.
+// Content-region screenshots of the docs, compared against the committed
+// per-platform baselines (see playwright.config.js). Keeping the shared docs
+// chrome out of each page capture confines a content change to the pages it
+// affects; the chrome has one small dedicated baseline below. The default
+// theme keeps broad page coverage. Every maintained preset adds a compact
+// representative set plus open interactive surfaces, so a new preset
+// discovered from src/presets/ cannot bypass visual verification.
 
 assertDocsBuilt("visual.spec");
 
@@ -178,14 +180,43 @@ const pageName = (pagePath) =>
 	pagePath.replace(/\.html$/, "").replace(/\//g, "-");
 
 /**
+ * `data-pagefind-body` already identifies the page-specific content for both
+ * the documentation layout and the home page. Its document-space box keeps
+ * the capture independent from the shared header, sidebar and outline while
+ * preserving overlays that paint across the content (dialogs, popovers and
+ * their backdrops). Integer outer edges avoid clipping antialiased borders.
+ *
+ * @param {import("@playwright/test").Page} page
+ */
+const docsContentRegion = (page) =>
+	page.locator("[data-pagefind-body]").evaluate((content) => {
+		const box = content.getBoundingClientRect();
+		const root = document.documentElement;
+		const x = Math.max(0, Math.floor(box.left + window.scrollX));
+		const y = Math.max(0, Math.floor(box.top + window.scrollY));
+		const right = Math.min(
+			root.scrollWidth,
+			Math.ceil(box.right + window.scrollX),
+		);
+		const bottom = Math.min(
+			root.scrollHeight,
+			Math.ceil(box.bottom + window.scrollY),
+		);
+
+		return { height: bottom - y, width: right - x, x, y };
+	});
+
+/**
  * @param {import("@playwright/test").Page} page
  * @param {string} name
  * @param {boolean} [splitLongPage]
  */
-const expectScreenshot = async (page, name, splitLongPage = false) => {
+const expectDocsScreenshot = async (page, name, splitLongPage = false) => {
 	const mask = [page.locator('[aria-busy="true"]')];
+	const region = await docsContentRegion(page);
 	if (!splitLongPage) {
 		await expect(page).toHaveScreenshot(`${name}.png`, {
+			clip: region,
 			fullPage: true,
 			mask,
 		});
@@ -196,16 +227,13 @@ const expectScreenshot = async (page, name, splitLongPage = false) => {
 	// customization guide crosses that limit on a mobile viewport, so keep
 	// complete coverage as four deterministic document-space slices instead
 	// of dropping the tail of the page or excluding the guide again (gh#99).
-	const { height, width } = await page.evaluate(() => ({
-		height: document.documentElement.scrollHeight,
-		width: document.documentElement.clientWidth,
-	}));
 	const parts = 4;
 	for (let part = 0; part < parts; part += 1) {
-		const y = Math.floor((height * part) / parts);
-		const bottom = Math.floor((height * (part + 1)) / parts);
+		const y = region.y + Math.floor((region.height * part) / parts);
+		const bottom =
+			region.y + Math.floor((region.height * (part + 1)) / parts);
 		await expect(page).toHaveScreenshot(`${name}-part-${part + 1}.png`, {
-			clip: { height: bottom - y, width, x: 0, y },
+			clip: { height: bottom - y, width: region.width, x: region.x, y },
 			fullPage: true,
 			mask,
 		});
@@ -223,7 +251,11 @@ for (const pagePath of visualPages) {
 		// aria-busy spinners keep animating even under reduced motion (a
 		// deliberate framework choice) and live inside a background-image SVG
 		// that `animations: "disabled"` cannot reach — mask them.
-		await expectScreenshot(page, name, pagePath === "customization/index.html");
+		await expectDocsScreenshot(
+			page,
+			name,
+			pagePath === "customization/index.html",
+		);
 	});
 }
 
@@ -233,7 +265,7 @@ for (const theme of themeVariants.filter(({ name }) => name !== "default")) {
 
 		test(name, async ({ page }) => {
 			await capture(page, pagePath, theme);
-			await expectScreenshot(page, name);
+			await expectDocsScreenshot(page, name);
 		});
 	}
 }
@@ -245,10 +277,27 @@ for (const theme of themeVariants) {
 
 		test(name, async ({ page }) => {
 			await capture(page, pagePath, theme, prepare);
-			await expectScreenshot(page, name);
+			await expectDocsScreenshot(page, name);
 		});
 	}
 }
+
+test("documentation chrome", async ({ page }) => {
+	await capture(page, "colors/index.html", defaultTheme);
+	await expect(page).toHaveScreenshot("docs-chrome.png", { fullPage: false });
+});
+
+test("readonly number input affordance", async ({ page }, testInfo) => {
+	test.skip(
+		!testInfo.project.name.startsWith("light-desktop"),
+		"one focused light capture per engine covers the native affordance",
+	);
+
+	await capture(page, "forms/index.html", defaultTheme);
+	await expect(
+		page.locator("[data-readonly-number-example]"),
+	).toHaveScreenshot("readonly-number-inputs.png");
+});
 
 for (const specimen of frameworkSpecimens) {
 	test(`specimen-${specimen}`, async ({ page }) => {
@@ -256,7 +305,10 @@ for (const specimen of frameworkSpecimens) {
 			waitUntil: "networkidle",
 		});
 		await page.evaluate(() => document.fonts.ready);
-		await expectScreenshot(page, `specimen-${specimen}`);
+		await expect(page).toHaveScreenshot(`specimen-${specimen}.png`, {
+			fullPage: true,
+			mask: [page.locator('[aria-busy="true"]')],
+		});
 	});
 }
 

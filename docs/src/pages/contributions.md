@@ -242,10 +242,13 @@ goal is to keep it that way: fix violations rather than baseline them.
 
 ### Visual regression — `check:visual`
 
-Playwright screenshots the default theme's selected documentation pages at
-full-page size in light and dark modes, at 1440 px and 390 px, and compares
-each against a committed baseline in `tests/__screenshots__/`. The set includes
-the prose-heavy About, Customization, Get Started, Upgrading, and Contributions
+Playwright screenshots the content region of the default theme's selected
+documentation pages in light and dark modes, at 1440 px and 390 px, and
+compares each against a committed baseline in `tests/__screenshots__/`. The
+shared documentation chrome has its own viewport-sized baseline, so changes to
+the header, sidebar or outline remain covered without invalidating every page
+capture. The set includes the
+prose-heavy About, Customization, Get Started, Upgrading, and Contributions
 pages: a large editorial rewrite must produce a reviewable visual diff too.
 
 Every preset discovered from `src/presets/` also renders a representative
