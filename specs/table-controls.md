@@ -93,5 +93,8 @@ overflowed by 26px; the demo now uses a visible header.
 - **Size budget.** This leaves 206 B gzip under the `cirth.min.css` budget.
   gh#107, prototyped in parallel, needs 136 B of the same headroom. Together
   they fit, with about 70 B to spare.
-- **The `.sr-only` leak** should be its own issue; `position: relative` on
-  `.overflow-auto` is the likely fix.
+- **The `.sr-only` leak** is fixed separately on
+  `fix/box-shadow-and-sr-only-overflow` (`position: relative` on
+  `.overflow-auto`). Once that lands, the demo could return to an
+  `.sr-only` "Actions" header; the visible one is kept because it reads
+  fine and does not depend on the fix.
