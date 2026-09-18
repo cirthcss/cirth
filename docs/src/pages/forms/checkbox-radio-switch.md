@@ -35,3 +35,32 @@ a checkbox turns it into a toggle switch with no extra markup.
   other form elements (see [Forms overview](/forms/)).
 * A `label` that contains a checkbox/radio becomes `cursor: pointer` and
   sizes itself to its content instead of stretching full width.
+
+## Segmented choice
+
+A compact single choice, drawn as joined segments, that is still an ordinary
+radio group. Add `class="segmented"` to a `fieldset` whose `legend` names the
+choice and whose labels each wrap one radio:
+
+{% demo "segmented" %}
+
+```html
+<fieldset class="segmented">
+  <legend>View</legend>
+  <label><input type="radio" name="view" value="list" checked> List</label>
+  <label><input type="radio" name="view" value="grid"> Grid</label>
+  <label><input type="radio" name="view" value="map" disabled> Map</label>
+</fieldset>
+```
+
+* The radios are not hidden. Arrow keys move the selection, the checked
+  value submits with the form, and assistive technology announces a radio
+  group named by the `legend`.
+* The selected segment takes the primary button's fill, and its radio keeps
+  its dot, so the selection does not depend on colour. In forced-colors mode,
+  where the fill is removed, the dot and the segment borders remain.
+* Keyboard focus draws an outline around the whole segment, outside the fill.
+* Each segment is at least 44px tall, like a button. A disabled radio fades
+  its segment once.
+* Class-based builds only. The classless build has no opt-in, so a
+  `fieldset` there always stays a plain group.
