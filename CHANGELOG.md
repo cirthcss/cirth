@@ -7,6 +7,15 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Added
+
+- **`table.controls`, for form controls placed directly in cells** (gh#108),
+  in class-based builds. A cell that holds an input, select, textarea or
+  button gives most of its padding to the control and the control drops its
+  stacking margin, so a row of fields no longer reads as a box inside a box.
+  The controls keep their borders, states, focus ring and 44px target. The
+  classless builds are unchanged.
+
 ### Changed
 
 - **The primary, secondary and contrast token families are named by role**
