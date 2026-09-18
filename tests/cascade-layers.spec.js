@@ -533,3 +533,109 @@ test("the print pass still outranks the build, and an author print rule outranks
 	);
 	expect(await styleOf(page, "target", "box-shadow")).toBe(`${ink} 0px 0px 0px 1px`);
 });
+
+// --- The documented examples, run as written (gh#110) ------------------
+
+// Customization → Cascade layers shows the import forms a consumer copies.
+// An `@import` after any rule other than a `@layer` statement is dropped
+// by the parser without a word, so a reordered example would still read
+// plausibly and silently load nothing. Each CSS example with an import is
+// therefore loaded verbatim: the package specifiers resolved through the
+// package's own `exports`, the way a bundler resolves them, and a relative
+// file stubbed. It passes when every `@import` in the text survived
+// parsing, loaded a stylesheet, and landed in the layer it names.
+test.describe("the Cascade layers examples on the Customization page", () => {
+	const origin = "https://cirth.test";
+	const page = read("docs/src/pages/customization.md");
+	const section = page.slice(
+		page.indexOf("\n## Cascade layers"),
+		page.indexOf("\n## ", page.indexOf("\n## Cascade layers") + 1),
+	);
+	const examples = [...section.matchAll(/```css\n([\s\S]*?)```/g)]
+		.map((match) => match[1])
+		.filter((css) => css.includes("@import"));
+
+	const importPattern =
+		/@import\s+(?:url\(\s*)?["']([^"']+)["']\s*\)?\s*(?:layer\(([^)]*)\))?/g;
+
+	/**
+	 * What each `@import` in the text should become in the CSSOM.
+	 *
+	 * @param {string} css
+	 */
+	const expectedImports = (css) =>
+		[...css.matchAll(importPattern)].map((match) => ({
+			layer: match[2] ?? null,
+			specifier: match[1],
+		}));
+
+	/**
+	 * Serve `css` with its specifiers resolved, and read back what the
+	 * browser made of every import in it.
+	 *
+	 * @param {import("@playwright/test").Page} browserPage
+	 * @param {string} css
+	 */
+	const loadExample = async (browserPage, css) => {
+		/** @type {Record<string, string>} */
+		const files = {};
+		const served = css.replace(importPattern, (whole, specifier) => {
+			const target = specifier.startsWith("@cirthcss/cirth")
+				? `/pkg/${path.relative(projectRoot, require.resolve(specifier))}`
+				: `/stub/${specifier}`;
+			files[target] = target.startsWith("/pkg/")
+				? read(target.slice("/pkg/".length))
+				: ".stub { color: inherit; }";
+			return whole.replace(/(?:url\(\s*)?["'][^"']+["']\s*\)?/, `url("${target}")`);
+		});
+
+		await browserPage.route(`${origin}/**`, (route) => {
+			const { pathname } = new URL(route.request().url());
+			return pathname in files
+				? route.fulfill({ body: files[pathname], contentType: "text/css" })
+				: route.fulfill({
+						body: `<!doctype html><style>${served}</style>`,
+						contentType: "text/html",
+					});
+		});
+		await browserPage.goto(`${origin}/`);
+		await browserPage.unroute(`${origin}/**`);
+
+		return browserPage.evaluate(() =>
+			[...document.styleSheets[0].cssRules]
+				.filter((rule) => rule instanceof CSSImportRule)
+				.map((rule) => ({
+					layer: rule.layerName,
+					loaded: (rule.styleSheet?.cssRules.length ?? 0) > 0,
+				})),
+		);
+	};
+
+	test("there are examples to check", () => {
+		expect(examples.length).toBeGreaterThanOrEqual(3);
+	});
+
+	for (const [index, css] of examples.entries()) {
+		test(`example ${index + 1} imports what it says, in an order the browser keeps`, async ({
+			page: browserPage,
+		}) => {
+			const expected = expectedImports(css);
+			const found = await loadExample(browserPage, css);
+
+			expect(found, css).toEqual(
+				expected.map(({ layer }) => ({ layer, loaded: true })),
+			);
+		});
+	}
+
+	test("the check notices an import written after a rule", async ({
+		page: browserPage,
+	}) => {
+		const broken = `.site-footer { color: red; }\n@import "@cirthcss/cirth";\n`;
+		const found = await loadExample(browserPage, broken);
+
+		expect(found).not.toEqual(
+			expectedImports(broken).map(({ layer }) => ({ layer, loaded: true })),
+		);
+	});
+});
