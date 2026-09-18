@@ -55,6 +55,20 @@ const themePreview = () => {
 	// the scoped build the preview loads puts the theme on `.cirth`.
 	const themeRootPattern = /^(:root|:host|\.cirth)$/;
 
+	// Top level of the file, or top level of the one `@layer cirth` block
+	// every compiled file now wraps itself in (gh#124). A rule nested any
+	// deeper sits in a media query, which is the case excluded above.
+	/** @param {import("postcss").Rule} rule */
+	const atTopLevel = (rule) => {
+		const parent = rule.parent;
+		if (parent?.type === "root") return true;
+		return (
+			parent?.type === "atrule" &&
+			/** @type {import("postcss").AtRule} */ (parent).name === "layer" &&
+			parent.parent?.type === "root"
+		);
+	};
+
 	/**
 	 * @param {string} file
 	 * @returns {Map<string, string>}
@@ -63,7 +77,7 @@ const themePreview = () => {
 		const found = new Map();
 		if (!fs.existsSync(file)) return found;
 		postcss.parse(fs.readFileSync(file, "utf8")).walkRules((rule) => {
-			if (rule.parent?.type !== "root") return;
+			if (!atTopLevel(rule)) return;
 			if (
 				!rule.selector
 					.split(",")

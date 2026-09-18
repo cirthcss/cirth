@@ -40,7 +40,10 @@ you trust) and point `--cirth-font-family` at it after the preset.
 
 Load the main stylesheet, then load a preset after it. The preset only sets
 the custom properties it needs to change, so it works with any of the
-default, classless, or scoped builds:
+default, classless, or scoped builds. It shares the build's
+[cascade layer](/customization#cascade-layers), which is why the order
+matters between the two, and why a token you set yourself beats both
+wherever you load it:
 
 ```html
 <link rel="stylesheet" href="dist/cirth.min.css">

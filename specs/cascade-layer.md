@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | gh#124, superseding the "do not wrap" decision recorded in gh#110 |
-| Status | Draft |
+| Status | Implementing |
 | Baseline | `c4dcd4c5` on `master` |
 | Breaking | Yes — cascade only; no class, token, file or markup change |
 
@@ -64,8 +64,12 @@ It does **not** promise:
   not the cascade, and layering does not change it. Set scoped tokens on
   `.cirth`.
 - **That Cirth's defensive rules override your CSS.** `[hidden]`, `.sr-only`,
-  the reduced-motion pass and the print pass still override Cirth's own
-  rules. They no longer override yours.
+  a popover's declared centring, the reduced-motion pass and the print pass
+  still override Cirth's own rules. They no longer override yours. The
+  popover is the sharpest case: `cef91fa6` declared its centring so that an
+  accidental layout rule could not knock it off while an author naming the
+  element still could. A layer cannot tell those two apart, so both now
+  win.
 
 ## Evidence ledger
 
@@ -101,7 +105,8 @@ at `c4dcd4c5`.
 | — rejected: keep scoped builds unlayered | Design | Splits the rule into "layered except in two of eight builds" and breaks presets, as above. |
 | Presets emit into `cirth`, after the build, rather than into a later layer | Design | Source order already puts them after the theme, exactly as today. A second top-level name (`cirth-presets`) would make ordering depend on which file a page happened to load first, unless every file carried an order statement. |
 | Presets declare on `.cirth` as well as `:root, :host` | Existing contract | The docs promise presets work with scoped builds. Per-build preset files would grow the matrix. |
-| The layer is added in SCSS, through one mixin (`src/helpers/_cascade.scss`), in `_index.scss`, `utilities/_print.scss` and each preset | Design | The docs site compiles `src` directly (`scripts/build-docs.js`), so a wrapper added by a build script or in the entrypoints would leave the site dogfooding a different cascade from the package. |
+| The layer is added in SCSS, through one mixin (`src/helpers/_cascade.scss`): `_index.scss` loads the unchanged module list, now `_modules.scss`, inside it with `meta.load-css()`; `utilities/_print.scss` and each preset wrap themselves | Design | The docs site compiles `src` directly (`scripts/build-docs.js`), so a wrapper added by a build script or in the entrypoints would leave the site dogfooding a different cascade from the package. `@use` cannot be nested; `meta.load-css()` emits the same modules with the same configuration in the same order. |
+| The popover keeps its margin-based centring (`inset: 0; margin: auto`), and the lost guarantee is documented | Constraint | Nothing can defend a rule against an unlayered author rule without `!important`. Centring by `translate` would stop `position-area` overriding it cleanly, which `cef91fa6` promised; `place-self` on an absolutely positioned box is outside the browser floor and would fight `position-area` too. The docs site's own trailing-margin rule now excludes `[popover]`. |
 | No `@layer cirth;` order statement is emitted | Design | With one name, the block itself is the declaration. A consumer who needs a fixed position writes their own statement before Cirth loads. |
 | `!important` stays banned, now asserted in the emitted CSS too | Existing contract | Stylelint already refuses it in the source. Inside a layer it would invert against the consumer, so `check:dist` checks the output as well. |
 
@@ -126,6 +131,12 @@ at `c4dcd4c5`.
   - [ ] a consumer order statement places `cirth` deterministically.
 - [ ] Every artifact's rules, unwrapped, are identical to the baseline's
       except the preset root selector.
+- [ ] `tests/popover.spec.js` pins the popover trade-off in both directions:
+      centred against layout CSS that yields to Cirth, moved by an unlayered
+      rule that reaches it. The docs Popover demo opens centred.
+- [ ] The docs site renders as before apart from its edited text: computed
+      styles unchanged, and `npm run check:visual` failing only on the pages
+      whose copy changed, with those baselines regenerated.
 - [ ] Documentation: `docs/src/pages/customization.md#cascade-layers`, plus
       `get-started.md`, `colors.md`, `upgrading.md`,
       `utilities/print.md` and `about.md` no longer contradict it.
@@ -140,7 +151,8 @@ at `c4dcd4c5`.
 | Override Cirth in your own stylesheet | Nothing breaks, and your rule now wins at any specificity, in any loading order | You can drop `:root:not(…)`, `.cirth`-prefixed or repeated-class selectors you wrote to out-weigh Cirth |
 | Load a stylesheet *before* Cirth so Cirth overrides it (a reset, legacy base styles, a third-party widget theme) | That stylesheet now beats Cirth wherever they overlap | Put it in a layer that sorts before Cirth: `@layer legacy, cirth;` then `@import url(legacy.css) layer(legacy);` |
 | Embed a scoped build in a page with its own global CSS | The host's unlayered rules now win inside `.cirth` | If the host CSS is yours, layer it as above. If it is not, mount the widget in a shadow root |
-| Rely on `[hidden]` or `.sr-only` beating your own element rules | Your `display` or `position` now wins | Scope your rule, e.g. `nav ul:not([hidden])`, or put your CSS in a layer after `cirth` if you prefer the old tie-breaking |
+| Rely on `[hidden]` or `.sr-only` beating your own element rules | Your `display` or `position` now wins | Scope your rule, e.g. `nav ul:not([hidden])` |
+| Have a layout rule that reaches a popover by accident (`.panel > :last-child { margin-bottom: 0 }`) | It beats the popover's own centring (`inset: 0; margin: auto`), and the open panel slides to an edge | Leave popovers out: `:last-child:not([popover])` |
 | Rely on Cirth's reduced-motion or print pass to neutralise your own animations or screen styles | They no longer reach your rules | Add your own `@media (prefers-reduced-motion: reduce)` / `@media print` rules |
 | Import Cirth with `@import url(…) layer(cirth)` (gh#110) | Nothing: it nests as `cirth.cirth` and sorts the same | Optional: switch back to a plain `<link>` and drop the import's serial fetch |
 | Import Cirth into a layer of another name to position it | Nothing, it nests as `yourname.cirth` | Optional: replace it with an order statement naming `cirth` |
@@ -158,3 +170,9 @@ path, and the loading order of build, preset and print sheet.
 2. **Sub-layers.** Rejected for now on evidence. Revisit only with a concrete
    consumer case that cannot be expressed as "before `cirth`" or "after
    `cirth`", and move every rule at once so that `cirth` itself stays empty.
+3. **A configurable prefix (gh#126, in flight on
+   `feat/issue-126-configurable-prefix`).** That branch renames `--cirth-*` at
+   build time. Whether the layer name should follow the prefix is its
+   decision. If it does, `src/helpers/_cascade.scss` and `layerName` in
+   `scripts/lib/dist-manifest.js` are the two places to change, and
+   `check:dist` will refuse a build where they disagree.

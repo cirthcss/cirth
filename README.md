@@ -176,8 +176,10 @@ See [Colors](docs/src/pages/colors.md) for what each preset changes.
 
 ## Customization
 
-Cirth is CSS-first. Override custom properties in your own stylesheet after
-loading the framework.
+Cirth is CSS-first. Override custom properties in your own stylesheet. Every
+stylesheet Cirth ships keeps its rules in one cascade layer, `cirth`, so CSS
+you write outside a layer wins without matching Cirth's selectors, wherever
+it loads.
 
 ```css
 :root {

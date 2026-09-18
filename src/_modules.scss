@@ -1,0 +1,59 @@
+// Layout
+@use "layout/document"; // html
+@use "layout/landmarks"; // body, header, main, footer
+@use "layout/section"; // section
+@use "layout/container"; // .container, .container-fluid, .breakout
+@use "layout/row"; // .row
+@use "layout/grid"; // .grid
+@use "layout/overflow-auto"; // .overflow-auto
+
+// Content
+@use "content/typography"; // headings, p, ul, blockquote, ...
+@use "content/link"; // a, role="link"
+@use "content/button"; // button, role="button", type="button", type="submit" ...
+@use "content/table"; // table, tr, td, ...
+@use "content/embedded"; // audio, canvas, iframe, img, svg, video
+@use "content/code"; // pre, code, ...
+@use "content/figure"; // figure, figcaption
+@use "content/misc"; // hr, [hidden]
+
+// Forms
+@use "forms/basics"; // input, select, textarea, label, fieldset, legend
+@use "forms/checkbox-radio-switch"; // type="checkbox", type="radio", role="switch"
+@use "forms/input-color"; // type="color"
+@use "forms/input-date"; // type="date", type="datetime-local", type="month", type="time", type="week"
+@use "forms/input-file"; // type="file"
+@use "forms/input-range"; // type="range"
+@use "forms/input-search"; // type="search"
+
+// Components
+@use "components/accordion"; // details, summary
+@use "components/card"; // article
+@use "components/dropdown"; // details.dropdown
+@use "components/group"; // role="group"
+@use "components/loading"; // aria-busy=true
+@use "components/meter"; // meter
+@use "components/modal"; // dialog
+@use "components/nav"; // nav
+@use "components/popover"; // [popover]
+@use "components/progress"; // progress
+
+// Utilities
+@use "utilities/accessibility"; // aria-*, [dir="rtl"]
+@use "utilities/reduce-motion"; // prefers-reduced-motion
+@use "utilities/sr-only"; // .sr-only, .sr-only-focusable
+@use "utilities/truncate"; // .truncate
+
+// Theme
+// src/theme/ is the single source of Cirth's official design tokens.
+// Alternate accents (see src/presets/) are published as separate
+// stylesheets that only override CSS custom properties, meant to be
+// loaded after this one — they are not alternate builds of this file.
+// They emit into the same cascade layer, so source order still decides.
+@use "theme";
+
+// Print is not here on purpose. It ships as its own stylesheet
+// (src/cirth.print*.scss -> dist/cirth.print*.css), loaded with
+// media="print", so the bytes that only matter on paper stay out of the
+// payload that has to arrive in the first round trip. See those entry
+// files for why source order still works.
