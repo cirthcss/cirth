@@ -80,7 +80,7 @@ const markFill = (file) => {
 	return fill[1];
 };
 
-// The page ink, from the scale the schemes build --cirth-contrast out of.
+// The page ink, from the scale the schemes build --cirth-contrast-text out of.
 /** @param {string} name */
 const neutral = (name) => {
 	const colors = fs.readFileSync(

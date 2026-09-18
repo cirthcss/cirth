@@ -749,11 +749,11 @@ test("the navbar states are a contrast ladder, not the accent", async ({
 	const [resting, active, accent] = await Promise.all([
 		read(other.first()),
 		read(current),
-		// Resolved, not the raw token: --cirth-primary is a light-dark()
+		// Resolved, not the raw token: --cirth-primary-text aliases a light-dark()
 		// expression, and comparing it as a string compares nothing.
 		page.evaluate(() => {
 			const probe = document.createElement("span");
-			probe.style.color = "var(--cirth-primary)";
+			probe.style.color = "var(--cirth-primary-text)";
 			document.body.append(probe);
 			const value = getComputedStyle(probe).color;
 			probe.remove();
@@ -1761,7 +1761,7 @@ test("the theme demo's control keeps the band's ink in every state", async ({
 	// The framework's own page roles, read off the band rather than
 	// restated here. The shell used to capture all three into --docs-band-*
 	// aliases, because a <button> rebinds --cirth-color and a control
-	// reaching for it inside itself got the button's inverse ink. The
+	// reaching for it inside itself got the button's on-surface ink. The
 	// library now names the page roles separately — --cirth-ink and
 	// --cirth-canvas, neither of which a component may rebind — so the
 	// control reads them directly and there is no alias left to drift.

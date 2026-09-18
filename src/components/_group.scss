@@ -120,7 +120,7 @@ $visible-group-item: ':not([hidden], input[type="hidden"])';
       --cirth-button-box-shadow: 0 0 0 var(--cirth-border-width)
         var(--cirth-primary-border);
       --cirth-button-hover-box-shadow: 0 0 0 var(--cirth-border-width)
-        var(--cirth-primary-hover-border);
+        var(--cirth-primary-border-active);
     }
   }
 

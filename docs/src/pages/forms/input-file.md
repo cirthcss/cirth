@@ -16,5 +16,5 @@ styled like a secondary [button](/content/button).
 
 The input itself has no border or background. Only the button part reads
 as a control. Hover, active, and focus states on the button use
-`--cirth-secondary-hover-background`/`-border` and a focus ring in
-`--cirth-secondary-focus`.
+`--cirth-secondary-surface-active` / `--cirth-secondary-border-active` and a
+focus ring in `--cirth-secondary-focus`.

@@ -183,7 +183,7 @@ loading the framework.
 :root {
   --cirth-font-family: Inter, system-ui, sans-serif;
   --cirth-primary: #2563eb;
-  --cirth-primary-background: #2563eb;
+  --cirth-primary-surface: #2563eb;
   --cirth-primary-border: #2563eb;
   --cirth-border-radius: 0.375rem;
   --cirth-spacing: 1rem;

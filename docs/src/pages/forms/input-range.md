@@ -19,7 +19,7 @@ input's keyboard, pointer, and value behavior.
 
 * Track color: `--cirth-range-border-color`, growing to
   `--cirth-range-active-border-color` on hover, while active, or while focused.
-* Thumb color: `--cirth-range-thumb-color`, strengthening to the secondary hover
+* Thumb color: `--cirth-range-thumb-color`, strengthening to the secondary active
   role on hover and switching to `--cirth-range-thumb-active-color` (the primary
   fill) while active or focused.
 * The input keeps the shared 44 px control target while the visible thumb stays

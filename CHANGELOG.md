@@ -7,6 +7,18 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Changed
+
+- **The primary, secondary and contrast token families are named by role.**
+  Their former `background`, `hover` and `inverse` vocabulary is now
+  `surface`, `active` and `on-surface`, with state following the role in
+  compound names such as `--cirth-primary-surface-active`. The bare
+  `--cirth-secondary` and `--cirth-contrast` roles are now `-text`, and the
+  primary family gains `--cirth-primary-text` as a derived alias of its
+  unchanged `--cirth-primary` input. No class, value or rendered state moves;
+  this is the pre-1.0 API rename that makes the accent families follow the
+  same semantic vocabulary as the status families.
+
 ## [0.15.0-beta.2] - 2026-09-14
 
 ### Added

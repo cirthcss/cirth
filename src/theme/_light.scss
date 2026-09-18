@@ -29,26 +29,34 @@
     from var(--cirth-warning) calc(l * 1.091) calc(c * 1.081) h
   );
   --cirth-warning-surface: oklch(from var(--cirth-warning) 93% 0.05 h);
-  --cirth-primary-background: var(--cirth-primary);
-  --cirth-primary-border: var(--cirth-primary-background);
+
+  // The input is not also a component role. Keeping the alias explicit lets
+  // consumers retune the accent once while components say what they need.
+  --cirth-primary-text: var(--cirth-primary);
+  --cirth-primary-surface: var(--cirth-primary);
+  --cirth-primary-border: var(--cirth-primary-surface);
   --cirth-primary-underline: oklch(from var(--cirth-primary) l c h / 50%);
 
   // 83.5% and 91.7% of the accent mixed toward black land exactly on
   // $copper-650 and $copper-600 — the ladder is proportional in L and C at
   // this end, so a single mix reproduces a step.
-  --cirth-primary-hover: color-mix(in oklch, var(--cirth-primary) 83.5%, black);
-  --cirth-primary-hover-background: color-mix(
+  --cirth-primary-active: color-mix(
+    in oklch,
+    var(--cirth-primary) 83.5%,
+    black
+  );
+  --cirth-primary-surface-active: color-mix(
     in oklch,
     var(--cirth-primary) 91.7%,
     black
   );
-  --cirth-primary-hover-border: var(--cirth-primary-hover-background);
-  --cirth-primary-hover-underline: var(--cirth-primary-hover);
+  --cirth-primary-border-active: var(--cirth-primary-surface-active);
+  --cirth-primary-underline-active: var(--cirth-primary-active);
 
   // Focus rings composite to >= 3:1 against the page background (WCAG
   // 1.4.11 as applied to focus indicators) — don't lower these alphas.
   --cirth-primary-focus: oklch(from var(--cirth-primary) l c h / 75%);
-  --cirth-primary-inverse: #{$white};
+  --cirth-primary-on-surface: #{$white};
 
   // Text selection. Derived, not pinned to a scale step: this used to be a
   // literal from the brand family, which meant every preset — a blue Plain
@@ -84,14 +92,14 @@
   --cirth-popover-background-color: var(--cirth-card-background-color);
 
   // Secondary and contrast
-  --cirth-secondary-background: #{$neutral-600};
-  --cirth-secondary-border: var(--cirth-secondary-background);
-  --cirth-secondary-hover-border: var(--cirth-secondary-hover-background);
-  --cirth-secondary-hover-underline: var(--cirth-secondary-hover);
-  --cirth-secondary-inverse: #{$white};
-  --cirth-contrast-border: var(--cirth-contrast-background);
-  --cirth-contrast-hover-border: var(--cirth-contrast-hover-background);
-  --cirth-contrast-hover-underline: var(--cirth-secondary-hover);
+  --cirth-secondary-surface: #{$neutral-600};
+  --cirth-secondary-border: var(--cirth-secondary-surface);
+  --cirth-secondary-border-active: var(--cirth-secondary-surface-active);
+  --cirth-secondary-underline-active: var(--cirth-secondary-active);
+  --cirth-secondary-on-surface: #{$white};
+  --cirth-contrast-border: var(--cirth-contrast-surface);
+  --cirth-contrast-border-active: var(--cirth-contrast-surface-active);
+  --cirth-contrast-underline-active: var(--cirth-secondary-active);
 
   // Highlighted text (<mark>). Relevance follows the theme's accent rather
   // than the warning family: a highlighted phrase is selected evidence, not
@@ -158,22 +166,22 @@
     --cirth-form-element-valid-active-border-color
   );
   --cirth-switch-thumb-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
-  --cirth-switch-checked-background-color: var(--cirth-primary-background);
+  --cirth-switch-checked-background-color: var(--cirth-primary-surface);
 
   // Thumb matches button text color rather than a hardcoded white, so a
-  // customized --cirth-primary-inverse stays consistent everywhere it
+  // customized --cirth-primary-on-surface stays consistent everywhere it
   // implies "text/icon on top of the primary color". Verified >= 3:1
   // (WCAG 1.4.11) against both tracks with the shipped values: 3.77:1
   // unchecked (white on neutral-450), 5.60:1 checked (white on
   // copper-550) — the tightest of the two is the one to re-check if
-  // --cirth-primary-inverse or --cirth-switch-background-color changes.
-  --cirth-switch-color: var(--cirth-primary-inverse);
+  // --cirth-primary-on-surface or --cirth-switch-background-color changes.
+  --cirth-switch-color: var(--cirth-primary-on-surface);
   --cirth-range-thumb-border-color: var(--cirth-background-color);
-  --cirth-range-thumb-color: var(--cirth-secondary);
-  --cirth-range-thumb-active-color: var(--cirth-primary-background);
+  --cirth-range-thumb-color: var(--cirth-secondary-text);
+  --cirth-range-thumb-active-color: var(--cirth-primary-surface);
 
   // Accordion (<details>)
-  --cirth-accordion-active-summary-color: var(--cirth-primary-hover);
+  --cirth-accordion-active-summary-color: var(--cirth-primary-active);
   --cirth-accordion-close-summary-color: var(--cirth-ink);
   --cirth-accordion-open-summary-color: var(--cirth-ink);
 
@@ -227,7 +235,7 @@
   --cirth-meter-optimum-color: var(--cirth-success);
   --cirth-meter-suboptimum-color: var(--cirth-warning);
   --cirth-meter-even-less-good-color: var(--cirth-error);
-  --cirth-progress-color: var(--cirth-primary-background);
+  --cirth-progress-color: var(--cirth-primary-surface);
 
   // Icons painted as background-image on replaced form controls. They
   // live in the scheme rather than at the root because a data URI cannot

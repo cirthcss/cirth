@@ -22,7 +22,7 @@ colors, including an animated indeterminate state.
 ## Behavior
 
 * Track: `--cirth-progress-background-color`; value/bar:
-  `--cirth-progress-color` (defaults to `--cirth-primary-background` in
+  `--cirth-progress-color` (defaults to `--cirth-primary-surface` in
   light mode; dark mode uses a lighter step of the accent so the bar keeps
   a 3:1 contrast against the track).
 * Border: `--cirth-progress-border-color` outlines the track so the

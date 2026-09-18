@@ -19,16 +19,16 @@ a checkbox turns it into a toggle switch with no extra markup.
 
 ## Behavior
 
-* Checked state uses `--cirth-primary-background` and the matching border token,
+* Checked state uses `--cirth-primary-surface` and the matching border token,
   plus an inline check icon (`--cirth-icon-checkbox`); an indeterminate checkbox shows
   a dash (`--cirth-icon-minus`) instead.
 * Radios are checked with a filled inner circle instead of an icon.
 * A `[type="checkbox"][role="switch"]` becomes a pill shaped toggle: track
   color from `--cirth-switch-background-color` /
   `--cirth-switch-checked-background-color`, thumb color from
-  `--cirth-switch-color`, which defaults to `--cirth-primary-inverse` (the
+  `--cirth-switch-color`, which defaults to `--cirth-primary-on-surface` (the
   same token buttons use for their text) rather than a fixed white — keep
-  the two in sync if you customize `--cirth-primary-inverse`, and recheck
+  the two in sync if you customize `--cirth-primary-on-surface`, and recheck
   contrast (WCAG 1.4.11, >= 3:1) against both `--cirth-switch-background-color`
   and `--cirth-switch-checked-background-color` if you do.
 * `aria-invalid="true"`/`"false"` recolor the checked state the same way as

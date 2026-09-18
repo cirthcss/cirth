@@ -14,9 +14,35 @@ working the way it already does.
 
 ## Unreleased, from v0.14.x
 
-The public class list stays the same, but containers and modals now size
-continuously instead of stepping through a shared viewport table. Check the
-few cases below if your CSS depended on the old implementation details.
+The public class list stays the same. The accent token families now use role
+names, and containers and modals size continuously instead of stepping
+through a shared viewport table. Check the cases below if your CSS overrides
+an accent role or depended on the old layout details.
+
+### Accent tokens are named by role
+
+`primary`, `secondary` and `contrast` still identify the three public colour
+groups, and `--cirth-primary` remains the input that retunes the accent.
+Their downstream tokens now say what they paint before naming a state. This
+brings them into the `text` / `border` / `active` / `surface` vocabulary
+already used by the error, success and warning families.
+
+If your theme overrides a downstream accent token, rename it with this map;
+the values and relationships have not changed:
+
+| Before | After |
+| --- | --- |
+| `--cirth-secondary` / `--cirth-contrast` | `--cirth-secondary-text` / `--cirth-contrast-text` |
+| `*-background` | `*-surface` |
+| `*-hover` | `*-active` |
+| `*-hover-background` | `*-surface-active` |
+| `*-hover-border` | `*-border-active` |
+| `*-hover-underline` | `*-underline-active` |
+| `*-inverse` | `*-on-surface` |
+
+`--cirth-primary-text` is the new derived text role; it follows the unchanged
+`--cirth-primary` input. The `.secondary` and `.contrast` classes are also
+unchanged — this is a custom-property migration, not a markup migration.
 
 ### Container gutters have their own token
 

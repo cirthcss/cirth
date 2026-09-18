@@ -74,7 +74,7 @@ $border-thumb: var(--cirth-border-width-2);
   @media (hover: hover) and (pointer: fine) {
     &:hover:not(:active, :focus, :disabled) {
       --cirth-range-border-color: var(--cirth-range-active-border-color);
-      --cirth-range-thumb-color: var(--cirth-secondary-hover);
+      --cirth-range-thumb-color: var(--cirth-secondary-active);
     }
   }
 

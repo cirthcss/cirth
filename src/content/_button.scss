@@ -42,9 +42,9 @@
 #{$parent-selector} [type="button"],
 #{$parent-selector} [type="file"]::file-selector-button,
 #{$parent-selector} [role="button"] {
-  --cirth-background-color: var(--cirth-primary-background);
+  --cirth-background-color: var(--cirth-primary-surface);
   --cirth-border-color: var(--cirth-primary-border);
-  --cirth-color: var(--cirth-primary-inverse);
+  --cirth-color: var(--cirth-primary-on-surface);
   --cirth-box-shadow: var(--cirth-button-box-shadow, 0 0 0 rgb(0 0 0 / 0%));
 
   // A control sizes to its label, but never past the space it was given:
@@ -86,13 +86,13 @@
 
   &:is([aria-current]:not([aria-current="false"])),
   &:is(:hover, :active, :focus) {
-    --cirth-background-color: var(--cirth-primary-hover-background);
-    --cirth-border-color: var(--cirth-primary-hover-border);
+    --cirth-background-color: var(--cirth-primary-surface-active);
+    --cirth-border-color: var(--cirth-primary-border-active);
     --cirth-box-shadow: var(
       --cirth-button-hover-box-shadow,
       0 0 0 rgb(0 0 0 / 0%)
     );
-    --cirth-color: var(--cirth-primary-inverse);
+    --cirth-color: var(--cirth-primary-on-surface);
   }
 
   // Pressed is one tonal step past hover. Painted as a wash over the
@@ -141,16 +141,16 @@
     :is(button, [type="submit"], [type="button"], [role="button"]).secondary,
   #{$parent-selector} [type="reset"],
   #{$parent-selector} [type="file"]::file-selector-button {
-    --cirth-background-color: var(--cirth-secondary-background);
+    --cirth-background-color: var(--cirth-secondary-surface);
     --cirth-border-color: var(--cirth-secondary-border);
-    --cirth-color: var(--cirth-secondary-inverse);
+    --cirth-color: var(--cirth-secondary-on-surface);
 
     cursor: pointer;
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
-      --cirth-background-color: var(--cirth-secondary-hover-background);
-      --cirth-border-color: var(--cirth-secondary-hover-border);
-      --cirth-color: var(--cirth-secondary-inverse);
+      --cirth-background-color: var(--cirth-secondary-surface-active);
+      --cirth-border-color: var(--cirth-secondary-border-active);
+      --cirth-color: var(--cirth-secondary-on-surface);
     }
   }
 
@@ -178,14 +178,14 @@
   // Contrast
   #{$parent-selector}
     :is(button, [type="submit"], [type="button"], [role="button"]).contrast {
-    --cirth-background-color: var(--cirth-contrast-background);
+    --cirth-background-color: var(--cirth-contrast-surface);
     --cirth-border-color: var(--cirth-contrast-border);
-    --cirth-color: var(--cirth-contrast-inverse);
+    --cirth-color: var(--cirth-contrast-on-surface);
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
-      --cirth-background-color: var(--cirth-contrast-hover-background);
-      --cirth-border-color: var(--cirth-contrast-hover-border);
-      --cirth-color: var(--cirth-contrast-inverse);
+      --cirth-background-color: var(--cirth-contrast-surface-active);
+      --cirth-border-color: var(--cirth-contrast-border-active);
+      --cirth-color: var(--cirth-contrast-on-surface);
     }
 
     &:focus-visible,
@@ -211,7 +211,7 @@
       color-mix(in oklch, var(--cirth-error) 55%, black)
     );
     --cirth-border-color: var(--cirth-background-color);
-    --cirth-color: var(--cirth-primary-inverse);
+    --cirth-color: var(--cirth-primary-on-surface);
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
       --cirth-background-color: light-dark(
@@ -219,7 +219,7 @@
         color-mix(in oklch, var(--cirth-error) 50%, black)
       );
       --cirth-border-color: var(--cirth-background-color);
-      --cirth-color: var(--cirth-primary-inverse);
+      --cirth-color: var(--cirth-primary-on-surface);
     }
 
     &:focus-visible,
@@ -267,17 +267,17 @@
   #{$parent-selector}
     :is(button, [type="submit"], [type="button"], [role="button"]).outline,
   #{$parent-selector} [type="reset"].outline {
-    --cirth-color: var(--cirth-primary);
-    --cirth-border-color: var(--cirth-primary);
+    --cirth-color: var(--cirth-primary-text);
+    --cirth-border-color: var(--cirth-primary-text);
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
       --cirth-background-color: color-mix(
         in oklch,
-        var(--cirth-primary) 12%,
+        var(--cirth-primary-text) 12%,
         var(--cirth-form-element-background-color)
       );
-      --cirth-color: var(--cirth-primary-hover);
-      --cirth-border-color: var(--cirth-primary-hover);
+      --cirth-color: var(--cirth-primary-active);
+      --cirth-border-color: var(--cirth-primary-active);
     }
   }
 
@@ -290,17 +290,17 @@
       [role="button"]
     ).outline.secondary,
   #{$parent-selector} [type="reset"].outline.secondary {
-    --cirth-color: var(--cirth-secondary);
-    --cirth-border-color: var(--cirth-secondary);
+    --cirth-color: var(--cirth-secondary-text);
+    --cirth-border-color: var(--cirth-secondary-text);
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
       --cirth-background-color: color-mix(
         in oklch,
-        var(--cirth-secondary) 12%,
+        var(--cirth-secondary-text) 12%,
         var(--cirth-form-element-background-color)
       );
-      --cirth-color: var(--cirth-secondary-hover);
-      --cirth-border-color: var(--cirth-secondary-hover);
+      --cirth-color: var(--cirth-secondary-active);
+      --cirth-border-color: var(--cirth-secondary-active);
     }
   }
 
@@ -313,17 +313,17 @@
       [role="button"]
     ).outline.contrast,
   #{$parent-selector} [type="reset"].outline.contrast {
-    --cirth-color: var(--cirth-contrast);
-    --cirth-border-color: var(--cirth-contrast);
+    --cirth-color: var(--cirth-contrast-text);
+    --cirth-border-color: var(--cirth-contrast-text);
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
       --cirth-background-color: color-mix(
         in oklch,
-        var(--cirth-contrast) 12%,
+        var(--cirth-contrast-text) 12%,
         var(--cirth-form-element-background-color)
       );
-      --cirth-color: var(--cirth-contrast-hover);
-      --cirth-border-color: var(--cirth-contrast-hover);
+      --cirth-color: var(--cirth-contrast-active);
+      --cirth-border-color: var(--cirth-contrast-active);
     }
   }
 
@@ -331,16 +331,16 @@
   #{$parent-selector}
     :is(button, [type="submit"], [type="button"], [role="button"]).ghost,
   #{$parent-selector} [type="reset"].ghost {
-    --cirth-color: var(--cirth-primary);
+    --cirth-color: var(--cirth-primary-text);
     --cirth-border-color: transparent;
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
       --cirth-background-color: color-mix(
         in oklch,
-        var(--cirth-primary) 12%,
+        var(--cirth-primary-text) 12%,
         transparent
       );
-      --cirth-color: var(--cirth-primary-hover);
+      --cirth-color: var(--cirth-primary-active);
       --cirth-border-color: transparent;
     }
   }
@@ -354,16 +354,16 @@
       [role="button"]
     ).ghost.secondary,
   #{$parent-selector} [type="reset"].ghost.secondary {
-    --cirth-color: var(--cirth-secondary);
+    --cirth-color: var(--cirth-secondary-text);
     --cirth-border-color: transparent;
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
       --cirth-background-color: color-mix(
         in oklch,
-        var(--cirth-secondary) 12%,
+        var(--cirth-secondary-text) 12%,
         transparent
       );
-      --cirth-color: var(--cirth-secondary-hover);
+      --cirth-color: var(--cirth-secondary-active);
       --cirth-border-color: transparent;
     }
   }
@@ -377,16 +377,16 @@
       [role="button"]
     ).ghost.contrast,
   #{$parent-selector} [type="reset"].ghost.contrast {
-    --cirth-color: var(--cirth-contrast);
+    --cirth-color: var(--cirth-contrast-text);
     --cirth-border-color: transparent;
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
       --cirth-background-color: color-mix(
         in oklch,
-        var(--cirth-contrast) 12%,
+        var(--cirth-contrast-text) 12%,
         transparent
       );
-      --cirth-color: var(--cirth-contrast-hover);
+      --cirth-color: var(--cirth-contrast-active);
       --cirth-border-color: transparent;
     }
   }
@@ -437,16 +437,16 @@
   // Secondary button without .class
   #{$parent-selector} [type="reset"],
   #{$parent-selector} [type="file"]::file-selector-button {
-    --cirth-background-color: var(--cirth-secondary-background);
+    --cirth-background-color: var(--cirth-secondary-surface);
     --cirth-border-color: var(--cirth-secondary-border);
-    --cirth-color: var(--cirth-secondary-inverse);
+    --cirth-color: var(--cirth-secondary-on-surface);
 
     cursor: pointer;
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
-      --cirth-background-color: var(--cirth-secondary-hover-background);
-      --cirth-border-color: var(--cirth-secondary-hover-border);
-      --cirth-color: var(--cirth-secondary-inverse);
+      --cirth-background-color: var(--cirth-secondary-surface-active);
+      --cirth-border-color: var(--cirth-secondary-border-active);
+      --cirth-color: var(--cirth-secondary-on-surface);
     }
   }
 

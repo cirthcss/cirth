@@ -276,7 +276,7 @@ $navbar-selector: "header:not(:is(article, aside, dialog, figure, li, nav, secti
       --cirth-color: color-mix(
         in oklch,
         var(--cirth-muted-color),
-        var(--cirth-contrast)
+        var(--cirth-contrast-text)
       );
     }
 
@@ -284,7 +284,7 @@ $navbar-selector: "header:not(:is(article, aside, dialog, figure, li, nav, secti
     // reader has to compare two greys to notice is a state carried by
     // colour alone.
     &:is([aria-current]:not([aria-current="false"]), [aria-selected="true"]) {
-      --cirth-color: var(--cirth-contrast);
+      --cirth-color: var(--cirth-contrast-text);
 
       font-weight: var(--cirth-font-weight-semibold);
     }

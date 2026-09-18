@@ -57,7 +57,7 @@ Tokens computed from an input, at runtime, by the browser. They are written
 as relationships:
 
 ```css
---cirth-primary-hover: color-mix(in oklch, var(--cirth-primary) 83.5%, black);
+--cirth-primary-active: color-mix(in oklch, var(--cirth-primary) 83.5%, black);
 --cirth-primary-underline: oklch(from var(--cirth-primary) l c h / 50%);
 ```
 
@@ -113,11 +113,11 @@ them:
 The distinction matters most inside a `<button>`, a link, an `<input>` or a
 heading, because each of those rebinds `--cirth-color` for its own subtree.
 A custom control built on `<button>` — a tab, a toolbar, a chip — that
-reaches for `--cirth-color` gets the button's inverse ink, which on a
+reaches for `--cirth-color` gets the button's on-surface ink, which on a
 button that has dropped its fill is white on white. Reach for
 `--cirth-ink` instead and you get the page's ink, whatever the theme is.
 
-`--cirth-contrast` is not the same thing: that is maximum-contrast ink, the
+`--cirth-contrast-text` is not the same thing: that is maximum-contrast ink, the
 role the `.contrast` variant is built on, not the ink of body text.
 
 ### Roles
@@ -169,14 +169,18 @@ set them:
 
 | Token | Relationship |
 | --- | --- |
-| `--cirth-primary-background` | The filled surface. Same as the accent in light; darker in dark |
-| `--cirth-primary-hover` | The accent, darkened (light) or lightened (dark) |
-| `--cirth-primary-hover-background` | The filled surface, one step further |
+| `--cirth-primary-text` | The accent as text: links and quiet controls |
+| `--cirth-primary-surface` | The filled surface. Same as the accent in light; darker in dark |
+| `--cirth-primary-border` | The edge of that filled surface |
+| `--cirth-primary-active` | Active text and quiet-control edges; darker in light, lighter in dark |
+| `--cirth-primary-surface-active` | The filled surface, one step further |
+| `--cirth-primary-border-active` | The active edge of that surface |
 | `--cirth-primary-underline` | The accent at 50% alpha |
+| `--cirth-primary-underline-active` | The underline while its link is active |
 | `--cirth-primary-focus` | The accent at 75% alpha — the focus ring |
-| `--cirth-primary-inverse` | The text that sits *on* the accent |
+| `--cirth-primary-on-surface` | The text that sits *on* the accent |
 
-`--cirth-primary-inverse` is the one to check when you pick an unusual
+`--cirth-primary-on-surface` is the one to check when you pick an unusual
 accent. It is white by default, which is right for most accents and wrong
 for a light one — a pale yellow accent with white text on it is
 unreadable. It is a plain value rather than a derivation because choosing
@@ -185,14 +189,22 @@ between light and dark text is a decision, not a mix.
 ```css
 :root {
   --cirth-primary: #fbbf24;          /* a light amber */
-  --cirth-primary-inverse: #1c1917;  /* so the label stays readable */
+  --cirth-primary-on-surface: #1c1917;  /* so the label stays readable */
 }
 ```
 
-`--cirth-secondary` and `--cirth-contrast` are the other two colour groups,
-with the same shape. `.secondary` and `.contrast` on a button or link swap
-which group it reads from; `.outline` and `.ghost` keep the group and drop
-the fill. See [Button](/content/button).
+The name now says the role before it says the state: `text`, `surface`,
+`border`, `underline`, `focus`, and `on-surface`, with `-active` appended
+where a state needs another value. That is the same vocabulary the status
+families use below, rather than the former mix of `background`, `hover` and
+`inverse`.
+
+`--cirth-secondary-text` and `--cirth-contrast-text` anchor the other two
+colour groups, with the same shape. They are roles rather than inputs: the
+default theme chooses their neutral and maximum-contrast values directly.
+`.secondary` and `.contrast` on a button or link swap which group it reads
+from; `.outline` and `.ghost` keep the group and drop the fill. See
+[Button](/content/button).
 
 ### Status colours
 
@@ -505,7 +517,7 @@ Everything the accent touches, in one line per scheme:
 }
 ```
 
-Check `--cirth-primary-inverse` if your accent is light: the label on a
+Check `--cirth-primary-on-surface` if your accent is light: the label on a
 filled button has to clear 4.5:1 against it.
 
 ### Swap the typography
@@ -589,7 +601,7 @@ result clears a threshold depends on the colour you chose. When you change
 an input, the pairs worth checking are:
 
 * your accent against the page, as link text;
-* `--cirth-primary-inverse` against `--cirth-primary-background`, as a
+* `--cirth-primary-on-surface` against `--cirth-primary-surface`, as a
   button label;
 * `--cirth-muted-color` against the page;
 * the status borders against a field.
@@ -624,41 +636,42 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 
 | Token | Kind |
 | --- | --- |
-| `--cirth-contrast` | role |
-| `--cirth-contrast-background` | role |
+| `--cirth-contrast-active` | role |
 | `--cirth-contrast-border` | derived |
+| `--cirth-contrast-border-active` | derived |
 | `--cirth-contrast-focus` | role |
-| `--cirth-contrast-hover` | role |
-| `--cirth-contrast-hover-background` | role |
-| `--cirth-contrast-hover-border` | derived |
-| `--cirth-contrast-hover-underline` | derived |
-| `--cirth-contrast-inverse` | role |
+| `--cirth-contrast-on-surface` | role |
+| `--cirth-contrast-surface` | role |
+| `--cirth-contrast-surface-active` | role |
+| `--cirth-contrast-text` | role |
 | `--cirth-contrast-underline` | role |
+| `--cirth-contrast-underline-active` | derived |
 | `--cirth-error` | input |
 | `--cirth-error-active` | derived |
 | `--cirth-error-border` | derived |
 | `--cirth-error-surface` | derived |
 | `--cirth-error-text` | derived |
 | `--cirth-primary` | input |
-| `--cirth-primary-background` | derived |
+| `--cirth-primary-active` | derived |
 | `--cirth-primary-border` | derived |
+| `--cirth-primary-border-active` | derived |
 | `--cirth-primary-focus` | derived |
-| `--cirth-primary-hover` | derived |
-| `--cirth-primary-hover-background` | derived |
-| `--cirth-primary-hover-border` | derived |
-| `--cirth-primary-hover-underline` | derived |
-| `--cirth-primary-inverse` | role |
+| `--cirth-primary-on-surface` | role |
+| `--cirth-primary-surface` | derived |
+| `--cirth-primary-surface-active` | derived |
+| `--cirth-primary-text` | derived |
 | `--cirth-primary-underline` | derived |
-| `--cirth-secondary` | role |
-| `--cirth-secondary-background` | role |
+| `--cirth-primary-underline-active` | derived |
+| `--cirth-secondary-active` | role |
 | `--cirth-secondary-border` | derived |
+| `--cirth-secondary-border-active` | derived |
 | `--cirth-secondary-focus` | role |
-| `--cirth-secondary-hover` | role |
-| `--cirth-secondary-hover-background` | role |
-| `--cirth-secondary-hover-border` | derived |
-| `--cirth-secondary-hover-underline` | derived |
-| `--cirth-secondary-inverse` | role |
+| `--cirth-secondary-on-surface` | role |
+| `--cirth-secondary-surface` | role |
+| `--cirth-secondary-surface-active` | role |
+| `--cirth-secondary-text` | role |
 | `--cirth-secondary-underline` | role |
+| `--cirth-secondary-underline-active` | derived |
 | `--cirth-success` | input |
 | `--cirth-success-active` | derived |
 | `--cirth-success-border` | derived |

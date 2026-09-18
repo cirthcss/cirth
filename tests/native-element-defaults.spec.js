@@ -412,7 +412,7 @@ for (const [name, css] of builds) {
 // --- 3. The page roles are not shadowable -------------------------------
 
 // --cirth-color is the slot a component rebinds: a <button> sets it to the
-// inverse ink its filled surface needs, a link to the accent, a heading to
+// on-surface ink its filled surface needs, a link to the accent, a heading to
 // its own. That is what --cirth-ink exists to sit beside, exactly as
 // --cirth-canvas already sat beside --cirth-background-color.
 for (const [name, css] of builds) {

@@ -528,7 +528,7 @@ test("navigation links reserve the accent for position, while header chrome uses
 		const sample = await page.evaluate(() => {
 			const probe = document.createElement("div");
 			document.body.append(probe);
-			probe.style.color = "var(--cirth-primary)";
+			probe.style.color = "var(--cirth-primary-text)";
 			const accent = getComputedStyle(probe).color;
 			probe.style.color = "var(--cirth-color)";
 			const ink = getComputedStyle(probe).color;
@@ -536,7 +536,7 @@ test("navigation links reserve the accent for position, while header chrome uses
 			const muted = getComputedStyle(probe).color;
 			// The top of the ladder: the token whose whole job is full
 			// contrast, which is what the current navbar entry now takes.
-			probe.style.color = "var(--cirth-contrast)";
+			probe.style.color = "var(--cirth-contrast-text)";
 			const contrast = getComputedStyle(probe).color;
 			probe.remove();
 

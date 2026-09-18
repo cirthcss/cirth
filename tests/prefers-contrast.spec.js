@@ -234,7 +234,7 @@ for (const scheme of /** @type {const} */ (["light", "dark"])) {
 
 // A button label sits on a fill, not on the page, so it is the one place
 // where strengthening the accent can make things *worse*: the fill derives
-// from --cirth-primary, the label is --cirth-primary-inverse (white), and an
+// from --cirth-primary, the label is --cirth-primary-on-surface (white), and an
 // accent lightened for text legibility drags the fill up under the label.
 // That regressed once, in the dark scheme, to 4.2:1 — below where it sat
 // with no preference expressed at all — because the pass boosted the accent

@@ -33,7 +33,7 @@
   &:checked,
   &:checked:active,
   &:checked:focus {
-    --cirth-background-color: var(--cirth-primary-background);
+    --cirth-background-color: var(--cirth-primary-surface);
     --cirth-border-color: var(--cirth-primary-border);
   }
 
@@ -50,10 +50,10 @@
 
 // Checkboxes
 
-// The mark is the icon applied as a mask over --cirth-primary-inverse, not
+// The mark is the icon applied as a mask over --cirth-primary-on-surface, not
 // an SVG with a baked stroke: a data URI cannot read a custom property, so
 // a baked white mark stays white on a light custom accent and disappears.
-// The inverse token is the one the theme already computes for text on the
+// The on-surface token is the one the theme already computes for text on the
 // accent, so the mark follows any retheme.
 
 // Scoped away from [role="switch"] — a switch paints its own thumb through
@@ -67,7 +67,7 @@
     display: block;
     width: 100%;
     height: 100%;
-    background-color: var(--cirth-primary-inverse);
+    background-color: var(--cirth-primary-on-surface);
     content: "";
     mask-position: center;
     mask-size: 0.9em auto;
@@ -85,7 +85,7 @@
   }
 
   &:indeterminate {
-    --cirth-background-color: var(--cirth-primary-background);
+    --cirth-background-color: var(--cirth-primary-surface);
     --cirth-border-color: var(--cirth-primary-border);
 
     &::before {
@@ -102,7 +102,7 @@
   &:checked,
   &:checked:active,
   &:checked:focus {
-    --cirth-background-color: var(--cirth-primary-inverse);
+    --cirth-background-color: var(--cirth-primary-on-surface);
 
     border-width: 0.42em;
   }
