@@ -154,10 +154,10 @@
   );
 
   // Box shadow
-  --cirth-box-shadow: light-dark(
-    #{functions.shadow($neutral-400)},
-    #{functions.shadow(color.mix($black, $neutral-950, $method: oklab))}
-  );
+  --cirth-box-shadow: #{functions.shadow(
+      $neutral-400,
+      color.mix($black, $neutral-950, $method: oklab)
+    )};
 
   // Typography
   // Headings colors — one step darker across the board than a plain

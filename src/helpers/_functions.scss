@@ -1,4 +1,5 @@
 @use "sass:color";
+@use "sass:list";
 @use "sass:math";
 @use "sass:string";
 
@@ -25,54 +26,51 @@
   );
 }
 
-// Generate a shadow layer
-@function shadow-layer($elevation, $blur, $opacity, $color) {
-  @return #{($elevation * 0.5)} #{$elevation} #{$blur}
-    #{color.change($color, $alpha: $opacity)};
+// A shadow colour per scheme. light-dark() only accepts colours, so the
+// scheme choice has to sit on each layer's colour: wrapping two whole
+// shadow lists in one light-dark() is invalid at computed-value time, and
+// every box-shadow that read it resolved to none.
+@function shadow-color($light, $dark, $opacity) {
+  @return light-dark(
+    #{color.change($light, $alpha: $opacity)},
+    #{color.change($dark, $alpha: $opacity)}
+  );
 }
 
-// Generate a shadow with 7 layers
-@function shadow($color) {
+// Generate a shadow layer
+@function shadow-layer($elevation, $blur, $opacity, $light, $dark) {
+  @return #{($elevation * 0.5)} #{$elevation} #{$blur}
+    shadow-color($light, $dark, $opacity);
+}
+
+// Generate a shadow with 7 layers, one geometry for both schemes
+@function shadow($light, $dark) {
   $box-shadow-elevation: 1rem;
   $box-shadow-blur-strength: 6rem;
   $box-shadow-opacity: 0.06;
+  $layers: ();
 
-  @return shadow-layer(
-      $box-shadow-elevation * 0.029,
-      $box-shadow-blur-strength * 0.029,
-      $box-shadow-opacity * 0.283,
-      $color
-    ),
-    shadow-layer(
-      $box-shadow-elevation * 0.067,
-      $box-shadow-blur-strength * 0.067,
-      $box-shadow-opacity * 0.4,
-      $color
-    ),
-    shadow-layer(
-      $box-shadow-elevation * 0.125,
-      $box-shadow-blur-strength * 0.125,
-      $box-shadow-opacity * 0.5,
-      $color
-    ),
-    shadow-layer(
-      $box-shadow-elevation * 0.225,
-      $box-shadow-blur-strength * 0.225,
-      $box-shadow-opacity * 0.6,
-      $color
-    ),
-    shadow-layer(
-      $box-shadow-elevation * 0.417,
-      $box-shadow-blur-strength * 0.417,
-      $box-shadow-opacity * 0.717,
-      $color
-    ),
-    shadow-layer(
-      $box-shadow-elevation,
-      $box-shadow-blur-strength,
-      $box-shadow-opacity,
-      $color
-    ),
-    0 0 0 0.0625rem
-      #{color.change($color, $alpha: ($box-shadow-opacity * 0.25))};
+  // Elevation and blur scale together; opacity has its own ramp.
+  @each $scale,
+    $opacity
+      in (0.029: 0.283, 0.067: 0.4, 0.125: 0.5, 0.225: 0.6, 0.417: 0.717, 1: 1)
+  {
+    $layers: list.append(
+      $layers,
+      shadow-layer(
+        $box-shadow-elevation * $scale,
+        $box-shadow-blur-strength * $scale,
+        $box-shadow-opacity * $opacity,
+        $light,
+        $dark
+      ),
+      comma
+    );
+  }
+
+  @return list.append(
+    $layers,
+    0 0 0 0.0625rem shadow-color($light, $dark, $box-shadow-opacity * 0.25),
+    comma
+  );
 }
