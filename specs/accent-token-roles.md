@@ -3,8 +3,8 @@
 | | |
 | --- | --- |
 | Issue | gh#96, gh#97 |
-| Status | Implementing |
-| Baseline | `f7484d1c` on `feat/issues-96-97-accent-roles`, from `12f5472e` on `master` |
+| Status | Landed |
+| Baseline | `c4dcd4c5` on `master`; CI run `35379220685` passed |
 | Breaking | Yes — custom properties only, no markup change |
 
 The three public accent families — `primary`, `secondary`, `contrast` — rename
@@ -80,7 +80,7 @@ would credit this branch with a fix it did not make.
 - [x] `npm run lint && npm run build && npm run check:dist` green on the branch
       head.
 - [x] `npm run check:visual` green, or every diff accounted for by the rename.
-- [ ] `CHANGELOG.md` carries the breaking change before the release PR.
+- [x] `CHANGELOG.md` carries the breaking change before the release PR.
 
 ## Migration
 
