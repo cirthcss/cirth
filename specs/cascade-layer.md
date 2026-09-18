@@ -4,7 +4,7 @@
 | --- | --- |
 | Issue | gh#124, superseding the "do not wrap" decision recorded in gh#110 |
 | Status | Implementing |
-| Baseline | `c4dcd4c5` on `master` |
+| Baseline | `c4dcd4c5` on `master`; implemented in `7a98b5d6` on `feat/issue-124-cascade-layers` |
 | Breaking | Yes — cascade only; no class, token, file or markup change |
 
 Every stylesheet Cirth publishes — the four screen builds, their four print
@@ -74,8 +74,9 @@ It does **not** promise:
 ## Evidence ledger
 
 Browsers are Playwright 1.61.1's engines — Chromium 149.0.7827.55, Firefox
-151.0, WebKit 26.5 — on macOS 26.6.2. "Baseline dist" means `npm run build`
-at `c4dcd4c5`.
+151.0, WebKit 26.5 — on macOS 26.6.2, measured 2026-09-19. "Baseline dist"
+means `npm run build` at `c4dcd4c5`; "branch dist" means `npm run build` of
+the source committed in `7a98b5d6`.
 
 | Claim | Evidence | Where | Verdict |
 | --- | --- | --- | --- |
@@ -83,10 +84,19 @@ at `c4dcd4c5`.
 | The issue's count of 71 `:where()` uses | 71 in `dist/cirth.css`, 71 in `dist/cirth.min.css` | Baseline dist, `grep -o` | Verified |
 | Natural overrides lose today and win once layered | 8 one-line overrides (`summary {color}`, `html {--cirth-primary}`, a dropdown link, a striped `th`, `.secondary`, `nav a`, …). Default build: 4 of 8 lose as shipped, 0 of 8 when wrapped in `@layer cirth`. Scoped build: 7 of 8 lose as shipped, 1 of 8 when wrapped — the `html` token case, which is inheritance (see Contract) | Baseline dist, Chromium 149 | Verified |
 | Wrapping with `meta.load-css()` inside `@layer` changes nothing inside the layer | The docs' `@use "src"; @use "src/utilities/print"` compiled plain and inside `@layer cirth { @include meta.load-css(…) }`: the unwrapped rule text is identical, ignoring blank lines | sass-embedded 1.100 over `c4dcd4c5` source | Verified |
-| Ordered sub-layers would change Cirth's own rendering | See the row added when the measurement finishes | — | Reported |
+| Ordered sub-layers would change Cirth's own rendering | The docs' `src` build compiled twice — one flat `cirth` layer, and seven sub-layers in source order (`layout`, `content`, `forms`, `components`, `utilities`, `theme`, `print`) — and each swapped in for `cirth-docs.css`. Computed styles of every element and generated pseudo-element on 50 pages, light and dark: all 100 renders differ, 2,102 (element, property) pairs. Among them `<select>` inline padding 40px → 8px, which runs text under the chevron, and `cursor: pointer` → `not-allowed` on busy `.secondary` buttons | Docs build of `c4dcd4c5`, Chromium 149 | Verified |
+| Inside the layer, every shipped artifact is the unlayered build | All 20 files in `dist/` are one `@layer cirth` block. Unwrapped, the minified files are byte-identical to baseline dist and the expanded ones identical but for the block's two spaces of indentation; the presets differ only in the added `.cirth` root | Branch dist against baseline dist | Verified |
+| Layering changes nothing the docs site renders at rest | The same 50-page, two-scheme computed-style comparison, unlayered against flat-layered: 0 differing pairs once custom-property values are compared with whitespace collapsed. Uncollapsed, 5,028,360 pairs differ, all of them the extra indentation Sass writes into multi-line custom-property values inside the block, which `getPropertyValue()` preserves and rendering ignores | Docs build of `c4dcd4c5`, Chromium 149 | Verified |
+| The first, uncollapsed comparison showed the layer changing the docs' rendering | Its 5,028,360 differing pairs were whitespace inside custom-property values, not rendering (row above) | As above | Invalid |
+| An accidental layout rule now moves an open popover | The docs Popover demo opened 355px below the viewport's centre with the layer and `.docs-demo-preview > :last-child { margin-bottom: 0 }`; centred again with `:not([popover])` added. `tests/popover.spec.js`'s former "stays centred even when page CSS zeroes its margin" failed in all three engines on branch dist before it was rewritten | Branch docs build, Chromium 149; behavior suite on branch dist | Verified |
+| The homepage theme preview depended on root-level rules | Reading `presets/plain.css` compiled with the layer: 0 of its 2 rules sit at the root, so the preview would have listed no declarations. After the reader change the served `states` are byte-identical to the baseline site's | `docs/eleventy.config.js`, branch docs build | Verified |
+| The fixture proves the layer and nothing else | `tests/cascade-layers.spec.js` and `tests/popover.spec.js` against baseline dist: 33 fail and 19 pass in each engine. The passes are containment and the host-layer remedy (true either way), the gh#110 import of an unlayered file, and the 14 popover cases the layer does not touch | Baseline dist, three engines | Verified |
+| `check:dist` refuses an unlayered build | 3,188 violations on baseline dist; clean on branch dist | `node scripts/check-dist.js` | Verified |
+| The published package carries the layer | `check:consumer` packs, installs and resolves 12 entry points; each opens with `@layer cirth` | Branch dist, packed with npm 11.19.1 | Verified |
+| The layer costs bytes inside the budget | `dist/cirth.min.css` 14,241 → 14,251 B gzipped, print sheets +8 B; every file still under its budget | `npm run build` size check, baseline and branch | Verified |
 | Presets never reached a scoped build | `cirth.scoped.css` + `presets/plain.css`: a link inside `.cirth` paints `oklch(0.527 0.107 44)`, the copper default, not plain's blue | Baseline dist, Chromium 149 | Verified |
 | `docs/src/pages/colors.md` says a preset "works with any of the default, classless, or scoped builds" | False for scoped (row above) | `c4dcd4c5` | Invalid |
-| gh#124 says gh#110 "documents the opt-in `@import … layer(cirth)` path" | No page documents it. `git grep "layer(cirth"` finds nothing on any local or remote branch, no PR references gh#110, and gh#110 is still open. The guidance exists only in the issue body | All refs as of 2026-09-19 | Invalid |
+| gh#124 says gh#110 "documents the opt-in `@import … layer(cirth)` path" | No page documents it. `git grep "layer(cirth"` finds nothing on any local or remote branch, no PR references gh#110, and gh#110 is still open. The guidance exists only in the issue body | Every local and remote ref except this branch, 2026-09-19 | Invalid |
 | Inside a scoped wrapper, host element rules lose today and win once layered | `button {background-color}`, `a {color}` and `h1 {font-size}` in an unlayered sheet: Cirth's values hold as shipped; the host's values apply when Cirth is wrapped | Baseline dist, Chromium 149 | Verified |
 | Cascade layers are inside the browser floor | `@layer` shipped in Chrome 99, Firefox 97 and Safari 15.4; the floor is Chrome 123 / Firefox 130 / Safari 18.2 | MDN compatibility data, not reproduced on floor browsers | Reported |
 | Prior art: nimble.css layers every rule, in `nimble.reset`, `nimble.base` and `nimble.utilities` | Quoted in gh#124 | Not inspected here | Reported |
@@ -95,7 +105,7 @@ at `c4dcd4c5`.
 
 | Decision | Basis | Rationale |
 | --- | --- | --- |
-| Layer everything Cirth emits | Design | Unlayered consumer CSS beats all of Cirth is a rule with no exceptions to learn. |
+| Layer everything Cirth emits | Design | "Unlayered consumer CSS beats all of Cirth" is a rule with no exceptions to learn. |
 | — rejected: layer the reset and base, leave components and utilities unlayered | Design | Leaves the specificity contest in place for the rules people override most, and unlayered Cirth rules would beat layered Cirth rules at any specificity, which reorders Cirth's own cascade. |
 | — rejected: leave the defensive rules (`[hidden]`, `.sr-only`, reduced motion) unlayered | Design | The same internal reordering, plus an exception list in the public contract. What they stop doing is recorded under Migration instead. |
 | One flat layer named `cirth` | Evidence | The only arrangement that is provably neutral for Cirth's own cascade: same rules, same order, same specificity. |
@@ -112,37 +122,43 @@ at `c4dcd4c5`.
 
 ## Acceptance
 
-- [ ] `npm run check:dist` asserts that every build and preset, expanded and
+- [x] `npm run check:dist` asserts that every build and preset, expanded and
       minified, is one top-level `@layer cirth` block with no other layer name
       and no `!important`.
-- [ ] `npm run check:consumer` finds `@layer cirth` in every published entry
+- [x] `npm run check:consumer` finds `@layer cirth` in every published entry
       point.
-- [ ] `tests/cascade-layers.spec.js`, on Chromium, Firefox and WebKit:
-  - [ ] unlayered author CSS beats Cirth with a selector no more specific than
+- [x] `tests/cascade-layers.spec.js`, on Chromium, Firefox and WebKit
+      (111 passed on branch dist):
+  - [x] unlayered author CSS beats Cirth with a selector no more specific than
         a type or single class, loaded before *and* after Cirth, in the
         default, classless, scoped and classless-scoped builds;
-  - [ ] every preset beats the theme and loses to the consumer in every build,
+  - [x] every preset beats the theme and loses to the consumer in every build,
         in either loading order of consumer and preset;
-  - [ ] scoped: nothing outside `.cirth` is styled, host rules now win inside
+  - [x] scoped: nothing outside `.cirth` is styled, host rules now win inside
         it, and both remedies — a host layer declared before `cirth`, and a
         shadow root — hold;
-  - [ ] the gh#110 `@import … layer(cirth)` path nests as `cirth.cirth` and
+  - [x] the gh#110 `@import … layer(cirth)` path nests as `cirth.cirth` and
         keeps every outcome above;
-  - [ ] a consumer order statement places `cirth` deterministically.
-- [ ] Every artifact's rules, unwrapped, are identical to the baseline's
+  - [x] a consumer order statement places `cirth` deterministically.
+- [x] Every artifact's rules, unwrapped, are identical to the baseline's
       except the preset root selector.
-- [ ] `tests/popover.spec.js` pins the popover trade-off in both directions:
+- [x] `tests/popover.spec.js` pins the popover trade-off in both directions:
       centred against layout CSS that yields to Cirth, moved by an unlayered
       rule that reaches it. The docs Popover demo opens centred.
-- [ ] The docs site renders as before apart from its edited text: computed
+- [x] The docs site renders as before apart from its edited text: computed
       styles unchanged, and `npm run check:visual` failing only on the pages
-      whose copy changed, with those baselines regenerated.
-- [ ] Documentation: `docs/src/pages/customization.md#cascade-layers`, plus
+      whose copy changed, with those baselines regenerated — the Darwin
+      set in `33e775f0`; the Linux set is left to
+      `update-visual-baselines.yml` on push.
+- [x] Documentation: `docs/src/pages/customization.md#cascade-layers`, plus
       `get-started.md`, `colors.md`, `upgrading.md`,
       `utilities/print.md` and `about.md` no longer contradict it.
-- [ ] `CHANGELOG.md` states what stops winning and what starts winning.
-- [ ] `npm run lint`, `build`, `check:dist`, `check:size`, `check:package`,
-      `check:consumer` green on the branch head.
+- [x] `CHANGELOG.md` states what stops winning and what starts winning.
+- [x] `npm run lint`, `build`, `check:dist`, `check:size`, `check:package`,
+      `check:consumer` and `check:tooling` exit 0 on `33e775f0`, as do
+      `check:behavior` (1,188 passed, 9 skipped) and `check:visual` (802
+      passed, 26 skipped), on macOS.
+- [ ] CI green on the pull request, Linux baselines included.
 
 ## Migration
 
