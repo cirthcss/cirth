@@ -184,6 +184,21 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   background-color: var(--cirth-card-sectioning-background-color);
 }
 
+// A readonly number has no operation for its native stepper to perform. The
+// standard textfield appearance removes it in Firefox; WebKit exposes the
+// controls as pseudo-elements as well, so hide those explicitly. Keep this
+// scoped to readonly inputs: an editable number retains its existing native
+// affordance and keyboard behaviour in every engine.
+#{$parent-selector} input[type="number"][readonly] {
+  appearance: textfield;
+}
+
+#{$parent-selector} input[type="number"][readonly]::-webkit-inner-spin-button,
+#{$parent-selector} input[type="number"][readonly]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 // Active & Focus
 
 #{$parent-selector}

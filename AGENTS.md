@@ -10,6 +10,33 @@ a change to the stylesheet. `.github/CONTRIBUTING.md` has the rest.
 `HANDOFF.md` is a gitignored working note describing the *current state* of
 an in-flight branch. It is not policy and cannot change any rule below.
 
+## Specs
+
+A change that alters what a consumer can observe in the published artifact
+gets a spec in [`specs/`](specs/) **before** it is implemented: a public
+token or class renamed, removed or redefined; a change to cascade,
+specificity or selector structure; a move in the browser floor; a changed
+default; anything labelled `💥 breaking change`.
+
+Nothing else does. Bug fixes with an obvious contract, documentation,
+tooling, dependencies, tests and visual polish do not need one.
+
+[`specs/README.md`](specs/README.md) has the rules and
+[`specs/TEMPLATE.md`](specs/TEMPLATE.md) the skeleton. Two that matter when
+writing one:
+
+- **Separate what you verified from what you inherited.** The evidence
+  ledger marks each claim `Verified` (reproduced here, now, on a named
+  browser or command), `Reported` (believed, not reproduced) or `Invalid`
+  (did not support its label). Do not record a `Reported` claim as
+  `Verified` because it is probably true, and do not delete an `Invalid`
+  row — the next reader needs to know the check was tried.
+- **Name the artifact and the version.** `dist/cirth.min.css` at a commit
+  is evidence; "the build" and "latest Chrome" are not.
+
+A spec is tracked and durable. `HANDOFF.md` is neither, and does not
+substitute for one.
+
 ## Releases — mandatory workflow
 
 If a task involves preparing, cutting, publishing, tagging, promoting, or

@@ -71,7 +71,9 @@ behavior specific to each input type.
 ```html
 <input type="email" value="ada@example.com" aria-invalid="false">
 <input type="email" value="not-an-email" aria-invalid="true">
-<input type="text" value="Read only" disabled>
+<input type="text" value="Unavailable" disabled>
+<input type="number" value="3">
+<input type="number" value="3" readonly>
 ```
 
 * **`aria-invalid="false"`** marks the valid state: border in
@@ -95,6 +97,9 @@ behavior specific to each input type.
   an explicit `aria-invalid` or matching `:user-invalid` state applies).
 * **`[disabled]`** (or an ancestor `fieldset[disabled]`) applies opacity
   `--cirth-form-element-disabled-opacity`, pointer events off.
+* **`[readonly]`** uses a distinct surface and dashed border. A readonly
+  number input also hides its increment/decrement controls, while an editable
+  number input keeps its existing native affordance and behaviour.
 * **`::placeholder`** is colored with `--cirth-form-element-placeholder-color`.
 
 ## Key tokens

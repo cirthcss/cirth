@@ -30,6 +30,17 @@ Pull requests are welcome when they are focused and easy to review.
 Please open an issue first for substantial changes, new public APIs, broad
 refactors, or anything that changes the project direction.
 
+If the change alters what a consumer can observe after upgrading — a public
+custom property or class renamed, removed or redefined, a change to cascade or
+specificity, a moved browser floor, a changed default — write a spec in
+[`specs/`](../specs/) before implementing it, and open the pull request with
+the spec in it. [`specs/README.md`](../specs/README.md) explains when one is
+required, when it is not, and how the evidence ledger distinguishes what you
+verified from what you took on trust.
+
+Most contributions do not need one. If you are unsure, ask in the issue rather
+than writing a spec speculatively.
+
 Use the pull request template and keep the checklist up to date while the pull
 request is being reviewed.
 
