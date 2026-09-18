@@ -32,6 +32,7 @@ The commands you'll actually use:
 
 ```sh
 npm run build      # compile src/ to dist/ (format, lint, compile, minify)
+npm run build -- --prefix "--acme-"  # the same dist/ under another custom property prefix
 npm run dev        # rebuild on change
 npm run lint       # stylelint + CSS custom property check
 npm run lint:fix
@@ -101,6 +102,7 @@ in CI on every push, and the same checks run locally:
 npm run lint          # tree noise + stylelint + custom property audit + browser target + doc links + CDN hashes
 npm run build         # compile src/ to dist/
 npm run check:dist    # structural invariants of every generated dist file
+npm run check:prefix  # a --prefix build differs from the default by the prefix alone
 npm run check:size    # ≤ 14 KiB gzipped per root bundle
 npm run docs:build    # build this site (input for the browser checks below)
 npm run check:behavior # interaction, reflow, user styles, and input parity across three engines

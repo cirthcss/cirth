@@ -44,6 +44,9 @@ jobs:
       - name: Check dist invariants
         run: npm run check:dist
 
+      - name: Check custom property prefix build
+        run: npm run check:prefix
+
       - name: Build docs
         run: npm run docs:build
 

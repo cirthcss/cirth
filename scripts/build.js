@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { compileScssFolder } = require("./lib/compile-scss");
+const { DEFAULT_PREFIX, readPrefixArg } = require("./lib/prefix");
 const { runSync } = require("./lib/run-sync");
 
 const projectRoot = path.join(__dirname, "..");
@@ -8,6 +9,18 @@ const binFolder = path.join(projectRoot, "node_modules/.bin");
 const binExtension = process.platform === "win32" ? ".cmd" : "";
 const sourceFolder = path.join(projectRoot, "src");
 const outputFolder = path.join(projectRoot, "dist");
+
+// `npm run build -- --prefix "--acme-"` builds the same dist/ under another
+// custom property prefix (gh#126). Read it before anything runs, so an
+// invalid value fails without touching dist/.
+/** @type {string} */
+let prefix;
+try {
+	prefix = readPrefixArg(process.argv.slice(2));
+} catch (error) {
+	console.error(`[@cirthcss/cirth] ${/** @type {Error} */ (error).message}`);
+	process.exit(1);
+}
 
 /** @param {string} name */
 const getBinary = (name) => path.join(binFolder, `${name}${binExtension}`);
@@ -31,6 +44,7 @@ const compileCss = () => {
 		sourceFolder,
 		outputFolder,
 		filter: (dirent) => dirent.name.startsWith("cirth"),
+		prefix,
 	});
 };
 
@@ -41,6 +55,9 @@ const cleanOutput = () => {
 };
 
 console.log("\x1b[96m[@cirthcss/cirth] Start\x1b[0m");
+if (prefix !== DEFAULT_PREFIX) {
+	console.log(`[@cirthcss/cirth] Custom property prefix: ${prefix}`);
+}
 
 // Keep this order: every generated CSS file should pass through Lightning CSS before minification.
 run("Format", getBinary("prettier"), [
@@ -57,6 +74,7 @@ cleanOutput();
 compileCss();
 run("Compile presets", process.execPath, [
 	path.join(__dirname, "build-presets.js"),
+	`--prefix=${prefix}`,
 ]);
 run("Transform CSS", process.execPath, [
 	path.join(__dirname, "process-css.js"),
