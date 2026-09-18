@@ -56,6 +56,13 @@
   // Focus rings composite to >= 3:1 against the page background (WCAG
   // 1.4.11 as applied to focus indicators) — don't lower these alphas.
   --cirth-primary-focus: oklch(from var(--cirth-primary) l c h / 75%);
+
+  // Deliberately explicit, not derived from --cirth-primary. Choosing light
+  // or dark ink is a contrast decision, not a mix: the relative-color
+  // threshold prototype picked the worse ink in 14 of 936 accents and left
+  // 10 below 4.5:1. contrast-color() can make the decision correctly, but is
+  // outside the browser floor. A theme with a light accent overrides this
+  // role beside the accent until that changes (gh#96).
   --cirth-primary-on-surface: #{$white};
 
   // Text selection. Derived, not pinned to a scale step: this used to be a

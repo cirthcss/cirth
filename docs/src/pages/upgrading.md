@@ -44,6 +44,13 @@ the values and relationships have not changed:
 `--cirth-primary` input. The `.secondary` and `.contrast` classes are also
 unchanged — this is a custom-property migration, not a markup migration.
 
+`--cirth-primary-on-surface` remains an explicit light-or-dark ink rather
+than deriving from `--cirth-primary`. Existing themes only rename their
+`--cirth-primary-inverse` override; a light accent still needs a deliberately
+dark on-surface value. The available relative-color threshold cannot make
+that choice reliably across hues, and `contrast-color()` is outside Cirth's
+browser floor.
+
 ### Container gutters have their own token
 
 `.container`, `.container-fluid`, and the classless `header`/`main`/`footer`

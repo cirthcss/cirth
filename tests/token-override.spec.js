@@ -116,6 +116,24 @@ test("accent families expose roles rather than positional paint names", () => {
 	}
 });
 
+test("primary on-surface ink remains an explicit contrast choice", () => {
+	for (const build of builds) {
+		const declarations = [
+			...read(build.file).matchAll(
+				/--cirth-primary-on-surface:\s*([^;]+);/g,
+			),
+		].map((match) => match[1]);
+
+		expect(declarations, `${build.name} declares the role`).not.toHaveLength(0);
+		for (const value of declarations) {
+			expect(
+				value,
+				`${build.name} keeps on-surface independent of the accent input`,
+			).not.toContain("--cirth-primary");
+		}
+	}
+});
+
 // One from each scheme layer, so a regression in any of them shows up:
 // text, an accent, a surface, and a border.
 const overrides = {

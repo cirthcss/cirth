@@ -9,7 +9,8 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Changed
 
-- **The primary, secondary and contrast token families are named by role.**
+- **The primary, secondary and contrast token families are named by role**
+  (gh#97).
   Their former `background`, `hover` and `inverse` vocabulary is now
   `surface`, `active` and `on-surface`, with state following the role in
   compound names such as `--cirth-primary-surface-active`. The bare

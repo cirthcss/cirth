@@ -88,6 +88,9 @@
   --cirth-text-selection-color: oklch(
     from var(--cirth-primary) calc(l * 1.065) c h / 18.75%
   );
+
+  // Explicit for the same contrast reason recorded in theme/_light.scss:
+  // the current browser floor cannot derive a reliable light-or-dark choice.
   --cirth-primary-on-surface: #{$white};
 
   // Surface model. Code is deeply recessed below the graphite canvas and

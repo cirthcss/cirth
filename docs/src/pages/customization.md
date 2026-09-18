@@ -184,7 +184,12 @@ set them:
 accent. It is white by default, which is right for most accents and wrong
 for a light one — a pale yellow accent with white text on it is
 unreadable. It is a plain value rather than a derivation because choosing
-between light and dark text is a decision, not a mix.
+between light and dark text is a decision, not a mix. A relative-color
+threshold was tested across 936 accents: 10 results missed 4.5:1 and it
+chose the worse of black and white in 14 cases, concentrated around
+cyan–teal. The exact `contrast-color()` decision is outside Cirth's browser
+floor, so the role remains explicit until the platform can choose reliably.
+A future theme generator can make the same choice before it emits a theme.
 
 ```css
 :root {
