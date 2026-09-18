@@ -35,6 +35,7 @@ module.exports = defineConfig({
 		"shell-overlays.spec.js",
 		"print.spec.js",
 		"surface-derivation.spec.js",
+		"table-controls.spec.js",
 		"token-override.spec.js",
 	],
 	fullyParallel: true,
