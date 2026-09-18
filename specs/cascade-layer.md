@@ -93,6 +93,8 @@ the source committed in `7a98b5d6`.
 | The fixture proves the layer and nothing else | `tests/cascade-layers.spec.js` and `tests/popover.spec.js` against baseline dist: 33 fail and 19 pass in each engine. The passes are containment and the host-layer remedy (true either way), the gh#110 import of an unlayered file, and the 14 popover cases the layer does not touch | Baseline dist, three engines | Verified |
 | `check:dist` refuses an unlayered build | 3,188 violations on baseline dist; clean on branch dist | `node scripts/check-dist.js` | Verified |
 | The published package carries the layer | `check:consumer` packs, installs and resolves 12 entry points; each opens with `@layer cirth` | Branch dist, packed with npm 11.19.1 | Verified |
+| The documented import examples work as written, and a broken one is caught | `tests/cascade-layers.spec.js` loads the three CSS examples with an `@import` from Customization → Cascade layers verbatim, specifiers resolved through the package's `exports`: every import survives parsing, loads, and lands in the layer it names. With one import moved below a rule, example 1 failed | Branch dist, three engines; the broken variant in Chromium 149 | Verified |
+| The layer and gh#126's build-time prefix compose | `feat/issue-126-configurable-prefix` (`a5702b78`) merged into this branch in a throwaway worktree: text merges cleanly, only the Contributions baselines conflict. Its `check-prefix.js` passes (7 checks, 20 files differ by the prefix alone); `npm run build -- --prefix "--acme-"` passes `check:dist`, leaves no `--cirth-`, keeps `@layer cirth`; a preset applies and `html { --acme-primary }` loaded before both wins | Trial merge of `fc633a6e` and `a5702b78`, Chromium 149 | Verified |
 | The layer costs bytes inside the budget | `dist/cirth.min.css` 14,241 → 14,251 B gzipped, print sheets +8 B; every file still under its budget | `npm run build` size check, baseline and branch | Verified |
 | Presets never reached a scoped build | `cirth.scoped.css` + `presets/plain.css`: a link inside `.cirth` paints `oklch(0.527 0.107 44)`, the copper default, not plain's blue | Baseline dist, Chromium 149 | Verified |
 | `docs/src/pages/colors.md` says a preset "works with any of the default, classless, or scoped builds" | False for scoped (row above) | `c4dcd4c5` | Invalid |
@@ -117,6 +119,7 @@ the source committed in `7a98b5d6`.
 | Presets declare on `.cirth` as well as `:root, :host` | Existing contract | The docs promise presets work with scoped builds. Per-build preset files would grow the matrix. |
 | The layer is added in SCSS, through one mixin (`src/helpers/_cascade.scss`): `_index.scss` loads the unchanged module list, now `_modules.scss`, inside it with `meta.load-css()`; `utilities/_print.scss` and each preset wrap themselves | Design | The docs site compiles `src` directly (`scripts/build-docs.js`), so a wrapper added by a build script or in the entrypoints would leave the site dogfooding a different cascade from the package. `@use` cannot be nested; `meta.load-css()` emits the same modules with the same configuration in the same order. |
 | The popover keeps its margin-based centring (`inset: 0; margin: auto`), and the lost guarantee is documented | Constraint | Nothing can defend a rule against an unlayered author rule without `!important`. Centring by `translate` would stop `position-area` overriding it cleanly, which `cef91fa6` promised; `place-self` on an absolutely positioned box is outside the browser floor and would fight `position-area` too. The docs site's own trailing-margin rule now excludes `[popover]`. |
+| The layer name does not follow gh#126's custom-property prefix | Design | A prefix exists because custom properties inherit and collide with a host's tokens. A layer name does neither: two stylesheets that share one merge into a single cascade position. The `.cirth` scope class stays fixed under that branch for the same reason, and a consumer who needs Cirth elsewhere in their order imports it into a layer of their own. A second name would split every order statement in the documentation by build flag. |
 | No `@layer cirth;` order statement is emitted | Design | With one name, the block itself is the declaration. A consumer who needs a fixed position writes their own statement before Cirth loads. |
 | `!important` stays banned, now asserted in the emitted CSS too | Existing contract | Stylelint already refuses it in the source. Inside a layer it would invert against the consumer, so `check:dist` checks the output as well. |
 
@@ -153,6 +156,9 @@ the source committed in `7a98b5d6`.
 - [x] Documentation: `docs/src/pages/customization.md#cascade-layers`, plus
       `get-started.md`, `colors.md`, `upgrading.md`,
       `utilities/print.md` and `about.md` no longer contradict it.
+- [x] gh#110's remaining acceptance — a documentation fixture that catches
+      a broken import example — met by the Customization-page examples in
+      `tests/cascade-layers.spec.js`.
 - [x] `CHANGELOG.md` states what stops winning and what starts winning.
 - [x] `npm run lint`, `build`, `check:dist`, `check:size`, `check:package`,
       `check:consumer` and `check:tooling` exit 0 on `33e775f0`, as do
@@ -183,6 +189,13 @@ path, and the loading order of build, preset and print sheet.
    `@layer`" — is reversed here, and its documentation acceptance is met by
    `customization.md#cascade-layers`. Closing it against this change is the
    maintainer's call.
+
+   *Closed.* Every acceptance item of gh#110 is now met: the local-package
+   and CDN forms, layer order, the precedence of unlayered styles and the
+   `@import` placement rule on the Customization page; scoped and preset
+   ordering there and in the fixture; and a fixture that runs the page's
+   import examples. The pull request closes gh#110 together with gh#124
+   when it merges, not before.
 2. **Sub-layers.** Rejected for now on evidence. Revisit only with a concrete
    consumer case that cannot be expressed as "before `cirth`" or "after
    `cirth`", and move every rule at once so that `cirth` itself stays empty.
@@ -192,3 +205,7 @@ path, and the loading order of build, preset and print sheet.
    decision. If it does, `src/helpers/_cascade.scss` and `layerName` in
    `scripts/lib/dist-manifest.js` are the two places to change, and
    `check:dist` will refuse a build where they disagree.
+
+   *Closed: it does not* — see Decisions. A trial merge of the two branches
+   proved they compose unchanged (Evidence ledger). Whichever lands second
+   regenerates the Contributions-page baselines, the one conflict.
