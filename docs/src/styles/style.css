@@ -302,10 +302,10 @@
   padding: 0.625rem 0.5rem;
   border-radius: var(--cirth-border-radius);
 
-  /* --cirth-contrast, not --cirth-color: on an <a> the latter is the slot
+  /* --cirth-contrast-text, not --cirth-color: on an <a> the latter is the slot
 	   the link component binds to the accent, and a result title wants to
 	   be readable. The accent's job here is the rail on the hovered row. */
-  color: var(--cirth-contrast);
+  color: var(--cirth-contrast-text);
   text-decoration: none;
 }
 
@@ -317,7 +317,7 @@
 .docs-search-results a:hover,
 .docs-search-results a:focus-visible {
   background: var(--cirth-mark-background-color);
-  box-shadow: inset 0.1875rem 0 0 var(--cirth-primary);
+  box-shadow: inset 0.1875rem 0 0 var(--cirth-primary-text);
 }
 
 .docs-search-results strong,
@@ -508,7 +508,7 @@
    way past. */
 .docs-brand,
 .docs-brand:is(:hover, :focus, :active) {
-  color: var(--cirth-contrast);
+  color: var(--cirth-contrast-text);
   text-decoration: none;
 }
 
@@ -600,7 +600,7 @@
 /* An editorial accent on part of a heading — a small named utility rather
    than a selector describing one element on one page. */
 .docs-accent {
-  color: var(--cirth-primary);
+  color: var(--cirth-primary-text);
 }
 
 /* forced-colors strips author colour, so the emphasis has to survive as
@@ -980,7 +980,7 @@
 }
 
 .docs-toc-top a:hover {
-  color: var(--cirth-primary);
+  color: var(--cirth-primary-text);
   text-decoration: underline;
 }
 
@@ -2455,7 +2455,7 @@ cirth-theme-preview:not(:defined) {
 /* The radius chip shows the radius, which is the only honest way to swatch
    one: a square with the theme's own corner on it. */
 .docs-token-legend li[data-token="--cirth-border-radius"] .docs-token-chip {
-  border-color: var(--cirth-primary);
+  border-color: var(--cirth-primary-text);
   border-radius: var(--cirth-border-radius);
 }
 
@@ -2915,7 +2915,7 @@ details.docs-demo-source > :not(summary) {
 
 .docs-sidebar nav li a:hover,
 .docs-toc a:hover {
-  color: var(--cirth-contrast);
+  color: var(--cirth-contrast-text);
 }
 
 details.docs-toc-top {
@@ -3079,7 +3079,7 @@ details.docs-toc-top {
   place-items: center;
   width: min(80%, 22rem);
   aspect-ratio: 1;
-  border: 1px dashed var(--cirth-primary);
+  border: 1px dashed var(--cirth-primary-text);
   background-image: var(--docs-grid-dots);
   background-size: 1rem 1rem;
 }
@@ -3087,7 +3087,7 @@ details.docs-toc-top {
 .docs-mark-clearspace::before,
 .docs-mark-clearspace::after {
   position: absolute;
-  color: var(--cirth-primary);
+  color: var(--cirth-primary-text);
   font-family: var(--cirth-font-family-mono);
   font-size: var(--cirth-font-size-xs);
   content: "0.5x";
@@ -3212,7 +3212,7 @@ details.docs-toc-top {
 }
 
 .docs-proof-strip dd strong {
-  color: var(--cirth-primary);
+  color: var(--cirth-primary-text);
   font-family: var(--cirth-font-family-mono);
   font-size: var(--cirth-font-size-xl);
 }

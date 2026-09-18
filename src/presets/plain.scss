@@ -51,11 +51,11 @@
     // Same reason as the theme's own pass: the accent lightens for text,
     // so the button fill has to be pinned or the white label on it gets
     // worse instead of better.
-    --cirth-primary-background: light-dark(
+    --cirth-primary-surface: light-dark(
       oklch(41% 0.17 258deg),
       oklch(42% 0.14 258deg)
     );
-    --cirth-primary-hover-background: light-dark(
+    --cirth-primary-surface-active: light-dark(
       oklch(34% 0.15 258deg),
       oklch(35% 0.13 258deg)
     );

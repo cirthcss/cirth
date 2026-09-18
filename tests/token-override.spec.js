@@ -60,6 +60,80 @@ const builds = [
 
 const presets = listPresetNames();
 
+const accentRoleTokens = [
+	"--cirth-primary",
+	"--cirth-primary-text",
+	"--cirth-primary-surface",
+	"--cirth-primary-border",
+	"--cirth-primary-active",
+	"--cirth-primary-surface-active",
+	"--cirth-primary-border-active",
+	"--cirth-primary-underline",
+	"--cirth-primary-underline-active",
+	"--cirth-primary-focus",
+	"--cirth-primary-on-surface",
+	...(["secondary", "contrast"].flatMap((group) =>
+		[
+			"text",
+			"surface",
+			"border",
+			"active",
+			"surface-active",
+			"border-active",
+			"underline",
+			"underline-active",
+			"focus",
+			"on-surface",
+		].map((role) => `--cirth-${group}-${role}`),
+	)),
+];
+
+const retiredAccentTokens = [
+	"--cirth-secondary",
+	"--cirth-contrast",
+	...(["primary", "secondary", "contrast"].flatMap((group) =>
+		[
+			"background",
+			"hover",
+			"hover-background",
+			"hover-border",
+			"hover-underline",
+			"inverse",
+		].map((role) => `--cirth-${group}-${role}`),
+	)),
+];
+
+test("accent families expose roles rather than positional paint names", () => {
+	for (const build of builds) {
+		const tokens = new Set(read(build.file).match(/--cirth-[a-z0-9-]+/g) ?? []);
+
+		for (const token of accentRoleTokens) {
+			expect(tokens, `${build.name} includes ${token}`).toContain(token);
+		}
+		for (const token of retiredAccentTokens) {
+			expect(tokens, `${build.name} retires ${token}`).not.toContain(token);
+		}
+	}
+});
+
+test("primary on-surface ink remains an explicit contrast choice", () => {
+	for (const build of builds) {
+		const declarations = [
+			...read(build.file).matchAll(
+				/--cirth-primary-on-surface:\s*([^;]+);/g,
+			),
+		].map((match) => match[1]);
+
+		expect(declarations, `${build.name} declares the role`).not.toHaveLength(0);
+		for (const value of declarations) {
+			expect(
+				value,
+				`${build.name} keeps on-surface independent of the accent input`,
+			).not.toContain("--cirth-primary");
+		}
+	}
+});
+
 // One from each scheme layer, so a regression in any of them shows up:
 // text, an accent, a surface, and a border.
 const overrides = {

@@ -56,13 +56,13 @@
 
   // The page ink, as an input of its own — the exact twin of --cirth-canvas
   // above, and for the same reason. --cirth-color is the slot a component
-  // rebinds: a <button> sets it to the inverse ink its filled surface
+  // rebinds: a <button> sets it to the on-surface ink its filled surface
   // needs, a link sets it to the accent, an <input> to the field ink. Every
   // one of those shadows the page role for the whole subtree, so anything
   // that needs to mean *the page's ink* — a custom control built on
   // <button>, a badge inside a link, a masked glyph that cannot use
   // currentColor — needs a name components are not allowed to rebind.
-  // That is this one. --cirth-contrast is not it: that is maximum-contrast
+  // That is this one. --cirth-contrast-text is not it: that is maximum-contrast
   // ink, the .contrast variant's role, not body ink.
   --cirth-ink: light-dark(#{$neutral-750}, #{$neutral-200});
 
@@ -109,13 +109,13 @@
   // Secondary colors. This is the neutral family, not another input graph:
   // its fixed scale keeps the public runtime relationships concentrated on
   // primary, status, and surfaces.
-  --cirth-secondary: light-dark(#{$neutral-550}, #{$neutral-350});
+  --cirth-secondary-text: light-dark(#{$neutral-550}, #{$neutral-350});
   --cirth-secondary-underline: light-dark(
     #{color.change($neutral-550, $alpha: 0.5)},
     #{color.change($neutral-350, $alpha: 0.5)}
   );
-  --cirth-secondary-hover: light-dark(#{$neutral-650}, #{$neutral-250});
-  --cirth-secondary-hover-background: light-dark(
+  --cirth-secondary-active: light-dark(#{$neutral-650}, #{$neutral-250});
+  --cirth-secondary-surface-active: light-dark(
     #{$neutral-650},
     #{$neutral-550}
   );
@@ -125,23 +125,23 @@
   );
 
   // Contrast colors
-  --cirth-contrast: light-dark(#{$neutral-900}, #{$neutral-100});
-  --cirth-contrast-background: light-dark(#{$neutral-900}, #{$neutral-50});
+  --cirth-contrast-text: light-dark(#{$neutral-900}, #{$neutral-100});
+  --cirth-contrast-surface: light-dark(#{$neutral-900}, #{$neutral-50});
   --cirth-contrast-underline: light-dark(
     #{color.change($neutral-900, $alpha: 0.5)},
     #{color.change($neutral-100, $alpha: 0.5)}
   );
-  --cirth-contrast-hover: light-dark(#{$black}, #{$white});
-  --cirth-contrast-hover-background: light-dark(#{$black}, #{$white});
+  --cirth-contrast-active: light-dark(#{$black}, #{$white});
+  --cirth-contrast-surface-active: light-dark(#{$black}, #{$white});
   --cirth-contrast-focus: light-dark(
     #{color.change($neutral-600, $alpha: 0.7)},
     #{color.change($neutral-150, $alpha: 0.5)}
   );
-  --cirth-contrast-inverse: light-dark(#{$white}, #{$black});
+  --cirth-contrast-on-surface: light-dark(#{$white}, #{$black});
 
   // Visited links: the accent drained to neutral, so a followed link reads
   // as spent without leaving the palette. A step darker than
-  // --cirth-secondary so the two aren't the same colour by accident.
+  // --cirth-secondary-text so the two aren't the same colour by accident.
   // Drained means *achromatic*, not "the grey from the neutral scale".
   // The scale's own steps carry the graphite tint, which next to a warm
   // accent is a hue change at almost the same lightness — the weakest

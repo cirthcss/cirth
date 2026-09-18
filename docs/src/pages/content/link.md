@@ -33,10 +33,10 @@ shows none of them as visited. Firefox still applies it globally.
 
 ## Behavior
 
-* Color and underline come from `--cirth-primary` /
+* Color and underline come from `--cirth-primary-text` /
   `--cirth-primary-underline` by default.
 * `:hover`, `:active`, `:focus`, and `[aria-current]` (excluding
-  `aria-current="false"`) switch to the `-hover` variants and force an
+  `aria-current="false"`) switch to the `-active` roles and force an
   underline.
 * `:focus-visible` adds a focus ring in `--cirth-primary-focus`.
 * `:visited` drops the accent for `--cirth-link-visited-color`, an

@@ -51,7 +51,7 @@ follow, and toner is not free. Under `@media print` Cirth:
   keep their underline, which reads either way. After an absolute
   (`http…`) link that is not navigation or a button, the URL is printed in
   parentheses — paper cannot resolve an `href` on its own.
-* **Outlines controls.** A button's label is `--cirth-primary-inverse`
+* **Outlines controls.** A button's label is `--cirth-primary-on-surface`
   (white) on a fill the browser is about to discard, so buttons print as an
   outlined label instead of as nothing at all.
 * **Keeps color that carries meaning.** `<mark>`, `<progress>`, checkboxes

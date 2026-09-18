@@ -32,7 +32,7 @@ $visited-exceptions: $visited-class-exceptions +
 
 #{$parent-selector} :where(a:not([role="button"])),
 #{$parent-selector} [role="link"] {
-  --cirth-color: var(--cirth-primary);
+  --cirth-color: var(--cirth-primary-text);
   --cirth-background-color: transparent;
   --cirth-underline: var(--cirth-primary-underline);
 
@@ -48,8 +48,8 @@ $visited-exceptions: $visited-class-exceptions +
     box-shadow var(--cirth-transition);
 
   &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
-    --cirth-color: var(--cirth-primary-hover);
-    --cirth-underline: var(--cirth-primary-hover-underline);
+    --cirth-color: var(--cirth-primary-active);
+    --cirth-underline: var(--cirth-primary-underline-active);
     --cirth-text-decoration: underline;
   }
 
@@ -65,7 +65,7 @@ $visited-exceptions: $visited-class-exceptions +
   @if $enable-classes {
     // Secondary
     &.secondary {
-      --cirth-color: var(--cirth-secondary);
+      --cirth-color: var(--cirth-secondary-text);
       --cirth-underline: var(--cirth-secondary-underline);
 
       &:is(
@@ -74,14 +74,14 @@ $visited-exceptions: $visited-class-exceptions +
         :active,
         :focus
       ) {
-        --cirth-color: var(--cirth-secondary-hover);
-        --cirth-underline: var(--cirth-secondary-hover-underline);
+        --cirth-color: var(--cirth-secondary-active);
+        --cirth-underline: var(--cirth-secondary-underline-active);
       }
     }
 
     // Contrast
     &.contrast {
-      --cirth-color: var(--cirth-contrast);
+      --cirth-color: var(--cirth-contrast-text);
       --cirth-underline: var(--cirth-contrast-underline);
 
       &:is(
@@ -90,8 +90,8 @@ $visited-exceptions: $visited-class-exceptions +
         :active,
         :focus
       ) {
-        --cirth-color: var(--cirth-contrast-hover);
-        --cirth-underline: var(--cirth-contrast-hover-underline);
+        --cirth-color: var(--cirth-contrast-active);
+        --cirth-underline: var(--cirth-contrast-underline-active);
       }
     }
   }

@@ -154,7 +154,7 @@
       // neutral the SVG used to bake in, so it follows a retheme. Not
       // currentColor, unlike the spinner in components/_loading.scss: this
       // control is a <button>, and content/_button.scss gives buttons
-      // --cirth-color: var(--cirth-primary-inverse) — white — because a
+      // --cirth-color: var(--cirth-primary-on-surface) — white — because a
       // button is normally a filled accent surface. The close control keeps
       // the box but drops the fill, so currentColor would paint a white
       // glyph on the dialog header.

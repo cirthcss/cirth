@@ -33,8 +33,8 @@
 
   &:is(:hover, :active, :focus) {
     &::file-selector-button {
-      --cirth-background-color: var(--cirth-secondary-hover-background);
-      --cirth-border-color: var(--cirth-secondary-hover-border);
+      --cirth-background-color: var(--cirth-secondary-surface-active);
+      --cirth-border-color: var(--cirth-secondary-border-active);
     }
   }
 

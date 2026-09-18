@@ -44,32 +44,35 @@
   // legible on the fill when --cirth-primary is replaced by the shipped
   // Plain value or by the documented custom blue, which are lighter than
   // the default copper and so darken less for the same ratio. Raising the
-  // resting one to land on a ladder step drops Plain's inverse to 4.36:1,
-  // under AA — that is why it is not a round number. Override any derived
-  // token directly if you want to break the relationship.
+  // resting one to land on a ladder step drops Plain's on-surface ink to
+  // 4.36:1, under AA — that is why it is not a round number. Override any
+  // derived token directly if you want to break the relationship.
 
-  --cirth-primary-background: color-mix(
+  // The input is not also a component role. Keeping the alias explicit lets
+  // consumers retune the accent once while components say what they need.
+  --cirth-primary-text: var(--cirth-primary);
+  --cirth-primary-surface: color-mix(
     in oklch,
     var(--cirth-primary) 75.2%,
     black
   );
-  --cirth-primary-border: var(--cirth-primary-background);
+  --cirth-primary-border: var(--cirth-primary-surface);
   --cirth-primary-underline: oklch(from var(--cirth-primary) l c h / 50%);
-  --cirth-primary-hover: oklch(
+  --cirth-primary-active: oklch(
     from var(--cirth-primary) calc(l * 1.124) calc(c * 1.132) h
   );
 
-  // Keep the filled control's white inverse above AA when the primary is
+  // Keep the filled control's white on-surface ink above AA when the primary is
   // replaced by the shipped Plain value or by the documented custom blue.
   // Darkening on hover also matches the light scheme's direction instead of
   // making the interactive state the lowest-contrast member of the family.
-  --cirth-primary-hover-background: color-mix(
+  --cirth-primary-surface-active: color-mix(
     in oklch,
     var(--cirth-primary) 72%,
     black
   );
-  --cirth-primary-hover-border: var(--cirth-primary-hover-background);
-  --cirth-primary-hover-underline: var(--cirth-primary-hover);
+  --cirth-primary-border-active: var(--cirth-primary-surface-active);
+  --cirth-primary-underline-active: var(--cirth-primary-active);
 
   // Focus rings composite to >= 3:1 against the page background (WCAG
   // 1.4.11 as applied to focus indicators) — don't lower these alphas.
@@ -85,7 +88,10 @@
   --cirth-text-selection-color: oklch(
     from var(--cirth-primary) calc(l * 1.065) c h / 18.75%
   );
-  --cirth-primary-inverse: #{$white};
+
+  // Explicit for the same contrast reason recorded in theme/_light.scss:
+  // the current browser floor cannot derive a reliable light-or-dark choice.
+  --cirth-primary-on-surface: #{$white};
 
   // Surface model. Code is deeply recessed below the graphite canvas and
   // fields sit part-way back toward it; section bands and cards rise in
@@ -110,14 +116,14 @@
   --cirth-popover-background-color: var(--cirth-card-background-color);
 
   // Secondary and contrast
-  --cirth-secondary-background: #{$neutral-600};
-  --cirth-secondary-border: var(--cirth-secondary-background);
-  --cirth-secondary-hover-border: var(--cirth-secondary-hover-background);
-  --cirth-secondary-hover-underline: var(--cirth-secondary-hover);
-  --cirth-secondary-inverse: #{$white};
-  --cirth-contrast-border: var(--cirth-contrast-background);
-  --cirth-contrast-hover-border: var(--cirth-contrast-hover-background);
-  --cirth-contrast-hover-underline: var(--cirth-contrast-hover);
+  --cirth-secondary-surface: #{$neutral-600};
+  --cirth-secondary-border: var(--cirth-secondary-surface);
+  --cirth-secondary-border-active: var(--cirth-secondary-surface-active);
+  --cirth-secondary-underline-active: var(--cirth-secondary-active);
+  --cirth-secondary-on-surface: #{$white};
+  --cirth-contrast-border: var(--cirth-contrast-surface);
+  --cirth-contrast-border-active: var(--cirth-contrast-surface-active);
+  --cirth-contrast-underline-active: var(--cirth-contrast-active);
 
   // Highlighted text (<mark>) — same semantic relationship as light, with
   // enough accent in the mix to remain visible on the graphite canvas.
@@ -173,19 +179,19 @@
     --cirth-form-element-valid-active-border-color
   );
   --cirth-switch-thumb-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
-  --cirth-switch-checked-background-color: var(--cirth-primary-background);
+  --cirth-switch-checked-background-color: var(--cirth-primary-surface);
 
   // Thumb matches button text color rather than a hardcoded white — see
   // the matching comment in _light.scss. Verified >= 3:1 (WCAG 1.4.11):
   // 5.37:1 unchecked (white on neutral-550), 6.44:1 checked (white on the
   // derived primary fill).
-  --cirth-switch-color: var(--cirth-primary-inverse);
+  --cirth-switch-color: var(--cirth-primary-on-surface);
   --cirth-range-thumb-border-color: var(--cirth-background-color);
-  --cirth-range-thumb-color: var(--cirth-secondary);
-  --cirth-range-thumb-active-color: var(--cirth-primary-background);
+  --cirth-range-thumb-color: var(--cirth-secondary-text);
+  --cirth-range-thumb-active-color: var(--cirth-primary-surface);
 
   // Accordion (<details>)
-  --cirth-accordion-active-summary-color: var(--cirth-primary-hover);
+  --cirth-accordion-active-summary-color: var(--cirth-primary-active);
   --cirth-accordion-close-summary-color: var(--cirth-ink);
   --cirth-accordion-open-summary-color: var(--cirth-ink);
 
@@ -231,7 +237,7 @@
   // Progress is part of the active-control language, not a brand specimen.
   // Following the public primary keeps Plain, Playroom and custom themes
   // recognisable as the same framework without leaking the default copper.
-  --cirth-progress-color: var(--cirth-primary);
+  --cirth-progress-color: var(--cirth-primary-text);
 
   // Icons painted as background-image on replaced form controls. They
   // live in the scheme rather than at the root because a data URI cannot

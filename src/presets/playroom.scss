@@ -94,11 +94,11 @@
   // lighting up, not pressing down. Setting these two directly opts them
   // out of the derivation — which is exactly what a derived token is for,
   // as long as you mean it.
-  --cirth-primary-hover: light-dark(
+  --cirth-primary-active: light-dark(
     oklch(56% 0.18 300deg),
     oklch(80% 0.13 300deg)
   );
-  --cirth-primary-hover-background: light-dark(
+  --cirth-primary-surface-active: light-dark(
     oklch(58% 0.18 300deg),
     oklch(58% 0.18 300deg)
   );
@@ -114,15 +114,15 @@
     --cirth-primary: light-dark(oklch(41% 0.17 300deg), oklch(86% 0.1 300deg));
 
     // The fill is pinned for the same reason as in the theme's own pass.
-    --cirth-primary-background: light-dark(
+    --cirth-primary-surface: light-dark(
       oklch(41% 0.17 300deg),
       oklch(42% 0.15 300deg)
     );
-    --cirth-primary-hover-background: light-dark(
+    --cirth-primary-surface-active: light-dark(
       oklch(34% 0.15 300deg),
       oklch(35% 0.13 300deg)
     );
-    --cirth-primary-hover: light-dark(
+    --cirth-primary-active: light-dark(
       oklch(34% 0.16 300deg),
       oklch(92% 0.07 300deg)
     );

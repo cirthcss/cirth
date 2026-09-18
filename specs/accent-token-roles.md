@@ -4,7 +4,7 @@
 | --- | --- |
 | Issue | gh#96, gh#97 |
 | Status | Implementing |
-| Baseline | `d7f2d7aa` on `feat/issues-96-97-accent-roles`, from `4b08b15a` on `master` |
+| Baseline | `f7484d1c` on `feat/issues-96-97-accent-roles`, from `12f5472e` on `master` |
 | Breaking | Yes — custom properties only, no markup change |
 
 The three public accent families — `primary`, `secondary`, `contrast` — rename
@@ -52,8 +52,9 @@ It does **not** promise:
 | The new roles are actually emitted, not just documented | Same grep: `primary-on-surface` ×16, `primary-surface-active` ×9, `primary-text` ×11 | This working tree, 2026-09-18 | Verified |
 | The migration table matches the renames applied in source | Table in `docs/src/pages/upgrading.md` compared against the `src/` diff, `master..d7f2d7aa` | This working tree, 2026-09-18 | Verified |
 | 4 remaining `hover-background` matches are out of scope, not leftovers | All four are `--cirth-dropdown-hover-background-color`, a component token outside the accent families | `src/components/_dropdown.scss`, `src/theme/_light.scss`, `src/theme/_dark.scss` | Verified |
-| `tests/token-override.spec.js` passes across 3 builds and every preset | Test added in `befaa6c2`; 74 lines covering default, classless and scoped builds | Not re-run for this document | Reported |
-| Visual output is unchanged except where baselines were regenerated | 180 baseline images updated in `d7f2d7aa` | Not re-run for this document | Reported |
+| `tests/token-override.spec.js` passes across 3 builds and every preset | `npm run check:behavior`: 1,074 passed, 9 skipped, including all token-override cases | `f7484d1c`, Playwright 1.61.1 on macOS 26.6.2, 2026-09-18 | Verified |
+| Visual output is unchanged except where baselines were regenerated | `npm run check:visual:update`: 802 passed, 26 skipped; 162 Darwin baselines regenerated. Linux workflow `35374102169` regenerated the other 150 and passed | `74110491` locally and `f7484d1c` on GitHub Actions, 2026-09-18 | Verified |
+| The source and emitted CSS pass the stylesheet gates | `npm run lint && npm run build && npm run check:dist`; all exited 0, including 20 parsed distribution files | `74110491` (same source as `f7484d1c`), 2026-09-18 | Verified |
 | Root-level overrides reach into forced-scheme subtrees | `light-dark()` pairs on the root, with the reasoning recorded in `src/theme/_dual.scss` | Already on `master`; inherited by this branch, not introduced by it | Reported |
 
 The last row matters for attribution: the override-reach work is context this
@@ -76,9 +77,9 @@ would credit this branch with a fix it did not make.
 - [x] Migration table published in `docs/src/pages/upgrading.md`.
 - [x] Override path covered by `tests/token-override.spec.js` for default,
       classless and scoped builds, with each preset stacked.
-- [ ] `npm run lint && npm run build && npm run check:dist` green on the branch
+- [x] `npm run lint && npm run build && npm run check:dist` green on the branch
       head.
-- [ ] `npm run check:visual` green, or every diff accounted for by the rename.
+- [x] `npm run check:visual` green, or every diff accounted for by the rename.
 - [ ] `CHANGELOG.md` carries the breaking change before the release PR.
 
 ## Migration
