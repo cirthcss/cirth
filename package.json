@@ -62,6 +62,7 @@
 		"check:consumer": "node scripts/smoke-consumer.js",
 		"check:dist": "node scripts/check-dist.js",
 		"check:package": "node scripts/check-package-surface.js",
+		"check:prefix": "node scripts/check-prefix.js",
 		"check:variables": "node scripts/check-css-variables.js",
 		"check:doc-links": "node scripts/check-doc-links.js",
 		"check:size": "node scripts/check-css-size.js",
