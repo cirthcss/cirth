@@ -97,6 +97,11 @@ unrepresented instead of guessing a value the stylesheet never produces.
 - **Presets and `prefers-contrast: more`.** Each could ship as further
   files using the same reader. They were left out until someone asks for
   them.
-- **The `--cirth-box-shadow` defect.** It should be fixed separately. Once
-  it is, the three shadow tokens will export as `shadow` without any change
-  here.
+- **The `--cirth-box-shadow` defect.** It is fixed separately on
+  `fix/box-shadow-and-sr-only-overflow`, which moves `light-dark()` onto
+  each layer's colour. The reader here resolves nested `light-dark()` for
+  that reason. Run against that branch's `dist/cirth.css`, `box-shadow`
+  exports as a 7-layer `shadow` in each scheme (first layer
+  `oklch(0.657 0.025 280)` light, `oklch(0.09 0.011 280)` dark),
+  `dropdown-box-shadow` and `popover-box-shadow` become aliases of it, and
+  the unrepresented count drops from 26 to 23 per scheme.

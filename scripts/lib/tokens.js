@@ -126,6 +126,34 @@ const functionCall = (value) => {
 };
 
 /**
+ * Replaces every `light-dark(a, b)` in a value with the given side — at
+ * the top level, or nested, as a shadow does per layer colour. A
+ * `light-dark()` that does not hold exactly two arguments is left as
+ * written, so the conversion reports the value instead of guessing.
+ *
+ * @param {string} value
+ * @param {0 | 1} side
+ * @returns {string}
+ */
+const pickScheme = (value, side) => {
+	const start = value.indexOf("light-dark(");
+	if (start === -1) return value;
+
+	let depth = 0;
+	let end = start + "light-dark".length;
+	for (; end < value.length; end += 1) {
+		if (value[end] === "(") depth += 1;
+		if (value[end] === ")") depth -= 1;
+		if (depth === 0) break;
+	}
+	const args = splitTopLevel(value.slice(start + "light-dark(".length, end), ",");
+	if (args.length !== 2) return value;
+
+	const picked = pickScheme(args[side], side);
+	return value.slice(0, start) + picked + pickScheme(value.slice(end + 1), side);
+};
+
+/**
  * Every custom property each scheme's root resolves, in declaration order:
  * the scheme-independent root first, then the scheme's own overrides.
  * `light-dark()` pairs are split per scheme here; a `light-dark()` that
@@ -185,11 +213,7 @@ const readSchemes = (css) => {
 	const resolve = (side, own) => {
 		/** @type {Map<string, string>} */
 		const tokens = new Map();
-		for (const [name, value] of base) {
-			const call = functionCall(value);
-			const args = call?.name === "light-dark" ? splitTopLevel(call.args, ",") : null;
-			tokens.set(name, args?.length === 2 ? args[side] : value);
-		}
+		for (const [name, value] of base) tokens.set(name, pickScheme(value, side));
 		for (const [name, value] of own) tokens.set(name, value);
 		return tokens;
 	};
