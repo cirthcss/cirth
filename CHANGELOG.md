@@ -7,6 +7,16 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Added
+
+- **The token surface as W3C Design Tokens** (gh#93). The package now ships
+  `@cirthcss/cirth/tokens/light` and `@cirthcss/cirth/tokens/dark`, one
+  DTCG JSON file per colour scheme, for design tools and non-CSS platforms.
+  References between tokens are exported as aliases; derived colours are
+  exported as their resolved values, with the CSS relationship kept
+  alongside; values no DTCG type can hold are listed rather than dropped.
+  The stylesheets are unchanged.
+
 ### Changed
 
 - **The primary, secondary and contrast token families are named by role**

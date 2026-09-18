@@ -246,6 +246,7 @@ module.exports = {
 	contrastRatio,
 	luminance,
 	oklabDistance,
+	oklchToSrgb,
 	over,
 	parseColor,
 	simulateCvd,
