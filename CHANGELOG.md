@@ -7,6 +7,8 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-09-18
+
 ### Changed
 
 - **The primary, secondary and contrast token families are named by role**
@@ -19,6 +21,13 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   unchanged `--cirth-primary` input. No class, value or rendered state moves;
   this is the pre-1.0 API rename that makes the accent families follow the
   same semantic vocabulary as the status families.
+
+### Fixed
+
+- **Readonly number inputs no longer show native stepper controls** (gh#106).
+  A readonly value cannot be stepped, so Firefox now receives the textfield
+  appearance and WebKit's inner and outer spin buttons are hidden explicitly.
+  Editable number inputs keep their native steppers and keyboard behaviour.
 
 ## [0.15.0-beta.2] - 2026-09-14
 
@@ -1687,6 +1696,7 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
+[0.15.0]: https://github.com/cirthcss/cirth/compare/v0.15.0-beta.2...v0.15.0
 [0.15.0-beta.2]: https://github.com/cirthcss/cirth/compare/v0.15.0-beta.1...v0.15.0-beta.2
 [0.15.0-beta.1]: https://github.com/cirthcss/cirth/compare/v0.14.1...v0.15.0-beta.1
 [0.14.1]: https://github.com/cirthcss/cirth/compare/v0.14.0...v0.14.1
