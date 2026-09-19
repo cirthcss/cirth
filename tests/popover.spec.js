@@ -174,20 +174,28 @@ test("a dialog that is also a popover keeps the dialog treatment", async ({
 //
 // Nothing about that rule is unusual, and a library that only stays centred
 // while no one touches its margins is not centred, it is lucky. So the
-// component declares the centring itself, and this is the case that holds
-// it to it: the panel is asked to land in the middle of the viewport with
-// exactly the page CSS that used to push it off.
-test("it stays centred even when page CSS zeroes its margin", async ({
-	page,
-}) => {
-	// The page rule is written the way the one that caused this was: a
-	// container tidying up its last child, reaching the popover only because
-	// the popover happens to be it. An author who names the element outright
-	// still outranks the component, and should — that is them positioning it
-	// on purpose, not a layout rule catching it by accident.
+// component declares the centring itself, and these cases hold it to it:
+// the panel is asked to land in the middle of the viewport with exactly the
+// page CSS that used to push it off.
+//
+// What that declaration can defend against changed with gh#124. Cirth now
+// sits in a cascade layer, so any unlayered page rule beats it — the
+// accidental one included, where before only a more specific selector did.
+// The centring still holds against the user agent and against page CSS that
+// yields to Cirth; an unlayered layout rule has to leave popovers out, as
+// this project's own docs now do (`.docs-demo-preview > :last-child
+// :not([popover])`).
+
+/**
+ * The open panel's distance from the viewport's centre, with page CSS
+ * loaded before Cirth's stylesheet, after it, or both.
+ *
+ * @param {import("@playwright/test").Page} page
+ * @param {{ before?: string, after?: string }} pageCss
+ */
+const offCentre = async (page, { before = "", after = "" }) => {
 	await setContent(page,
-		`<style>${css}</style>
-		<style>.preview > :last-child { margin-block-end: 0; margin-inline-end: 0 }</style>
+		`<style>${before}</style><style>${css}</style><style>${after}</style>
 		<div class="preview">
 			<p>Preceding content.</p>
 			<span id="hint" popover>A panel with nothing to anchor to.</span>
@@ -225,13 +233,45 @@ test("it stays centred even when page CSS zeroes its margin", async ({
 		};
 	});
 
+	return {
+		x: Math.abs(box.left + box.width / 2 - viewport.width / 2),
+		y: Math.abs(box.top + box.height / 2 - viewport.height / 2),
+	};
+};
+
+// The page rule is written the way the one that caused this was: a
+// container tidying up its last child, reaching the popover only because
+// the popover happens to be it.
+const tidyLastChild =
+	".preview > :last-child { margin-block-end: 0; margin-inline-end: 0 }";
+
+test("it stays centred against page CSS that yields to Cirth", async ({
+	page,
+}) => {
 	// Centred to within a pixel, which is as exact as sub-pixel layout gets.
-	expect(
-		Math.abs(box.top + box.height / 2 - viewport.height / 2),
-		"vertically centred",
-	).toBeLessThanOrEqual(1);
-	expect(
-		Math.abs(box.left + box.width / 2 - viewport.width / 2),
-		"horizontally centred",
-	).toBeLessThanOrEqual(1);
+	for (const pageCss of [
+		// Layout CSS in a layer ordered before Cirth's, stated up front.
+		{ before: `@layer layout, cirth; @layer layout { ${tidyLastChild} }` },
+		// Unlayered layout CSS that leaves popovers out.
+		{
+			after: tidyLastChild.replace(
+				":last-child",
+				":last-child:not([popover])",
+			),
+		},
+	]) {
+		const offset = await offCentre(page, pageCss);
+		const label = JSON.stringify(pageCss);
+		expect(offset.y, `vertically centred under ${label}`).toBeLessThanOrEqual(1);
+		expect(offset.x, `horizontally centred under ${label}`).toBeLessThanOrEqual(1);
+	}
+});
+
+test("an unlayered page rule that reaches it now wins over the centring", async ({
+	page,
+}) => {
+	// The gh#124 trade-off, pinned so that it cannot change unnoticed in
+	// either direction: before the layer, this case was centred.
+	const offset = await offCentre(page, { after: tidyLastChild });
+	expect(offset.y).toBeGreaterThan(1);
 });

@@ -1363,8 +1363,14 @@ pre > button.copy.copied::before {
 /* The frame's padding contract, not a restyle of the example: a padded box
    closes the trailing margin of what it holds, as the card contract does
    for <article>. The one shell declaration that reaches inside a preview,
-   said out loud rather than inherited. */
-.docs-demo-preview > :last-child {
+   said out loud rather than inherited.
+
+   Not a popover. It is not in the flow the padding closes, and it is
+   centred by its margins; since Cirth sits in a cascade layer (gh#124)
+   this unlayered rule would beat that centring and pin the open panel to
+   the bottom of the viewport, which is what the Popover page's own demo
+   did before this exclusion. */
+.docs-demo-preview > :last-child:not([popover]) {
   margin-bottom: 0;
 }
 

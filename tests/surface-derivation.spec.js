@@ -192,7 +192,11 @@ test("a direct derived-token override intentionally breaks the surface relation"
 
 test("Plain keeps its five-declaration root contract and no surface scale", () => {
 	const source = read("src/presets/plain.scss");
-	const rootBlock = source.match(/@include selectors\.root \{([\s\S]*?)\n\}/);
+	// The first theme-roots block, one level inside the preset's layer
+	// wrapper: the unconditional one, not the prefers-contrast restatement.
+	const rootBlock = source.match(
+		/@include selectors\.theme-roots \{([\s\S]*?)\n {2}\}/,
+	);
 	if (!rootBlock) throw new Error("Plain root block is missing");
 	const declarations = rootBlock[1].match(/^\s*--cirth-[\w-]+:/gm) ?? [];
 	expect(declarations).toHaveLength(5);

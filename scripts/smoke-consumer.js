@@ -19,6 +19,15 @@ const path = require("node:path");
 
 const projectRoot = path.join(__dirname, "..");
 const manifest = require("../package.json");
+const { layerName } = require("./lib/dist-manifest");
+
+// Every entry point, whatever build it names, opens with Cirth's cascade
+// layer (gh#124): the whole stylesheet is one `@layer cirth { … }` block, so
+// a consumer's unlayered CSS beats it. check-dist.js holds the full shape
+// to that in dist/; this proves it is still true of what npm delivered.
+const layerOpening = new RegExp(
+	`^(?:@charset "[^"]*";\\s*)?@layer ${layerName}\\s*\\{`,
+);
 
 /**
  * Every documented entry point, with something only the right file could
@@ -197,6 +206,14 @@ const main = () => {
 				}
 			}
 
+			if (!layerOpening.test(contents)) {
+				fail(
+					`\`${specifier}\` delivered a stylesheet that does not open ` +
+						`with \`@layer ${layerName}\` — its rules would compete with ` +
+						`the consumer's on specificity.`,
+				);
+			}
+
 			for (const needle of mustNot) {
 				if (contents.includes(needle)) {
 					fail(
@@ -254,7 +271,8 @@ const main = () => {
 	console.log(
 		`✓ smoke-consumer: installed from the tarball into a clean project; ` +
 			`${entryPoints.length} entry points resolve and deliver the build ` +
-			`they promise; ${sealed.length} internal paths stay sealed.`,
+			`they promise, in @layer ${layerName}; ${sealed.length} internal ` +
+			`paths stay sealed.`,
 	);
 };
 

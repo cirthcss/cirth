@@ -9,6 +9,26 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Changed
 
+- **Every stylesheet keeps its rules in one cascade layer, `cirth`**
+  (gh#124). The four builds, their print sheets and the presets each wrap
+  everything they emit in `@layer cirth`. CSS outside a layer now beats
+  Cirth whatever its specificity and wherever it loads, so an override no
+  longer has to match or out-weigh Cirth's selector, and a `:root` token
+  override no longer has to load last.
+  Nothing inside Cirth moved. The rules, their order and their weight are
+  unchanged, so build, preset and print sheet still resolve against each
+  other by source order and load in the same order as before.
+  What stops winning is Cirth against other CSS on the page. A stylesheet
+  loaded *before* Cirth so that Cirth would override it now beats Cirth
+  wherever they overlap. In a scoped build, the host page's unlayered rules
+  now win inside `.cirth`, where the prefix used to out-weigh a host
+  `button {}` or `h1 {}`. `[hidden]`, `.sr-only`, an open popover's
+  centring, and the reduced-motion and print passes no longer override your
+  own rules, only Cirth's: a layout rule such as `.panel > :last-child
+  { margin-bottom: 0 }` that happens to reach a popover now moves it.
+  Importing Cirth into a layer yourself (`@import … layer(cirth)`) keeps
+  working and nests as `cirth.cirth`. There are no sub-layers.
+  **Breaking** — see the Upgrading page.
 - **The primary, secondary and contrast token families are named by role**
   (gh#97).
   Their former `background`, `hover` and `inverse` vocabulary is now
@@ -19,6 +39,13 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   unchanged `--cirth-primary` input. No class, value or rendered state moves;
   this is the pre-1.0 API rename that makes the accent families follow the
   same semantic vocabulary as the status families.
+
+### Fixed
+
+- **A preset now applies inside a scoped build's wrapper.** Presets declared
+  their tokens on `:root` only, and the scoped build declares every token on
+  `.cirth` itself, which beats an inherited value — so a preset loaded with
+  a scoped build changed nothing. Presets now declare on `.cirth` too.
 
 ## [0.15.0-beta.2] - 2026-09-14
 

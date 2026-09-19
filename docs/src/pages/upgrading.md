@@ -14,10 +14,41 @@ working the way it already does.
 
 ## Unreleased, from v0.14.x
 
-The public class list stays the same. The accent token families now use role
-names, and containers and modals size continuously instead of stepping
-through a shared viewport table. Check the cases below if your CSS overrides
-an accent role or depended on the old layout details.
+The public class list stays the same. Every stylesheet now keeps its rules
+in a cascade layer, the accent token families use role names, and containers
+and modals size continuously instead of stepping through a shared viewport
+table. Check the cases below if other CSS on your page relied on Cirth
+overriding it, if your CSS overrides an accent role, or if you depended on
+the old layout details.
+
+### Cirth's rules are in a cascade layer
+
+Every build, print sheet and preset now wraps all of its rules in
+`@layer cirth`. CSS outside a layer beats it whatever its specificity and
+wherever it loads, so an override no longer has to match or out-weigh
+Cirth's selector. Nothing inside Cirth moved: the rules, their order and
+their weight are the ones the previous release shipped, and build, preset
+and print sheet still load in that order.
+
+What changes is everything on the page that is not Cirth. Anything that
+used to lose to Cirth on specificity or on loading order now wins:
+
+| If you… | Now | Do this |
+| --- | --- | --- |
+| Load a stylesheet *before* Cirth so Cirth overrides it — a reset, legacy base styles, a third-party widget's theme | That stylesheet beats Cirth wherever they overlap | Put it in a layer ordered before Cirth's: `@layer legacy, cirth;` then `@import url("legacy.css") layer(legacy);` |
+| Embed a scoped build in a page with its own global CSS | The host's unlayered rules win inside `.cirth`; the prefix no longer out-weighs a host `button { … }` | If the host CSS is yours, layer it the same way. If it is not, mount the widget in a shadow root |
+| Rely on `[hidden]` or `.sr-only` beating your own element rules | Your `display` or `position` wins | Exclude the state in your selector, e.g. `nav ul:not([hidden])` |
+| Have a layout rule that reaches a popover by accident, e.g. `.panel > :last-child { margin-bottom: 0 }` | It beats the popover's own centring, and the open panel slides to an edge | Leave popovers out: `.panel > :last-child:not([popover])` |
+| Rely on Cirth's reduced-motion or print pass to neutralize your own animations or screen styles | They no longer reach your rules | Write your own `@media (prefers-reduced-motion: reduce)` or `@media print` rules |
+| Wrote `.cirth`-prefixed, repeated-class or `:root:not(…)` selectors to beat Cirth | Nothing breaks | Optional: simplify them |
+| Import Cirth into a layer yourself, `@import … layer(cirth)` | Nothing breaks: Cirth nests as `cirth.cirth` and sorts where `cirth` does | Optional: switch back to a plain `<link>` |
+| Load a preset with a scoped build | The preset now applies inside `.cirth`; before, it silently did nothing | Remove any workaround that copied preset values onto the wrapper |
+
+If you use layers of your own, state their order before Cirth loads, for
+example `@layer reset, cirth, components;`, so that it does not depend on
+which stylesheet the page happens to load first. See
+[Cascade layers](/customization#cascade-layers) for the full model and the
+CDN and npm forms.
 
 ### Accent tokens are named by role
 
