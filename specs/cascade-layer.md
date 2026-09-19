@@ -95,6 +95,7 @@ the source committed in `7a98b5d6`.
 | The published package carries the layer | `check:consumer` packs, installs and resolves 12 entry points; each opens with `@layer cirth` | Branch dist, packed with npm 11.19.1 | Verified |
 | The documented import examples work as written, and a broken one is caught | `tests/cascade-layers.spec.js` loads the three CSS examples with an `@import` from Customization → Cascade layers verbatim, specifiers resolved through the package's `exports`: every import survives parsing, loads, and lands in the layer it names. With one import moved below a rule, example 1 failed | Branch dist, three engines; the broken variant in Chromium 149 | Verified |
 | The layer and gh#126's build-time prefix compose | `feat/issue-126-configurable-prefix` (`a5702b78`) merged into this branch in a throwaway worktree: text merges cleanly, only the Contributions baselines conflict. Its `check-prefix.js` passes (7 checks, 20 files differ by the prefix alone); `npm run build -- --prefix "--acme-"` passes `check:dist`, leaves no `--cirth-`, keeps `@layer cirth`; a preset applies and `html { --acme-primary }` loaded before both wins | Trial merge of `fc633a6e` and `a5702b78`, Chromium 149 | Verified |
+| The change holds on Linux CI, visual baselines included | CI run 35406816022 on `dde39b45`, the bot's Linux baseline regeneration: every step green. The behavior suite passed 1,203 with 9 skipped and no retry, visual passed 802 with 26 skipped, plus axe, `check:tooling`, package contents and tarball install. The bot regenerated exactly the Linux counterparts of the macOS set (the same 8 pages × 12 projects) and nothing else | GitHub Actions `ubuntu-latest`, 2026-09-19 | Verified |
 | The layer costs bytes inside the budget | `dist/cirth.min.css` 14,241 → 14,251 B gzipped, print sheets +8 B; every file still under its budget | `npm run build` size check, baseline and branch | Verified |
 | Presets never reached a scoped build | `cirth.scoped.css` + `presets/plain.css`: a link inside `.cirth` paints `oklch(0.527 0.107 44)`, the copper default, not plain's blue | Baseline dist, Chromium 149 | Verified |
 | `docs/src/pages/colors.md` says a preset "works with any of the default, classless, or scoped builds" | False for scoped (row above) | `c4dcd4c5` | Invalid |
@@ -164,7 +165,8 @@ the source committed in `7a98b5d6`.
       `check:consumer` and `check:tooling` exit 0 on `33e775f0`, as do
       `check:behavior` (1,188 passed, 9 skipped) and `check:visual` (802
       passed, 26 skipped), on macOS.
-- [ ] CI green on the pull request, Linux baselines included.
+- [x] CI green with the Linux baselines included: run 35406816022 on
+      `dde39b45`, the head of gh#135 once the bot's baselines landed.
 
 ## Migration
 
