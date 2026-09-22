@@ -2,6 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const { tokenSchemes } = require("./lib/dist-manifest");
+const { readPrefixArg } = require("./lib/prefix");
 const { buildTokenDocuments } = require("./lib/tokens");
 const { version } = require("../package.json");
 
@@ -10,18 +11,20 @@ const { version } = require("../package.json");
 // never edited or committed by hand: change src/, rebuild, and they follow.
 const distFolder = path.join(__dirname, "../dist");
 const tokensFolder = path.join(distFolder, "tokens");
+const prefix = readPrefixArg(process.argv.slice(2));
 
 const documents = buildTokenDocuments(
-	fs.readFileSync(path.join(distFolder, "cirth.css"), "utf8"),
-	version,
+  fs.readFileSync(path.join(distFolder, "cirth.css"), "utf8"),
+  version,
+  prefix,
 );
 
 fs.rmSync(tokensFolder, { recursive: true, force: true });
 fs.mkdirSync(tokensFolder, { recursive: true });
 
 for (const scheme of tokenSchemes) {
-	fs.writeFileSync(
-		path.join(tokensFolder, `${scheme}.tokens.json`),
-		`${JSON.stringify(documents[scheme], null, "\t")}\n`,
-	);
+  fs.writeFileSync(
+    path.join(tokensFolder, `${scheme}.tokens.json`),
+    `${JSON.stringify(documents[scheme], null, "\t")}\n`,
+  );
 }

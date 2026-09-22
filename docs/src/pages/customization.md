@@ -644,8 +644,8 @@ before any stylesheet names a layer:
 </style>
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.14.1/dist/cirth.min.css"
-  integrity="sha384-sU2A7luz2xm9uj6FZ0hdflySgcbY9uN+QeQgJzyaZaM4ujBLxiPPibqEcaG2Ckuk"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.15.0/dist/cirth.min.css"
+  integrity="sha384-EY9wuVx8+257bjfSiQThO5hiMpZ+YQAcVqmR6XcdxqYI0+qEJ15YD3/RVWYApOiN"
   crossorigin="anonymous">
 <link rel="stylesheet" href="app.css">
 ```
