@@ -11,6 +11,7 @@ module.exports = defineConfig({
 	testMatch: [
 		"accessibility-resilience.spec.js",
 		"baseline-consistency.spec.js",
+		"box-shadow.spec.js",
 		"button-overflow.spec.js",
 		"doc-links.spec.js",
 		"docs-stack.spec.js",
@@ -31,6 +32,7 @@ module.exports = defineConfig({
 		"native-element-defaults.spec.js",
 		"nav-dropdown.spec.js",
 		"number-readonly.spec.js",
+		"overflow-containment.spec.js",
 		"popover.spec.js",
 		"prefers-contrast.spec.js",
 		"shell-overlays.spec.js",

@@ -25,6 +25,20 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   and its default prefix are unchanged, and the `.cirth` scoping class is
   not affected.
 
+### Fixed
+
+- **Dropdowns and popovers draw their shadow again.** `--cirth-box-shadow`
+  wrapped two whole shadow lists in `light-dark()`, which only accepts
+  colours, so every `box-shadow` that read it resolved to `none` in every
+  engine. The scheme choice now sits on each layer's colour. The token's
+  name is unchanged, and it still follows the scheme of the element that
+  uses it.
+- **A visually hidden element inside `.overflow-auto` no longer widens the
+  page.** `.overflow-auto` is now `position: relative`, so absolutely
+  positioned content such as a `.sr-only` table header is clipped by the
+   scroll area instead of escaping it: a wide table with one such header
+   had pushed a 320px page more than 1,000px wider.
+
 ## [0.15.0] - 2026-09-18
 
 ### Changed
