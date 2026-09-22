@@ -7,6 +7,8 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-09-22
+
 ### Added
 
 - **`.no-cirth` excludes Cirth component declarations from a third-party
@@ -1778,6 +1780,7 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
+[0.16.0]: https://github.com/cirthcss/cirth/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/cirthcss/cirth/compare/v0.15.0-beta.2...v0.15.0
 [0.15.0-beta.2]: https://github.com/cirthcss/cirth/compare/v0.15.0-beta.1...v0.15.0-beta.2
 [0.15.0-beta.1]: https://github.com/cirthcss/cirth/compare/v0.14.1...v0.15.0-beta.1
