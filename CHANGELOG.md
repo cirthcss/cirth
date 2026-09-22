@@ -33,6 +33,14 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   alongside; values no DTCG type can hold are listed rather than dropped.
   The stylesheets are unchanged.
 
+- **`fieldset.segmented`, a segmented radio group** (gh#107), in class-based
+  builds. It draws a compact single choice as joined segments while the
+  radios stay real: the `legend` names the group, arrow keys move the
+  selection, the value submits with the form, and the selected radio keeps
+  its dot, so the choice does not rest on colour and survives forced-colors
+  mode. Focus outlines the whole segment, and each segment keeps the 44px
+  target floor. The classless builds are unchanged.
+
 ### Fixed
 
 - **Dropdowns and popovers draw their shadow again.** `--cirth-box-shadow`

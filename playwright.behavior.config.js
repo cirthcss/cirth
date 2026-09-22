@@ -37,6 +37,7 @@ module.exports = defineConfig({
 		"prefers-contrast.spec.js",
 		"shell-overlays.spec.js",
 		"print.spec.js",
+		"segmented.spec.js",
 		"surface-derivation.spec.js",
 		"token-override.spec.js",
 	],

@@ -25,6 +25,7 @@
 @use "forms/input-file"; // type="file"
 @use "forms/input-range"; // type="range"
 @use "forms/input-search"; // type="search"
+@use "forms/segmented"; // fieldset.segmented
 
 // Components
 @use "components/accordion"; // details, summary
