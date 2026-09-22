@@ -87,6 +87,18 @@ stylesheet to change its look. Print stylesheets are available separately.
 The [Get Started guide](docs/src/pages/get-started.md) has examples and npm
 import paths for each build.
 
+To keep Cirth's content, form, and component declarations off a third-party
+widget, mark its root with `.no-cirth`:
+
+```html
+<div class="no-cirth"><!-- third-party widget --></div>
+```
+
+This is a component opt-out, not complete isolation: reset, theme, inherited,
+layout, accessibility, motion, and print rules still apply. See
+[Get Started](docs/src/pages/get-started.md#excluding-a-third-party-component)
+for the boundary's `:has()` and sibling-selector limits.
+
 ## Customize
 
 Put your overrides in a stylesheet loaded after Cirth:

@@ -1,5 +1,7 @@
 @use "../config" as *;
 
+/* cirth-component:start */
+
 /**
    * Accordion (<details>)
    */
@@ -243,3 +245,5 @@ $surface-details: "details";
     }
   }
 }
+
+/* cirth-component:end */

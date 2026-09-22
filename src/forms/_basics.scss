@@ -88,6 +88,8 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 
 // ––––––––––––––––––––
 
+/* cirth-component:start */
+
 // Force height for alternatives input types
 
 #{$parent-selector}
@@ -527,3 +529,5 @@ $validation-any: "[aria-invalid], #{$invalid-native}";
     margin-top: calc(var(--cirth-spacing) * 0.25);
   }
 }
+
+/* cirth-component:end */

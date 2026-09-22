@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cirth component exclusion fixture</title>
+    <link rel="stylesheet" href="../../../dist/cirth.css">
+    <style>
+      body { padding: 2rem; }
+      .third-party button,
+      button.third-party {
+        min-block-size: 0;
+        padding: 3px 7px;
+        border: 2px solid rgb(1 2 3);
+        border-radius: 1px;
+        background: rgb(240 241 242);
+        color: rgb(4 5 6);
+        font: 13px/1.25 monospace;
+      }
+      #result[data-pass="true"] { color: green; }
+      #result[data-pass="false"] { color: red; }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <h1>Component exclusion fixture</h1>
+      <p id="identity"></p>
+      <p id="result">Running…</p>
+
+      <button id="outside">Cirth button</button>
+      <div id="boundary" class="no-cirth third-party grid">
+        <button id="excluded">Third-party button</button>
+        <div class="no-cirth"><button id="nested">Nested button</button></div>
+        <span><input><small id="inside-helper">Inside helper</small></span>
+        <dialog id="dialog"><p>Excluded dialog</p></dialog>
+      </div>
+      <input class="no-cirth"><small id="outside-helper">Outside helper</small>
+      <button id="toggle">Toggle subject</button>
+    </main>
+    <script>
+      addEventListener("load", () => {
+        const checks = [];
+        const check = (name, pass) => checks.push({ name, pass: Boolean(pass) });
+        const style = (id) => getComputedStyle(document.getElementById(id));
+        const outside = style("outside");
+        const excluded = style("excluded");
+        const nested = style("nested");
+        const boundary = style("boundary");
+
+        check("outside remains styled", outside.padding !== "3px 7px");
+        check("excluded padding", excluded.padding === "3px 7px");
+        check("excluded border", excluded.borderTopWidth === "2px");
+        check("nested exclusion", nested.padding === "3px 7px");
+        check("global box sizing", excluded.boxSizing === "border-box");
+        check("layout utility", boundary.display === "grid");
+        check("theme inheritance", excluded.getPropertyValue("--cirth-primary") !== "");
+        check("inside sibling subject excluded", style("inside-helper").display !== "block");
+        check("outside sibling reacts", style("outside-helper").display === "block");
+
+        const toggle = document.getElementById("toggle");
+        const before = getComputedStyle(toggle).padding;
+        toggle.classList.add("no-cirth");
+        const during = getComputedStyle(toggle).padding;
+        toggle.classList.remove("no-cirth");
+        const after = getComputedStyle(toggle).padding;
+        check("dynamic subject toggle", before !== during && after === before);
+
+        const dialog = document.getElementById("dialog");
+        dialog.showModal();
+        check("outside :has() reacts", getComputedStyle(document.documentElement).overflow === "hidden");
+        dialog.close();
+
+        const failures = checks.filter((item) => !item.pass);
+        const result = document.getElementById("result");
+        result.dataset.pass = String(failures.length === 0);
+        result.textContent = failures.length === 0
+          ? `PASS — ${checks.length}/${checks.length} assertions`
+          : `FAIL — ${failures.map((item) => item.name).join(", ")}`;
+        document.getElementById("identity").textContent = navigator.userAgent;
+      });
+    </script>
+  </body>
+</html>

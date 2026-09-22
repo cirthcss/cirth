@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cirth scoped component exclusion fixture</title>
+    <link rel="stylesheet" href="../../../dist/cirth.scoped.css">
+    <style>
+      body { padding: 2rem; }
+      .third-party button {
+        min-block-size: 0;
+        padding: 3px 7px;
+        border: 2px solid rgb(1 2 3);
+        border-radius: 1px;
+        font: 13px/1.25 monospace;
+      }
+      #result[data-pass="true"] { color: green; }
+      #result[data-pass="false"] { color: red; }
+    </style>
+  </head>
+  <body>
+    <main class="cirth">
+      <h1>Scoped exclusion fixture</h1>
+      <p id="identity"></p>
+      <p id="result">Running…</p>
+      <button id="outside">Cirth button</button>
+      <div class="no-cirth third-party"><button id="nested">Excluded button</button></div>
+    </main>
+    <div class="cirth no-cirth third-party"><button id="root">Excluded scope root</button></div>
+    <script>
+      addEventListener("load", () => {
+        const style = (id) => getComputedStyle(document.getElementById(id));
+        const checks = [
+          style("outside").padding !== "3px 7px",
+          style("nested").padding === "3px 7px",
+          style("root").padding === "3px 7px",
+          style("nested").boxSizing === "border-box",
+          style("nested").getPropertyValue("--cirth-primary") !== "",
+        ];
+        const passed = checks.filter(Boolean).length;
+        const result = document.getElementById("result");
+        result.dataset.pass = String(passed === checks.length);
+        result.textContent = passed === checks.length
+          ? `PASS — ${passed}/${checks.length} assertions`
+          : `FAIL — ${passed}/${checks.length} assertions`;
+        document.getElementById("identity").textContent = navigator.userAgent;
+      });
+    </script>
+  </body>
+</html>

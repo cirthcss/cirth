@@ -23,8 +23,8 @@ const manifest = require("../package.json");
 /**
  * Every documented entry point, with something only the right file could
  * contain. The sentinels are deliberately about the *promise the subpath
- * makes* — a print sheet is print-only, a classless build has no classes,
- * a scoped build lives under the wrapper — so a mapping that pointed a
+ * makes* — a print sheet is print-only, a classless build has no component
+ * or utility classes, a scoped build lives under the wrapper — so a mapping that pointed a
  * subpath at the wrong build would be caught, which byte-size alone cannot.
  *
  * @type {{ subpath: string, must: string[], mustNot: string[] }[]}

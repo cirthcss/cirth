@@ -2,6 +2,8 @@
 @use "../helpers/metrics";
 @use "../helpers/selectors";
 
+/* cirth-component:start */
+
 /**
    * Modal (<dialog>)
    */
@@ -237,3 +239,5 @@
     overflow: hidden;
   }
 }
+
+/* cirth-component:end */

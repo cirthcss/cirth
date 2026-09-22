@@ -26,6 +26,8 @@
 
 // Responsive by default
 
+/* cirth-component:start */
+
 #{$parent-selector} img {
   max-width: 100%;
 
@@ -43,3 +45,5 @@
 #{$parent-selector} :where(svg:not([fill])) {
   fill: currentColor;
 }
+
+/* cirth-component:end */

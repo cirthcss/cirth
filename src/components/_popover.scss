@@ -1,5 +1,7 @@
 @use "../config" as *;
 
+/* cirth-component:start */
+
 /**
    * Popover ([popover])
    */
@@ -106,3 +108,5 @@ $popover-selector: '[popover=""], [popover="auto"], [popover="hint"]';
     opacity: 0;
   }
 }
+
+/* cirth-component:end */

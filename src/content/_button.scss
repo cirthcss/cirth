@@ -36,6 +36,8 @@
 
 // ––––––––––––––––––––
 
+/* cirth-component:start */
+
 #{$parent-selector} button,
 #{$parent-selector} [type="submit"],
 #{$parent-selector} [type="reset"],
@@ -508,3 +510,5 @@
   :is(button:not([type="button"], [type="reset"]), [type="submit"]) {
   filter: grayscale(1);
 }
+
+/* cirth-component:end */

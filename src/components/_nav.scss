@@ -36,6 +36,8 @@
 
 // ––––––––––––––––––––
 
+/* cirth-component:start */
+
 // `ol` alongside `ul`. A breadcrumb is an ordered sequence and <ol> is the
 // element that says so, so this is the markup a careful author writes —
 // and it was the markup that rendered worse. Left out of the flex
@@ -404,3 +406,5 @@ $navbar-selector: "header:not(:is(article, aside, dialog, figure, li, nav, secti
 // Unicode Bidi_Mirrored property, so RTL rendering mirrors it to "<" on
 // its own. (The inherited Pico rule targeted ` ::after` as a descendant —
 // it never matched the divider — and hardcoded a "\" on top of it.)
+
+/* cirth-component:end */

@@ -1,5 +1,7 @@
 @use "../config" as *;
 
+/* cirth-component:start */
+
 /**
    * Figure
    */
@@ -16,3 +18,5 @@
     line-height: var(--cirth-line-height-normal);
   }
 }
+
+/* cirth-component:end */

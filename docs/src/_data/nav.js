@@ -2,7 +2,7 @@
 
 const siteTitle = "Cirth";
 const siteDescription =
-	"HTML-native CSS framework. Production-ready UI from semantic HTML — under 14KB gzipped, 0 JavaScript.";
+	"HTML-native CSS framework. Production-ready UI from semantic HTML — about 15KB gzipped, 0 JavaScript.";
 
 const topNav = [
 	{ text: "Docs", link: "/get-started" },
