@@ -1,5 +1,7 @@
 @use "../config" as *;
 
+/* cirth-component:start */
+
 // Wrapper
 @mixin color-wrapper {
   padding: 0;
@@ -32,3 +34,5 @@
     @include color-swatch;
   }
 }
+
+/* cirth-component:end */

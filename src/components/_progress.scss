@@ -22,6 +22,8 @@
 
 // ––––––––––––––––––––
 
+/* cirth-component:start */
+
 #{$parent-selector} progress {
   // Styles
   display: inline-block;
@@ -82,6 +84,8 @@
     }
   }
 }
+
+/* cirth-component:end */
 
 @keyframes progress-indeterminate {
   0% {

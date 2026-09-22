@@ -4,6 +4,10 @@ const path = require("node:path");
 const postcss = require("postcss");
 const selectorParser = require("postcss-selector-parser");
 const {
+	EXCLUSION_CLASS,
+	auditFinalCss,
+} = require("./lib/component-exclusion");
+const {
 	presetBuilds,
 	rootBuilds,
 	scopeClass,
@@ -20,8 +24,8 @@ const lightningcss = path.join(
 
 // Mechanical invariants of the published dist/ surface, run right after
 // the build. Each entry names the contract the build variant promises:
-// - classless builds must not emit class selectors (the wrapper class is
-//   the single exception in the scoped variant);
+// - classless builds must not emit component or utility classes
+//   (`.no-cirth` is the public boundary; `.cirth` is the scoped wrapper);
 // - scoped builds must not emit any rule outside the `.cirth` subtree;
 // - presets must only override custom properties on theme roots.
 //
@@ -192,11 +196,23 @@ for (const { name, classless, scoped } of rootBuilds) {
 		continue; // already reported above
 	}
 	const root = parseDist(file);
+	const guardedBranches = auditFinalCss(
+		fs.readFileSync(path.join(distDir, file), "utf8"),
+		file,
+	);
+	if (name.includes("print")) {
+		if (guardedBranches !== 0) {
+			fail(file, "print build contains component exclusion guards");
+		}
+	} else if (guardedBranches === 0) {
+		fail(file, "screen build contains no component exclusion guards");
+	}
 
 	if (classless) {
 		walkStyleRules(root, (rule) => {
 			const offending = listClasses(rule.selector).filter(
-				(value) => !(scoped && value === scopeClass),
+				(value) =>
+					value !== EXCLUSION_CLASS && !(scoped && value === scopeClass),
 			);
 			if (offending.length > 0) {
 				fail(
@@ -292,6 +308,6 @@ if (failures.length > 0) {
 
 console.log(
 	`✓ check-dist: ${allFiles.length} files parse and are non-empty; ` +
-		`classless builds are class-free, scoped builds stay inside ` +
-		`.${scopeClass}, presets only touch custom properties.`,
+		`classless builds only expose .${EXCLUSION_CLASS}, scoped builds stay ` +
+		`inside .${scopeClass}, presets only touch custom properties.`,
 );

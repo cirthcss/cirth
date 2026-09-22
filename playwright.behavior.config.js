@@ -15,6 +15,7 @@ module.exports = defineConfig({
 		"doc-links.spec.js",
 		"docs-stack.spec.js",
 		"date-input-group.spec.js",
+		"exclusion.spec.js",
 		"flow-spacing.spec.js",
 		"form-sizing.spec.js",
 		"forms-validity.spec.js",

@@ -1,5 +1,7 @@
 @use "../config" as *;
 
+/* cirth-component:start */
+
 /**
    * Card (<article>)
    */
@@ -60,3 +62,5 @@
     border-bottom-left-radius: var(--cirth-card-border-radius);
   }
 }
+
+/* cirth-component:end */

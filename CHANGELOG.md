@@ -7,6 +7,16 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Added
+
+- **`.no-cirth` excludes Cirth component declarations from a third-party
+  subtree** (gh#125). The zero-specificity guard is built into all four screen
+  stylesheets, works on the marked element and nested descendants, and needs
+  no JavaScript. It is deliberately not a complete style boundary: the global
+  reset, theme, inheritance, layout, accessibility, motion and print rules
+  continue to apply, and an outside `:has()` or sibling subject can still
+  react across the boundary.
+
 ## [0.15.0] - 2026-09-18
 
 ### Changed

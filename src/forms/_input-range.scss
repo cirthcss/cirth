@@ -1,6 +1,8 @@
 @use "../config" as *;
 @use "../helpers/metrics";
 
+/* cirth-component:start */
+
 // Config
 $height-track: 0.375rem;
 $height-thumb: 1.25rem;
@@ -94,3 +96,5 @@ $border-thumb: var(--cirth-border-width-2);
     }
   }
 }
+
+/* cirth-component:end */

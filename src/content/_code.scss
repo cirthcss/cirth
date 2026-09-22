@@ -40,6 +40,8 @@
 
 // ––––––––––––––––––––
 
+/* cirth-component:start */
+
 #{$parent-selector} pre,
 #{$parent-selector} code,
 #{$parent-selector} kbd,
@@ -105,3 +107,5 @@
   font-size: 0.875em;
   font-family: var(--cirth-font-family);
 }
+
+/* cirth-component:end */
