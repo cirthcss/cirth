@@ -21,6 +21,8 @@
 // groups that did not ask for it — the same hijack gh#19 removed from
 // [role="group"].
 
+/* cirth-component:start */
+
 @if $enable-classes {
   #{$parent-selector} fieldset.segmented {
     display: flex;
@@ -91,3 +93,5 @@
     }
   }
 }
+
+/* cirth-component:end */

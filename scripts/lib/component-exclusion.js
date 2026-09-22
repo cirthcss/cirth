@@ -152,59 +152,58 @@ const transformRoot = (root, filename = "<css>") => {
 	let componentBranches = 0;
 	let globalRules = 0;
 
-	for (const node of [...root.nodes]) {
-		if (node.type === "comment" && node.text.trim() === COMPONENT_START) {
-			if (inComponents) {
-				throw new Error(`${filename}: nested ${COMPONENT_START} marker`);
-			}
-			inComponents = true;
-			sections += 1;
-			node.remove();
-			continue;
-		}
-
-		if (node.type === "comment" && node.text.trim() === COMPONENT_END) {
-			if (!inComponents) {
-				throw new Error(`${filename}: unmatched ${COMPONENT_END} marker`);
-			}
-			inComponents = false;
-			node.remove();
-			continue;
-		}
-
-		/** @type {import("postcss").Rule[]} */
-		const rules = [];
-		if (node.type === "rule") {
-			rules.push(node);
-		}
-		if ("walkRules" in node && node.type !== "rule") {
-			node.walkRules((rule) => {
-				rules.push(rule);
-			});
-		}
-
-		for (const rule of rules) {
-			if (isInsideKeyframes(rule)) {
+	/** @param {import("postcss").Container | import("postcss").Document} container */
+	const visit = (container) => {
+		for (const node of [...container.nodes]) {
+			if (node.type === "comment" && node.text.trim() === COMPONENT_START) {
+				if (inComponents) {
+					throw new Error(`${filename}: nested ${COMPONENT_START} marker`);
+				}
+				inComponents = true;
+				sections += 1;
+				node.remove();
 				continue;
 			}
-			if (inComponents) {
-				componentBranches += guardRule(rule, filename);
-				componentRules += 1;
-			} else {
-				globalRules += 1;
-				selectorParser((selectors) => {
-					for (const selector of selectors.nodes) {
-						if (selector.nodes.some(isGuardNode)) {
-							throw new Error(
-								`${filename}: intentionally global selector carries the ` +
-									`component guard: \`${selector.toString()}\``,
-							);
+
+			if (node.type === "comment" && node.text.trim() === COMPONENT_END) {
+				if (!inComponents) {
+					throw new Error(`${filename}: unmatched ${COMPONENT_END} marker`);
+				}
+				inComponents = false;
+				node.remove();
+				continue;
+			}
+
+			if (node.type === "rule") {
+				if (isInsideKeyframes(node)) {
+					continue;
+				}
+				if (inComponents) {
+					componentBranches += guardRule(node, filename);
+					componentRules += 1;
+				} else {
+					globalRules += 1;
+					selectorParser((selectors) => {
+						for (const selector of selectors.nodes) {
+							if (selector.nodes.some(isGuardNode)) {
+								throw new Error(
+									`${filename}: intentionally global selector carries the ` +
+										`component guard: \`${selector.toString()}\``,
+								);
+							}
 						}
-					}
-				}).processSync(rule.selector);
+					}).processSync(node.selector);
+				}
+				continue;
+			}
+
+			if ("nodes" in node && node.nodes) {
+				visit(node);
 			}
 		}
-	}
+	};
+
+	visit(root);
 
 	if (inComponents) {
 		throw new Error(`${filename}: missing ${COMPONENT_END} marker`);

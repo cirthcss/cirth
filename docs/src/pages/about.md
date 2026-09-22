@@ -44,9 +44,10 @@ The framework ships compiled CSS only; there's nothing to run. Add one
 `<link rel="stylesheet">` (or one `import` in a bundler) and standard
 elements pick up their styling immediately — no template step, no
 JavaScript hydration, no class list to author. Customization happens by
-overriding CSS custom properties in an ordinary stylesheet loaded after
-Cirth's: change `--cirth-primary` once, and every button, link, and focus
-ring that derives from it updates, with no compiler in between. SCSS exists
+overriding CSS custom properties in an ordinary stylesheet of your own,
+which wins because Cirth keeps its rules in a cascade layer: change
+`--cirth-primary` once, and every button, link, and focus ring that derives
+from it updates, with no compiler in between. SCSS exists
 in the repository as internal build infrastructure for producing the
 compiled output; it is not a published Sass API.
 

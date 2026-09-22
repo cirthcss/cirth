@@ -13,6 +13,7 @@ module.exports = defineConfig({
 		"baseline-consistency.spec.js",
 		"box-shadow.spec.js",
 		"button-overflow.spec.js",
+		"cascade-layers.spec.js",
 		"doc-links.spec.js",
 		"docs-stack.spec.js",
 		"date-input-group.spec.js",

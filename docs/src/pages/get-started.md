@@ -71,6 +71,11 @@ existing set of custom properties (color, shadow, type, spacing, motion).
 Load them after any of the four builds above, for example
 `dist/presets/plain.min.css`.
 
+Every build, print sheet and preset keeps its rules in one cascade layer,
+`cirth`. CSS you write outside a layer overrides it without matching its
+selectors, wherever you load it; see
+[Cascade layers](/customization#cascade-layers).
+
 ### Classless
 
 ```html

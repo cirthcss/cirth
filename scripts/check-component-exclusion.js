@@ -78,15 +78,17 @@ for (const sourceEntry of fs.readdirSync(sourceFolder, { recursive: true })) {
 // catches regressions in list handling, rightmost-subject selection,
 // pseudo-element placement, conditional rules and keyframe exclusion.
 const fixture = `
-/* ${COMPONENT_START} */
-input,
-button::before,
-form:has(.inside) > label + small,
-::selection { color: red }
-@media (width > 10px) { textarea::placeholder { color: gray } }
-@keyframes fixture { from { opacity: 0 } }
-/* ${COMPONENT_END} */
-html { color: black }
+@layer cirth {
+	/* ${COMPONENT_START} */
+	input,
+	button::before,
+	form:has(.inside) > label + small,
+	::selection { color: red }
+	@media (width > 10px) { textarea::placeholder { color: gray } }
+	@keyframes fixture { from { opacity: 0 } }
+	/* ${COMPONENT_END} */
+	html { color: black }
+}
 `;
 const fixtureResult = transformCss(fixture, "selector-fixture.css");
 assert.equal(fixtureResult.stats.componentBranches, 5);

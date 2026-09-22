@@ -16,7 +16,9 @@ and no print-only markup to maintain.
 
 Load it **after** the main build: the pass wins over the component rules it
 has to outrank by source order, exactly as it did when it lived inside the
-bundle. Each build has its matching sheet — `cirth.print.min.css`,
+bundle. Both sit in the same [cascade layer](/customization#cascade-layers),
+so that order still decides between them, while your own print rules beat
+both. Each build has its matching sheet — `cirth.print.min.css`,
 `cirth.print.classless.min.css`, `cirth.print.scoped.min.css`,
 `cirth.print.classless.scoped.min.css` — or, from npm,
 `@cirthcss/cirth/print` and its `classless`/`scoped` variants.
@@ -80,7 +82,7 @@ Three tokens drive the whole pass:
 | `--cirth-print-muted-color` | 6.5:1 gray | Captions, attributions, placeholders, printed URLs |
 | `--cirth-print-border-color` | 3.8:1 gray | Table rules, card and field borders, `<hr>` |
 
-Override them like any other token, from a stylesheet loaded after Cirth:
+Override them like any other token, from a stylesheet of your own:
 
 ```css
 :root {

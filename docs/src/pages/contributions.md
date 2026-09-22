@@ -147,7 +147,12 @@ build, so the contracts of each build variant can't erode silently:
   selector can style markup that didn't opt in;
 * every `.no-cirth` occurrence is one valid zero-specificity subject guard,
   and print builds contain none;
-* presets only set custom properties on theme roots, never rules.
+* presets only set custom properties on theme roots, never rules;
+* every file, expanded and minified, is **one top-level `@layer cirth`
+  block** with no sub-layer and no `!important` — a rule left outside it
+  would compete with consumer CSS on specificity again. The layer is
+  written once, in `src/helpers/_cascade.scss`; see
+  [`specs/cascade-layer.md`](https://github.com/cirthcss/cirth/blob/master/specs/cascade-layer.md).
 
 `check:exclusion` goes back one step further. It recompiles all screen and
 print entry points, uses the source ownership markers to prove every content,

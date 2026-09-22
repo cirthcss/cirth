@@ -20,6 +20,11 @@
 // weight lets source order decide again. Anything more specific still wins
 // too, so overrides written against the old shape keep working.
 
+// Since gh#124 Cirth sits in a cascade layer, and a consumer's unlayered rule
+// beats it at any weight. The ceiling still matters inside the layer: it is
+// what lets a preset, loaded after the build and declaring on the same
+// roots, win on source order.
+
 // The other half was reach, and specificity could not fix it. While these
 // blocks declared the palette itself, an element carrying data-theme got
 // every colour declared *on it* — and a declaration on an element beats one

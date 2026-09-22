@@ -101,7 +101,10 @@ for the boundary's `:has()` and sibling-selector limits.
 
 ## Customize
 
-Put your overrides in a stylesheet loaded after Cirth:
+Cirth is CSS-first. Override custom properties in your own stylesheet. Every
+stylesheet Cirth ships keeps its rules in one cascade layer, `cirth`, so CSS
+you write outside a layer wins without matching Cirth's selectors, wherever
+it loads.
 
 ```css
 :root {

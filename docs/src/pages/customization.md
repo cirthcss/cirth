@@ -6,8 +6,9 @@ layout: docs.njk
 
 Cirth is CSS first. Every colour, space, radius, shadow and font is a
 `--cirth-*` custom property, and the supported way to change one is a rule
-in your own stylesheet, loaded after Cirth. No Sass, no build step, no
-rebuild.
+in your own stylesheet. No Sass, no build step, no rebuild. Cirth keeps all
+of its rules in a [cascade layer](#cascade-layers), so yours win without
+having to out-weigh its selectors.
 
 ```html
 <link rel="stylesheet" href="dist/cirth.min.css">
@@ -304,9 +305,9 @@ This is the same shape Cirth uses internally. The pair is resolved where
 the token is *used*, against the colour scheme in effect at that point, so
 one line covers the page and any widget that forces its own scheme.
 
-You can still target the scheme selectors directly. They are more specific
-than a plain `:root`, which makes them the tool for changing one scheme
-without touching the other:
+You can still target the scheme selectors directly, which is the tool for
+changing one scheme without touching the other. They are also more specific
+than a plain `:root`, so they win over a `:root` rule of your own:
 
 ```css
 :root:not([data-theme="dark"]) {
@@ -340,9 +341,10 @@ mirror the host's choice onto the wrapper:
 ### Increased contrast
 
 Cirth carries a `prefers-contrast: more` pass that strengthens inks,
-hairlines and focus rings. Your overrides load after it, so a token you set
-unconditionally will win there too — which usually means the preference
-stops working for that token.
+hairlines and focus rings. Your overrides sit outside Cirth's
+[layer](#cascade-layers), so a token you set unconditionally wins there too,
+wherever you load it — which usually means the preference stops working for
+that token.
 
 ```css
 /* your accent, in both modes */
@@ -610,6 +612,120 @@ an input, the pairs worth checking are:
   button label;
 * `--cirth-muted-color` against the page;
 * the status borders against a field.
+
+## Cascade layers
+
+Every stylesheet Cirth ships — each build, its print sheet, and the presets
+— puts all of its rules in one
+[cascade layer](https://developer.mozilla.org/en-US/docs/Web/CSS/@layer)
+named `cirth`. That settles how your CSS meets Cirth's:
+
+* **CSS you write outside a layer always wins**, whatever its specificity,
+  and whether it loads before Cirth or after it. `summary { color: … }`
+  beats Cirth's `details summary:not([role])`, and
+  `html { --cirth-primary: … }` beats its `:root`. There is no class to
+  repeat and no `!important` to reach for; Cirth ships none.
+* **Between Cirth's own stylesheets nothing changed.** They share the one
+  layer, so specificity and then source order decide, as they always did:
+  the build first, then a preset, then the print sheet.
+
+`cirth` is the only name. There are no sub-layers to target.
+
+### Your own layers
+
+If you use layers yourself, they sort against `cirth` by the usual rules: a
+layer that first appears after Cirth beats it, and one that first appears
+before it loses. To make that independent of loading order, state the order
+before any stylesheet names a layer:
+
+```html
+<style>
+  @layer reset, cirth, components;
+</style>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.14.1/dist/cirth.min.css"
+  integrity="sha384-sU2A7luz2xm9uj6FZ0hdflySgcbY9uN+QeQgJzyaZaM4ujBLxiPPibqEcaG2Ckuk"
+  crossorigin="anonymous">
+<link rel="stylesheet" href="app.css">
+```
+
+From npm, the same statement opens the stylesheet your bundler starts from.
+An `@import` has to come before every other rule in its file, and a
+`@layer` statement is the one thing allowed ahead of it:
+
+```css
+@layer reset, cirth, components;
+@import "@cirthcss/cirth";
+@import "@cirthcss/cirth/presets/plain";
+
+@layer reset { … }        /* loses to Cirth */
+@layer components { … }   /* beats Cirth */
+.site-footer { … }        /* unlayered: beats all of the above */
+```
+
+### Presets
+
+A preset shares the build's layer, so it still has to load after the build:
+one loaded first is overridden by the theme, as it always was. Your own
+overrides beat both, from anywhere in the page:
+
+```css
+:root {
+  --cirth-primary: #2563eb; /* over the build and the preset */
+}
+```
+
+A preset declares on `.cirth` as well as `:root`, so it applies inside a
+scoped build's wrapper too.
+
+### Scoped builds
+
+The scoped build is layered the same way, and it still styles nothing
+outside `.cirth`. Two things follow from the layer.
+
+Your overrides inside the widget no longer need a `.cirth` prefix to win.
+Tokens are the exception, for a reason that has nothing to do with layers:
+the wrapper declares every token on itself, and a declaration on an element
+beats one it would inherit from `:root`. Set them on the wrapper:
+
+```css
+.cirth {
+  --cirth-primary: #2563eb;
+}
+```
+
+The host page's CSS wins inside the widget too, when it is unlayered. The
+`.cirth` prefix used to out-weigh a host rule such as `button { … }` — it
+never out-weighed `.entry-content a` — and it no longer does. If the host's
+CSS is yours, put it in a layer ordered before Cirth's:
+
+```css
+@layer host, cirth;
+@import url("site.css") layer(host);
+```
+
+If it is not yours — a CMS theme, a page your widget is embedded in — mount
+the widget in a shadow root. The host's rules do not cross into it, and the
+scoped build works inside it unchanged; the theme demo on this site's home
+page is built that way.
+
+### If you imported Cirth into a layer yourself
+
+Before Cirth shipped in a layer, the way to get this behaviour was to put it
+in one on import:
+
+```css
+@import "@cirthcss/cirth" layer(cirth);
+```
+
+That keeps working. Cirth's own layer nests inside yours, as `cirth.cirth`,
+and sorts wherever `cirth` does. But it no longer does anything a plain
+`<link>` does not, and inside an external stylesheet an `@import` is a
+request the browser cannot start until that stylesheet has arrived. Switch
+back to the `<link>`. If you imported into a layer with another name to
+position Cirth among your own layers, replace the import with an order
+statement that names `cirth`.
 
 ## What you cannot change with a variable
 
