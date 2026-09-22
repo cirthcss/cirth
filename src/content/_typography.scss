@@ -41,6 +41,8 @@
 
 // ––––––––––––––––––––
 
+/* cirth-component:start */
+
 #{$parent-selector} address,
 #{$parent-selector} blockquote,
 #{$parent-selector} dl,
@@ -274,3 +276,5 @@
 #{$parent-selector} ::selection {
   background-color: var(--cirth-text-selection-color);
 }
+
+/* cirth-component:end */

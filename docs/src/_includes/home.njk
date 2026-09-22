@@ -425,7 +425,7 @@ bodyClass: docs-home-page
 					<h2 id="faq-title">{{ faq.title }}</h2>
 				</header>
 				<div class="docs-faq-list">
-					{% set measuredSize = proof.size.label if proof.size else "under 14 KB" %}
+					{% set measuredSize = proof.size.label if proof.size else "about 15 KB" %}
 					{% for item in faq.items %}
 						{{ faqDisclosure(item.q, item.a | replace("<!--browsers-->", browsers.sentence) | replace("<!--size-->", measuredSize)) }}
 					{% endfor %}

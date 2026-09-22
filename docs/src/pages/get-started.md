@@ -61,7 +61,7 @@ Cirth publishes four CSS builds from the same source:
 | File | Use it when… |
 | --- | --- |
 | `dist/cirth.min.css` | Default. You write normal HTML and want `.container`, `.grid`, `.secondary`/`.outline` modifiers, dropdowns, etc. |
-| `dist/cirth.classless.min.css` | You want the smallest possible markup: no classes at all, styled through `body > header/main/footer`. |
+| `dist/cirth.classless.min.css` | You want the smallest possible markup: no component or utility classes, styled through `body > header/main/footer`; `.no-cirth` remains available as an optional boundary. |
 | `dist/cirth.scoped.min.css` | You're embedding Cirth into an existing page, CMS, or app shell and only want elements inside a `.cirth` wrapper affected. |
 | `dist/cirth.classless.scoped.min.css` | Both: scoped **and** classless. |
 
@@ -70,6 +70,11 @@ All four builds share the same official copper theme. `plain` and `playroom`
 existing set of custom properties (color, shadow, type, spacing, motion).
 Load them after any of the four builds above, for example
 `dist/presets/plain.min.css`.
+
+Every build, print sheet and preset keeps its rules in one cascade layer,
+`cirth`. CSS you write outside a layer overrides it without matching its
+selectors, wherever you load it; see
+[Cascade layers](/customization#cascade-layers).
 
 ### Classless
 
@@ -96,6 +101,31 @@ where only descendants of `.cirth` should be styled.
 ```
 
 {% demo "scoped" %}
+
+### Excluding a third-party component
+
+When a datatable, map, rich-text editor, or other widget brings its own CSS,
+mark its root with `.no-cirth`:
+
+```html
+<div class="no-cirth">
+  <!-- third-party widget markup -->
+</div>
+```
+
+**Cirth's component declarations do not target that element or its
+descendants.** This applies to all four screen builds, including an element
+that carries both `.cirth` and `.no-cirth` in a scoped build. Nested
+`.no-cirth` boundaries stay excluded; there is no re-entry class and no
+JavaScript to initialize.
+
+The name is intentionally shorter than the contract. It does **not** turn all
+of Cirth off or restore browser defaults. The global reset, theme custom
+properties, inherited fonts and colours, layout classes, accessibility and
+reduced-motion rules, and the separate print stylesheet still apply. A Cirth
+selector whose subject is outside the boundary can also still react to an
+excluded descendant through `:has()` or to an excluded earlier sibling. Use
+Shadow DOM when a widget needs a real style-isolation boundary.
 
 This documentation site is itself styled by Cirth's default build. The
 header nav, the sidebar, the prose you're reading, and every live example

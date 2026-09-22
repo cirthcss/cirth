@@ -1,5 +1,7 @@
 @use "../config" as *;
 
+/* cirth-component:start */
+
 /**
    * Input type datetime
    */
@@ -111,3 +113,5 @@
   background-position: center left var(--cirth-icon-position);
   text-align: right;
 }
+
+/* cirth-component:end */

@@ -33,14 +33,14 @@ const distDir = path.join(projectRoot, "dist");
 // numbers in CHANGELOG.md and the documentation are quoted at.
 /** @type {Record<string, number>} */
 const budgets = {
-	"cirth.classless.min.css": 12_800,
-	"cirth.classless.scoped.min.css": 13_000,
-	"cirth.min.css": 14_500,
+	"cirth.classless.min.css": 13_300,
+	"cirth.classless.scoped.min.css": 13_400,
+	"cirth.min.css": 15_200,
 	"cirth.print.classless.min.css": 1_024,
 	"cirth.print.classless.scoped.min.css": 1_024,
 	"cirth.print.min.css": 1_024,
 	"cirth.print.scoped.min.css": 1_024,
-	"cirth.scoped.min.css": 14_750,
+	"cirth.scoped.min.css": 15_400,
 };
 
 const warnOnly = process.argv.includes("--warn-only");

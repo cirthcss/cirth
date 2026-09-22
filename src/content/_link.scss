@@ -1,5 +1,7 @@
 @use "../config" as *;
 
+/* cirth-component:start */
+
 // Everything a :visited repaint has to stand aside for: the states that
 // own the link color while they last, the color variants that are already
 // a different color group, navigation, and links that are components
@@ -130,3 +132,5 @@ $visited-exceptions: $visited-class-exceptions +
     display: inline-block;
   }
 }
+
+/* cirth-component:end */

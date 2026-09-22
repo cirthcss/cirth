@@ -44,11 +44,17 @@ jobs:
       - name: Check dist invariants
         run: npm run check:dist
 
+      - name: Check custom property prefix build
+        run: npm run check:prefix
+
       - name: Build docs
         run: npm run docs:build
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium firefox webkit
+
+      - name: Check the DTCG token export against three engines
+        run: npm run check:tokens
 
       # --retries=2, for the same reason the baseline workflow uses it: a
       # WebKit flake failing the whole run is worse than a flake, and it

@@ -1,6 +1,8 @@
 @use "../config" as *;
 @use "../helpers/metrics";
 
+/* cirth-component:start */
+
 @if $enable-classes {
   /**
    * Dropdown (details.dropdown)
@@ -364,3 +366,5 @@
     }
   }
 }
+
+/* cirth-component:end */

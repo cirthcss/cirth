@@ -1,0 +1,39 @@
+<div class="overflow-auto" tabindex="0" role="region" aria-labelledby="stock-caption">
+  <table class="controls">
+    <caption id="stock-caption">Stock adjustments</caption>
+    <thead>
+      <tr>
+        <th scope="col" id="stock-item">Item</th>
+        <th scope="col" id="stock-qty">Quantity</th>
+        <th scope="col" id="stock-bin">Bin</th>
+        <th scope="col" id="stock-note">Note</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row" id="stock-apples">Apples</th>
+        <td><input type="number" value="12" min="0" aria-labelledby="stock-qty stock-apples"></td>
+        <td>
+          <select aria-labelledby="stock-bin stock-apples">
+            <option>A1</option>
+            <option>B2</option>
+          </select>
+        </td>
+        <td><input type="text" value="Checked on arrival" aria-labelledby="stock-note stock-apples"></td>
+        <td><button type="button" aria-describedby="stock-apples">Save</button></td>
+      </tr>
+      <tr>
+        <th scope="row" id="stock-pears">Pears</th>
+        <td><input type="number" value="-3" min="0" aria-invalid="true" aria-labelledby="stock-qty stock-pears"></td>
+        <td>
+          <select aria-labelledby="stock-bin stock-pears" disabled>
+            <option>C3</option>
+          </select>
+        </td>
+        <td><input type="text" value="Supplier note" readonly aria-labelledby="stock-note stock-pears"></td>
+        <td><button type="button" class="secondary" aria-describedby="stock-pears">Save</button></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

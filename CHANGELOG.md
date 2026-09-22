@@ -7,6 +7,88 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Added
+
+- **`.no-cirth` excludes Cirth component declarations from a third-party
+  subtree** (gh#125). The zero-specificity guard is built into all four screen
+  stylesheets, works on the marked element and nested descendants, and needs
+  no JavaScript. It is deliberately not a complete style boundary: the global
+  reset, theme, inheritance, layout, accessibility, motion and print rules
+  continue to apply, and an outside `:has()` or sibling subject can still
+  react across the boundary.
+
+- **A build-time custom property prefix** (gh#126). Building from source
+  with `npm run build -- --prefix "--acme-"` produces the same stylesheets,
+  scoped builds and presets under `--acme-` instead of `--cirth-`, for
+  embedding Cirth beside a design system that already owns the namespace.
+  The prefix must start with `--` and end with `-`. The published package
+  and its default prefix are unchanged, and the `.cirth` scoping class is
+  not affected.
+
+- **The token surface as W3C Design Tokens** (gh#93). The package now ships
+  `@cirthcss/cirth/tokens/light` and `@cirthcss/cirth/tokens/dark`, one
+  DTCG JSON file per colour scheme, for design tools and non-CSS platforms.
+  References between tokens are exported as aliases; derived colours are
+  exported as their resolved values, with the CSS relationship kept
+  alongside; values no DTCG type can hold are listed rather than dropped.
+  The stylesheets are unchanged.
+
+- **`fieldset.segmented`, a segmented radio group** (gh#107), in class-based
+  builds. It draws a compact single choice as joined segments while the
+  radios stay real: the `legend` names the group, arrow keys move the
+  selection, the value submits with the form, and the selected radio keeps
+  its dot, so the choice does not rest on colour and survives forced-colors
+  mode. Focus outlines the whole segment, and each segment keeps the 44px
+  target floor. The classless builds are unchanged.
+
+- **`table.controls`, for form controls placed directly in cells** (gh#108),
+  in class-based builds. A cell that holds an input, select, textarea or
+  button gives most of its padding to the control and the control drops its
+  stacking margin, so a row of fields no longer reads as a box inside a box.
+  The controls keep their borders, states, focus ring and 44px target. The
+  classless builds are unchanged.
+
+### Changed
+
+- **Every stylesheet keeps its rules in one cascade layer, `cirth`**
+  (gh#124). The four builds, their print sheets and the presets each wrap
+  everything they emit in `@layer cirth`. CSS outside a layer now beats
+  Cirth whatever its specificity and wherever it loads, so an override no
+  longer has to match or out-weigh Cirth's selector, and a `:root` token
+  override no longer has to load last.
+  Nothing inside Cirth moved. The rules, their order and their weight are
+  unchanged, so build, preset and print sheet still resolve against each
+  other by source order and load in the same order as before.
+  What stops winning is Cirth against other CSS on the page. A stylesheet
+  loaded *before* Cirth so that Cirth would override it now beats Cirth
+  wherever they overlap. In a scoped build, the host page's unlayered rules
+  now win inside `.cirth`, where the prefix used to out-weigh a host
+  `button {}` or `h1 {}`. `[hidden]`, `.sr-only`, an open popover's
+  centring, and the reduced-motion and print passes no longer override your
+  own rules, only Cirth's: a layout rule such as `.panel > :last-child
+  { margin-bottom: 0 }` that happens to reach a popover now moves it.
+  Importing Cirth into a layer yourself (`@import … layer(cirth)`) keeps
+  working and nests as `cirth.cirth`. There are no sub-layers.
+  **Breaking** — see the Upgrading page.
+
+### Fixed
+
+- **Dropdowns and popovers draw their shadow again.** `--cirth-box-shadow`
+  wrapped two whole shadow lists in `light-dark()`, which only accepts
+  colours, so every `box-shadow` that read it resolved to `none` in every
+  engine. The scheme choice now sits on each layer's colour. The token's
+  name is unchanged, and it still follows the scheme of the element that
+  uses it.
+- **A visually hidden element inside `.overflow-auto` no longer widens the
+  page.** `.overflow-auto` is now `position: relative`, so absolutely
+  positioned content such as a `.sr-only` table header is clipped by the
+  scroll area instead of escaping it: a wide table with one such header
+  had pushed a 320px page more than 1,000px wider.
+- **A preset now applies inside a scoped build's wrapper.** Presets declared
+  their tokens on `:root` only, and the scoped build declares every token on
+  `.cirth` itself, which beats an inherited value — so a preset loaded with
+  a scoped build changed nothing. Presets now declare on `.cirth` too.
+
 ## [0.15.0] - 2026-09-18
 
 ### Changed

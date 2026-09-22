@@ -1,5 +1,7 @@
 @use "../config" as *;
 
+/* cirth-component:start */
+
 $visible-group-item: ':not([hidden], input[type="hidden"])';
 
 // Hidden metadata remains in the DOM child order, so group boundaries use
@@ -155,3 +157,5 @@ $visible-group-item: ':not([hidden], input[type="hidden"])';
     border-end-end-radius: var(--cirth-radius-pill);
   }
 }
+
+/* cirth-component:end */

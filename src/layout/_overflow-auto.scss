@@ -6,6 +6,12 @@
    */
 
   #{$parent-selector} .overflow-auto {
+    // A scroll container only clips what it contains, and an absolutely
+    // positioned descendant is contained by its nearest positioned
+    // ancestor, not by its parent. Without this, the .sr-only header a
+    // table puts on its action column escaped the scroll area and widened
+    // the page it was meant to protect: +1,111px at 320px (WCAG 1.4.10).
+    position: relative;
     overflow: auto;
 
     // A scroll container has to be keyboard reachable to be operable at

@@ -32,6 +32,7 @@ The commands you'll actually use:
 
 ```sh
 npm run build      # compile src/ to dist/ (format, lint, compile, minify)
+npm run build -- --prefix "--acme-"  # the same dist/ under another custom property prefix
 npm run dev        # rebuild on change
 npm run lint       # stylelint + CSS custom property check
 npm run lint:fix
@@ -98,10 +99,12 @@ review attention. Each one is enforced by an automated check that runs
 in CI on every push, and the same checks run locally:
 
 ```sh
-npm run lint          # tree noise + stylelint + custom property audit + browser target + doc links + CDN hashes
+npm run lint          # source lint plus selector, token, browser, link, and CDN invariants
 npm run build         # compile src/ to dist/
 npm run check:dist    # structural invariants of every generated dist file
-npm run check:size    # ≤ 14 KiB gzipped per root bundle
+npm run check:exclusion # parsed ownership and .no-cirth subject guards
+npm run check:prefix  # a --prefix build differs from the default by the prefix alone
+npm run check:size    # per-bundle gzip regression budgets
 npm run docs:build    # build this site (input for the browser checks below)
 npm run check:behavior # interaction, reflow, user styles, and input parity across three engines
 npm run check:a11y    # axe WCAG 2.0–2.2 A/AA audit of every docs page
@@ -138,11 +141,25 @@ Runs mechanical assertions over every file in `dist/` right after the
 build, so the contracts of each build variant can't erode silently:
 
 * every build re-parses with Lightning CSS and is non-empty;
-* classless builds emit **no class selectors** (the `.cirth` wrapper is
-  the single exception in the scoped variant);
+* classless builds emit no component or utility classes; `.no-cirth` is the
+  explicit exclusion marker, and `.cirth` is the scoped variant's wrapper;
 * scoped builds keep **every rule inside the `.cirth` subtree** — no
   selector can style markup that didn't opt in;
-* presets only set custom properties on theme roots, never rules.
+* every `.no-cirth` occurrence is one valid zero-specificity subject guard,
+  and print builds contain none;
+* presets only set custom properties on theme roots, never rules;
+* every file, expanded and minified, is **one top-level `@layer cirth`
+  block** with no sub-layer and no `!important` — a rule left outside it
+  would compete with consumer CSS on specificity again. The layer is
+  written once, in `src/helpers/_cascade.scss`; see
+  [`specs/cascade-layer.md`](https://github.com/cirthcss/cirth/blob/master/specs/cascade-layer.md).
+
+`check:exclusion` goes back one step further. It recompiles all screen and
+print entry points, uses the source ownership markers to prove every content,
+form, and component selector receives one guard while intentionally global
+reset, layout, theme, utility, and print selectors receive none, then parses
+the Lightning CSS expanded and minified outputs again. A new partial without
+an ownership decision fails the check.
 
 ### CDN integrity — `check:sri`
 

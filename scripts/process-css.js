@@ -1,12 +1,24 @@
 const fs = require("node:fs");
 const path = require("node:path");
+const { transformCss } = require("./lib/component-exclusion");
 const { runSync } = require("./lib/run-sync");
 
 // Presets (src/presets/) are plain custom-property overrides compiled into
 // dist/presets/ and treated exactly like the rest of dist/: transformed by
 // Lightning CSS, then minified.
-const distFoldername = path.join(__dirname, "../dist");
-const presetsFoldername = path.join(__dirname, "../dist/presets");
+//
+// `--dir <folder>` runs the same steps on another output folder;
+// scripts/check-prefix.js uses it to build outside dist/.
+const dirIndex = process.argv.indexOf("--dir");
+const dirArg = dirIndex === -1 ? undefined : process.argv[dirIndex + 1];
+if (dirIndex !== -1 && !dirArg) {
+	console.error("--dir needs a folder.");
+	process.exit(1);
+}
+const distFoldername = dirArg
+	? path.resolve(dirArg)
+	: path.join(__dirname, "../dist");
+const presetsFoldername = path.join(distFoldername, "presets");
 const lightningcssBinary = path.join(
 	__dirname,
 	"../node_modules/.bin",
@@ -65,12 +77,26 @@ const assertNativeLightDark = (filename) => {
 const transformFolder = (foldername) => {
 	getCssFiles(foldername).forEach((filename) => {
 		const source = path.join(foldername, filename);
+		const guarded = `${source}.guarded.tmp`;
 		const temp = `${source}.tmp`;
 
-		// Write to a temporary file first so the input is never overwritten mid-process.
-		runLightningCss(["--browserslist", source, "-o", temp]);
-		fs.renameSync(temp, source);
-		assertNativeLightDark(source);
+		// Component ownership is explicit in the compiled Sass. Parse each owned
+		// selector and append the zero-specificity `.no-cirth` subject guard before
+		// Lightning CSS sees it; layout, theme, utility and print rules stay global.
+		const input = fs.readFileSync(source, "utf8");
+		const transformed = transformCss(input, source);
+		fs.writeFileSync(guarded, transformed.css);
+
+		try {
+			// Write to a temporary file first so the input is never overwritten
+			// mid-process.
+			runLightningCss(["--browserslist", guarded, "-o", temp]);
+			fs.renameSync(temp, source);
+			assertNativeLightDark(source);
+		} finally {
+			fs.rmSync(guarded, { force: true });
+			fs.rmSync(temp, { force: true });
+		}
 	});
 };
 
@@ -109,6 +135,8 @@ if (mode === "--transform") {
 		minifyFolder(presetsFoldername);
 	}
 } else {
-	console.error("Usage: node scripts/process-css --transform|--minify");
+	console.error(
+		"Usage: node scripts/process-css --transform|--minify [--dir <folder>]",
+	);
 	process.exit(1);
 }

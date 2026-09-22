@@ -92,3 +92,46 @@ distinct name.
 
 This site applies it to every table in its own documentation, from
 `docs/eleventy.config.js`.
+
+## Form controls in cells
+
+Inputs, selects and buttons already work inside cells, but a cell's padding
+around a full-size bordered control reads as a box inside a box. Add
+`.controls` to the table and a cell that holds a control directly hands
+most of its padding to it, so a row of fields reads as one surface:
+
+{% demo "table-controls" %}
+
+```html
+<table class="controls">
+  <thead>
+    <tr>
+      <th scope="col" id="stock-item">Item</th>
+      <th scope="col" id="stock-qty">Quantity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row" id="stock-apples">Apples</th>
+      <td><input type="number" value="12" aria-labelledby="stock-qty stock-apples"></td>
+    </tr>
+  </tbody>
+</table>
+```
+
+* Only the cell changes. The controls keep their borders, their hover,
+  focus, readonly, disabled and validity states, and their 44px target, as
+  they would anywhere else in a form. The border is what identifies a field
+  as a field, so it is not removed.
+* **Name every control.** Row and column headers do not label the controls
+  beneath them. `aria-labelledby` pointing at the column header and the row
+  header gives each field a name such as "Quantity Apples". For a repeated
+  button, keep its visible label and point `aria-describedby` at the row
+  header.
+* For a table wider than the screen, wrap it in
+  [`.overflow-auto`](/layout/overflow-auto) with `tabindex="0"`, a
+  `role="region"` and a name, as the example does, so the scroll area can be
+  reached and named from the keyboard.
+* This is not a data grid: there is no cell-by-cell arrow-key navigation,
+  selection or editing state.
+* `.controls` is only available in the default build with classes enabled.

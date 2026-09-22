@@ -19,15 +19,24 @@ const path = require("node:path");
 
 const projectRoot = path.join(__dirname, "..");
 const manifest = require("../package.json");
+const { layerName } = require("./lib/dist-manifest");
+
+// Every CSS entry point opens with Cirth's cascade layer (gh#124): the whole
+// stylesheet is one `@layer cirth { … }` block, so a consumer's unlayered CSS
+// beats it. check-dist.js holds the full shape to that in dist/; this proves
+// it is still true of what npm delivered. JSON token entry points opt out.
+const layerOpening = new RegExp(
+	`^(?:@charset "[^"]*";\\s*)?@layer ${layerName}\\s*\\{`,
+);
 
 /**
  * Every documented entry point, with something only the right file could
  * contain. The sentinels are deliberately about the *promise the subpath
- * makes* — a print sheet is print-only, a classless build has no classes,
- * a scoped build lives under the wrapper — so a mapping that pointed a
+ * makes* — a print sheet is print-only, a classless build has no component
+ * or utility classes, a scoped build lives under the wrapper — so a mapping that pointed a
  * subpath at the wrong build would be caught, which byte-size alone cannot.
  *
- * @type {{ subpath: string, must: string[], mustNot: string[] }[]}
+ * @type {{ subpath: string, must: string[], mustNot: string[], layered?: boolean }[]}
  */
 const entryPoints = [
 	{ subpath: ".", must: ["--cirth-", ".container"], mustNot: ["@media print"] },
@@ -60,6 +69,19 @@ const entryPoints = [
 	},
 	{ subpath: "./presets/plain", must: ["--cirth-"], mustNot: [] },
 	{ subpath: "./presets/playroom", must: ["--cirth-"], mustNot: [] },
+	// The DTCG token export, one file per scheme (gh#93).
+	{
+		subpath: "./tokens/light",
+		must: ['"scheme": "light"', '"$type": "color"'],
+		mustNot: ['"scheme": "dark"'],
+		layered: false,
+	},
+	{
+		subpath: "./tokens/dark",
+		must: ['"scheme": "dark"', '"$type": "color"'],
+		mustNot: ['"scheme": "light"'],
+		layered: false,
+	},
 	// The two `*` patterns, reached by a path only they can serve: the
 	// expanded builds, which no explicit subpath names.
 	{ subpath: "./presets/plain.css", must: ["--cirth-"], mustNot: [] },
@@ -160,7 +182,7 @@ const main = () => {
 		// 3 — resolve as the consumer, through `exports`.
 		const resolve = createRequire(path.join(consumer, "index.cjs")).resolve;
 
-		for (const { subpath, must, mustNot } of entryPoints) {
+		for (const { subpath, must, mustNot, layered = true } of entryPoints) {
 			const specifier = `${manifest.name}${subpath.replace(/^\./, "")}`;
 			/** @type {string} */
 			let resolved;
@@ -195,6 +217,14 @@ const main = () => {
 							`promises.`,
 					);
 				}
+			}
+
+			if (layered && !layerOpening.test(contents)) {
+				fail(
+					`\`${specifier}\` delivered a stylesheet that does not open ` +
+						`with \`@layer ${layerName}\` — its rules would compete with ` +
+						`the consumer's on specificity.`,
+				);
 			}
 
 			for (const needle of mustNot) {
@@ -254,7 +284,8 @@ const main = () => {
 	console.log(
 		`✓ smoke-consumer: installed from the tarball into a clean project; ` +
 			`${entryPoints.length} entry points resolve and deliver the build ` +
-			`they promise; ${sealed.length} internal paths stay sealed.`,
+			`they promise, with CSS in @layer ${layerName}; ${sealed.length} internal ` +
+			`paths stay sealed.`,
 	);
 };
 

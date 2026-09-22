@@ -1,0 +1,97 @@
+@use "../config" as *;
+@use "../helpers/metrics";
+
+/**
+   * Segmented radio group (fieldset.segmented, classes build only)
+   */
+
+// A compact single choice drawn as joined segments, that stays a real radio
+// group (gh#107). The inputs are not hidden: the upstream pattern this
+// answers (pico discussion #567) set them to display: none, which removes
+// the control from the keyboard, the accessibility tree and form
+// submission, and leaves the selection conveyed by colour alone. Here each
+// radio keeps its native keyboard behaviour, its name in the form data and
+// its dot, which is the non-colour signal for the selection and the one
+// forced-colors mode keeps when it strips the segment's fill.
+
+// Markup: a fieldset with a legend, one label wrapping one radio each.
+
+// Opt-in by class only. The classless build has no class to require, and
+// reading a role or a bare fieldset as the trigger would restyle semantic
+// groups that did not ask for it — the same hijack gh#19 removed from
+// [role="group"].
+
+/* cirth-component:start */
+
+@if $enable-classes {
+  #{$parent-selector} fieldset.segmented {
+    display: flex;
+    flex-wrap: wrap;
+    width: fit-content;
+    max-width: 100%;
+
+    // Legend stays on its own line above the segments; the fieldset's
+    // rendered legend is not a flex item, so nothing else is needed.
+
+    > label {
+      display: inline-flex;
+      position: relative;
+      align-items: center;
+      width: auto;
+      min-block-size: metrics.$control-block-size;
+      margin: 0;
+      padding: var(--cirth-form-element-spacing-vertical)
+        var(--cirth-form-element-spacing-horizontal);
+      border: var(--cirth-border-width)
+        solid
+        var(--cirth-form-element-border-color);
+      font-weight: var(--cirth-font-weight);
+
+      & + label {
+        margin-inline-start: calc(var(--cirth-border-width) * -1);
+      }
+
+      &:first-of-type {
+        border-start-start-radius: var(--cirth-border-radius);
+        border-end-start-radius: var(--cirth-border-radius);
+      }
+
+      &:last-of-type {
+        border-start-end-radius: var(--cirth-border-radius);
+        border-end-end-radius: var(--cirth-border-radius);
+      }
+
+      // Filled with the same pair a primary button uses for its label, so
+      // the contrast is the one the theme already verifies.
+      &:has(:checked) {
+        z-index: 1;
+        border-color: var(--cirth-primary-border);
+        background-color: var(--cirth-primary-surface);
+        color: var(--cirth-primary-on-surface);
+      }
+
+      // The radio's own ring would sit on the accent fill of the selected
+      // segment, which is where focus lands. An outline around the whole
+      // segment stays on the page surface, and forced-colors mode repaints
+      // it with a system colour.
+      &:has(:focus-visible) {
+        z-index: 2;
+        outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
+        outline-offset: var(--cirth-outline-width);
+      }
+
+      // Faded once, on the segment: the radio's own disabled opacity
+      // would otherwise compound with it.
+      &:has(:disabled) {
+        opacity: var(--cirth-form-element-disabled-opacity);
+        cursor: not-allowed;
+
+        :disabled {
+          opacity: 1;
+        }
+      }
+    }
+  }
+}
+
+/* cirth-component:end */

@@ -1,5 +1,7 @@
 @use "../config" as *;
 
+/* cirth-component:start */
+
 /**
    * Meter (<meter>)
    */
@@ -83,3 +85,5 @@
     background: var(--cirth-meter-even-less-good-color);
   }
 }
+
+/* cirth-component:end */

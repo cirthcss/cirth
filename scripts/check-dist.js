@@ -4,6 +4,11 @@ const path = require("node:path");
 const postcss = require("postcss");
 const selectorParser = require("postcss-selector-parser");
 const {
+	EXCLUSION_CLASS,
+	auditFinalCss,
+} = require("./lib/component-exclusion");
+const {
+	layerName,
 	presetBuilds,
 	rootBuilds,
 	scopeClass,
@@ -20,10 +25,11 @@ const lightningcss = path.join(
 
 // Mechanical invariants of the published dist/ surface, run right after
 // the build. Each entry names the contract the build variant promises:
-// - classless builds must not emit class selectors (the wrapper class is
-//   the single exception in the scoped variant);
+// - classless builds must not emit component or utility classes
+//   (`.no-cirth` is the public boundary; `.cirth` is the scoped wrapper);
 // - scoped builds must not emit any rule outside the `.cirth` subtree;
-// - presets must only override custom properties on theme roots.
+// - presets must only override custom properties on theme roots;
+// - every file puts all of its rules in the one `cirth` cascade layer.
 //
 // Which files exist at all is scripts/lib/dist-manifest.js: the same list
 // the npm tarball is checked against, so "the build produced it" and "the
@@ -73,6 +79,71 @@ for (const file of allFiles) {
 	} else if (result.stdout.trim().length === 0) {
 		fail(file, "re-parses to an empty stylesheet.");
 	}
+}
+
+// --- Cascade layer (gh#124) -----------------------------------------
+
+// Every file, screen build, print sheet and preset alike, is one top-level
+// `@layer cirth { … }` block and nothing else (an @charset aside). That is
+// the whole consumer contract: a rule outside a layer beats everything in
+// here, so a single rule left outside the block would quietly compete on
+// specificity again. No other layer name and no nested layer either — a
+// sub-layer would reorder Cirth's own rules (specs/cascade-layer.md). And no
+// `!important`: inside a layer an important declaration outranks every
+// unlayered important one, so it would invert against the consumer instead
+// of merely being loud. Stylelint refuses it in src/; this checks the output.
+// Both the expanded and the minified file are parsed, because the minifier
+// is the last thing to touch what ships.
+for (const file of allFiles) {
+	const filePath = path.join(distDir, file);
+	if (!fs.existsSync(filePath)) {
+		continue; // already reported above
+	}
+	const root = postcss.parse(fs.readFileSync(filePath, "utf8"), { from: file });
+
+	/** @type {import("postcss").AtRule[]} */
+	const blocks = [];
+	for (const node of root.nodes) {
+		if (node.type === "comment") {
+			continue;
+		}
+		if (node.type === "atrule" && node.name === "charset") {
+			continue;
+		}
+		if (
+			node.type === "atrule" &&
+			node.name === "layer" &&
+			node.params === layerName &&
+			node.nodes
+		) {
+			blocks.push(node);
+			continue;
+		}
+		const label =
+			node.type === "atrule"
+				? `@${node.name} ${node.params}`
+				: node.toString().split("{")[0].trim();
+		fail(file, `\`${label}\` is outside \`@layer ${layerName}\`.`);
+	}
+	if (blocks.length !== 1) {
+		fail(
+			file,
+			`expected one top-level \`@layer ${layerName}\` block, ` +
+				`found ${blocks.length}.`,
+		);
+	}
+
+	root.walkAtRules("layer", (atRule) => {
+		if (atRule.parent?.type !== "root") {
+			fail(file, `nested \`@layer ${atRule.params}\` — Cirth has no sub-layers.`);
+		}
+	});
+
+	root.walkDecls((decl) => {
+		if (decl.important) {
+			fail(file, `\`${decl.prop}\` is \`!important\`.`);
+		}
+	});
 }
 
 // --- Selector/declaration invariants ---------------------------------
@@ -192,11 +263,23 @@ for (const { name, classless, scoped } of rootBuilds) {
 		continue; // already reported above
 	}
 	const root = parseDist(file);
+	const guardedBranches = auditFinalCss(
+		fs.readFileSync(path.join(distDir, file), "utf8"),
+		file,
+	);
+	if (name.includes("print")) {
+		if (guardedBranches !== 0) {
+			fail(file, "print build contains component exclusion guards");
+		}
+	} else if (guardedBranches === 0) {
+		fail(file, "screen build contains no component exclusion guards");
+	}
 
 	if (classless) {
 		walkStyleRules(root, (rule) => {
 			const offending = listClasses(rule.selector).filter(
-				(value) => !(scoped && value === scopeClass),
+				(value) =>
+					value !== EXCLUSION_CLASS && !(scoped && value === scopeClass),
 			);
 			if (offending.length > 0) {
 				fail(
@@ -252,6 +335,10 @@ for (const { name } of presets) {
 	const root = parseDist(file);
 
 	root.walkAtRules((atRule) => {
+		// The layer block itself is held to its shape above.
+		if (atRule.name === "layer" && atRule.parent?.type === "root") {
+			return;
+		}
 		if (atRule.name !== "media") {
 			fail(file, `preset contains @${atRule.name} — only @media is allowed.`);
 		}
@@ -292,6 +379,7 @@ if (failures.length > 0) {
 
 console.log(
 	`✓ check-dist: ${allFiles.length} files parse and are non-empty; ` +
-		`classless builds are class-free, scoped builds stay inside ` +
-		`.${scopeClass}, presets only touch custom properties.`,
+		`every rule is in @layer ${layerName}, with no !important; ` +
+		`classless builds only expose .${EXCLUSION_CLASS}, scoped builds stay ` +
+		`inside .${scopeClass}, presets only touch custom properties.`,
 );
