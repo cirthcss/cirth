@@ -25,6 +25,14 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   and its default prefix are unchanged, and the `.cirth` scoping class is
   not affected.
 
+- **The token surface as W3C Design Tokens** (gh#93). The package now ships
+  `@cirthcss/cirth/tokens/light` and `@cirthcss/cirth/tokens/dark`, one
+  DTCG JSON file per colour scheme, for design tools and non-CSS platforms.
+  References between tokens are exported as aliases; derived colours are
+  exported as their resolved values, with the CSS relationship kept
+  alongside; values no DTCG type can hold are listed rather than dropped.
+  The stylesheets are unchanged.
+
 ### Fixed
 
 - **Dropdowns and popovers draw their shadow again.** `--cirth-box-shadow`
@@ -36,8 +44,8 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 - **A visually hidden element inside `.overflow-auto` no longer widens the
   page.** `.overflow-auto` is now `position: relative`, so absolutely
   positioned content such as a `.sr-only` table header is clipped by the
-   scroll area instead of escaping it: a wide table with one such header
-   had pushed a 320px page more than 1,000px wider.
+  scroll area instead of escaping it: a wide table with one such header
+  had pushed a 320px page more than 1,000px wider.
 
 ## [0.15.0] - 2026-09-18
 

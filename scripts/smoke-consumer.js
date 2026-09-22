@@ -60,6 +60,17 @@ const entryPoints = [
 	},
 	{ subpath: "./presets/plain", must: ["--cirth-"], mustNot: [] },
 	{ subpath: "./presets/playroom", must: ["--cirth-"], mustNot: [] },
+	// The DTCG token export, one file per scheme (gh#93).
+	{
+		subpath: "./tokens/light",
+		must: ['"scheme": "light"', '"$type": "color"'],
+		mustNot: ['"scheme": "dark"'],
+	},
+	{
+		subpath: "./tokens/dark",
+		must: ['"scheme": "dark"', '"$type": "color"'],
+		mustNot: ['"scheme": "light"'],
+	},
 	// The two `*` patterns, reached by a path only they can serve: the
 	// expanded builds, which no explicit subpath names.
 	{ subpath: "./presets/plain.css", must: ["--cirth-"], mustNot: [] },

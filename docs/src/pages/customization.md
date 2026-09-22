@@ -625,6 +625,40 @@ they change which selectors exist at all:
 If you need different values for these you are choosing a different
 published build, not overriding a variable. See [Get Started](/get-started).
 
+## Tokens outside CSS
+
+The package also ships the default theme's tokens as
+[W3C Design Tokens](https://www.designtokens.org/tr/2025.10/format/) (DTCG 2025.10)
+JSON, for design tools and other platforms that cannot read a stylesheet:
+
+```js
+import light from "@cirthcss/cirth/tokens/light" with { type: "json" };
+import dark from "@cirthcss/cirth/tokens/dark" with { type: "json" };
+```
+
+Each file is one colour scheme and complete on its own, so a tool that
+treats files as modes can load one per mode. Token names drop the
+`--cirth-` prefix: `--cirth-primary-surface` is `primary-surface`.
+
+The files are generated from the compiled stylesheet on every build, and
+they follow the kinds described above:
+
+* A token that is another token (`var(--cirth-primary)`) is exported as an
+  alias, `{primary}`, so the relationship survives.
+* A derived colour — a `color-mix()` or a relative colour — is exported as
+  the value it resolves to in that scheme. DTCG cannot express the
+  relationship, so the CSS it came from is kept under
+  `$extensions["com.github.cirthcss"].css`. A tool that reads the value
+  gets the right colour today, but it does not follow a new accent the
+  way the stylesheet does.
+* A value no DTCG type can hold — a `calc()`, an `em` length, an icon
+  `url()` — is not exported as a token. It is listed, with its CSS and the
+  reason, under `$extensions["com.github.cirthcss"].unrepresented` in the
+  same file.
+
+The export describes the default theme only: not the presets, and not the
+`prefers-contrast: more` adjustments.
+
 ## Token reference
 
 Every `--cirth-*` token Cirth declares, grouped by what it affects. The
