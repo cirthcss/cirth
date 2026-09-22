@@ -41,6 +41,13 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   mode. Focus outlines the whole segment, and each segment keeps the 44px
   target floor. The classless builds are unchanged.
 
+- **`table.controls`, for form controls placed directly in cells** (gh#108),
+  in class-based builds. A cell that holds an input, select, textarea or
+  button gives most of its padding to the control and the control drops its
+  stacking margin, so a row of fields no longer reads as a box inside a box.
+  The controls keep their borders, states, focus ring and 44px target. The
+  classless builds are unchanged.
+
 ### Fixed
 
 - **Dropdowns and popovers draw their shadow again.** `--cirth-box-shadow`

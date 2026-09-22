@@ -39,6 +39,7 @@ module.exports = defineConfig({
 		"print.spec.js",
 		"segmented.spec.js",
 		"surface-derivation.spec.js",
+		"table-controls.spec.js",
 		"token-override.spec.js",
 	],
 	fullyParallel: true,
