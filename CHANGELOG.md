@@ -17,6 +17,14 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   continue to apply, and an outside `:has()` or sibling subject can still
   react across the boundary.
 
+- **A build-time custom property prefix** (gh#126). Building from source
+  with `npm run build -- --prefix "--acme-"` produces the same stylesheets,
+  scoped builds and presets under `--acme-` instead of `--cirth-`, for
+  embedding Cirth beside a design system that already owns the namespace.
+  The prefix must start with `--` and end with `-`. The published package
+  and its default prefix are unchanged, and the `.cirth` scoping class is
+  not affected.
+
 ## [0.15.0] - 2026-09-18
 
 ### Changed
