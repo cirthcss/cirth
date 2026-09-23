@@ -25,11 +25,11 @@ both. Each build has its matching sheet — `cirth.print.min.css`,
 
 ### Why it is a separate file
 
-Print styling is around 630 B gzipped, and it is never needed to paint the
-screen. Kept inside the main bundle it was charged to every visitor on the
-first round trip, including the ones who never print. As a separate sheet
-whose media query does not match the display, the browser fetches it at low
-priority and it never competes with the first paint.
+Print styling is around 0.8 KB with Brotli, and it is never needed to paint
+the screen. Kept inside the main bundle it was charged to every visitor on
+the first round trip, including the ones who never print. As a separate
+sheet whose media query does not match the display, the browser fetches it
+at low priority and it never competes with the first paint.
 
 The trade is that it is now opt-in: **a page that links only the main build
 prints with no pass at all.** If you upgraded from a version before this

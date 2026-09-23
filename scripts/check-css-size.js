@@ -1,17 +1,19 @@
 const fs = require("node:fs");
 const path = require("node:path");
-const zlib = require("node:zlib");
+
+const { BROTLI_QUALITY, brotliSize } = require("./lib/compressed-size");
+const { minifiedCssFiles } = require("./lib/dist-manifest");
 
 const projectRoot = path.join(__dirname, "..");
 const distDir = path.join(projectRoot, "dist");
 
-// Gzipped ceiling, per bundle.
+// Brotli-compressed ceiling, per bundle.
 //
 // This used to be one number — 14 * 1024 — applied to every file in dist/.
 // It was doing two jobs badly.
 //
 // As a *guard* it only ever watched one bundle. The print sheets are around
-// 880 B, so a shared 14 KB ceiling let them grow to sixteen times their size
+// 0.8 KB, so a shared 14 KB ceiling let them grow to many times their size
 // without a word; the classless builds had two kilobytes of silent room.
 // Only the scoped build was ever close enough to the line for the line to
 // mean anything, and by the end it was 305 B away — which is not headroom,
@@ -29,18 +31,20 @@ const distDir = path.join(projectRoot, "dist");
 // bundle actually measures. Every file is now genuinely watched, including
 // the ones that were not. Crossing a line here means "look at this", not
 // "revert this": raise the number in the same change that needs it, and say
-// why in the commit. The figures below are gzip level 9, which is what the
-// numbers in CHANGELOG.md and the documentation are quoted at.
+// why in the commit. The figures below use Brotli quality 11, shared with the
+// documentation through scripts/lib/compressed-size.js.
 /** @type {Record<string, number>} */
 const budgets = {
-	"cirth.classless.min.css": 13_300,
-	"cirth.classless.scoped.min.css": 13_400,
-	"cirth.min.css": 15_200,
-	"cirth.print.classless.min.css": 1_024,
-	"cirth.print.classless.scoped.min.css": 1_024,
-	"cirth.print.min.css": 1_024,
-	"cirth.print.scoped.min.css": 1_024,
-	"cirth.scoped.min.css": 15_400,
+	"cirth.classless.min.css": 11_500,
+	"cirth.classless.scoped.min.css": 11_600,
+	"cirth.min.css": 13_100,
+	"cirth.print.classless.min.css": 900,
+	"cirth.print.classless.scoped.min.css": 900,
+	"cirth.print.min.css": 900,
+	"cirth.print.scoped.min.css": 900,
+	"cirth.scoped.min.css": 13_200,
+	"presets/plain.min.css": 400,
+	"presets/playroom.min.css": 700,
 };
 
 const warnOnly = process.argv.includes("--warn-only");
@@ -50,13 +54,10 @@ if (!fs.existsSync(distDir)) {
 	process.exit(1);
 }
 
-const bundles = fs
-	.readdirSync(distDir)
-	.filter((name) => name.endsWith(".min.css"))
-	.sort();
+const bundles = minifiedCssFiles().map((file) => file.replace(/^dist\//, ""));
 
 if (bundles.length === 0) {
-	console.error("check-css-size: no dist/*.min.css bundles found.");
+	console.error("check-css-size: no expected minified CSS bundles found.");
 	process.exit(1);
 }
 
@@ -76,25 +77,37 @@ if (unbudgeted.length > 0) {
 
 for (const name of bundles) {
 	const source = fs.readFileSync(path.join(distDir, name));
-	const gzippedBytes = zlib.gzipSync(source, { level: 9 }).length;
+	const compressedBytes = brotliSize(source);
+	const sidecarPath = path.join(distDir, `${name}.br`);
+	const sidecarBytes = fs.existsSync(sidecarPath)
+		? fs.statSync(sidecarPath).size
+		: null;
 	const budget = budgets[name];
-	const overBudget = gzippedBytes >= budget;
-	const headroom = budget - gzippedBytes;
+	const overBudget = compressedBytes >= budget;
+	const sidecarMismatch = sidecarBytes !== compressedBytes;
+	const headroom = budget - compressedBytes;
 
-	const mark = overBudget ? (warnOnly ? "⚠" : "✗") : "✓";
+	const mark = overBudget || sidecarMismatch ? (warnOnly ? "⚠" : "✗") : "✓";
 	console.log(
-		`${mark} dist/${name} — ${gzippedBytes} B gzipped` +
+		`${mark} dist/${name} — ${compressedBytes} B Brotli q${BROTLI_QUALITY}` +
 			` (budget ${budget} B, ${headroom} B left)`,
 	);
+	if (sidecarMismatch) {
+		console.error(
+			`  dist/${name}.br is ${sidecarBytes === null ? "missing" : `${sidecarBytes} B`}; ` +
+				`expected ${compressedBytes} B from the same encoder.`,
+		);
+	}
 
-	if (overBudget) {
+	if (overBudget || sidecarMismatch) {
 		failed = true;
 	}
 }
 
 if (failed) {
 	const message =
-		"\ncheck-css-size: a bundle exceeds its gzipped size budget. This is a " +
+		"\ncheck-css-size: a bundle exceeds its Brotli-compressed size budget, " +
+		"or its sidecar does not match the measured representation. This is a " +
 		"regression guard, not a ceiling to design against: if the growth is " +
 		"deliberate, raise that bundle's number in scripts/check-css-size.js " +
 		"in the same change and say why in the commit.";

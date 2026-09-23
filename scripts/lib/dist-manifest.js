@@ -45,23 +45,41 @@ const presetBuilds = () =>
 const tokenSchemes = ["light", "dark"];
 
 /**
- * Every file a complete build writes into dist/, expanded and minified,
- * plus the token export, as tarball-relative paths.
+ * Every expanded and minified CSS file a complete build writes into dist/.
+ *
+ * @returns {string[]}
+ */
+const cssFiles = () =>
+	[...rootBuilds, ...presetBuilds()]
+		.flatMap(({ name }) => [`dist/${name}.css`, `dist/${name}.min.css`])
+		.sort();
+
+/** @returns {string[]} */
+const minifiedCssFiles = () =>
+	cssFiles().filter((file) => file.endsWith(".min.css"));
+
+/** @returns {string[]} */
+const brotliFiles = () => minifiedCssFiles().map((file) => `${file}.br`);
+
+/**
+ * Every file a complete build writes into dist/: CSS, precompressed minified
+ * CSS sidecars and token exports, as tarball-relative paths.
  *
  * @returns {string[]}
  */
 const distFiles = () =>
 	[
-		...[...rootBuilds, ...presetBuilds()].flatMap(({ name }) => [
-			`dist/${name}.css`,
-			`dist/${name}.min.css`,
-		]),
+		...cssFiles(),
+		...brotliFiles(),
 		...tokenSchemes.map((scheme) => `dist/tokens/${scheme}.tokens.json`),
 	].sort();
 
 module.exports = {
+	brotliFiles,
+	cssFiles,
 	distFiles,
 	layerName,
+	minifiedCssFiles,
 	presetBuilds,
 	rootBuilds,
 	scopeClass,
