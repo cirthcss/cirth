@@ -44,13 +44,13 @@ faq:
         produced, not a Sass API you are expected to compile.
     - q: How big is the default stylesheet?
       a: >-
-        <!--size--> gzipped in the build this site was made from. That is a
+        <!--size--> with Brotli in the build this site was made from. That is a
         measurement, not a promise:
         <a href="https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js">a
-        script</a> gzips every bundle on every build and fails past the
-        current budget, so the number stays honest — and it is free to move
-        when covering more HTML, or a better accessibility default, is
-        worth the bytes.
+        script</a> compresses every bundle with Brotli on every build and fails
+        past the current budget, so the number stays honest — and it is free
+        to move when covering more HTML, or a better accessibility default,
+        is worth the bytes.
     - q: Which browsers are supported?
       a: >-
         <!--browsers-->. That is the Browserslist target in

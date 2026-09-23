@@ -69,7 +69,8 @@ const UNCONSTRAINED = [];
 // Chrome for Android, already covered, and it accounts for 0.03% of
 // usage — while including it makes Lightning CSS stop trusting grouped
 // selectors and expand every `A, B { }` in the library into separate
-// rules, 743 B gzipped and over the size budget.
+// rules, 743 B under the former gzip measurement and over its then-current
+// size budget.
 // Opera Mobile was in the target until 2026-08-25, deliberately exempt
 // from the floor. It is forbidden now, and the reason is not usage: it is
 // that caniuse-lite pins the family to a single stale bucket, op_mob 80,
