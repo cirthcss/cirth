@@ -37,10 +37,13 @@ cache by `Accept-Encoding`, and keep the original CSS as the fallback.
 
 | Claim | Evidence | Where | Verdict |
 | --- | --- | --- | --- |
-| The baseline has 10 minified CSS entry points and no precompressed sidecars | Recursive `dist/` inventory after the existing build: 8 root/print files and 2 presets ending in `.min.css`; 0 files ending in `.br` | `dist/` from `92a32d7c`, Node 26.2.0, 2026-09-23 | Verified |
-| Brotli quality 11 produces smaller representations for all 10 minified sheets | `node:zlib.brotliCompressSync`: default 141,101 → 12,902 B; scoped 146,246 → 13,022 B; presets 678 → 244 B and 1,814 → 480 B; remaining six also decreased | `dist/**/*.min.css` from `92a32d7c`, Node 26.2.0, 2026-09-23 | Verified |
+| The baseline has 10 minified CSS entry points and no precompressed sidecars | Recursive `dist/` inventory after the existing build: 8 root/print files and 2 presets ending in `.min.css`; 0 files ending in `.br` | `dist/` from `92a32d7c`, Node 26.9.0, 2026-09-23 | Verified |
+| Brotli quality 11 produces smaller representations for all 10 minified sheets | `node:zlib.brotliCompressSync`: default 141,101 → 12,902 B; scoped 146,246 → 13,022 B; presets 678 → 244 B and 1,814 → 480 B; remaining six also decreased | `dist/**/*.min.css` from `92a32d7c`, Node 26.9.0, 2026-09-23 | Verified |
 | The configured browser floor can negotiate Brotli HTTP content coding | Chromium documentation describes `Accept-Encoding`/`Content-Encoding: br`; RFC 7932 defines Brotli content encoding; WebKit reports Brotli enabled across Safari platforms | Upstream documentation, not reproduced on Chrome 123 / Firefox 130 / Safari 18.2 for this spec | Reported |
-| Every shipped sidecar decompresses to its adjacent CSS file | Pending implementation and `npm run check:dist` | Not yet reproduced | Reported |
+| A clean build emits the complete sidecar set at the measured sizes | `npm run build`: 10 sidecars written at quality 11; all 10 budget checks passed, from 244 B to 13,022 B | `e9730d1f`, Node 26.9.0, 2026-09-23 | Verified |
+| Every built sidecar decompresses to its adjacent CSS and uses the canonical quality-11 representation | `npm run check:dist`: 20 CSS files parsed and 10 sidecars reproduced their sources byte for byte | `e9730d1f`, Node 26.9.0, 2026-09-23 | Verified |
+| The sidecars survive the package boundary | `npm run check:package`: 36 packed files, 32 declared build outputs; `npm run check:consumer`: all 10 installed sidecars resolved and reproduced their CSS | `e9730d1f`, npm 11.6.0 / Node 26.9.0, 2026-09-23 | Verified |
+| The hosting limitations are documented without breaking the About layout | 12 targeted visual comparisons passed across Chromium, Firefox and WebKit after the Darwin baselines were refreshed | `e9730d1f`, Playwright 1.61.1 on macOS, 2026-09-23 | Verified |
 
 ## Decisions
 
@@ -55,17 +58,17 @@ cache by `Accept-Encoding`, and keep the original CSS as the fallback.
 
 ## Acceptance
 
-- [ ] A clean `npm run build` creates exactly 10 `.br` sidecars, one per
+- [x] A clean `npm run build` creates exactly 10 `.br` sidecars, one per
       `dist/**/*.min.css`, using the shared quality-11 encoder.
-- [ ] `npm run check:dist` rejects a missing, stale or non-Brotli sidecar.
-- [ ] `npm run check:size` covers all 10 minified stylesheets and agrees with
+- [x] `npm run check:dist` rejects a missing, stale or non-Brotli sidecar.
+- [x] `npm run check:size` covers all 10 minified stylesheets and agrees with
       the corresponding sidecar byte counts.
-- [ ] `npm run check:package` proves the sidecars are present in the npm
+- [x] `npm run check:package` proves the sidecars are present in the npm
       tarball and no undeclared output is added.
-- [ ] `npm run check:consumer` installs the tarball and verifies every
+- [x] `npm run check:consumer` installs the tarball and verifies every
       delivered sidecar against its CSS source.
-- [ ] `CHANGELOG.md` and `docs/src/pages/about.md` explain both the shipped
-      artifacts and the hosting requirements.
+- [x] `CHANGELOG.md`, `README.md` and `docs/src/pages/about.md` explain both
+      the shipped artifacts and the hosting requirements.
 
 ## Open questions
 
