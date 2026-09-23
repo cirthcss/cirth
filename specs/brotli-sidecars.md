@@ -43,7 +43,7 @@ cache by `Accept-Encoding`, and keep the original CSS as the fallback.
 | A clean build emits the complete sidecar set at the measured sizes | `npm run build`: 10 sidecars written at quality 11; all 10 budget checks passed, from 244 B to 13,022 B | `e9730d1f`, Node 26.9.0, 2026-09-23 | Verified |
 | Every built sidecar decompresses to its adjacent CSS and uses the canonical quality-11 representation | `npm run check:dist`: 20 CSS files parsed and 10 sidecars reproduced their sources byte for byte | `e9730d1f`, Node 26.9.0, 2026-09-23 | Verified |
 | The sidecars survive the package boundary | `npm run check:package`: 36 packed files, 32 declared build outputs; `npm run check:consumer`: all 10 installed sidecars resolved and reproduced their CSS | `e9730d1f`, npm 11.6.0 / Node 26.9.0, 2026-09-23 | Verified |
-| The hosting limitations are documented without breaking the About layout | 12 targeted visual comparisons passed across Chromium, Firefox and WebKit after the Darwin baselines were refreshed | `e9730d1f`, Playwright 1.61.1 on macOS, 2026-09-23 | Verified |
+| The hosting limitations are documented without breaking the About layout | 12 targeted visual comparisons passed across Chromium, Firefox and WebKit after the Darwin baselines were refreshed; Linux workflow `35910788443` regenerated the matching 12 and passed | `e9730d1f` locally and `c8175970` on GitHub Actions, Playwright 1.61.1, 2026-09-23 | Verified |
 
 ## Decisions
 
