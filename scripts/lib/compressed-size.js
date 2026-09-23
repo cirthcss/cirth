@@ -7,13 +7,19 @@ const BROTLI_QUALITY = 11;
 
 /**
  * @param {Buffer | string} source
- * @returns {number}
+ * @returns {Buffer}
  */
-const brotliSize = (source) =>
+const brotliCompress = (source) =>
 	zlib.brotliCompressSync(source, {
 		params: {
 			[zlib.constants.BROTLI_PARAM_QUALITY]: BROTLI_QUALITY,
 		},
-	}).length;
+	});
 
-module.exports = { BROTLI_QUALITY, brotliSize };
+/**
+ * @param {Buffer | string} source
+ * @returns {number}
+ */
+const brotliSize = (source) => brotliCompress(source).length;
+
+module.exports = { BROTLI_QUALITY, brotliCompress, brotliSize };

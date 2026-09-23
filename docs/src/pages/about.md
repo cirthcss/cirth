@@ -72,14 +72,18 @@ The default stylesheet is **{{ proof.size.label }} with Brotli quality 11 in
 this build**, measured from `dist/cirth.min.css`. Every shipped bundle carries
 its own budget, checked automatically on every build by
 [`scripts/check-css-size.js`](https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js)
-— the four root builds and the four print sheets, each a few hundred bytes
-above what it currently measures.
+— the four root builds, the four print sheets and both presets, each with
+deliberate local headroom above what it currently measures.
 
-This is a model of HTTP transfer size, not another package format. npm still
-distributes its standard `.tgz` archive, and Cirth ships ordinary CSS rather
-than `.br` sidecars. A host or CDN has to negotiate Brotli over HTTPS and
-return `Content-Encoding: br`; otherwise it can serve gzip or the original
-bytes. Every engine in Cirth's current browser floor accepts that content
+The npm package is still a standard `.tgz`, but it now contains an adjacent
+`.br` sidecar for every minified stylesheet as well as the ordinary CSS. A
+self-hosting setup can select that sidecar when the request's
+`Accept-Encoding` includes `br`, while keeping the `.css` URL in markup, and
+return `Content-Encoding: br`, `Content-Type: text/css` and
+`Vary: Accept-Encoding`. Linking directly to the `.br` filename is not
+equivalent: without the response metadata a browser sees compressed bytes,
+not CSS. Hosts without that mapping can continue serving gzip or the original
+file. Every engine in Cirth's current browser floor accepts Brotli content
 encoding.
 
 ### Why small matters here

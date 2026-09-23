@@ -88,6 +88,9 @@ run("Export tokens", process.execPath, [
   path.join(__dirname, "build-tokens.js"),
   `--prefix=${prefix}`,
 ]);
+run("Compress CSS", process.execPath, [
+  path.join(__dirname, "build-brotli.js"),
+]);
 // Non-blocking: warns if a bundle grows past the Brotli budget so it still
 // fits a single TCP/HTTP round trip. `npm run check:size` (used in CI)
 // runs the same check without --warn-only and fails the build instead.
