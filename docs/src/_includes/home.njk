@@ -392,7 +392,7 @@ bodyClass: docs-home-page
 						{#- Measured off dist/cirth.min.css at build time, not written
 						    down: this cell says what today's build weighs, and the
 						    number moves when the stylesheet does. -#}
-						<small>{% if proof.size %}<strong class="docs-proof-figure">{{ proof.size.label }}</strong> gzipped in this build{% else %}Gzipped size measured{% endif %} — every bundle is measured on every build.</small>
+						<small>{% if proof.size %}<strong class="docs-proof-figure">{{ proof.size.label }}</strong> with Brotli in this build{% else %}Brotli size measured{% endif %} — every bundle is measured on every build.</small>
 						<a href="https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js">Current size</a>
 					</dd>
 				</div>

@@ -50,6 +50,15 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Changed
 
+- **Compressed-size reporting and per-bundle budgets now use Brotli quality
+  11 instead of gzip level 9.** The generated CSS is byte-for-byte unchanged;
+  this changes the transfer-size model used by the build, documentation and
+  regression guard. The default bundle measures 12,902 B with Brotli (formerly
+  15,088 B gzip) and the scoped bundle 13,022 B (formerly 15,274 B gzip). npm
+  still publishes its standard `.tgz`, and Cirth does not add `.br` sidecars:
+  Brotli delivery remains the responsibility of a host or CDN that negotiates
+  `Content-Encoding: br`.
+
 - **Every stylesheet keeps its rules in one cascade layer, `cirth`**
   (gh#124). The four builds, their print sheets and the presets each wrap
   everything they emit in `@layer cirth`. CSS outside a layer now beats

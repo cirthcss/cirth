@@ -198,11 +198,11 @@ has its matching sheet — `cirth.print.classless.min.css`,
 `cirth.print.scoped.min.css`, `cirth.print.classless.scoped.min.css` — or,
 from npm, `@cirthcss/cirth/print` and its `classless`/`scoped` variants.
 
-It moved because print styling is around 630 B gzipped that is never needed
-to paint the screen. Kept in the bundle it was charged to every visitor on
-the first round trip, including the ones who never print; as a separate
-sheet whose media query does not match the display, the browser fetches it
-at low priority.
+It moved because print styling is around 0.8 KB with Brotli that is never
+needed to paint the screen. Kept in the bundle it was charged to every visitor
+on the first round trip, including the ones who never print; as a separate
+sheet whose media query does not match the display, the browser fetches it at
+low priority.
 
 ### A `:root` override now reaches into forced-scheme subtrees
 
