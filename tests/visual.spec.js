@@ -27,6 +27,7 @@ const visualPages = [
 	"colors/index.html",
 	"contributions/index.html",
 	"customization/index.html",
+	"deploy/index.html",
 	"examples/index.html",
 	"get-started/index.html",
 	"components/accordion/index.html",
