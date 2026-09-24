@@ -16,7 +16,7 @@ already a finished, accessible baseline.
     <div><dt>Semantic baseline</dt><dd><strong>covered</strong><small>native element selectors</small></dd></div>
     <div><dt>Accessibility</dt><dd><strong>verified</strong><small>WCAG 2.2 AA floor</small></dd></div>
     <div><dt>Distributed runtime</dt><dd><strong>0 B JS</strong><small>CSS package only</small></dd></div>
-    <div><dt>Default footprint</dt><dd><strong>{{ proof.size.label }}</strong><small>Brotli q11, measured in this build</small></dd></div>
+    <div><dt>Default footprint</dt><dd><strong>{{ proof.size.label }}</strong><small>gzipped, measured in this build</small></dd></div>
     <div><dt>Build modes</dt><dd><strong>{{ proof.buildCount }}</strong><small>default / classless / scoped</small></dd></div>
     <div><dt>Runtime surface</dt><dd><strong>{{ proof.tokenCount }}</strong><small><code>--cirth-*</code> tokens</small></dd></div>
   </dl>
@@ -68,23 +68,18 @@ accident:
 
 ## Size, and what it is a budget for
 
-The default stylesheet is **{{ proof.size.label }} with Brotli quality 11 in
-this build**, measured from `dist/cirth.min.css`. Every shipped bundle carries
-its own budget, checked automatically on every build by
+The default stylesheet is **{{ proof.size.label }} gzipped in this build**,
+measured from `dist/cirth.min.css`. Every shipped bundle carries its own
+budget, checked automatically on every build by
 [`scripts/check-css-size.js`](https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js)
 — the four root builds, the four print sheets and both presets, each with
 deliberate local headroom above what it currently measures.
 
-The npm package is still a standard `.tgz`, but it now contains an adjacent
-`.br` sidecar for every minified stylesheet as well as the ordinary CSS. A
-self-hosting setup can select that sidecar when the request's
-`Accept-Encoding` includes `br`, while keeping the `.css` URL in markup, and
-return `Content-Encoding: br`, `Content-Type: text/css` and
-`Vary: Accept-Encoding`. Linking directly to the `.br` filename is not
-equivalent: without the response metadata a browser sees compressed bytes,
-not CSS. Hosts without that mapping can continue serving gzip or the original
-file. Every engine in Cirth's current browser floor accepts Brotli content
-encoding.
+The quoted figure is gzip because that is what the delivery paths documented
+here actually send. A host that precompresses the file itself and serves it
+with `Content-Encoding: br` gets the same bundle in
+{{ proof.size.brotliLabel }}, but that is a best case you arrange, not
+something installing the package provides.
 
 ### Why small matters here
 
@@ -188,8 +183,8 @@ compatibility. The most important differences for users are:
   official theme (copper), with `plain` and `playroom` published as optional
   token override presets; see [Colors](/colors).
 - A WCAG 2.2 AA baseline (contrast, focus visibility, target size) is
-  verified in the source, and every shipped stylesheet is held to a
-  Brotli-compressed size budget checked on every build.
+  verified in the source, and every shipped stylesheet is held to a gzipped
+  size budget checked on every build.
 
 ## Project and license
 

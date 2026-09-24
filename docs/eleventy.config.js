@@ -6,7 +6,7 @@ const markdownItAnchor = require("markdown-it-anchor");
 const GithubSlugger = require("github-slugger").default;
 const hljs = require("highlight.js");
 const { buildPagefindIndex } = require("../scripts/build-pagefind");
-const { brotliSize } = require("../scripts/lib/compressed-size");
+const { brotliSize, gzipSize } = require("../scripts/lib/compressed-size");
 const { listPresetNames, presetLabel } = require("../scripts/lib/presets");
 const { docsPathPrefix } = require("../scripts/lib/docs-site");
 
@@ -223,12 +223,12 @@ const runtimeTokenCount = () => {
 	return new Set(css.match(/--cirth-[a-z0-9-]+/g) ?? []).size;
 };
 
-// The Brotli-compressed size of the default build, measured here rather than
+// The gzipped size of the default build, measured here rather than
 // written down: the home page states the size as a measurement taken on
 // this build, not as a ceiling the project promises never to cross, so the
 // number has to come off the file every time the site is built.
-// `scripts/check-css-size.js` compresses the same bytes at the same quality,
-// and is what fails a build that grows past the current budget.
+// `scripts/check-css-size.js` gzips the same bytes at the same level, and
+// is what fails a build that grows past the current budget.
 //
 // dist/ is produced by `npm run build`, which runs before `docs:build`
 // everywhere it matters (CI, the deploy workflow, the release script). If
@@ -237,8 +237,14 @@ const runtimeTokenCount = () => {
 const defaultBuildSize = () => {
 	const file = path.join(docsRoot, "../dist/cirth.min.css");
 	if (!fs.existsSync(file)) return null;
-	const bytes = brotliSize(fs.readFileSync(file));
-	return { bytes, label: `${(bytes / 1024).toFixed(1)} KB` };
+	const source = fs.readFileSync(file);
+	const bytes = gzipSize(source);
+	const kb = (/** @type {number} */ value) => `${(value / 1024).toFixed(1)} KB`;
+	// `label` is the quoted figure: gzip, because that is what the delivery
+	// paths this site documents actually send. `brotliLabel` is the best case
+	// a host reaches by precompressing the file itself — reported, never
+	// promised. See scripts/lib/compressed-size.js.
+	return { bytes, label: kb(bytes), brotliLabel: kb(brotliSize(source)) };
 };
 
 // The supported browsers, read off the one place that decides them: the

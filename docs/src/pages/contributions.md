@@ -104,7 +104,7 @@ npm run build         # compile src/ to dist/
 npm run check:dist    # structural invariants of every generated dist file
 npm run check:exclusion # parsed ownership and .no-cirth subject guards
 npm run check:prefix  # a --prefix build differs from the default by the prefix alone
-npm run check:size    # per-bundle Brotli regression budgets
+npm run check:size    # per-bundle gzip regression budgets
 npm run docs:build    # build this site (input for the browser checks below)
 npm run check:behavior # interaction, reflow, user styles, and input parity across three engines
 npm run check:a11y    # axe WCAG 2.0–2.2 A/AA audit of every docs page

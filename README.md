@@ -87,14 +87,6 @@ stylesheet to change its look. Print stylesheets are available separately.
 The [Get Started guide](docs/src/pages/get-started.md) has examples and npm
 import paths for each build.
 
-Every minified stylesheet also ships with an adjacent `.br` sidecar for
-self-hosting. Keep the `.css` URL in your markup: your server or CDN must select
-the sidecar after `Accept-Encoding: br` negotiation and respond with
-`Content-Encoding: br`, `Content-Type: text/css`, and
-`Vary: Accept-Encoding`. Without that response metadata, linking directly to
-the `.br` file does not deliver usable CSS; serving the original `.css` remains
-the fallback.
-
 To keep Cirth's content, form, and component declarations off a third-party
 widget, mark its root with `.no-cirth`:
 
