@@ -3,11 +3,9 @@ const { spawnSync } = require("node:child_process");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
-const zlib = require("node:zlib");
 
 const { compileScssFolder } = require("./lib/compile-scss");
 const { version } = require("../package.json");
-const { writeBrotliSidecars } = require("./lib/brotli-sidecars");
 const { distFiles, tokenSchemes } = require("./lib/dist-manifest");
 const { DEFAULT_PREFIX, applyPrefix, readPrefixArg } = require("./lib/prefix");
 const { runSync } = require("./lib/run-sync");
@@ -18,7 +16,7 @@ const { buildTokenDocuments } = require("./lib/tokens");
 // The claim is that `npm run build -- --prefix "--acme-"` produces the
 // default artifact with the prefix swapped and nothing else. So this
 // builds every dist file twice, outside dist/, through the same compile,
-// transform, minify, token-export and compression steps build.js runs, and
+// transform, minify and token-export steps build.js runs, and
 // requires each prefixed file to equal its default counterpart with
 // `--cirth-` replaced. That
 // covers the root, classless, scoped and print builds and every preset,
@@ -132,17 +130,12 @@ const buildInto = (prefix) => {
       `${JSON.stringify(documents[scheme], null, "\t")}\n`,
     );
   }
-  writeBrotliSidecars(outputFolder);
   return outputFolder;
 };
 
 /** @param {string} folder @param {string} file */
-const readComparableText = (folder, file) => {
-  const contents = fs.readFileSync(path.join(folder, file));
-  return file.endsWith(".br")
-    ? zlib.brotliDecompressSync(contents).toString("utf8")
-    : contents.toString("utf8");
-};
+const readComparableText = (folder, file) =>
+  fs.readFileSync(path.join(folder, file), "utf8");
 
 try {
   const defaultFolder = buildInto(DEFAULT_PREFIX);
@@ -172,7 +165,7 @@ try {
   });
 
   check(
-    `${files.length} files, including scoped builds, presets, Brotli sidecars and token exports`,
+    `${files.length} files, including scoped builds, presets and token exports`,
     () => {
       assert.ok(files.some((file) => file.includes(".scoped.")));
       assert.ok(files.some((file) => file.startsWith("presets/")));

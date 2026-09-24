@@ -3,7 +3,6 @@ const fs = require("node:fs");
 const { createRequire } = require("node:module");
 const os = require("node:os");
 const path = require("node:path");
-const zlib = require("node:zlib");
 
 // Installs the real tarball into a clean project and uses it the way a
 // consumer would.
@@ -20,7 +19,7 @@ const zlib = require("node:zlib");
 
 const projectRoot = path.join(__dirname, "..");
 const manifest = require("../package.json");
-const { layerName, minifiedCssFiles } = require("./lib/dist-manifest");
+const { layerName } = require("./lib/dist-manifest");
 
 // Every CSS entry point opens with Cirth's cascade layer (gh#124): the whole
 // stylesheet is one `@layer cirth { … }` block, so a consumer's unlayered CSS
@@ -238,55 +237,7 @@ const main = () => {
 			}
 		}
 
-		// 4 — every precompressed representation survives packing and install,
-		// remains reachable through the existing ./dist/* export, and expands to
-		// exactly the CSS a consumer receives beside it.
-		for (const cssPath of minifiedCssFiles()) {
-			const cssSpecifier = `${manifest.name}/${cssPath}`;
-			const sidecarSpecifier = `${cssSpecifier}.br`;
-			/** @type {string} */
-			let resolvedCss;
-			/** @type {string} */
-			let resolvedSidecar;
-
-			try {
-				resolvedCss = resolve(cssSpecifier);
-				resolvedSidecar = resolve(sidecarSpecifier);
-			} catch (error) {
-				fail(
-					`Brotli pair \`${cssSpecifier}\` / \`${sidecarSpecifier}\` does not ` +
-						`resolve (${error instanceof Error ? error.message.split("\n")[0] : error}).`,
-				);
-				continue;
-			}
-			if (
-				!resolvedCss.startsWith(installed + path.sep) ||
-				!resolvedSidecar.startsWith(installed + path.sep)
-			) {
-				fail(
-					`Brotli pair \`${cssSpecifier}\` / \`${sidecarSpecifier}\` ` +
-						"resolved outside the installed package.",
-				);
-				continue;
-			}
-
-			try {
-				const source = fs.readFileSync(resolvedCss);
-				const expanded = zlib.brotliDecompressSync(
-					fs.readFileSync(resolvedSidecar),
-				);
-				if (!expanded.equals(source)) {
-					fail(`\`${sidecarSpecifier}\` does not reproduce its CSS source.`);
-				}
-			} catch (error) {
-				fail(
-					`\`${sidecarSpecifier}\` is not usable Brotli ` +
-						`(${error instanceof Error ? error.message : error}).`,
-				);
-			}
-		}
-
-		// 5 — the manifest a consumer's tooling reads, from the installed copy.
+		// 4 — the manifest a consumer's tooling reads, from the installed copy.
 		const deliveredManifest = JSON.parse(
 			fs.readFileSync(resolve(`${manifest.name}/package.json`), "utf8"),
 		);
@@ -305,7 +256,7 @@ const main = () => {
 			);
 		}
 
-		// 6 — and what must stay unreachable.
+		// 5 — and what must stay unreachable.
 		for (const subpath of sealed) {
 			const specifier = `${manifest.name}/${subpath.replace(/^\.\//, "")}`;
 			try {
@@ -334,7 +285,6 @@ const main = () => {
 		`✓ smoke-consumer: installed from the tarball into a clean project; ` +
 			`${entryPoints.length} entry points resolve and deliver the build ` +
 			`they promise, with CSS in @layer ${layerName}; ` +
-			`${minifiedCssFiles().length} Brotli sidecars reproduce their CSS; ` +
 			`${sealed.length} internal ` +
 			`paths stay sealed.`,
 	);
