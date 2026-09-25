@@ -135,7 +135,7 @@ overrides, and with `forced-colors: active`. Reflow assertions compare
 check open top-layer surfaces independently. WebKit provides the closest
 automated coverage available for Safari's rendering engine.
 
-### Dist invariants: `check:dist`
+### Dist invariants — `check:dist`
 
 Runs mechanical assertions over every file in `dist/` right after the
 build, so the contracts of each build variant can't erode silently:
@@ -161,7 +161,7 @@ reset, layout, theme, utility, and print selectors receive none, then parses
 the Lightning CSS expanded and minified outputs again. A new partial without
 an ownership decision fails the check.
 
-### CDN integrity: `check:sri`
+### CDN integrity — `check:sri`
 
 The `<link>` snippets on [Get Started](/get-started#cdn) and in the README
 pin a version *and* carry the `sha384` hash of the file that version
@@ -177,7 +177,7 @@ is how you ship a snippet that every browser refuses to load; the
 [`RELEASING.md`](https://github.com/cirthcss/cirth/blob/master/RELEASING.md)
 has the full sequence.
 
-### Browser target: `check:browserslist`
+### Browser target — `check:browserslist`
 
 The Browserslist target names ten browser families but describes a single
 engine floor: Opera and Samsung Internet are Chromium forks, Firefox for
@@ -231,7 +231,7 @@ what you are reading has not shipped. Both come out of one Pages artifact,
 built by the same workflow, so a push to either branch refreshes both and
 neither goes stale while the other moves.
 
-### Accessibility: `check:a11y`
+### Accessibility — `check:a11y`
 
 Runs [axe-core](https://github.com/dequelabs/axe-core) with the explicit
 `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, and `wcag22aa` tags against every
@@ -257,7 +257,7 @@ The check fails on any violation not listed in
 accepted finding can be recorded explicitly, but it is empty, and the
 goal is to keep it that way: fix violations rather than baseline them.
 
-### Visual regression: `check:visual`
+### Visual regression — `check:visual`
 
 Playwright screenshots the content region of the default theme's selected
 documentation pages in light and dark modes, at 1440 px and 390 px, and

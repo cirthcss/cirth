@@ -76,7 +76,7 @@ that value is good or bad. Color alone is not an accessible message
 number, a word) rather than relying on the bar being red:
 
 ```html
-<label>Air quality: poor (1 of 10)
+<label>Air quality — poor (1 of 10)
   <meter value="1" min="0" max="10" low="3" high="7" optimum="9"></meter>
 </label>
 ```

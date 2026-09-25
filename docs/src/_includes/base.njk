@@ -3,10 +3,10 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>{% if title %}{{ title }} · {{ nav.siteTitle }}{% else %}{{ nav.siteTitle }}{% endif %}</title>
+		<title>{% if title %}{{ title }} — {{ nav.siteTitle }}{% else %}{{ nav.siteTitle }}{% endif %}</title>
 		<meta name="description" content="{{ description or nav.siteDescription }}" />
 		<meta property="og:type" content="website" />
-		<meta property="og:title" content="{% if title %}{{ title }} · {{ nav.siteTitle }}{% else %}{{ nav.siteTitle }}{% endif %}" />
+		<meta property="og:title" content="{% if title %}{{ title }} — {{ nav.siteTitle }}{% else %}{{ nav.siteTitle }}{% endif %}" />
 		<meta property="og:description" content="{{ description or nav.siteDescription }}" />
 		<meta property="og:image" content="https://cirthcss.github.io/cirth/social-preview.png" />
 		<meta property="og:image:width" content="1200" />

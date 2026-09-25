@@ -37,7 +37,7 @@ writing one:
 A spec is tracked and durable. `HANDOFF.md` is neither, and does not
 substitute for one.
 
-## Releases: the mandatory workflow
+## Releases — mandatory workflow
 
 If a task involves preparing, cutting, publishing, tagging, promoting, or
 otherwise releasing a version of Cirth:
@@ -144,8 +144,8 @@ no refactor diary.
 
 ## Prose style
 
-This project does not use the em dash. Replace it with the mark that fits
-the job it was doing:
+Do not use the em dash to build a sentence. Where it joins or interrupts
+clauses, replace it with the mark that fits the job it was doing:
 
 - a full stop where both halves stand on their own;
 - a colon where what follows names or explains what precedes it;
@@ -155,8 +155,15 @@ the job it was doing:
 One mark standing in for four jobs hides which one a sentence is doing, so
 this is a readability rule and not only a house-style one.
 
-It covers everything written for a reader: documentation, source and script
-comments, specs, commit messages and pull request text.
+It covers prose: documentation, source and script comments, specs, commit
+messages and pull request text.
 
-`CHANGELOG.md` and `.github/releases/` are exempt. They record versions
-already published, and their wording is part of that record.
+It does not cover the dash used as a separator rather than as punctuation
+inside a sentence. Page and specimen titles, headings that pair a name with
+an identifier, and attribution lines keep it where it reads better than
+anything else.
+
+`CHANGELOG.md`, `.github/releases/` and `docs/versions/` are exempt
+entirely. The first two record versions already published; the third freezes
+a documentation line at its tag, and an archive that keeps changing is not
+an archive.
