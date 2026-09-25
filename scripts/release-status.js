@@ -8,7 +8,7 @@ const { distTagFor, parseVersion } = require("./lib/version");
 //
 // This exists because the alternative to an obvious path is an invented
 // one. Half of the mistakes a release can make are really the same
-// mistake — acting on a stale idea of what has already happened — and the
+// mistake — acting on a stale idea of what has already happened, and the
 // answer is cheap: ask git, GitHub and npm, then say which rung of the
 // ladder we are on.
 //

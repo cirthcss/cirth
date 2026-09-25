@@ -294,7 +294,7 @@ for (const preset of presets) {
 						background,
 					),
 					// The body ink comes from the framework's pass — no preset
-					// overrides --cirth-color — so this is the check that the two
+					// overrides --cirth-color, so this is the check that the two
 					// passes compose rather than cancel.
 					text: contrastRatio(await styleOf(page, "text", "color"), background),
 				};

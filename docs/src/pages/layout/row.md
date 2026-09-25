@@ -40,7 +40,7 @@ one, use [`.grid`](/layout/grid) instead.
   the column wider than its share of the row.
 * A form control (`input`, `select`, `textarea`, `button`, …) that is a
   direct child of `.row` drops its own `margin-bottom` — the row-gap
-  already provides that rhythm — and a trailing `<small>` after one of
+  already provides that rhythm, and a trailing `<small>` after one of
   those controls gets the same full-width helper-text treatment it gets
   after a bare `input`/`select`/`textarea`/`fieldset`.
 
@@ -51,7 +51,7 @@ classless equivalent since it requires a class to opt in.
 
 `.row` is the intentional exception to Cirth's intrinsic-first layout
 rules. Its contract is not “fit as many columns as this box can hold” —
-that is [`.grid`](/layout/grid) — but “these peers become one indivisible
+that is [`.grid`](/layout/grid), but “these peers become one indivisible
 row on a wide page”. The `768px` viewport decision expresses that contract
 directly. Replacing it with `auto-fit` or flex wrapping would make `.row`
 another spelling of `.grid` and remove the behavior it exists to provide.

@@ -240,7 +240,7 @@
   // Two quiet variants that differ in one thing: whether the control owns
   // an opaque surface. Outline does — it paints the control colour, so it
   // stays a control wherever it sits instead of letting the backdrop show
-  // through — and it draws a border. Ghost owns neither, and only becomes
+  // through, and it draws a border. Ghost owns neither, and only becomes
   // visible when the pointer arrives.
   // Both answer hover by tinting their background with their own accent
   // rather than by swapping to a filled treatment: the point of a quiet

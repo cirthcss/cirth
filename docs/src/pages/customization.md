@@ -136,7 +136,7 @@ The raw ladders: `--cirth-space-*`, `--cirth-radius-*`,
 Every step exists whether or not the library uses it, so picking one is the
 same exercise wherever you are. You will usually reach for the role token
 that sits on top of a scale — `--cirth-spacing` rather than
-`--cirth-space-5` — but the steps are there when you want to move one
+`--cirth-space-5`, but the steps are there when you want to move one
 component without moving the rest.
 
 ## Start here
@@ -410,7 +410,7 @@ than moving the scale everyone else reads:
 are slots: set at the root they change the page default, and elements that
 were given their own value keep it. The two tracking steps have consumers —
 `--cirth-letter-spacing-tight` on `h1`/`h2`, `--cirth-letter-spacing-snug`
-on `h3`/`h4` — so overriding one moves the headings that read it.
+on `h3`/`h4`, so overriding one moves the headings that read it.
 `--cirth-form-label-font-weight` is separate so labels can be heavier than
 the prose around them.
 
@@ -444,7 +444,7 @@ of the same rhythm.
 | Token | Why it is separate |
 | --- | --- |
 | `--cirth-form-element-spacing-vertical` / `-horizontal` | The one-line control height is computed from this pair, and that height carries WCAG 2.5.5's 44px target size. A density knob must not be able to walk a target size, so control padding is named on the space scale and overridden directly. |
-| `--cirth-block-spacing-vertical` / `-horizontal` **on `<article>`** | A card's padding is a container decision. It is pinned one step above the controls' gutter on the same scale — `--cirth-space-5` against `--cirth-space-4` — so a container stays roomier than its contents at *every* setting of `--cirth-spacing`. Derived from the knob instead, the two would cross the first time a preset tightened it. |
+| `--cirth-block-spacing-vertical` / `-horizontal` **on `<article>`** | A card's padding is a container decision. It is pinned one step above the controls' gutter on the same scale — `--cirth-space-5` against `--cirth-space-4`, so a container stays roomier than its contents at *every* setting of `--cirth-spacing`. Derived from the knob instead, the two would cross the first time a preset tightened it. |
 | `--cirth-container-gutter` | Page gutters follow the container, not the knob: opening a wide shell up must not also enlarge cards, controls and grid gaps. |
 
 To change control or card density, set those tokens. They are public, they
@@ -478,7 +478,7 @@ a height.
 
 `--cirth-border-radius` is the single knob. The per-component radii are
 derived from it — a card is softer, a checkbox and inline code are capped
-so they never read as circles — so zeroing it zeroes them too.
+so they never read as circles, so zeroing it zeroes them too.
 
 | Token | Relationship |
 | --- | --- |
@@ -547,7 +547,7 @@ filled button has to clear 4.5:1 against it.
 }
 ```
 
-That tightens the flow — prose, sections, grid gaps — and leaves controls
+That tightens the flow — prose, sections, grid gaps, and leaves controls
 and cards where they were. Add the control pair if you want the components
 to come in too:
 
@@ -603,7 +603,7 @@ of this site.
 
 That verification covers the values Cirth ships. **It does not extend to
 values you set.** The relationships hold — a derived hover stays
-proportionally darker than whatever accent you give it — but whether the
+proportionally darker than whatever accent you give it, but whether the
 result clears a threshold depends on the colour you chose. When you change
 an input, the pairs worth checking are:
 
@@ -697,7 +697,7 @@ beats one it would inherit from `:root`. Set them on the wrapper:
 
 The host page's CSS wins inside the widget too, when it is unlayered. The
 `.cirth` prefix used to out-weigh a host rule such as `button { … }` — it
-never out-weighed `.entry-content a` — and it no longer does. If the host's
+never out-weighed `.entry-content a`, and it no longer does. If the host's
 CSS is yours, put it in a layer ordered before Cirth's:
 
 ```css

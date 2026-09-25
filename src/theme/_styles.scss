@@ -77,7 +77,7 @@
   // Derived, not a second independent step. Paragraph rhythm *is* flow
   // spacing: with the two declared apart, a preset that opened the flow up
   // moved grids and sections and left prose at the default unless it
-  // remembered to restate this token — and every future preset would have
+  // remembered to restate this token, and every future preset would have
   // had to remember too. Identical to --cirth-space-4 at the default scale.
   --cirth-typography-spacing-vertical: var(--cirth-spacing);
 
@@ -142,7 +142,7 @@
   // same border, so the two read as a matched pair and retheming one
   // rethemes both. What goes *inside* the frame is a meter's own, because
   // the two elements mean different things — progress is a task running to
-  // completion, a meter is a reading that can be good or bad — and those
+  // completion, a meter is a reading that can be good or bad, and those
   // value colors are scheme-dependent (see theme/_light.scss).
   --cirth-meter-background-color: var(--cirth-progress-background-color);
   --cirth-meter-border-color: var(--cirth-progress-border-color);
@@ -334,7 +334,7 @@
   article {
     // The other half of the flow knob's contract. Both sides of this
     // relationship are named on the space scale — space-5 here against the
-    // controls' space-4 — so a container stays one step more generous than
+    // controls' space-4, so a container stays one step more generous than
     // the controls inside it at every setting of --cirth-spacing. Derived
     // from the knob instead, the two would cross the moment a preset moved
     // it: `calc(var(--cirth-spacing) * 1.25)` is an exact no-op at the

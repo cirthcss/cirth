@@ -17,7 +17,7 @@
 
 // The exit is honest about its reach: `overlay` is Chromium-only, so
 // elsewhere the close is instant. Nothing is lost by that — the dialog
-// goes away, which is what closing means — and prefers-reduced-motion
+// goes away, which is what closing means, and prefers-reduced-motion
 // collapses all of it anyway (utilities/_reduce-motion.scss).
 
 #{$parent-selector} dialog {
@@ -134,7 +134,7 @@
     // The icon is 1rem; the target around it is the full control height,
     // because a 16px close button is 16px of anything a pointer has to hit
     // and this is the control people reach for in a hurry. The box grows,
-    // the icon does not — background-size below pins it — and the negative
+    // the icon does not — background-size below pins it, and the negative
     // margins take the extra back out of the layout, so the header is laid
     // out around the same 1rem the design was built on. Without the width
     // the min-block-size floor in content/_button.scss would make this

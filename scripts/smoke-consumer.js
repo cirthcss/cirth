@@ -33,7 +33,7 @@ const layerOpening = new RegExp(
  * Every documented entry point, with something only the right file could
  * contain. The sentinels are deliberately about the *promise the subpath
  * makes* — a print sheet is print-only, a classless build has no component
- * or utility classes, a scoped build lives under the wrapper — so a mapping that pointed a
+ * or utility classes, a scoped build lives under the wrapper, so a mapping that pointed a
  * subpath at the wrong build would be caught, which byte-size alone cannot.
  *
  * @type {{ subpath: string, must: string[], mustNot: string[], layered?: boolean }[]}
@@ -256,7 +256,7 @@ const main = () => {
 			);
 		}
 
-		// 5 — and what must stay unreachable.
+		// 5, and what must stay unreachable.
 		for (const subpath of sealed) {
 			const specifier = `${manifest.name}/${subpath.replace(/^\.\//, "")}`;
 			try {

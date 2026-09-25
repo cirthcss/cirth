@@ -184,7 +184,7 @@ fixtures.push({
 // eight-round bound impossible to reintroduce quietly. It defeats the old
 // search twice over: leave-one-out names nothing at all once there is more
 // than one group — removing all-but-one still removes every other group
-// whole, so the page always moves — and nine groups need nine passes.
+// whole, so the page always moves, and nine groups need nine passes.
 
 const pairs = 9;
 fixtures.push({

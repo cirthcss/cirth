@@ -3,10 +3,10 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>{% if title %}{{ title }} — {{ nav.siteTitle }}{% else %}{{ nav.siteTitle }}{% endif %}</title>
+		<title>{% if title %}{{ title }} · {{ nav.siteTitle }}{% else %}{{ nav.siteTitle }}{% endif %}</title>
 		<meta name="description" content="{{ description or nav.siteDescription }}" />
 		<meta property="og:type" content="website" />
-		<meta property="og:title" content="{% if title %}{{ title }} — {{ nav.siteTitle }}{% else %}{{ nav.siteTitle }}{% endif %}" />
+		<meta property="og:title" content="{% if title %}{{ title }} · {{ nav.siteTitle }}{% else %}{{ nav.siteTitle }}{% endif %}" />
 		<meta property="og:description" content="{{ description or nav.siteDescription }}" />
 		<meta property="og:image" content="https://cirthcss.github.io/cirth/social-preview.png" />
 		<meta property="og:image:width" content="1200" />
@@ -32,7 +32,7 @@
 			// Same idea for the preset switcher (gh#80): apply a
 			// session-remembered preset before first paint, so returning to
 			// a page (or following a link) after picking one doesn't flash
-			// the default theme first. sessionStorage, not localStorage —
+			// the default theme first. sessionStorage, not localStorage:
 			// the issue asks for "the current session", not a permanent
 			// choice that'd survive a closed tab into someone's next visit.
 			(function () {
@@ -58,7 +58,7 @@
 				<p>
 					<strong>Unreleased documentation.</strong> This is the
 					<code>develop</code> branch, not a published version. What it
-					describes may change or be dropped before release —
+					describes may change or be dropped before release;
 					<a href="{{ page.url | siteRoot }}">read the current documentation</a> instead.
 				</p>
 			</aside>
@@ -86,7 +86,7 @@
 			// live example is the example. Injecting a control into it would
 			// put a <button> in the reader's specimen that Cirth never ships,
 			// and the caption on every demo says the opposite. The disclosure
-			// under the demo keeps its button — that listing is the shell's.
+			// under the demo keeps its button: that listing is the shell's.
 			for (const pre of document.querySelectorAll("pre")) {
 				if (pre.closest(".docs-demo-preview")) continue;
 				if (pre.querySelector(":scope > button.copy")) continue;

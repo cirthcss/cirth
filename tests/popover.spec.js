@@ -148,7 +148,7 @@ test("a manual popover is left to whoever is driving it", async ({ page }) => {
 	await page.evaluate(() => document.getElementById("chrome")?.showPopover());
 
 	// The border it does have is the user agent's own default for [popover],
-	// not this library's. What must not be there is Cirth's treatment — and
+	// not this library's. What must not be there is Cirth's treatment, and
 	// above all its transition: an overlay that fades in is an overlay a
 	// screenshot can catch mid-fade.
 	expect(await styleOf(page, "chrome", "transition-duration")).toBe("0s");

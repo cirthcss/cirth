@@ -74,7 +74,7 @@ try {
 	}
 
 	// Presets, compiled the same way scripts/build-presets.js compiles them
-	// for dist/ (standalone, no build-time config to inject) — so the header's
+	// for dist/ (standalone, no build-time config to inject), so the header's
 	// live preset switcher (see site-header.njk / base.njk, gh#80) has a real
 	// stylesheet to swap in rather than a reimplementation of one. Kept
 	// separate from npm run build's dist/presets/ output on purpose: docs:build

@@ -108,7 +108,7 @@ for (const specimen of specimens) {
 		// softer than the controls inside it, so a card reads as a sheet
 		// holding buttons rather than as a big button. A preset is expected
 		// to move both ends of that pair — plain squares them off, playroom
-		// rounds them — and the invariant is the relationship, not the value
+		// rounds them, and the invariant is the relationship, not the value
 		// it had in the default theme.
 		const geometry = await page
 			.locator('input[name="owner"]')

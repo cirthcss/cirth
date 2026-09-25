@@ -62,7 +62,7 @@
 
       // Resting: the chevron points down, which is where the panel is
       // about to appear. It used to rest at -90deg — pointing along the
-      // row rather than at anything — and swing to 0 on open, so the
+      // row rather than at anything, and swing to 0 on open, so the
       // closed state said "there is more this way" and the open state
       // said "there is more below" about content already below. Down,
       // then a half turn to up: closed points at what opening will
@@ -72,7 +72,7 @@
       // Masked over a theme token rather than drawn with the icon's own
       // baked stroke, so the marker follows a retheme. The <select>
       // chevron in forms/_basics.scss cannot do this — a replaced element
-      // has no pseudo-element to hang the mask on — so it keeps the baked
+      // has no pseudo-element to hang the mask on, so it keeps the baked
       // neutral and the two diverge under a custom theme (gh#82).
       background-color: currentColor;
       mask-image: var(--cirth-icon-chevron);
@@ -101,7 +101,7 @@
         // Outset by a quarter step, not inset by the ring's own width.
         // A summary carries `padding-block` but no `padding-inline` — the
         // trigger text starts exactly where the panel text below it does,
-        // which is the alignment this component wants — so the border box
+        // which is the alignment this component wants, so the border box
         // and the first glyph share an edge. An inset ring was therefore
         // drawn *over* the first character: measured, the gap from the
         // ring to the text was 0px horizontally against 6px vertically.
@@ -182,7 +182,7 @@ $surface-details: "details";
     // whatever happens to be last inside it. Hanging it on the last child's
     // margin-bottom looked equivalent and was not: margins are the first
     // thing content resets flatten, so any `p:last-child { margin: 0 }` in
-    // the page — or a last child that is a list, a figure, or a <pre> with
+    // the page, or a last child that is a list, a figure, or a <pre> with
     // its own margin — silently collapsed the panel onto its own divider.
     // Owning it here makes the gutter unconditional and identical for every
     // kind of content, and the reset below keeps the two from stacking.

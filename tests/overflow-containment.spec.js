@@ -6,7 +6,7 @@ const { setContent } = require("./helpers/render");
 // .overflow-auto exists so that something wider than the screen scrolls
 // inside it instead of widening the page (WCAG 1.4.10). A scroll container
 // only clips what it contains, though, and an absolutely positioned
-// descendant is contained by its nearest positioned ancestor — so a
+// descendant is contained by its nearest positioned ancestor, so a
 // .sr-only header on a table's action column escaped it and pushed the
 // page 1,111px wider at 320px. The container is now that ancestor.
 

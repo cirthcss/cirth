@@ -196,7 +196,7 @@ It used to do five. Navigation links carried the accent at rest, which meant
 a menu of eight entries was eight brand-coloured words next to one button
 that also wanted the colour, and the accent stopped meaning "act on this"
 and started meaning "this is a Cirth screen". Navigation now takes the ink
-of whatever it sits in and the accent marks only where you are — so the one
+of whatever it sits in and the accent marks only where you are, so the one
 thing copper still says, it says alone.
 
 The light theme's base surface is a mineral paper rather than white, and the
@@ -265,7 +265,7 @@ falls back to black, the same as the mono mark.</p>
 system sans stack the framework itself ships, which is the whole of the
 typographic claim: there is no font to install, and nothing to license. The
 cost is that the word's width moves a little between platforms — SF Pro sets
-it narrowest, Helvetica and Arial about 2.5% wider — so the box reserves
+it narrowest, Helvetica and Arial about 2.5% wider, so the box reserves
 room for the widest face in the stack and a narrower one leaves a little air
 on the right. That is the intended behaviour, not a mis-export.
 
@@ -319,7 +319,7 @@ Favor words like **native**, **runtime**, **tokens**, **scope**,
 **integrate**, **verify**, **ship**, **baseline**, **size budget**, and
 **browser primitives**. Avoid **purity**, **timeless**, **philosophy**,
 **framework dialect**, and repeated carving metaphors outside the name's
-origin story — and avoid unverifiable claims such as "nothing to break,"
+origin story, and avoid unverifiable claims such as "nothing to break,"
 "fully accessible," or "always delivered in one round trip."
 
 Example headlines:

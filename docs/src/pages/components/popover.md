@@ -6,7 +6,7 @@ layout: docs.njk
 
 `popover` is an attribute, not an element: it lifts anything into the top
 layer and lets the browser dismiss it. Cirth styles the **surface** that
-comes with that — a sheet above the page — and leaves what you put inside
+comes with that — a sheet above the page, and leaves what you put inside
 it entirely to you.
 
 {% demo "popover" %}
@@ -24,7 +24,7 @@ it entirely to you.
 </span>
 ```
 
-That example is a hint, because a hint is what replaced the old tooltip —
+That example is a hint, because a hint is what replaced the old tooltip,
 but it is one use of the attribute, not the use. Two attributes carry it:
 `popovertarget` makes the button an invoker, which gives you click, tap,
 `Enter` and `Space` for free, and `aria-describedby` is what a screen
@@ -73,7 +73,7 @@ be clipped by an ancestor's `overflow`, the top layer is not:
 </article>
 ```
 
-What Cirth does **not** style is `popover="manual"` — see Behavior below —
+What Cirth does **not** style is `popover="manual"` — see Behavior below,
 so a toast or an overlay your own script drives is left untouched.
 
 ## Why this is not called a tooltip
@@ -92,7 +92,7 @@ than hover, and named for what it is. A true hover tooltip needs
 `interestfor` together with `popover="hint"`, which hands the browser the
 interest delay, hover persistence, `Escape` handling and input-modality
 rules. `popover="hint"` is not supported in Safari at all and has an
-unstable history elsewhere, and `interestfor` is not yet broadly tracked —
+unstable history elsewhere, and `interestfor` is not yet broadly tracked,
 so it is a future addition, not a thing to ship now.
 
 ## Behavior
@@ -121,7 +121,7 @@ so it is a future addition, not a thing to ship now.
   their own surface. See [Modal](/components/modal).
 * So is `popover="manual"`. A manual popover is shown and hidden entirely
   by its author's script — application chrome, a toast, an overlay injected
-  by tooling — and a library that paints a border and a fade onto it is
+  by tooling, and a library that paints a border and a fade onto it is
   redecorating something it knows nothing about. Only `auto` (the default,
   written as a bare `popover`) and `hint` are styled: those are the ones
   the browser light-dismisses on the reader's behalf, which is what makes

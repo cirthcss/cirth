@@ -28,7 +28,7 @@ class, no wrapper required.
   default, not a typographic decision.
 * Consecutive pairs get half a rhythm step between them
   (`calc(var(--cirth-typography-spacing-vertical) * 0.5)`), applied to a
-  `<dt>` that follows a `<dd>` — so the space falls between pairs and never
+  `<dt>` that follows a `<dd>`, so the space falls between pairs and never
   inside one. Several `<dd>`s under one `<dt>`, or several `<dt>`s sharing one
   `<dd>`, stay together.
 * The list itself keeps the bottom margin every flow element gets.

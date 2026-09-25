@@ -33,7 +33,7 @@
     transition-duration: var(--cirth-duration-instant); // 4
 
     // 5. `transition-duration` above reaches elements, ::before and ::after,
-    //    and nothing else — so the engine pseudo-elements that make up a
+    //    and nothing else, so the engine pseudo-elements that make up a
     //    control's interior kept animating. Measured in Firefox with the
     //    playroom preset: the host input went to 0s while
     //    ::-moz-range-track and ::-moz-range-thumb stayed at 0.3s. Those

@@ -49,7 +49,7 @@ const runLightningCss = (args) => runSync(lightningcssBinary, args);
 // Lightning CSS will compile light-dark() away if any target sits below
 // its floor, replacing it with a --lightningcss-light/--lightningcss-dark
 // emulation. That emulation does not reproduce the semantics — a forced
-// scheme subtree stops resolving its own values — so its appearance is a
+// scheme subtree stops resolving its own values, so its appearance is a
 // broken build, not a slower one. It is worth failing loudly for: the
 // output still looks plausible, and the visual suite does not render
 // forced-scheme subtrees, so nothing else would catch it.

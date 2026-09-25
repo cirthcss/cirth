@@ -13,7 +13,7 @@ const {
 //
 // The rule it exists to enforce: **develop anywhere, release only from
 // master.** npm is a permanent, public record — a version, once live, is
-// the version everyone with a caret range may install — so what it holds
+// the version everyone with a caret range may install, so what it holds
 // must exist in the repository's own history, not in a branch that may be
 // rebased, renamed or abandoned. A tag on a working branch is a perfectly
 // valid git object and an invalid release.
@@ -113,7 +113,7 @@ const main = () => {
 				"[--unpublished [--commit <ref>]]\n\n" +
 				"  --channel states which npm dist-tag the caller intends. It is " +
 				"optional for a\n  caller that publishes nothing — the GitHub " +
-				"release job — and required of the one\n  that does.",
+				"release job, and required of the one\n  that does.",
 		);
 		process.exit(2);
 	}

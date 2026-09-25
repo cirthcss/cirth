@@ -15,7 +15,7 @@ const path = require("node:path");
 // So the retry is paired with this: every test that needed one is printed,
 // and on GitHub Actions each becomes a warning annotation on the run. The
 // step still succeeds — a flaky screenshot is not a reason to discard the
-// other eight hundred — but nobody has to go looking to find out which one
+// other eight hundred, but nobody has to go looking to find out which one
 // it was, or whether there was one at all.
 
 const reportPath = process.argv[2] ?? ".cache/baseline-report.json";
@@ -78,7 +78,7 @@ const walk = (suite, trail) => {
 				.join(" › ");
 			// `status` is the field to read. The JSON reporter classifies a
 			// test across all of its attempts — "expected", "unexpected",
-			// "flaky", "skipped" — and `ok` is not emitted at all in the
+			// "flaky", "skipped", and `ok` is not emitted at all in the
 			// version this repo pins, so a check written against it silently
 			// finds nothing.
 			if (test.status === "flaky" || (test.status === "expected" && attempts > 1)) {

@@ -20,7 +20,7 @@ edge near your visitor.
 
 What it costs is a second connection. The stylesheet lives on another
 origin, so the browser resolves a new hostname, opens a new TCP connection
-and completes a new TLS handshake before the first byte of CSS arrives — and
+and completes a new TLS handshake before the first byte of CSS arrives, and
 a stylesheet in the `<head>` blocks rendering until it does. That setup is
 usually worth more milliseconds than any compression choice further down
 this page will win back.
@@ -176,7 +176,7 @@ to ship a fix.
 The CDN snippet in [Get Started](/get-started#cdn) carries a Subresource
 Integrity hash, and it is worth keeping. The digest is taken over the
 decoded stylesheet, not over the transferred bytes, so it is unaffected by
-whether the response arrives gzipped, Brotli-compressed or plain — but it is
+whether the response arrives gzipped, Brotli-compressed or plain, but it is
 tied to the exact version in the URL. Change the version and take that
 release's hash with it.
 

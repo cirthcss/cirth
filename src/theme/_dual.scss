@@ -18,7 +18,7 @@
 // replaces the pair outright, so it holds in both schemes and reaches into
 // any subtree that forces one. Until 2026-08-25 the scheme blocks
 // redeclared these on the [data-theme] element, and a declaration made on
-// an element beats one inherited from an ancestor at any specificity — so
+// an element beats one inherited from an ancestor at any specificity, so
 // the same override stopped at the edge of a forced-scheme subtree, and
 // the docs had to tell people to repeat it. To vary a token by scheme, a
 // consumer now writes the pair:
@@ -37,7 +37,7 @@
 // used to cause it.
 // What stays in the scheme files, and why:
 //   - derived tokens, because their formula differs by scheme, not just
-//     their value — and they still follow an override, since they read
+//     their value, and they still follow an override, since they read
 //     var(--cirth-primary) resolved on the element they land on;
 //   - aliases, because of the substitution rule above;
 //   - icons, because a data URI cannot derive;

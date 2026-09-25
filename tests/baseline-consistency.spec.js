@@ -385,7 +385,7 @@ test("the card and table borders keep a neutral hue in every theme", async ({
 	// --cirth-card-border-color mixes the field border toward the card
 	// surface. Mixed `in oklch` that interpolated the *hue angle*, and the
 	// card surface is an authored oklch() whose hue is an explicit 0deg
-	// rather than a powerless one — so the 264deg field border took the
+	// rather than a powerless one, so the 264deg field border took the
 	// short way round the wheel and the most-used border in the library
 	// landed at 323.52deg, a faint magenta with no other member of the
 	// palette anywhere near it. Mixed `in oklab` there is no angle to

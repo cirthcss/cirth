@@ -6,7 +6,7 @@ const { setContent } = require("./helpers/render");
 // How tall form controls come out, which is two separate questions.
 //
 // The first is target size, checked as a floor rather than as a
-// coincidence — and there are two thresholds, deliberately. Outside a nav
+// coincidence, and there are two thresholds, deliberately. Outside a nav
 // it is 44px, WCAG 2.5.5 Target Size (Enhanced), which this project treats
 // as a product requirement. Inside a nav it is a 40px compact band, still
 // above the 24px WCAG 2.5.8 Target Size (Minimum) threshold.
@@ -124,7 +124,7 @@ for (const customMetrics of [false, true]) {
 
 // The second is how much of a textarea you can see before scrolling inside
 // it. The user agent opens one at two rows, which is a line and a half of
-// a paragraph — so Cirth asks for four. Measured in `lh`, so four rows
+// a paragraph, so Cirth asks for four. Measured in `lh`, so four rows
 // means four rows of this textarea's own text, not of the default type
 // scale.
 //
@@ -200,7 +200,7 @@ test(`a nav may be compact, but never below ${TARGET_NAV}px`, async ({
 	page,
 }) => {
 	// `height: auto` is how the nav escapes the input's fixed height, and it
-	// cannot escape a min-block-size the same way — so the nav restates the
+	// cannot escape a min-block-size the same way, so the nav restates the
 	// floor at the AA minimum instead of inheriting the AAA one.
 	await setContent(page,
 		`<style>${css}</style>

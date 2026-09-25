@@ -71,7 +71,7 @@ try {
 	// docs/versions/ is a passthrough into the built site (see
 	// docs/eleventy.config.js), so a build made at this tag contains every
 	// line archived before it. Copying those in would nest a second copy of
-	// each older line inside this one, and a third inside the next — and
+	// each older line inside this one, and a third inside the next, and
 	// none of them would ever be read: the version switcher builds its links
 	// from the site root, not from the archive it is sitting in. Skip them.
 	const archived = new Set(

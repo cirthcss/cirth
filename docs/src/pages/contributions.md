@@ -18,7 +18,7 @@ Node.js 24.18 (current LTS) is the version CI and the release workflows run
 on; `.nvmrc` pins it for local use with `nvm use`.
 
 ```sh
-git lfs install    # once per machine — visual test baselines are Git LFS objects
+git lfs install    # once per machine; visual test baselines are Git LFS objects
 git clone https://github.com/cirthcss/cirth.git
 cd cirth
 npm install
@@ -50,7 +50,7 @@ npm run docs:dev   # run this docs site locally
   alongside the default build. Its filenames are the source of truth used by
   the build, docs switcher, accessibility matrix, and visual suite; adding a
   preset automatically adds it to those checks.
-* `docs/` contains this site (Eleventy), styled by Cirth's own build — and
+* `docs/` contains this site (Eleventy), styled by Cirth's own build, and
   also doubles as the fixture the library's own QA runs against: `tests/`
   (visual regression) and `check:a11y` render the built docs site to catch
   unintended rendering/accessibility changes from a source edit. Kept in
@@ -59,8 +59,8 @@ npm run docs:dev   # run this docs site locally
   with source keeps a change and its matching docs update in the same
   commit checked by the same CI, and the QA coupling above means anyone
   doing serious library work needs the docs build regardless of where it
-  lives. Whether to eventually split docs into their own repository — and
-  do a full manual review pass over everything written so far — is
+  lives. Whether to eventually split docs into their own repository, and
+  do a full manual review pass over everything written so far, is
   something to evaluate later, not a settled plan; noted here so the
   current layout isn't mistaken for either the permanent shape of the
   project or a fixed roadmap item.
@@ -93,8 +93,8 @@ tarball (`npm pack`) before opening the PR.
 
 ## Quality gates
 
-The properties this site advertises — the size, the WCAG AA compliance,
-what each build variant does and doesn't contain — are not checked by
+The properties this site advertises (the size, the WCAG AA compliance,
+what each build variant does and doesn't contain) are not checked by
 review attention. Each one is enforced by an automated check that runs
 in CI on every push, and the same checks run locally:
 
@@ -114,7 +114,7 @@ npm run check:tooling # the dead-CSS audit measures a frozen copy of the build
 
 `check:tooling` is the only one of these that checks a tool rather than the
 library; it is seconds, and it runs locally rather than in CI because it
-rewrites `docs/dist` on purpose. Two more tools run on demand — a rendering
+rewrites `docs/dist` on purpose. Two more tools run on demand: a rendering
 fingerprint and a dead-CSS audit. See
 [On demand](#on-demand-the-rendering-fingerprint-and-the-dead-css-audit)
 below.
@@ -135,7 +135,7 @@ overrides, and with `forced-colors: active`. Reflow assertions compare
 check open top-layer surfaces independently. WebKit provides the closest
 automated coverage available for Safari's rendering engine.
 
-### Dist invariants — `check:dist`
+### Dist invariants: `check:dist`
 
 Runs mechanical assertions over every file in `dist/` right after the
 build, so the contracts of each build variant can't erode silently:
@@ -143,13 +143,13 @@ build, so the contracts of each build variant can't erode silently:
 * every build re-parses with Lightning CSS and is non-empty;
 * classless builds emit no component or utility classes; `.no-cirth` is the
   explicit exclusion marker, and `.cirth` is the scoped variant's wrapper;
-* scoped builds keep **every rule inside the `.cirth` subtree** — no
+* scoped builds keep **every rule inside the `.cirth` subtree**: no
   selector can style markup that didn't opt in;
 * every `.no-cirth` occurrence is one valid zero-specificity subject guard,
   and print builds contain none;
 * presets only set custom properties on theme roots, never rules;
 * every file, expanded and minified, is **one top-level `@layer cirth`
-  block** with no sub-layer and no `!important` — a rule left outside it
+  block** with no sub-layer and no `!important`: a rule left outside it
   would compete with consumer CSS on specificity again. The layer is
   written once, in `src/helpers/_cascade.scss`; see
   [`specs/cascade-layer.md`](https://github.com/cirthcss/cirth/blob/master/specs/cascade-layer.md).
@@ -161,7 +161,7 @@ reset, layout, theme, utility, and print selectors receive none, then parses
 the Lightning CSS expanded and minified outputs again. A new partial without
 an ownership decision fails the check.
 
-### CDN integrity — `check:sri`
+### CDN integrity: `check:sri`
 
 The `<link>` snippets on [Get Started](/get-started#cdn) and in the README
 pin a version *and* carry the `sha384` hash of the file that version
@@ -177,20 +177,20 @@ is how you ship a snippet that every browser refuses to load; the
 [`RELEASING.md`](https://github.com/cirthcss/cirth/blob/master/RELEASING.md)
 has the full sequence.
 
-### Browser target — `check:browserslist`
+### Browser target: `check:browserslist`
 
 The Browserslist target names ten browser families but describes a single
 engine floor: Opera and Samsung Internet are Chromium forks, Firefox for
 Android is the same Gecko as the desktop build, and iOS Safari is WebKit
 either way. Raising `Chrome` and forgetting `Opera` does not widen
-support — it quietly lowers the floor back to whatever Chromium that Opera
+support: it quietly lowers the floor back to whatever Chromium that Opera
 release was built on, because Lightning CSS compiles for the oldest engine
 in the list, and nothing else in the repository notices.
 
 `check:browserslist` (part of `npm run lint`) asserts that invariant: every
 Chromium family on the same version, the two forks on the releases built
 from it, Firefox and Safari in step with their mobile counterparts, and the
-legacy Android Browser absent — it is the same engine as Chrome for
+legacy Android Browser absent: it is the same engine as Chrome for
 Android and including it makes Lightning CSS expand every grouped selector
 in the library. The Chromium-to-fork table lives in the script with a note
 on how it was derived; when the floor moves past it, the check says so
@@ -205,7 +205,7 @@ Before 1.0 that boundary is a minor release; after it, a major.
 
 Three things make it work:
 
-* `docs/src/_data/versions.js` lists the lines. Adding one is a hand edit —
+* `docs/src/_data/versions.js` lists the lines. Adding one is a hand edit:
   a deliberate decision, not something a script infers from tags.
 * `docs/versions/<dir>/` holds the frozen sites. They are built once, at the
   release that ends them, and committed as-is. They are never rebuilt: an
@@ -220,7 +220,7 @@ At a breaking release, in order: archive the outgoing line
 (`npm run docs:archive -- v0.10.0 v0.10`), move `current: true` onto the
 new entry in `versions.js`, and write the migration on
 [Upgrading](/upgrading). The archived line is excluded from `check:a11y`
-and the visual suite on purpose — auditing it would re-audit what the
+and the visual suite on purpose: auditing it would re-audit what the
 toolchain thought a year ago, and any finding would be unfixable.
 
 ### Where the site is published
@@ -231,7 +231,7 @@ what you are reading has not shipped. Both come out of one Pages artifact,
 built by the same workflow, so a push to either branch refreshes both and
 neither goes stale while the other moves.
 
-### Accessibility — `check:a11y`
+### Accessibility: `check:a11y`
 
 Runs [axe-core](https://github.com/dequelabs/axe-core) with the explicit
 `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, and `wcag22aa` tags against every
@@ -254,10 +254,10 @@ open surfaces, and horizontal reflow.
 
 The check fails on any violation not listed in
 `scripts/a11y-baseline.json`. That baseline exists so an intentionally
-accepted finding can be recorded explicitly — but it is empty, and the
+accepted finding can be recorded explicitly, but it is empty, and the
 goal is to keep it that way: fix violations rather than baseline them.
 
-### Visual regression — `check:visual`
+### Visual regression: `check:visual`
 
 Playwright screenshots the content region of the default theme's selected
 documentation pages in light and dark modes, at 1440 px and 390 px, and
@@ -285,13 +285,13 @@ Two things to know about the baselines:
 * **They are per-platform.** System font rendering differs between
   operating systems, so macOS runs compare against the `*-darwin` sets
   and CI compares against the `*-linux` sets. You never edit the Linux
-  sets by hand — see below.
+  sets by hand; see below.
 * **They live in Git LFS**, so the repository history stays small while
   the images stay versioned.
 
 When your change **intentionally** alters how something renders:
 
-1. regenerate your platform's baselines —
+1. regenerate your platform's baselines:
    `npm run check:visual:update`;
 2. commit them with the change, and say in the PR what changed visually
    and why.
@@ -299,16 +299,16 @@ When your change **intentionally** alters how something renders:
 You don't need to touch the Linux sets. On every push that could affect
 rendering, the `update-visual-baselines` workflow regenerates them on a
 CI runner and, if anything actually differs, commits them back to the
-branch as `github-actions[bot]` — this self-heals both a first-time
+branch as `github-actions[bot]`: this self-heals both a first-time
 bootstrap and a partial change (only the pages your PR touched drift).
 Review that commit's images like any other diff.
 
 That commit lands as a separate, later push, so **`check:visual` in the
 same CI run as your content change can fail against the not-yet-updated
-Linux baseline** — this is expected for a visual change, not a
+Linux baseline**: this is expected for a visual change, not a
 regression. Re-run the check (or wait for the bot commit and push again)
 once it lands. If `check:visual` fails and you *didn't* intend a visual
-change, that's the check working — fix the regression instead of
+change, that's the check working: fix the regression instead of
 updating baselines.
 
 ### On demand: the rendering fingerprint and the dead-CSS audit
@@ -325,7 +325,7 @@ node scripts/fingerprint-docs.js --compare .cache/before.json
 
 `fingerprint-docs.js` walks the built site and records one hash per
 rendering: every page, at 1440, 1100, 900 and 390, in light and dark, twice
-over — as the page loads, and again with every `<details>`, `<dialog>` and
+over: as the page loads, and again with every `<details>`, `<dialog>` and
 popover opened. Both of those matter. A rule that only paints inside the
 drawer or the search dialog is invisible to anything that looks at a page
 that has just loaded; and the shell's tier ladder has seven boundaries, so
@@ -337,7 +337,7 @@ Each element is hashed on two things: its box and its paint-bearing
 computed style, and separately the tag, the text it owns and the attributes
 that belong to the document rather than to its styling (`href`, `id`,
 `role`, `aria-*`, …). So a copy change is a finding even when nothing
-re-wraps — which is how it should have caught "Zero JavaScript" becoming
+re-wraps, which is how it should have caught "Zero JavaScript" becoming
 "No JavaScript runtime". It renders under `prefers-reduced-motion: reduce`,
 because a measurement taken half way through a transition is noise, and it
 says so rather than pretending otherwise.
@@ -350,7 +350,7 @@ node scripts/audit-dead-css.js --json .cache/dead.json
 node scripts/audit-dead-css.js --no-order --no-skip   # both optimisations off, same verdicts
 ```
 
-`--no-order` and `--no-skip` turn off the two things the survey buys — the
+`--no-order` and `--no-skip` turn off the two things the survey buys: the
 richest-first visit order, and skipping a rendering that provably cannot
 see anything still undecided. They exist so those two can be *measured*
 against a run that differs in nothing else, and so a verdict can be
@@ -358,22 +358,22 @@ reproduced without them.
 
 `audit-dead-css.js` uses the same corpus to test declarations one at a
 time: take it out of the live CSSOM, re-measure, put it back. It surveys
-first — one pass that records which declarations each rendering can even
-see — and then probes richest-rendering-first, so a declaration proved live
+first (one pass that records which declarations each rendering can even
+see), and then probes richest-rendering-first, so a declaration proved live
 on the home page is never probed on the other forty-nine pages. Five
 verdicts:
 
-- **live** — removing it changed something, and the report names the first
+- **live**: removing it changed something, and the report names the first
   rendering that noticed.
-- **inert** — its selector matched real elements, and removing it changed
+- **inert**: its selector matched real elements, and removing it changed
   nothing anywhere in the corpus. A candidate for deletion; read it before
   you delete it.
-- **unmatched** — its selector never matched an element on any page. Read
+- **unmatched**: its selector never matched an element on any page. Read
   this as a fact about the corpus too: it *opens* what a page keeps closed,
   but it never types, hovers or clicks, so markup a script builds in
-  response to input — the search results Pagefind renders after a query —
+  response to input (the search results Pagefind renders after a query)
   lands here and is very much alive.
-- **not observable** — it sits under a media context the corpus does not
+- **not observable**: it sits under a media context the corpus does not
   enter (`forced-colors`, `print`, `prefers-reduced-motion: no-preference`),
   or behind a state it does not reach (`:hover`, `:focus`, `::backdrop`,
   `::selection`), or it does something a still photograph cannot show: an
@@ -381,7 +381,7 @@ verdicts:
   notch, an inset on a `position: sticky` box in a corpus that never
   scrolls, a transition. **Not a finding.** These have not been shown to be
   dead; they have not been looked at.
-- **unprobeable** — the declaration could not be taken out of the rule at
+- **unprobeable**: the declaration could not be taken out of the rule at
   all, because it is a longhand of a shorthand written with `var()`, which
   the engine stores whole. The experiment never ran, so there is no verdict.
 
@@ -390,7 +390,7 @@ that cannot say "I did not measure this" will eventually persuade someone
 to delete a hover state.
 
 The corpus is **one engine and one theme**: Chromium, default preset. Both
-halves of that have already produced a false `inert` — a `width` beside a
+halves of that have already produced a false `inert`: a `width` beside a
 `flex-basis` that Chromium ignores and Gecko and WebKit do not, and a
 `font-family` pinning the shell's chrome to the system stack, which does
 nothing until a preset makes the page face rounded. Both were caught by
@@ -408,20 +408,20 @@ node scripts/verify-dead-css.js --report .cache/dead-css.json
 ```
 
 `verify-dead-css.js` runs Firefox, WebKit and the `playroom` preset over
-that plan — a few dozen renderings rather than 800, minutes rather than
-hours — and turns each `inert` into one of:
+that plan (a few dozen renderings rather than 800, minutes rather than
+hours), and turns each `inert` into one of:
 
-- **inert** — nothing moved in any configuration. This is the verdict that
+- **inert**: nothing moved in any configuration. This is the verdict that
   makes a declaration safe to delete.
-- **engine-dependent** — Chromium measured nothing, Firefox or WebKit did.
+- **engine-dependent**: Chromium measured nothing, Firefox or WebKit did.
   Keep it, and name the engine in a comment beside it.
-- **preset-dependent** — the default theme measured nothing, `playroom`
+- **preset-dependent**: the default theme measured nothing, `playroom`
   did.
-- **unverified** — the configuration never entered the rule's media
+- **unverified**: the configuration never entered the rule's media
   condition, never matched its selector, or could not take the declaration
   out of the rule at all. Looked for, not measured; it keeps the sweep's
   verdict and gains no confirmation.
-- **interacting** — inert alone and not inert with the others. The pass
+- **interacting**: inert alone and not inert with the others. The pass
   ends by removing everything it just confirmed *at once*, because that is
   what a cleanup does and a one-at-a-time probe cannot see it: two
   declarations can each be dead only because the other is alive.
@@ -433,28 +433,28 @@ It also samples one width the sweep does not: 320px, below the shell's own
 22.5rem tier, which is where the original regression was seen and the only
 width that enters that tier at all. A fifth width costs a fifth of the
 sweep and almost nothing here. (It has not yet changed a verdict on its
-own — the pair above was caught at 1440. It is cheap insurance against the
+own; the pair above was caught at 1440. It is cheap insurance against the
 band nothing else samples.)
 
 It is not a third browser suite. It reuses the audit's corpus, its in-page
-measurement and its vocabulary, and it answers the audit's question — *does
-this declaration do anything?* — in more places. The other two keep their
+measurement and its vocabulary, and it answers the audit's question (*does
+this declaration do anything?*) in more places. The other two keep their
 own: `check:behavior` is what a page does, `check:visual` is what it looks
 like. Run them after acting on a report, not instead of reading it.
 
 Both tools measure a **copy** of the built site. `docs/dist` is a build
-output, and `npm run docs:build` replaces files in it — eleventy's
+output, and `npm run docs:build` replaces files in it: eleventy's
 passthrough copy replaces `styles/style.css` rather than editing it, so
 there is a window in which a page loads with no stylesheet at all. A sweep
 that runs for the better part of an hour cannot ask everyone else not to
 build, so it copies the tree once at startup (8 MB, well under a second),
-serves the copy, and removes it when the run ends — including when the run
+serves the copy, and removes it when the run ends, including when the run
 ends by throwing. `npm run check:tooling` is the proof: it rewrites
 `docs/dist` underneath an open corpus and checks the corpus never sees it.
 
 What they cannot copy is the source they are a claim about. A sweep ends
 with a list of declarations to delete from `docs/src/styles/style.css`, and
-that list only means anything for the file the sweep started with — so run
+that list only means anything for the file the sweep started with, so run
 one worker at a time against a working tree. Two editors, terminals or
 automated assistants sharing one checkout will eventually have one of them
 rewrite a file the other is half an hour into validating, and the result
@@ -480,9 +480,9 @@ check that blocks a merge over one only teaches people to stop running it.
 * **Don't regress the accessibility floor.** Contrast ratios, focus
   visibility, and the 44px control target size are verified properties of
   the source; a PR that trades them away for aesthetics won't land. The
-  target size is a floor, not a fixed height — controls may grow past it,
+  target size is a floor, not a fixed height: controls may grow past it,
   and `nav` opts down to a 40px band that remains above WCAG 2.5.8's 24px
-  minimum — so the property to preserve is that nothing drops below what it
+  minimum, so the property to preserve is that nothing drops below what it
   is entitled to.
 * **Stay on the spacing scale.** Spacing values are `--cirth-space-*`
   tokens (0.25rem steps to 1.5, 0.5 steps to 3, then whole rems). If a

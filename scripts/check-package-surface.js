@@ -25,7 +25,7 @@ const projectRoot = path.join(__dirname, "..");
 const manifest = require("../package.json");
 
 // tsc types package.json from its literal contents, so a field that is
-// absent today has no type — and "is this field absent?" is exactly what
+// absent today has no type, and "is this field absent?" is exactly what
 // several checks below ask. This is the same object seen as plain data.
 const manifestFields = /** @type {Record<string, unknown>} */ (
 	/** @type {unknown} */ (manifest)

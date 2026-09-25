@@ -99,7 +99,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 
 // The same 44px target, as a floor rather than a fixed height. A select
 // grows with its longest option and a textarea with its rows, so neither
-// can be pinned the way an input is — but both would otherwise reach the
+// can be pinned the way an input is, but both would otherwise reach the
 // target only by coincidence, since their height falls out of the text
 // inside them. Set a smaller font-size on a select and it quietly drops
 // below the threshold; this is what keeps WCAG 2.5.5 a property of the
@@ -472,7 +472,7 @@ $validation-any: "[aria-invalid], #{$invalid-native}";
   // explicit rows="2" would be worse than the default it replaced. Same
   // shape as select:not([multiple], [size]) above.
 
-  // Measured in `lh` — the element's own line box — so four rows means
+  // Measured in `lh` — the element's own line box, so four rows means
   // four rows of whatever text this textarea is actually set in, not four
   // rows of the default type scale. That is the opposite of the target
   // size floor below, which must not move when the type does. Padding and

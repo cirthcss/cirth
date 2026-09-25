@@ -3,14 +3,14 @@
     The argument this page makes is one move long: semantic HTML on the
     left, the interface Cirth renders from it on the right, close enough
     together that the eye reads them as one object. Everything here is in
-    service of that and nothing else — including the fact that only one
+    service of that and nothing else, including the fact that only one
     of the two is in a frame. The source is a document being shown; the
     output is the thing itself.
 
     What the composition deliberately does not have: a per-character
     reveal, an erase cycle, a rAF scheduler, output elements gated on
     offsets found in the source text, an IntersectionObserver, a
-    focus/selection settler, a `window` test surface to drive it all —
+    focus/selection settler, a `window` test surface to drive it all,
     and, now, any control at all. The build and theme selects that used to
     sit in these two title bands were the last thing here asking to be
     understood before the demo could be: a reader had to work out what
@@ -19,7 +19,7 @@
     reader who wants them is already looking for evidence.
 
     The write-in is a CSS wipe (docs/src/styles/style.css), so the whole
-    snippet is in the DOM and complete at every frame — selection, copy,
+    snippet is in the DOM and complete at every frame: selection, copy,
     assistive technology and no-JS see the same finished source they
     always did, and the panel cannot reflow because nothing about it
     changes. The script below is what is genuinely left: one thing markup
@@ -32,7 +32,7 @@
 	    title band all come from the card contract, with the two block-spacing
 	    tokens zeroed so the band bleeds to the edges and each cell carries
 	    its own padding. The five declarations the shell used to restate here
-	    — border, radius, background, shadow, clip — were the card's own
+	    (border, radius, background, shadow, clip) were the card's own
 	    values written out by hand on the most visible surface of a site whose
 	    argument is that you do not have to. The tokens are on the element
 	    because that is the API: the knob is the token, never the padding. -#}
@@ -46,8 +46,8 @@
 	{#- The output is not in a panel. It used to be a second .docs-plate
 	    with its own "Output" title band, which put the shell's frame
 	    around the one thing on this page that is not the shell: a card
-	    Cirth has already finished. Two frames, and the inner one — the
-	    real one — read as the contents of the outer one. What is left is
+	    Cirth has already finished. Two frames, and the inner one, the
+	    real one, read as the contents of the outer one. What is left is
 	    the rendered page itself, lifted off the source and labelled by
 	    the iframe's title rather than by a band above it.
 
@@ -73,8 +73,8 @@
 		if (!frame) return;
 
 		// All that is left. The demo has no controls: a reader should be
-		// able to take the argument — semantic HTML on one side, the
-		// interface Cirth renders from it on the other — without being
+		// able to take the argument (semantic HTML on one side, the
+		// interface Cirth renders from it on the other) without being
 		// asked to operate anything first. The one thing that still cannot
 		// be expressed in markup is that the framed document is a separate
 		// document, so it does not inherit the page's colour scheme; this

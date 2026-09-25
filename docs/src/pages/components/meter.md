@@ -57,7 +57,7 @@ measurement at all, neither element applies.
   same signal survives a reader who can't separate green from red. All
   three clear 3:1 against the track in both schemes.
 * **A meter with no `low`/`high`/`optimum` is entirely optimum** — that is
-  what the spec says — so it renders as one flat green bar. Set the
+  what the spec says, so it renders as one flat green bar. Set the
   thresholds if the reading has a good and a bad end.
 * Cross browser: the native appearance is reset and rebuilt through
   `::-webkit-meter-*` in Chrome, Edge and Safari, and through

@@ -109,7 +109,7 @@
       // every pair of adjacent links overlapped by 16px.
 
       // Keyed to the gutter it actually cancels, the chain closes at any
-      // value — and it closes to *nothing* at zero, which is what a nav
+      // value, and it closes to *nothing* at zero, which is what a nav
       // that is not a bar needs. See the vertical nav at the end of this
       // file: a stacked nav is a nav whose inline gutter is zero, and it is
       // now expressed that way rather than by undoing three insets by hand.
@@ -310,7 +310,7 @@ $navbar-selector: "header:not(:is(article, aside, dialog, figure, li, nav, secti
 
 // Toggler. Bootstrap's `.navbar-toggler` is deliberately unfilled —
 // `background-color: transparent`, a sober border, and a focus ring of its
-// own — so the control reads as chrome rather than as a form field that
+// own, so the control reads as chrome rather than as a form field that
 // wandered into the header. Here it is a <summary>, because the collapse is
 // <details>: native, and still zero JavaScript in the library.
 // Inside the same `@if` the dropdown component itself lives in: `.dropdown`
@@ -329,7 +329,7 @@ $navbar-selector: "header:not(:is(article, aside, dialog, figure, li, nav, secti
 
 // `aside nav`, not `aside`. The trigger for a stacked nav is a nav inside
 // a complementary region, but the selector was reaching every list in the
-// <aside> — so a plain <ul> of related links in a sidebar had `display:
+// <aside>, so a plain <ul> of related links in a sidebar had `display:
 // block` forced onto its items, which is not `list-item`: the markers
 // stopped being generated, and the list also picked up the nav's item
 // padding. A prose list in an aside is a prose list.
@@ -405,6 +405,6 @@ $navbar-selector: "header:not(:is(article, aside, dialog, figure, li, nav, secti
 // Breadcrumb RTL: no override needed — the default ">" divider has the
 // Unicode Bidi_Mirrored property, so RTL rendering mirrors it to "<" on
 // its own. (The inherited Pico rule targeted ` ::after` as a descendant —
-// it never matched the divider — and hardcoded a "\" on top of it.)
+// it never matched the divider, and hardcoded a "\" on top of it.)
 
 /* cirth-component:end */

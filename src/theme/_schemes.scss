@@ -27,7 +27,7 @@
 
 // The other half was reach, and specificity could not fix it. While these
 // blocks declared the palette itself, an element carrying data-theme got
-// every colour declared *on it* — and a declaration on an element beats one
+// every colour declared *on it*, and a declaration on an element beats one
 // inherited from an ancestor at any weight. A consumer override written at
 // :root therefore stopped at the edge of any subtree that forced a scheme,
 // and the documentation had to tell people to repeat it there. That was a

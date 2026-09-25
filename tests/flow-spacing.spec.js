@@ -8,7 +8,7 @@ const { setContent } = require("./helpers/render");
 // a card's header band does with a heading inside it, and where a
 // disclosure draws its focus ring. All three were found from the
 // documentation home page and all three were fixed in the library,
-// because all three are wrong in any page that uses the component — so
+// because all three are wrong in any page that uses the component, so
 // they are pinned here, against the compiled stylesheet, with no
 // documentation shell anywhere near them.
 
@@ -42,7 +42,7 @@ const render = (page, css, markup) =>
 /**
  * A token read off the element that resolves it. Several of these are
  * rebound per element — every heading level carries its own
- * --cirth-typography-spacing-top — so reading them off the root would
+ * --cirth-typography-spacing-top, so reading them off the root would
  * compare a measurement against a value nothing on the page uses.
  * @param {import("@playwright/test").Page} page
  * @param {string} selector

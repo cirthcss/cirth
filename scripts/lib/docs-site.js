@@ -48,7 +48,7 @@ const assertDocsBuilt = (label) => {
 // replace any file in it at any moment, and eleventy's passthrough copy
 // *replaces* rather than edits, so there is a window in which
 // styles/style.css does not exist at all. A run that reads the directory
-// directly can therefore fail — or, worse, measure two different builds
+// directly can therefore fail, or, worse, measure two different builds
 // and report the difference as a finding.
 //
 // The audit and the fingerprint take minutes to hours; a build takes

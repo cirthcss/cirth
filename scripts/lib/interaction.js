@@ -1,7 +1,7 @@
 // The interaction model behind the dead-CSS verification pass.
 //
 // One question, asked of a live document: if a cleanup deleted this whole
-// set of declarations at once, would anything move — and if so, which
+// set of declarations at once, would anything move, and if so, which
 // members is the movement actually made of?
 //
 // It lives here, apart from scripts/verify-dead-css.js, because the answer
@@ -21,7 +21,7 @@
 // stops moving. That is exactly right for one interacting group and wrong
 // for two. With two independent pairs, removing all-but-one always leaves
 // the other pair fully removed, so the page always moves, so nothing is
-// ever named — and the tool reports "something moved, no idea what".
+// ever named, and the tool reports "something moved, no idea what".
 //
 // Greedy minimisation answers the same question without that blind spot.
 // Take the whole moving set and try to drop each member in turn, keeping
@@ -189,7 +189,7 @@ const measureTogether = ({ needle, wanted }) => {
 		// The repeat is not belt and braces. A single greedy pass measures
 		// each drop against whatever the set happened to be at that moment,
 		// so a member kept early was judged against a larger set than the
-		// one that comes back — and CSS does not promise that removing less
+		// one that comes back, and CSS does not promise that removing less
 		// moves less, so it can turn out to be droppable from the smaller
 		// set after all. Running to a fixpoint means every member of the
 		// result has been measured against the result, which is what makes

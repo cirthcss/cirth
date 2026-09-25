@@ -106,7 +106,7 @@ for (const build of [
 		);
 
 		// The scoped builds are anchored in a wrapper and must not reach the
-		// document root, so they cannot lock the page — and must not try.
+		// document root, so they cannot lock the page, and must not try.
 		if (build.scoped) {
 			expect(source).not.toContain("html:has(dialog:modal)");
 		} else {

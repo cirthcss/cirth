@@ -36,7 +36,7 @@ const lastStableRelease = () => {
 	if (released.length === 0) {
 		throw new Error(
 			`${version} is a prerelease, so the documented CDN snippets should ` +
-				`stay on the last stable release — but ${path.relative(
+				`stay on the last stable release, but ${path.relative(
 					projectRoot,
 					releaseNotesDir,
 				)} lists none.`,

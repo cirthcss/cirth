@@ -5,7 +5,7 @@
 // being redeclared separately wherever they're used.
 // All five scales below (neutral + the four chromatic families) share one
 // 19-step lightness ladder — 950 (darkest) down to 50 (lightest), evenly
-// spaced from 18% to 96% — so picking a step is the same exercise
+// spaced from 18% to 96%, so picking a step is the same exercise
 // regardless of which family you're in, and there are no gaps: every
 // family defines every step.
 // Chroma is derived, not hand-picked. Each chromatic family is pinned to
@@ -14,7 +14,7 @@
 // family's voice:
 //   - $error-*, $success-*, $warning-* sit at 85%. A status color has to
 //     be recognised at a glance in a small mark — a validation border, a
-//     meter segment, a word of inserted text — and it appears rarely.
+//     meter segment, a word of inserted text, and it appears rarely.
 //   - $copper-* sits at 70%. The brand accent is the opposite case: it
 //     covers whole surfaces (a filled button, a focus ring, a checked
 //     control) and shows up on every screen, so the same 85% that makes a

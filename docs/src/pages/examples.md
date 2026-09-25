@@ -69,5 +69,5 @@ build):
 Every layout primitive, form control, and component has its own live
 demo with full HTML source on its documentation page — see
 [Layout](/layout/document), [Forms](/forms/), and
-[Components](/components/card) — and [Get Started](/get-started) walks
+[Components](/components/card), and [Get Started](/get-started) walks
 through a complete starter document build by build.

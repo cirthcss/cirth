@@ -15,7 +15,7 @@ const { spawnSync } = require("node:child_process");
 //
 // That half is a JSON parser, and a parser is only as good as the shape it
 // is written against. The first version of it keyed on `test.ok` — a field
-// this Playwright does not emit at all — so it would have reported nothing,
+// this Playwright does not emit at all, so it would have reported nothing,
 // for ever, and looked like good news. Reading a hand-written fixture would
 // not have caught that; only a real report does.
 //
@@ -285,7 +285,7 @@ const run = () => {
 	);
 	passed("a retry-recovered run exits zero and is still annotated");
 
-	// 7. Nothing flaky, nothing said — and no annotation at all, so a clean
+	// 7. Nothing flaky, nothing said, and no annotation at all, so a clean
 	//    run does not train anyone to ignore warnings.
 	const clean = runPlaywright(["--grep", "steady"]);
 	assert.equal(clean.status, 0, "the steady-only run should pass");

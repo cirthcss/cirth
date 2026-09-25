@@ -28,7 +28,7 @@ test.afterAll(() => {
 // Access (Safari's "Press Tab to highlight each item on a webpage"). It
 // is a platform preference, not a property of this page — a document
 // containing nothing but a link, a button and a summary behaves the same
-// way — so assertions about Tab *arriving* at a link or a button would be
+// way, so assertions about Tab *arriving* at a link or a button would be
 // asserting that setting. The controls themselves are still checked on
 // every engine; only the walk to them is skipped.
 //
@@ -335,7 +335,7 @@ test("header keeps navigation, search, and automatic versioning distinct", async
 	expect(placeholder.weight).toBe("400");
 
 	// Hover and focus move the surface and the border, the way a field's
-	// do — and leave the placeholder, and the size, exactly where they are.
+	// do, and leave the placeholder, and the size, exactly where they are.
 	await searchTrigger.hover();
 	const searchHover = await box(searchTrigger);
 	expect(searchHover.background).toBe(searchRest.background);
@@ -573,7 +573,7 @@ test("the navbar collapses at a single breakpoint with a complete menu", async (
 	// The shell used to have three states, not two. The toggler appeared at
 	// 1023px but the controls only moved into it at 575px, so across the
 	// whole tablet range the menu opened onto an empty "Display" heading
-	// while version, preset and theme sat outside it — and the bar, unable
+	// while version, preset and theme sat outside it, and the bar, unable
 	// to fit them beside the search, wrapped onto a second grid row: a
 	// 155px sticky header on every page. Both halves are asserted here,
 	// because either one alone can come back.
@@ -725,7 +725,7 @@ test("the navbar states are a contrast ladder, not the accent", async ({
 	page,
 }) => {
 	// Bootstrap's navbar ladder: resting ink below the hover step, hover
-	// below the current item, current at full contrast — and none of the
+	// below the current item, current at full contrast, and none of the
 	// three is the accent, which in chrome belongs to actions.
 	await page.setViewportSize({ width: 1280, height: 800 });
 	await page.goto(`${origin}/get-started/`, { waitUntil: "networkidle" });
@@ -846,7 +846,7 @@ test("every claim says what kind it is, and how to check it", async ({
 	}
 
 	// The vocabulary is three words, used by both halves of the section —
-	// the strip and the list under it — so a reader learns it once.
+	// the strip and the list under it, so a reader learns it once.
 	const kinds = await page
 		.locator(".docs-proof .docs-proof-state")
 		.evaluateAll((marks) => marks.map((mark) => mark.textContent?.trim()));
@@ -1203,7 +1203,7 @@ test.describe("without JavaScript", () => {
 // rendered into the page, and highlighted into the pane beside it. The
 // point of doing it that way is that the two cannot drift — the hero has
 // had exactly that bug before, a snippet declaring attributes the rendered
-// output no longer had — so the contract to pin is equality, not the
+// output no longer had, so the contract to pin is equality, not the
 // presence of either half.
 const normalizeMarkup = (/** @type {string} */ html) =>
 	html
@@ -1478,7 +1478,7 @@ test("every control in the showcase specimens is reachable and takes a ring", as
  * The listing beside the preview and the stylesheet the preview is really
  * carrying, normalised the same way. The listing breaks a `light-dark()`
  * value over three lines to fit the pane; the applied declaration is one
- * line. Collapsing whitespace — and the padding a broken line leaves
+ * line. Collapsing whitespace, and the padding a broken line leaves
  * inside the parentheses — compares the declarations rather than the two
  * formattings of them.
  * @param {string} css
@@ -1598,7 +1598,7 @@ test("the theme preview carries its own Cirth, in a shadow root", async ({
 	}
 
 	// Nothing is marked before anything has moved, and the demo is served
-	// in the default theme — the page's own — so the section opens on
+	// in the default theme — the page's own, so the section opens on
 	// agreement rather than on a difference the reader did not ask for.
 	expect(state.marked).toEqual([]);
 	expect(state.accent).toBe(state.pageAccent);
@@ -1763,7 +1763,7 @@ test("the theme demo's control keeps the band's ink in every state", async ({
 	// aliases, because a <button> rebinds --cirth-color and a control
 	// reaching for it inside itself got the button's on-surface ink. The
 	// library now names the page roles separately — --cirth-ink and
-	// --cirth-canvas, neither of which a component may rebind — so the
+	// --cirth-canvas, neither of which a component may rebind, so the
 	// control reads them directly and there is no alias left to drift.
 	const band = await page
 		.locator(".docs-theme-showcase .docs-stage-band")
@@ -1930,7 +1930,7 @@ test("every showcase is one contained stage, not three loose columns", async ({
 	}
 
 	// The live half is not a thumbnail: it takes at least as much of the row
-	// as the listing that explains it — and in the theme stage, where the
+	// as the listing that explains it, and in the theme stage, where the
 	// cause is three declarations long, rather more.
 	for (const scope of [
 		'[data-docs-panel="article"]',
@@ -2391,7 +2391,7 @@ test("the sidebar rail is a visible edge inside its aside", async ({ page }) => 
 
 // The flush card, dogfooded. The hero's Source panel and both overlay
 // panels are <article>s with the card's knobs moved, not hand-restated card
-// contracts — so the frame, the radius, the surface and the header's bleed
+// contracts, so the frame, the radius, the surface and the header's bleed
 // to the card's edges all arrive from components/_card.scss.
 test("the shell's flush panels are cards with their knobs moved", async ({
 	page,
@@ -2447,7 +2447,7 @@ test("the shell's flush panels are cards with their knobs moved", async ({
 });
 
 // A metrics panel is `.grid` plus a <dl>, which is what the framework tells
-// everyone else to do — and the panel's cells are divided by the grid gap
+// everyone else to do, and the panel's cells are divided by the grid gap
 // with the container's colour showing through, which holds at any column
 // count without a :nth-child ladder to restate in a media query.
 test("the metrics panels are gridded description lists divided by their gap", async ({

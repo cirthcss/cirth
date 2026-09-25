@@ -77,7 +77,7 @@ treatment with its active edge.
 A navbar also wraps rather than overflowing, and centres its items on the
 same 40px band its links occupy, so a brand lockup, a search field, and a
 `details` disclosure used as a toggler all line up on one row. The toggler
-is unfilled — a sober border and its own focus ring — so it reads as chrome
+is unfilled — a sober border and its own focus ring, so it reads as chrome
 and not as a form control that wandered into the header.
 
 ## Vertical nav

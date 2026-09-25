@@ -147,7 +147,7 @@ One behaviour change, on an attribute that was doing more than it says.
 
 `aria-busy="true"` set `pointer-events: none` on buttons and links, so a
 busy control could not be clicked. It could still be activated with Enter
-or Space, because CSS cannot reach keyboard activation — so the protection
+or Space, because CSS cannot reach keyboard activation, so the protection
 covered the pointer and left the keyboard open, which is worse than not
 having it: the behaviour differed by input method and nothing announced it.
 
@@ -195,7 +195,7 @@ untreated output you would get from a page that never had it.
 Load it after the main build: the pass wins over the component rules it has
 to outrank by source order, exactly as it did inside the bundle. Each build
 has its matching sheet — `cirth.print.classless.min.css`,
-`cirth.print.scoped.min.css`, `cirth.print.classless.scoped.min.css` — or,
+`cirth.print.scoped.min.css`, `cirth.print.classless.scoped.min.css`, or,
 from npm, `@cirthcss/cirth/print` and its `classless`/`scoped` variants.
 
 It moved because print styling is around 900 B gzipped that is never needed
@@ -288,7 +288,7 @@ accent's hover, focus and underline derive from `--cirth-primary`.
 
 An outline button used to be transparent. It paints `--cirth-canvas`, the
 page surface, and tints it on hover. Nothing changes where one sits on the
-page — which is most places — but on a card, a coloured band or a header it
+page — which is most places, but on a card, a coloured band or a header it
 used to show the backdrop through and now does not.
 
 If transparent was what you wanted, that is `.ghost`: no surface, no
@@ -332,7 +332,7 @@ Neither of these is breaking, but both change what you have to write:
   family.
 * **`--cirth-canvas` is new**: the page surface as a value of its own.
   `--cirth-background-color` is the slot components paint through — a
-  button rebinds it to its own fill — so it was never a reliable way to
+  button rebinds it to its own fill, so it was never a reliable way to
   refer to *the page*. It defaults to `--cirth-canvas` now. If you set the
   page colour, set the canvas; if you were setting
   `--cirth-background-color` at `:root`, it still works, but anything
@@ -373,7 +373,7 @@ users and was invisible to everyone else.
 ```
 
 The message is now a real element with a real id, so `aria-describedby`
-reaches it even while it is closed. See [Popover](/components/popover) —
+reaches it even while it is closed. See [Popover](/components/popover),
 and note that it opens on activation rather than hover, which is a
 deliberate difference and not a limitation to work around.
 
@@ -384,7 +384,7 @@ supplementary by design.
 
 `.modal-is-open`, `.modal-is-opening`, `.modal-is-closing` and
 `--cirth-scrollbar-width` no longer exist. A script that still toggles
-those classes keeps working — they simply do nothing — so nothing breaks
+those classes keeps working — they simply do nothing, so nothing breaks
 on upgrade. What changes is that you can delete that code:
 
 ```js
@@ -410,7 +410,7 @@ engine ships yet.
 
 This one breaks by starting to work. Overriding a color from `:root` used
 to do nothing — the scheme roots outweighed it, whatever the loading order
-— so an override written, found ineffective and left in the codebase now
+, so an override written, found ineffective and left in the codebase now
 takes effect on upgrade.
 
 ```css

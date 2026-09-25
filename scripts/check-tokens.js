@@ -14,7 +14,7 @@ const { EXTENSION, readSchemes } = require("./lib/tokens");
 // either exported or listed as unrepresentable, so nothing is dropped.
 //
 // The second is the one that matters. Most colour tokens are computed by
-// the browser — color-mix(), relative colours — and the export resolves
+// the browser — color-mix(), relative colours, and the export resolves
 // them itself. So each exported colour is compared with what Chromium,
 // Firefox and WebKit compute for the same token on dist/cirth.css in the
 // same scheme. A resolver that is subtly wrong about hue interpolation or

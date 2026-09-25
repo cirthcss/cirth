@@ -186,7 +186,7 @@ $print-root-selector: "body";
     }
 
     // Where a link points is the one thing paper can't resolve for itself.
-    // Absolute URLs only — in-page and relative hrefs print as noise — and
+    // Absolute URLs only — in-page and relative hrefs print as noise, and
     // never for navigation or controls, where the label is the whole point.
 
     #{$parent-selector} a[href^="http"]:not([role="button"], nav a)::after {

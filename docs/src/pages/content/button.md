@@ -54,7 +54,7 @@ one thing: whether the control owns an opaque surface.
 
 `.outline` does. It paints `--cirth-canvas`, the page surface, so it stays
 a control wherever it sits rather than letting whatever is behind it show
-through — and it draws a border. `.ghost` owns neither, which makes it the
+through, and it draws a border. `.ghost` owns neither, which makes it the
 right choice for an icon button in a header or a toolbar, where a border
 would be one line too many.
 

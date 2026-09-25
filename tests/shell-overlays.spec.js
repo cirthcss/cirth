@@ -370,7 +370,7 @@ test("the drawer is a modal surface with a way out of it", async ({ page }) => {
 	// A drawer with room in it: the full height of the screen, and wide
 	// enough to label its controls rather than squeeze them. Measured
 	// against the layout viewport, which is the box the panel is pinned to
-	// — and checked again 15px narrower, which is that same phone on a
+	//, and checked again 15px narrower, which is that same phone on a
 	// platform with classic scrollbars (helpers/viewport.js).
 	for (const width of withAndWithoutScrollbar(390)) {
 		await page.setViewportSize({ width, height: 844 });
@@ -422,7 +422,7 @@ test("the home page never scrolls sideways", async ({ page }) => {
 		// hairline strip that reflows, and the two claims left are a list
 		// that wraps. What still scrolls on this page is the code panes,
 		// and the reason they are allowed to is that a listing must not
-		// break an attribute across two lines — so the contract that
+		// break an attribute across two lines, so the contract that
 		// survives is the same one, asserted where it is now true: anything
 		// that scrolls can be reached to scroll it.
 		const panes = page.locator(".docs-native-home pre");

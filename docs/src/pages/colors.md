@@ -24,7 +24,7 @@ reasonably should.
 * **`playroom`** is the expressive end: a soft violet accent, surfaces
   tinted toward it, large radii, a rounded system face, generous spacing,
   springy motion, and a wide soft shadow. It reaches across colour,
-  geometry, typography, motion and depth — and overrides two *derived*
+  geometry, typography, motion and depth, and overrides two *derived*
   tokens on purpose, so its hover lightens rather than darkens. Suited to a
   consumer app, a community site, or a tool aimed at children.
 
@@ -105,7 +105,7 @@ gamut talking, not an inconsistency between families.
 `$neutral-*` is derived differently, because it isn't an accent. Its chroma
 is a bell that peaks mid-ladder and fades to nothing at the pale end — a
 light grey needs more chroma than a dark one to read as cool rather than as
-plain grey, and a large pale surface needs none at all — but it doesn't
+plain grey, and a large pale surface needs none at all, but it doesn't
 return to zero at the dark end. It floors at 70% of the peak, because the
 dark scheme builds its canvas out of the two darkest steps, and a bell that
 closed symmetrically left that canvas achromatic whatever hue the family

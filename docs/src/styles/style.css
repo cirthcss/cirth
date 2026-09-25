@@ -220,7 +220,7 @@
    Zero the two spacing *tokens*, never `padding: 0`. A card's header
    bleeds to the edge with a negative inline margin of
    --cirth-block-spacing-horizontal, so zeroing the padding alone leaves
-   the bleed reading a 1.25rem that is no longer there — and every band
+   the bleed reading a 1.25rem that is no longer there, and every band
    then has to be repaired by hand. This is the trap this site's own Card
    page documents. */
 .docs-search-dialog > article {
@@ -552,7 +552,7 @@
 /* Scoped to the header rather than doubled as
    `.docs-theme-toggle.docs-theme-toggle`. It has to outweigh the library's
    `nav li [type=button]` at (0,1,2) — not `nav li button`, which one class
-   already beats — and saying where the rule applies is both enough and
+   already beats, and saying where the rule applies is both enough and
    checkable. */
 .docs-header .docs-theme-toggle {
   display: inline-flex;
@@ -708,7 +708,7 @@
    wrong in a tall column. A drawer's nav is a stack, and it says so the way
    the framework asks: `--cirth-nav-element-spacing-horizontal: 0`. That one
    token releases all three of the nav's inline insets — the list's negative
-   margin, the item's padding, the link's negative margin — so none of them
+   margin, the item's padding, the link's negative margin, so none of them
    needs undoing by hand. */
 .docs-drawer > article > nav {
   --cirth-nav-element-spacing-horizontal: 0;
@@ -721,7 +721,7 @@
 
 /* Two columns, because a drawer has the width for them and a column of
    three short words down the inline edge wastes it. The list still
-   reads in DOM order — grid fills row by row — so the tab order and the
+   reads in DOM order — grid fills row by row, so the tab order and the
    reading order are the same order they are in the bar. */
 .docs-drawer > article > nav > ul {
   display: grid;
@@ -758,7 +758,7 @@
 }
 
 /* "Display" heads the three controls the script moves in here. Above the
-   collapse breakpoint, or with no script, they are not here — so the group
+   collapse breakpoint, or with no script, they are not here, so the group
    exists exactly when its contents do, rather than opening onto a heading
    over nothing. */
 .docs-mobile-controls:not(:has([data-docs-header-control])) {
@@ -861,7 +861,7 @@
 	   width from the item's own width, and without it the cluster comes out
 	   66px wide holding 88px of controls, hanging the menu toggle off a
 	   320px screen. Each is inert *alone* in all three engines — remove
-	   either and the other still states the cluster — and live as a pair,
+	   either and the other still states the cluster, and live as a pair,
 	   which is how a cleanup deletes them. */
   .docs-header-search {
     flex: 0 0 var(--cirth-space-10);
@@ -907,7 +907,7 @@
 
 /* Docs prose: airier than the framework default, and capped at a
    comfortable measure. Long-form documentation is read differently from an
-   application screen, so the column re-times itself — but the re-timing
+   application screen, so the column re-times itself, but the re-timing
    stops at the edge of a live example (see `.docs-demo-preview`), because
    both of these tokens inherit and a demo is a descendant of this column. */
 .docs-content {
@@ -1619,7 +1619,7 @@ pre > button.copy.copied::before {
 
 /* Source and Output, overlapping.
    ––––––––––––––––––––
-   The claim is one move long — this markup produces this interface — so
+   The claim is one move long — this markup produces this interface, so
    the two halves are two cards that touch, not two panes of one panel.
    Each carries its own control in its own title band: Build changes the
    source, Theme changes the rendering.
@@ -1835,7 +1835,7 @@ pre > button.copy.copied::before {
    Muted, monospace, extra-small, uppercase, slightly tracked out: the label
    this shell puts on a measurement, a claim type, or the name of a panel.
    Editorial voice rather than anything the framework should own — an
-   application does not want its <dt>s shouting in monospace — and one rule
+   application does not want its <dt>s shouting in monospace, and one rule
    rather than three, which is how the tracking drifted last time.
 
    The state marks it carries are Phosphor glyphs from the set the shell
@@ -1850,7 +1850,7 @@ pre > button.copy.copied::before {
   font-size: var(--cirth-font-size-xs);
   /* Stated, not inherited. <dt> now arrives semibold from the framework
      (content/_typography.scss), which is right for a term in a description
-     list and wrong for a monospace annotation label — so the voice says
+     list and wrong for a monospace annotation label, so the voice says
      what weight it is rather than taking whatever element it lands on. */
   font-weight: var(--cirth-font-weight-regular);
   letter-spacing: 0.04em;
@@ -1876,7 +1876,7 @@ pre > button.copy.copied::before {
    Showcase sections: a heading, one sentence, and a stage.
    ––––––––––––––––––––
    A stage is one object — a hairline container, a title band, and the
-   panes inside it — so the eye reads "one example" rather than "three
+   panes inside it, so the eye reads "one example" rather than "three
    widgets". The heading sits above it at full width. Spreading copy,
    source and result across three columns of the section grid instead
    leaves the live half at under half the content width and the listing
@@ -1932,7 +1932,7 @@ pre > button.copy.copied::before {
 
 /* The panes get their own grid rather than being items of the stage: a
    band spanning `1 / -1` over an auto-fit track list holds the spare
-   tracks open — they are not empty, the band is in them — and the unused
+   tracks open — they are not empty, the band is in them, and the unused
    ones then show as a slab of the container's colour. Nested, nothing
    spans, and auto-fit collapses what it should. */
 .docs-stage-body {
@@ -2082,7 +2082,7 @@ pre > button.copy.copied::before {
 
 /* The claim, at the strip's own size. A direct child, because the size
    cell carries a second <strong> inside its caption — the measured figure
-   — and that one is an annotation rather than the headline. */
+, and that one is an annotation rather than the headline. */
 .docs-proof-metrics dd > strong {
   font-size: var(--cirth-font-size-2xl);
   line-height: var(--cirth-line-height-none);
@@ -2094,7 +2094,7 @@ pre > button.copy.copied::before {
 }
 
 /* The one number left in the strip, inside the sentence that dates it. It
-   is set as a value rather than as running text — but in the caption,
+   is set as a value rather than as running text, but in the caption,
    because "14.7 KB" on its own is the shape of a promise and "14.7 KB
    gzipped in this build" is the shape of a measurement. */
 .docs-proof-metrics dd small .docs-proof-figure {
@@ -2295,7 +2295,7 @@ cirth-theme-preview {
   min-width: 0;
 }
 
-/* Before the element upgrades — and for a reader with no script at all —
+/* Before the element upgrades, and for a reader with no script at all —
    its children are ordinary light-DOM markup, rendered by the page's own
    Cirth. It is the same specimen, finished, and it needs the padding the
    pane just gave away. `:not(:defined)` is exactly this state and nothing
@@ -2470,7 +2470,7 @@ cirth-theme-preview:not(:defined) {
 }
 
 /* Placement, and nothing else. A FAQ is the canonical use of the
-   disclosure component and should look like it — and the showcase above
+   disclosure component and should look like it, and the showcase above
    lists this very element as its source, so anything the shell restyles
    here makes that listing describe something the reader is not looking
    at. */
@@ -2725,7 +2725,7 @@ cirth-theme-preview:not(:defined) {
    ––––––––––––––––––––
    Four surfaces on this site are grids of cells divided by hairlines
    inside a frame. They are not cards — a card is a container with a tinted
-   header band and a padded body — and almost-a-card is the worst available
+   header band and a padded body, and almost-a-card is the worst available
    answer, because the reader spends the page deciding which one they are
    looking at. The grammar:
 
@@ -2738,7 +2738,7 @@ cirth-theme-preview:not(:defined) {
      · A title band is a band, not a card header: the same hairline
        underneath, --cirth-space-5 of rhythm — which is exactly the card's
        horizontal padding, so the plate agrees with the card about rhythm
-       and disagrees about structure — and no tint.
+       and disagrees about structure, and no tint.
 
    What they keep from the framework is the part that is brand rather than
    component: the hairline on all four edges and the container radius. See
@@ -3186,7 +3186,7 @@ details.docs-toc-top {
   margin-block: 2rem 5rem;
 }
 
-/* The third `.grid` + <dl> metrics panel, divided by its gap — and the one
+/* The third `.grid` + <dl> metrics panel, divided by its gap, and the one
    that shows why the gap is worth the technique: a border ladder has to
    suppress :nth-child(3n) here and :nth-child(2n) in the narrow tier, so
    the same divider is described twice in terms of a column count declared
@@ -3230,7 +3230,7 @@ details.docs-toc-top {
 }
 
 /* Four build panes, divided by the gap. The <figure> stays a <figure> — a
-   captioned specimen is what the element is for — and its dividing lines
+   captioned specimen is what the element is for, and its dividing lines
    are the container's, so dropping to one column below the 48rem tier is
    the column count alone. */
 .docs-build-comparison > div {

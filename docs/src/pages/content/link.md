@@ -21,7 +21,7 @@ The second paragraph of that example is the `:visited` state, and it is the
 one state on this page that cannot be mocked up: a browser paints it only
 for a link you have really followed, and reports the unvisited colour to
 `getComputedStyle` so a page cannot read it back. So the example does the
-only honest thing — it asks you to follow the link and return — and prints
+only honest thing — it asks you to follow the link and return, and prints
 the token's own colour beside it, which is always visible.
 
 If the followed link still looks unvisited when you come back, the browser

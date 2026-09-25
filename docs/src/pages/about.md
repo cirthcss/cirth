@@ -34,7 +34,7 @@ already a finished, accessible baseline.
   and `<dialog>` behavior. It is a statement about what the package
   contains, not about your application, which is free to use JavaScript for
   anything it needs.
-- Four builds — default, classless, scoped, and scoped classless — so the
+- Four builds — default, classless, scoped, and scoped classless, so the
   same token system can style a page directly, style zero-class markup, or
   stay scoped inside a `.cirth` wrapper.
 

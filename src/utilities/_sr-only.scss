@@ -53,7 +53,7 @@
       // utility has to bring a surface with it: text revealed on top of
       // other text is not a successful reveal. The page's own canvas and
       // ink — both roles no component can rebind, which is exactly why
-      // --cirth-ink exists — so this carries no colour of its own and
+      // --cirth-ink exists, so this carries no colour of its own and
       // follows a retheme. Above sticky chrome, below a modal.
       z-index: var(--cirth-z-index-fixed);
       border-radius: var(--cirth-border-radius);

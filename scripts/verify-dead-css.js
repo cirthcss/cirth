@@ -35,7 +35,7 @@ const { auditSources, watchSources } = require("./lib/source-guard");
 // probes ~1000 declarations across 800 renderings and takes the better
 // part of an hour; running it again in three configurations would cost a
 // working day. But only what the sweep called `inert` is a deletion
-// candidate — a few dozen declarations — and the sweep already recorded,
+// candidate — a few dozen declarations, and the sweep already recorded,
 // per (viewport, scheme), which renderings can see each of them. That
 // cover is written into the report as a plan, and this pass executes it:
 // the same corpus, the same in-page measurement code, a handful of
@@ -77,7 +77,7 @@ const quiet = args.includes("--quiet");
 // the others. Firefox and WebKit are separate engines, not one
 // "non-Chromium": they agree on the flex case above and need not agree on
 // the next one. `playroom` is the preset that moves the most tokens — face,
-// radius, weight — so it is the one most likely to separate two values that
+// radius, weight, so it is the one most likely to separate two values that
 // coincide at the default.
 //
 // Any `<engine>` or `<engine>+<preset>` also works, so a fourth
@@ -295,7 +295,7 @@ const measure = ({ needle, wanted }) => {
 // `.docs-header-search { width }` and `.docs-search-trigger { width }` are
 // each inert in every engine at every width this corpus samples: take one
 // out and the other still states the cluster's width. Take out *both* — a
-// cleanup deleting everything a report called inert — and Firefox sized
+// cleanup deleting everything a report called inert, and Firefox sized
 // the header's actions from the basis alone. That is how the regression
 // the second pass exists to prevent actually happened, and no
 // single-declaration probe can see it.

@@ -9,7 +9,7 @@
 // Progress's semantic sibling: a scalar measurement inside a known range
 // (disk used, score, capacity) rather than the completion of a task. The
 // frame is progress's, borrowed rather than duplicated — same geometry,
-// same track, same border tokens (see theme/_styles.scss) — so the two
+// same track, same border tokens (see theme/_styles.scss), so the two
 // read as a matched pair.
 
 // What a meter has that progress doesn't is a notion of *where* in the

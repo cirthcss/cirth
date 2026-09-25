@@ -138,7 +138,7 @@
   // oklab, not oklch, and the reason is the card surface. A
   // polar space interpolates the *hue angle*, and an author-written
   // `oklch(L 0 0)` carries an explicit 0deg hue rather than a powerless
-  // one — so mixing the field border toward it took the short way round the
+  // one, so mixing the field border toward it took the short way round the
   // wheel and landed the result at ~325deg, a faint magenta outside the
   // palette. (`black`/`white` keywords are safe: they convert
   // with a missing hue, which is carried from the other colour. A literal
@@ -233,7 +233,7 @@
 
   // Meter (<meter>)
   // Green / gold / red, the reading every browser's own meter already
-  // teaches — but with the hue backed by weight: each step down the scale
+  // teaches, but with the hue backed by weight: each step down the scale
   // is also a darker color, so the same signal survives a reader who
   // cannot separate the hues. All three clear 3:1 against the track
   // (WCAG 1.4.11) with room: 3.97:1, 5.05:1, 6.57:1. A meter whose author

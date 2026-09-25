@@ -46,7 +46,7 @@ const render = (page, css, markup) =>
 // --- 1. The disclosure marker is centred on the line it belongs to ------
 
 // summary::after floats, and a float aligns to the *top* of the line box it
-// joins — so a marker shorter than the line sits high by half the
+// joins, so a marker shorter than the line sits high by half the
 // difference. It was 16px of chevron in a 24px line (4px high) at the
 // default type scale, and 16px in a 36px line (10px high) at 24px type,
 // because the box was pinned to the root scale while the line followed the
@@ -214,7 +214,7 @@ for (const [name, css] of builds) {
 // outside an <aside>: a drawer (<dialog>), a disclosure (<details>), and a
 // plain container. There is no ancestor the framework could key on — a
 // <dialog> can hold a horizontal tab bar and a <details> can hold anything
-// — so the contract is the gutter token, and it is the whole contract:
+//, so the contract is the gutter token, and it is the whole contract:
 // name it zero and all three of the bar's inline insets collapse together.
 for (const [name, css] of builds) {
 	for (const [shape, markup] of [
@@ -307,7 +307,7 @@ for (const [name, css] of builds) {
 }
 
 // `0` is what an author writes, and a custom property is substituted at
-// computed-value time — so the gutter has to survive arriving without a
+// computed-value time, so the gutter has to survive arriving without a
 // unit. Written into the `margin` shorthand it did not: `calc(0 * -1)` is a
 // <number> where a <length> is required, which invalidates the whole
 // declaration and takes the *block* margin with it, adding one link-gutter
@@ -862,7 +862,7 @@ test("default: a table in .overflow-auto scrolls and takes a focus ring", async 
 
 // --- 9. <ol> and <ul> are the same nav ----------------------------------
 
-// A breadcrumb is an ordered sequence, so <ol> is the element for it — and
+// A breadcrumb is an ordered sequence, so <ol> is the element for it, and
 // <ol> was the element the framework did not style. `nav, nav ul { display:
 // flex }` left an ordered list at `display: block` with `inline-block`
 // items, which is the one layout mode that *renders* the newlines a source
@@ -1042,7 +1042,7 @@ for (const [name, css] of builds) {
 // It reads as the density control and it was only half wired. `.grid` gaps
 // and section margins followed it; paragraph rhythm did not, because
 // --cirth-typography-spacing-vertical was declared as its own copy of
-// --cirth-space-4 — so the playroom preset had to restate it, and every
+// --cirth-space-4, so the playroom preset had to restate it, and every
 // future preset would have had to remember. It is derived now.
 //
 // The other half of the contract is what deliberately does *not* follow:
@@ -1184,7 +1184,7 @@ test("default: the playroom preset retimes prose through --cirth-spacing alone",
 		};
 	});
 
-	// 1.25rem — space-5 — and prose, grid and the knob all read it.
+	// 1.25rem — space-5, and prose, grid and the knob all read it.
 	expect(measured.typography).toBe(measured.spacing);
 	expect(measured.paragraph).toBe("20px");
 	expect(measured.columnGap).toBe("20px");

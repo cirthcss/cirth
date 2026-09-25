@@ -44,7 +44,7 @@ fit comfortably on one row:
   and grows evenly to fill any remaining space; once a row can't fit
   another column at that minimum, children wrap onto the next row.
 * `min(100%, var(--cirth-grid-min-column))` caps the minimum at the
-  container's own width, so a single child — or a very narrow
+  container's own width, so a single child, or a very narrow
   viewport — gets one full-width column instead of overflowing. No media
   query is needed for the narrow case; it falls out of the `min()` for
   free.

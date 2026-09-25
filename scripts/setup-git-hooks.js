@@ -8,7 +8,7 @@ const { hooksPath } = require("./lib/release-guard");
 // pointed there.
 //
 // Git will not run a hook a repository ships — .githooks/ is just a
-// directory until `core.hooksPath` names it — so a fresh clone has no
+// directory until `core.hooksPath` names it, so a fresh clone has no
 // guard at all until this runs. That is a property of Git, not an
 // oversight: a repository that could execute code on clone would be a
 // remarkable thing to hand a stranger.

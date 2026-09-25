@@ -22,7 +22,7 @@ it still visibly communicates progress) gets:
 * `--cirth-transition` itself re-pointed at that same instant duration.
 
 The last one is what makes the rule reach inside a control. A selector list
-covers elements, `::before` and `::after`, and nothing else — so the engine
+covers elements, `::before` and `::after`, and nothing else, so the engine
 pseudo-elements a native control is built from, `::-moz-range-thumb` and
 `::-webkit-slider-thumb` among them, went on animating while the control
 that owns them had already stopped. They cannot be added to that list:

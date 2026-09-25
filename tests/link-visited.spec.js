@@ -108,7 +108,7 @@ for (const build of builds) {
 		// declaration carrying both scheme values, rather than one per scheme
 		// root. What matters has not changed — a followed link is drained to
 		// neutral in *both* schemes, and the two neutrals are not the same
-		// colour — so this asserts the pair rather than counting declarations.
+		// colour, so this asserts the pair rather than counting declarations.
 		// Only the base pair: the preference passes that follow
 		// (prefers-contrast: more, then the print stylesheet) deliberately
 		// redefine the token, and are asserted in their own specs.

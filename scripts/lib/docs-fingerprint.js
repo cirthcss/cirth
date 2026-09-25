@@ -64,7 +64,7 @@ const viewports = {
 // 390 is a phone; it is not the narrowest phone, and the difference has
 // already cost a regression. `.docs-header-search { width }` beside its
 // `flex: 0 0 …` is inert at 390 in all three engines — measured, not
-// assumed — and taking it out left Firefox holding 88px of controls in a
+// assumed, and taking it out left Firefox holding 88px of controls in a
 // 66px cluster at 320. The sweep does not sample 320 because a fifth width
 // is a fifth more corpus on the pass that already runs for forty minutes;
 // the second pass probes a few dozen candidates on five pages and can
@@ -328,7 +328,7 @@ window.__cirthAudit = (() => {
 
 	// Measure twice and only believe a number that repeats. Even frozen,
 	// a page can still settle a frame late — a dialog that has just been
-	// shown, a lazily inserted stylesheet — and a fingerprint that changes
+	// shown, a lazily inserted stylesheet, and a fingerprint that changes
 	// between two runs of the same site is worse than no fingerprint.
 	const settle = () =>
 		new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve, 60))));
@@ -372,7 +372,7 @@ window.__cirthAudit = (() => {
 
 	// Memoised for the life of the document. Building it walks every rule
 	// in the sheet and re-parses every block's cssText — a thousand
-	// declarations — and both the audit and the verification pass ask for it
+	// declarations, and both the audit and the verification pass ask for it
 	// once per state, so half of that work was a rebuild of an answer that
 	// cannot have changed: probes edit declaration *values* and always put
 	// them back, and nothing here adds or removes a rule.
@@ -419,7 +419,7 @@ window.__cirthAudit = (() => {
 						property,
 						// getPropertyValue serialises to "" for a few values
 						// the engine will not round-trip — anything holding
-						// env(), for one — so the authored text is the
+						// env(), for one, so the authored text is the
 						// fallback, and it is what env-detection reads.
 						value:
 							rule.style.getPropertyValue(property) ||
@@ -509,7 +509,7 @@ window.__cirthAudit = (() => {
 
 	// "Would this selector match if the state it asks for were reachable?"
 	// Answers "matched", "stateful" — the base matches, the state does not
-	// — or "absent".
+	//, or "absent".
 	const reachability = (selector) => {
 		if (matches(selector)) return "matched";
 		STATE_PSEUDO.lastIndex = 0;

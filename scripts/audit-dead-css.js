@@ -34,7 +34,7 @@ const { auditSources, watchSources } = require("./lib/source-guard");
 //                      `prefers-reduced-motion: no-preference`, or a width
 //                      band none of the four viewports lands in, which the
 //                      run establishes by asking matchMedia rather than by
-//                      reading a list — or behind an
+//                      reading a list, or behind an
 //                      element state it does not reach (`:hover`, `:focus`,
 //                      `::backdrop`, `::selection`), or its value asks the
 //                      device a question a browser on a desktop cannot answer
@@ -72,7 +72,7 @@ const { auditSources, watchSources } = require("./lib/source-guard");
 // working day. It is also unnecessary: only the declarations this sweep
 // calls `inert` are candidates for deletion, and there are a few dozen of
 // them. So this run writes them out — with the handful of renderings that
-// can see each one — and a second, targeted pass re-probes exactly those:
+// can see each one, and a second, targeted pass re-probes exactly those:
 //
 //   node scripts/audit-dead-css.js --json .cache/dead-css.json
 //   node scripts/verify-dead-css.js --report .cache/dead-css.json
@@ -103,7 +103,7 @@ const noOrder = args.includes("--no-order");
 // The same escape hatch for the other optimisation: --no-skip visits every
 // rendering in the corpus, including the ones the survey proved can see
 // nothing still undecided. It exists so the skip's value can be measured
-// against a run that differs in nothing else, rather than asserted — and
+// against a run that differs in nothing else, rather than asserted, and
 // so a verdict can be reproduced without it if the survey is ever doubted.
 const noSkip = args.includes("--no-skip");
 
@@ -271,7 +271,7 @@ const run = async () => {
 					// The sheet was not in document.styleSheets. This used to
 					// mean a docs build was replacing docs/dist underneath the
 					// run; it cannot any more — the corpus serves an immutable
-					// copy taken at startup — so what is left is a real
+					// copy taken at startup, so what is left is a real
 					// mismatch between --sheet and what the page links.
 					throw new Error(
 						`audit-dead-css: no stylesheet matching "${sheet}" on ${context.page}. ` +
@@ -434,7 +434,7 @@ const run = async () => {
 
 							// Grouped by rule so the block's text is saved and
 							// put back once per rule rather than once per
-							// declaration — and so a longhand restored after a
+							// declaration, and so a longhand restored after a
 							// shorthand cannot silently reorder the cascade
 							// inside the block.
 							/** @type {Map<string, { path: number[], entries: typeof here }>} */
@@ -462,7 +462,7 @@ const run = async () => {
 							// the "something changed" answer cheap and the
 							// "nothing changed" answer a full pass. Verifying
 							// the restore unconditionally therefore charged every
-							// *inert* declaration two full passes — and inert
+							// *inert* declaration two full passes, and inert
 							// declarations are exactly the ones that survive to
 							// be re-probed on all four hundred renderings.
 							//
@@ -472,7 +472,7 @@ const run = async () => {
 							// something did move asynchronously in that window,
 							// the *next* probe reads it as a change, takes the
 							// verification path below, finds the page dirty and
-							// re-baselines — so the drift is still caught, one
+							// re-baselines, so the drift is still caught, one
 							// probe later, and the verdict it can produce in the
 							// meantime is "live", never "inert". The
 							// optimisation only ever errs toward keeping a

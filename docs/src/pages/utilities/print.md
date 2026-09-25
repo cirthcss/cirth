@@ -20,7 +20,7 @@ bundle. Both sit in the same [cascade layer](/customization#cascade-layers),
 so that order still decides between them, while your own print rules beat
 both. Each build has its matching sheet — `cirth.print.min.css`,
 `cirth.print.classless.min.css`, `cirth.print.scoped.min.css`,
-`cirth.print.classless.scoped.min.css` — or, from npm,
+`cirth.print.classless.scoped.min.css`, or, from npm,
 `@cirthcss/cirth/print` and its `classless`/`scoped` variants.
 
 ### Why it is a separate file

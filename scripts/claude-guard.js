@@ -16,7 +16,7 @@ const { classifyCommand } = require("./lib/release-guard");
 //
 // Per-machine, installed by scripts/setup-claude-hooks.js into
 // .claude/settings.local.json. Not the source of truth for the policy —
-// that is RELEASING.md — and not a boundary either, since whoever owns the
+// that is RELEASING.md, and not a boundary either, since whoever owns the
 // machine owns the settings file.
 
 /** @type {string[]} */

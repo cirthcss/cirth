@@ -19,7 +19,7 @@ const { setContent } = require("./helpers/render");
 // Where a case claims that a rule wins *because of the layer*, it first
 // proves the rule would have lost without it. The control is the same
 // stylesheet with the layer block unwrapped — identical rules, identical
-// order — so the only variable between the two renders is the layer.
+// order, so the only variable between the two renders is the layer.
 
 const projectRoot = path.join(__dirname, "..");
 
@@ -275,7 +275,7 @@ test.describe("a consumer's own layers", () => {
 
 // A preset is one file for every build, so it is checked against all four.
 // The token is read where it is used — inside the wrapper, in a scoped
-// build — so a preset that only reached :root would show the theme's value.
+// build, so a preset that only reached :root would show the theme's value.
 /**
  * @param {import("@playwright/test").Page} page
  * @param {(typeof builds)[number]} build
