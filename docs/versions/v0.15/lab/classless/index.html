@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Classless build — authentic Cirth output</title>
+		<script>
+			// Documentation-only enhancement: the stylesheet below remains the
+			// real Cirth build and the complete UI is readable without JavaScript.
+			// This script only mirrors the requested light/dark scheme before paint.
+			(function () {
+				var requested = new URLSearchParams(location.search).get("theme");
+				document.documentElement.setAttribute(
+					"data-theme",
+					requested === "dark" ? "dark" : "light",
+				);
+			})();
+		</script>
+		<link rel="stylesheet" href="/cirth/v0.15/styles/generated/cirth-lab-classless.css">
+	</head><body inert=""><aside style="border-bottom:1px solid #8884;padding:.5rem 1rem;text-align:center;font-size:.875rem">Archived documentation for v0.15.0 and earlier. <a href="/cirth/">Read the current documentation</a>.</aside>
+		
+		<main>
+			<article>
+				<h2>Sign in</h2>
+				<form>
+					<label>
+						Email
+						<input type="email" name="email" autocomplete="email" required="">
+					</label>
+					<label>
+						Password
+						<input type="password" name="password" autocomplete="current-password" required="">
+					</label>
+					<label><input type="checkbox" checked=""> Remember me</label>
+					<button>Sign in</button>
+				</form>
+			</article>
+		</main>
+		
+	</body>
+</html>
+

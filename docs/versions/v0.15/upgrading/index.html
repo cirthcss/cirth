@@ -1,0 +1,1440 @@
+<!doctype html>
+<html lang="en" data-base="/cirth/v0.15/">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Cirth</title>
+		<meta name="description" content="HTML-native CSS framework. Production-ready UI from semantic HTML — under 14KB gzipped, 0 JavaScript.">
+		<meta property="og:type" content="website">
+		<meta property="og:title" content="Cirth">
+		<meta property="og:description" content="HTML-native CSS framework. Production-ready UI from semantic HTML — under 14KB gzipped, 0 JavaScript.">
+		<meta property="og:image" content="https://cirthcss.github.io/cirth/social-preview.png">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta property="og:image:alt" content="Cirth: production-ready UI from semantic HTML, with a verified proof ledger.">
+		<meta name="twitter:card" content="summary_large_image">
+		<link rel="icon" href="/cirth/v0.15/favicon.svg" media="(prefers-color-scheme: light)">
+		<link rel="icon" href="/cirth/v0.15/favicon_dark.svg" media="(prefers-color-scheme: dark)">
+		<link rel="apple-touch-icon" href="/cirth/v0.15/apple-touch-icon.png">
+		<link rel="manifest" href="/cirth/v0.15/site.webmanifest">
+		<link rel="stylesheet" href="/cirth/v0.15/styles/style.css">
+		
+		<script>
+			// Set data-theme before first paint to avoid a light-mode flash.
+			(function () {
+				var stored = localStorage.getItem("cirth-theme");
+				var dark = stored
+					? stored === "dark"
+					: window.matchMedia("(prefers-color-scheme: dark)").matches;
+				document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+			})();
+
+			// Same idea for the preset switcher (gh#80): apply a
+			// session-remembered preset before first paint, so returning to
+			// a page (or following a link) after picking one doesn't flash
+			// the default theme first. sessionStorage, not localStorage —
+			// the issue asks for "the current session", not a permanent
+			// choice that'd survive a closed tab into someone's next visit.
+			(function () {
+				var preset = sessionStorage.getItem("cirth-preset");
+				if (!preset || preset === "default") return;
+				var base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
+				var link = document.createElement("link");
+				link.rel = "stylesheet";
+				link.id = "cirth-preset-stylesheet";
+				link.href = base + "/styles/generated/presets/" + preset + ".css";
+				document.head.appendChild(link);
+			})();
+		</script>
+	</head>
+	<body><aside style="border-bottom:1px solid #8884;padding:.5rem 1rem;text-align:center;font-size:.875rem">Archived documentation for v0.15.0 and earlier. <a href="/cirth/">Read the current documentation</a>.</aside>
+		<a href="#main-content" class="sr-only sr-only-focusable docs-skip-link">Skip to main content</a>
+		<header class="container docs-header">
+	<nav aria-label="main navigation">
+		<ul class="docs-header-start-group">
+			<li>
+				<a href="/cirth/v0.15/" class="contrast docs-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.15/logo_brand.svg" alt="" width="48" height="48">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.15/logo_brand_dark.svg" alt="" width="48" height="48">
+					<strong>Cirth</strong>
+				</a>
+			</li>
+			
+				<li class="docs-nav-item">
+					<a href="/cirth/v0.15/get-started">Docs</a>
+				</li>
+			
+				<li class="docs-nav-item">
+					<a href="/cirth/v0.15/examples">Examples</a>
+				</li>
+			
+		</ul>
+		<div class="docs-header-actions">
+			<div class="docs-header-search">
+				<button type="button" class="docs-search-trigger" aria-haspopup="dialog" aria-controls="docs-search-dialog" aria-expanded="false" aria-label="Search documentation" data-docs-search-trigger="" hidden="">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg><span class="truncate">Search documentation</span>
+					<kbd><span data-docs-search-modifier="">Ctrl</span> K</kbd>
+				</button>
+			</div><button type="button" class="ghost contrast docs-menu-toggle" aria-haspopup="dialog" aria-controls="docs-mobile-menu-panel" aria-expanded="false" data-docs-menu-trigger="">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M100,48a28,28,0,1,0,56,0a28,28,0,1,0-56,0ZM100,128a28,28,0,1,0,56,0a28,28,0,1,0-56,0ZM100,208a28,28,0,1,0,56,0a28,28,0,1,0-56,0Z"></path></svg><span class="sr-only">Menu</span>
+			</button>
+		</div>
+		<ul class="docs-header-controls-group">
+			<li class="docs-header-github">
+				<a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+			</li><li data-docs-header-control="">
+				<span class="docs-control-label" aria-hidden="true">Version</span>
+				<select class="docs-version-select" aria-label="Documentation version" data-docs-version-select="">
+					
+						<option value="/cirth/" selected="">v0.13</option>
+					
+						<option value="/cirth/v0.12/">v0.12</option>
+					
+						<option value="/cirth/v0.10/">v0.10</option>
+					
+					
+				</select>
+				<script>
+					(() => {
+					// Navigating between documentation lines is a page load, not
+					// a preference: each line is a separate build with its own
+					// pages, so there is nothing to remember or restore.
+						const versionSelect = document.querySelector("[data-docs-version-select]");
+						versionSelect?.addEventListener("change", () => {
+							if (versionSelect.value) window.location.assign(versionSelect.value);
+						});
+					})();
+				</script>
+			</li><li data-docs-header-control="">
+				<span class="docs-control-label" aria-hidden="true">Preset</span>
+				<select class="docs-preset-select" aria-label="Color preset" data-cirth-preset-select="">
+					<option value="default">Default</option>
+					
+						<option value="plain">Plain</option>
+					
+						<option value="playroom">Playroom</option>
+					
+				</select>
+			</li>
+			<li data-docs-header-control="">
+				<span class="docs-control-label" aria-hidden="true">Theme</span>
+				<button type="button" class="ghost contrast docs-theme-toggle" aria-label="Dark color scheme" aria-pressed="false">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="18" height="18" fill="currentColor" aria-hidden="true" class="docs-theme-icon-sun"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"></path></svg>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="18" height="18" fill="currentColor" aria-hidden="true" class="docs-theme-icon-moon"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"></path></svg>
+				</button>
+				<script>
+					(() => {
+					// Which icon is visible is driven entirely by CSS
+					// ([data-theme="dark"] .docs-theme-icon-*, see styles/style.css)
+					// — this script is only the click handler.
+						const themeToggle = document.querySelector(".docs-theme-toggle");
+						const syncThemeToggle = () => {
+						themeToggle?.setAttribute(
+							"aria-pressed",
+							document.documentElement.getAttribute("data-theme") === "dark" ? "true" : "false",
+						);
+						};
+						syncThemeToggle();
+						themeToggle?.addEventListener("click", () => {
+						const next =
+							document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+						document.documentElement.setAttribute("data-theme", next);
+						localStorage.setItem("cirth-theme", next);
+							syncThemeToggle();
+						});
+					})();
+				</script>
+			</li>
+		</ul>
+	</nav><dialog id="docs-mobile-menu-panel" class="docs-drawer" aria-label="Site menu" data-docs-menu-drawer="">
+		<article>
+			<header>
+				<span class="docs-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.15/logo_brand.svg" alt="" width="48" height="48">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.15/logo_brand_dark.svg" alt="" width="48" height="48">
+					<strong>Cirth</strong>
+				</span>
+				<button type="button" class="close" aria-label="Close menu" data-docs-menu-close=""></button>
+			</header>
+			<nav aria-label="Site">
+				<ul>
+					
+						<li><a href="/cirth/v0.15/get-started">Docs</a></li>
+					
+						<li><a href="/cirth/v0.15/examples">Examples</a></li>
+					
+					<li><a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub ↗<span class="sr-only"> (opens in a new tab)</span></a></li>
+				</ul>
+			</nav>
+			<section class="docs-mobile-controls">
+				<strong>Display</strong>
+				<ul data-docs-mobile-controls=""></ul>
+			</section>
+		</article>
+	</dialog>
+	<script>
+		(() => {
+			const header = document.currentScript?.closest(".docs-header");
+			const drawer = header?.querySelector("[data-docs-menu-drawer]");
+			const trigger = header?.querySelector("[data-docs-menu-trigger]");
+			const closeButton = drawer?.querySelector("[data-docs-menu-close]");
+			const desktopControls = header?.querySelector(".docs-header-controls-group");
+			const mobileControls = drawer?.querySelector("[data-docs-mobile-controls]");
+			// The one query that decides collapsed vs expanded. It is the same
+			// width the stylesheet uses to show this toggler, hide the in-header
+			// nav items and hide the sidebar: read from one place so the
+			// transfer and the toggler's visibility cannot drift apart.
+			const compact = window.matchMedia("(max-width: 1023px)");
+			const controls = desktopControls
+				? Array.from(desktopControls.querySelectorAll(":scope > [data-docs-header-control]"))
+				: [];
+
+			const syncMenuState = () => {
+				trigger?.setAttribute("aria-expanded", drawer?.open ? "true" : "false");
+			};
+			const closeDrawer = () => {
+				if (drawer?.open) drawer.close();
+			};
+			// Moving a node blurs whatever inside it had focus, so only move
+			// what is not already where it belongs, and hand focus back if the
+			// element that had it travelled. Crossing the breakpoint with the
+			// preset select focused should not drop the reader at the top of
+			// the document.
+			const placeControls = () => {
+				const target = compact.matches ? mobileControls : desktopControls;
+				if (target) {
+					const active = document.activeElement;
+					let refocus = null;
+					for (const control of controls) {
+						if (control.parentElement === target) continue;
+						if (active instanceof HTMLElement && control.contains(active)) {
+							refocus = active;
+						}
+						target.append(control);
+					}
+					refocus?.focus();
+				}
+				if (!compact.matches) closeDrawer();
+				syncMenuState();
+			};
+
+			trigger?.addEventListener("click", () => {
+				if (!drawer?.open) drawer?.showModal();
+				syncMenuState();
+			});
+			closeButton?.addEventListener("click", closeDrawer);
+			// Clicking the backdrop: the event target is the dialog itself
+			// only when the pointer misses the panel inside it.
+			drawer?.addEventListener("click", (event) => {
+				if (event.target === drawer) closeDrawer();
+			});
+			// Fires for the close button, for the backdrop, and for Escape,
+			// which the element handles on its own. Returning focus to the
+			// trigger explicitly rather than relying on the element's own
+			// restoration keeps this identical to the search dialog next to
+			// it, and correct when the drawer is closed by a resize.
+			drawer?.addEventListener("close", () => {
+				syncMenuState();
+				if (compact.matches) trigger?.focus();
+			});
+			compact.addEventListener?.("change", placeControls);
+			placeControls();
+		})();
+	</script>
+</header>
+
+		
+
+<main id="main-content" class="container docs-page-shell">
+	<div class="docs-mobile-tools">
+		<details class="docs-mobile-nav">
+			<summary>Browse documentation</summary>
+			<nav aria-label="Mobile documentation navigation">
+				
+					<section>
+						<strong>Introduction</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/get-started">Get Started</a></li>
+							
+								<li><a href="/cirth/v0.15/customization">Customization</a></li>
+							
+								<li><a href="/cirth/v0.15/colors">Colors</a></li>
+							
+								<li><a href="/cirth/v0.15/about">About Cirth</a></li>
+							
+								<li><a href="/cirth/v0.15/upgrading" aria-current="page">Upgrading</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Layout</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/layout/document">Document</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/landmarks">Landmarks</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/section">Section</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/container">Container</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/row">Row</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/grid">Grid</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/overflow-auto">Overflow auto</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Content</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/content/typography">Typography</a></li>
+							
+								<li><a href="/cirth/v0.15/content/description-list">Description list</a></li>
+							
+								<li><a href="/cirth/v0.15/content/link">Link</a></li>
+							
+								<li><a href="/cirth/v0.15/content/button">Button</a></li>
+							
+								<li><a href="/cirth/v0.15/content/table">Table</a></li>
+							
+								<li><a href="/cirth/v0.15/content/code">Code</a></li>
+							
+								<li><a href="/cirth/v0.15/content/figure">Figure</a></li>
+							
+								<li><a href="/cirth/v0.15/content/embedded">Embedded content</a></li>
+							
+								<li><a href="/cirth/v0.15/content/misc">Misc</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Forms</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/forms/">Overview</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/checkbox-radio-switch">Checkbox, radio, switch</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-color">Input color</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-date">Input date</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-file">Input file</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-range">Input range</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-search">Input search</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Components</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/components/accordion">Accordion</a></li>
+							
+								<li><a href="/cirth/v0.15/components/card">Card</a></li>
+							
+								<li><a href="/cirth/v0.15/components/dropdown">Dropdown</a></li>
+							
+								<li><a href="/cirth/v0.15/components/group">Group</a></li>
+							
+								<li><a href="/cirth/v0.15/components/loading">Loading</a></li>
+							
+								<li><a href="/cirth/v0.15/components/meter">Meter</a></li>
+							
+								<li><a href="/cirth/v0.15/components/modal">Modal</a></li>
+							
+								<li><a href="/cirth/v0.15/components/nav">Nav</a></li>
+							
+								<li><a href="/cirth/v0.15/components/popover">Popover</a></li>
+							
+								<li><a href="/cirth/v0.15/components/progress">Progress</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Utilities</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/utilities/accessibility">Accessibility</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/high-contrast">High contrast</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/reduce-motion">Reduce motion</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/sr-only">Screen-reader only</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/truncate">Truncate</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/breakout">Breakout</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/print">Print</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Project</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/examples">Examples</a></li>
+							
+								<li><a href="/cirth/v0.15/contributions">Contributions</a></li>
+							
+								<li><a href="/cirth/v0.15/brand">Brand</a></li>
+							
+						</ul>
+					</section>
+				
+			</nav>
+		</details>
+		
+			<details class="docs-toc-top">
+				<summary>On this page</summary>
+				<nav aria-label="On this page">
+					<ul>
+						
+							<li class="docs-toc-level-2">
+								<a href="#unreleased-from-v014x">Unreleased, from v0.14.x</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#accent-tokens-are-named-by-role">Accent tokens are named by role</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#container-gutters-have-their-own-token">Container gutters have their own token</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#breakout-belongs-directly-to-container">.breakout belongs directly to .container</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#modal-width-has-one-runtime-cap">Modal width has one runtime cap</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#to-v0140-from-v013x">To v0.14.0, from v0.13.x</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#aria-busy-no-longer-blocks-interaction">aria-busy no longer blocks interaction</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#to-v0130-from-v012x">To v0.13.0, from v0.12.x</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#print-is-a-separate-stylesheet">Print is a separate stylesheet</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#a-root-override-now-reaches-into-forced-scheme-subtrees">A :root override now reaches into forced-scheme subtrees</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#the-presets-are-renamed-and-redesigned">The presets are renamed and redesigned</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#outline-buttons-have-a-surface-now">.outline buttons have a surface now</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#form-fields-answer-the-pointer">Form fields answer the pointer</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#while-you-are-here">While you are here</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#to-v0110-from-v010x">To v0.11.0, from v0.10.x</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#data-tooltip-is-gone">[data-tooltip] is gone</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#the-modals-javascript-hooks-are-gone">The modal&#39;s JavaScript hooks are gone</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#a-root-override-of-a-color-token-now-applies">A :root override of a color token now applies</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#the-browser-floor-moved">The browser floor moved</a>
+							</li>
+						
+					</ul>
+				</nav>
+			</details>
+		
+	</div>
+	<div class="docs-layout">
+		<aside class="docs-sidebar">
+			<nav aria-label="docs navigation">
+				
+					<details open="">
+						<summary>Introduction</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/get-started">Get Started</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/customization">Customization</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/colors">Colors</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/about">About Cirth</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/upgrading" aria-current="page">Upgrading</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Layout</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/document">Document</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/landmarks">Landmarks</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/section">Section</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/container">Container</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/row">Row</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/grid">Grid</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/overflow-auto">Overflow auto</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Content</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/content/typography">Typography</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/description-list">Description list</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/link">Link</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/button">Button</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/table">Table</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/code">Code</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/figure">Figure</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/embedded">Embedded content</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/misc">Misc</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Forms</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/">Overview</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/checkbox-radio-switch">Checkbox, radio, switch</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-color">Input color</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-date">Input date</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-file">Input file</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-range">Input range</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-search">Input search</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Components</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/components/accordion">Accordion</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/card">Card</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/dropdown">Dropdown</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/group">Group</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/loading">Loading</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/meter">Meter</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/modal">Modal</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/nav">Nav</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/popover">Popover</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/progress">Progress</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Utilities</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/accessibility">Accessibility</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/high-contrast">High contrast</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/reduce-motion">Reduce motion</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/sr-only">Screen-reader only</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/truncate">Truncate</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/breakout">Breakout</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/print">Print</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Project</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/examples">Examples</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/contributions">Contributions</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/brand">Brand</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+			</nav>
+		</aside>
+		<div class="docs-content" data-pagefind-body="">
+			<h1>Upgrading</h1>
+<p>Cirth is pre-1.0, so a breaking change ships in a minor release. Every one
+gets an entry here saying what stopped working and what to do about it, and
+one that leaves the documented API behind it also starts a new line of
+documentation — the selector in the header switches between them.</p>
+<p>After 1.0 the same boundary becomes a major release, and this page keeps
+working the way it already does.</p>
+<h2 id="unreleased-from-v014x" tabindex="-1">Unreleased, from v0.14.x <a class="header-anchor" href="#unreleased-from-v014x">#</a></h2>
+<p>The public class list stays the same. The accent token families now use role
+names, and containers and modals size continuously instead of stepping
+through a shared viewport table. Check the cases below if your CSS overrides
+an accent role or depended on the old layout details.</p>
+<h3 id="accent-tokens-are-named-by-role" tabindex="-1">Accent tokens are named by role <a class="header-anchor" href="#accent-tokens-are-named-by-role">#</a></h3>
+<p><code>primary</code>, <code>secondary</code> and <code>contrast</code> still identify the three public colour
+groups, and <code>--cirth-primary</code> remains the input that retunes the accent.
+Their downstream tokens now say what they paint before naming a state. This
+brings them into the <code>text</code> / <code>border</code> / <code>active</code> / <code>surface</code> vocabulary
+already used by the error, success and warning families.</p>
+<p>If your theme overrides a downstream accent token, rename it with this map;
+the values and relationships have not changed:</p>
+<div class="overflow-auto docs-table-scroll" tabindex="0" role="region" aria-label="Table: Before, After"><table><thead>
+<tr>
+<th>Before</th>
+<th>After</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--cirth-secondary</code> / <code>--cirth-contrast</code></td>
+<td><code>--cirth-secondary-text</code> / <code>--cirth-contrast-text</code></td>
+</tr>
+<tr>
+<td><code>*-background</code></td>
+<td><code>*-surface</code></td>
+</tr>
+<tr>
+<td><code>*-hover</code></td>
+<td><code>*-active</code></td>
+</tr>
+<tr>
+<td><code>*-hover-background</code></td>
+<td><code>*-surface-active</code></td>
+</tr>
+<tr>
+<td><code>*-hover-border</code></td>
+<td><code>*-border-active</code></td>
+</tr>
+<tr>
+<td><code>*-hover-underline</code></td>
+<td><code>*-underline-active</code></td>
+</tr>
+<tr>
+<td><code>*-inverse</code></td>
+<td><code>*-on-surface</code></td>
+</tr>
+</tbody>
+</table></div><p><code>--cirth-primary-text</code> is the new derived text role; it follows the unchanged
+<code>--cirth-primary</code> input. The <code>.secondary</code> and <code>.contrast</code> classes are also
+unchanged — this is a custom-property migration, not a markup migration.</p>
+<p><code>--cirth-primary-on-surface</code> remains an explicit light-or-dark ink rather
+than deriving from <code>--cirth-primary</code>. Existing themes only rename their
+<code>--cirth-primary-inverse</code> override; a light accent still needs a deliberately
+dark on-surface value. The available relative-color threshold cannot make
+that choice reliably across hues, and <code>contrast-color()</code> is outside Cirth's
+browser floor.</p>
+<h3 id="container-gutters-have-their-own-token" tabindex="-1">Container gutters have their own token <a class="header-anchor" href="#container-gutters-have-their-own-token">#</a></h3>
+<p><code>.container</code>, <code>.container-fluid</code>, and the classless <code>header</code>/<code>main</code>/<code>footer</code>
+landmarks now use <code>--cirth-container-gutter</code>, whose default is
+<code>clamp(1rem, 4%, 3rem)</code>. Changing <code>--cirth-spacing</code> no longer changes their
+inline gutter; it remains the flow knob — prose rhythm, section margins and
+grid gaps. (Control and card padding have never followed it either; see
+<a href="/cirth/v0.15/customization#spacing-and-layout">Spacing and layout</a> for which tokens do
+and which deliberately do not.)</p>
+<p>Move an intentional page-gutter override to the new role token:</p>
+<pre tabindex="0"><code class="hljs language-css"><span class="hljs-comment">/* before */</span>
+<span class="hljs-selector-pseudo">:root</span> { <span class="hljs-attr">--cirth-spacing</span>: <span class="hljs-number">1.5rem</span>; }
+
+<span class="hljs-comment">/* after */</span>
+<span class="hljs-selector-pseudo">:root</span> { <span class="hljs-attr">--cirth-container-gutter</span>: <span class="hljs-number">1.5rem</span>; }
+</code></pre>
+<h3 id="breakout-belongs-directly-to-container" tabindex="-1"><code>.breakout</code> belongs directly to <code>.container</code> <a class="header-anchor" href="#breakout-belongs-directly-to-container">#</a></h3>
+<p>The selector is now <code>.container &gt; .breakout</code>, backed by named <code>content</code> and
+<code>full</code> grid lines. This prevents the utility from unexpectedly spanning an
+unrelated grid. If an existing breakout is wrapped, put the class on the
+direct child or move <code>.container</code> to the element that owns the content:</p>
+<pre tabindex="0"><code class="hljs language-html"><span class="hljs-comment">&lt;!-- before: the figure is not a direct grid item --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">section</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;container&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">figure</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;breakout&quot;</span>&gt;</span>…<span class="hljs-tag">&lt;/<span class="hljs-name">figure</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">section</span>&gt;</span>
+
+<span class="hljs-comment">&lt;!-- after --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">section</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;container&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">figure</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;breakout&quot;</span>&gt;</span>…<span class="hljs-tag">&lt;/<span class="hljs-name">figure</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">section</span>&gt;</span>
+</code></pre>
+<p>Code that used <code>.breakout</code> as a generic <code>grid-column: 1 / -1</code> utility outside
+<code>.container</code> needs a local rule instead. That broad behavior was never the
+documented purpose of the class and is no longer global.</p>
+<h3 id="modal-width-has-one-runtime-cap" tabindex="-1">Modal width has one runtime cap <a class="header-anchor" href="#modal-width-has-one-runtime-cap">#</a></h3>
+<p>The modal card no longer switches between the old <code>sm</code> and <code>md</code> widths. It
+uses the available width up to <code>--cirth-modal-max-width</code> (default <code>43.75rem</code>):</p>
+<pre tabindex="0"><code class="hljs language-css"><span class="hljs-selector-pseudo">:root</span> {
+  <span class="hljs-attr">--cirth-modal-max-width</span>: <span class="hljs-number">36rem</span>;
+}
+</code></pre>
+<p>No HTML changes are required. Override the token only if the former stepped
+widths were part of your design.</p>
+<h2 id="to-v0140-from-v013x" tabindex="-1">To v0.14.0, from v0.13.x <a class="header-anchor" href="#to-v0140-from-v013x">#</a></h2>
+<p>One behaviour change, on an attribute that was doing more than it says.</p>
+<h3 id="aria-busy-no-longer-blocks-interaction" tabindex="-1"><code>aria-busy</code> no longer blocks interaction <a class="header-anchor" href="#aria-busy-no-longer-blocks-interaction">#</a></h3>
+<p><code>aria-busy=&quot;true&quot;</code> set <code>pointer-events: none</code> on buttons and links, so a
+busy control could not be clicked. It could still be activated with Enter
+or Space, because CSS cannot reach keyboard activation — so the protection
+covered the pointer and left the keyboard open, which is worse than not
+having it: the behaviour differed by input method and nothing announced it.</p>
+<p><code>aria-busy</code> is a status. It tells assistive technology that a region is
+being updated, and that is all it means now.</p>
+<pre tabindex="0"><code class="hljs language-html"><span class="hljs-comment">&lt;!-- before: interaction stopped for a mouse, not for a keyboard --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;submit&quot;</span> <span class="hljs-attr">aria-busy</span>=<span class="hljs-string">&quot;true&quot;</span>&gt;</span>Saving…<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+
+<span class="hljs-comment">&lt;!-- after: say what you mean --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;submit&quot;</span> <span class="hljs-attr">aria-busy</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>Saving…<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+</code></pre>
+<p>Set <code>disabled</code> when the action starts and remove it when the action
+settles. For a control that is not a native button, use
+<code>aria-disabled=&quot;true&quot;</code> and have its script ignore pointer and keyboard
+activation alike — <code>aria-disabled</code> describes the state, it does not enforce
+it.</p>
+<p>This line of documentation still covers v0.13.0: nothing above changes the
+token surface, the build layout or the class list that v0.13.0 introduced,
+so the switcher keeps one entry for both.</p>
+<h2 id="to-v0130-from-v012x" tabindex="-1">To v0.13.0, from v0.12.x <a class="header-anchor" href="#to-v0130-from-v012x">#</a></h2>
+<p>Two behaviour changes. Neither touches your markup, and one of them is a
+line you have to add.</p>
+<h3 id="print-is-a-separate-stylesheet" tabindex="-1">Print is a separate stylesheet <a class="header-anchor" href="#print-is-a-separate-stylesheet">#</a></h3>
+<p>The <code>@media print</code> pass no longer rides inside the main build. A page that
+links only <code>cirth.min.css</code> now prints with no pass at all — the same
+untreated output you would get from a page that never had it.</p>
+<pre tabindex="0"><code class="hljs language-html"><span class="hljs-comment">&lt;!-- before --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;cirth.min.css&quot;</span>&gt;</span>
+
+<span class="hljs-comment">&lt;!-- after --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;cirth.min.css&quot;</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;cirth.print.min.css&quot;</span> <span class="hljs-attr">media</span>=<span class="hljs-string">&quot;print&quot;</span>&gt;</span>
+</code></pre>
+<p>Load it after the main build: the pass wins over the component rules it has
+to outrank by source order, exactly as it did inside the bundle. Each build
+has its matching sheet — <code>cirth.print.classless.min.css</code>,
+<code>cirth.print.scoped.min.css</code>, <code>cirth.print.classless.scoped.min.css</code> — or,
+from npm, <code>@cirthcss/cirth/print</code> and its <code>classless</code>/<code>scoped</code> variants.</p>
+<p>It moved because print styling is around 630 B gzipped that is never needed
+to paint the screen. Kept in the bundle it was charged to every visitor on
+the first round trip, including the ones who never print; as a separate
+sheet whose media query does not match the display, the browser fetches it
+at low priority.</p>
+<h3 id="a-root-override-now-reaches-into-forced-scheme-subtrees" tabindex="-1">A <code>:root</code> override now reaches into forced-scheme subtrees <a class="header-anchor" href="#a-root-override-now-reaches-into-forced-scheme-subtrees">#</a></h3>
+<p>Nothing to change if you customize at <code>:root</code> and let the page follow one
+scheme — that case only got more predictable. This matters if you force a
+scheme somewhere inside the page with <code>data-theme</code>.</p>
+<p>Before, every colour was declared on the element carrying the attribute, so
+a <code>:root</code> override stopped at the edge of that subtree, and this page told
+you to repeat it there. The scheme differences now live once at the root as
+<code>light-dark()</code> pairs, so the override carries in:</p>
+<pre tabindex="0"><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">data-theme</span>=<span class="hljs-string">&quot;dark&quot;</span>&gt;</span>…<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+</code></pre>
+<pre tabindex="0"><code class="hljs language-css"><span class="hljs-comment">/* before: applied outside the subtree, not inside it */</span>
+<span class="hljs-comment">/* after:  applies everywhere, including inside */</span>
+<span class="hljs-selector-pseudo">:root</span> {
+  <span class="hljs-attr">--cirth-primary</span>: <span class="hljs-number">#2563eb</span>;
+}
+</code></pre>
+<p>If you were relying on the old behaviour — an override that deliberately
+did <em>not</em> reach a forced-scheme widget — scope it to say so:</p>
+<pre tabindex="0"><code class="hljs language-css"><span class="hljs-selector-pseudo">:root</span><span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-attr">[data-theme=<span class="hljs-string">&quot;dark&quot;</span>]</span>) {
+  <span class="hljs-attr">--cirth-primary</span>: <span class="hljs-number">#2563eb</span>;
+}
+</code></pre>
+<p>That selector is more specific than a plain <code>:root</code>, so it still wins, and
+it is the same one the light scheme uses.</p>
+<p>To vary a token by scheme, write the pair rather than two rules:</p>
+<pre tabindex="0"><code class="hljs language-css"><span class="hljs-selector-pseudo">:root</span> {
+  <span class="hljs-attr">--cirth-primary</span>: <span class="hljs-built_in">light-dark</span>(<span class="hljs-number">#2563eb</span>, <span class="hljs-number">#93c5fd</span>);
+}
+</code></pre>
+<p>The pair is resolved wherever the token is used, against the color scheme in
+effect at that point, so one line covers the page and any subtree that
+forces a scheme. See
+<a href="/cirth/v0.15/customization#light-and-dark">Customization</a>.</p>
+<h3 id="the-presets-are-renamed-and-redesigned" tabindex="-1">The presets are renamed and redesigned <a class="header-anchor" href="#the-presets-are-renamed-and-redesigned">#</a></h3>
+<p><code>cobalt</code> and <code>coral</code> are gone, replaced by <code>plain</code> and <code>playroom</code>. The
+exports go with them:</p>
+<pre tabindex="0"><code class="hljs language-html"><span class="hljs-comment">&lt;!-- before --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;dist/presets/cobalt.min.css&quot;</span>&gt;</span>
+
+<span class="hljs-comment">&lt;!-- after --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;dist/presets/plain.min.css&quot;</span>&gt;</span>
+</code></pre>
+<pre tabindex="0"><code class="hljs language-js"><span class="hljs-comment">// before</span>
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;@cirthcss/cirth/presets/coral&quot;</span>;
+
+<span class="hljs-comment">// after</span>
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;@cirthcss/cirth/presets/playroom&quot;</span>;
+</code></pre>
+<p>There is no drop-in equivalent of either old preset, and the new pair is
+not a recolouring of the old one: they were redesigned around who they are
+for (gh#86). <code>plain</code> is the conventional application baseline — reach for
+it where you reached for <code>cobalt</code>. <code>playroom</code> is softer and more expressive
+than <code>coral</code> was, with large radii, a rounded face and springy motion.</p>
+<p>If you were depending on the exact colours of either, the honest migration
+is to copy the values you cared about out of the old file and set them
+yourself — which is now a much shorter list than it used to be, since the
+accent's hover, focus and underline derive from <code>--cirth-primary</code>.</p>
+<h3 id="outline-buttons-have-a-surface-now" tabindex="-1"><code>.outline</code> buttons have a surface now <a class="header-anchor" href="#outline-buttons-have-a-surface-now">#</a></h3>
+<p>An outline button used to be transparent. It paints <code>--cirth-canvas</code>, the
+page surface, and tints it on hover. Nothing changes where one sits on the
+page — which is most places — but on a card, a coloured band or a header it
+used to show the backdrop through and now does not.</p>
+<p>If transparent was what you wanted, that is <code>.ghost</code>: no surface, no
+border, and a hover that tints its background with its own colour group.
+It is the right variant for an icon button in a header or a toolbar, and it
+is what this documentation site's own theme toggle uses.</p>
+<pre tabindex="0"><code class="hljs language-html"><span class="hljs-comment">&lt;!-- a quiet button that keeps a surface --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;outline&quot;</span>&gt;</span>Cancel<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+
+<span class="hljs-comment">&lt;!-- a quiet button that has none --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;ghost&quot;</span>&gt;</span>Dismiss<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+</code></pre>
+<p>One related fix: <code>[type=&quot;reset&quot;].outline</code> used to come out with the
+secondary colours whether or not it asked for them. It takes the primary
+group now, and <code>.outline.secondary</code> still gets secondary.</p>
+<h3 id="form-fields-answer-the-pointer" tabindex="-1">Form fields answer the pointer <a class="header-anchor" href="#form-fields-answer-the-pointer">#</a></h3>
+<p><code>input</code>, <code>select</code> and <code>textarea</code> had no <code>:hover</code> at all. They do now — the
+border moves toward the field's own ink, which is deliberately not the
+focus treatment. Nothing to change unless you were relying on a field
+looking identical whether or not the pointer was over it; <code>[readonly]</code> and
+<code>[aria-invalid]</code> fields are left alone.</p>
+<h3 id="while-you-are-here" tabindex="-1">While you are here <a class="header-anchor" href="#while-you-are-here">#</a></h3>
+<p>Neither of these is breaking, but both change what you have to write:</p>
+<ul>
+<li><strong>The accent is an input.</strong> Setting <code>--cirth-primary</code> now retunes the
+background, hover, focus and underline tint with it. If you were setting
+all of them to keep them in step, you can delete every line but the first
+— unless you meant them to diverge, in which case they still do.</li>
+<li><strong>Status colors exist.</strong> <code>--cirth-error</code>, <code>--cirth-success</code> and
+<code>--cirth-warning</code> drive the validation borders, the meter readings, the
+<code>&lt;ins&gt;</code>/<code>&lt;del&gt;</code> inks and status surfaces. Retuning a status treatment used
+to mean finding each consumer; now it is one token per family. <code>&lt;mark&gt;</code>
+follows <code>--cirth-primary</code> instead: relevance no longer borrows the warning
+family.</li>
+<li><strong><code>--cirth-canvas</code> is new</strong>: the page surface as a value of its own.
+<code>--cirth-background-color</code> is the slot components paint through — a
+button rebinds it to its own fill — so it was never a reliable way to
+refer to <em>the page</em>. It defaults to <code>--cirth-canvas</code> now. If you set the
+page colour, set the canvas; if you were setting
+<code>--cirth-background-color</code> at <code>:root</code>, it still works, but anything
+tinting toward the page will follow the canvas instead.</li>
+<li><strong><code>--cirth-size-*</code> and <code>--cirth-outline-width-*</code> are gone</strong>, both exact
+duplicates of scales that remain. Use <code>--cirth-space-*</code> for spacing,
+<code>--cirth-font-size-md</code> where the old <code>--cirth-size-4</code> stood in for the
+base text size, and <code>--cirth-border-width-*</code> for stroke widths.</li>
+</ul>
+<h2 id="to-v0110-from-v010x" tabindex="-1">To v0.11.0, from v0.10.x <a class="header-anchor" href="#to-v0110-from-v010x">#</a></h2>
+<p>Three removals. All three replace CSS that could not do its job with
+platform features that can, so in each case there is less to write, not
+more.</p>
+<h3 id="data-tooltip-is-gone" tabindex="-1"><code>[data-tooltip]</code> is gone <a class="header-anchor" href="#data-tooltip-is-gone">#</a></h3>
+<p>The attribute renders nothing now. Markup that uses it keeps working as
+ordinary content, but the tooltip text — which lived inside the attribute —
+is not displayed at all.</p>
+<p>It was removed because it could never be accessible: the message was drawn
+with <code>content: attr()</code> on a pseudo-element, which is not reliably exposed
+to assistive technology, cannot be referenced with <code>aria-describedby</code>, does
+not render at all on replaced elements like <code>&lt;input&gt;</code>, and cannot be made
+dismissible without JavaScript. It looked like a tooltip to sighted mouse
+users and was invisible to everyone else.</p>
+<pre tabindex="0"><code class="hljs language-html"><span class="hljs-comment">&lt;!-- before --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">data-tooltip</span>=<span class="hljs-string">&quot;Saved to your library&quot;</span>&gt;</span>Save<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+
+<span class="hljs-comment">&lt;!-- after --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">popovertarget</span>=<span class="hljs-string">&quot;save-hint&quot;</span> <span class="hljs-attr">aria-describedby</span>=<span class="hljs-string">&quot;save-hint&quot;</span>&gt;</span>
+  Save
+<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;save-hint&quot;</span> <span class="hljs-attr">popover</span>&gt;</span>Saved to your library.<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+</code></pre>
+<p>The message is now a real element with a real id, so <code>aria-describedby</code>
+reaches it even while it is closed. See <a href="/cirth/v0.15/components/popover">Popover</a> —
+and note that it opens on activation rather than hover, which is a
+deliberate difference and not a limitation to work around.</p>
+<p>If the text is essential, put it in the page instead. A popover is
+supplementary by design.</p>
+<h3 id="the-modals-javascript-hooks-are-gone" tabindex="-1">The modal's JavaScript hooks are gone <a class="header-anchor" href="#the-modals-javascript-hooks-are-gone">#</a></h3>
+<p><code>.modal-is-open</code>, <code>.modal-is-opening</code>, <code>.modal-is-closing</code> and
+<code>--cirth-scrollbar-width</code> no longer exist. A script that still toggles
+those classes keeps working — they simply do nothing — so nothing breaks
+on upgrade. What changes is that you can delete that code:</p>
+<pre tabindex="0"><code class="hljs language-js"><span class="hljs-comment">// before</span>
+dialog.<span class="hljs-title function_">showModal</span>();
+<span class="hljs-variable language_">document</span>.<span class="hljs-property">documentElement</span>.<span class="hljs-property">classList</span>.<span class="hljs-title function_">add</span>(<span class="hljs-string">&quot;modal-is-open&quot;</span>, <span class="hljs-string">&quot;modal-is-opening&quot;</span>);
+<span class="hljs-variable language_">document</span>.<span class="hljs-property">documentElement</span>.<span class="hljs-property">style</span>.<span class="hljs-title function_">setProperty</span>(
+  <span class="hljs-string">&quot;--cirth-scrollbar-width&quot;</span>,
+  <span class="hljs-string">`<span class="hljs-subst">${<span class="hljs-variable language_">window</span>.innerWidth - <span class="hljs-variable language_">document</span>.documentElement.clientWidth}</span>px`</span>,
+);
+
+<span class="hljs-comment">// after</span>
+dialog.<span class="hljs-title function_">showModal</span>();
+</code></pre>
+<p>The page stops scrolling on its own, and the dialog animates itself in.
+<a href="/cirth/v0.15/components/modal">Modal</a> has the detail, including the one thing that
+did not survive: the closing animation now runs only in Chromium, because
+animating an element <em>out</em> of the top layer needs a property no other
+engine ships yet.</p>
+<h3 id="a-root-override-of-a-color-token-now-applies" tabindex="-1">A <code>:root</code> override of a color token now applies <a class="header-anchor" href="#a-root-override-of-a-color-token-now-applies">#</a></h3>
+<p>This one breaks by starting to work. Overriding a color from <code>:root</code> used
+to do nothing — the scheme roots outweighed it, whatever the loading order
+— so an override written, found ineffective and left in the codebase now
+takes effect on upgrade.</p>
+<pre tabindex="0"><code class="hljs language-css"><span class="hljs-selector-pseudo">:root</span> {
+  <span class="hljs-attr">--cirth-primary</span>: <span class="hljs-number">#2563eb</span>; <span class="hljs-comment">/* ignored before v0.11, applied now */</span>
+}
+</code></pre>
+<p>Worth grepping your stylesheets for <code>--cirth-</code> before upgrading. Two
+things to know: a bare <code>:root</code> override now applies to <strong>both</strong> color
+schemes, and anything written against the old workaround
+(<code>:root:not([data-theme=&quot;dark&quot;])</code>, <code>[data-theme=&quot;dark&quot;]</code>) is more specific
+and keeps winning. <a href="/cirth/v0.15/customization#light-and-dark">Customization</a>
+covers overriding one scheme at a time.</p>
+<h3 id="the-browser-floor-moved" tabindex="-1">The browser floor moved <a class="header-anchor" href="#the-browser-floor-moved">#</a></h3>
+<p>To Chrome 123, Firefox 130, Safari 18.2 — roughly 78% of global browser
+usage, up from the previous line's floor but no longer covering Safari
+17.x and older. The features the removals above depend on (<code>popover</code>,
+<code>@starting-style</code>, <code>scrollbar-gutter</code>, <code>:has()</code>) are why.</p>
+<p>If you support older browsers, stay on the <code>up to v0.10.0</code> line: it is
+still published, still documented, and <code>0.10.0</code> remains installable.</p>
+<pre tabindex="0"><code class="hljs language-sh">npm install @cirthcss/cirth@0.10.0
+</code></pre>
+
+			
+				
+				
+				
+					<footer class="docs-prev-next">
+						
+							<a href="/cirth/v0.15/about" class="secondary">← About Cirth</a>
+						
+						
+							<a href="/cirth/v0.15/layout/document" class="secondary">Document →</a>
+						
+					</footer>
+				
+			
+		</div>
+		
+			<aside class="docs-toc">
+				<nav aria-label="On this page" id="docs-toc-nav">
+					<strong>On this page</strong>
+					<ul>
+						
+							<li class="docs-toc-level-2">
+								<a href="#unreleased-from-v014x" data-toc-link="" data-slug="unreleased-from-v014x">Unreleased, from v0.14.x</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#accent-tokens-are-named-by-role" data-toc-link="" data-slug="accent-tokens-are-named-by-role">Accent tokens are named by role</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#container-gutters-have-their-own-token" data-toc-link="" data-slug="container-gutters-have-their-own-token">Container gutters have their own token</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#breakout-belongs-directly-to-container" data-toc-link="" data-slug="breakout-belongs-directly-to-container">.breakout belongs directly to .container</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#modal-width-has-one-runtime-cap" data-toc-link="" data-slug="modal-width-has-one-runtime-cap">Modal width has one runtime cap</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#to-v0140-from-v013x" data-toc-link="" data-slug="to-v0140-from-v013x">To v0.14.0, from v0.13.x</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#aria-busy-no-longer-blocks-interaction" data-toc-link="" data-slug="aria-busy-no-longer-blocks-interaction">aria-busy no longer blocks interaction</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#to-v0130-from-v012x" data-toc-link="" data-slug="to-v0130-from-v012x">To v0.13.0, from v0.12.x</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#print-is-a-separate-stylesheet" data-toc-link="" data-slug="print-is-a-separate-stylesheet">Print is a separate stylesheet</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#a-root-override-now-reaches-into-forced-scheme-subtrees" data-toc-link="" data-slug="a-root-override-now-reaches-into-forced-scheme-subtrees">A :root override now reaches into forced-scheme subtrees</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#the-presets-are-renamed-and-redesigned" data-toc-link="" data-slug="the-presets-are-renamed-and-redesigned">The presets are renamed and redesigned</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#outline-buttons-have-a-surface-now" data-toc-link="" data-slug="outline-buttons-have-a-surface-now">.outline buttons have a surface now</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#form-fields-answer-the-pointer" data-toc-link="" data-slug="form-fields-answer-the-pointer">Form fields answer the pointer</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#while-you-are-here" data-toc-link="" data-slug="while-you-are-here">While you are here</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#to-v0110-from-v010x" data-toc-link="" data-slug="to-v0110-from-v010x">To v0.11.0, from v0.10.x</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#data-tooltip-is-gone" data-toc-link="" data-slug="data-tooltip-is-gone">[data-tooltip] is gone</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#the-modals-javascript-hooks-are-gone" data-toc-link="" data-slug="the-modals-javascript-hooks-are-gone">The modal&#39;s JavaScript hooks are gone</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#a-root-override-of-a-color-token-now-applies" data-toc-link="" data-slug="a-root-override-of-a-color-token-now-applies">A :root override of a color token now applies</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#the-browser-floor-moved" data-toc-link="" data-slug="the-browser-floor-moved">The browser floor moved</a>
+							</li>
+						
+					</ul>
+				</nav>
+			</aside>
+		
+	</div>
+</main>
+<script>
+	// Scroll-spy for the "On this page" aside: highlight whichever heading
+	// was most recently scrolled past. Purely additive — the TOC works
+	// (and its links navigate) without this script.
+	const links = Array.from(document.querySelectorAll("[data-toc-link]"));
+	if (links.length > 0) {
+		const headings = Array.from(
+			document.querySelectorAll(".docs-content :is(h2, h3)[id]"),
+		);
+
+		const update = () => {
+			// 96px offset: the heading counts as "reached" slightly before it
+			// touches the top edge, matching where the eye lands after a jump.
+			let current = "";
+			for (const heading of headings) {
+				if (heading.getBoundingClientRect().top <= 96) current = heading.id;
+				else break;
+			}
+			const activeSlug = current || (headings[0] ? headings[0].id : "");
+			// aria-current only: the framework paints its one registered
+			// edge on the inline-start rail from it, and the stylesheet
+			// deliberately adds no second marker of its own.
+			for (const link of links) {
+				if (link.dataset.slug === activeSlug) {
+					link.setAttribute("aria-current", "true");
+				} else {
+					link.removeAttribute("aria-current");
+				}
+			}
+		};
+
+		window.addEventListener("scroll", update, { passive: true });
+		update();
+	}
+</script>
+
+		<footer class="docs-footer">
+	<div class="container">
+		<div class="docs-footer-top">
+			<div class="docs-footer-brand-block">
+				<a href="/cirth/v0.15/" class="contrast docs-brand docs-footer-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.15/logo_brand.svg" alt="" width="36" height="36">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.15/logo_brand_dark.svg" alt="" width="36" height="36">
+					<strong>Cirth</strong>
+				</a>
+				<p class="docs-footer-credit">
+					Designed and built by Riccardo Pastori, with help from the
+					<a href="https://github.com/cirthcss/cirth/graphs/contributors" target="_blank" rel="noreferrer">contributors<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>.
+				</p>
+				<ul class="docs-footer-social">
+					<li><a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+					<li><a href="https://www.npmjs.com/package/@cirthcss/cirth" target="_blank" rel="noreferrer">npm<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+					<li><a href="https://github.com/cirthcss/cirth/blob/master/CHANGELOG.md" target="_blank" rel="noreferrer">Changelog<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+				</ul>
+			</div>
+			<div class="docs-footer-columns">
+				
+					<div class="docs-footer-column">
+						<strong>Docs</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/get-started">Get Started</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/customization">Customization</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/colors">Colors</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/components/card">Components</a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+					<div class="docs-footer-column">
+						<strong>Project</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/about">About Cirth</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/upgrading">Upgrading</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/brand">Brand</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/examples">Examples</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/contributions">Contributions</a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+					<div class="docs-footer-column">
+						<strong>Community</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="https://github.com/cirthcss/cirth/issues" target="_blank" rel="noreferrer">Issues<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+			</div>
+		</div>
+		<hr>
+		<small>
+			<span>Released under the Apache License 2.0.</span>
+			<span>Copyright © 2025-present Riccardo Pastori</span>
+		</small>
+	</div>
+</footer>
+
+		<dialog id="docs-search-dialog" class="docs-search-dialog" aria-labelledby="docs-search-title" data-docs-search-dialog="">
+	<article>
+		<header>
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
+			<h2 id="docs-search-title" class="sr-only">Search documentation</h2>
+			<input id="docs-search-input" type="text" role="searchbox" aria-label="Search documentation" placeholder="Search the Cirth documentation…" autocomplete="off" enterkeyhint="search" aria-controls="docs-search-results" aria-describedby="docs-search-status" data-docs-search-input="">
+			<button type="button" class="close" aria-label="Close search" data-docs-search-close=""></button>
+		</header>
+		<p id="docs-search-status" class="docs-search-status" role="status" aria-live="polite" data-docs-search-status="">
+			Type at least two characters to search.
+		</p>
+		<ol id="docs-search-results" class="docs-search-results" data-docs-search-results=""></ol>
+		<footer class="docs-search-help" aria-hidden="true">
+			<span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+			<span><kbd>↵</kbd> open</span>
+			<span><kbd>esc</kbd> close</span>
+			<small>Search by Pagefind</small>
+		</footer>
+	</article>
+</dialog>
+<script type="module" src="/cirth/v0.15/search.js"></script>
+
+		<div class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-copy-status=""></div>
+		<script>
+			// Copy-to-clipboard for fenced code blocks: the markdown pipeline
+			// only highlights, it doesn't add a button, so one is injected for
+			// every `pre > code` on the page (prose fences and Demo's
+			// "Show HTML" source alike).
+			const copyStatus = document.querySelector("[data-copy-status]");
+			const announceCopyStatus = (message) => {
+				if (!copyStatus) return;
+				copyStatus.textContent = "";
+				requestAnimationFrame(() => {
+					copyStatus.textContent = message;
+				});
+			};
+
+			// Every code block the shell owns, and no others: a <pre> inside a
+			// live example is the example. Injecting a control into it would
+			// put a <button> in the reader's specimen that Cirth never ships,
+			// and the caption on every demo says the opposite. The disclosure
+			// under the demo keeps its button — that listing is the shell's.
+			for (const pre of document.querySelectorAll("pre")) {
+				if (pre.closest(".docs-demo-preview")) continue;
+				if (pre.querySelector(":scope > button.copy")) continue;
+				const code = pre.querySelector("code");
+				if (!code?.textContent) continue;
+
+				const button = document.createElement("button");
+				button.type = "button";
+				button.className = "copy";
+				button.setAttribute("aria-label", "Copy to clipboard");
+				pre.append(button);
+
+				button.addEventListener("click", async () => {
+					try {
+						await navigator.clipboard.writeText(code.textContent ?? "");
+						button.classList.add("copied");
+						setTimeout(() => button.classList.remove("copied"), 2000);
+						announceCopyStatus("Code copied to clipboard.");
+					} catch {
+						announceCopyStatus("Code could not be copied.");
+					}
+				});
+			}
+
+			// The scoped classless build reads data-theme from its own root
+			// element (.cirth-classless demos), so mirror the site theme onto
+			// every such wrapper whenever it changes.
+			const classlessRoots = document.querySelectorAll(".cirth-classless");
+			if (classlessRoots.length > 0) {
+				const sync = () => {
+					const theme = document.documentElement.getAttribute("data-theme");
+					for (const root of classlessRoots) root.setAttribute("data-theme", theme ?? "light");
+				};
+				sync();
+				new MutationObserver(sync).observe(document.documentElement, {
+					attributeFilter: ["data-theme"],
+				});
+			}
+
+			// Live preset switcher (gh#80): the <head> script above already
+			// applied a remembered choice before first paint; this wires up
+			// the header <select> for changes after load. Swapping the
+			// stylesheet's href (rather than always keeping one <link> per
+			// preset and toggling disabled) means an unvisited preset is
+			// never fetched at all.
+			const presetSelect = document.querySelector("[data-cirth-preset-select]");
+			if (presetSelect) {
+				const base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
+				const applyPreset = (preset) => {
+					const existing = document.getElementById("cirth-preset-stylesheet");
+					if (preset === "default") {
+						existing?.remove();
+						return;
+					}
+					const link = existing ?? document.createElement("link");
+					link.rel = "stylesheet";
+					link.id = "cirth-preset-stylesheet";
+					link.href = `${base}/styles/generated/presets/${preset}.css`;
+					if (!existing) document.head.appendChild(link);
+				};
+				presetSelect.value = sessionStorage.getItem("cirth-preset") || "default";
+				presetSelect.addEventListener("change", () => {
+					sessionStorage.setItem("cirth-preset", presetSelect.value);
+					applyPreset(presetSelect.value);
+				});
+			}
+
+		</script>
+	</body>
+</html>

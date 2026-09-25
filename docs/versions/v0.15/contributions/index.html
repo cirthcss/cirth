@@ -1,0 +1,1485 @@
+<!doctype html>
+<html lang="en" data-base="/cirth/v0.15/">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Cirth</title>
+		<meta name="description" content="HTML-native CSS framework. Production-ready UI from semantic HTML — under 14KB gzipped, 0 JavaScript.">
+		<meta property="og:type" content="website">
+		<meta property="og:title" content="Cirth">
+		<meta property="og:description" content="HTML-native CSS framework. Production-ready UI from semantic HTML — under 14KB gzipped, 0 JavaScript.">
+		<meta property="og:image" content="https://cirthcss.github.io/cirth/social-preview.png">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta property="og:image:alt" content="Cirth: production-ready UI from semantic HTML, with a verified proof ledger.">
+		<meta name="twitter:card" content="summary_large_image">
+		<link rel="icon" href="/cirth/v0.15/favicon.svg" media="(prefers-color-scheme: light)">
+		<link rel="icon" href="/cirth/v0.15/favicon_dark.svg" media="(prefers-color-scheme: dark)">
+		<link rel="apple-touch-icon" href="/cirth/v0.15/apple-touch-icon.png">
+		<link rel="manifest" href="/cirth/v0.15/site.webmanifest">
+		<link rel="stylesheet" href="/cirth/v0.15/styles/style.css">
+		
+		<script>
+			// Set data-theme before first paint to avoid a light-mode flash.
+			(function () {
+				var stored = localStorage.getItem("cirth-theme");
+				var dark = stored
+					? stored === "dark"
+					: window.matchMedia("(prefers-color-scheme: dark)").matches;
+				document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+			})();
+
+			// Same idea for the preset switcher (gh#80): apply a
+			// session-remembered preset before first paint, so returning to
+			// a page (or following a link) after picking one doesn't flash
+			// the default theme first. sessionStorage, not localStorage —
+			// the issue asks for "the current session", not a permanent
+			// choice that'd survive a closed tab into someone's next visit.
+			(function () {
+				var preset = sessionStorage.getItem("cirth-preset");
+				if (!preset || preset === "default") return;
+				var base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
+				var link = document.createElement("link");
+				link.rel = "stylesheet";
+				link.id = "cirth-preset-stylesheet";
+				link.href = base + "/styles/generated/presets/" + preset + ".css";
+				document.head.appendChild(link);
+			})();
+		</script>
+	</head>
+	<body><aside style="border-bottom:1px solid #8884;padding:.5rem 1rem;text-align:center;font-size:.875rem">Archived documentation for v0.15.0 and earlier. <a href="/cirth/">Read the current documentation</a>.</aside>
+		<a href="#main-content" class="sr-only sr-only-focusable docs-skip-link">Skip to main content</a>
+		<header class="container docs-header">
+	<nav aria-label="main navigation">
+		<ul class="docs-header-start-group">
+			<li>
+				<a href="/cirth/v0.15/" class="contrast docs-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.15/logo_brand.svg" alt="" width="48" height="48">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.15/logo_brand_dark.svg" alt="" width="48" height="48">
+					<strong>Cirth</strong>
+				</a>
+			</li>
+			
+				<li class="docs-nav-item">
+					<a href="/cirth/v0.15/get-started">Docs</a>
+				</li>
+			
+				<li class="docs-nav-item">
+					<a href="/cirth/v0.15/examples">Examples</a>
+				</li>
+			
+		</ul>
+		<div class="docs-header-actions">
+			<div class="docs-header-search">
+				<button type="button" class="docs-search-trigger" aria-haspopup="dialog" aria-controls="docs-search-dialog" aria-expanded="false" aria-label="Search documentation" data-docs-search-trigger="" hidden="">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg><span class="truncate">Search documentation</span>
+					<kbd><span data-docs-search-modifier="">Ctrl</span> K</kbd>
+				</button>
+			</div><button type="button" class="ghost contrast docs-menu-toggle" aria-haspopup="dialog" aria-controls="docs-mobile-menu-panel" aria-expanded="false" data-docs-menu-trigger="">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M100,48a28,28,0,1,0,56,0a28,28,0,1,0-56,0ZM100,128a28,28,0,1,0,56,0a28,28,0,1,0-56,0ZM100,208a28,28,0,1,0,56,0a28,28,0,1,0-56,0Z"></path></svg><span class="sr-only">Menu</span>
+			</button>
+		</div>
+		<ul class="docs-header-controls-group">
+			<li class="docs-header-github">
+				<a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+			</li><li data-docs-header-control="">
+				<span class="docs-control-label" aria-hidden="true">Version</span>
+				<select class="docs-version-select" aria-label="Documentation version" data-docs-version-select="">
+					
+						<option value="/cirth/" selected="">v0.13</option>
+					
+						<option value="/cirth/v0.12/">v0.12</option>
+					
+						<option value="/cirth/v0.10/">v0.10</option>
+					
+					
+				</select>
+				<script>
+					(() => {
+					// Navigating between documentation lines is a page load, not
+					// a preference: each line is a separate build with its own
+					// pages, so there is nothing to remember or restore.
+						const versionSelect = document.querySelector("[data-docs-version-select]");
+						versionSelect?.addEventListener("change", () => {
+							if (versionSelect.value) window.location.assign(versionSelect.value);
+						});
+					})();
+				</script>
+			</li><li data-docs-header-control="">
+				<span class="docs-control-label" aria-hidden="true">Preset</span>
+				<select class="docs-preset-select" aria-label="Color preset" data-cirth-preset-select="">
+					<option value="default">Default</option>
+					
+						<option value="plain">Plain</option>
+					
+						<option value="playroom">Playroom</option>
+					
+				</select>
+			</li>
+			<li data-docs-header-control="">
+				<span class="docs-control-label" aria-hidden="true">Theme</span>
+				<button type="button" class="ghost contrast docs-theme-toggle" aria-label="Dark color scheme" aria-pressed="false">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="18" height="18" fill="currentColor" aria-hidden="true" class="docs-theme-icon-sun"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"></path></svg>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="18" height="18" fill="currentColor" aria-hidden="true" class="docs-theme-icon-moon"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"></path></svg>
+				</button>
+				<script>
+					(() => {
+					// Which icon is visible is driven entirely by CSS
+					// ([data-theme="dark"] .docs-theme-icon-*, see styles/style.css)
+					// — this script is only the click handler.
+						const themeToggle = document.querySelector(".docs-theme-toggle");
+						const syncThemeToggle = () => {
+						themeToggle?.setAttribute(
+							"aria-pressed",
+							document.documentElement.getAttribute("data-theme") === "dark" ? "true" : "false",
+						);
+						};
+						syncThemeToggle();
+						themeToggle?.addEventListener("click", () => {
+						const next =
+							document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+						document.documentElement.setAttribute("data-theme", next);
+						localStorage.setItem("cirth-theme", next);
+							syncThemeToggle();
+						});
+					})();
+				</script>
+			</li>
+		</ul>
+	</nav><dialog id="docs-mobile-menu-panel" class="docs-drawer" aria-label="Site menu" data-docs-menu-drawer="">
+		<article>
+			<header>
+				<span class="docs-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.15/logo_brand.svg" alt="" width="48" height="48">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.15/logo_brand_dark.svg" alt="" width="48" height="48">
+					<strong>Cirth</strong>
+				</span>
+				<button type="button" class="close" aria-label="Close menu" data-docs-menu-close=""></button>
+			</header>
+			<nav aria-label="Site">
+				<ul>
+					
+						<li><a href="/cirth/v0.15/get-started">Docs</a></li>
+					
+						<li><a href="/cirth/v0.15/examples">Examples</a></li>
+					
+					<li><a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub ↗<span class="sr-only"> (opens in a new tab)</span></a></li>
+				</ul>
+			</nav>
+			<section class="docs-mobile-controls">
+				<strong>Display</strong>
+				<ul data-docs-mobile-controls=""></ul>
+			</section>
+		</article>
+	</dialog>
+	<script>
+		(() => {
+			const header = document.currentScript?.closest(".docs-header");
+			const drawer = header?.querySelector("[data-docs-menu-drawer]");
+			const trigger = header?.querySelector("[data-docs-menu-trigger]");
+			const closeButton = drawer?.querySelector("[data-docs-menu-close]");
+			const desktopControls = header?.querySelector(".docs-header-controls-group");
+			const mobileControls = drawer?.querySelector("[data-docs-mobile-controls]");
+			// The one query that decides collapsed vs expanded. It is the same
+			// width the stylesheet uses to show this toggler, hide the in-header
+			// nav items and hide the sidebar: read from one place so the
+			// transfer and the toggler's visibility cannot drift apart.
+			const compact = window.matchMedia("(max-width: 1023px)");
+			const controls = desktopControls
+				? Array.from(desktopControls.querySelectorAll(":scope > [data-docs-header-control]"))
+				: [];
+
+			const syncMenuState = () => {
+				trigger?.setAttribute("aria-expanded", drawer?.open ? "true" : "false");
+			};
+			const closeDrawer = () => {
+				if (drawer?.open) drawer.close();
+			};
+			// Moving a node blurs whatever inside it had focus, so only move
+			// what is not already where it belongs, and hand focus back if the
+			// element that had it travelled. Crossing the breakpoint with the
+			// preset select focused should not drop the reader at the top of
+			// the document.
+			const placeControls = () => {
+				const target = compact.matches ? mobileControls : desktopControls;
+				if (target) {
+					const active = document.activeElement;
+					let refocus = null;
+					for (const control of controls) {
+						if (control.parentElement === target) continue;
+						if (active instanceof HTMLElement && control.contains(active)) {
+							refocus = active;
+						}
+						target.append(control);
+					}
+					refocus?.focus();
+				}
+				if (!compact.matches) closeDrawer();
+				syncMenuState();
+			};
+
+			trigger?.addEventListener("click", () => {
+				if (!drawer?.open) drawer?.showModal();
+				syncMenuState();
+			});
+			closeButton?.addEventListener("click", closeDrawer);
+			// Clicking the backdrop: the event target is the dialog itself
+			// only when the pointer misses the panel inside it.
+			drawer?.addEventListener("click", (event) => {
+				if (event.target === drawer) closeDrawer();
+			});
+			// Fires for the close button, for the backdrop, and for Escape,
+			// which the element handles on its own. Returning focus to the
+			// trigger explicitly rather than relying on the element's own
+			// restoration keeps this identical to the search dialog next to
+			// it, and correct when the drawer is closed by a resize.
+			drawer?.addEventListener("close", () => {
+				syncMenuState();
+				if (compact.matches) trigger?.focus();
+			});
+			compact.addEventListener?.("change", placeControls);
+			placeControls();
+		})();
+	</script>
+</header>
+
+		
+
+<main id="main-content" class="container docs-page-shell">
+	<div class="docs-mobile-tools">
+		<details class="docs-mobile-nav">
+			<summary>Browse documentation</summary>
+			<nav aria-label="Mobile documentation navigation">
+				
+					<section>
+						<strong>Introduction</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/get-started">Get Started</a></li>
+							
+								<li><a href="/cirth/v0.15/customization">Customization</a></li>
+							
+								<li><a href="/cirth/v0.15/colors">Colors</a></li>
+							
+								<li><a href="/cirth/v0.15/about">About Cirth</a></li>
+							
+								<li><a href="/cirth/v0.15/upgrading">Upgrading</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Layout</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/layout/document">Document</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/landmarks">Landmarks</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/section">Section</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/container">Container</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/row">Row</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/grid">Grid</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/overflow-auto">Overflow auto</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Content</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/content/typography">Typography</a></li>
+							
+								<li><a href="/cirth/v0.15/content/description-list">Description list</a></li>
+							
+								<li><a href="/cirth/v0.15/content/link">Link</a></li>
+							
+								<li><a href="/cirth/v0.15/content/button">Button</a></li>
+							
+								<li><a href="/cirth/v0.15/content/table">Table</a></li>
+							
+								<li><a href="/cirth/v0.15/content/code">Code</a></li>
+							
+								<li><a href="/cirth/v0.15/content/figure">Figure</a></li>
+							
+								<li><a href="/cirth/v0.15/content/embedded">Embedded content</a></li>
+							
+								<li><a href="/cirth/v0.15/content/misc">Misc</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Forms</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/forms/">Overview</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/checkbox-radio-switch">Checkbox, radio, switch</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-color">Input color</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-date">Input date</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-file">Input file</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-range">Input range</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-search">Input search</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Components</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/components/accordion">Accordion</a></li>
+							
+								<li><a href="/cirth/v0.15/components/card">Card</a></li>
+							
+								<li><a href="/cirth/v0.15/components/dropdown">Dropdown</a></li>
+							
+								<li><a href="/cirth/v0.15/components/group">Group</a></li>
+							
+								<li><a href="/cirth/v0.15/components/loading">Loading</a></li>
+							
+								<li><a href="/cirth/v0.15/components/meter">Meter</a></li>
+							
+								<li><a href="/cirth/v0.15/components/modal">Modal</a></li>
+							
+								<li><a href="/cirth/v0.15/components/nav">Nav</a></li>
+							
+								<li><a href="/cirth/v0.15/components/popover">Popover</a></li>
+							
+								<li><a href="/cirth/v0.15/components/progress">Progress</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Utilities</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/utilities/accessibility">Accessibility</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/high-contrast">High contrast</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/reduce-motion">Reduce motion</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/sr-only">Screen-reader only</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/truncate">Truncate</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/breakout">Breakout</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/print">Print</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Project</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/examples">Examples</a></li>
+							
+								<li><a href="/cirth/v0.15/contributions" aria-current="page">Contributions</a></li>
+							
+								<li><a href="/cirth/v0.15/brand">Brand</a></li>
+							
+						</ul>
+					</section>
+				
+			</nav>
+		</details>
+		
+			<details class="docs-toc-top">
+				<summary>On this page</summary>
+				<nav aria-label="On this page">
+					<ul>
+						
+							<li class="docs-toc-level-2">
+								<a href="#getting-set-up">Getting set up</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#where-things-live">Where things live</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#package-exports">Package exports</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#quality-gates">Quality gates</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#interaction-regressions-checkbehavior">Interaction regressions: check:behavior</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#dist-invariants--checkdist">Dist invariants — check:dist</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#cdn-integrity--checksri">CDN integrity — check:sri</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#browser-target--checkbrowserslist">Browser target — check:browserslist</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#documentation-lines">Documentation lines</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#where-the-site-is-published">Where the site is published</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#accessibility--checka11y">Accessibility — check:a11y</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#visual-regression--checkvisual">Visual regression — check:visual</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#on-demand-the-rendering-fingerprint-and-the-dead-css-audit">On demand: the rendering fingerprint and the dead-CSS audit</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#what-makes-a-good-contribution">What makes a good contribution</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#license">License</a>
+							</li>
+						
+					</ul>
+				</nav>
+			</details>
+		
+	</div>
+	<div class="docs-layout">
+		<aside class="docs-sidebar">
+			<nav aria-label="docs navigation">
+				
+					<details>
+						<summary>Introduction</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/get-started">Get Started</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/customization">Customization</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/colors">Colors</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/about">About Cirth</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/upgrading">Upgrading</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Layout</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/document">Document</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/landmarks">Landmarks</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/section">Section</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/container">Container</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/row">Row</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/grid">Grid</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/overflow-auto">Overflow auto</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Content</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/content/typography">Typography</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/description-list">Description list</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/link">Link</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/button">Button</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/table">Table</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/code">Code</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/figure">Figure</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/embedded">Embedded content</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/misc">Misc</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Forms</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/">Overview</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/checkbox-radio-switch">Checkbox, radio, switch</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-color">Input color</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-date">Input date</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-file">Input file</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-range">Input range</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-search">Input search</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Components</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/components/accordion">Accordion</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/card">Card</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/dropdown">Dropdown</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/group">Group</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/loading">Loading</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/meter">Meter</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/modal">Modal</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/nav">Nav</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/popover">Popover</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/progress">Progress</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Utilities</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/accessibility">Accessibility</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/high-contrast">High contrast</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/reduce-motion">Reduce motion</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/sr-only">Screen-reader only</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/truncate">Truncate</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/breakout">Breakout</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/print">Print</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details open="">
+						<summary>Project</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/examples">Examples</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/contributions" aria-current="page">Contributions</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/brand">Brand</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+			</nav>
+		</aside>
+		<div class="docs-content" data-pagefind-body="">
+			<h1>Contributions</h1>
+<p>Cirth is developed in the open at
+<a href="https://github.com/cirthcss/cirth">github.com/cirthcss/cirth</a>.
+Bug reports, accessibility findings, and focused pull requests are all
+welcome. The full workflow lives in
+<a href="https://github.com/cirthcss/cirth/blob/master/.github/CONTRIBUTING.md"><code>.github/CONTRIBUTING.md</code></a>;
+this page is the practical summary.</p>
+<h2 id="getting-set-up" tabindex="-1">Getting set up <a class="header-anchor" href="#getting-set-up">#</a></h2>
+<p>npm is the only supported package manager: one install path, one lockfile.
+Node.js 24.18 (current LTS) is the version CI and the release workflows run
+on; <code>.nvmrc</code> pins it for local use with <code>nvm use</code>.</p>
+<pre tabindex="0"><code class="hljs language-sh">git lfs install    <span class="hljs-comment"># once per machine — visual test baselines are Git LFS objects</span>
+git <span class="hljs-built_in">clone</span> https://github.com/cirthcss/cirth.git
+<span class="hljs-built_in">cd</span> cirth
+npm install
+</code></pre>
+<p>If you cloned before installing <a href="https://git-lfs.com">Git LFS</a>, the
+screenshot baselines under <code>tests/__screenshots__/</code> are small pointer
+files instead of images; <code>git lfs pull</code> fetches the real ones.</p>
+<p>The commands you'll actually use:</p>
+<pre tabindex="0"><code class="hljs language-sh">npm run build      <span class="hljs-comment"># compile src/ to dist/ (format, lint, compile, minify)</span>
+npm run dev        <span class="hljs-comment"># rebuild on change</span>
+npm run lint       <span class="hljs-comment"># stylelint + CSS custom property check</span>
+npm run lint:fix
+npm run docs:dev   <span class="hljs-comment"># run this docs site locally</span>
+</code></pre>
+<h2 id="where-things-live" tabindex="-1">Where things live <a class="header-anchor" href="#where-things-live">#</a></h2>
+<ul>
+<li><code>src/</code> contains SCSS source. It is repository infrastructure, <strong>not</strong> a public Sass
+API: the npm package ships compiled CSS from <code>dist/</code> only, and
+customization stays CSS first through <code>--cirth-</code> custom properties.</li>
+<li><code>src/theme/</code> contains design tokens: color scales, foundations, and the
+light/dark schemes. Most visual changes start here, not in components.</li>
+<li><code>src/presets/</code> contains the maintained token override presets published
+alongside the default build. Its filenames are the source of truth used by
+the build, docs switcher, accessibility matrix, and visual suite; adding a
+preset automatically adds it to those checks.</li>
+<li><code>docs/</code> contains this site (Eleventy), styled by Cirth's own build — and
+also doubles as the fixture the library's own QA runs against: <code>tests/</code>
+(visual regression) and <code>check:a11y</code> render the built docs site to catch
+unintended rendering/accessibility changes from a source edit. Kept in
+this repository rather than a dedicated one <strong>on purpose, for now</strong>: the
+library is still under heavy, fast-moving revision, co-locating docs
+with source keeps a change and its matching docs update in the same
+commit checked by the same CI, and the QA coupling above means anyone
+doing serious library work needs the docs build regardless of where it
+lives. Whether to eventually split docs into their own repository — and
+do a full manual review pass over everything written so far — is
+something to evaluate later, not a settled plan; noted here so the
+current layout isn't mistaken for either the permanent shape of the
+project or a fixed roadmap item.</li>
+<li><code>scripts/</code> contains local Node build and check scripts. Prefer extending
+these over adding tooling dependencies; a new package needs to provide a
+real build capability that would be risky to maintain locally.</li>
+<li><code>tests/</code> contains the visual regression suite and its screenshot
+baselines (stored in Git LFS).</li>
+</ul>
+<h2 id="package-exports" tabindex="-1">Package exports <a class="header-anchor" href="#package-exports">#</a></h2>
+<p><code>package.json</code> declares an <code>exports</code> map with one entry per generated
+build, so bundlers and Node's resolver can pick a build without knowing
+the <code>dist/</code> filename convention:</p>
+<pre tabindex="0"><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;.&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./dist/cirth.min.css&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;./classless&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./dist/cirth.classless.min.css&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;./scoped&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./dist/cirth.scoped.min.css&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;./classless/scoped&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./dist/cirth.classless.scoped.min.css&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;./presets/plain&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./dist/presets/plain.min.css&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;./presets/playroom&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./dist/presets/playroom.min.css&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>A <code>./dist/*</code> wildcard keeps existing deep imports resolving. If you add a
+build variant, add its export path and verify it resolves from a packed
+tarball (<code>npm pack</code>) before opening the PR.</p>
+<h2 id="quality-gates" tabindex="-1">Quality gates <a class="header-anchor" href="#quality-gates">#</a></h2>
+<p>The properties this site advertises — the size, the WCAG AA compliance,
+what each build variant does and doesn't contain — are not checked by
+review attention. Each one is enforced by an automated check that runs
+in CI on every push, and the same checks run locally:</p>
+<pre tabindex="0"><code class="hljs language-sh">npm run lint          <span class="hljs-comment"># tree noise + stylelint + custom property audit + browser target + doc links + CDN hashes</span>
+npm run build         <span class="hljs-comment"># compile src/ to dist/</span>
+npm run check:dist    <span class="hljs-comment"># structural invariants of every generated dist file</span>
+npm run check:size    <span class="hljs-comment"># ≤ 14 KiB gzipped per root bundle</span>
+npm run docs:build    <span class="hljs-comment"># build this site (input for the browser checks below)</span>
+npm run check:behavior <span class="hljs-comment"># interaction, reflow, user styles, and input parity across three engines</span>
+npm run check:a11y    <span class="hljs-comment"># axe WCAG 2.0–2.2 A/AA audit of every docs page</span>
+npm run check:visual  <span class="hljs-comment"># screenshot diff across docs pages and maintained presets</span>
+npm run check:tooling <span class="hljs-comment"># the dead-CSS audit measures a frozen copy of the build</span>
+</code></pre>
+<p><code>check:tooling</code> is the only one of these that checks a tool rather than the
+library; it is seconds, and it runs locally rather than in CI because it
+rewrites <code>docs/dist</code> on purpose. Two more tools run on demand — a rendering
+fingerprint and a dead-CSS audit. See
+<a href="#on-demand-the-rendering-fingerprint-and-the-dead-css-audit">On demand</a>
+below.</p>
+<p>The browser-based checks need the Playwright browsers once:
+<code>npx playwright install chromium firefox webkit</code>.</p>
+<h3 id="interaction-regressions-checkbehavior" tabindex="-1">Interaction regressions: <code>check:behavior</code> <a class="header-anchor" href="#interaction-regressions-checkbehavior">#</a></h3>
+<p>Runs focused interaction tests against Chromium, Firefox, and WebKit. These
+tests cover browser-managed states that static screenshots cannot exercise,
+such as focus, blur, <code>:user-valid</code>, and <code>:user-invalid</code>; mouse, Enter, and
+Space activation parity; and open dialog and popover states. For the default
+theme and every preset discovered from <code>src/presets/</code>, the suite also checks
+every docs page at 320 CSS px, with text at 200%, with WCAG text-spacing
+overrides, and with <code>forced-colors: active</code>. Reflow assertions compare
+<code>documentElement.scrollWidth</code> with its <code>clientWidth</code>, detect clipped text, and
+check open top-layer surfaces independently. WebKit provides the closest
+automated coverage available for Safari's rendering engine.</p>
+<h3 id="dist-invariants--checkdist" tabindex="-1">Dist invariants — <code>check:dist</code> <a class="header-anchor" href="#dist-invariants--checkdist">#</a></h3>
+<p>Runs mechanical assertions over every file in <code>dist/</code> right after the
+build, so the contracts of each build variant can't erode silently:</p>
+<ul>
+<li>every build re-parses with Lightning CSS and is non-empty;</li>
+<li>classless builds emit <strong>no class selectors</strong> (the <code>.cirth</code> wrapper is
+the single exception in the scoped variant);</li>
+<li>scoped builds keep <strong>every rule inside the <code>.cirth</code> subtree</strong> — no
+selector can style markup that didn't opt in;</li>
+<li>presets only set custom properties on theme roots, never rules.</li>
+</ul>
+<h3 id="cdn-integrity--checksri" tabindex="-1">CDN integrity — <code>check:sri</code> <a class="header-anchor" href="#cdn-integrity--checksri">#</a></h3>
+<p>The <code>&lt;link&gt;</code> snippets on <a href="/cirth/v0.15/get-started#cdn">Get Started</a> and in the README
+pin a version <em>and</em> carry the <code>sha384</code> hash of the file that version
+serves. <code>check:sri</code> (part of <code>npm run lint</code>) keeps the two honest: every
+snippet has to pin the version in <code>package.json</code>, carry a well-formed hash,
+and set <code>crossorigin=&quot;anonymous&quot;</code>, without which the browser cannot verify
+the response at all.</p>
+<p>Version and hash are rewritten together by <code>npm run sri</code> at release time,
+then verified against the bytes jsDelivr actually serves with
+<code>npm run check:sri -- --from-cdn</code> after publishing. Editing either by hand
+is how you ship a snippet that every browser refuses to load; the
+<a href="https://github.com/cirthcss/cirth/blob/master/RELEASING.md"><code>RELEASING.md</code></a>
+has the full sequence.</p>
+<h3 id="browser-target--checkbrowserslist" tabindex="-1">Browser target — <code>check:browserslist</code> <a class="header-anchor" href="#browser-target--checkbrowserslist">#</a></h3>
+<p>The Browserslist target names ten browser families but describes a single
+engine floor: Opera and Samsung Internet are Chromium forks, Firefox for
+Android is the same Gecko as the desktop build, and iOS Safari is WebKit
+either way. Raising <code>Chrome</code> and forgetting <code>Opera</code> does not widen
+support — it quietly lowers the floor back to whatever Chromium that Opera
+release was built on, because Lightning CSS compiles for the oldest engine
+in the list, and nothing else in the repository notices.</p>
+<p><code>check:browserslist</code> (part of <code>npm run lint</code>) asserts that invariant: every
+Chromium family on the same version, the two forks on the releases built
+from it, Firefox and Safari in step with their mobile counterparts, and the
+legacy Android Browser absent — it is the same engine as Chrome for
+Android and including it makes Lightning CSS expand every grouped selector
+in the library. The Chromium-to-fork table lives in the script with a note
+on how it was derived; when the floor moves past it, the check says so
+instead of passing quietly.</p>
+<h3 id="documentation-lines" tabindex="-1">Documentation lines <a class="header-anchor" href="#documentation-lines">#</a></h3>
+<p>The site is versioned at breaking changes, not at releases. A line covers
+every version that documents the same API, which is why the switcher in the
+header reads <code>up to v0.10.0</code> / <code>from v0.11.0</code> rather than listing patches.
+Before 1.0 that boundary is a minor release; after it, a major.</p>
+<p>Three things make it work:</p>
+<ul>
+<li><code>docs/src/_data/versions.js</code> lists the lines. Adding one is a hand edit —
+a deliberate decision, not something a script infers from tags.</li>
+<li><code>docs/versions/&lt;dir&gt;/</code> holds the frozen sites. They are built once, at the
+release that ends them, and committed as-is. They are never rebuilt: an
+archived line should not have to keep compiling against a toolchain that
+has moved on.</li>
+<li><code>npm run docs:archive -- &lt;tag&gt; &lt;dir&gt;</code> does the freezing, in a detached
+worktree so the working tree is untouched. It repoints the tag's
+<code>pathPrefix</code> at the archive's own subdirectory before building, since a
+tag predates the directory it ends up in.</li>
+</ul>
+<p>At a breaking release, in order: archive the outgoing line
+(<code>npm run docs:archive -- v0.10.0 v0.10</code>), move <code>current: true</code> onto the
+new entry in <code>versions.js</code>, and write the migration on
+<a href="/cirth/v0.15/upgrading">Upgrading</a>. The archived line is excluded from <code>check:a11y</code>
+and the visual suite on purpose — auditing it would re-audit what the
+toolchain thought a year ago, and any finding would be unfixable.</p>
+<h3 id="where-the-site-is-published" tabindex="-1">Where the site is published <a class="header-anchor" href="#where-the-site-is-published">#</a></h3>
+<p>The root is always <code>master</code>, which is to say the version on npm. <code>develop</code>
+is built beside it under <code>/next/</code>, with a banner on every page saying that
+what you are reading has not shipped. Both come out of one Pages artifact,
+built by the same workflow, so a push to either branch refreshes both and
+neither goes stale while the other moves.</p>
+<h3 id="accessibility--checka11y" tabindex="-1">Accessibility — <code>check:a11y</code> <a class="header-anchor" href="#accessibility--checka11y">#</a></h3>
+<p>Runs <a href="https://github.com/dequelabs/axe-core">axe-core</a> with the explicit
+<code>wcag2a</code>, <code>wcag2aa</code>, <code>wcag21a</code>, <code>wcag21aa</code>, and <code>wcag22aa</code> tags against every
+page of the built docs site. The complete matrix covers the default theme and
+every preset discovered from <code>src/presets/</code> in light, dark, and forced-colors
+modes. Dialog and popover demos are audited once more while open. Since the
+component demos live on these pages, this continuously re-verifies the
+framework's own AA claim, not just the site around it.</p>
+<p>The shell-free framework and component-state specimens are audited separately
+in Default, Plain, Playroom, and a custom blue primary. Light and dark additionally
+cover real hover, keyboard-focus, and pointer-active states; forced colors keeps
+the complete static specimen and the dedicated resilience checks below.</p>
+<p>axe's contrast algorithm cannot model the system-color remapping performed by
+forced-colors mode, so <code>color-contrast</code> remains enabled in light and dark and
+is disabled only for that emulation. The behavior suite covers the forced-
+colors rendering directly, including focus rings, loading indicators, borders,
+open surfaces, and horizontal reflow.</p>
+<p>The check fails on any violation not listed in
+<code>scripts/a11y-baseline.json</code>. That baseline exists so an intentionally
+accepted finding can be recorded explicitly — but it is empty, and the
+goal is to keep it that way: fix violations rather than baseline them.</p>
+<h3 id="visual-regression--checkvisual" tabindex="-1">Visual regression — <code>check:visual</code> <a class="header-anchor" href="#visual-regression--checkvisual">#</a></h3>
+<p>Playwright screenshots the content region of the default theme's selected
+documentation pages in light and dark modes, at 1440 px and 390 px, and
+compares each against a committed baseline in <code>tests/__screenshots__/</code>. The
+shared documentation chrome has its own viewport-sized baseline, so changes to
+the header, sidebar or outline remain covered without invalidating every page
+capture. The set includes the
+prose-heavy About, Customization, Get Started, Upgrading, and Contributions
+pages: a large editorial rewrite must produce a reviewable visual diff too.</p>
+<p>Every preset discovered from <code>src/presets/</code> also renders a representative
+matrix covering colors, semantic meter states, button variants, form validity,
+and open modal and popover states. The default theme gets the same open-state
+captures. Adding a preset therefore adds visual cases automatically; a missing
+stylesheet or docs-switcher option fails before a screenshot is accepted. Any
+unexplained pixel difference fails the check.</p>
+<p>A single representative Chromium board also compares real rest, hover, focus,
+active, disabled, closed, and open pixels across the four shell-free themes in
+light and dark. Multi-engine state parity remains a behavior assertion, avoiding
+hundreds of duplicate image baselines without replacing real interaction.</p>
+<p>Two things to know about the baselines:</p>
+<ul>
+<li><strong>They are per-platform.</strong> System font rendering differs between
+operating systems, so macOS runs compare against the <code>*-darwin</code> sets
+and CI compares against the <code>*-linux</code> sets. You never edit the Linux
+sets by hand — see below.</li>
+<li><strong>They live in Git LFS</strong>, so the repository history stays small while
+the images stay versioned.</li>
+</ul>
+<p>When your change <strong>intentionally</strong> alters how something renders:</p>
+<ol>
+<li>regenerate your platform's baselines —
+<code>npm run check:visual:update</code>;</li>
+<li>commit them with the change, and say in the PR what changed visually
+and why.</li>
+</ol>
+<p>You don't need to touch the Linux sets. On every push that could affect
+rendering, the <code>update-visual-baselines</code> workflow regenerates them on a
+CI runner and, if anything actually differs, commits them back to the
+branch as <code>github-actions[bot]</code> — this self-heals both a first-time
+bootstrap and a partial change (only the pages your PR touched drift).
+Review that commit's images like any other diff.</p>
+<p>That commit lands as a separate, later push, so <strong><code>check:visual</code> in the
+same CI run as your content change can fail against the not-yet-updated
+Linux baseline</strong> — this is expected for a visual change, not a
+regression. Re-run the check (or wait for the bot commit and push again)
+once it lands. If <code>check:visual</code> fails and you <em>didn't</em> intend a visual
+change, that's the check working — fix the regression instead of
+updating baselines.</p>
+<h3 id="on-demand-the-rendering-fingerprint-and-the-dead-css-audit" tabindex="-1">On demand: the rendering fingerprint and the dead-CSS audit <a class="header-anchor" href="#on-demand-the-rendering-fingerprint-and-the-dead-css-audit">#</a></h3>
+<p>Two tools that do not run in CI. They answer a question the gates above
+cannot: <em>is this refactor really a no-op, and is this rule really dead?</em></p>
+<pre tabindex="0"><code class="hljs language-sh">node scripts/fingerprint-docs.js --out .cache/before.json
+<span class="hljs-comment"># make the change, then:</span>
+npm run docs:build
+node scripts/fingerprint-docs.js --compare .cache/before.json
+</code></pre>
+<p><code>fingerprint-docs.js</code> walks the built site and records one hash per
+rendering: every page, at 1440, 1100, 900 and 390, in light and dark, twice
+over — as the page loads, and again with every <code>&lt;details&gt;</code>, <code>&lt;dialog&gt;</code> and
+popover opened. Both of those matter. A rule that only paints inside the
+drawer or the search dialog is invisible to anything that looks at a page
+that has just loaded; and the shell's tier ladder has seven boundaries, so
+sampling only 1440 and 390 leaves the whole tablet band unmeasured. 800
+renderings, about a minute, and <code>--compare</code> names the elements that moved
+rather than only telling you something did.</p>
+<p>Each element is hashed on two things: its box and its paint-bearing
+computed style, and separately the tag, the text it owns and the attributes
+that belong to the document rather than to its styling (<code>href</code>, <code>id</code>,
+<code>role</code>, <code>aria-*</code>, …). So a copy change is a finding even when nothing
+re-wraps — which is how it should have caught &quot;Zero JavaScript&quot; becoming
+&quot;No JavaScript runtime&quot;. It renders under <code>prefers-reduced-motion: reduce</code>,
+because a measurement taken half way through a transition is noise, and it
+says so rather than pretending otherwise.</p>
+<pre tabindex="0"><code class="hljs language-sh">node scripts/audit-dead-css.js                       <span class="hljs-comment"># the whole shell stylesheet</span>
+node scripts/audit-dead-css.js --filter <span class="hljs-string">&quot;.docs-toc&quot;</span>  <span class="hljs-comment"># one family of selectors</span>
+node scripts/audit-dead-css.js --explain-order       <span class="hljs-comment"># show what it visits first, and why</span>
+node scripts/audit-dead-css.js --json .cache/dead.json
+node scripts/audit-dead-css.js --no-order --no-skip   <span class="hljs-comment"># both optimisations off, same verdicts</span>
+</code></pre>
+<p><code>--no-order</code> and <code>--no-skip</code> turn off the two things the survey buys — the
+richest-first visit order, and skipping a rendering that provably cannot
+see anything still undecided. They exist so those two can be <em>measured</em>
+against a run that differs in nothing else, and so a verdict can be
+reproduced without them.</p>
+<p><code>audit-dead-css.js</code> uses the same corpus to test declarations one at a
+time: take it out of the live CSSOM, re-measure, put it back. It surveys
+first — one pass that records which declarations each rendering can even
+see — and then probes richest-rendering-first, so a declaration proved live
+on the home page is never probed on the other forty-nine pages. Five
+verdicts:</p>
+<ul>
+<li><strong>live</strong> — removing it changed something, and the report names the first
+rendering that noticed.</li>
+<li><strong>inert</strong> — its selector matched real elements, and removing it changed
+nothing anywhere in the corpus. A candidate for deletion; read it before
+you delete it.</li>
+<li><strong>unmatched</strong> — its selector never matched an element on any page. Read
+this as a fact about the corpus too: it <em>opens</em> what a page keeps closed,
+but it never types, hovers or clicks, so markup a script builds in
+response to input — the search results Pagefind renders after a query —
+lands here and is very much alive.</li>
+<li><strong>not observable</strong> — it sits under a media context the corpus does not
+enter (<code>forced-colors</code>, <code>print</code>, <code>prefers-reduced-motion: no-preference</code>),
+or behind a state it does not reach (<code>:hover</code>, <code>:focus</code>, <code>::backdrop</code>,
+<code>::selection</code>), or it does something a still photograph cannot show: an
+<code>env(safe-area-inset-*)</code> that resolves to zero on a machine without a
+notch, an inset on a <code>position: sticky</code> box in a corpus that never
+scrolls, a transition. <strong>Not a finding.</strong> These have not been shown to be
+dead; they have not been looked at.</li>
+<li><strong>unprobeable</strong> — the declaration could not be taken out of the rule at
+all, because it is a longhand of a shorthand written with <code>var()</code>, which
+the engine stores whole. The experiment never ran, so there is no verdict.</li>
+</ul>
+<p>The last two categories are the reason to trust the first two. A report
+that cannot say &quot;I did not measure this&quot; will eventually persuade someone
+to delete a hover state.</p>
+<p>The corpus is <strong>one engine and one theme</strong>: Chromium, default preset. Both
+halves of that have already produced a false <code>inert</code> — a <code>width</code> beside a
+<code>flex-basis</code> that Chromium ignores and Gecko and WebKit do not, and a
+<code>font-family</code> pinning the shell's chrome to the system stack, which does
+nothing until a preset makes the page face rounded. Both were caught by
+<code>check:behavior</code> and <code>check:visual</code>, <em>after</em> the declarations had been
+deleted.</p>
+<p>So nothing is deleted on the sweep's word alone. The sweep writes its
+<code>inert</code> list out, with the smallest set of renderings that can see each
+one, and a second pass re-probes exactly those in the configurations the
+sweep cannot enter:</p>
+<pre tabindex="0"><code class="hljs language-sh">node scripts/audit-dead-css.js --json .cache/dead-css.json
+node scripts/verify-dead-css.js --report .cache/dead-css.json
+</code></pre>
+<p><code>verify-dead-css.js</code> runs Firefox, WebKit and the <code>playroom</code> preset over
+that plan — a few dozen renderings rather than 800, minutes rather than
+hours — and turns each <code>inert</code> into one of:</p>
+<ul>
+<li><strong>inert</strong> — nothing moved in any configuration. This is the verdict that
+makes a declaration safe to delete.</li>
+<li><strong>engine-dependent</strong> — Chromium measured nothing, Firefox or WebKit did.
+Keep it, and name the engine in a comment beside it.</li>
+<li><strong>preset-dependent</strong> — the default theme measured nothing, <code>playroom</code>
+did.</li>
+<li><strong>unverified</strong> — the configuration never entered the rule's media
+condition, never matched its selector, or could not take the declaration
+out of the rule at all. Looked for, not measured; it keeps the sweep's
+verdict and gains no confirmation.</li>
+<li><strong>interacting</strong> — inert alone and not inert with the others. The pass
+ends by removing everything it just confirmed <em>at once</em>, because that is
+what a cleanup does and a one-at-a-time probe cannot see it: two
+declarations can each be dead only because the other is alive.
+<code>.docs-header-search { width }</code> and <code>.docs-search-trigger { width }</code> are
+exactly that pair, in Firefox and WebKit, and deleting both together is
+how the 320px regression shipped the first time.</li>
+</ul>
+<p>It also samples one width the sweep does not: 320px, below the shell's own
+22.5rem tier, which is where the original regression was seen and the only
+width that enters that tier at all. A fifth width costs a fifth of the
+sweep and almost nothing here. (It has not yet changed a verdict on its
+own — the pair above was caught at 1440. It is cheap insurance against the
+band nothing else samples.)</p>
+<p>It is not a third browser suite. It reuses the audit's corpus, its in-page
+measurement and its vocabulary, and it answers the audit's question — <em>does
+this declaration do anything?</em> — in more places. The other two keep their
+own: <code>check:behavior</code> is what a page does, <code>check:visual</code> is what it looks
+like. Run them after acting on a report, not instead of reading it.</p>
+<p>Both tools measure a <strong>copy</strong> of the built site. <code>docs/dist</code> is a build
+output, and <code>npm run docs:build</code> replaces files in it — eleventy's
+passthrough copy replaces <code>styles/style.css</code> rather than editing it, so
+there is a window in which a page loads with no stylesheet at all. A sweep
+that runs for the better part of an hour cannot ask everyone else not to
+build, so it copies the tree once at startup (8 MB, well under a second),
+serves the copy, and removes it when the run ends — including when the run
+ends by throwing. <code>npm run check:tooling</code> is the proof: it rewrites
+<code>docs/dist</code> underneath an open corpus and checks the corpus never sees it.</p>
+<p>What they cannot copy is the source they are a claim about. A sweep ends
+with a list of declarations to delete from <code>docs/src/styles/style.css</code>, and
+that list only means anything for the file the sweep started with — so run
+one worker at a time against a working tree. Two editors, terminals or
+automated assistants sharing one checkout will eventually have one of them
+rewrite a file the other is half an hour into validating, and the result
+looks clean rather than wrong. Both tools hash the sources they depend on
+at the start and refuse the run if either has moved by the end, naming the
+file and saying whether it was edited or restored from a commit; a report
+produced from one tree is likewise refused against another.</p>
+<p>A whole-sheet run takes about forty minutes: it re-probes anything still
+undecided on every one of the 800 renderings, which is exactly what makes
+an &quot;inert everywhere&quot; verdict worth having, and an inert declaration is
+precisely the one that survives to be probed everywhere. <code>--filter</code> narrows
+it to one selector family in a couple of minutes and is the right tool for
+everyday work; the full sweep is for a cleanup pass. Neither tool fails a
+build: an inert declaration is something for a person to look at, and a
+check that blocks a merge over one only teaches people to stop running it.</p>
+<h2 id="what-makes-a-good-contribution" tabindex="-1">What makes a good contribution <a class="header-anchor" href="#what-makes-a-good-contribution">#</a></h2>
+<ul>
+<li><strong>Keep the surface small.</strong> New components need a strong case; new
+utility classes need a stronger one. If native HTML can express it,
+style the element instead.</li>
+<li><strong>Don't regress the accessibility floor.</strong> Contrast ratios, focus
+visibility, and the 44px control target size are verified properties of
+the source; a PR that trades them away for aesthetics won't land. The
+target size is a floor, not a fixed height — controls may grow past it,
+and <code>nav</code> opts down to a 40px band that remains above WCAG 2.5.8's 24px
+minimum — so the property to preserve is that nothing drops below what it
+is entitled to.</li>
+<li><strong>Stay on the spacing scale.</strong> Spacing values are <code>--cirth-space-*</code>
+tokens (0.25rem steps to 1.5, 0.5 steps to 3, then whole rems). If a
+value isn't on the scale, that's a design smell worth flagging.</li>
+<li><strong>Match the CSS first philosophy.</strong> Runtime customization through custom
+properties beats switches decided at compile time; those switches beat new
+build variants.</li>
+</ul>
+<h2 id="license" tabindex="-1">License <a class="header-anchor" href="#license">#</a></h2>
+<p>Contributions are accepted under the project's
+<a href="https://github.com/cirthcss/cirth/blob/master/LICENSE.md">Apache License 2.0</a>
+(see <a href="https://github.com/cirthcss/cirth/blob/master/NOTICE.md">NOTICE.md</a> for
+attribution). Documentation contributions fall under the same terms.</p>
+
+			
+				
+				
+				
+					<footer class="docs-prev-next">
+						
+							<a href="/cirth/v0.15/examples" class="secondary">← Examples</a>
+						
+						
+							<a href="/cirth/v0.15/brand" class="secondary">Brand →</a>
+						
+					</footer>
+				
+			
+		</div>
+		
+			<aside class="docs-toc">
+				<nav aria-label="On this page" id="docs-toc-nav">
+					<strong>On this page</strong>
+					<ul>
+						
+							<li class="docs-toc-level-2">
+								<a href="#getting-set-up" data-toc-link="" data-slug="getting-set-up">Getting set up</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#where-things-live" data-toc-link="" data-slug="where-things-live">Where things live</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#package-exports" data-toc-link="" data-slug="package-exports">Package exports</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#quality-gates" data-toc-link="" data-slug="quality-gates">Quality gates</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#interaction-regressions-checkbehavior" data-toc-link="" data-slug="interaction-regressions-checkbehavior">Interaction regressions: check:behavior</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#dist-invariants--checkdist" data-toc-link="" data-slug="dist-invariants--checkdist">Dist invariants — check:dist</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#cdn-integrity--checksri" data-toc-link="" data-slug="cdn-integrity--checksri">CDN integrity — check:sri</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#browser-target--checkbrowserslist" data-toc-link="" data-slug="browser-target--checkbrowserslist">Browser target — check:browserslist</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#documentation-lines" data-toc-link="" data-slug="documentation-lines">Documentation lines</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#where-the-site-is-published" data-toc-link="" data-slug="where-the-site-is-published">Where the site is published</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#accessibility--checka11y" data-toc-link="" data-slug="accessibility--checka11y">Accessibility — check:a11y</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#visual-regression--checkvisual" data-toc-link="" data-slug="visual-regression--checkvisual">Visual regression — check:visual</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#on-demand-the-rendering-fingerprint-and-the-dead-css-audit" data-toc-link="" data-slug="on-demand-the-rendering-fingerprint-and-the-dead-css-audit">On demand: the rendering fingerprint and the dead-CSS audit</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#what-makes-a-good-contribution" data-toc-link="" data-slug="what-makes-a-good-contribution">What makes a good contribution</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#license" data-toc-link="" data-slug="license">License</a>
+							</li>
+						
+					</ul>
+				</nav>
+			</aside>
+		
+	</div>
+</main>
+<script>
+	// Scroll-spy for the "On this page" aside: highlight whichever heading
+	// was most recently scrolled past. Purely additive — the TOC works
+	// (and its links navigate) without this script.
+	const links = Array.from(document.querySelectorAll("[data-toc-link]"));
+	if (links.length > 0) {
+		const headings = Array.from(
+			document.querySelectorAll(".docs-content :is(h2, h3)[id]"),
+		);
+
+		const update = () => {
+			// 96px offset: the heading counts as "reached" slightly before it
+			// touches the top edge, matching where the eye lands after a jump.
+			let current = "";
+			for (const heading of headings) {
+				if (heading.getBoundingClientRect().top <= 96) current = heading.id;
+				else break;
+			}
+			const activeSlug = current || (headings[0] ? headings[0].id : "");
+			// aria-current only: the framework paints its one registered
+			// edge on the inline-start rail from it, and the stylesheet
+			// deliberately adds no second marker of its own.
+			for (const link of links) {
+				if (link.dataset.slug === activeSlug) {
+					link.setAttribute("aria-current", "true");
+				} else {
+					link.removeAttribute("aria-current");
+				}
+			}
+		};
+
+		window.addEventListener("scroll", update, { passive: true });
+		update();
+	}
+</script>
+
+		<footer class="docs-footer">
+	<div class="container">
+		<div class="docs-footer-top">
+			<div class="docs-footer-brand-block">
+				<a href="/cirth/v0.15/" class="contrast docs-brand docs-footer-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.15/logo_brand.svg" alt="" width="36" height="36">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.15/logo_brand_dark.svg" alt="" width="36" height="36">
+					<strong>Cirth</strong>
+				</a>
+				<p class="docs-footer-credit">
+					Designed and built by Riccardo Pastori, with help from the
+					<a href="https://github.com/cirthcss/cirth/graphs/contributors" target="_blank" rel="noreferrer">contributors<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>.
+				</p>
+				<ul class="docs-footer-social">
+					<li><a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+					<li><a href="https://www.npmjs.com/package/@cirthcss/cirth" target="_blank" rel="noreferrer">npm<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+					<li><a href="https://github.com/cirthcss/cirth/blob/master/CHANGELOG.md" target="_blank" rel="noreferrer">Changelog<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+				</ul>
+			</div>
+			<div class="docs-footer-columns">
+				
+					<div class="docs-footer-column">
+						<strong>Docs</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/get-started">Get Started</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/customization">Customization</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/colors">Colors</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/components/card">Components</a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+					<div class="docs-footer-column">
+						<strong>Project</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/about">About Cirth</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/upgrading">Upgrading</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/brand">Brand</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/examples">Examples</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/contributions">Contributions</a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+					<div class="docs-footer-column">
+						<strong>Community</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="https://github.com/cirthcss/cirth/issues" target="_blank" rel="noreferrer">Issues<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+			</div>
+		</div>
+		<hr>
+		<small>
+			<span>Released under the Apache License 2.0.</span>
+			<span>Copyright © 2025-present Riccardo Pastori</span>
+		</small>
+	</div>
+</footer>
+
+		<dialog id="docs-search-dialog" class="docs-search-dialog" aria-labelledby="docs-search-title" data-docs-search-dialog="">
+	<article>
+		<header>
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
+			<h2 id="docs-search-title" class="sr-only">Search documentation</h2>
+			<input id="docs-search-input" type="text" role="searchbox" aria-label="Search documentation" placeholder="Search the Cirth documentation…" autocomplete="off" enterkeyhint="search" aria-controls="docs-search-results" aria-describedby="docs-search-status" data-docs-search-input="">
+			<button type="button" class="close" aria-label="Close search" data-docs-search-close=""></button>
+		</header>
+		<p id="docs-search-status" class="docs-search-status" role="status" aria-live="polite" data-docs-search-status="">
+			Type at least two characters to search.
+		</p>
+		<ol id="docs-search-results" class="docs-search-results" data-docs-search-results=""></ol>
+		<footer class="docs-search-help" aria-hidden="true">
+			<span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+			<span><kbd>↵</kbd> open</span>
+			<span><kbd>esc</kbd> close</span>
+			<small>Search by Pagefind</small>
+		</footer>
+	</article>
+</dialog>
+<script type="module" src="/cirth/v0.15/search.js"></script>
+
+		<div class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-copy-status=""></div>
+		<script>
+			// Copy-to-clipboard for fenced code blocks: the markdown pipeline
+			// only highlights, it doesn't add a button, so one is injected for
+			// every `pre > code` on the page (prose fences and Demo's
+			// "Show HTML" source alike).
+			const copyStatus = document.querySelector("[data-copy-status]");
+			const announceCopyStatus = (message) => {
+				if (!copyStatus) return;
+				copyStatus.textContent = "";
+				requestAnimationFrame(() => {
+					copyStatus.textContent = message;
+				});
+			};
+
+			// Every code block the shell owns, and no others: a <pre> inside a
+			// live example is the example. Injecting a control into it would
+			// put a <button> in the reader's specimen that Cirth never ships,
+			// and the caption on every demo says the opposite. The disclosure
+			// under the demo keeps its button — that listing is the shell's.
+			for (const pre of document.querySelectorAll("pre")) {
+				if (pre.closest(".docs-demo-preview")) continue;
+				if (pre.querySelector(":scope > button.copy")) continue;
+				const code = pre.querySelector("code");
+				if (!code?.textContent) continue;
+
+				const button = document.createElement("button");
+				button.type = "button";
+				button.className = "copy";
+				button.setAttribute("aria-label", "Copy to clipboard");
+				pre.append(button);
+
+				button.addEventListener("click", async () => {
+					try {
+						await navigator.clipboard.writeText(code.textContent ?? "");
+						button.classList.add("copied");
+						setTimeout(() => button.classList.remove("copied"), 2000);
+						announceCopyStatus("Code copied to clipboard.");
+					} catch {
+						announceCopyStatus("Code could not be copied.");
+					}
+				});
+			}
+
+			// The scoped classless build reads data-theme from its own root
+			// element (.cirth-classless demos), so mirror the site theme onto
+			// every such wrapper whenever it changes.
+			const classlessRoots = document.querySelectorAll(".cirth-classless");
+			if (classlessRoots.length > 0) {
+				const sync = () => {
+					const theme = document.documentElement.getAttribute("data-theme");
+					for (const root of classlessRoots) root.setAttribute("data-theme", theme ?? "light");
+				};
+				sync();
+				new MutationObserver(sync).observe(document.documentElement, {
+					attributeFilter: ["data-theme"],
+				});
+			}
+
+			// Live preset switcher (gh#80): the <head> script above already
+			// applied a remembered choice before first paint; this wires up
+			// the header <select> for changes after load. Swapping the
+			// stylesheet's href (rather than always keeping one <link> per
+			// preset and toggling disabled) means an unvisited preset is
+			// never fetched at all.
+			const presetSelect = document.querySelector("[data-cirth-preset-select]");
+			if (presetSelect) {
+				const base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
+				const applyPreset = (preset) => {
+					const existing = document.getElementById("cirth-preset-stylesheet");
+					if (preset === "default") {
+						existing?.remove();
+						return;
+					}
+					const link = existing ?? document.createElement("link");
+					link.rel = "stylesheet";
+					link.id = "cirth-preset-stylesheet";
+					link.href = `${base}/styles/generated/presets/${preset}.css`;
+					if (!existing) document.head.appendChild(link);
+				};
+				presetSelect.value = sessionStorage.getItem("cirth-preset") || "default";
+				presetSelect.addEventListener("change", () => {
+					sessionStorage.setItem("cirth-preset", presetSelect.value);
+					applyPreset(presetSelect.value);
+				});
+			}
+
+		</script>
+	</body>
+</html>
