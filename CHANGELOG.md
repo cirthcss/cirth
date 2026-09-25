@@ -7,6 +7,8 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-09-25
+
 ### Added
 
 - **`.no-cirth` excludes Cirth component declarations from a third-party
@@ -49,19 +51,6 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   classless builds are unchanged.
 
 ### Changed
-
-- **Compressed-size reporting and per-bundle budgets now use Brotli quality
-  11 instead of gzip level 9, and the package now includes precompressed
-  assets.** The generated CSS is byte-for-byte unchanged; every minified CSS
-  entry point, including print sheets and presets, gains an adjacent `.br`
-  sidecar built with the same encoder used by the size guard. The default
-  bundle measures 12,902 B with Brotli (formerly 15,088 B gzip) and the scoped
-  bundle 13,022 B (formerly 15,274 B gzip). npm still publishes its standard
-  `.tgz`, with the original CSS retained inside it. To use a sidecar, a host or
-  CDN must select it for a request for the corresponding `.css` URL, negotiate
-  `Accept-Encoding: br`, and return `Content-Encoding: br` plus
-  `Content-Type: text/css`; linking directly to a `.br` filename is not a
-  portable substitute for those response headers.
 
 - **Every stylesheet keeps its rules in one cascade layer, `cirth`**
   (gh#124). The four builds, their print sheets and the presets each wrap
@@ -1791,6 +1780,7 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
+[0.16.0]: https://github.com/cirthcss/cirth/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/cirthcss/cirth/compare/v0.15.0-beta.2...v0.15.0
 [0.15.0-beta.2]: https://github.com/cirthcss/cirth/compare/v0.15.0-beta.1...v0.15.0-beta.2
 [0.15.0-beta.1]: https://github.com/cirthcss/cirth/compare/v0.14.1...v0.15.0-beta.1

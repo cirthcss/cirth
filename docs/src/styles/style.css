@@ -2095,8 +2095,8 @@ pre > button.copy.copied::before {
 
 /* The one number left in the strip, inside the sentence that dates it. It
    is set as a value rather than as running text — but in the caption,
-   because "13.5 KB" on its own is the shape of a promise and "13.5 KB
-   with Brotli in this build" is the shape of a measurement. */
+   because "14.7 KB" on its own is the shape of a promise and "14.7 KB
+   gzipped in this build" is the shape of a measurement. */
 .docs-proof-metrics dd small .docs-proof-figure {
   color: var(--cirth-color);
   font-family: var(--cirth-font-family-mono);

@@ -2,7 +2,7 @@
 
 const siteTitle = "Cirth";
 const siteDescription =
-	"HTML-native CSS framework. Production-ready UI from semantic HTML — about 13KB with Brotli, 0 JavaScript.";
+	"HTML-native CSS framework. Production-ready UI from semantic HTML — no class vocabulary to learn, 0 JavaScript.";
 
 const topNav = [
 	{ text: "Docs", link: "/get-started" },
@@ -16,6 +16,7 @@ const sidebar = [
 			{ text: "Get Started", link: "/get-started" },
 			{ text: "Customization", link: "/customization" },
 			{ text: "Colors", link: "/colors" },
+			{ text: "Deploy", link: "/deploy" },
 			{ text: "About Cirth", link: "/about" },
 			{ text: "Upgrading", link: "/upgrading" },
 		],
@@ -102,6 +103,7 @@ const footerLinks = [
 			{ text: "Get Started", link: "/get-started" },
 			{ text: "Customization", link: "/customization" },
 			{ text: "Colors", link: "/colors" },
+			{ text: "Deploy", link: "/deploy" },
 			{ text: "Components", link: "/components/card" },
 		],
 	},

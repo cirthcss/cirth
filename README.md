@@ -29,8 +29,8 @@ Add the stylesheet from a CDN:
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.15.0/dist/cirth.min.css"
-  integrity="sha384-EY9wuVx8+257bjfSiQThO5hiMpZ+YQAcVqmR6XcdxqYI0+qEJ15YD3/RVWYApOiN"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.min.css"
+  integrity="sha384-lI8cp0vEMgtcAMV0HDytp7C+rad0hVfW/yXmsl87XmnuvTiMsx7O7ADf2lg5IQZq"
   crossorigin="anonymous">
 ```
 
@@ -86,14 +86,6 @@ All four share the same copper theme and light/dark support. Load an optional
 stylesheet to change its look. Print stylesheets are available separately.
 The [Get Started guide](docs/src/pages/get-started.md) has examples and npm
 import paths for each build.
-
-Every minified stylesheet also ships with an adjacent `.br` sidecar for
-self-hosting. Keep the `.css` URL in your markup: your server or CDN must select
-the sidecar after `Accept-Encoding: br` negotiation and respond with
-`Content-Encoding: br`, `Content-Type: text/css`, and
-`Vary: Accept-Encoding`. Without that response metadata, linking directly to
-the `.br` file does not deliver usable CSS; serving the original `.css` remains
-the fallback.
 
 To keep Cirth's content, form, and component declarations off a third-party
 widget, mark its root with `.no-cirth`:

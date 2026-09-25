@@ -333,7 +333,7 @@ Example one-line descriptions:
 - "Cirth turns native HTML elements into accessible, themeable
   interfaces, with zero shipped JavaScript."
 - "An HTML-native CSS framework with a runtime design token system and a
-  monitored Brotli-compressed size budget."
+  monitored gzipped size budget."
 
 ## Usage agreement
 

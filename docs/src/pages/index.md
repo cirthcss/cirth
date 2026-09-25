@@ -4,8 +4,10 @@ layout: home.njk
 hero:
   tagline: >-
     Cirth turns native HTML elements into accessible, themeable interfaces.
-    Load one stylesheet, customize it with runtime design tokens, and ship
-    an interface that needs no JavaScript runtime and no build step.
+    There is no class vocabulary to learn — the API is the markup you
+    already write, and the markup a model already knows. Load one
+    stylesheet, customize it with runtime design tokens, and ship an
+    interface that needs no JavaScript runtime and no build step.
   actions:
     - theme: brand
       text: Get Started
@@ -17,10 +19,10 @@ hero:
 pitch:
   lede: >-
     Not everything below is the same kind of statement. Some are
-    guarantees — properties the project intends to keep. Some are
-    capabilities: things Cirth lets you do, which say nothing about what
-    you build with them. One is a current fact, measured on this build and
-    free to move. Each cell says which it is, and how to check it.
+    guarantees — properties the project intends to keep, where a break
+    would be a bug. Some are capabilities: things Cirth lets you do, which
+    say nothing about what you build with them. Each cell says which it is,
+    and how to check it.
 faq:
   title: Before you install
   items:
@@ -44,13 +46,15 @@ faq:
         produced, not a Sass API you are expected to compile.
     - q: How big is the default stylesheet?
       a: >-
-        <!--size--> with Brotli in the build this site was made from. That is a
+        <!--size--> gzipped in the build this site was made from. That is a
         measurement, not a promise:
         <a href="https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js">a
-        script</a> compresses every bundle with Brotli on every build and fails
-        past the current budget, so the number stays honest — and it is free
-        to move when covering more HTML, or a better accessibility default,
-        is worth the bytes.
+        script</a> gzips every bundle on every build and fails past the
+        current budget, so the number stays honest — and it is free to move
+        when covering more HTML, or a better accessibility default, is
+        worth the bytes. What actually arrives at a browser depends on who
+        serves the file; <a href="/deploy#compression">Deploy</a> covers
+        that.
     - q: Which browsers are supported?
       a: >-
         <!--browsers-->. That is the Browserslist target in

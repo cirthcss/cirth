@@ -58,24 +58,19 @@ const cssFiles = () =>
 const minifiedCssFiles = () =>
 	cssFiles().filter((file) => file.endsWith(".min.css"));
 
-/** @returns {string[]} */
-const brotliFiles = () => minifiedCssFiles().map((file) => `${file}.br`);
-
 /**
- * Every file a complete build writes into dist/: CSS, precompressed minified
- * CSS sidecars and token exports, as tarball-relative paths.
+ * Every file a complete build writes into dist/: CSS and token exports, as
+ * tarball-relative paths.
  *
  * @returns {string[]}
  */
 const distFiles = () =>
 	[
 		...cssFiles(),
-		...brotliFiles(),
 		...tokenSchemes.map((scheme) => `dist/tokens/${scheme}.tokens.json`),
 	].sort();
 
 module.exports = {
-	brotliFiles,
 	cssFiles,
 	distFiles,
 	layerName,

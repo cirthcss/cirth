@@ -1,18 +1,14 @@
 const { spawnSync } = require("node:child_process");
 const fs = require("node:fs");
 const path = require("node:path");
-const zlib = require("node:zlib");
 const postcss = require("postcss");
 const selectorParser = require("postcss-selector-parser");
-const { brotliCompress } = require("./lib/compressed-size");
 const {
 	EXCLUSION_CLASS,
 	auditFinalCss,
 } = require("./lib/component-exclusion");
 const {
-	brotliFiles,
 	layerName,
-	minifiedCssFiles,
 	presetBuilds,
 	rootBuilds,
 	scopeClass,
@@ -82,53 +78,6 @@ for (const file of allFiles) {
 		fail(file, `does not re-parse with Lightning CSS:\n${result.stderr.trim()}`);
 	} else if (result.stdout.trim().length === 0) {
 		fail(file, "re-parses to an empty stylesheet.");
-	}
-}
-
-// --- Precompressed sidecars -----------------------------------------
-
-// These are HTTP representations, not stylesheets to parse directly. Prove
-// both parts of their contract: every expected file is valid Brotli that
-// expands to its adjacent CSS, and its bytes are the canonical quality-11
-// output used by the size checker. The second check catches a sidecar made
-// with a different quality setting even when decompression still succeeds.
-for (const manifestPath of minifiedCssFiles()) {
-	const file = manifestPath.replace(/^dist\//, "");
-	const sourcePath = path.join(distDir, file);
-	const sidecar = `${file}.br`;
-	const sidecarPath = path.join(distDir, sidecar);
-
-	if (!fs.existsSync(sidecarPath)) {
-		fail(sidecar, "missing — run `npm run build` first.");
-		continue;
-	}
-
-	const compressed = fs.readFileSync(sidecarPath);
-	if (compressed.length === 0) {
-		fail(sidecar, "is empty.");
-		continue;
-	}
-
-	if (!fs.existsSync(sourcePath)) {
-		continue; // the missing CSS source was already reported above
-	}
-
-	const source = fs.readFileSync(sourcePath);
-	try {
-		if (!zlib.brotliDecompressSync(compressed).equals(source)) {
-			fail(sidecar, `does not decompress byte-for-byte to dist/${file}.`);
-			continue;
-		}
-	} catch (error) {
-		fail(
-			sidecar,
-			`is not valid Brotli (${error instanceof Error ? error.message : error}).`,
-		);
-		continue;
-	}
-
-	if (!compressed.equals(brotliCompress(source))) {
-		fail(sidecar, "is not the canonical Brotli quality-11 representation.");
 	}
 }
 
@@ -430,7 +379,6 @@ if (failures.length > 0) {
 
 console.log(
 	`✓ check-dist: ${allFiles.length} files parse and are non-empty; ` +
-		`${brotliFiles().length} Brotli sidecars reproduce their minified CSS; ` +
 		`every rule is in @layer ${layerName}, with no !important; ` +
 		`classless builds only expose .${EXCLUSION_CLASS}, scoped builds stay ` +
 		`inside .${scopeClass}, presets only touch custom properties.`,
