@@ -37,7 +37,7 @@ leaving the other flat would be an inconsistency to remember, not a
 simplification.
 
 It is spent through a token rather than written as a number, so a theme that
-re-times the document re-times the space between sections with it — the same
+re-times the document re-times the space between sections with it: the same
 token the page's own `<header>`, `<main>` and `<footer>` spend on their block
 padding.
 
@@ -52,5 +52,5 @@ nothing inside has to fight it:
 ```
 
 That is what the front page of this site does. The framework's other flow
-elements — `<p>`, `<ul>`, `<table>` — take the same position: they arrive with
+elements (`<p>`, `<ul>`, `<table>`) take the same position: they arrive with
 document rhythm, and a layout that wants none says so once.

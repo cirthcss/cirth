@@ -25,7 +25,7 @@ const themeVariants = [
 // Both the Eleventy config and the built-link checker need this, and they
 // have to agree: Eleventy stamps the prefix into every absolute href it
 // emits, and a checker that did not know about it would find the whole
-// site missing. It did, once — see tests/doc-links.spec.js.
+// site missing. It did, once ; see tests/doc-links.spec.js.
 const docsPathPrefix = () => {
 	if (process.env.GITHUB_PAGES !== "true") {
 		return "/";
@@ -117,7 +117,7 @@ const installCleanup = () => {
  * can both call it.
  *
  * `source` defaults to docs/dist and is a parameter so the isolation can
- * be proved against a tree a test owns — see check-audit-snapshot.js.
+ * be proved against a tree a test owns ; see check-audit-snapshot.js.
  *
  * @param {{ attempts?: number, label: string, source?: string }} options
  * @returns {{ dispose: () => void, root: string }}
@@ -217,7 +217,7 @@ const contentTypes = {
 
 /**
  * Serve a built docs tree. Defaults to `docs/dist`; the audit and the
- * fingerprint pass a snapshot of it instead — see `snapshotDocs`.
+ * fingerprint pass a snapshot of it instead ; see `snapshotDocs`.
  *
  * @param {string} [root]
  */

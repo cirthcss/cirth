@@ -9,7 +9,7 @@ $visible-group-item: ':not([hidden], input[type="hidden"])';
 
 /**
    * Group (.group in the classes build, [role="group"]:not(fieldset) in
-   * the classless build — see $group-selector in config; [role="search"])
+   * the classless build ; see $group-selector in config; [role="search"])
    */
 
 #{$parent-selector} [role="search"],

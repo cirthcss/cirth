@@ -82,7 +82,7 @@
   // 3.68:1 there and 3.93:1 on the canvas.
   --cirth-primary-focus: oklch(from var(--cirth-primary) l c h / 80%);
 
-  // Text selection — see theme/_light.scss for why this is derived rather
+  // Text selection ; see theme/_light.scss for why this is derived rather
   // than pinned. The accent already sits high on the ladder in this scheme,
   // so the lift is small and the alpha carries the rest.
   --cirth-text-selection-color: oklch(
@@ -181,7 +181,7 @@
   --cirth-switch-thumb-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
   --cirth-switch-checked-background-color: var(--cirth-primary-surface);
 
-  // Thumb matches button text color rather than a hardcoded white — see
+  // Thumb matches button text color rather than a hardcoded white ; see
   // the matching comment in _light.scss. Verified >= 3:1 (WCAG 1.4.11):
   // 5.37:1 unchecked (white on neutral-550), 6.44:1 checked (white on the
   // derived primary fill).

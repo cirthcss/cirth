@@ -41,7 +41,7 @@ const distDir = path.join(projectRoot, "dist");
 // The figures below are gzip level 9, which is what the numbers in
 // CHANGELOG.md and the documentation are quoted at, and what the delivery
 // paths Cirth documents actually send. Brotli quality 11 is printed beside
-// each one as information — see scripts/lib/compressed-size.js for why it
+// each one as information ; see scripts/lib/compressed-size.js for why it
 // is not the budgeted number.
 /** @type {Record<string, number>} */
 const budgets = {

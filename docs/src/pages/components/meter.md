@@ -5,8 +5,8 @@ layout: docs.njk
 # Meter
 
 The native `<meter>` element is restyled to match
-[progress](/components/progress) — same track, same border, same
-geometry — while keeping the one thing a meter has that a progress bar
+[progress](/components/progress), with the same track, border and
+geometry, while keeping the one thing a meter has that a progress bar
 doesn't: a sense of whether the reading is any good.
 
 {% demo "meter" %}
@@ -24,9 +24,9 @@ doesn't: a sense of whether the reading is any good.
 They look like siblings because they are, but they answer different
 questions:
 
-* `<progress>` is a **task** running to completion — a file uploading, a
+* `<progress>` is a **task** running to completion: a file uploading, a
   form submitting. It is finished when it reaches the end.
-* `<meter>` is a **measurement inside a known range** — disk used, a
+* `<meter>` is a **measurement inside a known range**: disk used, a
   score, a rating, capacity. Reaching the end may be excellent or
   alarming, depending on what is being measured.
 
@@ -56,7 +56,7 @@ measurement at all, neither element applies.
   color in the light scheme, and a lighter one in the dark scheme, so the
   same signal survives a reader who can't separate green from red. All
   three clear 3:1 against the track in both schemes.
-* **A meter with no `low`/`high`/`optimum` is entirely optimum** — that is
+* **A meter with no `low`/`high`/`optimum` is entirely optimum**: that is
   what the spec says, so it renders as one flat green bar. Set the
   thresholds if the reading has a good and a bad end.
 * Cross browser: the native appearance is reset and rebuilt through
@@ -64,7 +64,7 @@ measurement at all, neither element applies.
   `::-moz-meter-bar` plus the `:-moz-meter-*` pseudo-classes in Firefox,
   which is the only way Firefox exposes the three regions.
 * Full width, like `<progress>` and the form controls. Give it a `width`
-  of your own where it belongs inline — in a table cell, or beside a
+  of your own where it belongs inline: in a table cell, or beside a
   number.
 
 ## Accessibility
@@ -72,11 +72,11 @@ measurement at all, neither element applies.
 `<meter>` carries an implicit `meter` role and exposes its value to
 assistive technology, but the *color* is the only thing that says whether
 that value is good or bad. Color alone is not an accessible message
-(WCAG 1.4.1), so put the reading in text next to the bar — a label, a
-number, a word — rather than relying on the bar being red:
+(WCAG 1.4.1), so put the reading in text next to the bar (a label, a
+number, a word) rather than relying on the bar being red:
 
 ```html
-<label>Air quality — poor (1 of 10)
+<label>Air quality: poor (1 of 10)
   <meter value="1" min="0" max="10" low="3" high="7" optimum="9"></meter>
 </label>
 ```

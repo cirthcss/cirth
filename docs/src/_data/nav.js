@@ -1,8 +1,8 @@
-// Site navigation config — ported 1:1 from the previous src/lib/nav.ts.
+// Site navigation config, ported 1:1 from the previous src/lib/nav.ts.
 
 const siteTitle = "Cirth";
 const siteDescription =
-	"HTML-native CSS framework. Production-ready UI from semantic HTML — no class vocabulary to learn, 0 JavaScript.";
+	"HTML-native CSS framework. Production-ready UI from semantic HTML, no class vocabulary to learn, 0 JavaScript.";
 
 const topNav = [
 	{ text: "Docs", link: "/get-started" },
@@ -139,6 +139,6 @@ module.exports = {
 	footerLinks,
 	footer,
 	github: "https://github.com/cirthcss/cirth",
-	// Flat, ordered list of every doc page — drives prev/next footer links.
+	// Flat, ordered list of every doc page: drives prev/next footer links.
 	flatPages: sidebar.flatMap((group) => group.items),
 };

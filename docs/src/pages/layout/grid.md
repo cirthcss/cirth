@@ -7,7 +7,7 @@ layout: docs.njk
 
 `.grid` is an intrinsically responsive wrapping grid: columns follow
 available space, wrapping onto a new row once children no longer fit at
-the minimum column width. Resize the window on the demo below — columns
+the minimum column width. Resize the window on the demo below: columns
 appear and disappear on their own, no breakpoint involved. For a grid
 that stays on one row regardless of item count, see [Row](/layout/row).
 
@@ -27,7 +27,7 @@ that stays on one row regardless of item count, see [Row](/layout/row).
 ## `.row` vs `.grid`
 
 Both are single-declaration, class-only layouts with no per-column
-markup — the difference is what happens when there are more items than
+markup: the difference is what happens when there are more items than
 fit comfortably on one row:
 
 | | `.row` | `.grid` |
@@ -45,7 +45,7 @@ fit comfortably on one row:
   another column at that minimum, children wrap onto the next row.
 * `min(100%, var(--cirth-grid-min-column))` caps the minimum at the
   container's own width, so a single child, or a very narrow
-  viewport — gets one full-width column instead of overflowing. No media
+  viewport, gets one full-width column instead of overflowing. No media
   query is needed for the narrow case; it falls out of the `min()` for
   free.
 * Gaps are controlled by `--cirth-grid-column-gap` and
@@ -53,10 +53,10 @@ fit comfortably on one row:
 * Children get `min-width: 0` so long content (text, tables) doesn't force
   a column wider than its track.
 * A form control (`input`, `select`, `textarea`, `button`, …) that is a
-  direct child of `.grid` drops its own `margin-bottom` — the row-gap
+  direct child of `.grid` drops its own `margin-bottom`: the row-gap
   already provides that rhythm (upstream pico#738).
 
-Tune `--cirth-grid-min-column` per grid to change how eagerly it wraps —
+Tune `--cirth-grid-min-column` per grid to change how eagerly it wraps:
 a smaller value packs in more, narrower columns; a larger one wraps
 sooner:
 
@@ -74,6 +74,6 @@ there's no classless equivalent since both require a class to opt in.
 Before this release, `.grid` was what `.row` is now: a single row of
 equal-width columns (`minmax(0%, 1fr)`, which never wraps) that stacked
 to one column below `md`. If you were using `.grid` for that behavior,
-rename it to `.row` — the markup and behavior are unchanged, only the
+rename it to `.row`: the markup and behavior are unchanged, only the
 class name is. `.grid` itself now wraps, has no `md` breakpoint, and
 needs the new `--cirth-grid-min-column` token instead.

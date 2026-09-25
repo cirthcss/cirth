@@ -41,7 +41,7 @@ It does **not** promise:
   light-or-dark ink that a theme must set deliberately. Renaming an existing
   `--cirth-primary-inverse` override is not enough to make a light accent
   legible; the value still has to be chosen.
-- That component tokens follow the same vocabulary. They do not yet — see
+- That component tokens follow the same vocabulary. They do not yet ; see
   Open questions.
 
 ## Evidence ledger

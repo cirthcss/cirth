@@ -129,7 +129,7 @@ for (const entry of browserslist) {
 for (const family of FORBIDDEN) {
 	if (floor[family]) {
 		fail(
-			`${family} must not be in the target — see the comment in this file`,
+			`${family} must not be in the target ; see the comment in this file`,
 		);
 	}
 }

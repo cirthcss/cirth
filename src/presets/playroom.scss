@@ -8,7 +8,7 @@
 // changes five declarations and lets the theme derive the rest, this one
 // reaches across colour and typography while preserving the framework's
 // permanent silhouette. It also overrides two *derived* tokens on purpose, which is
-// the other thing worth demonstrating — see the note further down.
+// the other thing worth demonstrating ; see the note further down.
 // Import after the main Cirth stylesheet. No @import, no webfont: the
 // rounded stack below is whatever the operating system already has.
 @use "../helpers/cascade";

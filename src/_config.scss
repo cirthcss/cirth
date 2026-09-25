@@ -8,7 +8,7 @@ $enable-classes: true !default;
 $parent-selector: "" !default;
 
 // The layout-"group" component's trigger selector. A plain [role="group"]
-// attribute hijacks any semantically-grouped element — e.g. an explicit
+// attribute hijacks any semantically-grouped element , e.g. an explicit
 // <fieldset role="group">, or any element grouped for pure a11y reasons —
 // into decorative flex-bar styling it didn't ask for (gh#19, upstream
 // pico#430): a semantic group and a decorative one become visually

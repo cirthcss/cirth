@@ -45,7 +45,7 @@
             )
           );
 
-        // Masked over a theme token — see components/_accordion.scss for
+        // Masked over a theme token ; see components/_accordion.scss for
         // why the matching <select> chevron cannot follow.
         background-color: var(--cirth-muted-color);
         mask-image: var(--cirth-icon-chevron);

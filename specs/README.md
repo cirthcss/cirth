@@ -44,11 +44,11 @@ what was observed, where, and what it licenses you to claim.
 
 Three verdicts, and the distinction between them is the point:
 
-- **Verified** — reproduced here, now, on a named browser, artifact, or
+- **Verified**: reproduced here, now, on a named browser, artifact, or
   command. Record the version; "latest Chrome" ages into a useless claim.
-- **Reported** — believed, but inherited from an earlier run, an upstream
+- **Reported**: believed, but inherited from an earlier run, an upstream
   issue, or another project. Not reproduced for this document.
-- **Invalid** — evidence that turned out not to support its label. **Keep the
+- **Invalid**: evidence that turned out not to support its label. **Keep the
   row.** Deleting it means the next reader repeats the mistake, and the fact
   that a check failed to prove something is itself worth knowing.
 

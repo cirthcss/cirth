@@ -6,8 +6,8 @@ layout: docs.njk
 # Breakout
 
 `.breakout` lets a direct child of [`.container`](/layout/container)
-fill the container's own box instead of stopping at its reading measure
-— for a wide table, image, or figure that shouldn't be squeezed down to
+fill the container's own box instead of stopping at its reading measure,
+for a wide table, image, or figure that shouldn't be squeezed down to
 prose width.
 
 {% demo "breakout" %}
@@ -27,7 +27,7 @@ prose width.
 center track) with named `content` and `full` lines; `.breakout` sets
 `grid-column: full` to span all three.
 That means it escapes only to the container's *own* edges, not the
-viewport — unlike the classic `width: 100vw; margin-inline: calc(50% -
+viewport, unlike the classic `width: 100vw; margin-inline: calc(50% -
 50vw)` trick, it stays correct inside a sidebar layout or any other
 context where the container itself isn't centered in the viewport, and
 it doesn't have that trick's scrollbar-gutter overflow bug. See

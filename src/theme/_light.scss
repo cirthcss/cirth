@@ -192,7 +192,7 @@
   --cirth-accordion-close-summary-color: var(--cirth-ink);
   --cirth-accordion-open-summary-color: var(--cirth-ink);
 
-  // Rectangular mix — see the note on --cirth-table-border-color above.
+  // Rectangular mix ; see the note on --cirth-table-border-color above.
   // The card surface goes in with its chroma zeroed, so it contributes
   // lightness and nothing else. Rectangular space stops a hue from
   // *rotating*, but it does not stop two hues from averaging: this scheme's

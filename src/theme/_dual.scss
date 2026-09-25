@@ -88,7 +88,7 @@
   // status hues are deliberately not fixed constants: a theme whose brand
   // overlaps a conventional status hue is expected to move them (see
   // gh#84). The default keeps error a full 22deg off the brand hue for
-  // exactly that reason — see the note in theme/_colors.scss.
+  // exactly that reason ; see the note in theme/_colors.scss.
   --cirth-error: light-dark(#{$error-650}, #{$error-300});
   --cirth-success: light-dark(#{$success-550}, #{$success-400});
   --cirth-warning: light-dark(#{$warning-600}, #{$warning-350});

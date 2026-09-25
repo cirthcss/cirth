@@ -17,7 +17,7 @@
 // tint, and focus rings turn fully opaque.
 
 // Tokens only, no geometry. Control heights are built from
-// --cirth-border-width (44px, WCAG 2.5.5 — see theme/_styles.scss), so
+// --cirth-border-width (44px, WCAG 2.5.5 ; see theme/_styles.scss), so
 // thickening borders here would silently resize every control in the
 // library; contrast is bought with color instead.
 

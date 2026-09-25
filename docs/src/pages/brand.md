@@ -16,7 +16,7 @@ integrations, and anywhere else the project is named.
     below: proportions, strokes and target sizes that hold in every preset,
     every scheme and every build. Compare
     <a href="/specimen/default/">the default specimen</a> with
-    <a href="/specimen/plain/">the plain one</a> — same six measurements,
+    <a href="/specimen/plain/">the plain one</a>: same six measurements,
     different pigment.</p>
   </header>
   <dl class="grid docs-brand-measures">
@@ -31,8 +31,8 @@ integrations, and anywhere else the project is named.
 
 The pairing is the recognisable part. A container is one radius step softer
 than the controls inside it, so a card reads as a sheet holding buttons
-rather than as a big button. Every resting edge is the same single hairline
-— a filled button, an outline button, a field, a card and a popover all draw
+rather than as a big button. Every resting edge is the same single hairline:
+a filled button, an outline button, a field, a card and a popover all draw
 the same 1px on all four sides, and none of them fakes relief on one edge.
 Interactive targets sit on a 44px floor (WCAG 2.5.5), except inside a
 `<nav>`, which opts down to a 40px band while staying above the 24px WCAG
@@ -49,7 +49,7 @@ The Cirth mark is a rune-form monogram: angular strokes that read as a
 carved "C". It references the project's namesake, the Cirth runic
 alphabet used by Tolkien's Dwarves, designed for carving into hard
 surfaces so every letter is reduced to the strokes the material allows.
-The same reduction — keep only what the medium requires — is the
+The same reduction, keeping only what the medium requires, is the
 engineering constraint the framework itself is built around: keep only
 what the medium requires, and watch the size of what is left. See
 [About Cirth](/about#size-and-what-it-is-a-budget-for) for how the budgets
@@ -150,7 +150,7 @@ writing system, not a claim of license or partnership.
 Each variant above is downloadable as SVG (preferred) or PNG. The full set
 lives in
 [`docs/public/`](https://github.com/cirthcss/cirth/tree/master/docs/public),
-including the two combinations this grid does not show — the mono mark on
+including the two combinations this grid does not show: the mono mark on
 its own background tile, light and dark, for square containers that have to
 stay one colour.
 
@@ -190,7 +190,7 @@ accent edge. Nothing else in a Cirth interface is copper.
 Editorial typography is the one place outside those two, and it is a
 deliberate exception rather than a leak: a word or phrase set in the accent
 inside a heading, the way this site's home page sets *semantic HTML*. It is
-a single named class, applied by hand, in prose — not a component state.
+a single named class, applied by hand, in prose, not a component state.
 
 It used to do five. Navigation links carried the accent at rest, which meant
 a menu of eight entries was eight brand-coloured words next to one button
@@ -233,7 +233,7 @@ logo hexes: the tokens are variants verified for WCAG. See
 The horizontal lockup is the mark with the name beside it: "Cirth" in the
 sans voice, bold, with the mark sized to the cap height and sitting on the
 same baseline. Use it where the name has to travel with the mark and there
-is room for both — a third-party README, a talk slide, a conference badge,
+is room for both: a third-party README, a talk slide, a conference badge,
 a social post.
 
 <div class="docs-brand-grid docs-lockup-grid">
@@ -264,7 +264,7 @@ falls back to black, the same as the mono mark.</p>
 **The name is live text, not outlines.** The lockup carries `<text>` in the
 system sans stack the framework itself ships, which is the whole of the
 typographic claim: there is no font to install, and nothing to license. The
-cost is that the word's width moves a little between platforms — SF Pro sets
+cost is that the word's width moves a little between platforms: SF Pro sets
 it narrowest, Helvetica and Arial about 2.5% wider, so the box reserves
 room for the widest face in the stack and a narrower one leaves a little air
 on the right. That is the intended behaviour, not a mis-export.
@@ -304,14 +304,14 @@ the **mono** variant wherever a single flat color is preferable to copper
 (badges, print, embossing, low-color terminals), and the **icon** tile
 wherever the mark needs to fill a square container. Don't pair the mark
 with fantasy-styled illustration, parchment or stone textures, or
-medieval typography — the mark itself carries the reference to the name;
+medieval typography: the mark itself carries the reference to the name;
 the surrounding presentation should stay contemporary and technical.
 
 ## Voice
 
 Cirth's writing is technical but accessible, precise, and evidence-led:
 assertive about what is verified, transparent about trade-offs, and never
-ideological. Prefer *claim → mechanism → proof* — state what the
+ideological. Prefer *claim → mechanism → proof*: state what the
 framework does, explain how, then point at something checkable (a script,
 a number, a source file).
 
@@ -366,5 +366,5 @@ When you do use the mark:
 * use the responsive small-size asset from 16–23px;
 * pick the brand or mono variant that keeps contrast on your background;
 * don't recolor, outline, rotate, add effects, or redraw the strokes,
-  and don't set the wordmark in another typeface — use
+  and don't set the wordmark in another typeface; use
   [the lockup](#the-lockup) rather than re-typesetting the name.

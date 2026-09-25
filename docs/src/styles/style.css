@@ -3139,7 +3139,7 @@ details.docs-toc-top {
   background: var(--cirth-background-color);
 }
 
-/* `.grid` plus a <dl>, divided by its own gap — see .docs-proof-metrics.
+/* `.grid` plus a <dl>, divided by its own gap ; see .docs-proof-metrics.
    The block-start border stays: it is the seam between this panel and the
    specimen above it, not a divider between cells.
 

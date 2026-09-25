@@ -544,7 +544,7 @@ const run = async () => {
 
 	// The sweep's plan covers the four widths the sweep samples. The one
 	// below them is this pass's own: the same pages, in the same schemes,
-	// probing the same candidates one tier narrower — see `narrowViewport`.
+	// probing the same candidates one tier narrower ; see `narrowViewport`.
 	// Ten more renderings per configuration, and the one class of false
 	// inert that has actually shipped a regression.
 	const [narrowName] = Object.keys(narrowViewport);

@@ -6,7 +6,7 @@ layout: docs.njk
 # Description list
 
 `<dl>` is HTML's element for a term and its description: order metadata,
-product specifications, a detail panel, a glossary. It arrives finished — no
+product specifications, a detail panel, a glossary. It arrives finished: no
 class, no wrapper required.
 
 {% demo "description-list" %}
@@ -61,6 +61,6 @@ do the one job it exists for. The elements inside it are styled either way;
 the box is yours.
 
 For the same reason `<dl>` ships no grid of its own. A metrics panel is a
-composition — `.grid` or [`.row`](/layout/row) plus a `<dl>` — not a
+composition (`.grid` or [`.row`](/layout/row) plus a `<dl>`), not a
 component, and the hairlines and column counts a particular panel wants are
 that page's design, not the framework's.

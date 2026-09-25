@@ -30,8 +30,8 @@ a list containing one engine's pseudo-element is discarded whole by the
 other. A custom property can reach them, because they inherit it, so the
 token is neutralized instead of the selector list being extended.
 
-The practical effect is that anything built from `--cirth-transition` —
-Cirth's own components, and any transition you write with the token —
+The practical effect is that anything built from `--cirth-transition`
+(Cirth's own components, and any transition you write with the token)
 follows the preference without being named here.
 
 This covers Cirth's own animated bits: the

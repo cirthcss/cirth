@@ -208,6 +208,6 @@ path, and the loading order of build, preset and print sheet.
    `scripts/lib/dist-manifest.js` are the two places to change, and
    `check:dist` will refuse a build where they disagree.
 
-   *Closed: it does not* — see Decisions. A trial merge of the two branches
+   *Closed: it does not* ; see Decisions. A trial merge of the two branches
    proved they compose unchanged (Evidence ledger). Whichever lands second
    regenerates the Contributions-page baselines, the one conflict.

@@ -7,7 +7,7 @@ layout: docs.njk
 
 `.row` is a single-row layout: stacked below `768px`, equal-width columns
 on one row from that viewport width up. Column count follows child count, not
-available space — for a grid that wraps into multiple rows instead, see
+available space; for a grid that wraps into multiple rows instead, see
 [Grid](/layout/grid).
 
 {% demo "row" %}
@@ -23,7 +23,7 @@ available space — for a grid that wraps into multiple rows instead, see
 ## When to use `.row`
 
 `.row` is for content that reads as one row of peers and should stay one
-row on wide screens, however many items there are — a group of form
+row on wide screens, however many items there are: a group of form
 controls, a row of stat tiles, a toolbar. If you have an unknown or large
 number of items that should wrap onto new rows instead of squeezing into
 one, use [`.grid`](/layout/grid) instead.
@@ -32,14 +32,14 @@ one, use [`.grid`](/layout/grid) instead.
 
 * Below `768px`, `.row` is a single column (`grid-template-columns: 1fr`).
 * At `768px` and above, columns become `repeat(auto-fit, minmax(0%, 1fr))`.
-  Every direct child becomes an equal-width column, however many there are —
+  Every direct child becomes an equal-width column, however many there are;
   columns never wrap onto a second row.
 * Gaps are controlled by `--cirth-grid-column-gap` and
   `--cirth-grid-row-gap` (both default to `--cirth-spacing`).
 * Children get `min-width: 0` so long content (text, tables) doesn't force
   the column wider than its share of the row.
 * A form control (`input`, `select`, `textarea`, `button`, …) that is a
-  direct child of `.row` drops its own `margin-bottom` — the row-gap
+  direct child of `.row` drops its own `margin-bottom`: the row-gap
   already provides that rhythm, and a trailing `<small>` after one of
   those controls gets the same full-width helper-text treatment it gets
   after a bare `input`/`select`/`textarea`/`fieldset`.
@@ -50,8 +50,8 @@ classless equivalent since it requires a class to opt in.
 ## Why it keeps one breakpoint
 
 `.row` is the intentional exception to Cirth's intrinsic-first layout
-rules. Its contract is not “fit as many columns as this box can hold” —
-that is [`.grid`](/layout/grid), but “these peers become one indivisible
+rules. Its contract is not “fit as many columns as this box can hold”
+(that is [`.grid`](/layout/grid)), but “these peers become one indivisible
 row on a wide page”. The `768px` viewport decision expresses that contract
 directly. Replacing it with `auto-fit` or flex wrapping would make `.row`
 another spelling of `.grid` and remove the behavior it exists to provide.
