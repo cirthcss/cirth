@@ -30,14 +30,14 @@ writing one:
   browser or command), `Reported` (believed, not reproduced) or `Invalid`
   (did not support its label). Do not record a `Reported` claim as
   `Verified` because it is probably true, and do not delete an `Invalid`
-  row — the next reader needs to know the check was tried.
+  row: the next reader needs to know the check was tried.
 - **Name the artifact and the version.** `dist/cirth.min.css` at a commit
   is evidence; "the build" and "latest Chrome" are not.
 
 A spec is tracked and durable. `HANDOFF.md` is neither, and does not
 substitute for one.
 
-## Releases — mandatory workflow
+## Releases: the mandatory workflow
 
 If a task involves preparing, cutting, publishing, tagging, promoting, or
 otherwise releasing a version of Cirth:
@@ -55,7 +55,7 @@ otherwise releasing a version of Cirth:
    ```sh
    git push origin master
    git tag …                 # release tags are created on the remote,
-   git push origin <tag>     # at a named master SHA — see RELEASING.md
+   git push origin <tag>     # at a named master SHA, see RELEASING.md
    npm publish
    npm stage publish
    npm stage approve
@@ -63,7 +63,7 @@ otherwise releasing a version of Cirth:
    npm version …          # outside `npm run release:prepare`
    ```
 
-   These commands are not forbidden in themselves — some of them live
+   These commands are not forbidden in themselves; some of them live
    inside the canonical scripts and workflows. What is forbidden is an
    agent substituting its own sequence for the process.
 5. **You may prepare a release branch and PR autonomously, but stop before
@@ -97,7 +97,7 @@ Both local guards share one definition of what is protected, in
 `scripts/lib/release-guard.js`, and are tested by `npm run check:guards`
 inside `npm run check:tooling`.
 
-The local guards are **not** a security boundary — that is what the last
+The local guards are **not** a security boundary. That is what the last
 two rows are. They exist so that the canonical path is the easy one, and
 so that a mistake is caught before it reaches the remote.
 
@@ -141,3 +141,22 @@ provenance.
 Do not generate a changelog from commit subjects. Decide which changes a
 consumer can see, and write those. No session history, no audit numbers,
 no refactor diary.
+
+## Prose style
+
+This project does not use the em dash. Replace it with the mark that fits
+the job it was doing:
+
+- a full stop where both halves stand on their own;
+- a colon where what follows names or explains what precedes it;
+- a semicolon between two independent clauses that belong together;
+- commas for a short aside, parentheses for a genuinely parenthetical one.
+
+One mark standing in for four jobs hides which one a sentence is doing, so
+this is a readability rule and not only a house-style one.
+
+It covers everything written for a reader: documentation, source and script
+comments, specs, commit messages and pull request text.
+
+`CHANGELOG.md` and `.github/releases/` are exempt. They record versions
+already published, and their wording is part of that record.
