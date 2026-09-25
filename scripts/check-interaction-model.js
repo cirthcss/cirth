@@ -76,7 +76,7 @@ const fixtures = [];
 // --- 1. Independent inert ----------------------------------------------
 //
 // Both declarations lose to a later rule of the same specificity. Neither
-// does anything alone, and removing both does nothing either — the verdict
+// does anything alone, and removing both does nothing either: the verdict
 // a cleanup needs before it deletes.
 
 fixtures.push({
@@ -106,7 +106,7 @@ fixtures.push({
 // and built the same way it occurs: two `width` declarations feeding one
 // intrinsic size. Both items sit in the same auto-sized grid column, so the
 // column is the larger of their contributions and either one alone states
-// it — while the other, stretched to the column, measures the same either
+// it, while the other, stretched to the column, measures the same either
 // way. `width` is not a tracked computed property, so removing one really
 // is invisible; removing both is not.
 
@@ -183,7 +183,7 @@ fixtures.push({
 // Eighteen candidates in nine groups, and the fixture that makes the old
 // eight-round bound impossible to reintroduce quietly. It defeats the old
 // search twice over: leave-one-out names nothing at all once there is more
-// than one group — removing all-but-one still removes every other group
+// than one group: removing all-but-one still removes every other group
 // whole, so the page always moves, and nine groups need nine passes.
 
 const pairs = 9;
@@ -216,7 +216,7 @@ fixtures.push({
 		assert.equal(
 			result.essential.length,
 			pairs * 2,
-			"independent groups lost members — leave-one-out names none of these",
+			"independent groups lost members: leave-one-out names none of these",
 		);
 		assert.equal(result.groups.length, pairs, "the groups were not separated");
 		for (const group of result.groups) {
@@ -298,7 +298,7 @@ ${overridden.map(([property, , live]) => `\t${property}: ${live};`).join("\n")}
 //
 // `#flip` is the last element in the document and the only one that moves,
 // so `differs()` reaches it on every walk. Its width alternates, but only
-// while the `.quiet` rule has no `width` — that is, only inside a sweep that
+// while the `.quiet` rule has no `width`, that is, only inside a sweep that
 // has removed the candidate.
 
 fixtures.push({

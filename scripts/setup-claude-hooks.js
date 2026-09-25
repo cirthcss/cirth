@@ -3,7 +3,7 @@ const path = require("node:path");
 
 // Installs the PreToolUse guard into this machine's Claude Code settings.
 //
-// `.claude/` is gitignored — it is per-machine assistant state, not project
+// `.claude/` is gitignored: it is per-machine assistant state, not project
 // configuration, so the settings cannot be committed. What is tracked is
 // this installer and the guard it points at, which is enough for a fresh
 // clone to reach the same protection with one command.
@@ -47,7 +47,7 @@ const main = () => {
 			console.error(
 				`✗ ${path.relative(projectRoot, settingsPath)} is not valid JSON ` +
 					`(${error instanceof Error ? error.message : error}).\n` +
-					`  Refusing to touch it — fix or move it, then run this again.`,
+					`  Refusing to touch it: fix or move it, then run this again.`,
 			);
 			process.exit(1);
 		}

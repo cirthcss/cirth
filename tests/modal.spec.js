@@ -138,7 +138,7 @@ test("the page stops scrolling while a dialog is open, and starts again after", 
 
 // Regression, found on this project's own documentation: the modal page
 // renders an open <dialog> inline as its worked example, and a scroll lock
-// keyed on [open] took the whole page's scrolling with it — the reader
+// keyed on [open] took the whole page's scrolling with it: the reader
 // could not reach the prose below the demo. A non-modal dialog is ordinary
 // in-flow content, so :modal is the condition, and this is the case that
 // says so.
@@ -190,7 +190,7 @@ test("the modal card sizes fluidly from one configurable cap", async ({
 	await expect(article).toHaveCSS("width", "700px");
 
 	// Below the cap the card is the viewport less one --cirth-spacing on
-	// each side, and the viewport it means is the layout viewport — the box
+	// each side, and the viewport it means is the layout viewport: the box
 	// `width: 100%` resolves against. Asserting a literal 358px here read
 	// the 390 straight off setViewportSize(), which is the window; on a
 	// platform with classic scrollbars the layout viewport is 15px narrower
@@ -313,7 +313,7 @@ test("the close button is a full-size target around a small icon", async ({
 		</dialog>`,
 	);
 
-	// The icon is 1rem and stays 1rem — what grows is what a pointer has to
+	// The icon is 1rem and stays 1rem: what grows is what a pointer has to
 	// hit. 16px was the whole target for the control people reach for in a
 	// hurry, and a floor that only grew its height would have left it tall
 	// and thin, which is worse than either.

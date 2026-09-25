@@ -11,12 +11,12 @@ const { contextKey, walkSite } = require("./lib/docs-fingerprint");
 // One entry per (page, viewport, scheme, state): a hash over every
 // element's box and its paint-bearing computed properties, plus the same
 // hash per element so a difference can be pointed at rather than merely
-// announced. Two states per page — as loaded, and with every <details>,
-// <dialog> and popover opened — because the surfaces a shell gets wrong
+// announced. Two states per page (as loaded, and with every <details>,
+// <dialog> and popover opened) because the surfaces a shell gets wrong
 // are usually the ones that are not on screen when the page arrives.
 //
 // It answers one question: did this change move anything a reader can see?
-// It is not a screenshot suite and does not replace one — no fonts, no
+// It is not a screenshot suite and does not replace one: no fonts, no
 // rasterization, no baselines to bless. Use it to make a refactor's "no
 // visual change" claim checkable in a few minutes.
 
@@ -75,7 +75,7 @@ const run = async () => {
 		fs.mkdirSync(path.dirname(resolved), { recursive: true });
 		// Renderings are keyed in the order the concurrent walk finished
 		// them, which is not the same order twice. The measurements were
-		// identical either way — `--compare` reads the map by key and has
+		// identical either way: `--compare` reads the map by key and has
 		// always said so, but the *file* was not, so the cheapest check
 		// anyone would reach for on a determinism claim (run it twice, hash
 		// both) reported a difference that was not there. Sorting on the

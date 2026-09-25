@@ -20,7 +20,7 @@ const {
 // drives never expose the state at all in Chromium and WebKit, and Firefox
 // resolves it asynchronously after first paint. So the CSS contract is
 // asserted against the built stylesheets, and the painted result is
-// asserted only where the engine actually offers one — gated on a sentinel
+// asserted only where the engine actually offers one, gated on a sentinel
 // rule, skipped where it doesn't.
 
 assertDocsBuilt("link-visited.spec");
@@ -106,7 +106,7 @@ for (const build of builds) {
 
 		// The token is a light-dark() pair in theme/_dual.scss: one
 		// declaration carrying both scheme values, rather than one per scheme
-		// root. What matters has not changed — a followed link is drained to
+		// root. What matters has not changed: a followed link is drained to
 		// neutral in *both* schemes, and the two neutrals are not the same
 		// colour, so this asserts the pair rather than counting declarations.
 		// Only the base pair: the preference passes that follow
@@ -138,7 +138,7 @@ test("the presets carry their own visited color", () => {
 		const preset = `dist/presets/${name}.css`;
 		// One declaration, not two: a preset states the scheme difference as a
 		// light-dark() pair, the same shape theme/_dual.scss uses. What matters
-		// is unchanged — a followed link is drained to neutral in both schemes,
+		// is unchanged: a followed link is drained to neutral in both schemes,
 		// and the two neutrals differ.
 		const pair = read(preset).match(
 			/--cirth-link-visited-color:\s*light-dark\(([^;]+)\);/,

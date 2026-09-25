@@ -247,7 +247,7 @@ test("the submit control waits for the reader before it dims", async ({
 }) => {
 	// The form on this page holds two required, empty controls, so it is
 	// :invalid from first paint. That used to be enough to grey the submit
-	// button — a login form nobody had touched drew its primary action as
+	// button: a login form nobody had touched drew its primary action as
 	// if it were disabled, which is exactly what it looked like on the home
 	// page's hero demo. The fields in the same form already waited for
 	// :user-invalid before showing anything; the button now waits with

@@ -8,7 +8,7 @@ const manifest = path.join(projectRoot, "package.json");
 // describes *one* engine floor: Opera and Samsung Internet are Chromium
 // forks, Firefox for Android ships the same Gecko as the desktop build,
 // and iOS Safari is WebKit either way. Saying "Chrome >= 123" while
-// leaving "Opera >= 97" behind does not widen support — it silently
+// leaving "Opera >= 97" behind does not widen support: it silently
 // lowers the floor to Chromium 111, because Lightning CSS compiles for
 // the oldest engine in the list. Nothing else in the repository notices:
 // the build succeeds, the output is valid, and every feature the floor
@@ -22,7 +22,7 @@ const manifest = path.join(projectRoot, "package.json");
 // CSS/HTML/API feature it records, the (chrome, opera) and (chrome,
 // samsung) version pairs a feature landed in, and taking the median per
 // Chromium version. Regenerate the same way if the range needs
-// extending — the forks skip versions often enough that guessing an
+// extending: the forks skip versions often enough that guessing an
 // offset goes wrong within a year.
 /** @type {Record<number, { opera: number, samsung: number }>} */
 const CHROMIUM_FORKS = {
@@ -67,21 +67,21 @@ const UNCONSTRAINED = [];
 
 // Never in the target. Its one modern caniuse entry is the same engine as
 // Chrome for Android, already covered, and it accounts for 0.03% of
-// usage — while including it makes Lightning CSS stop trusting grouped
+// usage, while including it makes Lightning CSS stop trusting grouped
 // selectors and expand every `A, B { }` in the library into separate
 // rules, 743 B under the former gzip measurement and over its then-current
 // size budget.
 // Opera Mobile was in the target until 2026-08-25, deliberately exempt
 // from the floor. It is forbidden now, and the reason is not usage: it is
 // that caniuse-lite pins the family to a single stale bucket, op_mob 80,
-// which is the release where the engine went Chromium — not a version
+// which is the release where the engine went Chromium, not a version
 // anyone still runs. Browserslist and Lightning CSS both read that bucket
 // literally, so one dead data point held the whole build below the floor
 // for light-dark(). Lightning then compiled every pair down to its
 // --lightningcss-light/--lightningcss-dark emulation, and that emulation
 // does not reproduce the native semantics: a [data-theme] subtree stopped
 // resolving its own scheme entirely (verified in all three engines).
-// Re-adding this family does not merely cost bytes — it silently breaks
+// Re-adding this family does not merely cost bytes: it silently breaks
 // theme/_dual.scss. scripts/process-css.js fails the build if the
 // emulation ever reappears.
 const FORBIDDEN = [
@@ -158,7 +158,7 @@ if (chromium) {
 		if (floor[family] && floor[family] !== chromium) {
 			fail(
 				`${family} >= ${floor[family]} disagrees with ${reference} >= ${chromium}` +
-					` — both are Chromium, so both carry the same floor`,
+					`, both being Chromium, so both carry the same floor`,
 			);
 		}
 	}
@@ -181,7 +181,7 @@ if (chromium) {
 			if (floor[family] && Number(floor[family]) !== expected) {
 				fail(
 					`${family} >= ${floor[family]} is not the release built on` +
-						` Chromium ${chromium} — that is ${family} ${expected}`,
+						` Chromium ${chromium}: that is ${family} ${expected}`,
 				);
 			}
 		}
@@ -192,7 +192,7 @@ for (const [desktop, mobile] of PAIRED_FAMILIES) {
 	if (floor[desktop] && floor[mobile] && floor[desktop] !== floor[mobile]) {
 		fail(
 			`${mobile} >= ${floor[mobile]} disagrees with ${desktop} >= ${floor[desktop]}` +
-				` — they are the same engine`,
+				`, they being the same engine`,
 		);
 	}
 }

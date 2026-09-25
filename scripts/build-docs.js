@@ -26,7 +26,7 @@ const variants = [
 	// The homepage build laboratory is isolated in an iframe so the docs'
 	// unscoped default build cannot leak into the comparison. These are the
 	// actual four public configurations, compiled from source with the same
-	// switches as the distributed entrypoints — not look-alike shell CSS.
+	// switches as the distributed entrypoints, not look-alike shell CSS.
 	{
 		filename: "cirth-lab-default.css",
 		content: `@use "src";`,

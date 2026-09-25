@@ -41,6 +41,6 @@ test("a visually hidden cell does not widen the page at 320px", async ({ page })
 		};
 	});
 	expect(metrics.page).toBeLessThanOrEqual(0);
-	// The table still overflows — into the container, where it scrolls.
+	// The table still overflows: into the container, where it scrolls.
 	expect(metrics.container).toBeGreaterThan(0);
 });

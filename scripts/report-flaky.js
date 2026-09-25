@@ -8,13 +8,13 @@ const path = require("node:path");
 // The baseline regeneration step runs with --retries=2 because it is a
 // writer: one flaky rendering used to throw away hundreds of regenerated
 // screenshots and leave the branch with no Linux baselines at all. Retries
-// fix that, and introduce their own problem — a step that goes green while
+// fix that, and introduce their own problem: a step that goes green while
 // something in it is genuinely unreliable, with the evidence buried in a
 // few thousand lines of log.
 //
 // So the retry is paired with this: every test that needed one is printed,
 // and on GitHub Actions each becomes a warning annotation on the run. The
-// step still succeeds — a flaky screenshot is not a reason to discard the
+// step still succeeds: a flaky screenshot is not a reason to discard the
 // other eight hundred, but nobody has to go looking to find out which one
 // it was, or whether there was one at all.
 
@@ -22,7 +22,7 @@ const reportPath = process.argv[2] ?? ".cache/baseline-report.json";
 const resolved = path.resolve(reportPath);
 
 if (!fs.existsSync(resolved)) {
-	console.log(`[@cirthcss/cirth] No report at ${reportPath} — nothing to check.`);
+	console.log(`[@cirthcss/cirth] No report at ${reportPath}: nothing to check.`);
 	process.exit(0);
 }
 
@@ -65,7 +65,7 @@ const walk = (suite, trail) => {
 		for (const test of spec.tests ?? []) {
 			const attempts = (test.results ?? []).length;
 			// The project belongs in the title. A spec carries one `tests`
-			// entry per project, and the suite trail is files, not projects —
+			// entry per project, and the suite trail is files, not projects:
 			// so without this the same rendering under chromium and under
 			// webkit are two identical lines, and a reader cannot tell
 			// whether one engine is flaky or both are.
@@ -77,7 +77,7 @@ const walk = (suite, trail) => {
 				.filter(Boolean)
 				.join(" › ");
 			// `status` is the field to read. The JSON reporter classifies a
-			// test across all of its attempts — "expected", "unexpected",
+			// test across all of its attempts: "expected", "unexpected",
 			// "flaky", "skipped", and `ok` is not emitted at all in the
 			// version this repo pins, so a check written against it silently
 			// finds nothing.
@@ -100,7 +100,7 @@ for (const suite of /** @type {Suite[]} */ (report.suites ?? [])) walk(suite, []
 
 if (failed.length > 0) {
 	console.log(
-		`[@cirthcss/cirth] ${failed.length} test(s) failed every attempt — ` +
+		`[@cirthcss/cirth] ${failed.length} test(s) failed every attempt: ` +
 			"the step that ran them has already reported it.",
 	);
 }

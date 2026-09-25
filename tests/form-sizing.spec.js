@@ -13,7 +13,7 @@ const { setContent } = require("./helpers/render");
 //
 // An input is pinned to 44px by an explicit height. A select grows with its
 // longest option and a textarea with its rows, so neither can be pinned the
-// same way — their height falls out of the text inside them, which means
+// same way: their height falls out of the text inside them, which means
 // the target size held only as long as nobody changed the type scale. This
 // asks each control for the threshold under a font-size an author might
 // plausibly set, which is how the documentation's own header selects were
@@ -173,7 +173,7 @@ test("four rows means four rows of the textarea's own text", async ({
 }) => {
 	await renderTextareas(page);
 
-	// Smaller type, same number of rows — a shorter box, not a box with
+	// Smaller type, same number of rows: a shorter box, not a box with
 	// more lines crammed into it.
 	expect(await rowsVisible(page, "small")).toBeCloseTo(4, 1);
 });
@@ -231,7 +231,7 @@ test("the file input's button is not forced past the input holding it", async ({
 	// ::file-selector-button is matched by the same selector list as every
 	// other button, and giving it the 44px floor made it taller than the
 	// content box of the 44px input it lives in, so it spilled out. The
-	// target here is the input — that is what the pointer is aimed at, and
+	// target here is the input: that is what the pointer is aimed at, and
 	// it meets the size on its own; the pseudo-element is a part of it.
 	await setContent(page,
 		`<style>${css}</style><main class="container"><input id="file" type="file"></main>`,

@@ -26,7 +26,7 @@ test.afterAll(() => {
 // WebKit's sequential focus navigation visits form controls only: links
 // and buttons are excluded unless the reader turns on macOS Full Keyboard
 // Access (Safari's "Press Tab to highlight each item on a webpage"). It
-// is a platform preference, not a property of this page — a document
+// is a platform preference, not a property of this page: a document
 // containing nothing but a link, a button and a summary behaves the same
 // way, so assertions about Tab *arriving* at a link or a button would be
 // asserting that setting. The controls themselves are still checked on
@@ -41,7 +41,7 @@ test.afterAll(() => {
 const tabSkipsButtons = (browserName) => browserName === "webkit";
 
 /**
- * The hero is a source card and the interface it produces, overlapping —
+ * The hero is a source card and the interface it produces, overlapping:
  * not one panel split in two, and not two panels: only the source is in a
  * frame. The geometry worth pinning is the relationship between them: the
  * output reaches back over the source by a real, bounded amount, sits
@@ -61,7 +61,7 @@ const assertHeroDemoGeometry = async (page) => {
 	}
 
 	// The iframe fills its surface exactly: no letterbox, no overhang.
-	// The surface is the output itself now — there is no panel around it —
+	// The surface is the output itself now, and there is no panel around it:
 	// so this is the frame against its own box.
 	expect(Math.abs(frameBox.y - outputBox.y)).toBeLessThanOrEqual(1);
 	expect(
@@ -469,7 +469,7 @@ test("the homepage FAQ exposes consistent interactive states", async ({
 	// The card half of this test went with the three shell-built cards it
 	// hovered. What replaced them renders from the specimen strings the
 	// page shows the source of, so it carries no shell hover treatment by
-	// design — its contract is "this is the library's card and nothing
+	// design: its contract is "this is the library's card and nothing
 	// else", pinned in baseline-consistency.spec.js.
 
 	const details = page.locator(".docs-native-faq details").first();
@@ -482,7 +482,7 @@ test("the homepage FAQ exposes consistent interactive states", async ({
 	// Wait for the panel to actually be in layout before measuring it. The
 	// disclosure now animates open (::details-content starts at block-size
 	// 0), so reading straight after the click can catch the paragraph
-	// before it has a box — which under a loaded suite it intermittently
+	// before it has a box, which under a loaded suite it intermittently
 	// did. The state being measured is "open", not "opening".
 	await expect(details).toHaveAttribute("open", "");
 	await expect(details.locator("p")).toBeVisible();
@@ -670,7 +670,7 @@ test("the collapsed menu is complete, ordered, and returns focus", async ({
 	const panel = menu;
 	const controls = panel.locator("[data-docs-mobile-controls]");
 
-	// Search, then the toggler — in the DOM, so also in the tab order.
+	// Search, then the toggler: in the DOM, so also in the tab order.
 	expect(
 		await actions.evaluate((element) =>
 			Array.from(element.children).map((child) => child.className),
@@ -845,7 +845,7 @@ test("every claim says what kind it is, and how to check it", async ({
 		).not.toBe("");
 	}
 
-	// The vocabulary is three words, used by both halves of the section —
+	// The vocabulary is three words, used by both halves of the section:
 	// the strip and the list under it, so a reader learns it once.
 	const kinds = await page
 		.locator(".docs-proof .docs-proof-state")
@@ -862,7 +862,7 @@ test("every claim says what kind it is, and how to check it", async ({
 	// The size is the one current fact, and it is stated as a measurement of
 	// this build rather than as a ceiling: a real number, in the caption
 	// that dates it, with the check beside it. A bare "<14 KB" headline is
-	// the shape of a promise, and the page does not make that one — the
+	// the shape of a promise, and the page does not make that one: the
 	// budget is a build guard, not a claim to a reader.
 	const size = cells.nth(3);
 	await expect(size.locator("dd > strong")).toHaveText("Small CSS footprint");
@@ -871,7 +871,7 @@ test("every claim says what kind it is, and how to check it", async ({
 	await expect(page.locator(".docs-proof")).not.toContainText("<14 KB");
 
 	// No claim rests on a count of builds either. "4 builds" was accurate,
-	// and the promise it implied — that there will always be exactly four —
+	// and the promise it implied (that there will always be exactly four)
 	// is not one worth making when print sheets and presets already sit
 	// beside them.
 	await expect(page.locator(".docs-proof")).not.toContainText(/\d+ builds/);
@@ -914,7 +914,7 @@ test("every claim says what kind it is, and how to check it", async ({
 	// The band has no frame of its own: the two showcases above are each a
 	// hairline plate, and a third would be the shape this page was rebuilt
 	// to stop having. Its tint is what separates it from them, and from the
-	// FAQ below — which is back on the canvas for the same reason.
+	// FAQ below, which is back on the canvas for the same reason.
 	const grounds = await page.evaluate(() => {
 		const read = (/** @type {string} */ selector) => {
 			const element = document.querySelector(selector);
@@ -939,7 +939,7 @@ test("every claim says what kind it is, and how to check it", async ({
 	).not.toBe(grounds.faq?.background);
 	expect(grounds.proof?.background).not.toBe(grounds.showcase?.background);
 
-	// It stays a hairline grid at every width — two columns on a phone, four
+	// It stays a hairline grid at every width: two columns on a phone, four
 	// once the row can hold them, and never a set of stacked cards with the
 	// claims' relationship to each other taken out.
 	for (const width of [1440, 1023, 767, 390, 320]) {
@@ -1015,8 +1015,8 @@ test("the hero writes the source in without ever changing it", async ({
 	expect(animation.iterations).toEqual([1]);
 
 	// Let it finish, then compare. The wipe only ever changed the ink, so
-	// nothing about the pane — its height, its scroll extent, the card
-	// around it, the text inside it, or the highlighting — is allowed to
+	// nothing about the pane (its height, its scroll extent, the card
+	// around it, the text inside it, or the highlighting) is allowed to
 	// differ between a half-written state and a finished one.
 	await page
 		.locator(".docs-source-panel pre > code")
@@ -1137,8 +1137,8 @@ test.describe("without JavaScript", () => {
 	// `hidden` rather than inert: with no script there is no tablist, so
 	// all three examples are served rendered, complete, and under their own
 	// headings. A row of buttons that cannot change anything would be the
-	// other outcome, and this page's own rule — stated on the preset select
-	// beside it — is that a choice which cannot be applied is not offered.
+	// other outcome, and this page's own rule, stated on the preset select
+	// beside it, is that a choice which cannot be applied is not offered.
 	test("the showcase degrades to three complete examples", async ({ page }) => {
 		await page.goto(`${origin}/`, { waitUntil: "load" });
 
@@ -1163,7 +1163,7 @@ test.describe("without JavaScript", () => {
 
 		// And the theme section is a listing and a finished interface, both
 		// served. The custom element never upgrades, so what renders is its
-		// own children — the same specimen, in the light DOM, painted by the
+		// own children: the same specimen, in the light DOM, painted by the
 		// page's Cirth. `:not(:defined)` is that state, and it is what
 		// carries the pane's padding while it lasts.
 		const listing = page.locator("[data-docs-theme-block]");
@@ -1183,7 +1183,7 @@ test.describe("without JavaScript", () => {
 		expect(fallback.shadow).toBe(false);
 		expect(fallback.children).toBe(1);
 		// The pane gave its padding to the element, so the un-upgraded
-		// element has to carry it — otherwise the specimen sits against the
+		// element has to carry it; otherwise the specimen sits against the
 		// stage's own edge.
 		expect(fallback.padding).toBeGreaterThan(8);
 		await expect(
@@ -1201,7 +1201,7 @@ test.describe("without JavaScript", () => {
 
 // Every specimen on this page is declared once in home.njk and used twice:
 // rendered into the page, and highlighted into the pane beside it. The
-// point of doing it that way is that the two cannot drift — the hero has
+// point of doing it that way is that the two cannot drift: the hero has
 // had exactly that bug before, a snippet declaring attributes the rendered
 // output no longer had, so the contract to pin is equality, not the
 // presence of either half.
@@ -1292,7 +1292,7 @@ test("the showcase strip is a real tablist", async ({ page }) => {
 
 	await assertOnlyOpen("article");
 
-	// Each tab controls a panel, and each panel is named by its tab —
+	// Each tab controls a panel, and each panel is named by its tab:
 	// which is what lets the heading in the panel be dropped once the
 	// strip is on without the panel losing its name.
 	for (const id of showcaseExamples) {
@@ -1305,7 +1305,7 @@ test("the showcase strip is a real tablist", async ({ page }) => {
 	}
 
 	// Arrow keys walk the strip and selection follows focus, because every
-	// panel is already in the document — nothing is fetched by arrowing.
+	// panel is already in the document: nothing is fetched by arrowing.
 	await page.locator('[data-docs-tab="article"]').focus();
 	await page.keyboard.press("ArrowRight");
 	await assertOnlyOpen("details");
@@ -1445,7 +1445,7 @@ test("every control in the showcase specimens is reachable and takes a ring", as
 			const control = controls.nth(index);
 			// A Tab first, because opening an example is a click and every
 			// engine's `:focus-visible` heuristic remembers that the last
-			// interaction was a pointer — a programmatic focus after a click
+			// interaction was a pointer: a programmatic focus after a click
 			// is deliberately not focus-visible. The keypress puts the
 			// browser back in the modality this assertion is about.
 			await page.keyboard.press("Tab");
@@ -1479,7 +1479,7 @@ test("every control in the showcase specimens is reachable and takes a ring", as
  * carrying, normalised the same way. The listing breaks a `light-dark()`
  * value over three lines to fit the pane; the applied declaration is one
  * line. Collapsing whitespace, and the padding a broken line leaves
- * inside the parentheses — compares the declarations rather than the two
+ * inside the parentheses: compares the declarations rather than the two
  * formattings of them.
  * @param {string} css
  */
@@ -1554,7 +1554,7 @@ test("the theme preview carries its own Cirth, in a shadow root", async ({
 		return {
 			mode: root ? "open" : "none",
 			// The real compiled scoped build, not a look-alike written for
-			// the demo — the same artifact the /lab/ specimens load.
+			// the demo: the same artifact the /lab/ specimens load.
 			stylesheets: sheets.map((sheet) =>
 				String(sheet.getAttribute("href")).replace(/^.*\/styles\//, "styles/"),
 			),
@@ -1598,7 +1598,7 @@ test("the theme preview carries its own Cirth, in a shadow root", async ({
 	}
 
 	// Nothing is marked before anything has moved, and the demo is served
-	// in the default theme — the page's own, so the section opens on
+	// in the default theme: the page's own, so the section opens on
 	// agreement rather than on a difference the reader did not ask for.
 	expect(state.marked).toEqual([]);
 	expect(state.accent).toBe(state.pageAccent);
@@ -1609,8 +1609,8 @@ test("the theme preview carries its own Cirth, in a shadow root", async ({
 });
 
 // The isolation, exercised rather than asserted: the site's own preset
-// switcher moves the page's tokens, and the demo — which has just been
-// given a different set of values — does not move with it. This is the
+// switcher moves the page's tokens, and the demo, which has just been
+// given a different set of values, does not move with it. This is the
 // property the shadow root is for, and the reason the section can show a
 // page theme and a demo theme at the same time.
 test("the theme demo and the page keep separate themes", async ({ page }) => {
@@ -1620,7 +1620,7 @@ test("the theme demo and the page keep separate themes", async ({ page }) => {
 	await expect(toggle).toBeVisible();
 
 	// Step the demo off its opening state by hand. The suite runs under
-	// reduced motion, where nothing autoplays — which is the contract
+	// reduced motion, where nothing autoplays, which is the contract
 	// below, and here it means the sequence only moves when asked.
 	const opening = await themeState(page);
 	await toggle.click();
@@ -1669,7 +1669,7 @@ test("the theme demo and the page keep separate themes", async ({ page }) => {
 // The sequence itself: one token at a time, marked where it stands, and
 // the value that lands is the value the listing then shows. Every value in
 // it is read out of a compiled file at build time, so "no fake code" is a
-// property of the pipeline — what this checks is that the demo applies
+// property of the pipeline; what this checks is that the demo applies
 // what it prints, at every step.
 test("the token animation applies exactly what it prints", async ({ page }) => {
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
@@ -1749,7 +1749,7 @@ test("the theme demo holds still under reduced motion", async ({ page }) => {
 // already: a <button> rebinds `--cirth-color` and `--cirth-background-color`
 // to the pair the framework paints a filled button with, so a rule inside
 // the button reaching for either name gets white-on-accent. Hovering this
-// one turned it white on the band's own surface at 1.07:1 — caught by an
+// one turned it white on the band's own surface at 1.07:1, caught by an
 // axe pass over the section, and pinned here because it comes back the
 // moment a state is left out of the rule.
 test("the theme demo's control keeps the band's ink in every state", async ({
@@ -1762,7 +1762,7 @@ test("the theme demo's control keeps the band's ink in every state", async ({
 	// restated here. The shell used to capture all three into --docs-band-*
 	// aliases, because a <button> rebinds --cirth-color and a control
 	// reaching for it inside itself got the button's on-surface ink. The
-	// library now names the page roles separately — --cirth-ink and
+	// library now names the page roles separately: --cirth-ink and
 	// --cirth-canvas, neither of which a component may rebind, so the
 	// control reads them directly and there is no alias left to drift.
 	const band = await page
@@ -2066,7 +2066,7 @@ test("a live example resolves the framework's own rhythm, not the reading column
 		};
 	});
 
-	// The column really is re-timed — this is not a test that passes because
+	// The column really is re-timed: this is not a test that passes because
 	// nothing was ever different.
 	expect(readings.column).not.toEqual(readings.root);
 	// And the preview hands both back.

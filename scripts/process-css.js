@@ -48,7 +48,7 @@ const runLightningCss = (args) => runSync(lightningcssBinary, args);
 //
 // Lightning CSS will compile light-dark() away if any target sits below
 // its floor, replacing it with a --lightningcss-light/--lightningcss-dark
-// emulation. That emulation does not reproduce the semantics — a forced
+// emulation. That emulation does not reproduce the semantics: a forced
 // scheme subtree stops resolving its own values, so its appearance is a
 // broken build, not a slower one. It is worth failing loudly for: the
 // output still looks plausible, and the visual suite does not render
@@ -68,7 +68,7 @@ const assertNativeLightDark = (filename) => {
 		`[@cirthcss/cirth] ${path.basename(filename)}: light-dark() was ` +
 			"compiled to Lightning CSS's emulation, which does not reproduce " +
 			"its semantics. A Browserslist target is below the light-dark() " +
-			"floor — check package.json against scripts/check-browserslist.js.",
+			"floor; check package.json against scripts/check-browserslist.js.",
 	);
 	process.exit(1);
 };

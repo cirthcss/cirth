@@ -13,7 +13,7 @@ assertDocsBuilt("shell-overlays.spec");
 
 // Keyboard behaviour that a screenshot cannot see: what Tab actually
 // reaches on the home page, and what the two modal surfaces in this shell
-// — search and the navigation drawer — do to the document behind them.
+// (search and the navigation drawer) do to the document behind them.
 //
 // These press keys rather than asserting attributes. An element can carry
 // a correct href, a correct aria-expanded and a correct role and still be
@@ -67,7 +67,7 @@ test("Tab reaches every landmark control on the home page", async ({
 	page,
 	browserName,
 }) => {
-	// WebKit's sequential focus navigation visits form controls only —
+	// WebKit's sequential focus navigation visits form controls only:
 	// links and buttons are skipped until the reader turns on macOS Full
 	// Keyboard Access (Safari's "Press Tab to highlight each item on a
 	// webpage"). A page containing nothing but a link, a button and a
@@ -128,7 +128,7 @@ test("the hero preview is a picture, not four tab stops", async ({ page }) => {
 	// <iframe> element, which the assertion above already excludes. This
 	// used to be approximated by counting <input> stops on the host page,
 	// which held only while the home page happened to own no fields of its
-	// own — it now has several, in the section whose whole argument is that
+	// own: it now has several, in the section whose whole argument is that
 	// its controls *are* reachable. Asserted where it is true instead: the
 	// preview renders a real form, and nothing in it was ever focused.
 	const preview = await page
@@ -193,8 +193,8 @@ test("search is a full surface on a phone, not a shrunken panel", async ({
 }) => {
 	// Both widths are the same phone. The second is what the first *is* on a
 	// platform that draws a classic scrollbar: the window keeps its 390, the
-	// layout viewport loses 15 to the scrollbar, and everything below —
-	// layout and media queries alike — sees only the layout viewport. See
+	// layout viewport loses 15 to the scrollbar, and everything below
+	// (layout and media queries alike) sees only the layout viewport. See
 	// helpers/viewport.js.
 	/** @param {number} width */
 	const openSearchAt = async (width) => {
@@ -225,7 +225,7 @@ test("search is a full surface on a phone, not a shrunken panel", async ({
 			};
 		});
 
-		// The whole screen, with nothing of the page showing around it — the
+		// The whole screen, with nothing of the page showing around it: the
 		// difference between a search mode and a dialog that happens to be
 		// narrow.
 		expect(geometry.width, `panel width at ${width}px`).toBeCloseTo(
@@ -250,7 +250,7 @@ test("search is a full surface on a phone, not a shrunken panel", async ({
 	// The keyboard-shortcut hints are advice about hardware this reader
 	// does not have, and they were sitting where results go. Gone, not
 	// shrunk. The attribution beside them is still true on a phone, so it
-	// stays — the band is not removed wholesale.
+	// stays: the band is not removed wholesale.
 	const help = page.locator(".docs-search-help");
 	await expect(help.locator("span").first()).toBeHidden();
 	await expect(help.locator("small")).toBeVisible();

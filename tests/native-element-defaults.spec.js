@@ -7,7 +7,7 @@ const { setContent } = require("./helpers/render");
 // compiled stylesheet with no documentation shell anywhere near them.
 //
 // Every one of these was measured in a browser before it was fixed, and
-// every one of them is wrong in any page that uses the markup — which is
+// every one of them is wrong in any page that uses the markup, which is
 // why they are library changes rather than shell overrides. The audit's
 // own test is the one each case has to keep passing: if the documentation
 // were deleted tomorrow and a real application were built on Cirth, would
@@ -109,9 +109,9 @@ for (const [name, css] of builds) {
 // --- 2. A vertical nav paints inside its own container -------------------
 
 // The horizontal nav pays its inline gutters forward and takes them back on
-// the link. Stacked, those insets stopped cancelling and the painted box —
+// the link. Stacked, those insets stopped cancelling and the painted box
 // the hover fill, and the border-inline-start used as the aria-current rail
-// — ran 8px outside the <aside> on both edges. In the container the pattern
+// ran 8px outside the <aside> on both edges. In the container the pattern
 // is actually for, a sticky sidebar that scrolls, the rail was clipped away
 // entirely.
 for (const [name, css] of builds) {
@@ -184,8 +184,8 @@ for (const [name, css] of builds) {
 }
 
 // A plain list in an <aside> is a plain list. The vertical-nav block used to
-// be keyed on `aside` alone, so it forced `display: block` — which is not
-// `list-item` — onto the items of any list in a complementary region, and
+// be keyed on `aside` alone, so it forced `display: block` (which is not
+// `list-item`) onto the items of any list in a complementary region, and
 // their markers stopped being generated.
 for (const [name, css] of builds) {
 	test(`${name}: a prose list inside an aside keeps its list semantics`, async ({
@@ -212,7 +212,7 @@ for (const [name, css] of builds) {
 
 // The same containment, in the three places a stacked nav actually lives
 // outside an <aside>: a drawer (<dialog>), a disclosure (<details>), and a
-// plain container. There is no ancestor the framework could key on — a
+// plain container. There is no ancestor the framework could key on: a
 // <dialog> can hold a horizontal tab bar and a <details> can hold anything
 //, so the contract is the gutter token, and it is the whole contract:
 // name it zero and all three of the bar's inline insets collapse together.
@@ -366,8 +366,8 @@ for (const [name, css] of builds) {
 }
 
 // The inline pull is the item's gutter negated, not the link's own. Keyed to
-// the link gutter — which it was, invisibly, because the two carry the same
-// 8px by default — re-timing either token broke a plain horizontal bar: the
+// the link gutter, which it was, invisibly, because the two carry the same
+// 8px by default: re-timing either token broke a plain horizontal bar: the
 // first link's painted box started outside a list pulled out by less, and
 // adjacent links overlapped by the difference.
 for (const [name, css] of builds) {
@@ -477,7 +477,7 @@ for (const [name, css] of builds) {
 }
 
 // A preset, or the high-contrast pass, that moves the page's ink has to move
-// the *role* and let the slot follow — not the other way round. Playroom set
+// the *role* and let the slot follow, not the other way round. Playroom set
 // --cirth-color directly, so under it --cirth-ink still held the base
 // theme's near-black: the two names disagreed about what the page's ink was,
 // which is the one thing a page role must never do.
@@ -689,7 +689,7 @@ for (const [name, css] of builds) {
 
 // `.sr-only-focusable` used to return the element to normal flow on focus,
 // which shoved the whole document down by its own height the instant a
-// keyboard reader pressed Tab — measured at +24px, on the first interaction
+// keyboard reader pressed Tab, measured at +24px, on the first interaction
 // anyone has with the page.
 test("default: .sr-only-focusable reveals without moving the document", async ({
 	page,
@@ -741,7 +741,7 @@ test("default: .sr-only-focusable reveals without moving the document", async ({
 // `:where(nav li)::before` carries a zero-width space so Safari does not drop
 // `list-style: none` navigation out of the accessibility tree. It used to
 // take itself out of flow with `float`, which a flex or grid container
-// ignores — the box was still generated, as an item before every real one.
+// ignores: the box was still generated, as an item before every real one.
 for (const [name, css] of builds) {
 	for (const [display, template] of [
 		["grid", "display: grid; grid-template-columns: 1fr auto"],
@@ -873,7 +873,7 @@ test("default: a table in .overflow-auto scrolls and takes a focus ring", async 
 //
 // The assertion is a comparison, not a set of numbers: the two lists are
 // the same nav, so they must measure the same. Real newlines and tabs sit
-// between the items on purpose — without them the whitespace half of the
+// between the items on purpose: without them the whitespace half of the
 // defect cannot appear.
 
 /** @type {{ file: string, name: string, wrapper: string }[]} */
@@ -951,7 +951,7 @@ for (const build of scopedAndUnscoped) {
 			asUl,
 		);
 
-		// And the separator is drawn — the half of this that no amount of
+		// And the separator is drawn: the half of this that no amount of
 		// comparing the two lists to each other would have caught.
 		expect(asOl.divider, "the breadcrumb divider is missing").not.toBe("none");
 
@@ -1132,7 +1132,7 @@ for (const [name, css] of builds) {
 }
 
 // A container stays more generous than the controls inside it at every
-// setting of the knob — the relationship the card's own comment claims.
+// setting of the knob: the relationship the card's own comment claims.
 // Derived from --cirth-spacing rather than named on the scale, the two
 // would have crossed the first time a preset tightened it.
 for (const [name, css] of builds) {
@@ -1184,7 +1184,7 @@ test("default: the playroom preset retimes prose through --cirth-spacing alone",
 		};
 	});
 
-	// 1.25rem — space-5, and prose, grid and the knob all read it.
+	// 1.25rem: space-5, and prose, grid and the knob all read it.
 	expect(measured.typography).toBe(measured.spacing);
 	expect(measured.paragraph).toBe("20px");
 	expect(measured.columnGap).toBe("20px");

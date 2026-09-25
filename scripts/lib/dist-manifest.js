@@ -23,7 +23,7 @@ const rootBuilds = [
 	// The print pass ships separately (see src/cirth.print*.scss). It is a
 	// root build like the others and owes the same invariants: a classless
 	// print sheet must stay class-free, a scoped one must stay inside the
-	// wrapper. Nothing here treats it as optional — a print stylesheet that
+	// wrapper. Nothing here treats it as optional: a print stylesheet that
 	// leaked a class selector would break the classless promise on paper
 	// just as surely as on screen.
 	{ name: "cirth.print", classless: false, scoped: false },

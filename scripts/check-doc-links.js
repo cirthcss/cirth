@@ -5,7 +5,7 @@ const { docsPathPrefix } = require("./lib/docs-site");
 
 const projectRoot = path.join(__dirname, "..");
 
-// Directories that hold generated, cached, or vendored content — never hand
+// Directories that hold generated, cached, or vendored content, never hand
 // authored, so link rot there isn't a documentation bug.
 const excludedDirnames = new Set([
 	"node_modules",
@@ -96,7 +96,7 @@ getTrackedFiles(projectRoot).forEach((filename) => {
 		if (ref !== "master" && !semverTagPattern.test(ref)) {
 			const line = lineAt(source, match.index);
 			violations.push(
-				`${relativeFilename}:${line} Link points at branch/ref "${ref}" — use "master" (or a real vX.Y.Z tag for historical release notes)`,
+				`${relativeFilename}:${line} Link points at branch/ref "${ref}": use "master" (or a real vX.Y.Z tag for historical release notes)`,
 			);
 		}
 	}
@@ -171,6 +171,6 @@ if (violations.length > 0) {
 
 console.log(
 	built.checked === 0
-		? "[@cirthcss/cirth] Documentation links check passed (sources only — docs/dist is not built)"
+		? "[@cirthcss/cirth] Documentation links check passed (sources only: docs/dist is not built)"
 		: `[@cirthcss/cirth] Documentation links check passed (sources, and ${built.checked} built pages)`,
 );

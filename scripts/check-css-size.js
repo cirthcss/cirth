@@ -14,23 +14,23 @@ const distDir = path.join(projectRoot, "dist");
 
 // Gzipped ceiling, per bundle.
 //
-// This used to be one number — 14 * 1024 — applied to every file in dist/.
+// This used to be one number (14 * 1024) applied to every file in dist/.
 // It was doing two jobs badly.
 //
 // As a *guard* it only ever watched one bundle. The print sheets are around
 // 900 B, so a shared 14 KB ceiling let them grow to sixteen times their size
 // without a word; the classless builds had two kilobytes of silent room.
 // Only the scoped build was ever close enough to the line for the line to
-// mean anything, and by the end it was 305 B away — which is not headroom,
+// mean anything, and by the end it was 305 B away, which is not headroom,
 // it is a tripwire in front of the next legitimate default.
 //
 // As a *promise* it was worse. "Under 14 KB" is a number a reader can hold
 // the project to, and holding a stylesheet under a round number is not a
 // design goal: it is a reason to leave <dl> with the user agent's indent
 // and a disclosure marker four pixels off its own line, which is exactly
-// what it had started to buy. Cirth is small because its model is small —
+// what it had started to buy. Cirth is small because its model is small:
 // element selectors and custom properties, no component catalogue and no
-// runtime — not because it rations correctness by the byte.
+// runtime, not because it rations correctness by the byte.
 //
 // So: one budget per bundle, each set a few hundred bytes above what that
 // bundle actually measures. Every file is now genuinely watched, including
@@ -60,7 +60,7 @@ const budgets = {
 const warnOnly = process.argv.includes("--warn-only");
 
 if (!fs.existsSync(distDir)) {
-	console.error("check-css-size: dist/ not found — run `npm run build` first.");
+	console.error("check-css-size: dist/ not found; run `npm run build` first.");
 	process.exit(1);
 }
 

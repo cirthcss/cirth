@@ -8,7 +8,7 @@ const { setContent } = require("./helpers/render");
 // The old component failed WCAG 1.4.13 by construction: its message lived
 // in generated content, so nothing could reference it and no engine had to
 // expose it. Every assertion here is aimed at the properties that failure
-// cost, and at the one guarantee CSS still owns — that an element carrying
+// cost, and at the one guarantee CSS still owns: that an element carrying
 // an attribute the browser might not know stays hidden rather than
 // spilling its contents into the page.
 
@@ -77,7 +77,7 @@ for (const build of builds) {
 		expect(source).toContain(":not(dialog)");
 
 		// Only the popovers the library can claim. A manual popover belongs to
-		// whoever is driving it — including tooling that injects one, which is
+		// whoever is driving it, including tooling that injects one, which is
 		// how a blanket rule once handed Playwright's own screenshot-mask
 		// overlay a fade and made every masked capture unstable.
 		expect(source, "auto is styled").toContain('[popover="auto"]');
@@ -102,7 +102,7 @@ test("the hint is hidden until it is asked for, and announced either way", async
 
 	expect(await styleOf(page, "hint", "display")).toBe("none");
 
-	// aria-describedby resolves while the panel is closed — the property the
+	// aria-describedby resolves while the panel is closed: the property the
 	// pseudo-element version could never have.
 	const described = await page.evaluate(() => {
 		const id = document.querySelector("button")?.getAttribute("aria-describedby");
@@ -179,7 +179,7 @@ test("a dialog that is also a popover keeps the dialog treatment", async ({
 // page CSS that used to push it off.
 //
 // What that declaration can defend against changed with gh#124. Cirth now
-// sits in a cascade layer, so any unlayered page rule beats it — the
+// sits in a cascade layer, so any unlayered page rule beats it: the
 // accidental one included, where before only a more specific selector did.
 // The centring still holds against the user agent and against page CSS that
 // yields to Cirth; an unlayered layout rule has to leave popovers out, as
@@ -214,7 +214,7 @@ const offCentre = async (page, { before = "", after = "" }) => {
 		// by putting a fixed element in it. window.innerWidth counts the
 		// scrollbar and this library reserves that space permanently with
 		// scrollbar-gutter, so on a platform with classic scrollbars a
-		// correctly centred popover reads as half a gutter off — which is
+		// correctly centred popover reads as half a gutter off, which is
 		// what CI saw on Linux (7.5px) while macOS, with overlay scrollbars,
 		// agreed. documentElement.clientHeight is no better: setContent
 		// writes no doctype, and in quirks mode Firefox answers with the

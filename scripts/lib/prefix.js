@@ -7,7 +7,7 @@
 //
 // The rename happens once, on the CSS Sass emits and before Lightning CSS
 // sees it, so the sources keep one spelling and every build step after the
-// compile — transform, minify, the dist checks — runs on the result
+// compile (transform, minify, the dist checks) runs on the result
 // unchanged. scripts/check-prefix.js proves a prefixed build differs from
 // the default one by the prefix alone.
 

@@ -34,7 +34,7 @@
 // The bounds are the data's: at most one group per member, and at most one
 // minimising pass per member of the group. Both are reached only by a
 // document that will not converge, which the loop reports rather than
-// truncating — there is no round budget left to run out.
+// truncating: there is no round budget left to run out.
 
 /**
  * The key a candidate is addressed by, matching the report's own scheme:
@@ -104,7 +104,7 @@ const measureTogether = ({ needle, wanted }) => {
 	// How often the document had to be re-measured because a probe left it
 	// somewhere else. Removing twenty-odd declarations at once can collapse
 	// the header, and the shell's own script then moves the display
-	// controls into the drawer — permanently. Putting the CSS back does not
+	// controls into the drawer, permanently. Putting the CSS back does not
 	// put the DOM back, so the reference has to move with it.
 	//
 	// This is a diagnostic, not a verdict. It used to decide `unstable`,
@@ -147,7 +147,7 @@ const measureTogether = ({ needle, wanted }) => {
 	};
 
 	// `unstable` means one thing: the same question, asked twice of the
-	// same document, came back with two different answers. Nothing else —
+	// same document, came back with two different answers. Nothing else:
 	// a set can be large, slow, and force a dozen re-baselines and still be
 	// perfectly deterministic, which is the common case and used to be
 	// reported as instability.
@@ -178,7 +178,7 @@ const measureTogether = ({ needle, wanted }) => {
 	// The safety bound is the data's own: every pass names a group of at
 	// least one member and takes it out of the set, so there cannot be more
 	// passes than there are members. It is a guard against a document that
-	// will not converge, not a budget — the loop below exits on its own the
+	// will not converge, not a budget: the loop below exits on its own the
 	// moment the remainder stops moving.
 	while (passes < here.length) {
 		passes += 1;
@@ -214,7 +214,7 @@ const measureTogether = ({ needle, wanted }) => {
 		// 1-minimality, confirmed: the group moves, and putting any single
 		// member back stops it. This is where an oscillating candidate is
 		// caught, because it is the same question the minimisation has just
-		// answered — a different answer now is the definition of unstable.
+		// answered: a different answer now is the definition of unstable.
 		if (!agrees(minimal, true)) break;
 		let holds = true;
 		for (const key of minimal) {

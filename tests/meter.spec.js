@@ -12,7 +12,7 @@ const { setContent } = require("./helpers/render");
 // Blink and WebKit, :-moz-meter-sub-optimum::-moz-meter-bar in Firefox),
 // and getComputedStyle answers for none of them. So each meter is
 // screenshotted and compared against a plain <div> painted with the token
-// it should be using — an exact buffer match or nothing.
+// it should be using: an exact buffer match or nothing.
 //
 // The same method catches the geometry regression that made this element
 // worth a test of its own: Blink lays the value out at half the track's
@@ -37,7 +37,7 @@ const read = (file) => {
 
 const css = read("dist/cirth.css");
 
-// Each fixture is a *full* bar — value at max — that still lands in a
+// Each fixture is a *full* bar (value at max) that still lands in a
 // different region, which is what makes a whole-element pixel comparison
 // possible. The spec's classification does the work: with `optimum` above
 // `high`, a value at max is optimum; with `optimum` below `low`, a value

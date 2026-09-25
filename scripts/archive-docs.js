@@ -10,7 +10,7 @@ const { runSync } = require("./lib/run-sync");
 // result under docs/versions/<dir>/, which the site copies verbatim into
 // its output. Copied rather than rebuilt on every deploy, because an
 // archived line should not have to keep compiling against a toolchain that
-// has moved on — the whole point of freezing it is that it stops changing.
+// has moved on: the whole point of freezing it is that it stops changing.
 //
 //   node scripts/archive-docs.js v0.10.0 v0.10
 //
@@ -46,7 +46,7 @@ try {
 	run("git", ["worktree", "add", "--detach", worktree, tag]);
 
 	// The archived line is served from a subdirectory, and the tag predates
-	// the idea — its config only knows how to build for the site root. One
+	// the idea: its config only knows how to build for the site root. One
 	// line is repointed at the archive's own prefix so every internal link
 	// and asset path lands inside it. This is the only edit made to the
 	// checkout, and it lives and dies with the temporary worktree.
@@ -55,7 +55,7 @@ try {
 
 	if (!source.includes('"/cirth/"')) {
 		throw new Error(
-			`${tag} does not build for "/cirth/" — check how its pathPrefix is set`,
+			`${tag} does not build for "/cirth/": check how its pathPrefix is set`,
 		);
 	}
 
@@ -95,7 +95,7 @@ try {
 	// A frozen line cannot grow a version switcher, so it gets told where it
 	// is instead. Without this, someone arriving from a search result reads
 	// documentation for a version they may not be running, with no signal and
-	// no way back — the same problem the /next/ banner solves, at the other
+	// no way back: the same problem the /next/ banner solves, at the other
 	// end of the timeline.
 	const banner =
 		'<aside style="border-bottom:1px solid #8884;padding:.5rem 1rem;' +

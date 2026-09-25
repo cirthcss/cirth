@@ -2,8 +2,8 @@
 // evaluated against.
 //
 // Not `window.innerWidth`: that is the window's content area, classic
-// scrollbar included. On a platform that draws overlay scrollbars — macOS,
-// and every phone — the two are the same number, so using it works by
+// scrollbar included. On a platform that draws overlay scrollbars (macOS,
+// and every phone) the two are the same number, so using it works by
 // accident; on the GTK Chromium that runs CI the window is about 15px
 // wider than the box, and every assertion that compared a fixed-position
 // element against it was 15px out.
@@ -17,7 +17,7 @@
 // box the overlay is laid out in. CI failed on exactly that: expected 390,
 // received 375.
 //
-// So ask the question in the terms the answer is given in — put a fixed
+// So ask the question in the terms the answer is given in: put a fixed
 // element in the box and measure it. `popover.spec.js` has done this since
 // it hit the same wall.
 
@@ -42,12 +42,12 @@ const layoutViewport = (page) =>
 const classicScrollbar = 15;
 
 // Overlay scrollbars cannot be turned off in a Playwright browser on macOS
-// — not with a launch flag, not with `::-webkit-scrollbar`, not with
+// Not with a launch flag, not with `::-webkit-scrollbar`, not with
 // `scrollbar-gutter`, so the Linux geometry cannot be reproduced here.
 //
 // This does not reproduce it either, and it is worth being exact about
 // what it does. A classic scrollbar narrows the box content is laid out in
-// *without* narrowing what a width media query is evaluated against —
+// *without* narrowing what a width media query is evaluated against:
 // Chromium answers that one with the window, so a 390px window with a
 // scrollbar is not the same document as a 375px window without one. They
 // agree on layout and differ on which tier applies.

@@ -2,7 +2,7 @@
 //
 // A general SemVer parser shrugs at `0.15.0-beta` (no number) and
 // `0.15.0-beta.01` (leading zero); a release must not. Both of those sort
-// unpredictably against their neighbours — `beta` < `beta.1` but `beta.01`
+// unpredictably against their neighbours: `beta` < `beta.1` but `beta.01`
 // is a *string* identifier and sorts after every numeric one, so a series
 // that contains either has no reliable "latest beta". They are errors here.
 //

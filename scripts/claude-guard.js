@@ -3,7 +3,7 @@ const { classifyCommand } = require("./lib/release-guard");
 // A Claude Code PreToolUse hook: refuses the release commands an agent
 // must never run directly, before the shell sees them.
 //
-// The Git pre-push hook already covers pushes, and covers them better —
+// The Git pre-push hook already covers pushes, and covers them better:
 // it sees the resolved refs rather than a command string. This exists for
 // the half Git cannot see: `npm publish`, `npm stage approve`, a dist-tag
 // moved by hand. Those never touch Git, so nothing else local would
@@ -15,7 +15,7 @@ const { classifyCommand } = require("./lib/release-guard");
 // payload here: a malformed JSON reply would let the call through.
 //
 // Per-machine, installed by scripts/setup-claude-hooks.js into
-// .claude/settings.local.json. Not the source of truth for the policy —
+// .claude/settings.local.json. Not the source of truth for the policy:
 // that is RELEASING.md, and not a boundary either, since whoever owns the
 // machine owns the settings file.
 
@@ -53,7 +53,7 @@ process.stdin.on("end", () => {
 
 	process.stderr.write(
 		`Blocked by the Cirth release policy.\n\n${verdict.reason}\n\n` +
-			`Do not work around this guard — not with --no-verify, not by ` +
+			`Do not work around this guard: not with --no-verify, not by ` +
 			`editing hook\nconfiguration. Follow the canonical process in ` +
 			`RELEASING.md, and if it genuinely\ndoes not cover this case, stop ` +
 			`and say so.\n`,

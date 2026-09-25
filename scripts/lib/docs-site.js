@@ -37,7 +37,7 @@ const docsPathPrefix = () => {
 const assertDocsBuilt = (label) => {
 	if (!fs.existsSync(path.join(docsDist, "index.html"))) {
 		throw new Error(
-			`${label}: built docs not found — run \`npm run docs:build\` first.`,
+			`${label}: built docs not found; run \`npm run docs:build\` first.`,
 		);
 	}
 };
@@ -94,7 +94,7 @@ const discard = (root) => {
 	fs.rmSync(root, { force: true, recursive: true });
 };
 
-// Whatever ends the process — a thrown error, Ctrl-C, a normal exit — the
+// Whatever ends the process (a thrown error, Ctrl-C, a normal exit) the
 // copy goes with it. `exit` cannot await, so the removal is synchronous.
 const installCleanup = () => {
 	if (cleanupInstalled) return;
@@ -143,7 +143,7 @@ const snapshotDocs = ({ attempts = 3, label, source = docsDist }) => {
 				if (!fs.existsSync(file) || fs.statSync(file).size === 0) {
 					throw new Error(
 						`${label}: ${path.relative(projectRoot, source)} is missing or ` +
-							`empty at ${required} — run \`npm run docs:build\`.`,
+							`empty at ${required}; run \`npm run docs:build\`.`,
 					);
 				}
 			}
@@ -163,7 +163,7 @@ const snapshotDocs = ({ attempts = 3, label, source = docsDist }) => {
 // build time) are frozen sites, not part of this one: auditing them would
 // re-audit whatever the toolchain thought a year ago, and any finding
 // would be unfixable by definition. The /next/ preview is excluded for the
-// opposite reason — it is this site, built twice.
+// opposite reason: it is this site, built twice.
 // Share-card/icon routes are deterministic rasterization sources, not
 // navigable documentation. The lab routes are isolated iframe targets and
 // intentionally omit the docs preset controls that generic page audits wait

@@ -13,7 +13,7 @@ const cdnOrigin = "https://cdn.jsdelivr.net/npm/@cirthcss/cirth";
 // package.json, and during a prerelease series it must not be.
 //
 // A `<link>` in the README is an instruction to a reader, and the reader
-// asked for the framework, not for a beta of it — the same reason a
+// asked for the framework, not for a beta of it: the same reason a
 // prerelease never takes the `latest` dist-tag. While package.json is at
 // 0.15.0-beta.1, the snippets keep pointing at the last stable release,
 // so `npm install` and the CDN say the same thing.
@@ -311,7 +311,7 @@ const processDocument = async (filename) => {
 
 const main = async () => {
 	// Write mode hashes whatever is in dist/. During a prerelease that is
-	// the prerelease's own build, while the snippets pin the last stable —
+	// the prerelease's own build, while the snippets pin the last stable:
 	// so rewriting here would pin a digest that does not match the file
 	// jsDelivr serves, and every browser would refuse the stylesheet
 	// outright. Refuse to rewrite instead of producing that.

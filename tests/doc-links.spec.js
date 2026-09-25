@@ -88,7 +88,7 @@ test("the fixture breaks in exactly the five ways it is meant to", () => {
 
 // The site is served from the root in every local build and from /cirth/
 // on GitHub Pages, so the second spelling is only exercised on the deploy
-// — where a mistake is a failed deployment rather than a failed check.
+// Where a mistake is a failed deployment rather than a failed check.
 // It happened: the checker resolved /cirth/colors against a tree whose
 // pages are at /colors, and reported the entire site as missing.
 test("absolute links resolve under the prefix the site is served from", () => {

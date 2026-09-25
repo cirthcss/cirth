@@ -8,7 +8,7 @@ const { distFiles } = require("./lib/dist-manifest");
 // `files: ["dist"]` is a rule, not an inventory: it says which directory
 // npm may walk, and npm then adds README/LICENSE/package.json on its own.
 // Nothing in the repository stated the resulting list, so nothing could
-// notice it changing — a stale file left in dist/ by an interrupted build
+// notice it changing: a stale file left in dist/ by an interrupted build
 // ships, a renamed build variant silently stops shipping, and an entry
 // point in `exports` can point at a file the tarball does not contain,
 // which fails at the consumer's `import` and nowhere earlier.
@@ -119,7 +119,7 @@ const main = () => {
 	// --- Metadata the registry page and a consumer's tooling read --------
 
 	if (manifestFields.private === true) {
-		fail("package.json sets `private: true` — npm would refuse to publish.");
+		fail("package.json sets `private: true`: npm would refuse to publish.");
 	}
 
 	for (const field of [
@@ -171,7 +171,7 @@ const main = () => {
 		const leak = knownLeaks.find((entry) => entry.test.test(file));
 		fail(
 			leak
-				? `${file} would be published — that is ${leak.what}, which the ` +
+				? `${file} would be published: that is ${leak.what}, which the ` +
 						`package must not carry.`
 				: `${file} would be published and is not part of the declared ` +
 						`surface. Add it to scripts/lib/dist-manifest.js if a build ` +
@@ -202,7 +202,7 @@ const main = () => {
 			if (!present.has(file)) {
 				fail(
 					`exports["${subpath}"] points at ${target}, which the tarball ` +
-						`does not contain — \`import "${manifest.name}${subpath.slice(1)}"\` ` +
+						`does not contain: \`import "${manifest.name}${subpath.slice(1)}"\` ` +
 						`would fail for every consumer.`,
 				);
 			}
@@ -247,7 +247,7 @@ const main = () => {
 	const bytes = files.reduce((total, file) => total + file.size, 0);
 	console.log(
 		`✓ check-package-surface: ${manifest.name}@${manifest.version} packs ` +
-			`${files.length} files (${(bytes / 1024).toFixed(0)} kB unpacked) — ` +
+			`${files.length} files (${(bytes / 1024).toFixed(0)} kB unpacked): ` +
 			`${distFiles().length} build outputs, ${metadataFiles.length} metadata ` +
 			`files, nothing else; ${entryPoints.length} entry points all resolve.`,
 	);

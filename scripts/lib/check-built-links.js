@@ -16,7 +16,7 @@ const path = require("node:path");
 //   #section       does this page contain id="section"?
 //
 // Not a crawler: nothing leaves the filesystem, and an http(s) link is
-// somebody else's uptime. The requirement is narrower and absolute — the
+// somebody else's uptime. The requirement is narrower and absolute: the
 // documentation must not be able to build with an internal 404 or with a
 // fragment that points at nothing.
 
@@ -89,7 +89,7 @@ const routesFor = (root, file) => {
 /**
  * Absolute hrefs carry the prefix the site is served from; the files on
  * disk do not. Under /cirth/ a link to /cirth/colors has to be looked up
- * as /colors, or every absolute link in the site reads as broken — which
+ * as /colors, or every absolute link in the site reads as broken, which
  * is exactly what happened the first time this ran on GitHub Pages.
  *
  * A link outside the prefix is left alone, and will be reported: under a
@@ -190,7 +190,7 @@ const checkBuiltLinks = ({ root, reportRoot = root, pathPrefix = "/" }) => {
 
 			if (!page) {
 				// Not a page. It is allowed to be a file the site really ships
-				// — a stylesheet, an image, an archive.
+				// A stylesheet, an image, an archive.
 				if (assets.has(resolved)) continue;
 				violations.push(
 					`${name}:${line} Link "${href}" resolves to ${resolved}, which the built site does not contain`,

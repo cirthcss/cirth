@@ -4,7 +4,7 @@ const { classifyPush } = require("./lib/release-guard");
 // definition of "protected" with the Claude Code command guard rather than
 // growing a second one in shell.
 //
-// Reads the pre-push protocol on stdin — `<local ref> <local sha>
+// Reads the pre-push protocol on stdin: `<local ref> <local sha>
 // <remote ref> <remote sha>`, one line per ref, and exits non-zero if any
 // of them may not be pushed by hand.
 

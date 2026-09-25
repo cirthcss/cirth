@@ -7,8 +7,8 @@ const { setContent } = require("./helpers/render");
 // table.controls (gh#108): form controls placed directly in table cells,
 // without the box-inside-a-box of cell padding around a full control. The
 // variant may only take padding away. Everything that makes a control a
-// control — its border, its states, its focus ring, its 44px target, its
-// name — has to arrive unchanged, and that is most of what this pins.
+// control (its border, its states, its focus ring, its 44px target, its
+// name) has to arrive unchanged, and that is most of what this pins.
 
 /** @param {string} file */
 const readCss = (file) =>
