@@ -119,6 +119,43 @@ like any other.
 Bundling also decides cascade order. [Customization](/customization#cascade-layers)
 covers how the `cirth` layer sorts against your own.
 
+## What a smaller stylesheet actually buys
+
+Around 14 KiB is the figure people quote, and it is worth understanding
+rather than aiming at.
+
+It approximates the
+[initial congestion window](https://datatracker.ietf.org/doc/html/rfc6928)
+that TCP and [QUIC](https://www.rfc-editor.org/rfc/rfc9002.html#section-7.2)
+use for a new connection: the data a server may send before it has to stop
+and wait for the client's first acknowledgment. A response that fits inside
+that first flight saves a round trip of waiting.
+
+Three things stop that from being a line you can design against.
+
+**The window belongs to the connection, not to your stylesheet.** On a
+connection that has already carried the HTML document it has grown past its
+initial size, so by the time the stylesheet is requested the threshold has
+moved.
+
+**A cross-origin stylesheet never gets a warm connection.** It pays DNS, TCP
+and TLS first, and that setup costs more than the round trip the threshold
+is about. Trimming bytes to cross a line you are already paying past several
+times over is the wrong lever; moving the file to your own origin is the
+right one.
+
+**The first flight is usually spent on the document.** The HTML is fetched
+before the browser knows the stylesheet exists, so it is the response that
+actually competes for that first window.
+
+None of which makes a smaller stylesheet worthless — fewer bytes are fewer
+bytes on a slow link, and the budgets in
+[`check-css-size.js`](https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js)
+exist so growth is noticed. It makes the threshold a reason the project
+keeps Cirth small rather than a promise about any one request.
+[About](/about#why-it-is-a-guard-and-not-a-promise) covers why that number
+is a per-bundle regression guard and not a ceiling.
+
 ## Caching
 
 A version-pinned URL names bytes that will never change, so it can be cached

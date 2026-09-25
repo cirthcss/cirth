@@ -225,7 +225,7 @@ bodyClass: docs-home-page
 		<div class="docs-native-grid">
 			<header class="docs-showcase-lede">
 				<h2 id="semantic-title">Start with the HTML you already know.</h2>
-				<p>Standard elements carry the styling <em>and</em> the behaviour. Change the markup and you change the interface — there is no component API in between, and nothing in these three samples is wired to a script.</p>
+				<p>Standard elements carry the styling <em>and</em> the behaviour. Change the markup and you change the interface. There is no component API in between, and nothing in these three samples is wired to a script.</p>
 			</header>
 			{#- The strip chooses what the section is about, so it sits with the
 			    section's own copy rather than inside the stage. In the band it
@@ -294,7 +294,7 @@ bodyClass: docs-home-page
 		<div class="docs-native-grid">
 			<header class="docs-showcase-lede">
 				<h2 id="theme-title">Your theme. Same HTML.</h2>
-				<p>Every colour, radius and font is a <code>--cirth-*</code> custom property. The markup on the right never changes and no class is added to it — the declarations on the left do, one at a time, and the finished interface follows them.</p>
+				<p>Every colour, radius and font is a <code>--cirth-*</code> custom property. The markup on the right never changes and no class is added to it. The declarations on the left do, one at a time, and the finished interface follows them.</p>
 			</header>
 			<div class="docs-stage">
 				<header class="docs-stage-band">
@@ -328,7 +328,7 @@ bodyClass: docs-home-page
 						<cirth-theme-preview data-docs-theme-preview>{{ themeSpecimen | safe }}</cirth-theme-preview>
 					</div>
 				</div>
-				<p class="docs-example-note">Real values, from the files that declare them: the default theme in <code>cirth.scoped.css</code>, and the <code>plain</code> and <code>playroom</code> presets compiled from <code>src/presets/</code>. In your own page the same declarations go on <code>:root</code> — <a href="/customization">every token, and how to override it</a>.</p>
+				<p class="docs-example-note">Real values, from the files that declare them: the default theme in <code>cirth.scoped.css</code>, and the <code>plain</code> and <code>playroom</code> presets compiled from <code>src/presets/</code>. In your own page the same declarations go on <code>:root</code>. Check <a href="/customization">every token, and how to override it</a>.</p>
 			</div>
 		</div>
 	</section>
@@ -339,10 +339,10 @@ bodyClass: docs-home-page
 	    differently. A *guarantee* is something the project intends to keep
 	    and would treat a break as a bug. A *capability* is something Cirth
 	    lets you do; it does not promise anything about your application. A
-	    *current fact* is true of this build and free to move — the size is
-	    the one on this page, and stating it as a permanent ceiling would
-	    make covering more HTML, or adding an accessibility default, look
-	    like a broken promise instead of a normal change.
+	    *current fact* would be true of this build and free to move — the
+	    gzipped size used to be one here, and it has moved to /deploy, where
+	    a reader is deciding something with it rather than scoring the
+	    project by it.
 
 	    So no number is a claim by itself here. "4 builds" went for the same
 	    reason: the count was accurate and the promise it implied — that
@@ -386,14 +386,18 @@ bodyClass: docs-home-page
 					</dd>
 				</div>
 				<div>
-					<dt>{{ proofKind("current") }}</dt>
+					<dt>{{ proofKind("guarantee") }}</dt>
 					<dd>
-						<strong>Small CSS footprint</strong>
-						{#- Measured off dist/cirth.min.css at build time, not written
-						    down: this cell says what today's build weighs, and the
-						    number moves when the stylesheet does. -#}
-						<small>{% if proof.size %}<strong class="docs-proof-figure">{{ proof.size.label }}</strong> gzipped in this build{% else %}Gzipped size measured{% endif %} — every bundle is measured on every build.</small>
-						<a href="https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js">Current size</a>
+						{#- The cause, not the symptom. This used to print the gzipped
+						    size, which invited the one comparison the project does not
+						    want made: a byte count read as a score. What is actually
+						    being promised is the model — element selectors and custom
+						    properties, no component catalogue, nothing to run — and the
+						    size is downstream of it. The measured figure still exists,
+						    on /deploy, where a reader can act on it. -#}
+						<strong>Small by construction</strong>
+						<small>Element selectors and custom properties — no component catalogue, and nothing to run. The size follows from that model rather than from leaving native elements unfinished.</small>
+						<a href="/about#size-and-what-it-is-a-budget-for">Why</a>
 					</dd>
 				</div>
 			</dl>

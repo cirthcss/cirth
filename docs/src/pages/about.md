@@ -84,15 +84,18 @@ something installing the package provides.
 ### Why small matters here
 
 Around 14 KiB is a meaningful threshold, and it is why this project pays
-attention at all. It approximates the
-[initial congestion window](https://datatracker.ietf.org/doc/html/rfc6928)
-TCP and [QUIC](https://www.rfc-editor.org/rfc/rfc9002.html#section-7.2) use
-for a new connection — the data a server can send before it has to pause and
-wait for the client's first acknowledgment. A stylesheet that fits inside
-that first flight can start rendering styled content without an extra round
-trip, when network conditions allow it. That was never a guarantee about any
-individual request: actual delivery depends on TLS overhead, HTTP version,
-prior congestion state, and the network path.
+attention at all: it approximates what a server can send on a new connection
+before it has to stop and wait for the client's first acknowledgment.
+
+It was never a guarantee about any individual request, and on the delivery
+paths most consumers actually use it is not the number that decides
+anything — the connection the stylesheet arrives on has usually moved the
+threshold already.
+[Deploy](/deploy#what-a-smaller-stylesheet-actually-buys) works through what
+it does and does not buy.
+
+What it is here is a reason to notice growth. That is a different job from
+promising a ceiling, and the difference is the rest of this section.
 
 ### Why it is a guard and not a promise
 
