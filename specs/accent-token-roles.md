@@ -7,7 +7,7 @@
 | Baseline | `c4dcd4c5` on `master`; CI run `35379220685` passed |
 | Breaking | Yes — custom properties only, no markup change |
 
-The three public accent families — `primary`, `secondary`, `contrast` — rename
+The three public accent families (`primary`, `secondary`, `contrast`) rename
 their downstream custom properties to say what they paint before naming a
 state, matching the vocabulary the `error`, `success` and `warning` families
 already use. A theme that overrides a downstream accent token must rename it.
@@ -15,7 +15,7 @@ A theme that only sets `--cirth-primary` is unaffected, and no class changes.
 
 > **Retrospective.** This spec was reconstructed from the branch after the work
 > was done, as the worked example for gh#127. It is not evidence that the
-> process was followed here — the three commits on the branch carry empty
+> process was followed here: the three commits on the branch carry empty
 > bodies, so the reasoning was recoverable only from the diff and from
 > `docs/src/pages/upgrading.md`. That is the gap this directory exists to
 > close.

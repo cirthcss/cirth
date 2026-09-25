@@ -44,7 +44,7 @@
       // shorter than the line sits high by half the difference: 16px of
       // chevron in a 24px line put the glyph 4px above the optical centre
       // of the first row, everywhere a disclosure appeared. At a larger
-      // body size the gap grew with the line — 10px at 24px type — because
+      // body size the gap grew with the line (10px at 24px type) because
       // the box was pinned to the root scale (--cirth-font-size-md) while
       // the line it had to centre in followed the element. `1lh` is that
       // line, whatever the type scale or a local line-height says, and
@@ -61,7 +61,7 @@
       float: right;
 
       // Resting: the chevron points down, which is where the panel is
-      // about to appear. It used to rest at -90deg — pointing along the
+      // about to appear. It used to rest at -90deg, pointing along the
       // row rather than at anything, and swing to 0 on open, so the
       // closed state said "there is more this way" and the open state
       // said "there is more below" about content already below. Down,
@@ -71,7 +71,7 @@
 
       // Masked over a theme token rather than drawn with the icon's own
       // baked stroke, so the marker follows a retheme. The <select>
-      // chevron in forms/_basics.scss cannot do this — a replaced element
+      // chevron in forms/_basics.scss cannot do this: a replaced element
       // has no pseudo-element to hang the mask on, so it keeps the baked
       // neutral and the two diverge under a custom theme (gh#82).
       background-color: currentColor;
@@ -99,7 +99,7 @@
     &:focus-visible {
       &:not([role]) {
         // Outset by a quarter step, not inset by the ring's own width.
-        // A summary carries `padding-block` but no `padding-inline` — the
+        // A summary carries `padding-block` but no `padding-inline`: the
         // trigger text starts exactly where the panel text below it does,
         // which is the alignment this component wants, so the border box
         // and the first glyph share an edge. An inset ring was therefore
@@ -129,7 +129,7 @@
       // `padding-block: var(--cirth-space-2)` below (it is what lifts the
       // trigger to the 2.75rem target), so a full rhythm step of margin on
       // top of it measured 24px from the summary's text to the first line
-      // of the panel — one and a half times the step the same paragraph
+      // of the panel: one and a half times the step the same paragraph
       // would get anywhere else in the document. Half a step of margin
       // plus the padding that was already there is exactly one step, so
       // the panel opens on the framework's own rhythm and the hit area is
@@ -153,7 +153,7 @@
 // A resting disclosure is a rule, not a box. Dropdowns already own a menu
 // frame, so class builds leave that specialised component untouched.
 // This used to be a card: border on all four sides, card surface, card
-// radius, a tinted summary band when open. A disclosure is not a card —
+// radius, a tinted summary band when open. A disclosure is not a card:
 // it is a row of text you can open, and a stack of them is a list. Boxing
 // each one turned a FAQ into a column of framed panels with the reading
 // order buried inside them, and it put a second container inside every
@@ -183,7 +183,7 @@ $surface-details: "details";
     // margin-bottom looked equivalent and was not: margins are the first
     // thing content resets flatten, so any `p:last-child { margin: 0 }` in
     // the page, or a last child that is a list, a figure, or a <pre> with
-    // its own margin — silently collapsed the panel onto its own divider.
+    // its own margin, silently collapsed the panel onto its own divider.
     // Owning it here makes the gutter unconditional and identical for every
     // kind of content, and the reset below keeps the two from stacking.
     padding-block-end: var(--cirth-space-4);
@@ -205,7 +205,7 @@ $surface-details: "details";
 // nothing about the resting state depends on it.
 
 // `interpolate-size: allow-keywords` is what makes `auto` an animatable
-// height — without it there is no way to transition to a height the
+// height: without it there is no way to transition to a height the
 // content decides. `content-visibility` with allow-discrete keeps the
 // panel rendered for the length of the close instead of vanishing on the
 // first frame, the same trick the modal uses for `display`.

@@ -16,7 +16,7 @@
 // with classes only an integrator's JavaScript could add and remove.
 
 // The exit is honest about its reach: `overlay` is Chromium-only, so
-// elsewhere the close is instant. Nothing is lost by that — the dialog
+// elsewhere the close is instant. Nothing is lost by that: the dialog
 // goes away, which is what closing means, and prefers-reduced-motion
 // collapses all of it anyway (utilities/_reduce-motion.scss).
 
@@ -51,8 +51,8 @@
 
     > article {
       // A settle, not an arrival from off-screen. This used to be
-      // `translateY(-100%)` — the dialog's own height, 420px for a typical
-      // one — which is travel the rest of the system does not use: the
+      // `translateY(-100%)`: the dialog's own height, 420px for a typical
+      // one, which is travel the rest of the system does not use: the
       // documentation shell moves an entering block 6px to 12px for the
       // same job. Distance here carries no information the fade does not
       // already carry, and the longer the throw the more the dialog reads
@@ -134,7 +134,7 @@
     // The icon is 1rem; the target around it is the full control height,
     // because a 16px close button is 16px of anything a pointer has to hit
     // and this is the control people reach for in a hurry. The box grows,
-    // the icon does not — background-size below pins it, and the negative
+    // the icon does not: background-size below pins it, and the negative
     // margins take the extra back out of the layout, so the header is laid
     // out around the same 1rem the design was built on. Without the width
     // the min-block-size floor in content/_button.scss would make this
@@ -156,14 +156,14 @@
       // neutral the SVG used to bake in, so it follows a retheme. Not
       // currentColor, unlike the spinner in components/_loading.scss: this
       // control is a <button>, and content/_button.scss gives buttons
-      // --cirth-color: var(--cirth-primary-on-surface) — white — because a
+      // --cirth-color: var(--cirth-primary-on-surface), white, because a
       // button is normally a filled accent surface. The close control keeps
       // the box but drops the fill, so currentColor would paint a white
       // glyph on the dialog header.
 
       // --cirth-ink is the general answer to that trap now (theme/_dual.scss:
       // the page's ink under a name no component may rebind), but this
-      // control does not want the page's ink — it wants the subordinate one.
+      // control does not want the page's ink: it wants the subordinate one.
       // The muted ink is what the baked stroke was approximating anyway, and
       // nothing shadows it either; the opacity above still carries the
       // resting/hover distinction.
@@ -218,7 +218,7 @@
 }
 
 // Scroll lock, asked of the document rather than of a script. :has() lets
-// the page notice its own open dialog — :modal and not [open], because a
+// the page notice its own open dialog: :modal and not [open], because a
 // non-modal <dialog open> is ordinary in-flow content that happens to be
 // a dialog, and locking the page behind it would be locking the page
 // behind something the reader can simply scroll past. Caught on this

@@ -8,7 +8,7 @@
 
 // Progress's semantic sibling: a scalar measurement inside a known range
 // (disk used, score, capacity) rather than the completion of a task. The
-// frame is progress's, borrowed rather than duplicated — same geometry,
+// frame is progress's, borrowed rather than duplicated: same geometry,
 // same track, same border tokens (see theme/_styles.scss), so the two
 // read as a matched pair.
 
@@ -16,7 +16,7 @@
 // range the value falls: low/high/optimum split it into an optimum
 // region, a suboptimal one, and one the spec calls "even less good".
 // Resetting the appearance without honoring that split would throw away
-// information the author explicitly encoded, so all three are painted —
+// information the author explicitly encoded, so all three are painted:
 // and, since the regions are mutually exclusive, only ever one at a time.
 
 // Each engine exposes the split differently: WebKit and Blink through
@@ -36,7 +36,7 @@
   overflow: hidden;
 
   // The track is too close to the page background to meet WCAG 1.4.11 on
-  // its own, so a >= 3:1 border marks the component's extent instead —
+  // its own, so a >= 3:1 border marks the component's extent instead:
   // same reasoning as progress.
   border: var(--cirth-border-width-1) solid var(--cirth-meter-border-color);
   border-radius: var(--cirth-border-radius);
@@ -50,7 +50,7 @@
   }
 
   // Blink lays the bar out at half the element's height and centers it,
-  // and ignores an author `height` on the bar itself — an 8px meter fills
+  // and ignores an author `height` on the bar itself: an 8px meter fills
   // 4px, a visibly thinner line than the progress bar beside it. Making
   // the inner element a flex container stretches the bar to full height
   // (measured, rather than assumed: rows of pixels sampled top to bottom

@@ -134,7 +134,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 
 // Blocks, 100%
 // An explicit `size` (the standard, semantic way to size a field to its
-// expected content — a postcode, a short code, an OTP digit) opts an
+// expected content: a postcode, a short code, an OTP digit) opts an
 // input out of the full-width default and lets UA-native sizing apply.
 
 #{$parent-selector} input:not([type="checkbox"], [type="radio"], [size]),
@@ -237,7 +237,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 // Hover
 
 // Every other interactive control in the library answers the pointer, and
-// a field that does not reads as inert next to them — the affordance is
+// a field that does not reads as inert next to them: the affordance is
 // the point, not the decoration. It is deliberately not the focus
 // treatment: the border moves toward the field's own ink rather than to
 // the accent, so hover stays legible as "this is reachable" while focus
@@ -245,7 +245,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 // Mixing toward --cirth-color needs no second value and no new token:
 // inside these rules that slot is the field's ink, so the hover darkens in
 // the light scheme and lightens in the dark one on its own. It also cannot
-// weaken the 3:1 the resting border owes WCAG 1.4.11 — moving toward the
+// weaken the 3:1 the resting border owes WCAG 1.4.11: moving toward the
 // ink only ever increases the contrast against the field.
 
 @media (hover: hover) and (pointer: fine) {
@@ -288,7 +288,7 @@ $helper-previous-tags: "input, select, textarea, fieldset";
       var(--cirth-form-element-focus-color);
 
     // Invisible in normal rendering, but forced-colors mode strips
-    // box-shadow and repaints transparent outlines with a system color —
+    // box-shadow and repaints transparent outlines with a system color:
     // without this, keyboard focus disappears in Windows High Contrast.
     outline: var(--cirth-outline-width) solid transparent;
   }
@@ -472,7 +472,7 @@ $validation-any: "[aria-invalid], #{$invalid-native}";
   // explicit rows="2" would be worse than the default it replaced. Same
   // shape as select:not([multiple], [size]) above.
 
-  // Measured in `lh` — the element's own line box, so four rows means
+  // Measured in `lh`: the element's own line box, so four rows means
   // four rows of whatever text this textarea is actually set in, not four
   // rows of the default type scale. That is the opposite of the target
   // size floor below, which must not move when the type does. Padding and

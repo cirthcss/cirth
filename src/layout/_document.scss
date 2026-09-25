@@ -47,7 +47,7 @@
   // Always, not only while something needs it. A classic scrollbar takes
   // layout width; an overlay one does not. Reserving the gutter on demand
   // therefore *causes* the shift it is meant to prevent on every platform
-  // that draws overlay scrollbars — measured: 1280px wide before, 1265px
+  // that draws overlay scrollbars; measured: 1280px wide before, 1265px
   // after. Held open permanently, the width never changes: a page that
   // scrolls looks the same as one that does not, and hiding the overflow
   // (components/_modal.scss) moves nothing.

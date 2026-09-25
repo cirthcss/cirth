@@ -41,7 +41,7 @@
     //    containing one engine's pseudo-element is discarded whole by the
     //    other engine. The token can: custom properties inherit into these
     //    pseudo-elements, which is how they already read their own colours,
-    //    so neutralising it here reaches every transition built from it —
+    //    so neutralising it here reaches every transition built from it:
     //    including any a consumer writes.
     --cirth-transition: var(--cirth-duration-instant) var(--cirth-ease-out); // 5
   }

@@ -24,7 +24,7 @@
 // Runs through the same schemes.apply() wiring as the base themes, so
 // each override lands on exactly the selector it overrides and wins on
 // source order. Ratios in the comments below are measured against the
-// worst surface of each scheme — the paper canvas in light, a card in
+// worst surface of each scheme: the paper canvas in light, a card in
 // dark, so they hold everywhere the token is used.
 
 @mixin light {
@@ -40,7 +40,7 @@
   --cirth-h5-color: var(--cirth-color);
   --cirth-h6-color: var(--cirth-color);
 
-  // Secondary inks: 8.7:1 or better, up from 5.0:1 — still subordinate, no
+  // Secondary inks: 8.7:1 or better, up from 5.0:1, still subordinate, no
   // longer AA-and-no-further.
   --cirth-muted-color: #{$neutral-700};
   --cirth-secondary-text: #{$neutral-700};
@@ -56,7 +56,7 @@
   // so the contrast pass has to re-bake them: --cirth-muted-color climbing
   // here does not reach a data URI. Without this the masked chevrons in
   // the accordion and the dropdown would strengthen while the <select>,
-  // date, time and search icons stayed at the base tone — the split this
+  // date, time and search icons stayed at the base tone: the split this
   // pass exists to avoid.
   --cirth-icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-700)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   --cirth-icon-date: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-700)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
@@ -112,7 +112,7 @@
   // so the contrast pass has to re-bake them: --cirth-muted-color climbing
   // here does not reach a data URI. Without this the masked chevrons in
   // the accordion and the dropdown would strengthen while the <select>,
-  // date, time and search icons stayed at the base tone — the split this
+  // date, time and search icons stayed at the base tone: the split this
   // pass exists to avoid.
   --cirth-icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-250)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   --cirth-icon-date: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-250)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
@@ -123,7 +123,7 @@
   --cirth-link-visited-color: #{$neutral-250};
 
   // 3.7:1 and 6.2:1, up from 1.2:1 and 3.1:1. The card border is normally
-  // the card background — an invisible seam, and becomes a real edge
+  // the card background: an invisible seam, and becomes a real edge
   // here.
   --cirth-muted-border-color: #{$neutral-500};
   --cirth-card-border-color: var(--cirth-muted-border-color);

@@ -34,7 +34,7 @@
         // paints its chevron at --cirth-space-3 from the border (see
         // forms/_basics.scss). The translate bridges exactly that
         // difference, so the chevron lands at --cirth-space-3 from the edge
-        // for any trigger padding. (Inherited Pico hardcoded 0.2rem here —
+        // for any trigger padding. (Inherited Pico hardcoded 0.2rem here:
         // an eyeballed approximation of this 0.25rem gap.)
         transform: rotate(0deg)
           translateX(

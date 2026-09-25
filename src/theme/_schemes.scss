@@ -8,8 +8,8 @@
    * Color scheme switching
    */
 
-// Every part of these selectors that only *filters* which scheme applies —
-// the data-theme tests — sits inside :where(), which contributes nothing to
+// Every part of these selectors that only *filters* which scheme applies,
+// the data-theme tests, sits inside :where(), which contributes nothing to
 // specificity. What is left is the root itself: :root (0,1,0) unscoped, the
 // wrapper class in the scoped builds.
 
@@ -35,7 +35,7 @@
 
 // So the values moved: theme/_dual.scss states each scheme difference once,
 // at the root, as a light-dark() pair. These blocks kept what genuinely
-// belongs to a scheme — color-scheme itself, the derived tokens whose
+// belongs to a scheme: color-scheme itself, the derived tokens whose
 // *formula* differs rather than just their value, the aliases that have to
 // re-resolve per scheme, and the icons a data URI cannot derive. What they
 // no longer do is shadow a consumer.

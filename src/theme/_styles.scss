@@ -28,8 +28,8 @@
   // elements (checkboxes, code) are capped so they never read as circles.
   --cirth-border-radius: var(--cirth-radius-sm);
 
-  // Derived, not a second independent step. The pair — a container one step
-  // softer than the controls inside it — is one of the few things about
+  // Derived, not a second independent step. The pair (a container one step
+  // softer than the controls inside it) is one of the few things about
   // Cirth that survives a retheme (see docs/brand.md), so it is stated as a
   // relationship rather than as two numbers that happen to be 1.5 apart.
   // It also makes the documented promise true: zeroing the knob used to
@@ -66,7 +66,7 @@
   // --cirth-spacing is the *flow* knob, and that is the whole of its
   // contract. It times the space between blocks, the gaps in a `.grid`,
   // and the padding of the document-content blocks that are made of
-  // running text — <pre>, <blockquote>, table cells. It deliberately does
+  // running text: <pre>, <blockquote>, table cells. It deliberately does
   // not time the padding inside an interactive control or inside a card:
   // those are the two families below, each pinned to the space scale
   // directly, for reasons stated where they are declared. Setting it opens
@@ -96,7 +96,7 @@
   );
 
   // `.container` center-track cap (also consumed classless, by the
-  // body > header/main/footer grid in layout/_landmarks.scss) — a
+  // body > header/main/footer grid in layout/_landmarks.scss): a
   // reading/app-shell-friendly measure, not full-viewport.
   --cirth-container-max-width: 60rem;
 
@@ -109,7 +109,7 @@
   }
 
   // Spacings for form elements and button
-  // Controls have a 2.75rem (44px) floor — the WCAG 2.5.5 target size.
+  // Controls have a 2.75rem (44px) floor: the WCAG 2.5.5 target size.
   // Component rules keep that floor independent from paint geometry, so a
   // consumer can change the border width without silently shrinking an
   // interactive target. A nav opts down to a 40px band, still clear of
@@ -119,7 +119,7 @@
   // is the deliberate half of the flow knob's contract: this pair is what
   // the one-line control height is computed from, so hanging it off a
   // density knob would let "open the page up a little" walk a target size
-  // — the one measurement here that has a normative floor under it.
+  // The one measurement here that has a normative floor under it.
   // Override the pair directly to change control density.
   --cirth-form-element-spacing-vertical: var(--cirth-space-2);
   --cirth-form-element-spacing-horizontal: var(--cirth-space-4);
@@ -141,7 +141,7 @@
   // The frame is progress's, borrowed rather than duplicated: same track,
   // same border, so the two read as a matched pair and retheming one
   // rethemes both. What goes *inside* the frame is a meter's own, because
-  // the two elements mean different things — progress is a task running to
+  // the two elements mean different things: progress is a task running to
   // completion, a meter is a reading that can be good or bad, and those
   // value colors are scheme-dependent (see theme/_light.scss).
   --cirth-meter-background-color: var(--cirth-progress-background-color);
@@ -156,7 +156,7 @@
 
   // Wide enough for a panel or a menu, capped so a single long line cannot
   // run the width of the screen. Not a statement about what belongs in a
-  // popover — override it per popover where the content asks for it.
+  // popover; override it per popover where the content asks for it.
   --cirth-popover-max-width: min(30rem, 100% - var(--cirth-spacing) * 2);
 
   // Modal (<dialog>)
@@ -179,14 +179,14 @@
 
   // Checkboxes icons
   // Applied as masks (forms/_checkbox-radio-switch.scss), so only the
-  // alpha channel is read and the stroke colour below is inert — the
+  // alpha channel is read and the stroke colour below is inert: the
   // visible colour comes from the ::before background. Kept as a flat
   // black so nothing suggests the value still means something.
   --cirth-icon-checkbox: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
   --cirth-icon-minus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='5' y1='12' x2='19' y2='12'%3E%3C/line%3E%3C/svg%3E");
 
   // Close icon
-  // Masked too (components/_modal.scss) — same note as the check above.
+  // Masked too (components/_modal.scss): same note as the check above.
   --cirth-icon-close: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='18' y1='6' x2='6' y2='18'%3E%3C/line%3E%3Cline x1='6' y1='6' x2='18' y2='18'%3E%3C/line%3E%3C/svg%3E");
 
   // Loading icon (animated)
@@ -226,7 +226,7 @@
   // Small
   // `--cirth-font-size` was set here but never consumed as `font-size` on
   // this selector, so `<small>` silently fell back to the browser's
-  // `smaller` keyword (~83%) instead of this token's 0.875em — close
+  // `smaller` keyword (~83%) instead of this token's 0.875em, close
   // enough that it went unnoticed, but the token is the intended, themeable
   // value (normalize's own `small { font-size: 80% }` would have been no
   // more correct, just as unconsumed).
@@ -242,7 +242,7 @@
   // to top out at 2.75rem (44px at the shipped root size), which is a
   // landing-page heading; every product page and this project's own
   // documentation inherited that campaign scale by default and nobody
-  // asked for it. The ladder below runs 44 / 32 / 24 / 20 / 18 / 16 —
+  // asked for it. The ladder below runs 44 / 32 / 24 / 20 / 18 / 16:
   // six distinct steps read straight off the font-size scale, fluid down
   // to h3, because that is where viewport width still makes a
   // difference and below it a heading is just a label.
@@ -333,7 +333,7 @@
   // controls that sit inside them
   article {
     // The other half of the flow knob's contract. Both sides of this
-    // relationship are named on the space scale — space-5 here against the
+    // relationship are named on the space scale: space-5 here against the
     // controls' space-4, so a container stays one step more generous than
     // the controls inside it at every setting of --cirth-spacing. Derived
     // from the knob instead, the two would cross the moment a preset moved
@@ -403,7 +403,7 @@
     --cirth-border-width: var(--cirth-border-width-2);
   }
 
-  // A 1.5em box at the full control radius would read as a circle —
+  // A 1.5em box at the full control radius would read as a circle:
   // keep checkboxes visibly square-cornered
   [type="checkbox"] {
     --cirth-border-radius: var(--cirth-checkbox-border-radius);

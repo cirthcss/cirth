@@ -66,7 +66,7 @@ Two rules that sound pedantic and are not:
 
 Copy [`TEMPLATE.md`](TEMPLATE.md) to `specs/<short-slug>.md`. Name it after the
 change, not the issue number, so it is still findable when the tracker is not
-to hand — `accent-token-roles.md`, not `issue-96.md`. Link the issue from the
+to hand: `accent-token-roles.md`, not `issue-96.md`. Link the issue from the
 header instead.
 
 [`accent-token-roles.md`](accent-token-roles.md) is a worked example.

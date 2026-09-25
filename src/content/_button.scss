@@ -58,7 +58,7 @@
 
   // The 44px target size (WCAG 2.5.5), as a floor rather than as an
   // outcome. The padding and line-height below add up to it at the default
-  // type scale and stop doing so the moment anyone changes the font-size —
+  // type scale and stop doing so the moment anyone changes the font-size:
   // a button at 0.875rem came out at 40.75px. Measured from
   // --cirth-font-size-md rather than from the element's own font-size, so the
   // floor stays put when the type does not, and matched by the same floor
@@ -123,7 +123,7 @@
       0 0 0 var(--cirth-outline-width) var(--cirth-primary-focus);
 
     // Invisible in normal rendering, but forced-colors mode strips
-    // box-shadow and repaints transparent outlines with a system color —
+    // box-shadow and repaints transparent outlines with a system color:
     // without this, keyboard focus disappears in Windows High Contrast.
     outline: var(--cirth-outline-width) solid transparent;
   }
@@ -238,7 +238,7 @@
 
   // Outline and ghost
   // Two quiet variants that differ in one thing: whether the control owns
-  // an opaque surface. Outline does — it paints the control colour, so it
+  // an opaque surface. Outline does: it paints the control colour, so it
   // stays a control wherever it sits instead of letting the backdrop show
   // through, and it draws a border. Ghost owns neither, and only becomes
   // visible when the pointer arrives.
@@ -246,8 +246,8 @@
   // rather than by swapping to a filled treatment: the point of a quiet
   // button is that it stays quiet, and a wash is enough to say it is live.
   // Ghost mixes toward transparent rather than toward the canvas so the
-  // wash composites over whatever it is actually on — a card, a header, a
-  // popover — while outline, already opaque, mixes toward the canvas it
+  // wash composites over whatever it is actually on (a card, a header, a
+  // popover) while outline, already opaque, mixes toward the canvas it
   // is painting.
   // The border stays declared as transparent on ghost rather than removed:
   // a border-width of zero would resize the control, and these two are
@@ -483,7 +483,7 @@
 }
 
 // Submit control of a form the reader has made invalid
-// Visual only, deliberately not [disabled]/pointer-events: none — the
+// Visual only, deliberately not [disabled]/pointer-events: none: the
 // button stays clickable so a submit attempt still triggers the browser's
 // native constraint-validation UI (the "Please fill in this field"
 // bubbles), which a truly disabled/inert control could never surface.
@@ -496,7 +496,7 @@
 
 // :has(:user-invalid), not :invalid. `form:invalid` is true from first
 // paint for any form holding a `required` field, so a login form nobody
-// has touched yet drew its submit in grey — the previous version of this
+// has touched yet drew its submit in grey: the previous version of this
 // rule said so in a comment and accepted it. It does not have to be
 // accepted: the fields in the same form already wait for interaction
 // (forms/_basics.scss binds the invalid treatment to :user-invalid, not

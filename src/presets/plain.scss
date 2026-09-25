@@ -23,7 +23,7 @@
   @include selectors.theme-roots {
     // A single pair per token covers both schemes. light-dark() is resolved
     // where the token is used, so these hold inside a subtree that forces a
-    // scheme too — no second block, no scheme wiring.
+    // scheme too: no second block, no scheme wiring.
     --cirth-primary: light-dark(oklch(52% 0.17 258deg), oklch(72% 0.13 258deg));
 
     // Plain white rather than warm paper. Card, form, code, dropdown and

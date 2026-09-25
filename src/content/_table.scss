@@ -56,7 +56,7 @@
 
 // Cells
 
-// Cells stay transparent so tables inherit the surface they sit on —
+// Cells stay transparent so tables inherit the surface they sit on:
 // painting var(--cirth-background-color) here showed the *page* background
 // inside cards (upstream #497)
 
@@ -84,9 +84,9 @@
 // Form controls placed directly in cells (gh#108). A cell's padding plus a
 // full 44px bordered control reads as a box inside a box; this variant
 // hands most of the cell's padding to the control instead, so a row of
-// fields reads as one surface. The controls themselves are untouched —
+// fields reads as one surface. The controls themselves are untouched:
 // their borders, states, focus ring and target size are the ones every
-// form uses — because the border is what identifies a field as a field
+// form uses, because the border is what identifies a field as a field
 // (WCAG 1.4.11). Headers are not a substitute for a label: name each
 // control, e.g. with aria-labelledby pointing at its row and column
 // headers.

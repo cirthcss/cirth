@@ -25,7 +25,7 @@
 
 // Every element a build declares the theme on, whichever build is loaded:
 // the document root or a shadow host unscoped, the wrapper when scoped.
-// For a stylesheet compiled once for all builds — a preset. With only
+// For a stylesheet compiled once for all builds: a preset. With only
 // :root it would stop at a scoped wrapper, which redeclares every token on
 // itself, and a declaration there beats one inherited from :root. The
 // wrapper is the one src/cirth*.scoped.scss configure as $parent-selector.

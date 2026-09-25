@@ -44,7 +44,7 @@ $visible-group-item: ':not([hidden], input[type="hidden"])';
     // Fields are width: 100% globally, which as flex-basis: auto would
     // claim a whole wrapped line for themselves now that the group wraps.
     // Basis 0 lets them sit beside content-sized buttons, and the dominant
-    // grow factor hands them virtually all the free space — while groups
+    // grow factor hands them virtually all the free space, while groups
     // made of buttons alone still share the row evenly (grow 1 each).
     &:is(input, select, textarea) {
       flex: 99 1 0%;
@@ -102,7 +102,7 @@ $visible-group-item: ':not([hidden], input[type="hidden"])';
   ) {
     --cirth-group-box-shadow: var(--cirth-group-box-shadow-focus-with-button);
 
-    // [aria-invalid] siblings keep their state border — hiding it while
+    // [aria-invalid] siblings keep their state border: hiding it while
     // the button has focus dropped the invalid signal (upstream #536)
     input:not([type="checkbox"], [type="radio"], [aria-invalid]),
     select:not([aria-invalid]) {

@@ -3,13 +3,13 @@
 // One name, and only one, for the builds, the print sheets and the presets
 // alike. They merge into the same layer, so between Cirth's own stylesheets
 // the cascade is exactly what it was before the layer existed: specificity,
-// then source order — build, then preset, then print. What the layer
+// then source order: build, then preset, then print. What the layer
 // changes is the other side: any rule a consumer writes outside a layer
 // beats every rule in here, whatever its specificity and wherever it loads.
 
 // Deliberately flat. Ordered sub-layers would let a later layer beat an
 // earlier one at any specificity, which reorders Cirth's own rules against
-// each other — measured, it changes rendered output (specs/cascade-layer.md).
+// each other: measured, it changes rendered output (specs/cascade-layer.md).
 
 // This mixin is the only place the name is written in src/.
 // scripts/lib/dist-manifest.js names it for the checks that hold every

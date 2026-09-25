@@ -68,15 +68,15 @@
 // Firefox's own native picker icon is hidden for date and datetime-local
 // Firefox draws its own native picker icon for [type="date"] and
 // [type="datetime-local"] (verified against unstyled inputs) but not for
-// [type="month"], [type="week"], or [type="time"], and — unlike
-// Chromium/WebKit — gives no pseudo-element to opacity: 0 it away (no
+// [type="month"], [type="week"], or [type="time"], and, unlike
+// Chromium/WebKit, gives no pseudo-element to opacity: 0 it away (no
 // ::-moz-calendar-picker-indicator), so stacking our own SVG on top of
 // date/datetime-local used to produce two icons there.
 // `color: transparent` hides it: Firefox paints that icon using the
 // element's `color`, decoupled from the field's actual text glyphs, which
 // are repainted independently via the non-standard but Firefox-supported
 // `-webkit-text-fill-color`. An explicit color is required on that
-// property — `currentColor` resolves circularly to the `color: transparent`
+// property: `currentColor` resolves circularly to the `color: transparent`
 // set right above it on the same element, hiding the text along with the
 // icon. Interaction is unaffected: the (now invisible) native icon's
 // picker button still opens Firefox's date picker on click, so this only

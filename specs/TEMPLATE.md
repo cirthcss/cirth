@@ -15,7 +15,7 @@ still know whether this affects them.>
 What Cirth promises once this lands, stated so that it can be falsified.
 
 Say what the change does **not** promise too. Most support questions come from
-a reasonable reading of a contract that was never written down — name the
+a reasonable reading of a contract that was never written down: name the
 reading you are ruling out.
 
 ## Evidence ledger
@@ -27,7 +27,7 @@ reading you are ruling out.
 | <a claim that did not hold> | <what was actually observed> | <where> | Invalid |
 
 Verdicts: **Verified** (reproduced here, now) · **Reported** (believed, not
-reproduced) · **Invalid** (did not support its label — keep the row).
+reproduced) · **Invalid** (did not support its label; keep the row).
 
 ## Decisions
 

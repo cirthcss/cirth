@@ -8,7 +8,7 @@
   // Font families
   // Single source for every font stack. Components read the role tokens
   // set in theme/_styles.scss (--cirth-font-family, -display), which point
-  // back here — don't redeclare these stacks anywhere else.
+  // back here; don't redeclare these stacks anywhere else.
   --cirth-font-family-emoji:
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --cirth-font-family-sans:
@@ -26,7 +26,7 @@
   // 7xl bound h1. Before, the ladder stopped at 2.3rem while h1 ran to
   // 3.5rem, so the scale could not express the headings it was supposed
   // to govern and the top five steps had no consumer at all. Overriding a
-  // step still moves the heading it bounds — the fluidity lives in the
+  // step still moves the heading it bounds: the fluidity lives in the
   // clamp, the sizes live here.
   --cirth-font-size-xs: 0.75rem;
   --cirth-font-size-sm: 0.875rem;
@@ -48,10 +48,10 @@
   --cirth-font-weight-bold: 700;
 
   // Letter spacing
-  // Negative tracking for display sizes only — body text stays at normal.
+  // Negative tracking for display sizes only: body text stays at normal.
   // Both steps have consumers: -tight on h1/h2, -snug on h3/h4 (see
   // theme/_styles.scss). -tight moved from -0.02em to -0.03em when the
-  // heading scale went back up — a token that names the tracking for the
+  // heading scale went back up: a token that names the tracking for the
   // largest type on the page has to be worth setting at that size.
   --cirth-letter-spacing-tight: -0.03em;
   --cirth-letter-spacing-snug: -0.01em;
@@ -91,7 +91,7 @@
 
   // Stroke widths
   // One ladder for borders and outlines both. They used to be two, with
-  // identical values step for step — the same duplication the old size
+  // identical values step for step: the same duplication the old size
   // scale had against the spacing scale, and the same fix: one scale, with
   // the role tokens (--cirth-border-width, --cirth-outline-width in
   // theme/_styles.scss) deciding which step each use gets.
