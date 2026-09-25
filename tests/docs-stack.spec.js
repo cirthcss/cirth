@@ -806,9 +806,10 @@ test("the navbar states are a contrast ladder, not the accent", async ({
 
 // Four claims and two more below them, and what is worth pinning is no
 // longer only that each has a path to check it: it is that each says what
-// kind of claim it is. A guarantee, a capability and a measurement age
-// differently, and a page that presents them identically is promising the
-// measurement.
+// kind of claim it is. A guarantee and a capability age differently, and a
+// page that presents them identically is promising the weaker one. The
+// strip used to carry a measurement as well; the byte count now lives on
+// /deploy, where a reader is deciding something with it.
 test("every claim says what kind it is, and how to check it", async ({
 	page,
 }) => {
@@ -822,7 +823,7 @@ test("every claim says what kind it is, and how to check it", async ({
 		"0 B JS runtime",
 		"WCAG 2.2 AA baseline",
 		"Flexible distribution",
-		"Small CSS footprint",
+		"Small by construction",
 	]) {
 		await expect(
 			page.locator(".docs-proof-metrics", { hasText: value }),
@@ -845,8 +846,10 @@ test("every claim says what kind it is, and how to check it", async ({
 		).not.toBe("");
 	}
 
-	// The vocabulary is three words, used by both halves of the section —
-	// the strip and the list under it — so a reader learns it once.
+	// The vocabulary is shared by both halves of the section, the strip and
+	// the list under it, so a reader learns it once. Two of its three words
+	// are in use here; "Current fact" left with the size cell and the macro
+	// keeps it for whatever states a measurement next.
 	const kinds = await page
 		.locator(".docs-proof .docs-proof-state")
 		.evaluateAll((marks) => marks.map((mark) => mark.textContent?.trim()));
@@ -854,21 +857,22 @@ test("every claim says what kind it is, and how to check it", async ({
 		"Guarantee",
 		"Guarantee",
 		"Capability",
-		"Current fact",
+		"Guarantee",
 		"Guarantee",
 		"Capability",
 	]);
 
-	// The size is the one current fact, and it is stated as a measurement of
-	// this build rather than as a ceiling: a real number, in the caption
-	// that dates it, with the check beside it. A bare "<14 KB" headline is
-	// the shape of a promise, and the page does not make that one — the
-	// budget is a build guard, not a claim to a reader.
-	const size = cells.nth(3);
-	await expect(size.locator("dd > strong")).toHaveText("Small CSS footprint");
-	await expect(size.locator("dd small")).toContainText(/\d+(\.\d+)? KB/);
-	await expect(size.locator("dd small")).toContainText("this build");
+	// The size is not a claim on this page at all now. What the strip states
+	// is the model the size follows from, and the byte count moved to
+	// /deploy where it is something a reader acts on rather than scores the
+	// project by. A bare "<14 KB" headline is the shape of a promise the
+	// project does not make; so is any figure standing on its own up here,
+	// which is why the strip is asserted to carry no byte count.
+	const model = cells.nth(3);
+	await expect(model.locator("dd > strong")).toHaveText("Small by construction");
+	await expect(model.locator("dd small")).toContainText("no component catalogue");
 	await expect(page.locator(".docs-proof")).not.toContainText("<14 KB");
+	await expect(page.locator(".docs-proof")).not.toContainText(/\d+(\.\d+)? KB/);
 
 	// No claim rests on a count of builds either. "4 builds" was accurate,
 	// and the promise it implied — that there will always be exactly four —
