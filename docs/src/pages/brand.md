@@ -79,8 +79,9 @@ against the outgoing drawing would be wrong about the incoming one.
 
 Cirth is not affiliated with, endorsed by, or associated with the
 Tolkien estate, the Tolkien Society, Amazon's Middle-earth adaptations,
-or any other rights holder. The name is a reference to a real-world
-writing system, not a claim of license or partnership.
+or any other rights holder. The Cirth is a script Tolkien devised, and
+naming a stylesheet after it is a reference, not a claim of license or
+partnership. The mark and the wordmark are the project's own work.
 
 <div class="docs-brand-grid">
   <figure class="docs-brand-tile" data-theme="light">
