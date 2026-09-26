@@ -3040,103 +3040,11 @@ details.docs-toc-top {
   }
 }
 
-/* Brand specification: original assets remain untouched; the responsive
-   experiment is presented as a measurable system, not a logo gallery. */
+/* Brand specification panels: a bordered grid of named measurements. Used
+   for the proportions the interface keeps across presets, and for the
+   mark measurements still waiting on the definitive drawing. */
 .docs-brand-spec {
   margin-block: 2rem 5rem;
-}
-
-.docs-brand-construction {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  min-height: 28rem;
-}
-
-/* No `margin: 0`: `figure { margin: 0 }` is the framework's. */
-.docs-brand-construction figure {
-  display: grid;
-  grid-template-rows: 1fr auto;
-  border-inline-end: var(--cirth-border-width) solid
-    var(--cirth-card-border-color);
-}
-
-.docs-brand-construction figure:last-child {
-  border-inline-end: 0;
-}
-
-.docs-brand-construction figure > :first-child {
-  align-self: center;
-  justify-self: center;
-}
-
-.docs-brand-construction figcaption {
-  display: grid;
-  gap: 0.25rem;
-  padding: 0.75rem 1rem;
-  border-block-start: var(--cirth-border-width) solid
-    var(--cirth-muted-border-color);
-  font-family: var(--cirth-font-family-mono);
-  font-size: var(--cirth-font-size-xs);
-}
-
-.docs-mark-clearspace {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: min(80%, 22rem);
-  aspect-ratio: 1;
-  border: 1px dashed var(--cirth-primary-text);
-  background-image: var(--docs-grid-dots);
-  background-size: 1rem 1rem;
-}
-
-.docs-mark-clearspace::before,
-.docs-mark-clearspace::after {
-  position: absolute;
-  color: var(--cirth-primary-text);
-  font-family: var(--cirth-font-family-mono);
-  font-size: var(--cirth-font-size-xs);
-  content: "0.5x";
-}
-
-.docs-mark-clearspace::before {
-  inset-block-start: 0.35rem;
-  inset-inline-start: 0.5rem;
-}
-
-.docs-mark-clearspace::after {
-  inset-block-end: 0.35rem;
-  inset-inline-end: 0.5rem;
-}
-
-.docs-mark-clearspace img {
-  width: 54%;
-}
-
-.docs-mark-clearspace i {
-  position: absolute;
-  background: var(--cirth-muted-border-color);
-}
-
-.docs-mark-clearspace .axis-x {
-  inset-inline: 0;
-  inset-block-start: 50%;
-  height: 1px;
-}
-
-.docs-mark-clearspace .axis-y {
-  inset-block: 0;
-  inset-inline-start: 50%;
-  width: 1px;
-}
-
-.docs-mark-low picture {
-  display: grid;
-  place-items: center;
-  width: 4rem;
-  height: 4rem;
-  border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-  background: var(--cirth-background-color);
 }
 
 /* `.grid` plus a <dl>, divided by its own gap ; see .docs-proof-metrics.
@@ -3164,17 +3072,6 @@ details.docs-toc-top {
 }
 
 @media (width < 48rem) {
-  .docs-brand-construction {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .docs-mark-blueprint {
-    grid-column: 1 / -1;
-    min-height: 24rem;
-    border-block-end: var(--cirth-border-width) solid
-      var(--cirth-muted-border-color);
-  }
-
   .docs-brand-measures {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

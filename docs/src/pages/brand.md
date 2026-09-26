@@ -20,8 +20,8 @@ integrations, and anywhere else the project is named.
     different pigment.</p>
   </header>
   <dl class="grid docs-brand-measures">
-    <div><dt>Container corner</dt><dd><code>9px</code> · <code>--cirth-card-border-radius</code></dd></div>
-    <div><dt>Control corner</dt><dd><code>6px</code> · <code>--cirth-border-radius</code></dd></div>
+    <div><dt>Container corner</dt><dd>{% if proof.radius and proof.radius.container %}<code>{{ proof.radius.container }}</code> · {% endif %}<code>--cirth-card-border-radius</code></dd></div>
+    <div><dt>Control corner</dt><dd>{% if proof.radius and proof.radius.control %}<code>{{ proof.radius.control }}</code> · {% endif %}<code>--cirth-border-radius</code></dd></div>
     <div><dt>Resting edge</dt><dd><code>1px</code>, all four sides, every button variant</dd></div>
     <div><dt>Target floor</dt><dd><code>44px</code> controls · <code>40px</code> in a nav</dd></div>
     <div><dt>Card contract</dt><dd>Tinted header band · <code>12/20px</code> · padded body</dd></div>
@@ -45,56 +45,43 @@ takes the interface out of the system.
 
 ## The mark
 
-The Cirth mark is a rune-form monogram: angular strokes that read as a
-carved "C". It references the project's namesake, the Cirth runic
-alphabet used by Tolkien's Dwarves, designed for carving into hard
-surfaces so every letter is reduced to the strokes the material allows.
-The same reduction, keeping only what the medium requires, is the
-engineering constraint the framework itself is built around: keep only
-what the medium requires, and watch the size of what is left. See
-[About Cirth](/about#size-and-what-it-is-a-budget-for) for how the budgets
-work, and why they are a guard rather than a promise.
+Cirth's name comes from a writing system, and the mark is the project's
+own sign rather than a letter borrowed from one. It carries the copper the
+interface uses for action and position, and it is built to hold at the
+sizes technical work actually puts it in: a README header, an npm listing,
+a favicon, a tab strip.
 
-<section class="docs-brand-spec" aria-labelledby="brand-spec-title">
+The mark is being redrawn. The files in the grid below are the current
+ones and remain the assets to use until they are replaced; the geometry
+that describes them (construction grid, clearspace, minimum size,
+alignment in the lockup) is not published here, because a rule measured
+against the outgoing drawing would be wrong about the incoming one.
+
+<section class="docs-brand-spec" aria-labelledby="mark-pending-title">
   <header class="docs-brand-spec-header">
-    <h2 id="brand-spec-title">One mark, three levels of fidelity.</h2>
+    <h2 id="mark-pending-title">Measured on the mark, not before it.</h2>
+    <p>Everything in this list is a number, and a number about a drawing
+    can only be taken off that drawing. Each one is specified here once the
+    definitive mark is in the repository, and not sooner. What the rest of
+    this page documents does not depend on the drawing and is current:
+    the colour roles, the typographic voice, the proportions of the
+    interface, the terms of use.</p>
   </header>
-  <div class="docs-brand-construction">
-    <figure class="docs-mark-blueprint">
-      <div class="docs-mark-clearspace">
-        <img src="/logo_brand.svg" alt="Full Cirth monogram over its construction grid" width="240" height="240" />
-        <i class="axis-x" aria-hidden="true"></i>
-        <i class="axis-y" aria-hidden="true"></i>
-      </div>
-      <figcaption><strong>High fidelity</strong><span>Full five-part mark · 48px and above</span></figcaption>
-    </figure>
-    <figure class="docs-mark-medium">
-      <img src="/logo_brand.svg" alt="Full Cirth monogram at medium size" width="48" height="48" />
-      <figcaption><strong>Medium fidelity</strong><span>Full mark · 24–47px</span></figcaption>
-    </figure>
-    <figure class="docs-mark-low">
-      <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="/mark_small_dark.svg" />
-        <img src="/mark_small.svg" alt="Optically simplified Cirth small-size mark" width="20" height="20" />
-      </picture>
-      <figcaption><strong>Low fidelity</strong><span>Four-part optical mark · 16–23px</span></figcaption>
-    </figure>
-  </div>
   <dl class="grid docs-brand-measures">
-    <div><dt>Base unit</dt><dd><code>8px</code></dd></div>
-    <div><dt>Micro unit</dt><dd><code>4px</code></dd></div>
-    <div><dt>Primary joint</dt><dd><code>45°</code></dd></div>
-    <div><dt>Clearspace</dt><dd><code>0.5 × mark width</code></dd></div>
-    <div><dt>Signal hue</dt><dd><code>44°</code></dd></div>
-    <div><dt>Minimum size</dt><dd><code>16px optical</code></dd></div>
+    <div><dt>Clearspace</dt><dd>Pending the definitive mark</dd></div>
+    <div><dt>Minimum size</dt><dd>Pending the definitive mark</dd></div>
+    <div><dt>Construction grid</dt><dd>Pending the definitive mark</dd></div>
+    <div><dt>Size thresholds</dt><dd>Pending the definitive mark</dd></div>
+    <div><dt>Lockup alignment</dt><dd>Pending the definitive mark</dd></div>
+    <div><dt>Reduced variant</dt><dd>Pending the definitive mark</dd></div>
   </dl>
 </section>
 
-
 Cirth is not affiliated with, endorsed by, or associated with the
 Tolkien estate, the Tolkien Society, Amazon's Middle-earth adaptations,
-or any other rights holder. The name is a reference to a real-world
-writing system, not a claim of license or partnership.
+or any other rights holder. The Cirth is a script Tolkien devised, and
+naming a stylesheet after it is a reference, not a claim of license or
+partnership. The mark and the wordmark are the project's own work.
 
 <div class="docs-brand-grid">
   <figure class="docs-brand-tile" data-theme="light">
@@ -149,7 +136,9 @@ writing system, not a claim of license or partnership.
 
 Each variant above is downloadable as SVG (preferred) or PNG. The full set
 lives in
-[`docs/public/`](https://github.com/cirthcss/cirth/tree/master/docs/public),
+[`docs/public/`](https://github.com/cirthcss/cirth/tree/master/docs/public)
+and is catalogued in
+[`docs/BRAND_ASSETS.md`](https://github.com/cirthcss/cirth/blob/master/docs/BRAND_ASSETS.md),
 including the two combinations this grid does not show: the mono mark on
 its own background tile, light and dark, for square containers that have to
 stay one colour.
@@ -162,21 +151,22 @@ avatars, bookmark icons. Not for inline use next to text.
 
 ## Operational rules
 
-Use the full mark above 24px and switch to the optical small-size mark for
-favicon-scale contexts. The optical variant preserves the incised “C”,
-removes the detached origin accent, and fills more of its view box. It is an
-experimental responsive asset; the original SVG files remain unchanged.
+Pick the variant by what the surface can carry, not by taste: **brand**
+wherever colour is available, **mono** wherever one flat ink is preferable
+or required, the **icon tile** wherever the mark has to fill a square. Give
+the mark a margin of clear space on every side and keep other elements out
+of it. How much, exactly, is one of the numbers waiting on the definitive
+mark; until it is measured, err generous.
 
-The 45° joint is a structural device for diagram junctions, section
-terminals, and large composition crops. Do not apply it to every card,
-button, or input. Keep clearspace equal to half the visible mark width.
+The mark is a sign, not a pattern. It marks the project once on a surface:
+in a header, on a card, at the foot of a page. It is not a texture, a
+watermark, a bullet, or a shape to repeat behind content.
 
 ### Incorrect use
 
-Do not stretch, rotate, outline, add a glow, put the mark on low-contrast
-surfaces, repeat it as wallpaper, or pair it with fantasy imagery. Do not
-use the small-size variant above 24px, where its reduced detail becomes
-unnecessarily blunt.
+Do not stretch it, rotate it, outline it, add a glow or a shadow, recolour
+it outside the variants published here, place it on a surface it has no
+contrast against, repeat it as wallpaper, or pair it with fantasy imagery.
 
 ## Color
 
@@ -269,18 +259,20 @@ it narrowest, Helvetica and Arial about 2.5% wider, so the box reserves
 room for the widest face in the stack and a narrower one leaves a little air
 on the right. That is the intended behaviour, not a mis-export.
 
-### Which asset, at which size
+### Which asset, for which context
 
 | Context | Asset | Why |
 | --- | --- | --- |
-| Name and mark together, 128px wide and up | Lockup | Below 128px the mark inside it drops under its own 24px floor |
+| Name and mark together, with room for both | Lockup | Carries the name where the surrounding text does not |
 | Square container: favicon, avatar, app tile | Icon tile | The mark fills the square; the lockup cannot |
-| Inline beside text, 24px and up | Full mark | Five-part mark at medium fidelity |
-| 16–23px | Optical small mark | Fewer parts, tighter box |
+| Beside text that already names the project | Mark | The name is in the sentence; the mark identifies it |
+| One flat ink: print, badges, embossing | Mono mark or mono lockup | No second colour to lose |
 
 The lockup does not replace the mark at small sizes. Shrinking it until the
 name is legible makes the mark illegible first; at that point the mark alone
-is the correct asset and the name belongs in the text next to it.
+is the correct asset and the name belongs in the text next to it. The size
+each asset stops working at is a measurement, and it is
+[waiting on the definitive mark](#the-mark).
 
 ## Typography
 
@@ -302,25 +294,37 @@ The mark is built to survive small, high-contrast, low-color placements:
 READMEs, npm listings, CI badges, terminal output headers, favicons. Use
 the **mono** variant wherever a single flat color is preferable to copper
 (badges, print, embossing, low-color terminals), and the **icon** tile
-wherever the mark needs to fill a square container. Don't pair the mark
-with fantasy-styled illustration, parchment or stone textures, or
-medieval typography: the mark itself carries the reference to the name;
-the surrounding presentation should stay contemporary and technical.
+wherever the mark needs to fill a square container. Keep what surrounds it
+contemporary and technical: no fantasy illustration, no parchment or stone
+texture, no medieval lettering. Cirth is named after a writing system, and
+a page that dresses up the reference reads as a theme rather than as a
+tool.
 
 ## Voice
 
 Cirth's writing is technical but accessible, precise, and evidence-led:
 assertive about what is verified, transparent about trade-offs, and never
-ideological. Prefer *claim → mechanism → proof*: state what the
-framework does, explain how, then point at something checkable (a script,
-a number, a source file).
+ideological. Prefer *claim → mechanism → proof*. State what the framework
+does, explain how it does it, then point at something checkable: a script,
+a number, a source file.
 
-Favor words like **native**, **runtime**, **tokens**, **scope**,
-**integrate**, **verify**, **ship**, **baseline**, **size budget**, and
-**browser primitives**. Avoid **purity**, **timeless**, **philosophy**,
-**framework dialect**, and repeated carving metaphors outside the name's
-origin story, and avoid unverifiable claims such as "nothing to break,"
-"fully accessible," or "always delivered in one round trip."
+The subject is a language and what it is made of, so the vocabulary is
+too. Favour **semantics**, **structure**, **syntax**, **vocabulary**,
+**grammar**, **relation**, **scope**, **token**, **runtime**, **source**,
+**output**, **native**, **integrate**, **baseline**, **verify** and
+**transformation**.
+
+Two habits to avoid. The first is the workshop register: **carving**,
+**forging**, **craft**, **tooling**, **hardness**, **purity**, **metal**
+and engineering as a metaphor for manual labour. Cirth is named after a
+writing system, not a trade, and a page that reaches for the anvil is
+describing an atmosphere instead of a mechanism. The material reading of
+the name belongs in the origin story, once, and nowhere else.
+
+The second is the unfalsifiable claim: **timeless**, **philosophy**,
+"nothing to break", "fully accessible", "always delivered in one round
+trip". If a sentence cannot be checked against a script, a measurement or
+a source file, it is not doing the work this voice is for.
 
 Example headlines:
 
@@ -362,8 +366,7 @@ For permissions, open an issue on
 
 When you do use the mark:
 
-* keep clearspace around it of at least half its width;
-* use the responsive small-size asset from 16–23px;
+* keep a generous margin of clear space around it on every side;
 * pick the brand or mono variant that keeps contrast on your background;
 * don't recolor, outline, rotate, add effects, or redraw the strokes,
   and don't set the wordmark in another typeface; use
