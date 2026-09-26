@@ -50,15 +50,31 @@ try {
 	// line is repointed at the archive's own prefix so every internal link
 	// and asset path lands inside it. This is the only edit made to the
 	// checkout, and it lives and dies with the temporary worktree.
-	const config = path.join(worktree, "docs/eleventy.config.js");
-	const source = fs.readFileSync(config, "utf8");
+	//
+	// Where that line lives has moved. Up to v0.14.1 the prefix was written
+	// in the Eleventy config; from v0.15.0 it is returned by docsPathPrefix()
+	// in scripts/lib/docs-site.js. Look in both, newest arrangement first,
+	// rather than in one and failing on the other. This script silently
+	// stopped working for new tags the day the value was extracted, which is
+	// the kind of breakage a release only notices years later.
+	const candidates = [
+		path.join(worktree, "scripts/lib/docs-site.js"),
+		path.join(worktree, "docs/eleventy.config.js"),
+	];
+	const config = candidates.find(
+		(file) => fs.existsSync(file) && fs.readFileSync(file, "utf8").includes('"/cirth/"'),
+	);
 
-	if (!source.includes('"/cirth/"')) {
+	if (!config) {
 		throw new Error(
-			`${tag} does not build for "/cirth/": check how its pathPrefix is set`,
+			`${tag} does not build for "/cirth/": looked in ` +
+				candidates.map((file) => path.relative(worktree, file)).join(" and "),
 		);
 	}
 
+	// Only the bare prefix is repointed. "/cirth/next/" is a different
+	// literal and is left alone.
+	const source = fs.readFileSync(config, "utf8");
 	fs.writeFileSync(config, source.replace('"/cirth/"', `"/cirth/${directory}/"`));
 
 	run("npm", ["ci", "--no-audit", "--no-fund"], worktree);

@@ -1,0 +1,1024 @@
+<!doctype html>
+<html lang="en" data-base="/cirth/v0.15/">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Cirth</title>
+		<meta name="description" content="HTML-native CSS framework. Production-ready UI from semantic HTML — under 14KB gzipped, 0 JavaScript.">
+		<meta property="og:type" content="website">
+		<meta property="og:title" content="Cirth">
+		<meta property="og:description" content="HTML-native CSS framework. Production-ready UI from semantic HTML — under 14KB gzipped, 0 JavaScript.">
+		<meta property="og:image" content="https://cirthcss.github.io/cirth/social-preview.png">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta property="og:image:alt" content="Cirth: production-ready UI from semantic HTML, with a verified proof ledger.">
+		<meta name="twitter:card" content="summary_large_image">
+		<link rel="icon" href="/cirth/v0.15/favicon.svg" media="(prefers-color-scheme: light)">
+		<link rel="icon" href="/cirth/v0.15/favicon_dark.svg" media="(prefers-color-scheme: dark)">
+		<link rel="apple-touch-icon" href="/cirth/v0.15/apple-touch-icon.png">
+		<link rel="manifest" href="/cirth/v0.15/site.webmanifest">
+		<link rel="stylesheet" href="/cirth/v0.15/styles/style.css">
+		
+		<script>
+			// Set data-theme before first paint to avoid a light-mode flash.
+			(function () {
+				var stored = localStorage.getItem("cirth-theme");
+				var dark = stored
+					? stored === "dark"
+					: window.matchMedia("(prefers-color-scheme: dark)").matches;
+				document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+			})();
+
+			// Same idea for the preset switcher (gh#80): apply a
+			// session-remembered preset before first paint, so returning to
+			// a page (or following a link) after picking one doesn't flash
+			// the default theme first. sessionStorage, not localStorage —
+			// the issue asks for "the current session", not a permanent
+			// choice that'd survive a closed tab into someone's next visit.
+			(function () {
+				var preset = sessionStorage.getItem("cirth-preset");
+				if (!preset || preset === "default") return;
+				var base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
+				var link = document.createElement("link");
+				link.rel = "stylesheet";
+				link.id = "cirth-preset-stylesheet";
+				link.href = base + "/styles/generated/presets/" + preset + ".css";
+				document.head.appendChild(link);
+			})();
+		</script>
+	</head>
+	<body><aside style="border-bottom:1px solid #8884;padding:.5rem 1rem;text-align:center;font-size:.875rem">Archived documentation for v0.15.0 and earlier. <a href="/cirth/">Read the current documentation</a>.</aside>
+		<a href="#main-content" class="sr-only sr-only-focusable docs-skip-link">Skip to main content</a>
+		<header class="container docs-header">
+	<nav aria-label="main navigation">
+		<ul class="docs-header-start-group">
+			<li>
+				<a href="/cirth/v0.15/" class="contrast docs-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.15/logo_brand.svg" alt="" width="48" height="48">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.15/logo_brand_dark.svg" alt="" width="48" height="48">
+					<strong>Cirth</strong>
+				</a>
+			</li>
+			
+				<li class="docs-nav-item">
+					<a href="/cirth/v0.15/get-started">Docs</a>
+				</li>
+			
+				<li class="docs-nav-item">
+					<a href="/cirth/v0.15/examples">Examples</a>
+				</li>
+			
+		</ul>
+		<div class="docs-header-actions">
+			<div class="docs-header-search">
+				<button type="button" class="docs-search-trigger" aria-haspopup="dialog" aria-controls="docs-search-dialog" aria-expanded="false" aria-label="Search documentation" data-docs-search-trigger="" hidden="">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg><span class="truncate">Search documentation</span>
+					<kbd><span data-docs-search-modifier="">Ctrl</span> K</kbd>
+				</button>
+			</div><button type="button" class="ghost contrast docs-menu-toggle" aria-haspopup="dialog" aria-controls="docs-mobile-menu-panel" aria-expanded="false" data-docs-menu-trigger="">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M100,48a28,28,0,1,0,56,0a28,28,0,1,0-56,0ZM100,128a28,28,0,1,0,56,0a28,28,0,1,0-56,0ZM100,208a28,28,0,1,0,56,0a28,28,0,1,0-56,0Z"></path></svg><span class="sr-only">Menu</span>
+			</button>
+		</div>
+		<ul class="docs-header-controls-group">
+			<li class="docs-header-github">
+				<a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+			</li><li data-docs-header-control="">
+				<span class="docs-control-label" aria-hidden="true">Version</span>
+				<select class="docs-version-select" aria-label="Documentation version" data-docs-version-select="">
+					
+						<option value="/cirth/" selected="">v0.13</option>
+					
+						<option value="/cirth/v0.12/">v0.12</option>
+					
+						<option value="/cirth/v0.10/">v0.10</option>
+					
+					
+				</select>
+				<script>
+					(() => {
+					// Navigating between documentation lines is a page load, not
+					// a preference: each line is a separate build with its own
+					// pages, so there is nothing to remember or restore.
+						const versionSelect = document.querySelector("[data-docs-version-select]");
+						versionSelect?.addEventListener("change", () => {
+							if (versionSelect.value) window.location.assign(versionSelect.value);
+						});
+					})();
+				</script>
+			</li><li data-docs-header-control="">
+				<span class="docs-control-label" aria-hidden="true">Preset</span>
+				<select class="docs-preset-select" aria-label="Color preset" data-cirth-preset-select="">
+					<option value="default">Default</option>
+					
+						<option value="plain">Plain</option>
+					
+						<option value="playroom">Playroom</option>
+					
+				</select>
+			</li>
+			<li data-docs-header-control="">
+				<span class="docs-control-label" aria-hidden="true">Theme</span>
+				<button type="button" class="ghost contrast docs-theme-toggle" aria-label="Dark color scheme" aria-pressed="false">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="18" height="18" fill="currentColor" aria-hidden="true" class="docs-theme-icon-sun"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"></path></svg>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="18" height="18" fill="currentColor" aria-hidden="true" class="docs-theme-icon-moon"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"></path></svg>
+				</button>
+				<script>
+					(() => {
+					// Which icon is visible is driven entirely by CSS
+					// ([data-theme="dark"] .docs-theme-icon-*, see styles/style.css)
+					// — this script is only the click handler.
+						const themeToggle = document.querySelector(".docs-theme-toggle");
+						const syncThemeToggle = () => {
+						themeToggle?.setAttribute(
+							"aria-pressed",
+							document.documentElement.getAttribute("data-theme") === "dark" ? "true" : "false",
+						);
+						};
+						syncThemeToggle();
+						themeToggle?.addEventListener("click", () => {
+						const next =
+							document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+						document.documentElement.setAttribute("data-theme", next);
+						localStorage.setItem("cirth-theme", next);
+							syncThemeToggle();
+						});
+					})();
+				</script>
+			</li>
+		</ul>
+	</nav><dialog id="docs-mobile-menu-panel" class="docs-drawer" aria-label="Site menu" data-docs-menu-drawer="">
+		<article>
+			<header>
+				<span class="docs-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.15/logo_brand.svg" alt="" width="48" height="48">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.15/logo_brand_dark.svg" alt="" width="48" height="48">
+					<strong>Cirth</strong>
+				</span>
+				<button type="button" class="close" aria-label="Close menu" data-docs-menu-close=""></button>
+			</header>
+			<nav aria-label="Site">
+				<ul>
+					
+						<li><a href="/cirth/v0.15/get-started">Docs</a></li>
+					
+						<li><a href="/cirth/v0.15/examples">Examples</a></li>
+					
+					<li><a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub ↗<span class="sr-only"> (opens in a new tab)</span></a></li>
+				</ul>
+			</nav>
+			<section class="docs-mobile-controls">
+				<strong>Display</strong>
+				<ul data-docs-mobile-controls=""></ul>
+			</section>
+		</article>
+	</dialog>
+	<script>
+		(() => {
+			const header = document.currentScript?.closest(".docs-header");
+			const drawer = header?.querySelector("[data-docs-menu-drawer]");
+			const trigger = header?.querySelector("[data-docs-menu-trigger]");
+			const closeButton = drawer?.querySelector("[data-docs-menu-close]");
+			const desktopControls = header?.querySelector(".docs-header-controls-group");
+			const mobileControls = drawer?.querySelector("[data-docs-mobile-controls]");
+			// The one query that decides collapsed vs expanded. It is the same
+			// width the stylesheet uses to show this toggler, hide the in-header
+			// nav items and hide the sidebar: read from one place so the
+			// transfer and the toggler's visibility cannot drift apart.
+			const compact = window.matchMedia("(max-width: 1023px)");
+			const controls = desktopControls
+				? Array.from(desktopControls.querySelectorAll(":scope > [data-docs-header-control]"))
+				: [];
+
+			const syncMenuState = () => {
+				trigger?.setAttribute("aria-expanded", drawer?.open ? "true" : "false");
+			};
+			const closeDrawer = () => {
+				if (drawer?.open) drawer.close();
+			};
+			// Moving a node blurs whatever inside it had focus, so only move
+			// what is not already where it belongs, and hand focus back if the
+			// element that had it travelled. Crossing the breakpoint with the
+			// preset select focused should not drop the reader at the top of
+			// the document.
+			const placeControls = () => {
+				const target = compact.matches ? mobileControls : desktopControls;
+				if (target) {
+					const active = document.activeElement;
+					let refocus = null;
+					for (const control of controls) {
+						if (control.parentElement === target) continue;
+						if (active instanceof HTMLElement && control.contains(active)) {
+							refocus = active;
+						}
+						target.append(control);
+					}
+					refocus?.focus();
+				}
+				if (!compact.matches) closeDrawer();
+				syncMenuState();
+			};
+
+			trigger?.addEventListener("click", () => {
+				if (!drawer?.open) drawer?.showModal();
+				syncMenuState();
+			});
+			closeButton?.addEventListener("click", closeDrawer);
+			// Clicking the backdrop: the event target is the dialog itself
+			// only when the pointer misses the panel inside it.
+			drawer?.addEventListener("click", (event) => {
+				if (event.target === drawer) closeDrawer();
+			});
+			// Fires for the close button, for the backdrop, and for Escape,
+			// which the element handles on its own. Returning focus to the
+			// trigger explicitly rather than relying on the element's own
+			// restoration keeps this identical to the search dialog next to
+			// it, and correct when the drawer is closed by a resize.
+			drawer?.addEventListener("close", () => {
+				syncMenuState();
+				if (compact.matches) trigger?.focus();
+			});
+			compact.addEventListener?.("change", placeControls);
+			placeControls();
+		})();
+	</script>
+</header>
+
+		
+
+<main id="main-content" class="container docs-page-shell">
+	<div class="docs-mobile-tools">
+		<details class="docs-mobile-nav">
+			<summary>Browse documentation</summary>
+			<nav aria-label="Mobile documentation navigation">
+				
+					<section>
+						<strong>Introduction</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/get-started">Get Started</a></li>
+							
+								<li><a href="/cirth/v0.15/customization">Customization</a></li>
+							
+								<li><a href="/cirth/v0.15/colors">Colors</a></li>
+							
+								<li><a href="/cirth/v0.15/about">About Cirth</a></li>
+							
+								<li><a href="/cirth/v0.15/upgrading">Upgrading</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Layout</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/layout/document" aria-current="page">Document</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/landmarks">Landmarks</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/section">Section</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/container">Container</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/row">Row</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/grid">Grid</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/overflow-auto">Overflow auto</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Content</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/content/typography">Typography</a></li>
+							
+								<li><a href="/cirth/v0.15/content/description-list">Description list</a></li>
+							
+								<li><a href="/cirth/v0.15/content/link">Link</a></li>
+							
+								<li><a href="/cirth/v0.15/content/button">Button</a></li>
+							
+								<li><a href="/cirth/v0.15/content/table">Table</a></li>
+							
+								<li><a href="/cirth/v0.15/content/code">Code</a></li>
+							
+								<li><a href="/cirth/v0.15/content/figure">Figure</a></li>
+							
+								<li><a href="/cirth/v0.15/content/embedded">Embedded content</a></li>
+							
+								<li><a href="/cirth/v0.15/content/misc">Misc</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Forms</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/forms/">Overview</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/checkbox-radio-switch">Checkbox, radio, switch</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-color">Input color</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-date">Input date</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-file">Input file</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-range">Input range</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-search">Input search</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Components</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/components/accordion">Accordion</a></li>
+							
+								<li><a href="/cirth/v0.15/components/card">Card</a></li>
+							
+								<li><a href="/cirth/v0.15/components/dropdown">Dropdown</a></li>
+							
+								<li><a href="/cirth/v0.15/components/group">Group</a></li>
+							
+								<li><a href="/cirth/v0.15/components/loading">Loading</a></li>
+							
+								<li><a href="/cirth/v0.15/components/meter">Meter</a></li>
+							
+								<li><a href="/cirth/v0.15/components/modal">Modal</a></li>
+							
+								<li><a href="/cirth/v0.15/components/nav">Nav</a></li>
+							
+								<li><a href="/cirth/v0.15/components/popover">Popover</a></li>
+							
+								<li><a href="/cirth/v0.15/components/progress">Progress</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Utilities</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/utilities/accessibility">Accessibility</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/high-contrast">High contrast</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/reduce-motion">Reduce motion</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/sr-only">Screen-reader only</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/truncate">Truncate</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/breakout">Breakout</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/print">Print</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Project</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/examples">Examples</a></li>
+							
+								<li><a href="/cirth/v0.15/contributions">Contributions</a></li>
+							
+								<li><a href="/cirth/v0.15/brand">Brand</a></li>
+							
+						</ul>
+					</section>
+				
+			</nav>
+		</details>
+		
+			<details class="docs-toc-top">
+				<summary>On this page</summary>
+				<nav aria-label="On this page">
+					<ul>
+						
+							<li class="docs-toc-level-2">
+								<a href="#what-it-sets">What it sets</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#scrollbar-gutter">Scrollbar gutter</a>
+							</li>
+						
+					</ul>
+				</nav>
+			</details>
+		
+	</div>
+	<div class="docs-layout">
+		<aside class="docs-sidebar">
+			<nav aria-label="docs navigation">
+				
+					<details>
+						<summary>Introduction</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/get-started">Get Started</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/customization">Customization</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/colors">Colors</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/about">About Cirth</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/upgrading">Upgrading</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details open="">
+						<summary>Layout</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/document" aria-current="page">Document</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/landmarks">Landmarks</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/section">Section</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/container">Container</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/row">Row</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/grid">Grid</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/overflow-auto">Overflow auto</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Content</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/content/typography">Typography</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/description-list">Description list</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/link">Link</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/button">Button</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/table">Table</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/code">Code</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/figure">Figure</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/embedded">Embedded content</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/misc">Misc</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Forms</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/">Overview</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/checkbox-radio-switch">Checkbox, radio, switch</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-color">Input color</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-date">Input date</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-file">Input file</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-range">Input range</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-search">Input search</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Components</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/components/accordion">Accordion</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/card">Card</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/dropdown">Dropdown</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/group">Group</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/loading">Loading</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/meter">Meter</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/modal">Modal</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/nav">Nav</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/popover">Popover</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/progress">Progress</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Utilities</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/accessibility">Accessibility</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/high-contrast">High contrast</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/reduce-motion">Reduce motion</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/sr-only">Screen-reader only</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/truncate">Truncate</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/breakout">Breakout</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/print">Print</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Project</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/examples">Examples</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/contributions">Contributions</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/brand">Brand</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+			</nav>
+		</aside>
+		<div class="docs-content" data-pagefind-body="">
+			<h1>Document</h1>
+<p>The document layer is Cirth's reboot: a small set of opinionated resets
+(based on normalize.css and sanitize.css) applied to every element, plus the
+base document typography that everything else inherits from.</p>
+<p>It has no markup requirements: it applies to <code>:root</code>/<code>:host</code> (or to the
+scoped root, for the scoped build) and to every element universally.</p>
+<h2 id="what-it-sets" tabindex="-1">What it sets <a class="header-anchor" href="#what-it-sets">#</a></h2>
+<ul>
+<li><code>box-sizing: border-box</code> on every element and pseudo element.</li>
+<li>Background images don't repeat by default.</li>
+<li><code>text-decoration</code> and <code>vertical-align</code> are inherited through
+<code>::before</code>/<code>::after</code> pseudo elements.</li>
+<li>The root element gets the base font stack, size, weight, line height, and
+color from the active color scheme:</li>
+</ul>
+<pre tabindex="0"><code class="hljs language-css"><span class="hljs-selector-pseudo">:root</span> {
+  <span class="hljs-attribute">background-color</span>: <span class="hljs-built_in">var</span>(--cirth-background-color);
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--cirth-color);
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-built_in">var</span>(--cirth-font-weight);
+  <span class="hljs-attribute">font-size</span>: <span class="hljs-built_in">var</span>(--cirth-font-size);
+  <span class="hljs-attribute">line-height</span>: <span class="hljs-built_in">var</span>(--cirth-line-height);
+  <span class="hljs-attribute">font-family</span>: <span class="hljs-built_in">var</span>(--cirth-font-family);
+}
+</code></pre>
+<ul>
+<li><code>--cirth-font-size</code> is a fixed <code>100%</code> at every breakpoint: sizes based on <code>rem</code>
+sizes (body text, 44px controls) don't drift with viewport width. Display
+type scales fluidly on its own, via <code>clamp()</code> in each heading's
+<code>--cirth-font-size</code> values.</li>
+<li>Words break instead of overflowing (<code>overflow-wrap: break-word</code>), tabs are
+4 spaces wide, and the iOS tap highlight and orientation change font
+resizing are disabled.</li>
+</ul>
+<p>None of this is meant to be overridden one selector at a time. Tune it through
+the tokens instead: <code>--cirth-font-family</code>, <code>--cirth-font-size</code>,
+<code>--cirth-line-height</code>, <code>--cirth-background-color</code>, <code>--cirth-color</code>. See
+<a href="/cirth/v0.15/customization">Customization</a>.</p>
+<h2 id="scrollbar-gutter" tabindex="-1">Scrollbar gutter <a class="header-anchor" href="#scrollbar-gutter">#</a></h2>
+<p>The document reserves the scrollbar's gutter permanently
+(<code>scrollbar-gutter: stable</code>), so a page that scrolls is exactly as wide as
+one that does not.</p>
+<p>It is there for the <a href="/cirth/v0.15/components/modal">modal</a>, which stops the page
+scrolling while it is open: without a reserved gutter, hiding the overflow
+would widen the content by a scrollbar's width and shift the whole layout.
+Reserving it only while the dialog is open does not work — on platforms
+with overlay scrollbars, where nothing was taking width in the first place,
+that <em>causes</em> the shift instead of preventing it.</p>
+<p>The cost lands on platforms with classic scrollbars, where a short page now
+keeps an empty gutter it would not otherwise have. If you would rather have
+it back:</p>
+<pre tabindex="0"><code class="hljs language-css"><span class="hljs-selector-pseudo">:root</span> {
+  <span class="hljs-attribute">scrollbar-gutter</span>: auto;
+}
+</code></pre>
+<p>Cirth sets it inside <code>:where()</code>, so a single declaration of your own wins.</p>
+
+			
+				
+				
+				
+					<footer class="docs-prev-next">
+						
+							<a href="/cirth/v0.15/upgrading" class="secondary">← Upgrading</a>
+						
+						
+							<a href="/cirth/v0.15/layout/landmarks" class="secondary">Landmarks →</a>
+						
+					</footer>
+				
+			
+		</div>
+		
+			<aside class="docs-toc">
+				<nav aria-label="On this page" id="docs-toc-nav">
+					<strong>On this page</strong>
+					<ul>
+						
+							<li class="docs-toc-level-2">
+								<a href="#what-it-sets" data-toc-link="" data-slug="what-it-sets">What it sets</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#scrollbar-gutter" data-toc-link="" data-slug="scrollbar-gutter">Scrollbar gutter</a>
+							</li>
+						
+					</ul>
+				</nav>
+			</aside>
+		
+	</div>
+</main>
+<script>
+	// Scroll-spy for the "On this page" aside: highlight whichever heading
+	// was most recently scrolled past. Purely additive — the TOC works
+	// (and its links navigate) without this script.
+	const links = Array.from(document.querySelectorAll("[data-toc-link]"));
+	if (links.length > 0) {
+		const headings = Array.from(
+			document.querySelectorAll(".docs-content :is(h2, h3)[id]"),
+		);
+
+		const update = () => {
+			// 96px offset: the heading counts as "reached" slightly before it
+			// touches the top edge, matching where the eye lands after a jump.
+			let current = "";
+			for (const heading of headings) {
+				if (heading.getBoundingClientRect().top <= 96) current = heading.id;
+				else break;
+			}
+			const activeSlug = current || (headings[0] ? headings[0].id : "");
+			// aria-current only: the framework paints its one registered
+			// edge on the inline-start rail from it, and the stylesheet
+			// deliberately adds no second marker of its own.
+			for (const link of links) {
+				if (link.dataset.slug === activeSlug) {
+					link.setAttribute("aria-current", "true");
+				} else {
+					link.removeAttribute("aria-current");
+				}
+			}
+		};
+
+		window.addEventListener("scroll", update, { passive: true });
+		update();
+	}
+</script>
+
+		<footer class="docs-footer">
+	<div class="container">
+		<div class="docs-footer-top">
+			<div class="docs-footer-brand-block">
+				<a href="/cirth/v0.15/" class="contrast docs-brand docs-footer-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.15/logo_brand.svg" alt="" width="36" height="36">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.15/logo_brand_dark.svg" alt="" width="36" height="36">
+					<strong>Cirth</strong>
+				</a>
+				<p class="docs-footer-credit">
+					Designed and built by Riccardo Pastori, with help from the
+					<a href="https://github.com/cirthcss/cirth/graphs/contributors" target="_blank" rel="noreferrer">contributors<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>.
+				</p>
+				<ul class="docs-footer-social">
+					<li><a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+					<li><a href="https://www.npmjs.com/package/@cirthcss/cirth" target="_blank" rel="noreferrer">npm<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+					<li><a href="https://github.com/cirthcss/cirth/blob/master/CHANGELOG.md" target="_blank" rel="noreferrer">Changelog<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+				</ul>
+			</div>
+			<div class="docs-footer-columns">
+				
+					<div class="docs-footer-column">
+						<strong>Docs</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/get-started">Get Started</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/customization">Customization</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/colors">Colors</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/components/card">Components</a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+					<div class="docs-footer-column">
+						<strong>Project</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/about">About Cirth</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/upgrading">Upgrading</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/brand">Brand</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/examples">Examples</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/contributions">Contributions</a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+					<div class="docs-footer-column">
+						<strong>Community</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="https://github.com/cirthcss/cirth/issues" target="_blank" rel="noreferrer">Issues<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+			</div>
+		</div>
+		<hr>
+		<small>
+			<span>Released under the Apache License 2.0.</span>
+			<span>Copyright © 2025-present Riccardo Pastori</span>
+		</small>
+	</div>
+</footer>
+
+		<dialog id="docs-search-dialog" class="docs-search-dialog" aria-labelledby="docs-search-title" data-docs-search-dialog="">
+	<article>
+		<header>
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
+			<h2 id="docs-search-title" class="sr-only">Search documentation</h2>
+			<input id="docs-search-input" type="text" role="searchbox" aria-label="Search documentation" placeholder="Search the Cirth documentation…" autocomplete="off" enterkeyhint="search" aria-controls="docs-search-results" aria-describedby="docs-search-status" data-docs-search-input="">
+			<button type="button" class="close" aria-label="Close search" data-docs-search-close=""></button>
+		</header>
+		<p id="docs-search-status" class="docs-search-status" role="status" aria-live="polite" data-docs-search-status="">
+			Type at least two characters to search.
+		</p>
+		<ol id="docs-search-results" class="docs-search-results" data-docs-search-results=""></ol>
+		<footer class="docs-search-help" aria-hidden="true">
+			<span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+			<span><kbd>↵</kbd> open</span>
+			<span><kbd>esc</kbd> close</span>
+			<small>Search by Pagefind</small>
+		</footer>
+	</article>
+</dialog>
+<script type="module" src="/cirth/v0.15/search.js"></script>
+
+		<div class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-copy-status=""></div>
+		<script>
+			// Copy-to-clipboard for fenced code blocks: the markdown pipeline
+			// only highlights, it doesn't add a button, so one is injected for
+			// every `pre > code` on the page (prose fences and Demo's
+			// "Show HTML" source alike).
+			const copyStatus = document.querySelector("[data-copy-status]");
+			const announceCopyStatus = (message) => {
+				if (!copyStatus) return;
+				copyStatus.textContent = "";
+				requestAnimationFrame(() => {
+					copyStatus.textContent = message;
+				});
+			};
+
+			// Every code block the shell owns, and no others: a <pre> inside a
+			// live example is the example. Injecting a control into it would
+			// put a <button> in the reader's specimen that Cirth never ships,
+			// and the caption on every demo says the opposite. The disclosure
+			// under the demo keeps its button — that listing is the shell's.
+			for (const pre of document.querySelectorAll("pre")) {
+				if (pre.closest(".docs-demo-preview")) continue;
+				if (pre.querySelector(":scope > button.copy")) continue;
+				const code = pre.querySelector("code");
+				if (!code?.textContent) continue;
+
+				const button = document.createElement("button");
+				button.type = "button";
+				button.className = "copy";
+				button.setAttribute("aria-label", "Copy to clipboard");
+				pre.append(button);
+
+				button.addEventListener("click", async () => {
+					try {
+						await navigator.clipboard.writeText(code.textContent ?? "");
+						button.classList.add("copied");
+						setTimeout(() => button.classList.remove("copied"), 2000);
+						announceCopyStatus("Code copied to clipboard.");
+					} catch {
+						announceCopyStatus("Code could not be copied.");
+					}
+				});
+			}
+
+			// The scoped classless build reads data-theme from its own root
+			// element (.cirth-classless demos), so mirror the site theme onto
+			// every such wrapper whenever it changes.
+			const classlessRoots = document.querySelectorAll(".cirth-classless");
+			if (classlessRoots.length > 0) {
+				const sync = () => {
+					const theme = document.documentElement.getAttribute("data-theme");
+					for (const root of classlessRoots) root.setAttribute("data-theme", theme ?? "light");
+				};
+				sync();
+				new MutationObserver(sync).observe(document.documentElement, {
+					attributeFilter: ["data-theme"],
+				});
+			}
+
+			// Live preset switcher (gh#80): the <head> script above already
+			// applied a remembered choice before first paint; this wires up
+			// the header <select> for changes after load. Swapping the
+			// stylesheet's href (rather than always keeping one <link> per
+			// preset and toggling disabled) means an unvisited preset is
+			// never fetched at all.
+			const presetSelect = document.querySelector("[data-cirth-preset-select]");
+			if (presetSelect) {
+				const base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
+				const applyPreset = (preset) => {
+					const existing = document.getElementById("cirth-preset-stylesheet");
+					if (preset === "default") {
+						existing?.remove();
+						return;
+					}
+					const link = existing ?? document.createElement("link");
+					link.rel = "stylesheet";
+					link.id = "cirth-preset-stylesheet";
+					link.href = `${base}/styles/generated/presets/${preset}.css`;
+					if (!existing) document.head.appendChild(link);
+				};
+				presetSelect.value = sessionStorage.getItem("cirth-preset") || "default";
+				presetSelect.addEventListener("change", () => {
+					sessionStorage.setItem("cirth-preset", presetSelect.value);
+					applyPreset(presetSelect.value);
+				});
+			}
+
+		</script>
+	</body>
+</html>

@@ -12,7 +12,7 @@ documentation: the selector in the header switches between them.
 After 1.0 the same boundary becomes a major release, and this page keeps
 working the way it already does.
 
-## Unreleased, from v0.14.x
+## To v0.16.0, from v0.14.x
 
 The public class list stays the same. Every stylesheet now keeps its rules
 in a cascade layer, the accent token families use role names, and containers

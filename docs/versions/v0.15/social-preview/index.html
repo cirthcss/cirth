@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-card-theme="light" data-card-format="social">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Cirth social brand asset</title>
+		<!-- Relative, not absolute: these three pages are rasterised straight
+		     from docs/dist over file:// by scripts/capture-brand-assets.js,
+		     which has no server to resolve a root-relative path. The logo
+		     below is referenced the same way for the same reason. -->
+		<link rel="stylesheet" href="../styles/generated/cirth-docs.css">
+		<style>
+			* { box-sizing: border-box; }
+			html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+			/* The card's composition vocabulary, defined from the framework's
+			   tokens rather than restated as literals. It used to carry its own
+			   seven-colour palette in hex, in two themes — a second palette that
+			   could drift from the one Cirth ships without anything noticing.
+			   data-theme on <html> is what the stylesheet's own scheme wiring
+			   reads, so the dark card needs no second block here. */
+			body {
+				--paper: var(--cirth-canvas);
+				--board: var(--cirth-card-background-color);
+				--ink: var(--cirth-ink);
+				--muted: var(--cirth-muted-color);
+				--line: var(--cirth-form-element-border-color);
+				--signal: var(--cirth-primary-text);
+				--signal-soft: color-mix(in oklab, var(--cirth-primary-text) 22%, var(--cirth-canvas));
+				display: grid; grid-template-columns: repeat(12, minmax(0, 1fr));
+				gap: 24px; padding: 48px; background: var(--paper); color: var(--ink);
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+				/* The card takes the palette from the stylesheet above but not
+				   its reading rhythm: this is a fixed-size raster whose line
+				   breaks are part of the composition, so the leading is pinned
+				   here rather than following --cirth-line-height. */
+				line-height: 1.2;
+			}
+			/* background-repeat is restated because the library's reset sets
+			   no-repeat on every element and pseudo-element, which would leave
+			   this construction grid as a single dot in the corner. */
+			body::before { position: absolute; inset: 0; content: ""; opacity: .5;
+				background-image: radial-gradient(circle, var(--line) 1px, transparent 1px);
+				background-repeat: repeat;
+				background-size: 16px 16px; mask-image: linear-gradient(120deg, #000, transparent 65%); }
+			.brand { position: relative; grid-column: 1 / span 5; display: flex; flex-direction: column; }
+			.lockup { display: flex; align-items: center; gap: 16px; color: var(--muted);
+				font: 700 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .12em; text-transform: uppercase; }
+			.lockup img { width: 72px; height: 72px; }
+			h1 { max-width: 8ch; margin: auto 0 0; font-size: 82px; line-height: .88; letter-spacing: -.065em; }
+			h1 em { color: var(--signal); font-style: normal; }
+			.tag { margin: 24px 0 0; color: var(--muted); font-size: 22px; }
+			.board { position: relative; grid-column: 6 / -1; display: grid; grid-template-rows: auto 1fr auto;
+				border: 1px solid var(--line); background: var(--board); box-shadow: 12px 12px 0 var(--signal-soft); }
+			.board::after { position: absolute; top: -1px; right: -1px; width: 36px; height: 36px; content: "";
+				background: linear-gradient(135deg, transparent 48%, var(--line) 50%, var(--paper) 52%); }
+			.board-head { display: flex; justify-content: space-between; padding: 14px 48px 14px 18px; border-bottom: 1px solid var(--line);
+				color: var(--muted); font: 700 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
+			.flow { display: grid; grid-template-columns: 1fr 90px 1fr; align-items: stretch; }
+			.node { display: grid; place-content: center; gap: 14px; padding: 24px; }
+			/* Bare, not the library's inline-code chip: inside the card a code
+			   fragment is a specimen of markup, not a token mentioned in prose. */
+			.node code { padding: 0; background: none; color: var(--signal);
+				font: 700 16px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; }
+			.node strong { font-size: 24px; }
+			.connector { position: relative; display: grid; place-items: center; border-inline: 1px solid var(--line); color: var(--muted);
+				font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace; text-align: center; text-transform: uppercase; }
+			.connector::before { position: absolute; inset-inline: 0; top: 50%; border-top: 2px solid var(--signal); content: ""; }
+			.connector span { position: relative; padding: 8px; background: var(--board); }
+			.ledger { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); }
+			.proof { display: grid; gap: 5px; padding: 15px 18px; border-right: 1px solid var(--line); }
+			.proof:last-child { border: 0; }
+			.proof small { color: var(--muted); font: 700 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace; text-transform: uppercase; }
+			.proof strong { font-size: 14px; }
+
+			[data-card-format="readme"] body { gap: 20px; padding: 24px 32px; }
+			[data-card-format="readme"] .brand { grid-column: 1 / span 5; }
+			[data-card-format="readme"] .lockup img { width: 44px; height: 44px; }
+			[data-card-format="readme"] h1 { max-width: none; margin: auto 0; font-size: 44px; line-height: .92; }
+			[data-card-format="readme"] .tag { margin: 0; font-size: 14px; }
+			[data-card-format="readme"] .board { grid-column: 6 / -1; grid-template-rows: auto 1fr; box-shadow: 8px 8px 0 var(--signal-soft); }
+			[data-card-format="readme"] .flow { display: none; }
+			[data-card-format="readme"] .ledger { grid-template-columns: repeat(2, 1fr); border-top: 0; }
+			[data-card-format="readme"] .proof { align-content: center; border-bottom: 1px solid var(--line); }
+			[data-card-format="readme"] .proof:nth-child(3), [data-card-format="readme"] .proof:nth-child(4) { border-bottom: 0; }
+		</style>
+	</head>
+	<body><aside style="border-bottom:1px solid #8884;padding:.5rem 1rem;text-align:center;font-size:.875rem">Archived documentation for v0.15.0 and earlier. <a href="/cirth/">Read the current documentation</a>.</aside>
+		<section class="brand">
+			<div class="lockup">
+				<img src="../logo_brand.svg" alt="">
+				<span>Cirth / Native baseline</span>
+			</div>
+			<h1>UI from <em>semantic HTML.</em></h1>
+			<p class="tag">One stylesheet. Accessible baseline. No runtime.</p>
+		</section>
+		<section class="board">
+			<header class="board-head"><span>Fig. 01 / source → output</span><span>Verified build</span></header>
+			<div class="flow">
+				<div class="node"><code>&lt;article&gt;<br>&nbsp;&nbsp;&lt;form&gt;</code><strong>HTML carries intent.</strong></div>
+				<div class="connector"><span>Cirth<br>CSS</span></div>
+				<div class="node"><code>native / themed</code><strong>Production-ready UI.</strong></div>
+			</div>
+			<div class="ledger">
+				<div class="proof"><small>✓ semantic</small><strong>HTML first</strong></div>
+				<div class="proof"><small>✓ baseline</small><strong>WCAG 2.2 AA</strong></div>
+				<div class="proof"><small>● runtime</small><strong>0 B JavaScript</strong></div>
+				<div class="proof"><small>● budget</small><strong>&lt;14 KB gzip · 248 tokens</strong></div>
+			</div>
+		</section>
+	</body>
+</html>
+

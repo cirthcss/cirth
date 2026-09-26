@@ -24,10 +24,24 @@ const lines = [
 	{
 		current: true,
 		href: root,
-		label: "from v0.13.0",
-		shortLabel: "v0.13",
+		label: "from v0.16.0",
+		shortLabel: "v0.16",
 		summary:
-			"The palette is driven by input tokens, and print ships as its own stylesheet.",
+			"Every stylesheet emits its rules inside the cascade layer `cirth`, so unlayered CSS on the page wins whatever its specificity.",
+	},
+	{
+		href: `${root}v0.15/`,
+		label: "up to v0.15.0",
+		shortLabel: "v0.15",
+		summary:
+			"The last line where Cirth won on specificity and load order rather than sitting in a layer.",
+	},
+	{
+		href: `${root}v0.14/`,
+		label: "up to v0.14.1",
+		shortLabel: "v0.14",
+		summary:
+			"The last line where the accent families were named by hue rather than by the role they fill.",
 	},
 	{
 		href: `${root}v0.12/`,

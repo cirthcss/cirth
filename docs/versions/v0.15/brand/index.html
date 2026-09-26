@@ -1,0 +1,1417 @@
+<!doctype html>
+<html lang="en" data-base="/cirth/v0.15/">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Cirth</title>
+		<meta name="description" content="HTML-native CSS framework. Production-ready UI from semantic HTML — under 14KB gzipped, 0 JavaScript.">
+		<meta property="og:type" content="website">
+		<meta property="og:title" content="Cirth">
+		<meta property="og:description" content="HTML-native CSS framework. Production-ready UI from semantic HTML — under 14KB gzipped, 0 JavaScript.">
+		<meta property="og:image" content="https://cirthcss.github.io/cirth/social-preview.png">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta property="og:image:alt" content="Cirth: production-ready UI from semantic HTML, with a verified proof ledger.">
+		<meta name="twitter:card" content="summary_large_image">
+		<link rel="icon" href="/cirth/v0.15/favicon.svg" media="(prefers-color-scheme: light)">
+		<link rel="icon" href="/cirth/v0.15/favicon_dark.svg" media="(prefers-color-scheme: dark)">
+		<link rel="apple-touch-icon" href="/cirth/v0.15/apple-touch-icon.png">
+		<link rel="manifest" href="/cirth/v0.15/site.webmanifest">
+		<link rel="stylesheet" href="/cirth/v0.15/styles/style.css">
+		
+		<script>
+			// Set data-theme before first paint to avoid a light-mode flash.
+			(function () {
+				var stored = localStorage.getItem("cirth-theme");
+				var dark = stored
+					? stored === "dark"
+					: window.matchMedia("(prefers-color-scheme: dark)").matches;
+				document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+			})();
+
+			// Same idea for the preset switcher (gh#80): apply a
+			// session-remembered preset before first paint, so returning to
+			// a page (or following a link) after picking one doesn't flash
+			// the default theme first. sessionStorage, not localStorage —
+			// the issue asks for "the current session", not a permanent
+			// choice that'd survive a closed tab into someone's next visit.
+			(function () {
+				var preset = sessionStorage.getItem("cirth-preset");
+				if (!preset || preset === "default") return;
+				var base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
+				var link = document.createElement("link");
+				link.rel = "stylesheet";
+				link.id = "cirth-preset-stylesheet";
+				link.href = base + "/styles/generated/presets/" + preset + ".css";
+				document.head.appendChild(link);
+			})();
+		</script>
+	</head>
+	<body><aside style="border-bottom:1px solid #8884;padding:.5rem 1rem;text-align:center;font-size:.875rem">Archived documentation for v0.15.0 and earlier. <a href="/cirth/">Read the current documentation</a>.</aside>
+		<a href="#main-content" class="sr-only sr-only-focusable docs-skip-link">Skip to main content</a>
+		<header class="container docs-header">
+	<nav aria-label="main navigation">
+		<ul class="docs-header-start-group">
+			<li>
+				<a href="/cirth/v0.15/" class="contrast docs-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.15/logo_brand.svg" alt="" width="48" height="48">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.15/logo_brand_dark.svg" alt="" width="48" height="48">
+					<strong>Cirth</strong>
+				</a>
+			</li>
+			
+				<li class="docs-nav-item">
+					<a href="/cirth/v0.15/get-started">Docs</a>
+				</li>
+			
+				<li class="docs-nav-item">
+					<a href="/cirth/v0.15/examples">Examples</a>
+				</li>
+			
+		</ul>
+		<div class="docs-header-actions">
+			<div class="docs-header-search">
+				<button type="button" class="docs-search-trigger" aria-haspopup="dialog" aria-controls="docs-search-dialog" aria-expanded="false" aria-label="Search documentation" data-docs-search-trigger="" hidden="">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg><span class="truncate">Search documentation</span>
+					<kbd><span data-docs-search-modifier="">Ctrl</span> K</kbd>
+				</button>
+			</div><button type="button" class="ghost contrast docs-menu-toggle" aria-haspopup="dialog" aria-controls="docs-mobile-menu-panel" aria-expanded="false" data-docs-menu-trigger="">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M100,48a28,28,0,1,0,56,0a28,28,0,1,0-56,0ZM100,128a28,28,0,1,0,56,0a28,28,0,1,0-56,0ZM100,208a28,28,0,1,0,56,0a28,28,0,1,0-56,0Z"></path></svg><span class="sr-only">Menu</span>
+			</button>
+		</div>
+		<ul class="docs-header-controls-group">
+			<li class="docs-header-github">
+				<a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+			</li><li data-docs-header-control="">
+				<span class="docs-control-label" aria-hidden="true">Version</span>
+				<select class="docs-version-select" aria-label="Documentation version" data-docs-version-select="">
+					
+						<option value="/cirth/" selected="">v0.13</option>
+					
+						<option value="/cirth/v0.12/">v0.12</option>
+					
+						<option value="/cirth/v0.10/">v0.10</option>
+					
+					
+				</select>
+				<script>
+					(() => {
+					// Navigating between documentation lines is a page load, not
+					// a preference: each line is a separate build with its own
+					// pages, so there is nothing to remember or restore.
+						const versionSelect = document.querySelector("[data-docs-version-select]");
+						versionSelect?.addEventListener("change", () => {
+							if (versionSelect.value) window.location.assign(versionSelect.value);
+						});
+					})();
+				</script>
+			</li><li data-docs-header-control="">
+				<span class="docs-control-label" aria-hidden="true">Preset</span>
+				<select class="docs-preset-select" aria-label="Color preset" data-cirth-preset-select="">
+					<option value="default">Default</option>
+					
+						<option value="plain">Plain</option>
+					
+						<option value="playroom">Playroom</option>
+					
+				</select>
+			</li>
+			<li data-docs-header-control="">
+				<span class="docs-control-label" aria-hidden="true">Theme</span>
+				<button type="button" class="ghost contrast docs-theme-toggle" aria-label="Dark color scheme" aria-pressed="false">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="18" height="18" fill="currentColor" aria-hidden="true" class="docs-theme-icon-sun"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"></path></svg>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="18" height="18" fill="currentColor" aria-hidden="true" class="docs-theme-icon-moon"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"></path></svg>
+				</button>
+				<script>
+					(() => {
+					// Which icon is visible is driven entirely by CSS
+					// ([data-theme="dark"] .docs-theme-icon-*, see styles/style.css)
+					// — this script is only the click handler.
+						const themeToggle = document.querySelector(".docs-theme-toggle");
+						const syncThemeToggle = () => {
+						themeToggle?.setAttribute(
+							"aria-pressed",
+							document.documentElement.getAttribute("data-theme") === "dark" ? "true" : "false",
+						);
+						};
+						syncThemeToggle();
+						themeToggle?.addEventListener("click", () => {
+						const next =
+							document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+						document.documentElement.setAttribute("data-theme", next);
+						localStorage.setItem("cirth-theme", next);
+							syncThemeToggle();
+						});
+					})();
+				</script>
+			</li>
+		</ul>
+	</nav><dialog id="docs-mobile-menu-panel" class="docs-drawer" aria-label="Site menu" data-docs-menu-drawer="">
+		<article>
+			<header>
+				<span class="docs-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.15/logo_brand.svg" alt="" width="48" height="48">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.15/logo_brand_dark.svg" alt="" width="48" height="48">
+					<strong>Cirth</strong>
+				</span>
+				<button type="button" class="close" aria-label="Close menu" data-docs-menu-close=""></button>
+			</header>
+			<nav aria-label="Site">
+				<ul>
+					
+						<li><a href="/cirth/v0.15/get-started">Docs</a></li>
+					
+						<li><a href="/cirth/v0.15/examples">Examples</a></li>
+					
+					<li><a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub ↗<span class="sr-only"> (opens in a new tab)</span></a></li>
+				</ul>
+			</nav>
+			<section class="docs-mobile-controls">
+				<strong>Display</strong>
+				<ul data-docs-mobile-controls=""></ul>
+			</section>
+		</article>
+	</dialog>
+	<script>
+		(() => {
+			const header = document.currentScript?.closest(".docs-header");
+			const drawer = header?.querySelector("[data-docs-menu-drawer]");
+			const trigger = header?.querySelector("[data-docs-menu-trigger]");
+			const closeButton = drawer?.querySelector("[data-docs-menu-close]");
+			const desktopControls = header?.querySelector(".docs-header-controls-group");
+			const mobileControls = drawer?.querySelector("[data-docs-mobile-controls]");
+			// The one query that decides collapsed vs expanded. It is the same
+			// width the stylesheet uses to show this toggler, hide the in-header
+			// nav items and hide the sidebar: read from one place so the
+			// transfer and the toggler's visibility cannot drift apart.
+			const compact = window.matchMedia("(max-width: 1023px)");
+			const controls = desktopControls
+				? Array.from(desktopControls.querySelectorAll(":scope > [data-docs-header-control]"))
+				: [];
+
+			const syncMenuState = () => {
+				trigger?.setAttribute("aria-expanded", drawer?.open ? "true" : "false");
+			};
+			const closeDrawer = () => {
+				if (drawer?.open) drawer.close();
+			};
+			// Moving a node blurs whatever inside it had focus, so only move
+			// what is not already where it belongs, and hand focus back if the
+			// element that had it travelled. Crossing the breakpoint with the
+			// preset select focused should not drop the reader at the top of
+			// the document.
+			const placeControls = () => {
+				const target = compact.matches ? mobileControls : desktopControls;
+				if (target) {
+					const active = document.activeElement;
+					let refocus = null;
+					for (const control of controls) {
+						if (control.parentElement === target) continue;
+						if (active instanceof HTMLElement && control.contains(active)) {
+							refocus = active;
+						}
+						target.append(control);
+					}
+					refocus?.focus();
+				}
+				if (!compact.matches) closeDrawer();
+				syncMenuState();
+			};
+
+			trigger?.addEventListener("click", () => {
+				if (!drawer?.open) drawer?.showModal();
+				syncMenuState();
+			});
+			closeButton?.addEventListener("click", closeDrawer);
+			// Clicking the backdrop: the event target is the dialog itself
+			// only when the pointer misses the panel inside it.
+			drawer?.addEventListener("click", (event) => {
+				if (event.target === drawer) closeDrawer();
+			});
+			// Fires for the close button, for the backdrop, and for Escape,
+			// which the element handles on its own. Returning focus to the
+			// trigger explicitly rather than relying on the element's own
+			// restoration keeps this identical to the search dialog next to
+			// it, and correct when the drawer is closed by a resize.
+			drawer?.addEventListener("close", () => {
+				syncMenuState();
+				if (compact.matches) trigger?.focus();
+			});
+			compact.addEventListener?.("change", placeControls);
+			placeControls();
+		})();
+	</script>
+</header>
+
+		
+
+<main id="main-content" class="container docs-page-shell">
+	<div class="docs-mobile-tools">
+		<details class="docs-mobile-nav">
+			<summary>Browse documentation</summary>
+			<nav aria-label="Mobile documentation navigation">
+				
+					<section>
+						<strong>Introduction</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/get-started">Get Started</a></li>
+							
+								<li><a href="/cirth/v0.15/customization">Customization</a></li>
+							
+								<li><a href="/cirth/v0.15/colors">Colors</a></li>
+							
+								<li><a href="/cirth/v0.15/about">About Cirth</a></li>
+							
+								<li><a href="/cirth/v0.15/upgrading">Upgrading</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Layout</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/layout/document">Document</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/landmarks">Landmarks</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/section">Section</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/container">Container</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/row">Row</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/grid">Grid</a></li>
+							
+								<li><a href="/cirth/v0.15/layout/overflow-auto">Overflow auto</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Content</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/content/typography">Typography</a></li>
+							
+								<li><a href="/cirth/v0.15/content/description-list">Description list</a></li>
+							
+								<li><a href="/cirth/v0.15/content/link">Link</a></li>
+							
+								<li><a href="/cirth/v0.15/content/button">Button</a></li>
+							
+								<li><a href="/cirth/v0.15/content/table">Table</a></li>
+							
+								<li><a href="/cirth/v0.15/content/code">Code</a></li>
+							
+								<li><a href="/cirth/v0.15/content/figure">Figure</a></li>
+							
+								<li><a href="/cirth/v0.15/content/embedded">Embedded content</a></li>
+							
+								<li><a href="/cirth/v0.15/content/misc">Misc</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Forms</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/forms/">Overview</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/checkbox-radio-switch">Checkbox, radio, switch</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-color">Input color</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-date">Input date</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-file">Input file</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-range">Input range</a></li>
+							
+								<li><a href="/cirth/v0.15/forms/input-search">Input search</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Components</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/components/accordion">Accordion</a></li>
+							
+								<li><a href="/cirth/v0.15/components/card">Card</a></li>
+							
+								<li><a href="/cirth/v0.15/components/dropdown">Dropdown</a></li>
+							
+								<li><a href="/cirth/v0.15/components/group">Group</a></li>
+							
+								<li><a href="/cirth/v0.15/components/loading">Loading</a></li>
+							
+								<li><a href="/cirth/v0.15/components/meter">Meter</a></li>
+							
+								<li><a href="/cirth/v0.15/components/modal">Modal</a></li>
+							
+								<li><a href="/cirth/v0.15/components/nav">Nav</a></li>
+							
+								<li><a href="/cirth/v0.15/components/popover">Popover</a></li>
+							
+								<li><a href="/cirth/v0.15/components/progress">Progress</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Utilities</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/utilities/accessibility">Accessibility</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/high-contrast">High contrast</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/reduce-motion">Reduce motion</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/sr-only">Screen-reader only</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/truncate">Truncate</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/breakout">Breakout</a></li>
+							
+								<li><a href="/cirth/v0.15/utilities/print">Print</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Project</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.15/examples">Examples</a></li>
+							
+								<li><a href="/cirth/v0.15/contributions">Contributions</a></li>
+							
+								<li><a href="/cirth/v0.15/brand" aria-current="page">Brand</a></li>
+							
+						</ul>
+					</section>
+				
+			</nav>
+		</details>
+		
+			<details class="docs-toc-top">
+				<summary>On this page</summary>
+				<nav aria-label="On this page">
+					<ul>
+						
+							<li class="docs-toc-level-2">
+								<a href="#signature-title">The part that survives a retheme.</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#the-mark">The mark</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#brand-spec-title">One mark, three levels of fidelity.</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#operational-rules">Operational rules</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#incorrect-use">Incorrect use</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#color">Color</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#the-lockup">The lockup</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#which-asset-at-which-size">Which asset, at which size</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#typography">Typography</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#using-the-mark-in-technical-contexts">Using the mark in technical contexts</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#voice">Voice</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#usage-agreement">Usage agreement</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#keeping-the-mark-intact">Keeping the mark intact</a>
+							</li>
+						
+					</ul>
+				</nav>
+			</details>
+		
+	</div>
+	<div class="docs-layout">
+		<aside class="docs-sidebar">
+			<nav aria-label="docs navigation">
+				
+					<details>
+						<summary>Introduction</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/get-started">Get Started</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/customization">Customization</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/colors">Colors</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/about">About Cirth</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/upgrading">Upgrading</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Layout</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/document">Document</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/landmarks">Landmarks</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/section">Section</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/container">Container</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/row">Row</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/grid">Grid</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/layout/overflow-auto">Overflow auto</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Content</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/content/typography">Typography</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/description-list">Description list</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/link">Link</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/button">Button</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/table">Table</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/code">Code</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/figure">Figure</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/embedded">Embedded content</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/content/misc">Misc</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Forms</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/">Overview</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/checkbox-radio-switch">Checkbox, radio, switch</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-color">Input color</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-date">Input date</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-file">Input file</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-range">Input range</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/forms/input-search">Input search</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Components</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/components/accordion">Accordion</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/card">Card</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/dropdown">Dropdown</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/group">Group</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/loading">Loading</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/meter">Meter</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/modal">Modal</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/nav">Nav</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/popover">Popover</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/components/progress">Progress</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Utilities</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/accessibility">Accessibility</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/high-contrast">High contrast</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/reduce-motion">Reduce motion</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/sr-only">Screen-reader only</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/truncate">Truncate</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/breakout">Breakout</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/utilities/print">Print</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details open="">
+						<summary>Project</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.15/examples">Examples</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/contributions">Contributions</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.15/brand" aria-current="page">Brand</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+			</nav>
+		</aside>
+		<div class="docs-content" data-pagefind-body="">
+			<h1>Brand</h1>
+<p>Assets and guidelines for representing Cirth in articles, talks,
+integrations, and anywhere else the project is named.</p>
+<section class="docs-brand-spec" aria-labelledby="signature-title">
+  <header class="docs-brand-spec-header">
+    <h2 id="signature-title">The part that survives a retheme.</h2>
+    <p>Cirth's identity is not the copper. The accent is the first token any
+    adopter replaces, and a framework whose character lives entirely in one
+    hue has no character left the moment it is adopted. What stays is
+    below: proportions, strokes and target sizes that hold in every preset,
+    every scheme and every build. Compare
+    <a href="/cirth/v0.15/specimen/default/">the default specimen</a> with
+    <a href="/cirth/v0.15/specimen/plain/">the plain one</a> — same six measurements,
+    different pigment.</p>
+  </header>
+  <dl class="grid docs-brand-measures">
+    <div><dt>Container corner</dt><dd><code>9px</code> · <code>--cirth-card-border-radius</code></dd></div>
+    <div><dt>Control corner</dt><dd><code>6px</code> · <code>--cirth-border-radius</code></dd></div>
+    <div><dt>Resting edge</dt><dd><code>1px</code>, all four sides, every button variant</dd></div>
+    <div><dt>Target floor</dt><dd><code>44px</code> controls · <code>40px</code> in a nav</dd></div>
+    <div><dt>Card contract</dt><dd>Tinted header band · <code>12/20px</code> · padded body</dd></div>
+    <div><dt>Spacing unit</dt><dd><code>4px</code> scale · <code>16px</code> default step</dd></div>
+  </dl>
+</section>
+<p>The pairing is the recognisable part. A container is one radius step softer
+than the controls inside it, so a card reads as a sheet holding buttons
+rather than as a big button. Every resting edge is the same single hairline
+— a filled button, an outline button, a field, a card and a popover all draw
+the same 1px on all four sides, and none of them fakes relief on one edge.
+Interactive targets sit on a 44px floor (WCAG 2.5.5), except inside a
+<code>&lt;nav&gt;</code>, which opts down to a 40px band while staying above the 24px WCAG
+2.5.8 minimum.</p>
+<p>Those are the marks to preserve when Cirth is restyled. Replacing
+<code>--cirth-primary</code> is expected and supported; flattening the radius pair to a
+single value, thickening one edge of a control, or dropping the target floor
+takes the interface out of the system.</p>
+<h2 id="the-mark" tabindex="-1">The mark <a class="header-anchor" href="#the-mark">#</a></h2>
+<p>The Cirth mark is a rune-form monogram: angular strokes that read as a
+carved &quot;C&quot;. It references the project's namesake, the Cirth runic
+alphabet used by Tolkien's Dwarves, designed for carving into hard
+surfaces so every letter is reduced to the strokes the material allows.
+The same reduction — keep only what the medium requires — is the
+engineering constraint the framework itself is built around: keep only
+what the medium requires, and watch the size of what is left. See
+<a href="/cirth/v0.15/about#size-and-what-it-is-a-budget-for">About Cirth</a> for how the budgets
+work, and why they are a guard rather than a promise.</p>
+<section class="docs-brand-spec" aria-labelledby="brand-spec-title">
+  <header class="docs-brand-spec-header">
+    <h2 id="brand-spec-title">One mark, three levels of fidelity.</h2>
+  </header>
+  <div class="docs-brand-construction">
+    <figure class="docs-mark-blueprint">
+      <div class="docs-mark-clearspace">
+        <img src="/cirth/v0.15/logo_brand.svg" alt="Full Cirth monogram over its construction grid" width="240" height="240">
+        <i class="axis-x" aria-hidden="true"></i>
+        <i class="axis-y" aria-hidden="true"></i>
+      </div>
+      <figcaption><strong>High fidelity</strong><span>Full five-part mark · 48px and above</span></figcaption>
+    </figure>
+    <figure class="docs-mark-medium">
+      <img src="/cirth/v0.15/logo_brand.svg" alt="Full Cirth monogram at medium size" width="48" height="48">
+      <figcaption><strong>Medium fidelity</strong><span>Full mark · 24–47px</span></figcaption>
+    </figure>
+    <figure class="docs-mark-low">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="/cirth/v0.15/mark_small_dark.svg">
+        <img src="/cirth/v0.15/mark_small.svg" alt="Optically simplified Cirth small-size mark" width="20" height="20">
+      </picture>
+      <figcaption><strong>Low fidelity</strong><span>Four-part optical mark · 16–23px</span></figcaption>
+    </figure>
+  </div>
+  <dl class="grid docs-brand-measures">
+    <div><dt>Base unit</dt><dd><code>8px</code></dd></div>
+    <div><dt>Micro unit</dt><dd><code>4px</code></dd></div>
+    <div><dt>Primary joint</dt><dd><code>45°</code></dd></div>
+    <div><dt>Clearspace</dt><dd><code>0.5 × mark width</code></dd></div>
+    <div><dt>Signal hue</dt><dd><code>44°</code></dd></div>
+    <div><dt>Minimum size</dt><dd><code>16px optical</code></dd></div>
+  </dl>
+</section>
+<p>Cirth is not affiliated with, endorsed by, or associated with the
+Tolkien estate, the Tolkien Society, Amazon's Middle-earth adaptations,
+or any other rights holder. The name is a reference to a real-world
+writing system, not a claim of license or partnership.</p>
+<div class="docs-brand-grid">
+  <figure class="docs-brand-tile" data-theme="light">
+    <img src="/cirth/v0.15/logo_brand.svg" alt="Cirth brand mark, copper on light" width="96" height="96">
+    <figcaption>Brand · light</figcaption>
+    <p class="docs-brand-downloads">
+      <a class="secondary" href="/cirth/v0.15/logo_brand.svg" download="">SVG</a>
+      <a class="secondary" href="/cirth/v0.15/logo_brand.png" download="">PNG</a>
+    </p>
+  </figure>
+  <figure class="docs-brand-tile" data-theme="light">
+    <img src="/cirth/v0.15/logo_mono.svg" alt="Cirth monochrome mark, black on light" width="96" height="96">
+    <figcaption>Mono · light</figcaption>
+    <p class="docs-brand-downloads">
+      <a class="secondary" href="/cirth/v0.15/logo_mono.svg" download="">SVG</a>
+      <a class="secondary" href="/cirth/v0.15/logo_mono.png" download="">PNG</a>
+    </p>
+  </figure>
+  <figure class="docs-brand-tile" data-theme="light">
+    <img src="/cirth/v0.15/logo_brand_app.svg" alt="Cirth icon on its background tile, light" width="96" height="96">
+    <figcaption>Icon · light</figcaption>
+    <p class="docs-brand-downloads">
+      <a class="secondary" href="/cirth/v0.15/logo_brand_app.svg" download="">SVG</a>
+      <a class="secondary" href="/cirth/v0.15/logo_brand_app.png" download="">PNG</a>
+    </p>
+  </figure>
+  <figure class="docs-brand-tile" data-theme="dark">
+    <img src="/cirth/v0.15/logo_brand_dark.svg" alt="Cirth brand mark, copper on dark" width="96" height="96">
+    <figcaption>Brand · dark</figcaption>
+    <p class="docs-brand-downloads">
+      <a class="secondary" href="/cirth/v0.15/logo_brand_dark.svg" download="">SVG</a>
+      <a class="secondary" href="/cirth/v0.15/logo_brand_dark.png" download="">PNG</a>
+    </p>
+  </figure>
+  <figure class="docs-brand-tile" data-theme="dark">
+    <img src="/cirth/v0.15/logo_mono_dark.svg" alt="Cirth monochrome mark, white on dark" width="96" height="96">
+    <figcaption>Mono · dark</figcaption>
+    <p class="docs-brand-downloads">
+      <a class="secondary" href="/cirth/v0.15/logo_mono_dark.svg" download="">SVG</a>
+      <a class="secondary" href="/cirth/v0.15/logo_mono_dark.png" download="">PNG</a>
+    </p>
+  </figure>
+  <figure class="docs-brand-tile" data-theme="dark">
+    <img src="/cirth/v0.15/logo_brand_app_dark.svg" alt="Cirth icon on its background tile, dark" width="96" height="96">
+    <figcaption>Icon · dark</figcaption>
+    <p class="docs-brand-downloads">
+      <a class="secondary" href="/cirth/v0.15/logo_brand_app_dark.svg" download="">SVG</a>
+      <a class="secondary" href="/cirth/v0.15/logo_brand_app_dark.png" download="">PNG</a>
+    </p>
+  </figure>
+</div>
+<p>Each variant above is downloadable as SVG (preferred) or PNG. The full set
+lives in
+<a href="https://github.com/cirthcss/cirth/tree/master/docs/public"><code>docs/public/</code></a>,
+including the two combinations this grid does not show — the mono mark on
+its own background tile, light and dark, for square containers that have to
+stay one colour.</p>
+<p>Use the <strong>brand</strong> (copper) mark wherever color is available, matching the
+variant to the background. Use <strong>mono</strong> in one color contexts such as print,
+badges, embossing. The <strong>icon</strong> variants sit on their own background
+tile; use them where the mark needs to fill a square: favicons, social
+avatars, bookmark icons. Not for inline use next to text.</p>
+<h2 id="operational-rules" tabindex="-1">Operational rules <a class="header-anchor" href="#operational-rules">#</a></h2>
+<p>Use the full mark above 24px and switch to the optical small-size mark for
+favicon-scale contexts. The optical variant preserves the incised “C”,
+removes the detached origin accent, and fills more of its view box. It is an
+experimental responsive asset; the original SVG files remain unchanged.</p>
+<p>The 45° joint is a structural device for diagram junctions, section
+terminals, and large composition crops. Do not apply it to every card,
+button, or input. Keep clearspace equal to half the visible mark width.</p>
+<h3 id="incorrect-use" tabindex="-1">Incorrect use <a class="header-anchor" href="#incorrect-use">#</a></h3>
+<p>Do not stretch, rotate, outline, add a glow, put the mark on low-contrast
+surfaces, repeat it as wallpaper, or pair it with fantasy imagery. Do not
+use the small-size variant above 24px, where its reduced detail becomes
+unnecessarily blunt.</p>
+<h2 id="color" tabindex="-1">Color <a class="header-anchor" href="#color">#</a></h2>
+<p>The brand color is copper, and in an interface it has exactly two jobs:
+<strong>action</strong> and <strong>current position</strong>. A primary button, a focus ring and a
+link in running prose are actions. The rail beside the page you are on, the
+edge on an active in-page nav item and a selected control are position.
+Header navbars are quieter chrome: they use ink and weight rather than an
+accent edge. Nothing else in a Cirth interface is copper.</p>
+<p>Editorial typography is the one place outside those two, and it is a
+deliberate exception rather than a leak: a word or phrase set in the accent
+inside a heading, the way this site's home page sets <em>semantic HTML</em>. It is
+a single named class, applied by hand, in prose — not a component state.</p>
+<p>It used to do five. Navigation links carried the accent at rest, which meant
+a menu of eight entries was eight brand-coloured words next to one button
+that also wanted the colour, and the accent stopped meaning &quot;act on this&quot;
+and started meaning &quot;this is a Cirth screen&quot;. Navigation now takes the ink
+of whatever it sits in and the accent marks only where you are — so the one
+thing copper still says, it says alone.</p>
+<p>The light theme's base surface is a mineral paper rather than white, and the
+card sheet carries the same temperature: the page is not neutral, but the
+warmth is a surface property, not a wash of the accent. In dark the base is
+a graphite carrying the same stone tint as the neutral scale. Neither scheme
+paints the brand hue across backgrounds.</p>
+<p>The mark's hue, <strong>44°</strong> in oklch, is the exact hue the framework's entire
+copper scale is generated from; the logo sits brighter and more saturated
+than the UI tokens because it is an identity color, not a text color. The
+scale holds the accent at 70% of its own gamut ceiling so it can cover whole
+surfaces without shouting; the mark, which covers a monogram, is free to sit
+at 85%.</p>
+<div class="overflow-auto docs-table-scroll" tabindex="0" role="region" aria-label="Table: Role, Value"><table><thead>
+<tr>
+<th>Role</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mark, light backgrounds</td>
+<td><code>#BD5928</code> (<code>oklch(58% 0.143 44deg)</code>)</td>
+</tr>
+<tr>
+<td>Mark, dark backgrounds</td>
+<td><code>#E16B31</code> (<code>oklch(66% 0.163 44deg)</code>)</td>
+</tr>
+<tr>
+<td>UI primary (light theme)</td>
+<td><code>oklch(52.7% 0.107 44deg)</code>, from <code>$copper-550</code></td>
+</tr>
+<tr>
+<td>UI primary (dark theme)</td>
+<td><code>oklch(65.7% 0.134 44deg)</code>, from <code>$copper-400</code></td>
+</tr>
+</tbody>
+</table></div><p>The dark UI primary is one ladder step deeper than a mirror of the light one
+would be. Copper's gamut ceiling climbs steeply past 65% lightness, so the
+mirroring step comes out an orange; a step down keeps it reading as metal
+and still clears AA on every surface in the scheme.</p>
+<p>In interfaces, always use the <code>--cirth-primary*</code> tokens rather than the
+logo hexes: the tokens are variants verified for WCAG. See
+<a href="/cirth/v0.15/colors">Colors</a> for the full system.</p>
+<h2 id="the-lockup" tabindex="-1">The lockup <a class="header-anchor" href="#the-lockup">#</a></h2>
+<p>The horizontal lockup is the mark with the name beside it: &quot;Cirth&quot; in the
+sans voice, bold, with the mark sized to the cap height and sitting on the
+same baseline. Use it where the name has to travel with the mark and there
+is room for both — a third-party README, a talk slide, a conference badge,
+a social post.</p>
+<div class="docs-brand-grid docs-lockup-grid">
+  <figure class="docs-brand-tile" data-theme="light">
+    <img src="/cirth/v0.15/wordmark.svg" alt="Cirth horizontal lockup, copper mark and graphite name on light" width="240" height="57">
+    <figcaption>Lockup · light</figcaption>
+    <p class="docs-brand-downloads">
+      <a class="secondary" href="/cirth/v0.15/wordmark.svg" download="">SVG</a>
+      <a class="secondary" href="/cirth/v0.15/wordmark.png" download="">PNG</a>
+    </p>
+  </figure>
+  <figure class="docs-brand-tile" data-theme="dark">
+    <img src="/cirth/v0.15/wordmark_dark.svg" alt="Cirth horizontal lockup, copper mark and paper name on dark" width="240" height="57">
+    <figcaption>Lockup · dark</figcaption>
+    <p class="docs-brand-downloads">
+      <a class="secondary" href="/cirth/v0.15/wordmark_dark.svg" download="">SVG</a>
+      <a class="secondary" href="/cirth/v0.15/wordmark_dark.png" download="">PNG</a>
+    </p>
+  </figure>
+</div>
+<p>A one-colour lockup is available as
+<a class="secondary" href="/cirth/v0.15/wordmark_mono.svg" download=""><code>wordmark_mono.svg</code></a>
+for print, badges and embossing. It paints with <code>currentColor</code>, so
+inline it to give it your own ink; loaded through <code>&lt;img&gt;</code> it
+falls back to black, the same as the mono mark.</p>
+<p><strong>The name is live text, not outlines.</strong> The lockup carries <code>&lt;text&gt;</code> in the
+system sans stack the framework itself ships, which is the whole of the
+typographic claim: there is no font to install, and nothing to license. The
+cost is that the word's width moves a little between platforms — SF Pro sets
+it narrowest, Helvetica and Arial about 2.5% wider — so the box reserves
+room for the widest face in the stack and a narrower one leaves a little air
+on the right. That is the intended behaviour, not a mis-export.</p>
+<h3 id="which-asset-at-which-size" tabindex="-1">Which asset, at which size <a class="header-anchor" href="#which-asset-at-which-size">#</a></h3>
+<div class="overflow-auto docs-table-scroll" tabindex="0" role="region" aria-label="Table: Context, Asset, Why"><table><thead>
+<tr>
+<th>Context</th>
+<th>Asset</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Name and mark together, 128px wide and up</td>
+<td>Lockup</td>
+<td>Below 128px the mark inside it drops under its own 24px floor</td>
+</tr>
+<tr>
+<td>Square container: favicon, avatar, app tile</td>
+<td>Icon tile</td>
+<td>The mark fills the square; the lockup cannot</td>
+</tr>
+<tr>
+<td>Inline beside text, 24px and up</td>
+<td>Full mark</td>
+<td>Five-part mark at medium fidelity</td>
+</tr>
+<tr>
+<td>16–23px</td>
+<td>Optical small mark</td>
+<td>Fewer parts, tighter box</td>
+</tr>
+</tbody>
+</table></div><p>The lockup does not replace the mark at small sizes. Shrinking it until the
+name is legible makes the mark illegible first; at that point the mark alone
+is the correct asset and the name belongs in the text next to it.</p>
+<h2 id="typography" tabindex="-1">Typography <a class="header-anchor" href="#typography">#</a></h2>
+<p>Sans-serif is the primary typographic voice for product surfaces, headings,
+and UI chrome, and it is the voice the lockup is set in. Monospace is
+reserved for code, size metrics, and proof points (<code>13.6 KB</code>,
+<code>--cirth-primary</code>), and for the site's own chrome, where the name appears as
+a navigational label rather than as the wordmark. Serif remains available as
+a primitive token for an author to opt into, but is not part of Cirth's
+product voice. There is no custom font to install: the brand uses the same
+system stacks the framework ships, on purpose.</p>
+<p>Write the name as <strong>Cirth</strong> (capitalized, never uppercase); the npm scope
+is <code>@cirthcss/cirth</code>.</p>
+<h2 id="using-the-mark-in-technical-contexts" tabindex="-1">Using the mark in technical contexts <a class="header-anchor" href="#using-the-mark-in-technical-contexts">#</a></h2>
+<p>The mark is built to survive small, high-contrast, low-color placements:
+READMEs, npm listings, CI badges, terminal output headers, favicons. Use
+the <strong>mono</strong> variant wherever a single flat color is preferable to copper
+(badges, print, embossing, low-color terminals), and the <strong>icon</strong> tile
+wherever the mark needs to fill a square container. Don't pair the mark
+with fantasy-styled illustration, parchment or stone textures, or
+medieval typography — the mark itself carries the reference to the name;
+the surrounding presentation should stay contemporary and technical.</p>
+<h2 id="voice" tabindex="-1">Voice <a class="header-anchor" href="#voice">#</a></h2>
+<p>Cirth's writing is technical but accessible, precise, and evidence-led:
+assertive about what is verified, transparent about trade-offs, and never
+ideological. Prefer <em>claim → mechanism → proof</em> — state what the
+framework does, explain how, then point at something checkable (a script,
+a number, a source file).</p>
+<p>Favor words like <strong>native</strong>, <strong>runtime</strong>, <strong>tokens</strong>, <strong>scope</strong>,
+<strong>integrate</strong>, <strong>verify</strong>, <strong>ship</strong>, <strong>baseline</strong>, <strong>size budget</strong>, and
+<strong>browser primitives</strong>. Avoid <strong>purity</strong>, <strong>timeless</strong>, <strong>philosophy</strong>,
+<strong>framework dialect</strong>, and repeated carving metaphors outside the name's
+origin story — and avoid unverifiable claims such as &quot;nothing to break,&quot;
+&quot;fully accessible,&quot; or &quot;always delivered in one round trip.&quot;</p>
+<p>Example headlines:</p>
+<ul>
+<li>&quot;Production-ready UI from semantic HTML.&quot;</li>
+<li>&quot;One stylesheet. Runtime tokens. No JavaScript runtime.&quot;</li>
+<li>&quot;A size budget on every bundle, checked on every build.&quot;</li>
+</ul>
+<p>Example one-line descriptions:</p>
+<ul>
+<li>&quot;Cirth turns native HTML elements into accessible, themeable
+interfaces, with zero shipped JavaScript.&quot;</li>
+<li>&quot;An HTML-native CSS framework with a runtime design token system and a
+monitored gzipped size budget.&quot;</li>
+</ul>
+<h2 id="usage-agreement" tabindex="-1">Usage agreement <a class="header-anchor" href="#usage-agreement">#</a></h2>
+<p>The Cirth code is released under the Apache License 2.0; the name and logo are brand assets with
+their own terms:</p>
+<ol>
+<li><strong>Naming projects.</strong> You may use the Cirth name as part of a
+noncommercial open source project's name, for example
+&quot;cirth-react&quot; or &quot;cirth-starter&quot;, as long as it's clear the project
+is built <em>for</em> Cirth, not <em>by</em> Cirth. Using the name in a commercial
+product or service requires prior written permission.</li>
+<li><strong>Using the logo.</strong> The mark may be used in articles, talks,
+tutorials, and documentation that reference Cirth, with attribution.
+It may not be used as (or inside) the logo of another project,
+product, or company, whether open source or commercial.</li>
+<li><strong>Merchandise.</strong> Using the Cirth name or logo on merchandise
+(shirts, stickers, and similar) requires explicit written consent.</li>
+<li><strong>No implied endorsement.</strong> Neither the name nor the mark may be used
+in a way that suggests Cirth endorses, certifies, or maintains an
+external product.</li>
+</ol>
+<p>For permissions, open an issue on
+<a href="https://github.com/cirthcss/cirth/issues">GitHub</a>.</p>
+<h3 id="keeping-the-mark-intact" tabindex="-1">Keeping the mark intact <a class="header-anchor" href="#keeping-the-mark-intact">#</a></h3>
+<p>When you do use the mark:</p>
+<ul>
+<li>keep clearspace around it of at least half its width;</li>
+<li>use the responsive small-size asset from 16–23px;</li>
+<li>pick the brand or mono variant that keeps contrast on your background;</li>
+<li>don't recolor, outline, rotate, add effects, or redraw the strokes,
+and don't set the wordmark in another typeface — use
+<a href="#the-lockup">the lockup</a> rather than re-typesetting the name.</li>
+</ul>
+
+			
+				
+				
+				
+					<footer class="docs-prev-next">
+						
+							<a href="/cirth/v0.15/contributions" class="secondary">← Contributions</a>
+						
+						
+					</footer>
+				
+			
+		</div>
+		
+			<aside class="docs-toc">
+				<nav aria-label="On this page" id="docs-toc-nav">
+					<strong>On this page</strong>
+					<ul>
+						
+							<li class="docs-toc-level-2">
+								<a href="#signature-title" data-toc-link="" data-slug="signature-title">The part that survives a retheme.</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#the-mark" data-toc-link="" data-slug="the-mark">The mark</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#brand-spec-title" data-toc-link="" data-slug="brand-spec-title">One mark, three levels of fidelity.</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#operational-rules" data-toc-link="" data-slug="operational-rules">Operational rules</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#incorrect-use" data-toc-link="" data-slug="incorrect-use">Incorrect use</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#color" data-toc-link="" data-slug="color">Color</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#the-lockup" data-toc-link="" data-slug="the-lockup">The lockup</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#which-asset-at-which-size" data-toc-link="" data-slug="which-asset-at-which-size">Which asset, at which size</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#typography" data-toc-link="" data-slug="typography">Typography</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#using-the-mark-in-technical-contexts" data-toc-link="" data-slug="using-the-mark-in-technical-contexts">Using the mark in technical contexts</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#voice" data-toc-link="" data-slug="voice">Voice</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#usage-agreement" data-toc-link="" data-slug="usage-agreement">Usage agreement</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#keeping-the-mark-intact" data-toc-link="" data-slug="keeping-the-mark-intact">Keeping the mark intact</a>
+							</li>
+						
+					</ul>
+				</nav>
+			</aside>
+		
+	</div>
+</main>
+<script>
+	// Scroll-spy for the "On this page" aside: highlight whichever heading
+	// was most recently scrolled past. Purely additive — the TOC works
+	// (and its links navigate) without this script.
+	const links = Array.from(document.querySelectorAll("[data-toc-link]"));
+	if (links.length > 0) {
+		const headings = Array.from(
+			document.querySelectorAll(".docs-content :is(h2, h3)[id]"),
+		);
+
+		const update = () => {
+			// 96px offset: the heading counts as "reached" slightly before it
+			// touches the top edge, matching where the eye lands after a jump.
+			let current = "";
+			for (const heading of headings) {
+				if (heading.getBoundingClientRect().top <= 96) current = heading.id;
+				else break;
+			}
+			const activeSlug = current || (headings[0] ? headings[0].id : "");
+			// aria-current only: the framework paints its one registered
+			// edge on the inline-start rail from it, and the stylesheet
+			// deliberately adds no second marker of its own.
+			for (const link of links) {
+				if (link.dataset.slug === activeSlug) {
+					link.setAttribute("aria-current", "true");
+				} else {
+					link.removeAttribute("aria-current");
+				}
+			}
+		};
+
+		window.addEventListener("scroll", update, { passive: true });
+		update();
+	}
+</script>
+
+		<footer class="docs-footer">
+	<div class="container">
+		<div class="docs-footer-top">
+			<div class="docs-footer-brand-block">
+				<a href="/cirth/v0.15/" class="contrast docs-brand docs-footer-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.15/logo_brand.svg" alt="" width="36" height="36">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.15/logo_brand_dark.svg" alt="" width="36" height="36">
+					<strong>Cirth</strong>
+				</a>
+				<p class="docs-footer-credit">
+					Designed and built by Riccardo Pastori, with help from the
+					<a href="https://github.com/cirthcss/cirth/graphs/contributors" target="_blank" rel="noreferrer">contributors<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>.
+				</p>
+				<ul class="docs-footer-social">
+					<li><a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+					<li><a href="https://www.npmjs.com/package/@cirthcss/cirth" target="_blank" rel="noreferrer">npm<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+					<li><a href="https://github.com/cirthcss/cirth/blob/master/CHANGELOG.md" target="_blank" rel="noreferrer">Changelog<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+				</ul>
+			</div>
+			<div class="docs-footer-columns">
+				
+					<div class="docs-footer-column">
+						<strong>Docs</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/get-started">Get Started</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/customization">Customization</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/colors">Colors</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/components/card">Components</a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+					<div class="docs-footer-column">
+						<strong>Project</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/about">About Cirth</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/upgrading">Upgrading</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/brand">Brand</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/examples">Examples</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.15/contributions">Contributions</a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+					<div class="docs-footer-column">
+						<strong>Community</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="https://github.com/cirthcss/cirth/issues" target="_blank" rel="noreferrer">Issues<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+			</div>
+		</div>
+		<hr>
+		<small>
+			<span>Released under the Apache License 2.0.</span>
+			<span>Copyright © 2025-present Riccardo Pastori</span>
+		</small>
+	</div>
+</footer>
+
+		<dialog id="docs-search-dialog" class="docs-search-dialog" aria-labelledby="docs-search-title" data-docs-search-dialog="">
+	<article>
+		<header>
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
+			<h2 id="docs-search-title" class="sr-only">Search documentation</h2>
+			<input id="docs-search-input" type="text" role="searchbox" aria-label="Search documentation" placeholder="Search the Cirth documentation…" autocomplete="off" enterkeyhint="search" aria-controls="docs-search-results" aria-describedby="docs-search-status" data-docs-search-input="">
+			<button type="button" class="close" aria-label="Close search" data-docs-search-close=""></button>
+		</header>
+		<p id="docs-search-status" class="docs-search-status" role="status" aria-live="polite" data-docs-search-status="">
+			Type at least two characters to search.
+		</p>
+		<ol id="docs-search-results" class="docs-search-results" data-docs-search-results=""></ol>
+		<footer class="docs-search-help" aria-hidden="true">
+			<span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+			<span><kbd>↵</kbd> open</span>
+			<span><kbd>esc</kbd> close</span>
+			<small>Search by Pagefind</small>
+		</footer>
+	</article>
+</dialog>
+<script type="module" src="/cirth/v0.15/search.js"></script>
+
+		<div class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-copy-status=""></div>
+		<script>
+			// Copy-to-clipboard for fenced code blocks: the markdown pipeline
+			// only highlights, it doesn't add a button, so one is injected for
+			// every `pre > code` on the page (prose fences and Demo's
+			// "Show HTML" source alike).
+			const copyStatus = document.querySelector("[data-copy-status]");
+			const announceCopyStatus = (message) => {
+				if (!copyStatus) return;
+				copyStatus.textContent = "";
+				requestAnimationFrame(() => {
+					copyStatus.textContent = message;
+				});
+			};
+
+			// Every code block the shell owns, and no others: a <pre> inside a
+			// live example is the example. Injecting a control into it would
+			// put a <button> in the reader's specimen that Cirth never ships,
+			// and the caption on every demo says the opposite. The disclosure
+			// under the demo keeps its button — that listing is the shell's.
+			for (const pre of document.querySelectorAll("pre")) {
+				if (pre.closest(".docs-demo-preview")) continue;
+				if (pre.querySelector(":scope > button.copy")) continue;
+				const code = pre.querySelector("code");
+				if (!code?.textContent) continue;
+
+				const button = document.createElement("button");
+				button.type = "button";
+				button.className = "copy";
+				button.setAttribute("aria-label", "Copy to clipboard");
+				pre.append(button);
+
+				button.addEventListener("click", async () => {
+					try {
+						await navigator.clipboard.writeText(code.textContent ?? "");
+						button.classList.add("copied");
+						setTimeout(() => button.classList.remove("copied"), 2000);
+						announceCopyStatus("Code copied to clipboard.");
+					} catch {
+						announceCopyStatus("Code could not be copied.");
+					}
+				});
+			}
+
+			// The scoped classless build reads data-theme from its own root
+			// element (.cirth-classless demos), so mirror the site theme onto
+			// every such wrapper whenever it changes.
+			const classlessRoots = document.querySelectorAll(".cirth-classless");
+			if (classlessRoots.length > 0) {
+				const sync = () => {
+					const theme = document.documentElement.getAttribute("data-theme");
+					for (const root of classlessRoots) root.setAttribute("data-theme", theme ?? "light");
+				};
+				sync();
+				new MutationObserver(sync).observe(document.documentElement, {
+					attributeFilter: ["data-theme"],
+				});
+			}
+
+			// Live preset switcher (gh#80): the <head> script above already
+			// applied a remembered choice before first paint; this wires up
+			// the header <select> for changes after load. Swapping the
+			// stylesheet's href (rather than always keeping one <link> per
+			// preset and toggling disabled) means an unvisited preset is
+			// never fetched at all.
+			const presetSelect = document.querySelector("[data-cirth-preset-select]");
+			if (presetSelect) {
+				const base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
+				const applyPreset = (preset) => {
+					const existing = document.getElementById("cirth-preset-stylesheet");
+					if (preset === "default") {
+						existing?.remove();
+						return;
+					}
+					const link = existing ?? document.createElement("link");
+					link.rel = "stylesheet";
+					link.id = "cirth-preset-stylesheet";
+					link.href = `${base}/styles/generated/presets/${preset}.css`;
+					if (!existing) document.head.appendChild(link);
+				};
+				presetSelect.value = sessionStorage.getItem("cirth-preset") || "default";
+				presetSelect.addEventListener("change", () => {
+					sessionStorage.setItem("cirth-preset", presetSelect.value);
+					applyPreset(presetSelect.value);
+				});
+			}
+
+		</script>
+	</body>
+</html>

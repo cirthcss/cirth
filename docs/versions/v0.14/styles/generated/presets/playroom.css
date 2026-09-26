@@ -1,0 +1,78 @@
+:root,
+:host {
+  --cirth-primary: light-dark(oklch(50% 0.16 300deg), oklch(70% 0.14 300deg));
+  --cirth-canvas: light-dark(oklch(98% 0.012 300deg), oklch(24% 0.028 295deg));
+  --cirth-card-background-color: light-dark(
+    oklch(100% 0 0deg),
+    oklch(29% 0.032 295deg)
+  );
+  --cirth-color: light-dark(oklch(36% 0.03 295deg), oklch(93% 0.012 300deg));
+  --cirth-muted-color: light-dark(
+    oklch(52% 0.035 295deg),
+    oklch(70% 0.028 295deg)
+  );
+  --cirth-muted-border-color: light-dark(
+    oklch(90% 0.02 300deg),
+    oklch(36% 0.03 295deg)
+  );
+  --cirth-link-visited-color: light-dark(
+    oklch(50% 0.03 295deg),
+    oklch(70% 0.025 295deg)
+  );
+  --cirth-error: light-dark(oklch(45% 0.16 25deg), oklch(74% 0.13 25deg));
+  --cirth-success: light-dark(oklch(52% 0.11 155deg), oklch(72% 0.11 155deg));
+  --cirth-warning: light-dark(oklch(50% 0.1 75deg), oklch(74% 0.11 75deg));
+  --cirth-border-radius: var(--cirth-radius-2xl);
+  --cirth-spacing: var(--cirth-space-5);
+  --cirth-font-family:
+    ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", system-ui,
+    "Segoe UI", Roboto, sans-serif, var(--cirth-font-family-emoji);
+  --cirth-font-family-display: var(--cirth-font-family);
+  --cirth-font-weight: var(--cirth-font-weight-medium);
+  --cirth-line-height: var(--cirth-line-height-relaxed);
+  --cirth-transition: var(--cirth-duration-slow)
+    cubic-bezier(0.34, 1.56, 0.64, 1);
+  --cirth-box-shadow:
+    0 0.0625rem 0.125rem oklch(36% 0.03 295deg / 6%),
+    0 0.75rem 1.5rem oklch(36% 0.03 295deg / 10%);
+  --cirth-primary-hover: light-dark(
+    oklch(56% 0.18 300deg),
+    oklch(80% 0.13 300deg)
+  );
+  --cirth-primary-hover-background: light-dark(
+    oklch(58% 0.18 300deg),
+    oklch(58% 0.18 300deg)
+  );
+}
+
+@media (prefers-contrast: more) {
+  :root,
+  :host {
+    --cirth-primary: light-dark(oklch(41% 0.17 300deg), oklch(86% 0.1 300deg));
+    --cirth-primary-background: light-dark(
+      oklch(41% 0.17 300deg),
+      oklch(42% 0.15 300deg)
+    );
+    --cirth-primary-hover-background: light-dark(
+      oklch(34% 0.15 300deg),
+      oklch(35% 0.13 300deg)
+    );
+    --cirth-primary-hover: light-dark(
+      oklch(34% 0.16 300deg),
+      oklch(92% 0.07 300deg)
+    );
+    --cirth-color: light-dark(oklch(22% 0.02 295deg), oklch(98% 0.006 300deg));
+    --cirth-muted-color: light-dark(
+      oklch(40% 0.035 295deg),
+      oklch(82% 0.02 295deg)
+    );
+    --cirth-muted-border-color: light-dark(
+      oklch(58% 0.03 295deg),
+      oklch(62% 0.03 295deg)
+    );
+    --cirth-link-visited-color: light-dark(
+      oklch(36% 0.03 295deg),
+      oklch(84% 0.02 295deg)
+    );
+  }
+}
