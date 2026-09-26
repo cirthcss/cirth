@@ -112,11 +112,36 @@ const withoutPrefix = (prefix) => {
 };
 
 /**
+ * Is an absolute path part of this build at all?
+ *
+ * A build served from a subdirectory sits inside a larger site it does not
+ * contain and cannot check. The /next/ preview is the case that matters:
+ * it is published under /cirth/next/ beside the released site at /cirth/,
+ * and its banner links back out to that site. Those links are correct and
+ * deliberate, but every one of them resolves above this build's root, so a
+ * checker that treats "not in my file tree" as "broken" reports the whole
+ * way out as a 404 and fails the build that was about to publish it.
+ *
+ * At the site root the prefix is `/`, nothing can be outside it, and this
+ * answers true for everything: the released site is checked exactly as
+ * before.
+ *
+ * @param {string} prefix
+ * @returns {(route: string) => boolean}
+ */
+const insidePrefix = (prefix) => {
+	if (prefix === "/") return () => true;
+	const bare = prefix.replace(/\/$/, "");
+	return (route) => route === bare || route.startsWith(prefix);
+};
+
+/**
  * @param {{ root: string, reportRoot?: string, pathPrefix?: string }} options
  * @returns {{ checked: number, pages: number, violations: string[] }}
  */
 const checkBuiltLinks = ({ root, reportRoot = root, pathPrefix = "/" }) => {
 	const stripPrefix = withoutPrefix(pathPrefix);
+	const isOurs = insidePrefix(pathPrefix);
 	/** @type {string[]} */
 	const violations = [];
 	const htmlFiles = listHtml(root);
@@ -176,13 +201,19 @@ const checkBuiltLinks = ({ root, reportRoot = root, pathPrefix = "/" }) => {
 			// Where does this land? The same page when the href is a bare
 			// fragment; otherwise resolved as a URL against this page's own
 			// route, which is what makes `../` correct rather than guessed.
-			const resolved =
+			const absolute =
 				target === ""
-					? route
-					: stripPrefix(
-							new URL(target, `http://docs${pathPrefix.slice(0, -1)}${route}`)
-								.pathname.replace(/\/{2,}/g, "/"),
-						);
+					? null
+					: new URL(
+							target,
+							`http://docs${pathPrefix.slice(0, -1)}${route}`,
+						).pathname.replace(/\/{2,}/g, "/");
+
+			// Above this build's own root: the surrounding site's page, not
+			// one of ours to find. A bare fragment never leaves the page.
+			if (absolute !== null && !isOurs(absolute)) continue;
+
+			const resolved = absolute === null ? route : stripPrefix(absolute);
 
 			if (excludedRoute.test(resolved)) continue;
 
