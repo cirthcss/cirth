@@ -6,6 +6,7 @@ const {
 	startServer,
 } = require("../scripts/lib/docs-site");
 const { withAndWithoutScrollbar } = require("./helpers/viewport");
+const versions = require("../docs/src/_data/versions.js");
 
 assertDocsBuilt("docs-stack.spec");
 
@@ -371,11 +372,16 @@ test("header keeps navigation, search, and automatic versioning distinct", async
 	await searchInput.press("Enter");
 	await expect(page).toHaveURL(`${origin}/components/accordion/`);
 
-	expect(await version.locator("option").allTextContents()).toEqual([
-		"v0.13",
-		"v0.12",
-		"v0.10",
-	]);
+	// Read from the same list the switcher is built from, not copied out of
+	// it. This test is named for automatic versioning, and a hand-kept copy
+	// here turns archiving a line into a test edit, which is friction in
+	// exactly the place the project least wants it: the archive went three
+	// releases without a new line, and every small cost in the way of adding
+	// one is part of why.
+	expect(await version.locator("option").allTextContents()).toEqual(
+		versions.lines.map((line) => line.shortLabel),
+	);
+	expect(versions.lines[0].current).toBe(true);
 	await version.selectOption({ label: "v0.12" });
 	await expect(page).toHaveURL(`${origin}/v0.12/`);
 });

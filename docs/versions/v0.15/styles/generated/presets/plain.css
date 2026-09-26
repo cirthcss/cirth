@@ -1,0 +1,27 @@
+:root,
+:host {
+  --cirth-primary: light-dark(oklch(52% 0.17 258deg), oklch(72% 0.13 258deg));
+  --cirth-canvas: light-dark(oklch(98.5% 0 0deg), oklch(20% 0.008 264deg));
+  --cirth-font-family-display: var(--cirth-font-family);
+  --cirth-border-radius: var(--cirth-radius-xs);
+  --cirth-transition: var(--cirth-duration-fast) var(--cirth-ease-out);
+}
+
+@media (prefers-contrast: more) {
+  :root,
+  :host {
+    --cirth-primary: light-dark(oklch(41% 0.17 258deg), oklch(86% 0.09 258deg));
+    --cirth-primary-surface: light-dark(
+      oklch(41% 0.17 258deg),
+      oklch(42% 0.14 258deg)
+    );
+    --cirth-primary-surface-active: light-dark(
+      oklch(34% 0.15 258deg),
+      oklch(35% 0.13 258deg)
+    );
+    --cirth-link-visited-color: light-dark(
+      oklch(38% 0.02 258deg),
+      oklch(80% 0.02 258deg)
+    );
+  }
+}
