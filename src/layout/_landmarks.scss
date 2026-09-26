@@ -50,7 +50,7 @@ $container-root-selector: "body";
   > header,
   > main,
   > footer {
-    // <header>, <main>, <footer> as containers — same three-track grid
+    // <header>, <main>, <footer> as containers: same three-track grid
     // as `.container` (layout/_container.scss): two gutter tracks that
     // never drop out, center track capped at the reading measure.
     @if not $enable-classes {

@@ -29,7 +29,7 @@
 /* cirth-component:end */
 
 // Hide [hidden] elements, but not those revealed by find-in-page
-// (`hidden="until-found"`, Chrome/Edge 102+) — a blanket `display: none`
+// (`hidden="until-found"`, Chrome/Edge 102+): a blanket `display: none`
 // would disable that browser feature entirely.
 
 #{$parent-selector} [hidden]:where(:not([hidden="until-found"])) {

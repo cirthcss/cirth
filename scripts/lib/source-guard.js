@@ -22,7 +22,7 @@ const { execFileSync } = require("node:child_process");
 //
 // Deliberately not a lock, a daemon, or a watch: two stats and a hash at
 // each end of a run that already costs minutes. Normal editing is
-// unaffected — the guard only ever speaks about the run it wrapped.
+// unaffected: the guard only ever speaks about the run it wrapped.
 
 const projectRoot = path.join(__dirname, "../..");
 
@@ -53,7 +53,7 @@ const git = (args, cwd) => {
 
 // What a file looked like at a commit, by content. This is the difference
 // between "somebody edited the sheet" and "something ran git checkout,
-// git stash or git restore over it" — which is the shape a concurrent
+// git stash or git restore over it", which is the shape a concurrent
 // session's cleanup actually takes, and a different thing to go and fix.
 /** @param {string} relative @param {string} revision @param {string} cwd */
 const committedDigest = (relative, revision, cwd) => {
@@ -114,13 +114,13 @@ const watchSources = ({ files, label, root = projectRoot }) => {
 				`changed: ${was.size} B → ${size} B (${sign}${delta}), ` +
 				`${was.digest.slice(0, 12)} → ${hash.slice(0, 12)}`;
 
-			// Content that now matches a commit was not typed — it was
+			// Content that now matches a commit was not typed: it was
 			// restored. Naming the revision turns "a file changed under me"
 			// into "something ran git over this tree".
 			for (const revision of [head, "HEAD"]) {
 				if (!revision) continue;
 				if (committedDigest(relative, revision, root) !== hash) continue;
-				how += `\n      it now matches ${revision === head ? `the commit this run started on (${revision.slice(0, 8)})` : "the current HEAD"} exactly — something restored it rather than edited it`;
+				how += `\n      it now matches ${revision === head ? `the commit this run started on (${revision.slice(0, 8)})` : "the current HEAD"} exactly: something restored it rather than edited it`;
 				break;
 			}
 			findings.push({ how, relative });

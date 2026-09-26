@@ -3,7 +3,7 @@
 ## Claude Code
 
 The repository's instructions are in `AGENTS.md`, imported above. Release
-work additionally requires reading `RELEASING.md` in full before acting —
+work additionally requires reading `RELEASING.md` in full before acting:
 the summary in `AGENTS.md` is not enough to cut a release from.
 
 Two local guards will refuse dangerous release commands: a Git `pre-push`
@@ -14,6 +14,10 @@ valid agent actions in any circumstance.
 
 If a guard blocks something you believe is correct, stop and say so rather
 than working around it.
+
+The prose style rule in `AGENTS.md` applies to everything you write here,
+including commit messages, pull request descriptions and your replies in
+the terminal. No em dashes.
 
 Long checks (`check:behavior`, `check:visual`, the dead-CSS audit) take
 minutes and share this working tree. Before starting one, confirm no other

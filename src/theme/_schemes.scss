@@ -8,8 +8,8 @@
    * Color scheme switching
    */
 
-// Every part of these selectors that only *filters* which scheme applies —
-// the data-theme tests — sits inside :where(), which contributes nothing to
+// Every part of these selectors that only *filters* which scheme applies,
+// the data-theme tests, sits inside :where(), which contributes nothing to
 // specificity. What is left is the root itself: :root (0,1,0) unscoped, the
 // wrapper class in the scoped builds.
 
@@ -27,7 +27,7 @@
 
 // The other half was reach, and specificity could not fix it. While these
 // blocks declared the palette itself, an element carrying data-theme got
-// every colour declared *on it* — and a declaration on an element beats one
+// every colour declared *on it*, and a declaration on an element beats one
 // inherited from an ancestor at any weight. A consumer override written at
 // :root therefore stopped at the edge of any subtree that forced a scheme,
 // and the documentation had to tell people to repeat it there. That was a
@@ -35,7 +35,7 @@
 
 // So the values moved: theme/_dual.scss states each scheme difference once,
 // at the root, as a light-dark() pair. These blocks kept what genuinely
-// belongs to a scheme — color-scheme itself, the derived tokens whose
+// belongs to a scheme: color-scheme itself, the derived tokens whose
 // *formula* differs rather than just their value, the aliases that have to
 // re-resolve per scheme, and the icons a data URI cannot derive. What they
 // no longer do is shadow a consumer.

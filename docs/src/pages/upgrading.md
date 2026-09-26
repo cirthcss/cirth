@@ -7,7 +7,7 @@ layout: docs.njk
 Cirth is pre-1.0, so a breaking change ships in a minor release. Every one
 gets an entry here saying what stopped working and what to do about it, and
 one that leaves the documented API behind it also starts a new line of
-documentation — the selector in the header switches between them.
+documentation: the selector in the header switches between them.
 
 After 1.0 the same boundary becomes a major release, and this page keeps
 working the way it already does.
@@ -35,7 +35,7 @@ used to lose to Cirth on specificity or on loading order now wins:
 
 | If you… | Now | Do this |
 | --- | --- | --- |
-| Load a stylesheet *before* Cirth so Cirth overrides it — a reset, legacy base styles, a third-party widget's theme | That stylesheet beats Cirth wherever they overlap | Put it in a layer ordered before Cirth's: `@layer legacy, cirth;` then `@import url("legacy.css") layer(legacy);` |
+| Load a stylesheet *before* Cirth so Cirth overrides it (a reset, legacy base styles, a third-party widget's theme) | That stylesheet beats Cirth wherever they overlap | Put it in a layer ordered before Cirth's: `@layer legacy, cirth;` then `@import url("legacy.css") layer(legacy);` |
 | Embed a scoped build in a page with its own global CSS | The host's unlayered rules win inside `.cirth`; the prefix no longer out-weighs a host `button { … }` | If the host CSS is yours, layer it the same way. If it is not, mount the widget in a shadow root |
 | Rely on `[hidden]` or `.sr-only` beating your own element rules | Your `display` or `position` wins | Exclude the state in your selector, e.g. `nav ul:not([hidden])` |
 | Have a layout rule that reaches a popover by accident, e.g. `.panel > :last-child { margin-bottom: 0 }` | It beats the popover's own centring, and the open panel slides to an edge | Leave popovers out: `.panel > :last-child:not([popover])` |
@@ -73,7 +73,7 @@ the values and relationships have not changed:
 
 `--cirth-primary-text` is the new derived text role; it follows the unchanged
 `--cirth-primary` input. The `.secondary` and `.contrast` classes are also
-unchanged — this is a custom-property migration, not a markup migration.
+unchanged: this is a custom-property migration, not a markup migration.
 
 `--cirth-primary-on-surface` remains an explicit light-or-dark ink rather
 than deriving from `--cirth-primary`. Existing themes only rename their
@@ -87,7 +87,7 @@ browser floor.
 `.container`, `.container-fluid`, and the classless `header`/`main`/`footer`
 landmarks now use `--cirth-container-gutter`, whose default is
 `clamp(1rem, 4%, 3rem)`. Changing `--cirth-spacing` no longer changes their
-inline gutter; it remains the flow knob — prose rhythm, section margins and
+inline gutter; it remains the flow knob: prose rhythm, section margins and
 grid gaps. (Control and card padding have never followed it either; see
 [Spacing and layout](/customization#spacing-and-layout) for which tokens do
 and which deliberately do not.)
@@ -147,7 +147,7 @@ One behaviour change, on an attribute that was doing more than it says.
 
 `aria-busy="true"` set `pointer-events: none` on buttons and links, so a
 busy control could not be clicked. It could still be activated with Enter
-or Space, because CSS cannot reach keyboard activation — so the protection
+or Space, because CSS cannot reach keyboard activation, so the protection
 covered the pointer and left the keyboard open, which is worse than not
 having it: the behaviour differed by input method and nothing announced it.
 
@@ -165,7 +165,7 @@ being updated, and that is all it means now.
 Set `disabled` when the action starts and remove it when the action
 settles. For a control that is not a native button, use
 `aria-disabled="true"` and have its script ignore pointer and keyboard
-activation alike — `aria-disabled` describes the state, it does not enforce
+activation alike: `aria-disabled` describes the state, it does not enforce
 it.
 
 This line of documentation still covers v0.13.0: nothing above changes the
@@ -180,7 +180,7 @@ line you have to add.
 ### Print is a separate stylesheet
 
 The `@media print` pass no longer rides inside the main build. A page that
-links only `cirth.min.css` now prints with no pass at all — the same
+links only `cirth.min.css` now prints with no pass at all: the same
 untreated output you would get from a page that never had it.
 
 ```html
@@ -194,8 +194,8 @@ untreated output you would get from a page that never had it.
 
 Load it after the main build: the pass wins over the component rules it has
 to outrank by source order, exactly as it did inside the bundle. Each build
-has its matching sheet — `cirth.print.classless.min.css`,
-`cirth.print.scoped.min.css`, `cirth.print.classless.scoped.min.css` — or,
+has its matching sheet: `cirth.print.classless.min.css`,
+`cirth.print.scoped.min.css`, `cirth.print.classless.scoped.min.css`, or,
 from npm, `@cirthcss/cirth/print` and its `classless`/`scoped` variants.
 
 It moved because print styling is around 900 B gzipped that is never needed
@@ -207,7 +207,7 @@ at low priority.
 ### A `:root` override now reaches into forced-scheme subtrees
 
 Nothing to change if you customize at `:root` and let the page follow one
-scheme — that case only got more predictable. This matters if you force a
+scheme; that case only got more predictable. This matters if you force a
 scheme somewhere inside the page with `data-theme`.
 
 Before, every colour was declared on the element carrying the attribute, so
@@ -227,8 +227,8 @@ you to repeat it there. The scheme differences now live once at the root as
 }
 ```
 
-If you were relying on the old behaviour — an override that deliberately
-did *not* reach a forced-scheme widget — scope it to say so:
+If you were relying on the old behaviour (an override that deliberately
+did *not* reach a forced-scheme widget), scope it to say so:
 
 ```css
 :root:not([data-theme="dark"]) {
@@ -275,20 +275,20 @@ import "@cirthcss/cirth/presets/playroom";
 
 There is no drop-in equivalent of either old preset, and the new pair is
 not a recolouring of the old one: they were redesigned around who they are
-for (gh#86). `plain` is the conventional application baseline — reach for
+for (gh#86). `plain` is the conventional application baseline: reach for
 it where you reached for `cobalt`. `playroom` is softer and more expressive
 than `coral` was, with large radii, a rounded face and springy motion.
 
 If you were depending on the exact colours of either, the honest migration
 is to copy the values you cared about out of the old file and set them
-yourself — which is now a much shorter list than it used to be, since the
+yourself, which is now a much shorter list than it used to be, since the
 accent's hover, focus and underline derive from `--cirth-primary`.
 
 ### `.outline` buttons have a surface now
 
 An outline button used to be transparent. It paints `--cirth-canvas`, the
 page surface, and tints it on hover. Nothing changes where one sits on the
-page — which is most places — but on a card, a coloured band or a header it
+page, which is most places, but on a card, a coloured band or a header it
 used to show the backdrop through and now does not.
 
 If transparent was what you wanted, that is `.ghost`: no surface, no
@@ -310,7 +310,7 @@ group now, and `.outline.secondary` still gets secondary.
 
 ### Form fields answer the pointer
 
-`input`, `select` and `textarea` had no `:hover` at all. They do now — the
+`input`, `select` and `textarea` had no `:hover` at all. They do now: the
 border moves toward the field's own ink, which is deliberately not the
 focus treatment. Nothing to change unless you were relying on a field
 looking identical whether or not the pointer was over it; `[readonly]` and
@@ -323,7 +323,7 @@ Neither of these is breaking, but both change what you have to write:
 * **The accent is an input.** Setting `--cirth-primary` now retunes the
   background, hover, focus and underline tint with it. If you were setting
   all of them to keep them in step, you can delete every line but the first
-   — unless you meant them to diverge, in which case they still do.
+   Unless you meant them to diverge, in which case they still do.
 * **Status colors exist.** `--cirth-error`, `--cirth-success` and
   `--cirth-warning` drive the validation borders, the meter readings, the
   `<ins>`/`<del>` inks and status surfaces. Retuning a status treatment used
@@ -331,8 +331,8 @@ Neither of these is breaking, but both change what you have to write:
   follows `--cirth-primary` instead: relevance no longer borrows the warning
   family.
 * **`--cirth-canvas` is new**: the page surface as a value of its own.
-  `--cirth-background-color` is the slot components paint through — a
-  button rebinds it to its own fill — so it was never a reliable way to
+  `--cirth-background-color` is the slot components paint through: a
+  button rebinds it to its own fill, so it was never a reliable way to
   refer to *the page*. It defaults to `--cirth-canvas` now. If you set the
   page colour, set the canvas; if you were setting
   `--cirth-background-color` at `:root`, it still works, but anything
@@ -351,7 +351,7 @@ more.
 ### `[data-tooltip]` is gone
 
 The attribute renders nothing now. Markup that uses it keeps working as
-ordinary content, but the tooltip text — which lived inside the attribute —
+ordinary content, but the tooltip text, which lived inside the attribute,
 is not displayed at all.
 
 It was removed because it could never be accessible: the message was drawn
@@ -373,7 +373,7 @@ users and was invisible to everyone else.
 ```
 
 The message is now a real element with a real id, so `aria-describedby`
-reaches it even while it is closed. See [Popover](/components/popover) —
+reaches it even while it is closed. See [Popover](/components/popover),
 and note that it opens on activation rather than hover, which is a
 deliberate difference and not a limitation to work around.
 
@@ -384,7 +384,7 @@ supplementary by design.
 
 `.modal-is-open`, `.modal-is-opening`, `.modal-is-closing` and
 `--cirth-scrollbar-width` no longer exist. A script that still toggles
-those classes keeps working — they simply do nothing — so nothing breaks
+those classes keeps working: they simply do nothing, so nothing breaks
 on upgrade. What changes is that you can delete that code:
 
 ```js
@@ -409,8 +409,8 @@ engine ships yet.
 ### A `:root` override of a color token now applies
 
 This one breaks by starting to work. Overriding a color from `:root` used
-to do nothing — the scheme roots outweighed it, whatever the loading order
-— so an override written, found ineffective and left in the codebase now
+to do nothing: the scheme roots outweighed it, whatever the loading order
+, so an override written, found ineffective and left in the codebase now
 takes effect on upgrade.
 
 ```css
@@ -428,7 +428,7 @@ covers overriding one scheme at a time.
 
 ### The browser floor moved
 
-To Chrome 123, Firefox 130, Safari 18.2 — roughly 78% of global browser
+To Chrome 123, Firefox 130, Safari 18.2, roughly 78% of global browser
 usage, up from the previous line's floor but no longer covering Safari
 17.x and older. The features the removals above depend on (`popover`,
 `@starting-style`, `scrollbar-gutter`, `:has()`) are why.

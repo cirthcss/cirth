@@ -107,8 +107,8 @@ for (const specimen of specimens) {
 		// The radius is a *pair*, not a number: a container is one step
 		// softer than the controls inside it, so a card reads as a sheet
 		// holding buttons rather than as a big button. A preset is expected
-		// to move both ends of that pair — plain squares them off, playroom
-		// rounds them — and the invariant is the relationship, not the value
+		// to move both ends of that pair: plain squares them off, playroom
+		// rounds them, and the invariant is the relationship, not the value
 		// it had in the default theme.
 		const geometry = await page
 			.locator('input[name="owner"]')
@@ -310,8 +310,8 @@ for (const specimen of specimens) {
 
 // A preset changes the dialect, not the grammar.
 //
-// This test used to assert that a preset changed *nothing* except colour —
-// identical radius, identical stroke — which made the shipped presets a
+// This test used to assert that a preset changed *nothing* except colour:
+// identical radius, identical stroke, which made the shipped presets a
 // demonstration of one token and left the rest of the contract unexercised.
 // A preset is supposed to be the worked example of what the token surface
 // can do, so plain and playroom now also move the radius pair, the spacing
@@ -319,7 +319,7 @@ for (const specimen of specimens) {
 // calls the structural signature: one hairline on every resting edge, the
 // 44px control floor, and the radius *pairing*. Those are asserted below,
 // along with the thing that would make the presets pointless in the other
-// direction — every one of them being identical after all.
+// direction: every one of them being identical after all.
 test("presets change the dialect, not the grammar", async ({ page }) => {
 	const values = [];
 	for (const specimen of specimens) {

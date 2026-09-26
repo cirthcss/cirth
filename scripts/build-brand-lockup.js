@@ -2,7 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { parseColor } = require("./lib/color");
 
-// Generates the horizontal lockup — the mark with "Cirth" beside it — from
+// Generates the horizontal lockup (the mark with "Cirth" beside it) from
 // the assets and tokens that already define both halves. Nothing here is a
 // second copy of the identity:
 //
@@ -15,14 +15,14 @@ const { parseColor } = require("./lib/color");
 // this file exists instead of four hand-drawn SVGs. Cirth's wordmark is
 // "the same system stacks the framework ships" (docs/src/pages/brand.md);
 // outlining it would both freeze one platform's rendering and embed glyph
-// outlines from fonts — SF Pro, Segoe UI — that are not ours to
+// outlines from fonts (SF Pro, Segoe UI) that are not ours to
 // redistribute. Live text costs one thing in exchange: the advance width
 // moves between faces, so the box reserves the widest one measured.
 
 const projectRoot = path.join(__dirname, "..");
 const publicDir = path.join(projectRoot, "docs/public");
 
-// Geometry. The mark's ink occupies this box inside its 512 viewBox — the
+// Geometry. The mark's ink occupies this box inside its 512 viewBox: the
 // paths are not centred in it, so a lockup that used the viewBox would sit
 // visibly off its own baseline.
 const MARK_BOX = { x: 76, y: 66, width: 340.476, height: 380 };
@@ -43,8 +43,8 @@ const TEXT_RESERVE = 2.45 * FONT_SIZE;
 const ASCENDER = 0.78 * FONT_SIZE;
 
 // The gap between mark and word, as a fraction of the cap height. The two
-// places Cirth already sets its own name beside the mark — the site header
-// and the share card — sit either side of this value.
+// places Cirth already sets its own name beside the mark (the site header
+// and the share card) sit either side of this value.
 const GAP = 0.25 * CAP_HEIGHT;
 
 // Tracking, in user units rather than `em`: `letter-spacing` with a

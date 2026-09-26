@@ -18,12 +18,12 @@
 // reference, so all of that comes from the platform instead: the top
 // layer, light dismiss, Escape, and the invoker relationship are the
 // browser's job. What is left for CSS is what it should have been all
-// along — how the thing looks.
+// along: how the thing looks.
 
 // And only that. `popover` is an attribute, not an element: it grants top
 // layer and light dismiss to *anything*, so what it marks may be a hint, a
-// menu, a picker, a filter panel. Styling it as a hint — narrow, small
-// type — would be this library deciding what popovers are for. What is
+// menu, a picker, a filter panel. Styling it as a hint (narrow, small
+// type) would be this library deciding what popovers are for. What is
 // styled here is the surface a thing in the top layer needs in order to
 // read as a sheet above the page at all, since the user agent's own
 // default is a box with a 1px black border. Everything about the content
@@ -34,13 +34,13 @@
 // trigger needs anchor positioning, which is outside the Browserslist floor
 // (Chrome 125, Firefox 147, Safari 26); until then a hint reads as a small
 // panel rather than a bubble with a tail, and authors who need it attached
-// can position it themselves — `position-area` overrides what is set below.
+// can position it themselves: `position-area` overrides what is set below.
 // The centring is declared rather than inherited from the user agent, for
 // the reason given at the rule.
 
 // Only the popovers this library can claim. `auto` (the default, written
 // as a bare `popover`) and `hint` are content the browser light-dismisses
-// on the reader's behalf — a panel, which is what is styled below.
+// on the reader's behalf: a panel, which is what is styled below.
 // `popover="manual"` is the opposite: shown and hidden entirely under the
 // author's control, which is what application chrome, toasts and injected
 // tooling overlays use. Painting a border and a fade onto those would be
@@ -53,7 +53,7 @@ $popover-selector: '[popover=""], [popover="auto"], [popover="hint"]';
 
 #{$parent-selector} :is(#{$popover-selector}):not(dialog) {
   // Fails closed. An unrecognised popover attribute carries no behaviour,
-  // so without this the element would render as ordinary page content —
+  // so without this the element would render as ordinary page content:
   // the message leaking into the document instead of staying hidden.
   // The open state below is naturally more specific, so it wins without
   // any help.
@@ -65,8 +65,8 @@ $popover-selector: '[popover=""], [popover="auto"], [popover="hint"]';
     display: var(--cirth-popover-display);
 
     // Centred by this library, not by the user agent's default margin.
-    // Anything on the page that touches margins — a layout rule zeroing
-    // the last child's, say — would otherwise leave one side auto and the
+    // Anything on the page that touches margins (a layout rule zeroing
+    // the last child's, say) would otherwise leave one side auto and the
     // other fixed, and the panel would slide to an edge. Where anchor
     // positioning is available and asked for, `position-area` overrides
     // these; where it is not, this is the fallback that keeps the panel

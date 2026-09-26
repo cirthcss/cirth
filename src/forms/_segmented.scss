@@ -18,7 +18,7 @@
 
 // Opt-in by class only. The classless build has no class to require, and
 // reading a role or a bare fieldset as the trigger would restyle semantic
-// groups that did not ask for it — the same hijack gh#19 removed from
+// groups that did not ask for it: the same hijack gh#19 removed from
 // [role="group"].
 
 /* cirth-component:start */

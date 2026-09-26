@@ -22,7 +22,7 @@ it still visibly communicates progress) gets:
 * `--cirth-transition` itself re-pointed at that same instant duration.
 
 The last one is what makes the rule reach inside a control. A selector list
-covers elements, `::before` and `::after`, and nothing else — so the engine
+covers elements, `::before` and `::after`, and nothing else, so the engine
 pseudo-elements a native control is built from, `::-moz-range-thumb` and
 `::-webkit-slider-thumb` among them, went on animating while the control
 that owns them had already stopped. They cannot be added to that list:
@@ -30,8 +30,8 @@ a list containing one engine's pseudo-element is discarded whole by the
 other. A custom property can reach them, because they inherit it, so the
 token is neutralized instead of the selector list being extended.
 
-The practical effect is that anything built from `--cirth-transition` —
-Cirth's own components, and any transition you write with the token —
+The practical effect is that anything built from `--cirth-transition`
+(Cirth's own components, and any transition you write with the token)
 follows the preference without being named here.
 
 This covers Cirth's own animated bits: the

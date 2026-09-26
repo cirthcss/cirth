@@ -6,14 +6,14 @@ const { setContent } = require("./helpers/render");
 // How tall form controls come out, which is two separate questions.
 //
 // The first is target size, checked as a floor rather than as a
-// coincidence — and there are two thresholds, deliberately. Outside a nav
+// coincidence, and there are two thresholds, deliberately. Outside a nav
 // it is 44px, WCAG 2.5.5 Target Size (Enhanced), which this project treats
 // as a product requirement. Inside a nav it is a 40px compact band, still
 // above the 24px WCAG 2.5.8 Target Size (Minimum) threshold.
 //
 // An input is pinned to 44px by an explicit height. A select grows with its
 // longest option and a textarea with its rows, so neither can be pinned the
-// same way — their height falls out of the text inside them, which means
+// same way: their height falls out of the text inside them, which means
 // the target size held only as long as nobody changed the type scale. This
 // asks each control for the threshold under a font-size an author might
 // plausibly set, which is how the documentation's own header selects were
@@ -124,7 +124,7 @@ for (const customMetrics of [false, true]) {
 
 // The second is how much of a textarea you can see before scrolling inside
 // it. The user agent opens one at two rows, which is a line and a half of
-// a paragraph — so Cirth asks for four. Measured in `lh`, so four rows
+// a paragraph, so Cirth asks for four. Measured in `lh`, so four rows
 // means four rows of this textarea's own text, not of the default type
 // scale.
 //
@@ -173,7 +173,7 @@ test("four rows means four rows of the textarea's own text", async ({
 }) => {
 	await renderTextareas(page);
 
-	// Smaller type, same number of rows — a shorter box, not a box with
+	// Smaller type, same number of rows: a shorter box, not a box with
 	// more lines crammed into it.
 	expect(await rowsVisible(page, "small")).toBeCloseTo(4, 1);
 });
@@ -200,7 +200,7 @@ test(`a nav may be compact, but never below ${TARGET_NAV}px`, async ({
 	page,
 }) => {
 	// `height: auto` is how the nav escapes the input's fixed height, and it
-	// cannot escape a min-block-size the same way — so the nav restates the
+	// cannot escape a min-block-size the same way, so the nav restates the
 	// floor at the AA minimum instead of inheriting the AAA one.
 	await setContent(page,
 		`<style>${css}</style>
@@ -231,7 +231,7 @@ test("the file input's button is not forced past the input holding it", async ({
 	// ::file-selector-button is matched by the same selector list as every
 	// other button, and giving it the 44px floor made it taller than the
 	// content box of the 44px input it lives in, so it spilled out. The
-	// target here is the input — that is what the pointer is aimed at, and
+	// target here is the input: that is what the pointer is aimed at, and
 	// it meets the size on its own; the pseudo-element is a part of it.
 	await setContent(page,
 		`<style>${css}</style><main class="container"><input id="file" type="file"></main>`,

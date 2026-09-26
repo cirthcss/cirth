@@ -17,9 +17,9 @@ const { auditSources, watchSources } = require("./lib/source-guard");
 //
 // The method is the one thing that makes a dead-CSS cleanup a fact rather
 // than a hope: take a declaration out of the live CSSOM, re-measure the
-// page, put it back. If nothing moved in any rendering of the corpus — 50
+// page, put it back. If nothing moved in any rendering of the corpus (50
 // pages, two viewports, two schemes, and every disclosure, dialog and
-// popover opened — the declaration is inert *there*, and that is exactly
+// popover opened) the declaration is inert *there*, and that is exactly
 // what the report says.
 //
 // Four verdicts, and the difference between them is the whole point:
@@ -30,15 +30,15 @@ const { auditSources, watchSources } = require("./lib/source-guard");
 //                      changed nothing anywhere in the corpus.
 //   unmatched          its selector never matched an element on any page.
 //   not observable     it sits under a media query this corpus does not
-//                      enter — `forced-colors`, `print`,
+//                      enter: `forced-colors`, `print`,
 //                      `prefers-reduced-motion: no-preference`, or a width
 //                      band none of the four viewports lands in, which the
 //                      run establishes by asking matchMedia rather than by
-//                      reading a list — or behind an
+//                      reading a list, or behind an
 //                      element state it does not reach (`:hover`, `:focus`,
 //                      `::backdrop`, `::selection`), or its value asks the
 //                      device a question a browser on a desktop cannot answer
-//                      (`env(safe-area-inset-*)`). Not a finding — a
+//                      (`env(safe-area-inset-*)`). Not a finding: a
 //                      measurement this tool cannot make. The last audit
 //                      misread exactly this class, and separately called two
 //                      declarations dead that were alive inside the drawer
@@ -52,7 +52,7 @@ const { auditSources, watchSources } = require("./lib/source-guard");
 // types nothing, hovers nothing, clicks nothing. The search-results styling,
 // which Pagefind builds only once a query has been typed, therefore comes
 // back `unmatched`, and it is very much alive. Read `unmatched` as "no page
-// in the corpus contains this element" — a fact about the corpus as much as
+// in the corpus contains this element": a fact about the corpus as much as
 // about the rule.
 //
 // This sweep is **one engine and one theme**: Chromium, default preset.
@@ -63,7 +63,7 @@ const { auditSources, watchSources } = require("./lib/source-guard");
 //     actions cluster 66px wide holding 88px of controls in Firefox,
 //     hanging the menu toggle 6px off a 320px screen.
 //   - Presets move tokens, and two declarations that resolve to the same
-//     value under the default theme need not under `playroom` — a
+//     value under the default theme need not under `playroom`: a
 //     `font-family: var(--cirth-font-family-sans)` pinning the shell's
 //     chrome to the plain system stack is inert until a preset makes the
 //     page face rounded.
@@ -71,8 +71,8 @@ const { auditSources, watchSources } = require("./lib/source-guard");
 // Running the whole corpus on three engines and four presets would cost a
 // working day. It is also unnecessary: only the declarations this sweep
 // calls `inert` are candidates for deletion, and there are a few dozen of
-// them. So this run writes them out — with the handful of renderings that
-// can see each one — and a second, targeted pass re-probes exactly those:
+// them. So this run writes them out, with the handful of renderings that
+// can see each one, and a second, targeted pass re-probes exactly those:
 //
 //   node scripts/audit-dead-css.js --json .cache/dead-css.json
 //   node scripts/verify-dead-css.js --report .cache/dead-css.json
@@ -103,7 +103,7 @@ const noOrder = args.includes("--no-order");
 // The same escape hatch for the other optimisation: --no-skip visits every
 // rendering in the corpus, including the ones the survey proved can see
 // nothing still undecided. It exists so the skip's value can be measured
-// against a run that differs in nothing else, rather than asserted — and
+// against a run that differs in nothing else, rather than asserted, and
 // so a verdict can be reproduced without it if the survey is ever doubted.
 const noSkip = args.includes("--no-skip");
 
@@ -171,7 +171,7 @@ const run = async () => {
 	try {
 		// --- Pass 1: the catalogue, and what each visit can even see -------
 		//
-		// Cheap — one querySelectorAll per rule per rendering, no measuring —
+		// Cheap: one querySelectorAll per rule per rendering, no measuring,
 		// and it buys the order of pass 2. Without it the walk runs in
 		// listPages() order, which puts the near-empty 404 page first and the
 		// home page, by far the richest, dead last.
@@ -197,7 +197,7 @@ const run = async () => {
 						// eight times.
 						// Every at-rule condition on the sheet, asked of this
 						// rendering. A condition that no rendering in the whole
-						// corpus matches has not been shown to be dead — the
+						// corpus matches has not been shown to be dead: the
 						// corpus simply never enters it, which is the same
 						// answer as forced-colors and one the hand-written
 						// feature list above cannot give for a width band.
@@ -270,8 +270,8 @@ const run = async () => {
 				if (!result) {
 					// The sheet was not in document.styleSheets. This used to
 					// mean a docs build was replacing docs/dist underneath the
-					// run; it cannot any more — the corpus serves an immutable
-					// copy taken at startup — so what is left is a real
+					// run; it cannot any more: the corpus serves an immutable
+					// copy taken at startup, so what is left is a real
 					// mismatch between --sheet and what the page links.
 					throw new Error(
 						`audit-dead-css: no stylesheet matching "${sheet}" on ${context.page}. ` +
@@ -318,7 +318,7 @@ const run = async () => {
 		// Greedy set cover over what pass 1 measured: the visit that can see
 		// the most undecided declarations goes first, then the one that adds
 		// the most the first could not see, and so on. Nothing about which
-		// page or viewport that is, is written down here — it falls out of
+		// page or viewport that is, is written down here: it falls out of
 		// the site as built.
 
 		/** @param {(typeof corpus.visits)[number]} target */
@@ -375,9 +375,9 @@ const run = async () => {
 		// can see. Pass 2 uses it twice: to skip a navigation to a rendering
 		// that can see nothing still undecided, and to hand the page the
 		// short list of what to look at instead of the whole sheet. Neither
-		// changes a verdict — a rendering whose selectors do not match
+		// changes a verdict: a rendering whose selectors do not match
 		// probes nothing when it gets there, and the page still checks that
-		// each selector matches before touching the rule — they just stop
+		// each selector matches before touching the rule: they just stop
 		// the run paying for the trip.
 
 		for (const { target } of order) {
@@ -434,7 +434,7 @@ const run = async () => {
 
 							// Grouped by rule so the block's text is saved and
 							// put back once per rule rather than once per
-							// declaration — and so a longhand restored after a
+							// declaration, and so a longhand restored after a
 							// shorthand cannot silently reorder the cascade
 							// inside the block.
 							/** @type {Map<string, { path: number[], entries: typeof here }>} */
@@ -452,7 +452,7 @@ const run = async () => {
 							// The page is not a still life. This site's own
 							// header script moves the display controls into the
 							// drawer when the bar gets too narrow, so touching a
-							// padding can make the document rearrange itself —
+							// padding can make the document rearrange itself:
 							// permanently, and through no fault of the
 							// declaration being probed.
 							//
@@ -462,7 +462,7 @@ const run = async () => {
 							// the "something changed" answer cheap and the
 							// "nothing changed" answer a full pass. Verifying
 							// the restore unconditionally therefore charged every
-							// *inert* declaration two full passes — and inert
+							// *inert* declaration two full passes, and inert
 							// declarations are exactly the ones that survive to
 							// be re-probed on all four hundred renderings.
 							//
@@ -472,7 +472,7 @@ const run = async () => {
 							// something did move asynchronously in that window,
 							// the *next* probe reads it as a change, takes the
 							// verification path below, finds the page dirty and
-							// re-baselines — so the drift is still caught, one
+							// re-baselines, so the drift is still caught, one
 							// probe later, and the verdict it can produce in the
 							// meantime is "live", never "inert". The
 							// optimisation only ever errs toward keeping a
@@ -593,8 +593,8 @@ const run = async () => {
 		// `id` is a rule path, and a rule path is a fact about *this* engine's
 		// parse of the sheet: another engine that drops a rule it cannot
 		// parse renumbers everything after it. So each declaration also gets
-		// a key made of what the source actually wrote — conditions,
-		// selector, property, and which occurrence of that trio it is — which
+		// a key made of what the source actually wrote (conditions,
+		// selector, property, and which occurrence of that trio it is) which
 		// is what verify-dead-css.js looks declarations up by.
 		/** @type {Map<string, string>} */
 		const keys = new Map();
@@ -716,16 +716,16 @@ const run = async () => {
 					"or the device they ask for; do not delete one on this report's say-so.\n",
 			);
 			console.log(
-				`  ${String(report.notObservable.length).padStart(4)}  under a media context the corpus never entered —\n` +
+				`  ${String(report.notObservable.length).padStart(4)}  under a media context the corpus never entered:\n` +
 					"        forced-colors, print, prefers-reduced-motion: no-preference,\n" +
 					"        or a width band none of the four viewports lands in\n",
 			);
 			console.log(
-				`  ${String(report.stateOnly.length).padStart(4)}  behind an element state it does not reach —\n` +
+				`  ${String(report.stateOnly.length).padStart(4)}  behind an element state it does not reach:\n` +
 					"        :hover, :focus, ::backdrop, ::selection\n",
 			);
 			console.log(
-				`  ${String(report.environment.length).padStart(4)}  doing something a still photograph cannot show —\n` +
+				`  ${String(report.environment.length).padStart(4)}  doing something a still photograph cannot show:\n` +
 					"        an env() the browser resolves to zero without a notch, an inset\n" +
 					"        on a sticky box in a corpus that never scrolls, a transition\n",
 			);

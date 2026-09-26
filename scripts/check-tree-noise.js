@@ -1,7 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-// Duplicate copies — "name 2.png", "name 3.png" — appear beside real files
+// Duplicate copies ("name 2.png", "name 3.png") appear beside real files
 // in this working tree and have done since at least August. They are
 // gitignored, so `git status` stays clean while they accumulate: the last
 // batch reached 440 files and 130 MB before anyone noticed.
@@ -12,7 +12,7 @@ const path = require("node:path");
 // of silently tolerated.
 //
 // What creates them is still unknown (gh#102). What is established:
-//   - the mtimes match git operations that rewrite LFS-tracked baselines —
+//   - the mtimes match git operations that rewrite LFS-tracked baselines:
 //     the last batch lands on a `pull --ff-only` at 18:14 and a fast-forward
 //     merge at 18:25, to the minute, and the affected files are exactly the
 //     160 Linux baselines those operations rewrote;

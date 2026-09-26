@@ -4,7 +4,7 @@ const sass = require("sass-embedded");
 const { DEFAULT_PREFIX, applyPrefix } = require("./prefix");
 
 // Compiles every matching .scss file directly under `sourceFolder` to
-// plain, expanded (unminified) CSS in `outputFolder` — the shared first
+// plain, expanded (unminified) CSS in `outputFolder`: the shared first
 // build step both the default entrypoints (cirth*.scss, build.js) and
 // the presets (src/presets/*.scss, build-presets.js) go through before
 // Lightning CSS transforms and minifies the result. `prefix` renames the

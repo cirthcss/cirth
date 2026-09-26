@@ -12,8 +12,8 @@ const {
 // and a maintainer's terminal ask the identical question.
 //
 // The rule it exists to enforce: **develop anywhere, release only from
-// master.** npm is a permanent, public record — a version, once live, is
-// the version everyone with a caret range may install — so what it holds
+// master.** npm is a permanent, public record: a version, once live, is
+// the version everyone with a caret range may install, so what it holds
 // must exist in the repository's own history, not in a branch that may be
 // rebased, renamed or abandoned. A tag on a working branch is a perfectly
 // valid git object and an invalid release.
@@ -112,8 +112,8 @@ const main = () => {
 				"[--channel <beta|rc|latest>] [--base origin/master] " +
 				"[--unpublished [--commit <ref>]]\n\n" +
 				"  --channel states which npm dist-tag the caller intends. It is " +
-				"optional for a\n  caller that publishes nothing — the GitHub " +
-				"release job — and required of the one\n  that does.",
+				"optional for a\n  caller that publishes nothing: the GitHub " +
+				"release job, and required of the one\n  that does.",
 		);
 		process.exit(2);
 	}
@@ -231,7 +231,7 @@ const main = () => {
 	});
 	if (!baseResolved.ok) {
 		return fail(
-			`\`${base}\` is not available in this checkout — fetch it before ` +
+			`\`${base}\` is not available in this checkout; fetch it before ` +
 				`validating (the ancestry check cannot be skipped).`,
 		);
 	}
@@ -274,7 +274,7 @@ const main = () => {
 		// It deliberately emits no workflow outputs: a publish job must never
 		// be able to consume a verdict reached without the tag existing.
 		console.log(
-			`\n[@cirthcss/cirth] ADVISORY — ${tagName} would be releasable ` +
+			`\n[@cirthcss/cirth] ADVISORY: ${tagName} would be releasable ` +
 				`from master under the \`${distTag}\` dist-tag.\n` +
 				`  The tag does not exist yet, so this is a pre-tag check and ` +
 				`authorises nothing.\n` +

@@ -11,7 +11,7 @@
 #{$parent-selector}
   [aria-busy="true"]:not(input, select, textarea, html, form) {
   // The spinner is the icon SVG applied as a mask over currentColor, so it
-  // always matches the text it sits next to — a baked-in stroke color can't
+  // always matches the text it sits next to: a baked-in stroke color can't
   // adapt on primary buttons or colored cards (upstream #643)
   &::before {
     display: inline-block;
@@ -42,8 +42,8 @@
   }
 }
 
-// Submit/button/reset inputs are replaced elements — pseudo-elements don't
-// render on them — so the spinner is painted as a background icon at the
+// Submit/button/reset inputs are replaced elements: pseudo-elements don't
+// render on them, so the spinner is painted as a background icon at the
 // line start instead (upstream #693). Kept as a background-image (not a
 // mask, which would clip the whole control): the icon's baked neutral
 // stroke reads on both button variants.

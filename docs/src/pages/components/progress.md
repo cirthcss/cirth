@@ -37,7 +37,7 @@ colors, including an animated indeterminate state.
   `prefers-reduced-motion: reduce` (see
   [Reduce motion](/utilities/reduce-motion)).
 * For a measurement inside a known range rather than a task running to
-  completion — disk used, a score, capacity — reach for
+  completion (disk used, a score, capacity), reach for
   [meter](/components/meter) instead. It is styled as this component's
   matched pair.
 * Give every progress indicator an accessible name. The examples connect a

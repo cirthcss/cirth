@@ -21,7 +21,7 @@ The second paragraph of that example is the `:visited` state, and it is the
 one state on this page that cannot be mocked up: a browser paints it only
 for a link you have really followed, and reports the unvisited colour to
 `getComputedStyle` so a page cannot read it back. So the example does the
-only honest thing — it asks you to follow the link and return — and prints
+only honest thing: it asks you to follow the link and return, and prints
 the token's own colour beside it, which is always visible.
 
 If the followed link still looks unvisited when you come back, the browser
@@ -43,7 +43,7 @@ shows none of them as visited. Firefox still applies it globally.
   achromatic grey at the same lightness as the accent, so a followed link in
   a long page shows as spent. Zero chroma on purpose: a *cool* grey read as
   a cold cast against the warm paper canvas, and against a warm accent it
-  was a hue change at nearly the same lightness — the weakest available way
+  was a hue change at nearly the same lightness: the weakest available way
   to say "you have been here". It applies to content links only: entries inside `nav` or a
   dropdown menu keep their color, since a menu that grays out one item at a
   time as the reader browses looks broken rather than oriented. `.secondary`

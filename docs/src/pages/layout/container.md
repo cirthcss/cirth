@@ -24,7 +24,7 @@ classes enabled; the classless build applies `.container`'s behavior to
 ## How it works
 
 Both classes are three-track CSS grids with named `full` and `content`
-lines — two gutter tracks that never drop out, and a center track that
+lines: two gutter tracks that never drop out, and a center track that
 holds the content:
 
 ```css
@@ -46,7 +46,7 @@ holds the content:
 `.container`'s center track is capped at `--cirth-container-max-width`
 (default `60rem`, 960px at the standard 16px root);
 `.container-fluid`'s isn't. The cap resizes continuously with the
-viewport — there's no breakpoint table to memorize, and no jump between
+viewport: there's no breakpoint table to memorize, and no jump between
 fixed widths as the window is resized. The gutters are controlled by
 `--cirth-container-gutter`, which defaults to
 `clamp(1rem, 4%, 3rem)`: they grow with the container itself but never drop
@@ -60,7 +60,7 @@ remaining width to `content`. It does not split the box into three equal
 `1fr` columns.
 
 Override `--cirth-container-max-width` per instance for layouts that sit
-between the two — for example a docs shell with a sidebar might want a
+between the two: for example a docs shell with a sidebar might want a
 wider measure than an article:
 
 ```css
@@ -81,7 +81,7 @@ edge:
 ## `.breakout`
 
 A direct child of `.container` normally stops at the center track. Give
-it `.breakout` to fill the container's own box instead — for a wide
+it `.breakout` to fill the container's own box instead, for a wide
 table, image, or figure that shouldn't be squeezed to the reading
 measure:
 
@@ -103,13 +103,13 @@ measure:
 ```
 
 `.breakout` deliberately isn't the classic
-`width: 100vw; margin-inline: calc(50% - 50vw)` trick — that only works
+`width: 100vw; margin-inline: calc(50% - 50vw)` trick, which only works
 when the container itself is centered in the viewport, which isn't true
 everywhere a container is used (a docs layout with a sidebar, for
 example). Breaking out via `grid-column` instead escapes only to the
 container's *own* edges, so it's correct regardless of what surrounds
 it, and it doesn't have the `100vw` trick's scrollbar-gutter overflow
-bug. `.container-fluid` doesn't need `.breakout` — it's already full
+bug. `.container-fluid` doesn't need `.breakout`: it's already full
 width.
 
 The selector is deliberately limited to a direct child of `.container`.
@@ -151,5 +151,5 @@ Before this release, `.container`'s max width stepped up at five fixed
 breakpoints (from 510px to 1450px) and `.container-fluid` was little
 more than full width with padding. Both are now the grid described
 above. If you relied on the old stepped widths, set
-`--cirth-container-max-width` to the value you need — there's no longer
+`--cirth-container-max-width` to the value you need: there's no longer
 a breakpoint table, just one continuously-resizing cap.

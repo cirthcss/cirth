@@ -23,8 +23,8 @@ having to out-weigh its selectors.
 ```
 
 That one line is a worked example rather than a teaser: it moves the accent
-everywhere it is used — links, focus rings, the filled button, its hover,
-the underline tint, the checkbox mark, the switch, the range thumb — because
+everywhere it is used (links, focus rings, the filled button, its hover,
+the underline tint, the checkbox mark, the switch, the range thumb), because
 those are derived from it rather than listed alongside it. The next section
 is about why, because it is the thing that makes the rest of this page
 short.
@@ -37,8 +37,8 @@ which one you are looking at tells you what will happen when you set it.
 ### Inputs
 
 A small set of tokens that other tokens are built from. `--cirth-primary`
-is the clearest one, and the status trio — `--cirth-error`,
-`--cirth-success`, `--cirth-warning` — behaves the same way. Setting an
+is the clearest one, and the status trio (`--cirth-error`,
+`--cirth-success`, `--cirth-warning`) behaves the same way. Setting an
 input is the cheapest possible change: everything downstream follows.
 
 ```css
@@ -62,7 +62,7 @@ as relationships:
 --cirth-primary-underline: oklch(from var(--cirth-primary) l c h / 50%);
 ```
 
-You can set a derived token directly, and sometimes you should — that is
+You can set a derived token directly, and sometimes you should: that is
 how you break a relationship on purpose. The `playroom` preset does exactly
 this so its buttons brighten on hover instead of darkening, which no
 proportional darkening could produce. What you should know is that doing so
@@ -80,7 +80,7 @@ component paints *through*, and components rebind them constantly:
 `--cirth-text-decoration`
 
 `--cirth-color` is declared on the page, and then again on every heading,
-on a button, inside a dropdown, on a form field — each time pointing at the
+on a button, inside a dropdown, on a form field, each time pointing at the
 token that element should use. Setting it at `:root` changes the page
 default and nothing else, because everything else was already given its own
 value.
@@ -104,16 +104,16 @@ When you need to refer to *the page itself*, use the two page roles. They
 are values, not slots, and no component is allowed to shadow either of
 them:
 
-* `--cirth-canvas` — the page surface. Use it for an opaque background on
+* `--cirth-canvas`: the page surface. Use it for an opaque background on
   a control, or a tint mixing toward the page. `--cirth-background-color`
   defaults to it.
-* `--cirth-ink` — the page text colour. Use it wherever you need the ink
+* `--cirth-ink`: the page text colour. Use it wherever you need the ink
   the document is set in rather than the ink of whatever you happen to be
   inside. `--cirth-color` defaults to it.
 
 The distinction matters most inside a `<button>`, a link, an `<input>` or a
 heading, because each of those rebinds `--cirth-color` for its own subtree.
-A custom control built on `<button>` — a tab, a toolbar, a chip — that
+A custom control built on `<button>` (a tab, a toolbar, a chip) that
 reaches for `--cirth-color` gets the button's on-surface ink, which on a
 button that has dropped its fill is white on white. Reach for
 `--cirth-ink` instead and you get the page's ink, whatever the theme is.
@@ -135,8 +135,8 @@ The raw ladders: `--cirth-space-*`, `--cirth-radius-*`,
 `--cirth-font-size-*`, `--cirth-border-width-*`, `--cirth-duration-*`.
 Every step exists whether or not the library uses it, so picking one is the
 same exercise wherever you are. You will usually reach for the role token
-that sits on top of a scale — `--cirth-spacing` rather than
-`--cirth-space-5` — but the steps are there when you want to move one
+that sits on top of a scale: `--cirth-spacing` rather than
+`--cirth-space-5`, but the steps are there when you want to move one
 component without moving the rest.
 
 ## Start here
@@ -152,12 +152,12 @@ these.
 | `--cirth-border-radius` | Every radius, including the ones derived from it |
 
 The `plain` preset is those first two plus three role choices, and nothing
-else — see
+else, see
 [Colors](/colors) for what it looks like. It exists partly to prove the
 point: a coherent, accessible, light-and-dark theme in five declarations.
 
-Here is a custom accent applied live, which is two declarations — the pair
-and a radius — over the build this page is already using:
+Here is a custom accent applied live, which is two declarations (the pair
+and a radius) over the build this page is already using:
 
 {% demo "customization" %}
 
@@ -178,12 +178,12 @@ set them:
 | `--cirth-primary-border-active` | The active edge of that surface |
 | `--cirth-primary-underline` | The accent at 50% alpha |
 | `--cirth-primary-underline-active` | The underline while its link is active |
-| `--cirth-primary-focus` | The accent at 75% alpha — the focus ring |
+| `--cirth-primary-focus` | The accent at 75% alpha, the focus ring |
 | `--cirth-primary-on-surface` | The text that sits *on* the accent |
 
 `--cirth-primary-on-surface` is the one to check when you pick an unusual
 accent. It is white by default, which is right for most accents and wrong
-for a light one — a pale yellow accent with white text on it is
+for a light one: a pale yellow accent with white text on it is
 unreadable. It is a plain value rather than a derivation because choosing
 between light and dark text is a decision, not a mix. A relative-color
 threshold was tested across 936 accents: 10 results missed 4.5:1 and it
@@ -218,7 +218,7 @@ Three inputs, each driving four roles:
 
 | Role | Used by |
 | --- | --- |
-| `--cirth-error` | The solid reading — a worst-band `<meter>` and the `.danger` button fill |
+| `--cirth-error` | The solid reading: a worst-band `<meter>` and the `.danger` button fill |
 | `--cirth-error-text` | `<del>`, and status text on the page |
 | `--cirth-error-border` | An `[aria-invalid="true"]` field |
 | `--cirth-error-active` | That field while it has focus |
@@ -231,7 +231,7 @@ the explicit `*-surface` families.
 
 Status hues are deliberately not fixed constants. If your brand overlaps a
 conventional status hue, move the status family rather than avoiding the
-brand — what has to stay true is that the two remain distinguishable, and
+brand: what has to stay true is that the two remain distinguishable, and
 that state is never signalled by colour alone (WCAG 1.4.1). Cirth's own
 validity styling pairs colour with an icon for that reason.
 
@@ -249,7 +249,7 @@ validity styling pairs colour with an icon for that reason.
 | `--cirth-muted-color` | Subordinate text |
 | `--cirth-muted-border-color` | Hairlines: tables, cards, blockquotes |
 
-`--cirth-canvas` and `--cirth-ink` are the two inputs in this family — the
+`--cirth-canvas` and `--cirth-ink` are the two inputs in this family: the
 page's surface and the page's ink. Set either and the tokens that alias it
 follow: `--cirth-background-color` and the surface ladder from the canvas,
 `--cirth-color` and the component inks (accordion summary, dropdown,
@@ -283,7 +283,7 @@ that subtree.
 <html data-theme="dark">
 ```
 
-A `:root` override applies to **both** schemes, and it applies everywhere —
+A `:root` override applies to **both** schemes, and it applies everywhere:
 including inside a subtree that forces one:
 
 ```css
@@ -343,7 +343,7 @@ mirror the host's choice onto the wrapper:
 Cirth carries a `prefers-contrast: more` pass that strengthens inks,
 hairlines and focus rings. Your overrides sit outside Cirth's
 [layer](#cascade-layers), so a token you set unconditionally wins there too,
-wherever you load it — which usually means the preference stops working for
+wherever you load it, which usually means the preference stops working for
 that token.
 
 ```css
@@ -372,7 +372,7 @@ Both presets do this, and it is worth copying if you set colours at all.
 ```
 
 `--cirth-font-family` is body text and every control that inherits it.
-`--cirth-font-family-display` is headings — it points at the serif stack by
+`--cirth-font-family-display` is headings: it points at the serif stack by
 default, which is part of Cirth's own identity; setting it to
 `var(--cirth-font-family)` is how both presets make headings match the body.
 
@@ -400,7 +400,7 @@ than moving the scale everyone else reads:
 
 ```css
 /* a campaign page, opting in through the slot every heading resolves
-   through — no second API, and the rest of the site keeps product scale */
+   through: no second API, and the rest of the site keeps product scale */
 .hero h1 {
   --cirth-font-size: clamp(2.75rem, 2rem + 1.9vw, 3.5rem);
 }
@@ -408,9 +408,9 @@ than moving the scale everyone else reads:
 
 `--cirth-line-height`, `--cirth-font-weight` and `--cirth-letter-spacing`
 are slots: set at the root they change the page default, and elements that
-were given their own value keep it. The two tracking steps have consumers —
+were given their own value keep it. The two tracking steps have consumers:
 `--cirth-letter-spacing-tight` on `h1`/`h2`, `--cirth-letter-spacing-snug`
-on `h3`/`h4` — so overriding one moves the headings that read it.
+on `h3`/`h4`, so overriding one moves the headings that read it.
 `--cirth-form-label-font-weight` is separate so labels can be heavier than
 the prose around them.
 
@@ -444,12 +444,12 @@ of the same rhythm.
 | Token | Why it is separate |
 | --- | --- |
 | `--cirth-form-element-spacing-vertical` / `-horizontal` | The one-line control height is computed from this pair, and that height carries WCAG 2.5.5's 44px target size. A density knob must not be able to walk a target size, so control padding is named on the space scale and overridden directly. |
-| `--cirth-block-spacing-vertical` / `-horizontal` **on `<article>`** | A card's padding is a container decision. It is pinned one step above the controls' gutter on the same scale — `--cirth-space-5` against `--cirth-space-4` — so a container stays roomier than its contents at *every* setting of `--cirth-spacing`. Derived from the knob instead, the two would cross the first time a preset tightened it. |
+| `--cirth-block-spacing-vertical` / `-horizontal` **on `<article>`** | A card's padding is a container decision. It is pinned one step above the controls' gutter on the same scale: `--cirth-space-5` against `--cirth-space-4`, so a container stays roomier than its contents at *every* setting of `--cirth-spacing`. Derived from the knob instead, the two would cross the first time a preset tightened it. |
 | `--cirth-container-gutter` | Page gutters follow the container, not the knob: opening a wide shell up must not also enlarge cards, controls and grid gaps. |
 
 To change control or card density, set those tokens. They are public, they
 are documented in the reference below, and overriding one of them is not a
-workaround — it is the second half of the same contract.
+workaround: it is the second half of the same contract.
 
 | Token | What it moves |
 | --- | --- |
@@ -457,14 +457,14 @@ workaround — it is the second half of the same contract.
 | `--cirth-grid-min-column` | When `.grid` wraps to a new row |
 | `--cirth-modal-max-width` | The fluid modal card's upper width bound |
 
-A note on control height: Cirth's controls are at least 44px tall — WCAG
+A note on control height: Cirth's controls are at least 44px tall: WCAG
 2.5.5's target size. Button, input, select and one-line textarea share one
 runtime formula made from `--cirth-font-size-md`, line-height, vertical
 padding and border. Text inputs use that result as their fixed one-line
 height; controls that may legitimately grow use it as a floor. Changing the
 padding therefore changes their internal proportions without letting an
 equivalent control fall out of alignment. Navigation opts down to a 40px
-band — comfortably clear of WCAG 2.5.8's 24px AA minimum — because a nav row
+band (comfortably clear of WCAG 2.5.8's 24px AA minimum) because a nav row
 is compact by design and a header should not have to fight the framework for
 a height.
 
@@ -477,15 +477,15 @@ a height.
 ```
 
 `--cirth-border-radius` is the single knob. The per-component radii are
-derived from it — a card is softer, a checkbox and inline code are capped
-so they never read as circles — so zeroing it zeroes them too.
+derived from it: a card is softer, a checkbox and inline code are capped
+so they never read as circles, so zeroing it zeroes them too.
 
 | Token | Relationship |
 | --- | --- |
-| `--cirth-card-border-radius` | `--cirth-border-radius` × 1.5 — the container/control pair |
+| `--cirth-card-border-radius` | `--cirth-border-radius` × 1.5, the container/control pair |
 | `--cirth-checkbox-border-radius` | Capped at `--cirth-radius-sm` |
 | `--cirth-code-border-radius` | Capped at `--cirth-radius-sm` |
-| `--cirth-radius-pill` | Untouched by the knob — switches stay pills |
+| `--cirth-radius-pill` | Untouched by the knob: switches stay pills |
 
 `--cirth-border-width` and `--cirth-outline-width` read steps from one
 stroke ladder, `--cirth-border-width-*`.
@@ -547,7 +547,7 @@ filled button has to clear 4.5:1 against it.
 }
 ```
 
-That tightens the flow — prose, sections, grid gaps — and leaves controls
+That tightens the flow (prose, sections, grid gaps) and leaves controls
 and cards where they were. Add the control pair if you want the components
 to come in too:
 
@@ -596,14 +596,14 @@ the host page knows nothing about:
 
 ## Verifying your theme
 
-Cirth's shipped themes — the default and both presets — are verified: every
+Cirth's shipped themes, the default and both presets, are verified: every
 text pair clears WCAG AA (4.5:1, or 7:1 under `prefers-contrast: more`) and
 every non-text indicator clears 3:1, checked in light and dark on every page
 of this site.
 
 That verification covers the values Cirth ships. **It does not extend to
-values you set.** The relationships hold — a derived hover stays
-proportionally darker than whatever accent you give it — but whether the
+values you set.** The relationships hold: a derived hover stays
+proportionally darker than whatever accent you give it, but whether the
 result clears a threshold depends on the colour you chose. When you change
 an input, the pairs worth checking are:
 
@@ -615,8 +615,8 @@ an input, the pairs worth checking are:
 
 ## Cascade layers
 
-Every stylesheet Cirth ships — each build, its print sheet, and the presets
-— puts all of its rules in one
+Every stylesheet Cirth ships (each build, its print sheet, and the presets)
+puts all of its rules in one
 [cascade layer](https://developer.mozilla.org/en-US/docs/Web/CSS/@layer)
 named `cirth`. That settles how your CSS meets Cirth's:
 
@@ -696,8 +696,8 @@ beats one it would inherit from `:root`. Set them on the wrapper:
 ```
 
 The host page's CSS wins inside the widget too, when it is unlayered. The
-`.cirth` prefix used to out-weigh a host rule such as `button { … }` — it
-never out-weighed `.entry-content a` — and it no longer does. If the host's
+`.cirth` prefix used to out-weigh a host rule such as `button { … }`: it
+never out-weighed `.entry-content a`, and it no longer does. If the host's
 CSS is yours, put it in a layer ordered before Cirth's:
 
 ```css
@@ -705,7 +705,7 @@ CSS is yours, put it in a layer ordered before Cirth's:
 @import url("site.css") layer(host);
 ```
 
-If it is not yours — a CMS theme, a page your widget is embedded in — mount
+If it is not yours (a CMS theme, a page your widget is embedded in), mount
 the widget in a shadow root. The host's rules do not cross into it, and the
 scoped build works inside it unchanged; the theme demo on this site's home
 page is built that way.
@@ -761,14 +761,14 @@ they follow the kinds described above:
 
 * A token that is another token (`var(--cirth-primary)`) is exported as an
   alias, `{primary}`, so the relationship survives.
-* A derived colour — a `color-mix()` or a relative colour — is exported as
+* A derived colour, a `color-mix()` or a relative colour, is exported as
   the value it resolves to in that scheme. DTCG cannot express the
   relationship, so the CSS it came from is kept under
   `$extensions["com.github.cirthcss"].css`. A tool that reads the value
   gets the right colour today, but it does not follow a new accent the
   way the stylesheet does.
-* A value no DTCG type can hold — a `calc()`, an `em` length, an icon
-  `url()` — is not exported as a token. It is listed, with its CSS and the
+* A value no DTCG type can hold (a `calc()`, an `em` length, an icon
+  `url()`) is not exported as a token. It is listed, with its CSS and the
   reason, under `$extensions["com.github.cirthcss"].unrepresented` in the
   same file.
 
@@ -781,11 +781,11 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 **kind** column is the distinction from
 [How the token system works](#how-the-token-system-works):
 
-* **input** — set this; other tokens follow
-* **derived** — computed from an input; set it only to break that
-* **slot** — a variable components paint through, not a theme setting
-* **role** — a named setting a component reads directly
-* **scale** — a step on a ladder
+* **input**: set this; other tokens follow
+* **derived**: computed from an input; set it only to break that
+* **slot**: a variable components paint through, not a theme setting
+* **role**: a named setting a component reads directly
+* **scale**: a step on a ladder
 
 #### Accent and status
 

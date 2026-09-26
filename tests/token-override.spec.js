@@ -9,7 +9,7 @@ const { setContent } = require("./helpers/render");
 //
 // Two things had to be true, and each was fixed in its own pass. First the
 // weight: every colour is declared on the scheme roots, which used to read
-// `:root:not([data-theme="dark"])` — (0,2,0) against a plain `:root`'s
+// `:root:not([data-theme="dark"])`: (0,2,0) against a plain `:root`'s
 // (0,1,0), so the override lost on specificity whatever the loading order.
 // The filters moved inside :where(), giving up the weight of the choosing
 // while keeping the choosing itself.
@@ -269,7 +269,7 @@ test("a forced scheme still switches the tokens it was not given", async ({
 	page,
 }) => {
 	// The other half: reach must not cost the switch. With no override in
-	// play a forced-dark subtree still resolves to the dark value — that is
+	// play a forced-dark subtree still resolves to the dark value: that is
 	// the light-dark() pair being evaluated against the subtree's own
 	// color-scheme rather than the root's, which is the whole reason the
 	// pairs can live at the root at all.

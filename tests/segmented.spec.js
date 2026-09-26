@@ -5,10 +5,10 @@ const { expect, test } = require("@playwright/test");
 const { setContent } = require("./helpers/render");
 
 // fieldset.segmented (gh#107): a segmented control that has to remain a
-// real radio group. Every test here pins part of that contract — the
+// real radio group. Every test here pins part of that contract: the
 // native keyboard model, form submission, the accessible names, a focus
 // indicator and a selection signal that survive forced colours, the 44px
-// floor, RTL — because each of them is exactly what the upstream pattern
+// floor, RTL, because each of them is exactly what the upstream pattern
 // (inputs set to display: none) gave up.
 
 // Default Safari leaves form controls out of the Tab order (see
@@ -126,7 +126,7 @@ test("segments are joined, meet the 44px floor, and keep the radios rendered", a
 	for (const box of boxes) {
 		expect(box.height, box.value).toBeGreaterThanOrEqual(44);
 		expect(box.width, box.value).toBeGreaterThanOrEqual(44);
-		// Rendered, not display: none — that is the upstream failure.
+		// Rendered, not display: none: that is the upstream failure.
 		expect(box.radioDisplay, box.value).not.toBe("none");
 		expect(box.radioWidth, box.value).toBeGreaterThan(0);
 	}

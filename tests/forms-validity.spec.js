@@ -211,7 +211,7 @@ test("Firefox keeps an opened required select neutral and a valid choice does no
 	await select.press("Tab");
 
 	// The pointer is still where the click left it, and a field answers
-	// hover now (forms/_basics.scss) — so it has to be moved off before the
+	// hover now (forms/_basics.scss), so it has to be moved off before the
 	// border is compared against a reference that was never hovered, or the
 	// comparison is between two different states rather than two schemes of
 	// validity styling.
@@ -247,7 +247,7 @@ test("the submit control waits for the reader before it dims", async ({
 }) => {
 	// The form on this page holds two required, empty controls, so it is
 	// :invalid from first paint. That used to be enough to grey the submit
-	// button — a login form nobody had touched drew its primary action as
+	// button: a login form nobody had touched drew its primary action as
 	// if it were disabled, which is exactly what it looked like on the home
 	// page's hero demo. The fields in the same form already waited for
 	// :user-invalid before showing anything; the button now waits with

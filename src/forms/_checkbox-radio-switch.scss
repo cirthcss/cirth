@@ -58,7 +58,7 @@
 // The on-surface token is the one the theme already computes for text on the
 // accent, so the mark follows any retheme.
 
-// Scoped away from [role="switch"] — a switch paints its own thumb through
+// Scoped away from [role="switch"]: a switch paints its own thumb through
 // ::before (see below), and a mask set here would cut that thumb to the
 // shape of the mark. Radios are excluded by construction: they draw their
 // dot with a thick border, and this block never reaches them.

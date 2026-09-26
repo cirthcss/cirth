@@ -9,7 +9,7 @@ const path = require("node:path");
 //
 // Everything else in this repository checks dist/ where it is built. That
 // cannot see the layer between: `files`, `exports`, and npm's own packing
-// rules. An entry point can be documented, built, and still unreachable —
+// rules. An entry point can be documented, built, and still unreachable:
 // `exports` is an allow-list, so a subpath it does not name is a hard
 // resolution error no matter what the tarball contains.
 //
@@ -32,8 +32,8 @@ const layerOpening = new RegExp(
 /**
  * Every documented entry point, with something only the right file could
  * contain. The sentinels are deliberately about the *promise the subpath
- * makes* — a print sheet is print-only, a classless build has no component
- * or utility classes, a scoped build lives under the wrapper — so a mapping that pointed a
+ * makes*: a print sheet is print-only, a classless build has no component
+ * or utility classes, a scoped build lives under the wrapper, so a mapping that pointed a
  * subpath at the wrong build would be caught, which byte-size alone cannot.
  *
  * @type {{ subpath: string, must: string[], mustNot: string[], layered?: boolean }[]}
@@ -213,7 +213,7 @@ const main = () => {
 				if (!contents.includes(needle)) {
 					fail(
 						`\`${specifier}\` delivered a stylesheet with no ` +
-							`\`${needle}\` in it — that is not the build this subpath ` +
+							`\`${needle}\` in it: that is not the build this subpath ` +
 							`promises.`,
 					);
 				}
@@ -222,7 +222,7 @@ const main = () => {
 			if (layered && !layerOpening.test(contents)) {
 				fail(
 					`\`${specifier}\` delivered a stylesheet that does not open ` +
-						`with \`@layer ${layerName}\` — its rules would compete with ` +
+						`with \`@layer ${layerName}\`: its rules would compete with ` +
 						`the consumer's on specificity.`,
 				);
 			}
@@ -251,17 +251,17 @@ const main = () => {
 
 		if (!fs.existsSync(path.join(installed, "NOTICE.md"))) {
 			fail(
-				"NOTICE.md did not survive the install — the upstream Pico CSS " +
+				"NOTICE.md did not survive the install: the upstream Pico CSS " +
 					"attribution has to travel with the package.",
 			);
 		}
 
-		// 5 — and what must stay unreachable.
+		// 5, and what must stay unreachable.
 		for (const subpath of sealed) {
 			const specifier = `${manifest.name}/${subpath.replace(/^\.\//, "")}`;
 			try {
 				const leaked = resolve(specifier);
-				fail(`\`${specifier}\` resolved to ${leaked} — it must not be API.`);
+				fail(`\`${specifier}\` resolved to ${leaked}: it must not be API.`);
 			} catch {
 				// The expected outcome: ERR_PACKAGE_PATH_NOT_EXPORTED.
 			}

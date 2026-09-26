@@ -138,7 +138,7 @@ for (const build of builds) {
 		expect(block).toContain(':where([data-theme="dark"])');
 		expect(block).toContain("prefers-color-scheme: dark");
 
-		// Geometry is deliberately untouched — control heights are built
+		// Geometry is deliberately untouched: control heights are built
 		// from the border width (44px, WCAG 2.5.5).
 		expect(block).not.toContain("--cirth-border-width:");
 		expect(block).not.toContain("--cirth-outline-width:");
@@ -221,7 +221,7 @@ for (const scheme of /** @type {const} */ (["light", "dark"])) {
 			);
 		}
 
-		// A translucent ring composites against whatever is behind it —
+		// A translucent ring composites against whatever is behind it:
 		// exactly what "more contrast" asks us to stop doing.
 		expect(base.focus.alpha).toBeLessThan(1);
 		expect(more.focus.alpha).toBe(1);
@@ -236,8 +236,8 @@ for (const scheme of /** @type {const} */ (["light", "dark"])) {
 // where strengthening the accent can make things *worse*: the fill derives
 // from --cirth-primary, the label is --cirth-primary-on-surface (white), and an
 // accent lightened for text legibility drags the fill up under the label.
-// That regressed once, in the dark scheme, to 4.2:1 — below where it sat
-// with no preference expressed at all — because the pass boosted the accent
+// That regressed once, in the dark scheme, to 4.2:1, below where it sat
+// with no preference expressed at all, because the pass boosted the accent
 // and let the fill follow. Both the theme and every preset now pin the fill.
 for (const scheme of /** @type {const} */ (["light", "dark"])) {
 	test(`${scheme} scheme: a button label clears AAA on its own fill`, async ({
@@ -293,8 +293,8 @@ for (const preset of presets) {
 						await styleOf(page, "muted", "color"),
 						background,
 					),
-					// The body ink comes from the framework's pass — no preset
-					// overrides --cirth-color — so this is the check that the two
+					// The body ink comes from the framework's pass: no preset
+					// overrides --cirth-color, so this is the check that the two
 					// passes compose rather than cancel.
 					text: contrastRatio(await styleOf(page, "text", "color"), background),
 				};

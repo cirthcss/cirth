@@ -251,7 +251,7 @@ for (const pagePath of visualPages) {
 		await capture(page, pagePath, defaultTheme);
 		// aria-busy spinners keep animating even under reduced motion (a
 		// deliberate framework choice) and live inside a background-image SVG
-		// that `animations: "disabled"` cannot reach — mask them.
+		// that `animations: "disabled"` cannot reach: mask them.
 		await expectDocsScreenshot(
 			page,
 			name,

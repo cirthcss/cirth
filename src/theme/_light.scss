@@ -38,7 +38,7 @@
   --cirth-primary-underline: oklch(from var(--cirth-primary) l c h / 50%);
 
   // 83.5% and 91.7% of the accent mixed toward black land exactly on
-  // $copper-650 and $copper-600 — the ladder is proportional in L and C at
+  // $copper-650 and $copper-600: the ladder is proportional in L and C at
   // this end, so a single mix reproduces a step.
   --cirth-primary-active: color-mix(
     in oklch,
@@ -54,7 +54,7 @@
   --cirth-primary-underline-active: var(--cirth-primary-active);
 
   // Focus rings composite to >= 3:1 against the page background (WCAG
-  // 1.4.11 as applied to focus indicators) — don't lower these alphas.
+  // 1.4.11 as applied to focus indicators); don't lower these alphas.
   --cirth-primary-focus: oklch(from var(--cirth-primary) l c h / 75%);
 
   // Deliberately explicit, not derived from --cirth-primary. Choosing light
@@ -66,8 +66,8 @@
   --cirth-primary-on-surface: #{$white};
 
   // Text selection. Derived, not pinned to a scale step: this used to be a
-  // literal from the brand family, which meant every preset — a blue Plain
-  // page, a violet Playroom one — highlighted text in the default theme's
+  // literal from the brand family, which meant every preset (a blue Plain
+  // page, a violet Playroom one) highlighted text in the default theme's
   // accent. The ratio lifts the accent to the lightness the wash needs so
   // the page's ink stays legible through it (8.0:1 with the shipped value).
   --cirth-text-selection-color: oklch(
@@ -138,7 +138,7 @@
   // oklab, not oklch, and the reason is the card surface. A
   // polar space interpolates the *hue angle*, and an author-written
   // `oklch(L 0 0)` carries an explicit 0deg hue rather than a powerless
-  // one — so mixing the field border toward it took the short way round the
+  // one, so mixing the field border toward it took the short way round the
   // wheel and landed the result at ~325deg, a faint magenta outside the
   // palette. (`black`/`white` keywords are safe: they convert
   // with a missing hue, which is carried from the other colour. A literal
@@ -180,7 +180,7 @@
   // implies "text/icon on top of the primary color". Verified >= 3:1
   // (WCAG 1.4.11) against both tracks with the shipped values: 3.77:1
   // unchecked (white on neutral-450), 5.60:1 checked (white on
-  // copper-550) — the tightest of the two is the one to re-check if
+  // copper-550): the tightest of the two is the one to re-check if
   // --cirth-primary-on-surface or --cirth-switch-background-color changes.
   --cirth-switch-color: var(--cirth-primary-on-surface);
   --cirth-range-thumb-border-color: var(--cirth-background-color);
@@ -192,15 +192,15 @@
   --cirth-accordion-close-summary-color: var(--cirth-ink);
   --cirth-accordion-open-summary-color: var(--cirth-ink);
 
-  // Rectangular mix — see the note on --cirth-table-border-color above.
+  // Rectangular mix ; see the note on --cirth-table-border-color above.
   // The card surface goes in with its chroma zeroed, so it contributes
   // lightness and nothing else. Rectangular space stops a hue from
   // *rotating*, but it does not stop two hues from averaging: this scheme's
   // canvas is warm (the brand hue) while the neutral scale is a cool stone,
   // and once the neutral's chroma decays toward the pale end the two
   // contributions are the same order of magnitude. Mixed whole they cancel
-  // into a hue two thirds of the way to magenta — 349deg, against a 308deg
-  // field border — which is the same failure the oklch mix used to produce,
+  // into a hue two thirds of the way to magenta: 349deg, against a 308deg
+  // field border, which is the same failure the oklch mix used to produce,
   // arrived at by addition instead of rotation. With the surface hueless the
   // result is the field border's own hue at 38% of its chroma, whatever
   // temperature a consumer gives the canvas. Lightness, and so the measured
@@ -233,12 +233,12 @@
 
   // Meter (<meter>)
   // Green / gold / red, the reading every browser's own meter already
-  // teaches — but with the hue backed by weight: each step down the scale
+  // teaches, but with the hue backed by weight: each step down the scale
   // is also a darker color, so the same signal survives a reader who
   // cannot separate the hues. All three clear 3:1 against the track
   // (WCAG 1.4.11) with room: 3.97:1, 5.05:1, 6.57:1. A meter whose author
   // declared no low/high/optimum is entirely optimum, so it prints as one
-  // flat green bar — which is what it means.
+  // flat green bar, which is what it means.
   --cirth-meter-optimum-color: var(--cirth-success);
   --cirth-meter-suboptimum-color: var(--cirth-warning);
   --cirth-meter-even-less-good-color: var(--cirth-error);
@@ -250,7 +250,7 @@
   // theme is to bake one per scheme. The value tracks --cirth-muted-color
   // above, so they match the masked chevrons in the accordion and the
   // dropdown, which take that token directly. A consumer who rethemes
-  // past the shipped schemes has to re-emit these four — that is what the
+  // past the shipped schemes has to re-emit these four: that is what the
   // theme generator (gh#90) is for.
   --cirth-icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-550)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   --cirth-icon-date: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-550)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");

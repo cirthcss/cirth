@@ -4,7 +4,7 @@ const { expect } = require("@playwright/test");
 //
 // `page.setContent()` writes exactly what it is handed. A fragment that
 // starts at `<style>` has no doctype, and a document with no doctype is
-// parsed in quirks mode — `document.compatMode === "BackCompat"` — which is
+// parsed in quirks mode (`document.compatMode === "BackCompat"`) which is
 // a rendering mode no page served by a real site has been in for twenty
 // years. It is not a harmless difference. Measured on the same table under
 // the same stylesheet: in quirks mode a `<table>` does not inherit
@@ -35,8 +35,8 @@ const setContent = async (page, html, options) => {
 
 /**
  * `CSS1Compat` is standards mode; `BackCompat` is quirks. Exported on its
- * own so a spec that navigates to a URL — the built docs site, an example
- * file — can make the same assertion about a document it did not compose.
+ * own so a spec that navigates to a URL (the built docs site, an example
+ * file) can make the same assertion about a document it did not compose.
  *
  * @param {import("@playwright/test").Page | import("@playwright/test").Frame} page
  */

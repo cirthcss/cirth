@@ -25,7 +25,7 @@ item, with no JavaScript and no ARIA widget required.
 
 Give a group of `details` the same `name` and the browser makes them
 mutually exclusive: opening one closes the others. No JavaScript, no
-`aria-expanded` bookkeeping — the state lives in the elements, and the
+`aria-expanded` bookkeeping: the state lives in the elements, and the
 accessibility tree follows it for free.
 
 {% demo "accordion-exclusive" %}

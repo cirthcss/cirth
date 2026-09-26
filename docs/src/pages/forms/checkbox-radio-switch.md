@@ -27,7 +27,7 @@ a checkbox turns it into a toggle switch with no extra markup.
   color from `--cirth-switch-background-color` /
   `--cirth-switch-checked-background-color`, thumb color from
   `--cirth-switch-color`, which defaults to `--cirth-primary-on-surface` (the
-  same token buttons use for their text) rather than a fixed white — keep
+  same token buttons use for their text) rather than a fixed white: keep
   the two in sync if you customize `--cirth-primary-on-surface`, and recheck
   contrast (WCAG 1.4.11, >= 3:1) against both `--cirth-switch-background-color`
   and `--cirth-switch-checked-background-color` if you do.

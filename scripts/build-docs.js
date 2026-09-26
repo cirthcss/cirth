@@ -26,7 +26,7 @@ const variants = [
 	// The homepage build laboratory is isolated in an iframe so the docs'
 	// unscoped default build cannot leak into the comparison. These are the
 	// actual four public configurations, compiled from source with the same
-	// switches as the distributed entrypoints — not look-alike shell CSS.
+	// switches as the distributed entrypoints, not look-alike shell CSS.
 	{
 		filename: "cirth-lab-default.css",
 		content: `@use "src";`,
@@ -74,7 +74,7 @@ try {
 	}
 
 	// Presets, compiled the same way scripts/build-presets.js compiles them
-	// for dist/ (standalone, no build-time config to inject) — so the header's
+	// for dist/ (standalone, no build-time config to inject), so the header's
 	// live preset switcher (see site-header.njk / base.njk, gh#80) has a real
 	// stylesheet to swap in rather than a reimplementation of one. Kept
 	// separate from npm run build's dist/presets/ output on purpose: docs:build

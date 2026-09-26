@@ -10,7 +10,7 @@ const { setContent } = require("./helpers/render");
 // ones, focus shadow included.
 
 const projectRoot = path.join(__dirname, "..");
-const pillThreshold = 100; // px — the pill token is 9999px, the group radius single digits
+const pillThreshold = 100; // px: the pill token is 9999px, the group radius single digits
 
 const builds = [
 	{ file: "dist/cirth.css", name: "default", scope: "" },

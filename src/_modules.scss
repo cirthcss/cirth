@@ -49,7 +49,7 @@
 // src/theme/ is the single source of Cirth's official design tokens.
 // Alternate accents (see src/presets/) are published as separate
 // stylesheets that only override CSS custom properties, meant to be
-// loaded after this one — they are not alternate builds of this file.
+// loaded after this one: they are not alternate builds of this file.
 // They emit into the same cascade layer, so source order still decides.
 @use "theme";
 

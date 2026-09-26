@@ -54,7 +54,7 @@ one thing: whether the control owns an opaque surface.
 
 `.outline` does. It paints `--cirth-canvas`, the page surface, so it stays
 a control wherever it sits rather than letting whatever is behind it show
-through — and it draws a border. `.ghost` owns neither, which makes it the
+through, and it draws a border. `.ghost` owns neither, which makes it the
 right choice for an icon button in a header or a toolbar, where a border
 would be one line too many.
 
@@ -62,7 +62,7 @@ Both answer `:hover` by tinting their own background with their colour
 group rather than switching to a filled treatment: the point of a quiet
 button is that it stays quiet, and a wash is enough to say it is live.
 `.ghost` mixes toward `transparent` so the wash composites over whatever it
-is actually on — a card, a header, a popover — while `.outline`, already
+is actually on (a card, a header, a popover), while `.outline`, already
 opaque, mixes toward the canvas it is painting.
 
 A ghost button keeps a transparent border rather than removing it, so
@@ -83,7 +83,7 @@ there's no way to add `.secondary` to them.
   pointer events.
 * A submit button (`[type="submit"]`, or a plain `button` with no `type`,
   which defaults to submit) inside a `form:invalid` drops to
-  `--cirth-opacity-disabled` too, but stays **fully clickable** — no
+  `--cirth-opacity-disabled` too, but stays **fully clickable**: no
   `pointer-events: none`, no `[disabled]`. This is deliberate: a truly
   disabled submit button can't be activated, so it can never trigger the
   browser's own constraint-validation messages, and screen reader users get
@@ -91,7 +91,7 @@ there's no way to add `.secondary` to them.
   (or Enter) still surfaces the native "please fill in this field" UI with
   zero JS. Note a required-but-untouched form is already `:invalid` on
   first paint, so the button can look muted before the user has done
-  anything wrong — accepted as the trade-off for zero-JS feedback once
+  anything wrong, accepted as the trade-off for zero-JS feedback once
   fields start getting filled in.
 * Combine with [Loading](/components/loading) (`aria-busy="true"`) to show a
   spinner while a button's action is pending. Add the native `disabled`

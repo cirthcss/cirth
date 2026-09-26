@@ -7,7 +7,7 @@ layout: docs.njk
 
 The native `<dialog>` element is styled as a centered modal with a
 backdrop. Opening it, closing it, locking the page behind it and animating
-it in are all the platform's work — Cirth supplies the appearance and
+it in are all the platform's work: Cirth supplies the appearance and
 nothing else, and no longer asks your script for anything.
 
 {% demo "modal" %}
@@ -51,7 +51,7 @@ Two attributes, no script:
 </dialog>
 ```
 
-`command="show-modal"` opens it, `close` and `request-close` close it — the
+`command="show-modal"` opens it, `close` and `request-close` close it: the
 second firing a cancel event first, so a form can object. A
 `<form method="dialog">` closes the dialog on submit and reports which
 button did it through `dialog.returnValue`.
@@ -68,8 +68,8 @@ dialog.showModal(); // open
 dialog.close(); // close
 ```
 
-That is a compatibility path and application logic — confirming a
-deletion, sending a request — not something Cirth needs in order to
+That is a compatibility path and application logic (confirming a
+deletion, sending a request), not something Cirth needs in order to
 present the component.
 
 ## Behavior

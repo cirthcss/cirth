@@ -47,12 +47,12 @@ behavior specific to each input type.
   content-based width.
 * `textarea` opens four rows tall instead of the browser's two, so a
   field meant for a paragraph shows a paragraph. An explicit `rows`
-  attribute (`<textarea rows="2">`) takes over completely — the default
+  attribute (`<textarea rows="2">`) takes over completely: the default
   only applies when you haven't said how tall you want it. The four rows
   are measured in `lh`, so they stay four rows of *this* textarea's text
   if you change its font size.
 * Controls are at least 44px tall (the WCAG 2.5.5 target size) whatever
-  font size you set on them — buttons, `select` and `textarea` each hold
+  font size you set on them: buttons, `select` and `textarea` each hold
   that floor independently of the type scale. Inside a `nav` the floor
   becomes a compact 40px band, still above WCAG 2.5.8's 24px AA minimum.
   Equivalent one-line controls share the same font, line-height, padding,

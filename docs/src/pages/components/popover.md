@@ -6,7 +6,7 @@ layout: docs.njk
 
 `popover` is an attribute, not an element: it lifts anything into the top
 layer and lets the browser dismiss it. Cirth styles the **surface** that
-comes with that — a sheet above the page — and leaves what you put inside
+comes with that: a sheet above the page, and leaves what you put inside
 it entirely to you.
 
 {% demo "popover" %}
@@ -24,7 +24,7 @@ it entirely to you.
 </span>
 ```
 
-That example is a hint, because a hint is what replaced the old tooltip —
+That example is a hint, because a hint is what replaced the old tooltip,
 but it is one use of the attribute, not the use. Two attributes carry it:
 `popovertarget` makes the button an invoker, which gives you click, tap,
 `Enter` and `Space` for free, and `aria-describedby` is what a screen
@@ -48,7 +48,7 @@ and no type size, so these need nothing but their own markup.
 </ul>
 ```
 
-**A filter or settings panel.** A form works unchanged inside one —
+**A filter or settings panel.** A form works unchanged inside one:
 `method="dialog"` is for `<dialog>`, so submit or close it as you would
 anywhere else:
 
@@ -73,7 +73,7 @@ be clipped by an ancestor's `overflow`, the top layer is not:
 </article>
 ```
 
-What Cirth does **not** style is `popover="manual"` — see Behavior below —
+What Cirth does **not** style is `popover="manual"` ; see Behavior below,
 so a toast or an overlay your own script drives is left untouched.
 
 ## Why this is not called a tooltip
@@ -92,7 +92,7 @@ than hover, and named for what it is. A true hover tooltip needs
 `interestfor` together with `popover="hint"`, which hands the browser the
 interest delay, hover persistence, `Escape` handling and input-modality
 rules. `popover="hint"` is not supported in Safari at all and has an
-unstable history elsewhere, and `interestfor` is not yet broadly tracked —
+unstable history elsewhere, and `interestfor` is not yet broadly tracked,
 so it is a future addition, not a thing to ship now.
 
 ## Behavior
@@ -110,18 +110,18 @@ so it is a future addition, not a thing to ship now.
 * Width is capped by `--cirth-popover-max-width` (30rem, and never more
   than the viewport minus a gutter) so a single long line cannot run the
   width of the screen. It is a safety rail, not a statement about how wide
-  a panel should be — override it per popover when the content asks.
+  a panel should be; override it per popover when the content asks.
 * Type size, line length and layout inside are untouched. A menu, a form
   and a paragraph all keep the styling they would have anywhere else.
-* It fades in and out using `@starting-style` and discrete transitions —
+* It fades in and out using `@starting-style` and discrete transitions:
   no class toggling, no script. Under
   [reduced motion](/utilities/reduce-motion) the fade collapses with
   everything else.
 * `<dialog popover>` is left alone: dialogs have their own component and
   their own surface. See [Modal](/components/modal).
 * So is `popover="manual"`. A manual popover is shown and hidden entirely
-  by its author's script — application chrome, a toast, an overlay injected
-  by tooling — and a library that paints a border and a fade onto it is
+  by its author's script: application chrome, a toast, an overlay injected
+  by tooling, and a library that paints a border and a fade onto it is
   redecorating something it knows nothing about. Only `auto` (the default,
   written as a bare `popover`) and `hint` are styled: those are the ones
   the browser light-dismisses on the reader's behalf, which is what makes
@@ -132,8 +132,8 @@ so it is a future addition, not a thing to ship now.
 A popover opens in the middle of the viewport. That is the browser's own
 default, but Cirth states it rather than relying on it: the user agent
 centres a popover by giving it `margin: auto` on all four sides, and any
-rule of yours that sets a margin on that element — a container zeroing its
-last child's, say — leaves the remaining sides to absorb the free space and
+rule of yours that sets a margin on that element (a container zeroing its
+last child's, say) leaves the remaining sides to absorb the free space and
 slides the panel to an edge. Cirth sets `inset: 0; margin: auto` on the open
 panel so the centring survives ordinary layout CSS.
 
@@ -142,7 +142,7 @@ It does mean a hint can land on top of the control that opened it.
 Attaching it to its trigger needs CSS anchor positioning, which is outside
 Cirth's [browser floor](https://github.com/cirthcss/cirth#browser-support)
 (Chrome 125, Firefox 147, Safari 26). Shipping it behind `@supports` would
-serve one engine and not the others, so it is left to you — `position-area`
+serve one engine and not the others, so it is left to you: `position-area`
 takes precedence over the centring above, so nothing needs undoing first:
 
 ```css

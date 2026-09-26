@@ -24,7 +24,7 @@ const { auditSources, watchSources } = require("./lib/source-guard");
 //     66px wide holding 88px of controls and hung the menu toggle 6px off a
 //     320px screen.
 //   - `font-family: var(--cirth-font-family-sans)` on the shell's chrome
-//     resolves to the same stack the page already had — until a preset
+//     resolves to the same stack the page already had, until a preset
 //     makes the page face rounded and the shell has to stay plain.
 //
 // Both were caught downstream, by check:behavior and check:visual, after
@@ -35,7 +35,7 @@ const { auditSources, watchSources } = require("./lib/source-guard");
 // probes ~1000 declarations across 800 renderings and takes the better
 // part of an hour; running it again in three configurations would cost a
 // working day. But only what the sweep called `inert` is a deletion
-// candidate — a few dozen declarations — and the sweep already recorded,
+// candidate: a few dozen declarations, and the sweep already recorded,
 // per (viewport, scheme), which renderings can see each of them. That
 // cover is written into the report as a plan, and this pass executes it:
 // the same corpus, the same in-page measurement code, a handful of
@@ -57,7 +57,7 @@ const { auditSources, watchSources } = require("./lib/source-guard");
 //                      so the experiment never ran.
 //
 // A candidate that comes back `unmatched`, `not observable` or
-// `unprobeable` everywhere has not been verified — it has been looked for.
+// `unprobeable` everywhere has not been verified: it has been looked for.
 // The report says so rather than promoting it to `inert`.
 
 const args = process.argv.slice(2);
@@ -76,8 +76,8 @@ const quiet = args.includes("--quiet");
 // each one is in the list rather than an assumption that one stands in for
 // the others. Firefox and WebKit are separate engines, not one
 // "non-Chromium": they agree on the flex case above and need not agree on
-// the next one. `playroom` is the preset that moves the most tokens — face,
-// radius, weight — so it is the one most likely to separate two values that
+// the next one. `playroom` is the preset that moves the most tokens: face,
+// radius, weight, so it is the one most likely to separate two values that
 // coincide at the default.
 //
 // Any `<engine>` or `<engine>+<preset>` also works, so a fourth
@@ -100,7 +100,7 @@ const parseConfig = (name) => {
 	const [engine, preset = "default"] = name.split("+");
 	if (engine !== "chromium" && engine !== "firefox" && engine !== "webkit") {
 		throw new Error(
-			`verify-dead-css: unknown configuration "${name}" — use one of ` +
+			`verify-dead-css: unknown configuration "${name}": use one of ` +
 				`${Object.keys(CONFIGS).join(", ")}, or <engine>+<preset>.`,
 		);
 	}
@@ -138,8 +138,8 @@ const configs = (flag("--configs") ?? "firefox,webkit,playroom")
  */
 
 // Everything below the `page.evaluate` boundary is the same experiment
-// audit-dead-css.js runs — take the declaration out of the live CSSOM,
-// re-measure, put it back — over a named subset instead of the whole
+// audit-dead-css.js runs: take the declaration out of the live CSSOM,
+// re-measure, put it back, over a named subset instead of the whole
 // sheet. It is a separate function only because the two passes select
 // their subject differently: by rule path there, by authored identity
 // here, which is what survives another engine's parse.
@@ -270,7 +270,7 @@ const measure = ({ needle, wanted }) => {
 				result.unprobeable.push(entry.key);
 				continue;
 			}
-			// The page can rearrange itself under a probe — the shell's own
+			// The page can rearrange itself under a probe: the shell's own
 			// header script moves controls into the drawer when the bar gets
 			// narrow. Re-baseline and try once more before believing it.
 			if (!attempt.clean) {
@@ -294,8 +294,8 @@ const measure = ({ needle, wanted }) => {
 //
 // `.docs-header-search { width }` and `.docs-search-trigger { width }` are
 // each inert in every engine at every width this corpus samples: take one
-// out and the other still states the cluster's width. Take out *both* — a
-// cleanup deleting everything a report called inert — and Firefox sized
+// out and the other still states the cluster's width. Take out *both*: a
+// cleanup deleting everything a report called inert, and Firefox sized
 // the header's actions from the basis alone. That is how the regression
 // the second pass exists to prevent actually happened, and no
 // single-declaration probe can see it.
@@ -544,7 +544,7 @@ const run = async () => {
 
 	// The sweep's plan covers the four widths the sweep samples. The one
 	// below them is this pass's own: the same pages, in the same schemes,
-	// probing the same candidates one tier narrower — see `narrowViewport`.
+	// probing the same candidates one tier narrower ; see `narrowViewport`.
 	// Ten more renderings per configuration, and the one class of false
 	// inert that has actually shipped a regression.
 	const [narrowName] = Object.keys(narrowViewport);
@@ -554,7 +554,7 @@ const run = async () => {
 
 	if (candidates.length === 0) {
 		console.log(
-			`\n[@cirthcss/cirth] No inert candidates in ${reportPath} — nothing to verify.\n`,
+			`\n[@cirthcss/cirth] No inert candidates in ${reportPath}: nothing to verify.\n`,
 		);
 		return 0;
 	}
@@ -758,7 +758,7 @@ const run = async () => {
 
 	if (unverified.length > 0) {
 		console.log(
-			`${unverified.length} candidate${unverified.length === 1 ? " was" : "s were"} not judged by this pass — looked for, not measured.\n` +
+			`${unverified.length} candidate${unverified.length === 1 ? " was" : "s were"} not judged by this pass: looked for, not measured.\n` +
 				"They keep the first sweep's verdict and gain no confirmation from it:\n",
 		);
 		for (const row of unverified) {
@@ -807,7 +807,7 @@ const run = async () => {
 	}
 
 	// A reporting tool, like the sweep it follows: it says which candidates
-	// survived, and a person decides what to delete — from the sheet this
+	// survived, and a person decides what to delete, from the sheet this
 	// run actually read, which is what the guard is checking.
 	guard.assertUnchanged();
 	return 0;

@@ -19,7 +19,7 @@ parent, most commonly a wide table, instead of letting it overflow the page.
 It's a single declaration (`overflow: auto`), available only in the default
 build with classes enabled. When the content actually overflows,
 `tabindex="0"` is what makes the scroll container itself keyboard-reachable
-(WCAG 2.1.1) — without it, a mouse or touch user can scroll but a keyboard
+(WCAG 2.1.1): without it, a mouse or touch user can scroll but a keyboard
 user can't. Skip the attribute only when you know the content never
 overflows for anyone (there's nothing to scroll to reach).
 

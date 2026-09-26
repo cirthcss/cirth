@@ -4,8 +4,8 @@
 // _styles.scss for its inline icons), consolidated in one place instead of
 // being redeclared separately wherever they're used.
 // All five scales below (neutral + the four chromatic families) share one
-// 19-step lightness ladder — 950 (darkest) down to 50 (lightest), evenly
-// spaced from 18% to 96% — so picking a step is the same exercise
+// 19-step lightness ladder: 950 (darkest) down to 50 (lightest), evenly
+// spaced from 18% to 96%, so picking a step is the same exercise
 // regardless of which family you're in, and there are no gaps: every
 // family defines every step.
 // Chroma is derived, not hand-picked. Each chromatic family is pinned to
@@ -13,8 +13,8 @@
 // in-gamut sRGB chroma at every lightness step; the fraction is the
 // family's voice:
 //   - $error-*, $success-*, $warning-* sit at 85%. A status color has to
-//     be recognised at a glance in a small mark — a validation border, a
-//     meter segment, a word of inserted text — and it appears rarely.
+//     be recognised at a glance in a small mark: a validation border, a
+//     meter segment, a word of inserted text, and it appears rarely.
 //   - $copper-* sits at 70%. The brand accent is the opposite case: it
 //     covers whole surfaces (a filled button, a focus ring, a checked
 //     control) and shows up on every screen, so the same 85% that makes a
@@ -22,12 +22,12 @@
 //     it reading as oxidized metal rather than as an orange.
 // Because the sRGB gamut boundary shape differs per hue (e.g. red's
 // ceiling peaks earlier, at a darker lightness, than green's does), the
-// families don't hit peak saturation at the same step — that's the gamut
+// families don't hit peak saturation at the same step: that's the gamut
 // speaking, not an inconsistency. What stays consistent is the method.
 // $neutral-* is derived differently, because it is not an accent. Its
 // chroma is a bell that peaks mid-ladder and fades to nothing at the pale
-// end — a light grey needs more chroma than a dark one to read as cool
-// rather than as plain grey, and a large pale surface needs none at all —
+// end: a light grey needs more chroma than a dark one to read as cool
+// rather than as plain grey, and a large pale surface needs none at all:
 // but it does not return to zero at the dark end. It floors at 70% of the
 // peak instead, because the dark scheme builds its canvas out of the two
 // darkest steps, and a bell that closed symmetrically left that canvas
@@ -36,11 +36,11 @@
 // predominantly blue with a violet lift: it reads as shadow iron, and it
 // sits 124deg from the brand hue, far enough to be the cool counterweight
 // the copper is measured against. Pulled further round toward the plum end
-// of the moodboard it stops being a counterweight — the page loses its
+// of the moodboard it stops being a counterweight: the page loses its
 // blue and every surface, ink and signal reads as a variation on the same
 // warm temperature.
 // Status colors (error, success, warning) are named for the role they
-// play, not the hue they happen to be — $error-500 is what most people
+// play, not the hue they happen to be: $error-500 is what most people
 // would call "red", but naming it that way would hide why it's actually
 // used (invalid form state, deleted/removed text). $copper and $neutral
 // are named for what they visually are (brand accent; graphite) since
@@ -57,7 +57,7 @@ $white: oklch(100% 0 0deg);
 // it. Off the 19-step ladder on purpose: it's a surface color, not a scale
 // step. Verified against WCAG AA: every text token keeps >= 4.5:1 and
 // every 3:1 non-text claim in _light.scss still holds on this background.
-// Chroma stays low deliberately — the page should read as the material,
+// Chroma stays low deliberately: the page should read as the material,
 // the accent as the signal on top of it, not as a wash across everything.
 // Presets already made this same call independently (the plain preset's
 // own page sits at zero chroma).

@@ -5,8 +5,8 @@ layout: docs.njk
 # About Cirth
 
 Cirth is an HTML-native CSS framework: a stylesheet that styles standard
-HTML elements directly — `<button>`, `<nav>`, `<article>`, `<table>`,
-`<dialog>` — instead of asking you to learn a parallel vocabulary of class
+HTML elements directly (`<button>`, `<nav>`, `<article>`, `<table>`,
+`<dialog>`) instead of asking you to learn a parallel vocabulary of class
 names first. Load it, write semantic markup, and most of an interface is
 already a finished, accessible baseline.
 
@@ -30,11 +30,11 @@ already a finished, accessible baseline.
   drive color, spacing, radius, type, and motion, overridable in plain CSS
   after the stylesheet loads.
 - No JavaScript runtime. Cirth ships none and requires none: interactive
-  patterns — accordion, dropdown, modal — are built on native `<details>`
+  patterns (accordion, dropdown, modal) are built on native `<details>`
   and `<dialog>` behavior. It is a statement about what the package
   contains, not about your application, which is free to use JavaScript for
   anything it needs.
-- Four builds — default, classless, scoped, and scoped classless — so the
+- Four builds: default, classless, scoped, and scoped classless, so the
   same token system can style a page directly, style zero-class markup, or
   stay scoped inside a `.cirth` wrapper.
 
@@ -42,7 +42,7 @@ already a finished, accessible baseline.
 
 The framework ships compiled CSS only; there's nothing to run. Add one
 `<link rel="stylesheet">` (or one `import` in a bundler) and standard
-elements pick up their styling immediately — no template step, no
+elements pick up their styling immediately: no template step, no
 JavaScript hydration, no class list to author. Customization happens by
 overriding CSS custom properties in an ordinary stylesheet of your own,
 which wins because Cirth keeps its rules in a cascade layer: change
@@ -63,7 +63,7 @@ accident:
   elements to work doesn't belong in the default build.
 - **Runtime tokens, not build-time variables.** Every color, spacing,
   radius, font, and shadow is a `--cirth-` custom property, overridable
-  after the stylesheet loads — no Sass, no rebuild.
+  after the stylesheet loads: no Sass, no rebuild.
 - **A monitored compressed size for every shipped stylesheet** (below).
 
 ## Size, and what it is a budget for
@@ -72,8 +72,9 @@ The default stylesheet is **{{ proof.size.label }} gzipped in this build**,
 measured from `dist/cirth.min.css`. Every shipped bundle carries its own
 budget, checked automatically on every build by
 [`scripts/check-css-size.js`](https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js)
-— the four root builds, the four print sheets and both presets, each with
-deliberate local headroom above what it currently measures.
+which covers the four root builds, the four print sheets and both
+presets, each with deliberate local headroom above what it currently
+measures.
 
 The quoted figure is gzip because that is what the delivery paths documented
 here actually send. A host that precompresses the file itself and serves it
@@ -89,7 +90,7 @@ before it has to stop and wait for the client's first acknowledgment.
 
 It was never a guarantee about any individual request, and on the delivery
 paths most consumers actually use it is not the number that decides
-anything — the connection the stylesheet arrives on has usually moved the
+anything: the connection the stylesheet arrives on has usually moved the
 threshold already.
 [Deploy](/deploy#what-a-smaller-stylesheet-actually-buys) works through what
 it does and does not buy.
@@ -99,7 +100,7 @@ promising a ceiling, and the difference is the rest of this section.
 
 ### Why it is a guard and not a promise
 
-It used to be written as a single ceiling — "under 14 KB" — applied to every
+It used to be written as a single ceiling, "under 14 KB", applied to every
 file in `dist/`. That number was doing two jobs, and doing both badly.
 
 As a guard it watched one bundle. The print sheets are under 900 bytes, so a
@@ -117,7 +118,7 @@ container that clipped it. Those are defects, and none of them was worth
 Cirth is small because its model is small: element selectors and custom
 properties, no component catalogue, and nothing to run. It is not small
 because it leaves native elements unfinished. So the number is now a
-per-bundle regression guard — cross a line and the build stops and asks —
+per-bundle regression guard (cross a line and the build stops and asks),
 raised deliberately, in the change that needs it, with the reason in the
 commit.
 
@@ -127,13 +128,13 @@ WCAG 2.2 AA contrast, visible focus rings that survive Windows High
 Contrast / forced-colors mode, 44px touch targets, and
 `prefers-reduced-motion` / `prefers-contrast: more` support are checked in
 the source rather than left to integrators to add. This is a floor Cirth verifies for its own
-components and default theme — a baseline, not a substitute for testing
+components and default theme: a baseline, not a substitute for testing
 the accessibility of the interface you build on top of it.
 
 ## Where Cirth fits
 
-- Sites and internal tools where standard HTML elements — forms, tables,
-  nav, articles — cover most of the interface.
+- Sites and internal tools where standard HTML elements (forms, tables,
+  nav, articles) cover most of the interface.
 - Projects that want a production-ready baseline without adopting or
   maintaining a design system.
 - Teams that want zero shipped JavaScript and no required build step.
@@ -144,7 +145,7 @@ the accessibility of the interface you build on top of it.
 ## Where Cirth does not fit
 
 - Highly custom, brand-driven interfaces designed and built
-  component-by-component — a utility-first workflow or a bespoke design
+  component-by-component: a utility-first workflow or a bespoke design
   system fits that job better.
 - Projects that need a large, pre-built component catalog beyond layout,
   forms, and Cirth's small component set.
@@ -162,8 +163,8 @@ keeps every shipped stylesheet within a monitored compressed size budget.
 
 Not minimalism for its own sake. Constraints used as an engineering tool.
 
-The visual identity built on that idea — the rune-form mark, the copper
-hue, and the wordmark — is documented on the [Brand](/brand) page. Cirth
+The visual identity built on that idea (the rune-form mark, the copper
+hue, and the wordmark) is documented on the [Brand](/brand) page. Cirth
 is not affiliated with the Tolkien estate or any rights holder; the name
 is a reference, not a claim of association.
 

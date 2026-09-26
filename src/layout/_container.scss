@@ -39,7 +39,7 @@
    * instead of stopping at the measure (a wide table, image, figure).
    * Breaks out to the container's *own* edges, not the viewport, so it
    * stays correct regardless of what surrounds the container.
-   * `.container-fluid` doesn't need it — its content track is uncapped.
+   * `.container-fluid` doesn't need it: its content track is uncapped.
    */
 
   #{$parent-selector} .container > .breakout {

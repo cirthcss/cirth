@@ -60,7 +60,7 @@ for (const file of allFiles) {
 	const filePath = path.join(distDir, file);
 
 	if (!fs.existsSync(filePath)) {
-		fail(file, "missing — run `npm run build` first.");
+		fail(file, "missing; run `npm run build` first.");
 		continue;
 	}
 
@@ -87,7 +87,7 @@ for (const file of allFiles) {
 // `@layer cirth { … }` block and nothing else (an @charset aside). That is
 // the whole consumer contract: a rule outside a layer beats everything in
 // here, so a single rule left outside the block would quietly compete on
-// specificity again. No other layer name and no nested layer either — a
+// specificity again. No other layer name and no nested layer either: a
 // sub-layer would reorder Cirth's own rules (specs/cascade-layer.md). And no
 // `!important`: inside a layer an important declaration outranks every
 // unlayered important one, so it would invert against the consumer instead
@@ -135,7 +135,7 @@ for (const file of allFiles) {
 
 	root.walkAtRules("layer", (atRule) => {
 		if (atRule.parent?.type !== "root") {
-			fail(file, `nested \`@layer ${atRule.params}\` — Cirth has no sub-layers.`);
+			fail(file, `nested \`@layer ${atRule.params}\`: Cirth has no sub-layers.`);
 		}
 	});
 
@@ -340,7 +340,7 @@ for (const { name } of presets) {
 			return;
 		}
 		if (atRule.name !== "media") {
-			fail(file, `preset contains @${atRule.name} — only @media is allowed.`);
+			fail(file, `preset contains @${atRule.name}: only @media is allowed.`);
 		}
 	});
 
@@ -358,7 +358,7 @@ for (const { name } of presets) {
 		if (!decl.prop.startsWith("--")) {
 			fail(
 				file,
-				`preset declares \`${decl.prop}\` — presets may only set ` +
+				`preset declares \`${decl.prop}\`: presets may only set ` +
 					`custom properties.`,
 			);
 		}
