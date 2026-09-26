@@ -135,7 +135,9 @@ writing system, not a claim of license or partnership.
 
 Each variant above is downloadable as SVG (preferred) or PNG. The full set
 lives in
-[`docs/public/`](https://github.com/cirthcss/cirth/tree/master/docs/public),
+[`docs/public/`](https://github.com/cirthcss/cirth/tree/master/docs/public)
+and is catalogued in
+[`docs/BRAND_ASSETS.md`](https://github.com/cirthcss/cirth/blob/master/docs/BRAND_ASSETS.md),
 including the two combinations this grid does not show — the mono mark on
 its own background tile, light and dark, for square containers that have to
 stay one colour.
