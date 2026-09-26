@@ -247,8 +247,8 @@ const defaultBuildSize = () => {
 	return { bytes, label: kb(bytes), brotliLabel: kb(brotliSize(source)) };
 };
 
-// The radius pair — a container's corner against the corners of the
-// controls inside it — resolved off the compiled stylesheet rather than
+// The radius pair (a container's corner against the corners of the
+// controls inside it), resolved off the compiled stylesheet rather than
 // written down. The Brand page quotes both numbers as the thing that
 // survives a retheme, and it quoted them wrong for three minor versions:
 // the knob moved from `radius-md` to `radius-sm` in "establish a
@@ -257,8 +257,8 @@ const defaultBuildSize = () => {
 // against `dist/` has to come out of `dist/`.
 //
 // The resolver is deliberately narrow. It follows the two shapes the
-// radius tokens actually use — `var(--other)` and
-// `calc(var(--other) * <n>)` — down to a `rem` or `px` literal, and
+// radius tokens actually use (`var(--other)` and
+// `calc(var(--other) * <n>)`) down to a `rem` or `px` literal, and
 // returns null on anything else rather than guessing. A null prints as a
 // token name with no measurement, which is missing information; a guess
 // would be wrong information.
@@ -270,8 +270,8 @@ const radiusPair = () => {
 	// Root custom properties only. A token redeclared inside a component
 	// scope (`article` moves --cirth-block-spacing-*, [type=search] moves
 	// the radius to a pill) is that component's decision, not the default
-	// this table describes, so the first declaration — the `:root` one the
-	// minifier emits ahead of the scoped overrides — is the one read.
+	// this table describes, so the first declaration is the one read: the
+	// `:root` one, which the minifier emits ahead of the scoped overrides.
 	/** @type {Map<string, string>} */
 	const declared = new Map();
 	for (const [, name, value] of css.matchAll(

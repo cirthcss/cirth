@@ -87,10 +87,12 @@ faq:
         No. The project is not affiliated with, endorsed by, or associated
         with the Tolkien estate, the Tolkien Society, Amazon's Middle-earth
         adaptations, or any other rights holder. The name points at the
-        Cirth runic alphabet — an angular script cut for carving, where
-        every letter is reduced to the strokes the material allows — because
-        that reduction is the constraint this framework is built around. It
-        is a reference, not a claim of license or partnership. The mark, the
+        Cirth, an alphabet Tolkien invented for his languages: a small set
+        of signs where related sounds take related shapes, so the script is
+        learned as a system rather than one sign at a time. That is the
+        property the framework is named for, and
+        <a href="/about#origin-of-the-name">About</a> explains it. It is a
+        reference, not a claim of license or partnership. The mark, the
         wordmark and the rest of the project's identity are Cirth's own work
         and are unrelated to Tolkien's; <a href="/brand">Brand</a> sets out
         where they come from and how they may be used.

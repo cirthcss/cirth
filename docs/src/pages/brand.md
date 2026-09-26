@@ -53,8 +53,8 @@ a favicon, a tab strip.
 
 The mark is being redrawn. The files in the grid below are the current
 ones and remain the assets to use until they are replaced; the geometry
-that describes them — construction grid, clearspace, minimum size,
-alignment in the lockup — is not published here, because a rule measured
+that describes them (construction grid, clearspace, minimum size,
+alignment in the lockup) is not published here, because a rule measured
 against the outgoing drawing would be wrong about the incoming one.
 
 <section class="docs-brand-spec" aria-labelledby="mark-pending-title">
@@ -63,9 +63,9 @@ against the outgoing drawing would be wrong about the incoming one.
     <p>Everything in this list is a number, and a number about a drawing
     can only be taken off that drawing. Each one is specified here once the
     definitive mark is in the repository, and not sooner. What the rest of
-    this page documents — the colour roles, the typographic voice, the
-    proportions of the interface, the terms of use — does not depend on the
-    drawing and is current.</p>
+    this page documents does not depend on the drawing and is current:
+    the colour roles, the typographic voice, the proportions of the
+    interface, the terms of use.</p>
   </header>
   <dl class="grid docs-brand-measures">
     <div><dt>Clearspace</dt><dd>Pending the definitive mark</dd></div>
@@ -301,16 +301,27 @@ tool.
 
 Cirth's writing is technical but accessible, precise, and evidence-led:
 assertive about what is verified, transparent about trade-offs, and never
-ideological. Prefer *claim → mechanism → proof* — state what the
-framework does, explain how, then point at something checkable (a script,
-a number, a source file).
+ideological. Prefer *claim → mechanism → proof*. State what the framework
+does, explain how it does it, then point at something checkable: a script,
+a number, a source file.
 
-Favor words like **native**, **runtime**, **tokens**, **scope**,
-**integrate**, **verify**, **ship**, **baseline**, **size budget**, and
-**browser primitives**. Avoid **purity**, **timeless**, **philosophy**,
-**framework dialect**, and repeated carving metaphors outside the name's
-origin story — and avoid unverifiable claims such as "nothing to break,"
-"fully accessible," or "always delivered in one round trip."
+The subject is a language and what it is made of, so the vocabulary is
+too. Favour **semantics**, **structure**, **syntax**, **vocabulary**,
+**grammar**, **relation**, **scope**, **token**, **runtime**, **source**,
+**output**, **native**, **integrate**, **baseline**, **verify** and
+**transformation**.
+
+Two habits to avoid. The first is the workshop register: **carving**,
+**forging**, **craft**, **tooling**, **hardness**, **purity**, **metal**
+and engineering as a metaphor for manual labour. Cirth is named after a
+writing system, not a trade, and a page that reaches for the anvil is
+describing an atmosphere instead of a mechanism. The material reading of
+the name belongs in the origin story, once, and nowhere else.
+
+The second is the unfalsifiable claim: **timeless**, **philosophy**,
+"nothing to break", "fully accessible", "always delivered in one round
+trip". If a sentence cannot be checked against a script, a measurement or
+a source file, it is not doing the work this voice is for.
 
 Example headlines:
 

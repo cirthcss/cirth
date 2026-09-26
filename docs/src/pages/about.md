@@ -153,19 +153,24 @@ the accessibility of the interface you build on top of it.
 
 ## Origin of the name
 
-Cirth takes its name from the runic writing system used by Tolkien's
-Dwarves: angular signs shaped by the need to be carved into hard surfaces.
+The Cirth are an invented alphabet, devised by Tolkien for his languages:
+a small set of signs where related sounds are given related shapes, so the
+script can be learned as a system rather than memorised sign by sign.
 
-The same principle guides the framework. Cirth starts from the structure
-the web already provides, removes unnecessary runtime and abstraction, and
-keeps every shipped stylesheet within a monitored compressed size budget.
+That is the part worth borrowing. A framework is a notation you write an
+interface in, and the property that makes a notation usable is not how much
+it can express but how much of it you can predict. Cirth has almost no
+vocabulary of its own: the elements are HTML's, the theming surface is one
+prefixed set of custom properties, and the relationships hold across the
+whole of it. A container keeps a softer corner than the controls inside it
+everywhere. Every resting edge is the same hairline. Learning one part tells
+you what the next one does.
 
-Not minimalism for its own sake. Constraints used as an engineering tool.
-
-The visual identity built on that idea — the rune-form mark, the copper
-hue, and the wordmark — is documented on the [Brand](/brand) page. Cirth
-is not affiliated with the Tolkien estate or any rights holder; the name
-is a reference, not a claim of association.
+Nothing here requires the reference. It explains where the name came from,
+not how the framework works, and the [Brand](/brand) page documents the
+mark, the copper and the terms the name is used under. Cirth is not
+affiliated with the Tolkien estate or any rights holder: the name points at
+a writing system, and is not a claim of association.
 
 ## Relationship to Pico CSS
 
