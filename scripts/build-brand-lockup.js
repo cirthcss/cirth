@@ -1,12 +1,13 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { parseColor } = require("./lib/color");
+const { boundingBox, markPaths, publicDir, read } = require("./lib/brand-mark");
 
 // Generates the horizontal lockup — the mark with "Cirth" beside it — from
 // the assets and tokens that already define both halves. Nothing here is a
 // second copy of the identity:
 //
-//   geometry   docs/public/logo_brand.svg      (the five mark paths, verbatim)
+//   geometry   docs/public/logo_brand.svg      (the mark paths, verbatim)
 //   pigment    docs/public/logo_brand*.svg     (each variant's own fill)
 //   ink        src/theme/_colors.scss          ($neutral-900 / $neutral-100)
 //   type       the system sans the framework ships, as live SVG text
@@ -20,12 +21,14 @@ const { parseColor } = require("./lib/color");
 // moves between faces, so the box reserves the widest one measured.
 
 const projectRoot = path.join(__dirname, "..");
-const publicDir = path.join(projectRoot, "docs/public");
 
-// Geometry. The mark's ink occupies this box inside its 512 viewBox — the
-// paths are not centred in it, so a lockup that used the viewBox would sit
-// visibly off its own baseline.
-const MARK_BOX = { x: 76, y: 66, width: 340.476, height: 380 };
+// Geometry. The mark's ink occupies a box inside its 512 viewBox, and the
+// paths are not centred in it, so a lockup built on the viewBox would sit
+// visibly off its own baseline. The box is measured from the path data
+// (scripts/lib/brand-mark.js) rather than written down here: it used to be
+// a literal, and a literal is a measurement of one drawing that no longer
+// holds the moment the drawing changes.
+const MARK_BOX = boundingBox(markPaths());
 
 // Type. Measured in Chromium at 700 weight, 100px, over the faces
 // `--cirth-font-family-sans` can actually resolve to:
@@ -56,26 +59,10 @@ const TRACKING = -0.02 * FONT_SIZE;
 const FONT_STACK =
 	"system-ui, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, Helvetica, Arial, 'Helvetica Neue', sans-serif";
 
-/** @param {string} file */
-const readAsset = (file) => fs.readFileSync(path.join(publicDir, file), "utf8");
-
-// The five path commands, taken from the brand mark so the lockup can never
-// drift from it. Only `d` is read; the fill comes from the variant.
-const markPaths = () => {
-	const source = readAsset("logo_brand.svg");
-	const paths = [...source.matchAll(/<path\s+d="([^"]+)"/g)].map((m) => m[1]);
-	if (paths.length !== 5) {
-		throw new Error(
-			`build-brand-lockup: expected 5 mark paths in logo_brand.svg, found ${paths.length}`,
-		);
-	}
-	return paths;
-};
-
 // The fill a given mark variant paints with, read back out of that variant.
 /** @param {string} file */
 const markFill = (file) => {
-	const fill = readAsset(file).match(/<path\s+d="[^"]+"\s+fill="([^"]+)"/);
+	const fill = read(file).match(/<path\s+d="[^"]+"\s+fill="([^"]+)"/);
 	if (!fill) throw new Error(`build-brand-lockup: no fill found in ${file}`);
 	return fill[1];
 };
