@@ -247,6 +247,78 @@ const defaultBuildSize = () => {
 	return { bytes, label: kb(bytes), brotliLabel: kb(brotliSize(source)) };
 };
 
+// The radius pair — a container's corner against the corners of the
+// controls inside it — resolved off the compiled stylesheet rather than
+// written down. The Brand page quotes both numbers as the thing that
+// survives a retheme, and it quoted them wrong for three minor versions:
+// the knob moved from `radius-md` to `radius-sm` in "establish a
+// recognizable default surface" and the prose kept saying 9px and 6px
+// while the build shipped 6px and 4px. A number a reader can check
+// against `dist/` has to come out of `dist/`.
+//
+// The resolver is deliberately narrow. It follows the two shapes the
+// radius tokens actually use — `var(--other)` and
+// `calc(var(--other) * <n>)` — down to a `rem` or `px` literal, and
+// returns null on anything else rather than guessing. A null prints as a
+// token name with no measurement, which is missing information; a guess
+// would be wrong information.
+const radiusPair = () => {
+	const file = path.join(docsRoot, "../dist/cirth.min.css");
+	if (!fs.existsSync(file)) return null;
+	const css = fs.readFileSync(file, "utf8");
+
+	// Root custom properties only. A token redeclared inside a component
+	// scope (`article` moves --cirth-block-spacing-*, [type=search] moves
+	// the radius to a pill) is that component's decision, not the default
+	// this table describes, so the first declaration — the `:root` one the
+	// minifier emits ahead of the scoped overrides — is the one read.
+	/** @type {Map<string, string>} */
+	const declared = new Map();
+	for (const [, name, value] of css.matchAll(
+		/(--cirth-[a-z0-9-]+)\s*:\s*([^;}]+)/g,
+	)) {
+		if (!declared.has(name)) declared.set(name, value.trim());
+	}
+
+	const ROOT_FONT_SIZE = 16;
+	/**
+	 * @param {string} name
+	 * @param {number} depth
+	 * @returns {number | null}
+	 */
+	const resolve = (name, depth = 0) => {
+		if (depth > 8) return null;
+		const value = declared.get(name);
+		if (!value) return null;
+
+		const rem = /^(-?[0-9.]+)rem$/.exec(value);
+		if (rem) return Number(rem[1]) * ROOT_FONT_SIZE;
+		const px = /^(-?[0-9.]+)px$/.exec(value);
+		if (px) return Number(px[1]);
+
+		const alias = /^var\((--cirth-[a-z0-9-]+)\)$/.exec(value);
+		if (alias) return resolve(alias[1], depth + 1);
+
+		const scaled = /^calc\(\s*var\((--cirth-[a-z0-9-]+)\)\s*\*\s*([0-9.]+)\s*\)$/.exec(
+			value,
+		);
+		if (scaled) {
+			const base = resolve(scaled[1], depth + 1);
+			return base === null ? null : base * Number(scaled[2]);
+		}
+		return null;
+	};
+
+	/** @param {number | null} value */
+	const px = (value) =>
+		value === null ? null : `${Math.round(value * 100) / 100}px`;
+
+	return {
+		control: px(resolve("--cirth-border-radius")),
+		container: px(resolve("--cirth-card-border-radius")),
+	};
+};
+
 // The supported browsers, read off the one place that decides them: the
 // Browserslist target in package.json, which is what Lightning CSS
 // compiles against and what scripts/check-browserslist.js holds to a
@@ -335,6 +407,7 @@ module.exports = (eleventyConfig) => {
 		tokenCount: runtimeTokenCount(),
 		buildCount: buildModeCount(),
 		size: defaultBuildSize(),
+		radius: radiusPair(),
 	});
 	eleventyConfig.addGlobalData(
 		"presets",

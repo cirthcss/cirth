@@ -20,8 +20,8 @@ integrations, and anywhere else the project is named.
     different pigment.</p>
   </header>
   <dl class="grid docs-brand-measures">
-    <div><dt>Container corner</dt><dd><code>9px</code> · <code>--cirth-card-border-radius</code></dd></div>
-    <div><dt>Control corner</dt><dd><code>6px</code> · <code>--cirth-border-radius</code></dd></div>
+    <div><dt>Container corner</dt><dd>{% if proof.radius and proof.radius.container %}<code>{{ proof.radius.container }}</code> · {% endif %}<code>--cirth-card-border-radius</code></dd></div>
+    <div><dt>Control corner</dt><dd>{% if proof.radius and proof.radius.control %}<code>{{ proof.radius.control }}</code> · {% endif %}<code>--cirth-border-radius</code></dd></div>
     <div><dt>Resting edge</dt><dd><code>1px</code>, all four sides, every button variant</dd></div>
     <div><dt>Target floor</dt><dd><code>44px</code> controls · <code>40px</code> in a nav</dd></div>
     <div><dt>Card contract</dt><dd>Tinted header band · <code>12/20px</code> · padded body</dd></div>
