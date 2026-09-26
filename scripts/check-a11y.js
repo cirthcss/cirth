@@ -14,7 +14,7 @@ const {
 
 // Axe (WCAG 2.0–2.2 A/AA rules) over every page of the built docs site, in
 // every shipped theme, both color schemes, and forced-colors mode, so the
-// "AA — verified in the source" claim stays continuously verified. Dialog
+// "AA, verified in the source" claim stays continuously verified. Dialog
 // and popover examples are also audited while open: axe otherwise skips
 // their hidden content.
 // Fails only on violations not present in the committed baseline
@@ -396,7 +396,7 @@ run()
 		if (stale.length > 0) {
 			console.log(
 				`check-a11y: ${stale.length} baseline entr(y/ies) no longer ` +
-					`occur — run with --update-baseline to prune:`,
+					`occur; run with --update-baseline to prune:`,
 			);
 			for (const key of stale) {
 				console.log(`  ${key}`);

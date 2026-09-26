@@ -41,7 +41,7 @@ $print-root-selector: "body";
   @media print {
     @include selectors.root {
       // Ink, measured on white paper: solid black for text, 6.5:1 for the
-      // secondary ink, 3.8:1 for hairlines — gray that survives a
+      // secondary ink, 3.8:1 for hairlines: gray that survives a
       // monochrome printer instead of fading out of it. Declared here, one
       // level above where they're consumed, so overriding them takes
       // nothing more than a `:root` rule of your own.
@@ -137,8 +137,8 @@ $print-root-selector: "body";
 
       // Insertions, deletions and a meter's three readings are pinned to the
       // light scheme's inks rather than blacked out: the hue is the
-      // semantics, and the dark scheme's pale variants — tuned for contrast
-      // against a near-black track — would barely register on paper.
+      // semantics, and the dark scheme's pale variants (tuned for contrast
+      // against a near-black track) would barely register on paper.
       --cirth-ins-color: #{$success-750};
       --cirth-del-color: #{$error-750};
       --cirth-meter-optimum-color: #{$success-550};
@@ -154,8 +154,8 @@ $print-root-selector: "body";
     }
 
     // Controls print as outlined labels. Their fill is dropped by the
-    // browser anyway, and a button's label is --cirth-primary-on-surface —
-    // white — which would leave nothing at all on the paper. Done as a rule
+    // browser anyway, and a button's label is --cirth-primary-on-surface,
+    // white, which would leave nothing at all on the paper. Done as a rule
     // rather than through the primary tokens on purpose: those same tokens
     // fill a checked checkbox and a progress bar, whose color is content.
 
@@ -177,7 +177,7 @@ $print-root-selector: "body";
     // Color that carries meaning rather than decoration opts back in. Under
     // the browser's default economy setting a checked box loses its tick, a
     // switch loses its on-state, a meter or progress bar loses its fill and
-    // a <mark> loses its highlight — in each case the dropped paint *is*
+    // a <mark> loses its highlight: in each case the dropped paint *is*
     // the content.
 
     #{$parent-selector}
@@ -186,7 +186,7 @@ $print-root-selector: "body";
     }
 
     // Where a link points is the one thing paper can't resolve for itself.
-    // Absolute URLs only — in-page and relative hrefs print as noise — and
+    // Absolute URLs only: in-page and relative hrefs print as noise, and
     // never for navigation or controls, where the label is the whole point.
 
     #{$parent-selector} a[href^="http"]:not([role="button"], nav a)::after {

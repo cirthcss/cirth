@@ -14,7 +14,7 @@ const {
 //
 // Each test below pins a specific regression that had actually shipped, so
 // a failure here names the thing that came back rather than "the design
-// changed" — that is what the screenshot baselines are for.
+// changed": that is what the screenshot baselines are for.
 
 assertDocsBuilt("baseline-consistency.spec");
 
@@ -203,8 +203,8 @@ test("the home page's specimen cards all share one card contract", async ({
 // reports the *unvisited* style for a visited link in every engine, by
 // design, so a test that read colours off the page could only ever observe
 // sameness whether the rule was right or wrong. The guarantee that does
-// survive is the one below — the selector excludes card links in the first
-// place — asserted against the built stylesheets.
+// survive is the one below (the selector excludes card links in the first
+// place) asserted against the built stylesheets.
 
 test("the visited rule stands aside for a link wrapping a card", () => {
 	// Asserted on the built stylesheets rather than through the page: the
@@ -342,7 +342,7 @@ test("the sidebar group headers share the inline gutter of their entries", async
 // --- No separator under a page title -----------------------------------
 
 test("no documentation page draws a rule under its title", async ({ page }) => {
-	// Includes the four pages the old :first-child rule actually reached —
+	// Includes the four pages the old :first-child rule actually reached:
 	// the reason this looked like it only affected some pages.
 	const paths = [
 		"/about/",
@@ -385,7 +385,7 @@ test("the card and table borders keep a neutral hue in every theme", async ({
 	// --cirth-card-border-color mixes the field border toward the card
 	// surface. Mixed `in oklch` that interpolated the *hue angle*, and the
 	// card surface is an authored oklch() whose hue is an explicit 0deg
-	// rather than a powerless one — so the 264deg field border took the
+	// rather than a powerless one, so the 264deg field border took the
 	// short way round the wheel and the most-used border in the library
 	// landed at 323.52deg, a faint magenta with no other member of the
 	// palette anywhere near it. Mixed `in oklab` there is no angle to
@@ -466,13 +466,13 @@ test("the documentation header stays under 120px at every desktop width", async 
 test("no rendered text on the built site is smaller than 12px", async ({
 	page,
 }) => {
-	// axe has nothing to say here — there is no AA success criterion on
-	// minimum text size — which is exactly why 8px, 8.75px, 9px, 9.625px and
+	// axe has nothing to say here: there is no AA success criterion on
+	// minimum text size, which is exactly why 8px, 8.75px, 9px, 9.625px and
 	// 10px had accumulated across the annotation layer, and why this is a
 	// test rather than a review note.
 	//
 	// The floor applies to the *rendered* size, so a container counts as
-	// under it when a shrinking child (small, code, kbd, samp — all 0.875em)
+	// under it when a shrinking child (small, code, kbd, samp, all 0.875em)
 	// would land below: the shell's rule is that any such container starts
 	// at --cirth-font-size-sm, and leaves take --cirth-font-size-xs.
 	await page.setViewportSize({ width: 1280, height: 800 });
@@ -516,7 +516,7 @@ test("navigation links reserve the accent for position, while header chrome uses
 }) => {
 	// Ordinary navigation is a position map: neutral ink plus one accent
 	// edge for the current entry. Header navigation is application chrome,
-	// and follows the navbar ladder Bootstrap defines — resting ink below
+	// and follows the navbar ladder Bootstrap defines: resting ink below
 	// the hover step, hover below the current entry, and the current entry
 	// at the emphasis ink rather than at whatever the header happens to
 	// inherit. Neither convention paints membership with the action colour.

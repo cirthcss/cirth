@@ -25,7 +25,7 @@ const themeVariants = [
 // Both the Eleventy config and the built-link checker need this, and they
 // have to agree: Eleventy stamps the prefix into every absolute href it
 // emits, and a checker that did not know about it would find the whole
-// site missing. It did, once — see tests/doc-links.spec.js.
+// site missing. It did, once ; see tests/doc-links.spec.js.
 const docsPathPrefix = () => {
 	if (process.env.GITHUB_PAGES !== "true") {
 		return "/";
@@ -37,7 +37,7 @@ const docsPathPrefix = () => {
 const assertDocsBuilt = (label) => {
 	if (!fs.existsSync(path.join(docsDist, "index.html"))) {
 		throw new Error(
-			`${label}: built docs not found — run \`npm run docs:build\` first.`,
+			`${label}: built docs not found; run \`npm run docs:build\` first.`,
 		);
 	}
 };
@@ -48,7 +48,7 @@ const assertDocsBuilt = (label) => {
 // replace any file in it at any moment, and eleventy's passthrough copy
 // *replaces* rather than edits, so there is a window in which
 // styles/style.css does not exist at all. A run that reads the directory
-// directly can therefore fail — or, worse, measure two different builds
+// directly can therefore fail, or, worse, measure two different builds
 // and report the difference as a finding.
 //
 // The audit and the fingerprint take minutes to hours; a build takes
@@ -94,7 +94,7 @@ const discard = (root) => {
 	fs.rmSync(root, { force: true, recursive: true });
 };
 
-// Whatever ends the process — a thrown error, Ctrl-C, a normal exit — the
+// Whatever ends the process (a thrown error, Ctrl-C, a normal exit) the
 // copy goes with it. `exit` cannot await, so the removal is synchronous.
 const installCleanup = () => {
 	if (cleanupInstalled) return;
@@ -117,7 +117,7 @@ const installCleanup = () => {
  * can both call it.
  *
  * `source` defaults to docs/dist and is a parameter so the isolation can
- * be proved against a tree a test owns — see check-audit-snapshot.js.
+ * be proved against a tree a test owns ; see check-audit-snapshot.js.
  *
  * @param {{ attempts?: number, label: string, source?: string }} options
  * @returns {{ dispose: () => void, root: string }}
@@ -143,7 +143,7 @@ const snapshotDocs = ({ attempts = 3, label, source = docsDist }) => {
 				if (!fs.existsSync(file) || fs.statSync(file).size === 0) {
 					throw new Error(
 						`${label}: ${path.relative(projectRoot, source)} is missing or ` +
-							`empty at ${required} — run \`npm run docs:build\`.`,
+							`empty at ${required}; run \`npm run docs:build\`.`,
 					);
 				}
 			}
@@ -163,7 +163,7 @@ const snapshotDocs = ({ attempts = 3, label, source = docsDist }) => {
 // build time) are frozen sites, not part of this one: auditing them would
 // re-audit whatever the toolchain thought a year ago, and any finding
 // would be unfixable by definition. The /next/ preview is excluded for the
-// opposite reason — it is this site, built twice.
+// opposite reason: it is this site, built twice.
 // Share-card/icon routes are deterministic rasterization sources, not
 // navigable documentation. The lab routes are isolated iframe targets and
 // intentionally omit the docs preset controls that generic page audits wait
@@ -217,7 +217,7 @@ const contentTypes = {
 
 /**
  * Serve a built docs tree. Defaults to `docs/dist`; the audit and the
- * fingerprint pass a snapshot of it instead — see `snapshotDocs`.
+ * fingerprint pass a snapshot of it instead ; see `snapshotDocs`.
  *
  * @param {string} [root]
  */

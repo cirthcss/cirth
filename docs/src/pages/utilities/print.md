@@ -6,7 +6,7 @@ layout: docs.njk
 
 Cirth ships a `@media print` pass as its own stylesheet. Add it once,
 with `media="print"`, and any page built from semantic HTML prints as a
-readable document in either color scheme — there is nothing to configure
+readable document in either color scheme: there is nothing to configure
 and no print-only markup to maintain.
 
 ```html
@@ -18,9 +18,9 @@ Load it **after** the main build: the pass wins over the component rules it
 has to outrank by source order, exactly as it did when it lived inside the
 bundle. Both sit in the same [cascade layer](/customization#cascade-layers),
 so that order still decides between them, while your own print rules beat
-both. Each build has its matching sheet — `cirth.print.min.css`,
+both. Each build has its matching sheet: `cirth.print.min.css`,
 `cirth.print.classless.min.css`, `cirth.print.scoped.min.css`,
-`cirth.print.classless.scoped.min.css` — or, from npm,
+`cirth.print.classless.scoped.min.css`, or, from npm,
 `@cirthcss/cirth/print` and its `classless`/`scoped` variants.
 
 ### Why it is a separate file
@@ -37,7 +37,7 @@ split and printing regressed, the missing `<link>` above is why.
 
 ## Behavior
 
-Paper is not a screen — there is no elevation, no hover, no color scheme to
+Paper is not a screen: there is no elevation, no hover, no color scheme to
 follow, and toner is not free. Under `@media print` Cirth:
 
 * **Resets the surface pair.** The page goes to a transparent background
@@ -52,7 +52,7 @@ follow, and toner is not free. Under `@media print` Cirth:
   screen affordance; out of a monochrome printer it is gray mush. Links
   keep their underline, which reads either way. After an absolute
   (`http…`) link that is not navigation or a button, the URL is printed in
-  parentheses — paper cannot resolve an `href` on its own.
+  parentheses: paper cannot resolve an `href` on its own.
 * **Outlines controls.** A button's label is `--cirth-primary-on-surface`
   (white) on a fill the browser is about to discard, so buttons print as an
   outlined label instead of as nothing at all.
@@ -64,7 +64,7 @@ follow, and toner is not free. Under `@media print` Cirth:
   `<tfoot>` lands after the last row, and rows are not torn in half by the
   fold.
 * **Stops clipping content.** `<pre>` wraps instead of scrolling, and
-  `.overflow-auto` spills instead of hiding what is past the edge — what
+  `.overflow-auto` spills instead of hiding what is past the edge: what
   scrolls sideways on screen would simply be cut off on paper.
 * **Prints an open `<dialog>` in the flow** rather than pinned over the
   first page.
@@ -106,8 +106,8 @@ To drop the printed URLs after external links:
 
 * **No `@page` rule.** Margins, page size, and orientation belong to your
   document, not to a component library.
-* **Nothing is hidden.** Which parts of *your* layout are chrome — a
-  sticky header, a cookie banner, a sidebar — is something only your
+* **Nothing is hidden.** Which parts of *your* layout are chrome (a
+  sticky header, a cookie banner, a sidebar) is something only your
   application knows. Add your own `@media print { … { display: none } }`
   for those.
 

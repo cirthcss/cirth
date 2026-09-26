@@ -14,8 +14,8 @@ const { spawnSync } = require("node:child_process");
 // step cannot quietly hide an unreliable rendering.
 //
 // That half is a JSON parser, and a parser is only as good as the shape it
-// is written against. The first version of it keyed on `test.ok` — a field
-// this Playwright does not emit at all — so it would have reported nothing,
+// is written against. The first version of it keyed on `test.ok`: a field
+// this Playwright does not emit at all, so it would have reported nothing,
 // for ever, and looked like good news. Reading a hand-written fixture would
 // not have caught that; only a real report does.
 //
@@ -46,7 +46,7 @@ const passed = (what) => {
 // Inside .cache so that `@playwright/test` resolves through the repo's own
 // node_modules, and so nothing here is ever committed. `testDir: "tests"`
 // mirrors the real config, which is what makes the report's `rootDir` a
-// directory *below* the working directory — the arrangement report-flaky.js
+// directory *below* the working directory: the arrangement report-flaky.js
 // has to undo to produce a repo-relative path for its annotation.
 
 const writeFixture = () => {
@@ -179,7 +179,7 @@ const run = () => {
 	assert.equal(
 		Object.hasOwn(recovered[0], "ok"),
 		false,
-		"this Playwright now emits `ok` — the parser may key on it again",
+		"this Playwright now emits `ok`: the parser may key on it again",
 	);
 	assert.equal(recovered[0].status, "flaky");
 	assert.equal(recovered[0].results.length, 2, "the flake retried once");
@@ -199,7 +199,7 @@ const run = () => {
 	passed("a deterministic failure fails the Playwright run");
 
 	// 3. The recovered flake is named, once per project, with the project in
-	//    the title — without it the two entries are indistinguishable.
+	//    the title: without it the two entries are indistinguishable.
 	const annotated = runReporter();
 	assert.match(annotated, /2 test\(s\) passed only after a retry/);
 	for (const project of ["alpha", "beta"]) {
@@ -236,7 +236,7 @@ const run = () => {
 	passed("a deterministic failure is reported apart from the flakes");
 
 	// 5. The annotation points at a file that exists, spelled relative to the
-	//    directory the reporter ran in — the translation from the report's
+	//    directory the reporter ran in: the translation from the report's
 	//    own rootDir.
 	const warning = annotated
 		.split("\n")
@@ -285,7 +285,7 @@ const run = () => {
 	);
 	passed("a retry-recovered run exits zero and is still annotated");
 
-	// 7. Nothing flaky, nothing said — and no annotation at all, so a clean
+	// 7. Nothing flaky, nothing said, and no annotation at all, so a clean
 	//    run does not train anyone to ignore warnings.
 	const clean = runPlaywright(["--grep", "steady"]);
 	assert.equal(clean.status, 0, "the steady-only run should pass");
@@ -321,7 +321,7 @@ const run = () => {
 	fs.rmSync(fixtureRoot, { force: true, recursive: true });
 	console.log(
 		`\n[@cirthcss/cirth] Flake reporting verified against Playwright ` +
-			`${require("@playwright/test/package.json").version} — ${checks.length} checks passed.\n`,
+			`${require("@playwright/test/package.json").version}: ${checks.length} checks passed.\n`,
 	);
 	return 0;
 };

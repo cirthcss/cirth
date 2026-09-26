@@ -9,7 +9,7 @@
 // browses read as broken rather than as oriented, so the visited cue is
 // for content links only (gh#58).
 // `:has(article)` is the same argument one level up: a link wrapped around
-// a card — the HTML-native way to make a whole card clickable — is a
+// a card (the HTML-native way to make a whole card clickable) is a
 // surface with its own ink contract, not a phrase in a paragraph. Letting
 // the visited color inherit into it drains the card's heading to grey the
 // moment someone follows it, so a grid of cards ends up in two different
@@ -59,7 +59,7 @@ $visited-exceptions: $visited-class-exceptions +
     box-shadow: 0 0 0 var(--cirth-outline-width) var(--cirth-primary-focus);
 
     // Invisible in normal rendering, but forced-colors mode strips
-    // box-shadow and repaints transparent outlines with a system color —
+    // box-shadow and repaints transparent outlines with a system color:
     // without this, keyboard focus disappears in Windows High Contrast.
     outline: var(--cirth-outline-width) solid transparent;
   }
@@ -113,14 +113,14 @@ $visited-exceptions: $visited-class-exceptions +
   color: var(--cirth-link-visited-color);
 }
 
-// A link wrapped around a card — the HTML-native way to make a whole card
-// clickable — takes the ink of the surface it wraps rather than the accent.
+// A link wrapped around a card (the HTML-native way to make a whole card
+// clickable) takes the ink of the surface it wraps rather than the accent.
 // The argument is the one already made above for :visited, one step
 // earlier: a card is a surface with its own ink contract, not a phrase in a
 // paragraph, and painting the entire card in the brand colour is how a grid
 // of cards ends up reading as decoration instead of as content. The card's
 // affordance is its hover border and tint; the accent stays with actions.
-// `inherit`, not a token: there is nothing new to name — this is whatever
+// `inherit`, not a token: there is nothing new to name: this is whatever
 // --cirth-color the container already had. Hover, focus and :active still
 // outrank this and still bring the accent back.
 #{$parent-selector} :where(a:not([role="button"])):has(article) {

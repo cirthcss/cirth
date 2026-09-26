@@ -10,9 +10,9 @@ into one visually joined control, without extra markup for the joins.
 
 **A `.group` class is required, on top of `role="group"`** (default build):
 `[role="group"]` alone used to be the trigger, but that meant any element
-grouped for pure accessibility reasons — including a plain `<fieldset
+grouped for pure accessibility reasons, including a plain `<fieldset
 role="group">`, where the role is entirely redundant since a fieldset's
-*implicit* role is already `group` — got hijacked into this decorative
+*implicit* role is already `group`, got hijacked into this decorative
 layout it never asked for, making a semantic group and a decorative one
 visually indistinguishable (WCAG 3.2.4, Consistent Identification). Keep
 `role="group"` for the semantics and add `class="group"` for the layout

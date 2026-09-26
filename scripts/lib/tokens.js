@@ -13,8 +13,8 @@ const { DEFAULT_PREFIX } = require("./prefix");
 // has to merge two.
 //
 // A `var()` reference to another token is exported as a DTCG alias, which
-// keeps the relationship. Anything the browser computes — `color-mix()`,
-// relative colours, a font stack that pulls in another stack — is exported
+// keeps the relationship. Anything the browser computes (`color-mix()`,
+// relative colours, a font stack that pulls in another stack) is exported
 // resolved, because no DTCG type can express it, with the CSS it came from
 // kept under $extensions so the relationship is not lost. A value no DTCG
 // type can hold at all (a `calc()`, an `em` length, a `url()`) is not
@@ -128,7 +128,7 @@ const functionCall = (value) => {
 };
 
 /**
- * Replaces every `light-dark(a, b)` in a value with the given side — at
+ * Replaces every `light-dark(a, b)` in a value with the given side, at
  * the top level, or nested, as a shadow does per layer colour. A
  * `light-dark()` that does not hold exactly two arguments is left as
  * written, so the conversion reports the value instead of guessing.

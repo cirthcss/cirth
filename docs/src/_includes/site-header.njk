@@ -40,7 +40,7 @@
 			</div>
 			{#- Search precedes the menu in both DOM and visual order. At the
 			    collapse breakpoint the existing control nodes are moved into
-			    the drawer below — moved, never cloned, so there is only ever
+			    the drawer below: moved, never cloned, so there is only ever
 			    one of each in the document and the tab order stays the
 			    reading order. -#}
 			<button
@@ -62,7 +62,7 @@
 			    gains an entry only when a release breaks something, so it
 			    answers "does what I am reading apply to the version I have?"
 			    rather than listing every patch. A native <select> for the
-			    same reason as the preset one below — keyboard and screen
+			    same reason as the preset one below: keyboard and screen
 			    reader support for free. -#}
 			<li data-docs-header-control>
 				<span class="docs-control-label" aria-hidden="true">Version</span>
@@ -88,12 +88,12 @@
 					})();
 				</script>
 			</li>
-			{#- Live preset switcher (gh#80): lets anyone preview the presets —
-			    including their light/dark variants — against the whole real
+			{#- Live preset switcher (gh#80): lets anyone preview the presets
+			    (including their light/dark variants) against the whole real
 			    site without downloading anything. Handled in base.njk: swaps
 			    in the compiled preset stylesheet built by build-docs.js,
 			    remembered for the session via sessionStorage. A native
-			    <select> on purpose, not a custom dropdown — full keyboard and
+			    <select> on purpose, not a custom dropdown: full keyboard and
 			    screen-reader support for free, matching the theme toggle's own
 			    "smallest control that does the job" bar. -#}
 			<li data-docs-header-control>
@@ -115,7 +115,7 @@
 					(() => {
 					// Which icon is visible is driven entirely by CSS
 					// ([data-theme="dark"] .docs-theme-icon-*, see styles/style.css)
-					// — this script is only the click handler.
+					// this script is only the click handler.
 						const themeToggle = document.querySelector(".docs-theme-toggle");
 						const syncThemeToggle = () => {
 						themeToggle?.setAttribute(
@@ -139,7 +139,7 @@
 
 	{#- The compact-viewport menu, as an offcanvas drawer.
 
-	    It used to be `details.dropdown` — a 20rem panel hanging off the
+	    It used to be `details.dropdown`, a 20rem panel hanging off the
 	    hamburger, capped at `100dvh - 5rem`, with the page behind it still
 	    scrollable and still in the tab order, and Escape wired by hand.
 	    That is a menu drawn as a dropdown; what a compact viewport wants is
@@ -150,8 +150,8 @@
 	    natively: showModal() traps focus, makes the rest of the document
 	    inert, closes on Escape, and returns focus to the invoker. The
 	    alternative was rebuilding all four in script. The drawer is only
-	    docs shell — nothing here goes into the library (see the note in
-	    styles/style.css) — but what it is built out of is not: the nav is a
+	    docs shell, and nothing here goes into the library (see the note in
+	    styles/style.css). What it is built out of is not: the nav is a
 	    Cirth <nav><ul>, the close control is the library's own .close, and
 	    the controls that move in keep the <select> and <button> they had in
 	    the bar. -#}

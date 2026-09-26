@@ -19,7 +19,7 @@ const { compareVersions, parseVersion } = require("./lib/version");
 // only a reader of the diff can tell which is which.
 //
 // It also never commits, pushes, merges, or tags. The release branch it
-// leaves behind is a proposal — a human decides whether it enters master.
+// leaves behind is a proposal: a human decides whether it enters master.
 //
 //   node scripts/release-prepare.js --version 0.15.0-beta.2
 //   node scripts/release-prepare.js --version 0.15.0-beta.2 --dry-run
@@ -139,7 +139,7 @@ const main = () => {
 
 	console.log(
 		`[@cirthcss/cirth] Preparing ${version.raw}` +
-			`${dryRun ? " (dry run — nothing will be written)" : ""}\n`,
+			`${dryRun ? " (dry run: nothing will be written)" : ""}\n`,
 	);
 
 	// --- Refusals, before anything is touched --------------------------
@@ -160,7 +160,7 @@ const main = () => {
 				.split("\n")
 				.map((line) => `      ${line}`)
 				.join("\n")}\n\n` +
-				`    Commit or stash them first — a release branch must contain ` +
+				`    Commit or stash them first: a release branch must contain ` +
 				`release material only.`,
 		);
 	}
@@ -330,11 +330,11 @@ const main = () => {
 	);
 	console.log("  Still to write, by hand:");
 	console.log(
-		`    - CHANGELOG.md, under ## [${version.raw}] — what changed for` +
+		`    - CHANGELOG.md, under ## [${version.raw}]: what changed for` +
 			` someone using Cirth`,
 	);
 	console.log(
-		`    - ${path.relative(projectRoot, notesPath)} — the release notes`,
+		`    - ${path.relative(projectRoot, notesPath)}: the release notes`,
 	);
 	console.log(
 		"\n  Release notes describe changes in Cirth, not how the maintainers",

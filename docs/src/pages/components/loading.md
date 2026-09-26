@@ -20,7 +20,7 @@ text, but it does not disable an action by itself.
 ## Behavior
 
 * The spinner is the `--cirth-icon-loading` SVG applied as a mask over
-  `currentColor`, so it always matches the text it sits next to — on any
+  `currentColor`, so it always matches the text it sits next to, on any
   button variant, card, or color scheme. Forced-colors mode paints it in a
   system color.
 * Content with text gets the spinner prefixed with a small gap; empty

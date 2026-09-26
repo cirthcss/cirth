@@ -14,7 +14,7 @@ They are often confused, and Cirth supports both:
 
 | Preference | Who owns the palette | What Cirth does |
 | --- | --- | --- |
-| `forced-colors: active` (Windows High Contrast) | The operating system, which replaces author colors outright | Makes sure nothing *disappears* under the replacement — focus rings are backed by a transparent `outline` (a stripped `box-shadow` would leave no visible focus), and the loading spinner falls back to `CanvasText` |
+| `forced-colors: active` (Windows High Contrast) | The operating system, which replaces author colors outright | Makes sure nothing *disappears* under the replacement: focus rings are backed by a transparent `outline` (a stripped `box-shadow` would leave no visible focus), and the loading spinner falls back to `CanvasText` |
 | `prefers-contrast: more` | Cirth | Keeps the palette and stops spending it on subtlety |
 
 `prefers-contrast: more` is the softer of the two: the design still looks
@@ -25,7 +25,7 @@ like itself, it just stops being quiet.
 Under `prefers-contrast: more`, in both light and dark:
 
 * **Text goes to WCAG AAA.** Body ink reaches 15:1 or better against the
-  surface it sits on, and the six-step heading ramp collapses onto it —
+  surface it sits on, and the six-step heading ramp collapses onto it:
   six shades of near-black is a screen luxury, not information.
 * **Secondary ink reaches 8.7:1 or better**, up from a shade over the AA
   floor. Muted text, code, and visited links stay subordinate without
@@ -33,8 +33,8 @@ Under `prefers-contrast: more`, in both light and dark:
 * **Hairlines become real lines.** `--cirth-muted-border-color` (table
   rules, card and blockquote edges, `<hr>`, accordion dividers) and
   `--cirth-form-element-border-color` climb well past the 3:1 non-text
-  floor. In the dark scheme a card's border is normally its own background
-  — an invisible seam — and becomes a visible edge here.
+  floor. In the dark scheme a card's border is normally its own background,
+  an invisible seam, and becomes a visible edge here.
 * **Link underlines lose their tint.** The half-alpha underline under
   links goes to the full link color.
 * **Focus rings turn opaque.** A translucent ring composites against
@@ -49,8 +49,8 @@ The [`plain` and `playroom`](/customization) presets carry their own version
 of this pass. They have to: a preset is loaded after Cirth and redeclares
 the same tokens on the same roots, so anything the framework's pass
 strengthened would be handed straight back to the screen values.
-Each preset restates only the tokens it overrides — its accent, muted
-inks, hairlines, and visited color — at its own hue and at the same
+Each preset restates only the tokens it overrides (its accent, muted
+inks, hairlines, and visited color) at its own hue and at the same
 targets, verified against its own canvas. If you write your own preset,
 do the same for whichever color tokens you override.
 
@@ -59,23 +59,23 @@ do the same for whichever color tokens you override.
 **Geometry.** No border grows, no control resizes, no spacing changes.
 A control's natural height is the sum of its text, its padding and its
 border, so thickening `--cirth-border-width` under this preference would
-make every control in the library taller — and the 44px floor (WCAG 2.5.5's
+make every control in the library taller, and the 44px floor (WCAG 2.5.5's
 target size) is a `min-block-size`, so it would not hold that growth back.
 The extra contrast is bought with colour instead.
 
 ## Testing it
 
-* **macOS** — System Settings → Accessibility → Display → Increase
+* **macOS**: System Settings → Accessibility → Display → Increase
   contrast.
-* **Windows** — Settings → Accessibility → Contrast themes (this also
+* **Windows**: Settings → Accessibility → Contrast themes (this also
   triggers `forced-colors: active`).
-* **Chrome DevTools** — Rendering panel → "Emulate CSS media feature
+* **Chrome DevTools**: Rendering panel → "Emulate CSS media feature
   prefers-contrast" → `more`.
 
 ## Customization
 
 The overrides are plain token declarations, applied through the same
-light/dark wiring as the schemes themselves — so your own values win the
+light/dark wiring as the schemes themselves, so your own values win the
 same way they do anywhere else, as long as they are inside the same media
 query. A bare `:root` covers both schemes:
 

@@ -16,7 +16,7 @@ integrations, and anywhere else the project is named.
     below: proportions, strokes and target sizes that hold in every preset,
     every scheme and every build. Compare
     <a href="/specimen/default/">the default specimen</a> with
-    <a href="/specimen/plain/">the plain one</a> — same six measurements,
+    <a href="/specimen/plain/">the plain one</a>: same six measurements,
     different pigment.</p>
   </header>
   <dl class="grid docs-brand-measures">
@@ -31,8 +31,8 @@ integrations, and anywhere else the project is named.
 
 The pairing is the recognisable part. A container is one radius step softer
 than the controls inside it, so a card reads as a sheet holding buttons
-rather than as a big button. Every resting edge is the same single hairline
-— a filled button, an outline button, a field, a card and a popover all draw
+rather than as a big button. Every resting edge is the same single hairline:
+a filled button, an outline button, a field, a card and a popover all draw
 the same 1px on all four sides, and none of them fakes relief on one edge.
 Interactive targets sit on a 44px floor (WCAG 2.5.5), except inside a
 `<nav>`, which opts down to a 40px band while staying above the 24px WCAG
@@ -139,7 +139,7 @@ lives in
 [`docs/public/`](https://github.com/cirthcss/cirth/tree/master/docs/public)
 and is catalogued in
 [`docs/BRAND_ASSETS.md`](https://github.com/cirthcss/cirth/blob/master/docs/BRAND_ASSETS.md),
-including the two combinations this grid does not show — the mono mark on
+including the two combinations this grid does not show: the mono mark on
 its own background tile, light and dark, for square containers that have to
 stay one colour.
 
@@ -180,13 +180,13 @@ accent edge. Nothing else in a Cirth interface is copper.
 Editorial typography is the one place outside those two, and it is a
 deliberate exception rather than a leak: a word or phrase set in the accent
 inside a heading, the way this site's home page sets *semantic HTML*. It is
-a single named class, applied by hand, in prose — not a component state.
+a single named class, applied by hand, in prose, not a component state.
 
 It used to do five. Navigation links carried the accent at rest, which meant
 a menu of eight entries was eight brand-coloured words next to one button
 that also wanted the colour, and the accent stopped meaning "act on this"
 and started meaning "this is a Cirth screen". Navigation now takes the ink
-of whatever it sits in and the accent marks only where you are — so the one
+of whatever it sits in and the accent marks only where you are, so the one
 thing copper still says, it says alone.
 
 The light theme's base surface is a mineral paper rather than white, and the
@@ -223,7 +223,7 @@ logo hexes: the tokens are variants verified for WCAG. See
 The horizontal lockup is the mark with the name beside it: "Cirth" in the
 sans voice, bold, with the mark sized to the cap height and sitting on the
 same baseline. Use it where the name has to travel with the mark and there
-is room for both — a third-party README, a talk slide, a conference badge,
+is room for both: a third-party README, a talk slide, a conference badge,
 a social post.
 
 <div class="docs-brand-grid docs-lockup-grid">
@@ -254,8 +254,8 @@ falls back to black, the same as the mono mark.</p>
 **The name is live text, not outlines.** The lockup carries `<text>` in the
 system sans stack the framework itself ships, which is the whole of the
 typographic claim: there is no font to install, and nothing to license. The
-cost is that the word's width moves a little between platforms — SF Pro sets
-it narrowest, Helvetica and Arial about 2.5% wider — so the box reserves
+cost is that the word's width moves a little between platforms: SF Pro sets
+it narrowest, Helvetica and Arial about 2.5% wider, so the box reserves
 room for the widest face in the stack and a narrower one leaves a little air
 on the right. That is the intended behaviour, not a mis-export.
 
@@ -369,5 +369,5 @@ When you do use the mark:
 * keep a generous margin of clear space around it on every side;
 * pick the brand or mono variant that keeps contrast on your background;
 * don't recolor, outline, rotate, add effects, or redraw the strokes,
-  and don't set the wordmark in another typeface — use
+  and don't set the wordmark in another typeface; use
   [the lockup](#the-lockup) rather than re-typesetting the name.

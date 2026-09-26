@@ -1,7 +1,7 @@
 // One definition of "this would bypass the release process", read by both
 // local guards.
 //
-// The Git pre-push hook sees real refs — it knows exactly what is being
+// The Git pre-push hook sees real refs: it knows exactly what is being
 // pushed, because Git tells it. The Claude Code PreToolUse hook sees a
 // command string and has to work out what it would do. Those are different
 // problems, but they must not come to different conclusions about which
@@ -80,7 +80,7 @@ const classifyRef = (remoteRef) => {
 /**
  * The pre-push protocol: one line per ref, `<local ref> <local sha>
  * <remote ref> <remote sha>`. A deletion arrives with an all-zero local
- * sha and is judged the same way — deleting master is not safer than
+ * sha and is judged the same way: deleting master is not safer than
  * pushing to it.
  *
  * @param {string} stdin
@@ -102,7 +102,7 @@ const classifyPush = (stdin) =>
 /**
  * Enough of a shell tokenizer for the commands agents actually write:
  * quotes, escapes, and the operators that separate one command from the
- * next. Not a shell — a command hidden inside `$(…)` or an alias is not
+ * next. Not a shell: a command hidden inside `$(…)` or an alias is not
  * caught here, and is not meant to be. The Git hook sees those anyway,
  * because they still end up invoking git.
  *
@@ -185,7 +185,7 @@ const segments = (input) => {
 };
 
 /**
- * `git -C dir --no-pager push …` — strip the options git itself takes
+ * `git -C dir --no-pager push …`: strip the options git itself takes
  * before the subcommand, so the subcommand can be found.
  *
  * @param {string[]} tokens
@@ -363,7 +363,7 @@ const classifyCommand = (command) => {
 			continue;
 		}
 
-		// `env FOO=bar git push …`, `sudo npm publish` — step over the
+		// `env FOO=bar git push …`, `sudo npm publish`: step over the
 		// wrapper rather than being fooled by it.
 		let words = tokens;
 		while (

@@ -17,7 +17,7 @@ const engines = { chromium, firefox, webkit };
 // Removing a declaration and looking at the home page proves nothing: the
 // last audit found two declarations that looked completely inert on all 27
 // built pages and were doing real work inside the drawer and the search
-// dialog — surfaces that simply are not rendered on a page that has just
+// dialog: surfaces that simply are not rendered on a page that has just
 // loaded. So the corpus opens what is normally closed, and it says out
 // loud which media contexts it does *not* enter, rather than letting a
 // rule that only applies in `forced-colors` be reported as dead because
@@ -30,8 +30,8 @@ const engines = { chromium, firefox, webkit };
 // of them.
 //
 // The corpus renders under `prefers-reduced-motion: reduce`, which is what
-// makes those numbers repeatable: the site's own motion — the hero typing
-// demo, dialog and disclosure transitions — stops itself there, and a
+// makes those numbers repeatable: the site's own motion (the hero typing
+// demo, dialog and disclosure transitions) stops itself there, and a
 // measurement taken half way through a transition is noise, not a finding.
 // The price is that `prefers-reduced-motion: no-preference` joins
 // `forced-colors` and `print` on the list of contexts this corpus does not
@@ -43,7 +43,7 @@ const engines = { chromium, firefox, webkit };
 //
 // The corpus ran at 1440 and 390 only, and the shell's tier ladder has
 // seven boundaries: everything between 36rem and 80rem was sampled by
-// neither. Measured consequence — a dozen declarations came back inert
+// neither. Measured consequence: a dozen declarations came back inert
 // that are the tablet band's entire layout, because at 390 the narrower
 // rule overrides them and at 1440 their query does not match at all. The
 // two-column drawer nav, the six-part home grid, the sidebar rail's own
@@ -63,8 +63,8 @@ const viewports = {
 //
 // 390 is a phone; it is not the narrowest phone, and the difference has
 // already cost a regression. `.docs-header-search { width }` beside its
-// `flex: 0 0 …` is inert at 390 in all three engines — measured, not
-// assumed — and taking it out left Firefox holding 88px of controls in a
+// `flex: 0 0 …` is inert at 390 in all three engines: measured, not
+// assumed, and taking it out left Firefox holding 88px of controls in a
 // 66px cluster at 320. The sweep does not sample 320 because a fifth width
 // is a fifth more corpus on the pass that already runs for forty minutes;
 // the second pass probes a few dozen candidates on five pages and can
@@ -76,7 +76,7 @@ const narrowViewport = { squeeze: { width: 320, height: 844 } };
 const schemes = ["light", "dark"];
 
 // What the matrix above actually exercises. Any rule sitting under a media
-// feature outside this set is *not observable here* — a different thing
+// feature outside this set is *not observable here*: a different thing
 // from inert, and the distinction the previous audit had to make by hand.
 const observableMediaFeatures = new Set([
 	"width",
@@ -103,14 +103,14 @@ const observableMediaFeatures = new Set([
 //
 // The rule for what belongs here: anything a reader can see that the four
 // numbers of a bounding box cannot show. A property that only ever moves
-// geometry — `order`, `justify-self`, `float` — is already covered, because
+// geometry (`order`, `justify-self`, `float`) is already covered, because
 // moving geometry moves rectangles. A property that repaints without moving
 // anything is invisible unless it is named, and the audit reads "invisible"
 // as "inert".
 //
 // That is not hypothetical. The first full sweep called `list-style: none`
 // inert on five lists, `cursor: pointer` inert on the copy button, and the
-// three `background-position/repeat/size` of the code-block chrome inert —
+// three `background-position/repeat/size` of the code-block chrome inert:
 // all of them because nothing here was looking. Deleting any of them on that
 // report would have put bullets back on the footer, changed a cursor and
 // moved a gradient, with every rectangle in the document unchanged.
@@ -228,7 +228,7 @@ window.__cirthAudit = (() => {
 	// structurally blind to.
 	//
 	// describe() is boxes and computed style. That is the right signal for
-	// the audit — removing a CSS declaration cannot change a word of copy —
+	// the audit (removing a CSS declaration cannot change a word of copy)
 	// but it made the fingerprint miss the thing a documentation site
 	// changes most often. "Zero JavaScript" became "No JavaScript runtime"
 	// on a line that did not re-wrap, and 400 renderings reported identical.
@@ -242,7 +242,7 @@ window.__cirthAudit = (() => {
 	//
 	// The class attribute is deliberately absent. It is the shell's own
 	// vocabulary, it is already visible through every computed property it
-	// drives, and it is what scripts toggle — including it would trade the
+	// drives, and it is what scripts toggle: including it would trade the
 	// signal for noise. Every data- attribute is absent for the same reason.
 	const ATTRS = [
 		"alt",
@@ -327,8 +327,8 @@ window.__cirthAudit = (() => {
 	};
 
 	// Measure twice and only believe a number that repeats. Even frozen,
-	// a page can still settle a frame late — a dialog that has just been
-	// shown, a lazily inserted stylesheet — and a fingerprint that changes
+	// a page can still settle a frame late: a dialog that has just been
+	// shown, a lazily inserted stylesheet, and a fingerprint that changes
 	// between two runs of the same site is worse than no fingerprint.
 	const settle = () =>
 		new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve, 60))));
@@ -371,8 +371,8 @@ window.__cirthAudit = (() => {
 	};
 
 	// Memoised for the life of the document. Building it walks every rule
-	// in the sheet and re-parses every block's cssText — a thousand
-	// declarations — and both the audit and the verification pass ask for it
+	// in the sheet and re-parses every block's cssText: a thousand
+	// declarations, and both the audit and the verification pass ask for it
 	// once per state, so half of that work was a rebuild of an answer that
 	// cannot have changed: probes edit declaration *values* and always put
 	// them back, and nothing here adds or removes a rule.
@@ -418,8 +418,8 @@ window.__cirthAudit = (() => {
 						path: here,
 						property,
 						// getPropertyValue serialises to "" for a few values
-						// the engine will not round-trip — anything holding
-						// env(), for one — so the authored text is the
+						// the engine will not round-trip: anything holding
+						// env(), for one, so the authored text is the
 						// fallback, and it is what env-detection reads.
 						value:
 							rule.style.getPropertyValue(property) ||
@@ -447,7 +447,7 @@ window.__cirthAudit = (() => {
 	};
 
 	// Property names as the source wrote them. Splits the serialized block
-	// on top-level semicolons — parentheses and quotes hold, so a url() or a
+	// on top-level semicolons: parentheses and quotes hold, so a url() or a
 	// content string carrying one does not split a declaration in half.
 	const authored = (cssText) => {
 		const names = [];
@@ -479,7 +479,7 @@ window.__cirthAudit = (() => {
 	};
 
 	// The states this corpus never enters. A rule behind one of them has not
-	// been shown to be dead — it has not been looked at, which is a
+	// been shown to be dead: it has not been looked at, which is a
 	// different sentence, and the one a report has to be able to say.
 	const STATE_PSEUDO =
 		/::?(?:active|autofill|backdrop|default|focus|focus-visible|focus-within|hover|placeholder-shown|selection|target|target-text|user-invalid|user-valid|visited)\\b|::-\\w+-[\\w-]+/g;
@@ -508,8 +508,8 @@ window.__cirthAudit = (() => {
 	};
 
 	// "Would this selector match if the state it asks for were reachable?"
-	// Answers "matched", "stateful" — the base matches, the state does not
-	// — or "absent".
+	// Answers "matched", "stateful": the base matches, the state does not
+	//, or "absent".
 	const reachability = (selector) => {
 		if (matches(selector)) return "matched";
 		STATE_PSEUDO.lastIndex = 0;
@@ -630,10 +630,10 @@ const walkSite = async ({ concurrency = 4, label, onPage, pages }) => {
  * `walkSite` above is a sweep: it walks the site in a fixed order, which
  * is exactly right for a fingerprint, where every rendering costs the same
  * and the order cannot matter. It is wrong for the audit, where the order
- * is the difference between an hour and ten minutes — a declaration proved
+ * is the difference between an hour and ten minutes: a declaration proved
  * live on the first rendering is never probed again, so visiting the
  * richest pages first empties the undecided set fastest. Under `listPages()`
- * order the home page — far and away the richest — sorted *last*.
+ * order the home page (far and away the richest) sorted *last*.
  *
  * So the four (viewport, scheme) browser contexts are all opened up front
  * and held, each with one page, and the caller drives visits across them in
@@ -647,7 +647,7 @@ const walkSite = async ({ concurrency = 4, label, onPage, pages }) => {
  * neighbour under the default theme need not under `playroom`. The second
  * pass (`verify-dead-css.js`) reopens this same corpus in another engine
  * or under a preset, over the handful of pages that can see the
- * candidates — which is why they are options here rather than a fork of
+ * candidates, which is why they are options here rather than a fork of
  * this file.
  *
  * @param {{
@@ -671,7 +671,7 @@ const openCorpus = async ({
 	const theme = themeVariants.find((variant) => variant.name === preset);
 	if (!theme) {
 		throw new Error(
-			`${label}: unknown preset "${preset}" — known: ` +
+			`${label}: unknown preset "${preset}", known: ` +
 				themeVariants.map((variant) => variant.name).join(", "),
 		);
 	}
@@ -784,8 +784,8 @@ const observable = (conditions) => {
 // - the scroll   A position: sticky inset pays out only once the page
 //   family       moves, and this corpus never scrolls: at offset 0 a
 //                sticky header sits exactly where it would sit with
-//                top: auto. Three of them — the header, the sidebar rail
-//                and the page outline — came back inert on that footing.
+//                top: auto. Three of them (the header, the sidebar rail
+//                and the page outline) came back inert on that footing.
 // - motion       A transition or an animation is a path between two
 //                states, and every measurement here is of one state,
 //                taken deliberately after the motion has settled.

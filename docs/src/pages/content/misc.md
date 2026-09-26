@@ -17,6 +17,6 @@ A small set of remaining resets: `hr` and `[hidden]`.
 
 * `hr`: a single top border in `--cirth-muted-border-color`, with vertical
   margin from `--cirth-typography-spacing-vertical`.
-* `[hidden]`: `display: none`, except `hidden="until-found"` — Chrome/Edge's
+* `[hidden]`: `display: none`, except `hidden="until-found"`: Chrome/Edge's
   find-in-page-revealed hidden state is deliberately left alone rather than
   overridden.

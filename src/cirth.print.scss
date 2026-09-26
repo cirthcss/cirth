@@ -6,6 +6,6 @@
 // outrank, which is why it used to sit last inside the bundle. As its own
 // stylesheet loaded afterwards it keeps exactly that position, and the
 // browser fetches it at low priority because the media query does not
-// match the screen — so it never competes with the first paint.
+// match the screen, so it never competes with the first paint.
 
 @use "utilities/print";

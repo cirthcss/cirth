@@ -4,7 +4,7 @@ bodyClass: docs-home-page
 ---
 {#- The specimens below are declared once and used twice: rendered live, and
     highlighted into the source pane beside them. One string, so the markup a
-    reader copies is the markup that produced what they are looking at — the
+    reader copies is the markup that produced what they are looking at: the
     drift this page has had before (a snippet that declared attributes the
     rendered output no longer had) cannot happen when there is only one copy.
 
@@ -12,7 +12,7 @@ bodyClass: docs-home-page
     `set` block is captured verbatim, and this is the indentation that ends up
     in the <pre>. -#}
 
-{#- 1 — Article + table. Structure, and the two axes of a real table
+{#- 1. Article + table. Structure, and the two axes of a real table
     header. Rows on one line, which is how table rows are actually written
     and what keeps the listing to a screenful: at one element per line this
     was 27 lines against the next example's 14, so switching tabs moved the
@@ -35,10 +35,10 @@ bodyClass: docs-home-page
 </article>
 {%- endset -%}
 
-{#- 2 — Disclosure. `name` on a <details> is what makes the group
+{#- 2. Disclosure. `name` on a <details> is what makes the group
     exclusive, and it is the browser doing it: the same four elements
     render the questions under "Before you install" at the bottom of this
-    page. A plausible little interface rather than a specimen sheet — the
+    page. A plausible little interface rather than a specimen sheet: the
     delivery options of a checkout. -#}
 {%- set detailsSpecimen -%}
 <article>
@@ -55,7 +55,7 @@ bodyClass: docs-home-page
 </article>
 {%- endset -%}
 
-{#- 3 — Form controls + validation. `type="email"` and `required` are the
+{#- 3. Form controls + validation. `type="email"` and `required` are the
     whole validation layer: the browser decides when the field is wrong and
     `:user-invalid` decides when to say so, which is after the reader has
     caused it rather than on load.
@@ -63,7 +63,7 @@ bodyClass: docs-home-page
     No <form> element and no submit button, which is a deliberate limit on
     the sample rather than an omission from it. A <form> with no action
     submits to this page, so a reader who filled the field in and pressed
-    Save would be navigated off the home page mid-demo — and the only ways
+    Save would be navigated off the home page mid-demo, and the only ways
     to stop that are an inline handler or a script, in the section whose
     whole claim is that there is neither. Constraint validation does not
     need a form owner: `required` and `type="email"` still make the control
@@ -89,7 +89,7 @@ bodyClass: docs-home-page
 
 {#- The interface the theme showcase rethemes. Not one of the three above:
     that section's subject is the stylesheet, so the sample has to hold the
-    surfaces a theme actually moves — a card edge, a control border, a
+    surfaces a theme actually moves: a card edge, a control border, a
     filled button, an accent. -#}
 {%- set themeSpecimen -%}
 <article>
@@ -125,7 +125,7 @@ bodyClass: docs-home-page
     tab: "Article",
     name: "Article + table",
     markup: articleSpecimen,
-    note: "Nine elements, no classes. <code>&lt;th scope&gt;</code> on both axes is what gives a screen reader real row and column navigation — an ARIA re-implementation of a table cannot be reached this way."
+    note: "Nine elements, no classes. <code>&lt;th scope&gt;</code> on both axes is what gives a screen reader real row and column navigation. An ARIA re-implementation of a table cannot be reached this way."
   },
   {
     id: "details",
@@ -139,7 +139,7 @@ bodyClass: docs-home-page
     tab: "Form",
     name: "Form + validation",
     markup: formSpecimen,
-    note: "Type an address that is not one, then leave the field. <code>required</code> and <code>type=\"email\"</code> are the whole validation layer — and <code>:user-invalid</code> holds the error styling back until the reader has caused it, so nothing is painted red on arrival."
+    note: "Type an address that is not one, then leave the field. <code>required</code> and <code>type=\"email\"</code> are the whole validation layer, and <code>:user-invalid</code> holds the error styling back until the reader has caused it, so nothing is painted red on arrival."
   }
 ] -%}
 
@@ -147,10 +147,10 @@ bodyClass: docs-home-page
     strip and the list below it, defined once so the two cannot drift into
     saying the same thing with different words.
 
-    · guarantee — a property the project intends to keep; a break is a bug.
-    · capability — something Cirth lets you do. It says nothing about what
+    · guarantee: a property the project intends to keep; a break is a bug.
+    · capability: something Cirth lets you do. It says nothing about what
       your application does with it.
-    · current fact — true of this build, measured, and free to move.
+    · current fact: true of this build, measured, and free to move.
 
     The glyphs are the shell's own (eleventy.config.js): shield-check for
     what a suite holds, sliders for what the reader can change, and the
@@ -172,8 +172,8 @@ bodyClass: docs-home-page
     checkable from one place.
 
     The answers arrive already substituted (see the loop): two of them
-    quote a fact the build measures — the Browserslist target and the size
-    of this build — and front matter is data, not a template. A marker keeps
+    quote a fact the build measures (the Browserslist target and the size
+    of this build), and front matter is data, not a template. A marker keeps
     the answer readable in index.md and un-substitutable into nonsense: an
     HTML comment reads as nothing at all if one ever survives. -#}
 {%- macro faqDisclosure(question, answer) -%}
@@ -201,7 +201,7 @@ bodyClass: docs-home-page
 		</div>
 	</section>
 
-	{#- The showcase. Three examples, one stage, and a strip above it — the
+	{#- The showcase. Three examples, one stage, and a strip above it, the
 	    arrangement FastHTML's "this home page is a FastHTML app" uses, for
 	    the reason it uses it: one example proves that the
 	    markup renders, three prove that *different* semantic markup renders
@@ -219,7 +219,7 @@ bodyClass: docs-home-page
 	    Every panel is served rendered and unhidden. The tab strip ships
 	    `hidden` and the script below turns it on, so without script this is
 	    three complete examples stacked under their own headings rather than
-	    a row of controls that cannot do anything — the same rule the pause
+	    a row of controls that cannot do anything, the same rule the pause
 	    control in the next section follows. -#}
 	<section class="docs-showcase" aria-labelledby="semantic-title">
 		<div class="docs-native-grid">
@@ -229,7 +229,7 @@ bodyClass: docs-home-page
 			</header>
 			{#- The strip chooses what the section is about, so it sits with the
 			    section's own copy rather than inside the stage. In the band it
-			    read as part of the listing's toolbar — one row, beside a file
+			    read as part of the listing's toolbar: one row, beside a file
 			    name and above a copy affordance, which is where a reader looks
 			    for something belonging to the code block rather than for the
 			    editorial choice of which example is on. Above the stage it is
@@ -274,7 +274,7 @@ bodyClass: docs-home-page
 	    attaches a shadow root, loads the scoped build into it, and applies
 	    the declarations there. Nothing in the page's cascade is touched, no
 	    selector on this page has to out-specify the framework, and the two
-	    themes are visible at once — the page's around the stage, the demo's
+	    themes are visible at once: the page's around the stage, the demo's
 	    inside it.
 
 	    The listing is the stylesheet the element really carries: one block,
@@ -282,12 +282,12 @@ bodyClass: docs-home-page
 	    the same string it just wrote (themePreview() in
 	    docs/eleventy.config.js reads both out of the compiled files). One
 	    block rather than one per state is also what keeps the shell's copy
-	    button honest — it copies `textContent`, so a hidden variant inside
+	    button honest: it copies `textContent`, so a hidden variant inside
 	    the block would come along with it.
 
 	    No preset control. The selector this section used to carry drove the
 	    whole site's theme from inside a demo about theming, which made the
-	    page the demo — and left the reader to operate something before the
+	    page the demo, and left the reader to operate something before the
 	    section said anything. The header's switcher still does that job for
 	    the site; this section demonstrates instead of asking. -#}
 	<section class="docs-showcase docs-theme-showcase" aria-labelledby="theme-title">
@@ -311,7 +311,7 @@ bodyClass: docs-home-page
 						    page's: the same declarations are set on this list, so a
 						    swatch cannot show one thing while the preview shows
 						    another. They are painted by the custom properties
-						    themselves — no script picks a colour. -#}
+						    themselves. No script picks a colour. -#}
 						<ul class="docs-token-legend" data-docs-theme-legend>
 							{% for token in themePreview.tokens %}
 								<li data-token="{{ token }}"><span class="docs-token-chip" aria-hidden="true"></span><code>{{ token }}</code></li>
@@ -322,7 +322,7 @@ bodyClass: docs-home-page
 					    what a reader without script gets: the page's Cirth renders it
 					    in the light DOM, finished, exactly as the section says it
 					    would. With script the element clones it into the shadow root,
-					    where the demo's stylesheet is — one markup source either
+					    where the demo's stylesheet is. One markup source either
 					    way. -#}
 					<div class="docs-stage-preview">
 						<cirth-theme-preview data-docs-theme-preview>{{ themeSpecimen | safe }}</cirth-theme-preview>
@@ -339,14 +339,14 @@ bodyClass: docs-home-page
 	    differently. A *guarantee* is something the project intends to keep
 	    and would treat a break as a bug. A *capability* is something Cirth
 	    lets you do; it does not promise anything about your application. A
-	    *current fact* would be true of this build and free to move — the
+	    *current fact* would be true of this build and free to move: the
 	    gzipped size used to be one here, and it has moved to /deploy, where
 	    a reader is deciding something with it rather than scoring the
 	    project by it.
 
 	    So no number is a claim by itself here. "4 builds" went for the same
-	    reason: the count was accurate and the promise it implied — that
-	    there will always be exactly four — is not one worth making, when
+	    reason: the count was accurate and the promise it implied (that
+	    there will always be exactly four) is not one worth making, when
 	    what actually matters is that the distribution has classless and
 	    scoped forms and optional outputs beside them.
 
@@ -373,7 +373,7 @@ bodyClass: docs-home-page
 					<dt>{{ proofKind("guarantee") }}</dt>
 					<dd>
 						<strong>WCAG 2.2 AA baseline</strong>
-						<small>Automated checks over Cirth's own components and defaults — a floor to build on, not a verdict on your interface.</small>
+						<small>Automated checks over Cirth's own components and defaults: a floor to build on, not a verdict on your interface.</small>
 						<a href="/about#accessibility-baseline">Method</a>
 					</dd>
 				</div>
@@ -391,19 +391,19 @@ bodyClass: docs-home-page
 						{#- The cause, not the symptom. This used to print the gzipped
 						    size, which invited the one comparison the project does not
 						    want made: a byte count read as a score. What is actually
-						    being promised is the model — element selectors and custom
-						    properties, no component catalogue, nothing to run — and the
+						    being promised is the model (element selectors and custom
+						    properties, no component catalogue, nothing to run), and the
 						    size is downstream of it. The measured figure still exists,
 						    on /deploy, where a reader can act on it. -#}
 						<strong>Small by construction</strong>
-						<small>Element selectors and custom properties — no component catalogue, and nothing to run. The size follows from that model rather than from leaving native elements unfinished.</small>
+						<small>Element selectors and custom properties: no component catalogue, and nothing to run. The size follows from that model rather than from leaving native elements unfinished.</small>
 						<a href="/about#size-and-what-it-is-a-budget-for">Why</a>
 					</dd>
 				</div>
 			</dl>
 			{#- The two claims that are not about the package's shape. A list,
 			    because two rows of four columns is a table's shape without a
-			    table's reason — the strip above is the part that compares. Same
+			    table's reason; the strip above is the part that compares. Same
 			    three kinds, same vocabulary. -#}
 			<ul class="docs-proof-claims">
 				<li>
@@ -442,7 +442,7 @@ bodyClass: docs-home-page
 <script>
 	// The showcase's tab strip. Everything it needs is already in the page:
 	// three rendered examples, each with its own heading, served visible.
-	// This turns them into one tab panel at a time and turns the strip on —
+	// This turns them into one tab panel at a time and turns the strip on,
 	// so a reader without script gets three complete examples rather than a
 	// row of buttons that do nothing, and the ARIA roles only ever exist
 	// while there is something implementing them.
@@ -493,7 +493,7 @@ bodyClass: docs-home-page
 
 		// Selection follows focus, which is the pattern's default where every
 		// panel is already in the document: nothing is fetched or built by
-		// arrowing across the strip. There is no autoplay to interrupt — a
+		// arrowing across the strip. There is no autoplay to interrupt: a
 		// panel that changed itself would take a <details> the reader had
 		// just opened, or a field they were typing in, out from under them,
 		// and no amount of pausing makes that worth having.
@@ -519,7 +519,7 @@ bodyClass: docs-home-page
 		select(0, false);
 	})();
 
-	// <cirth-theme-preview> — the theme demo, with its own copy of Cirth.
+	// <cirth-theme-preview>: the theme demo, with its own copy of Cirth.
 	//
 	// A documentation element, not a Cirth API: nothing in the published
 	// package knows about it, and the section it serves is the only place it
@@ -535,7 +535,7 @@ bodyClass: docs-home-page
 	//
 	//   · the page's element rules (article, button, input …) do not cross
 	//     the boundary, so nothing in here is styled by the site's build;
-	//   · custom properties do inherit in — and the scoped build re-declares
+	//   · custom properties do inherit in, and the scoped build re-declares
 	//     every one of them on `.cirth`, so the page's values are shadowed
 	//     for this subtree by the demo's own stylesheet rather than by a
 	//     more specific selector;
@@ -543,9 +543,9 @@ bodyClass: docs-home-page
 	//     custom properties at the same specificity, which is exactly what
 	//     the Customization page tells an author to write.
 	//
-	// The stylesheet it loads is the real compiled scoped build — the same
+	// The stylesheet it loads is the real compiled scoped build (the same
 	// artifact the /lab/ specimens use, compiled from src/ with the public
-	// scoped switch — and the markup is the element's own children, served
+	// scoped switch), and the markup is the element's own children, served
 	// by the template and cloned in. Without script those children are what
 	// a reader gets: the page's Cirth renders the same specimen in the light
 	// DOM.
@@ -565,7 +565,7 @@ bodyClass: docs-home-page
 			cirth.rel = "stylesheet";
 			cirth.href = `${base}/styles/generated/cirth-lab-scoped.css`;
 
-			// The element's own layout — the part the docs shell owns. The
+			// The element's own layout: the part the docs shell owns. The
 			// padding lives in here rather than on the pane outside, so the
 			// surface --cirth-canvas paints is the whole half of the stage:
 			// when the demo's canvas moves, the page's canvas is right beside
@@ -602,7 +602,7 @@ bodyClass: docs-home-page
 			theme.dataset.cirthTheme = "";
 
 			// The fallback, moved rather than copied. Left behind it would be a
-			// second, unrendered copy of a form — invisible, unfocusable, and
+			// second, unrendered copy of a form: invisible, unfocusable, and
 			// still matching every selector anything on this page looks with.
 			const surface = document.createElement("div");
 			surface.className = "cirth";
@@ -614,7 +614,7 @@ bodyClass: docs-home-page
 			// One thing a stylesheet cannot say: a shadow tree is styled by
 			// its own sheet, so the scheme the page is in has to be handed to
 			// it. The scoped build reads `data-theme` off the `.cirth`
-			// element itself, which is what this sets — the demo isolates the
+			// element itself, which is what this sets: the demo isolates the
 			// theme's tokens, not whether the site is in the dark.
 			const scheme = () => {
 				surface.dataset.theme =
@@ -653,7 +653,7 @@ bodyClass: docs-home-page
 	//
 	// Deliberately not a type-out. The claim is "the values moved and the
 	// markup did not", and a terminal pretending to be typed says the
-	// opposite — that the stylesheet is a performance. A line is marked, its
+	// opposite: that the stylesheet is a performance. A line is marked, its
 	// value is replaced, the element takes it, and the interface settles.
 	(() => {
 		const preview = document.querySelector("[data-docs-theme-preview]");
@@ -670,7 +670,7 @@ bodyClass: docs-home-page
 		const states = {{ themePreview.states | dump | safe }};
 
 		// What the element is carrying. It starts as the block the page was
-		// served with, which is the first state — so nothing moves on load.
+		// served with, which is the first state, so nothing moves on load.
 		const current = new Map(
 			tokens.map((token) => [token, states[0].lines[token]]),
 		);
@@ -681,7 +681,7 @@ bodyClass: docs-home-page
 				.join("\n");
 			preview.setTheme(`${selector} {\n${declarations}\n}`);
 			// The chips take the same declarations. A swatch is a claim about
-			// a value, so it has to be painted by the value the preview has —
+			// a value, so it has to be painted by the value the preview has;
 			// left to the page's own tokens it would show the site's accent
 			// beside a preview carrying a different one.
 			if (legend) {
@@ -696,7 +696,7 @@ bodyClass: docs-home-page
 		write();
 
 		// The sequence: every state in turn, one token per step, and only
-		// where the value actually moves — a step that changes nothing would
+		// where the value actually moves; a step that changes nothing would
 		// mark a line to say it had changed. It ends on the state it started
 		// from, so the loop closes without a jump.
 		const steps = [];
@@ -787,7 +787,7 @@ bodyClass: docs-home-page
 		).observe(preview);
 
 		// Autoplay only where motion is welcome. With the preference set the
-		// section is served in its first state and holds there — and the
+		// section is served in its first state and holds there, and the
 		// control is still live, so the sequence is available on request,
 		// with the value changes landing immediately because the transitions
 		// are declared under no-preference only.

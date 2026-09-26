@@ -1,6 +1,6 @@
 // Documentation lines.
 //
-// The docs are not archived per release — they are archived at breaking
+// The docs are not archived per release: they are archived at breaking
 // changes. A line covers every version that documents the same API, and a
 // new one starts only where something stopped working the way it used to,
 // which is why the labels are ranges ("up to v0.10.0") rather than single
@@ -15,7 +15,7 @@
 
 // Where the site itself lives, which is not where this build lives: the
 // /next/ preview is served from a subdirectory, so a link that has to
-// reach another documentation line — the switcher, the banner's way out —
+// reach another documentation line (the switcher, the banner's way out)
 // must be built from the site root rather than from the build's own
 // pathPrefix, which Eleventy's `url` filter would otherwise apply.
 const root = process.env.GITHUB_PAGES === "true" ? "/cirth/" : "/";

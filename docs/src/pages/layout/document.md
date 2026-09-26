@@ -53,7 +53,7 @@ one that does not.
 It is there for the [modal](/components/modal), which stops the page
 scrolling while it is open: without a reserved gutter, hiding the overflow
 would widen the content by a scrollbar's width and shift the whole layout.
-Reserving it only while the dialog is open does not work — on platforms
+Reserving it only while the dialog is open does not work: on platforms
 with overlay scrollbars, where nothing was taking width in the first place,
 that *causes* the shift instead of preventing it.
 
