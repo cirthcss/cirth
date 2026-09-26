@@ -24,7 +24,7 @@ alternating row backgrounds.
 ## Caption
 
 `<caption>` is the native way to give a table an accessible name, and the one
-WCAG guidance prefers over a heading placed outside the table — the name
+WCAG guidance prefers over a heading placed outside the table: the name
 travels with the table instead of depending on proximity.
 
 ```html
@@ -64,7 +64,7 @@ want it underneath.
 ## A wide table, scrollable and operable
 
 A table wider than its column has to scroll, and a scroll container is only
-operable if a keyboard can reach it. This is the pattern — four attributes,
+operable if a keyboard can reach it. This is the pattern: four attributes,
 and all four are load-bearing:
 
 ```html

@@ -14,7 +14,7 @@ const captures = [
 
 // Every capture below freezes animations. The homepage writes its source
 // panel in with a CSS wipe, so a capture taken on `networkidle` lands on
-// whatever frame the wipe had reached — which made these review assets
+// whatever frame the wipe had reached, which made these review assets
 // differ on every run, and churn a tracked file for no reason. `animations:
 // "disabled"` finishes the animation and holds it there, the same thing
 // tests/visual.spec.js does for the same reason.
@@ -33,7 +33,7 @@ const lockupCaptures = [
 // The set a brand reviewer needs, rendered from the site rather than mocked
 // up beside it. The two specimen captures are the application screen: copper
 // on small surfaces, graphite dark surfaces, and a primary sitting next to a
-// destructive action — the adjacency the palette was hardest to settle.
+// destructive action: the adjacency the palette was hardest to settle.
 /** @type {Array<{file: string, width: number, height: number, theme: "light" | "dark", path?: string}>} */
 const reviewCaptures = [
 	{ file: "home-desktop-light.png", width: 1440, height: 900, theme: "light" },

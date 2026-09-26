@@ -5,8 +5,8 @@
 // initial, escaped-but-unhighlighted contents of the <pre>) and once again
 // as a JavaScript object literal in the same file, which the build switcher
 // assigned with `source.textContent = …`. Two consequences, both visible:
-// the two copies could drift, and every path — the server-rendered one
-// included — produced plain text, so the panel this project puts at the top
+// the two copies could drift, and every path (the server-rendered one
+// included) produced plain text, so the panel this project puts at the top
 // of its own home page was the only code block on the site with no syntax
 // highlighting at all (0 highlight spans against 203 in a docs page's
 // prose). `textContent` would have erased the markup even if the template

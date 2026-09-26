@@ -2,7 +2,7 @@
 // actually ships.
 //
 // Every scheme token is an oklch() literal, and browsers hand those back
-// from getComputedStyle unresolved — `color` on a paragraph reads as
+// from getComputedStyle unresolved: `color` on a paragraph reads as
 // "oklch(0.353 0.021 264)", not as an rgb triple. A check that wants to
 // assert a contrast ratio therefore has to do the conversion itself,
 // which is what this module is for.
@@ -135,7 +135,7 @@ const parseColor = (value) => {
 };
 
 /**
- * Composites a translucent color over an opaque backdrop — what the eye
+ * Composites a translucent color over an opaque backdrop: what the eye
  * is actually judging when a focus ring carries an alpha.
  *
  * @param {Color} color

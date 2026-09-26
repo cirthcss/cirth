@@ -8,7 +8,7 @@ const { setContent } = require("./helpers/render");
 // a card's header band does with a heading inside it, and where a
 // disclosure draws its focus ring. All three were found from the
 // documentation home page and all three were fixed in the library,
-// because all three are wrong in any page that uses the component — so
+// because all three are wrong in any page that uses the component, so
 // they are pinned here, against the compiled stylesheet, with no
 // documentation shell anywhere near them.
 
@@ -41,8 +41,8 @@ const render = (page, css, markup) =>
 
 /**
  * A token read off the element that resolves it. Several of these are
- * rebound per element — every heading level carries its own
- * --cirth-typography-spacing-top — so reading them off the root would
+ * rebound per element: every heading level carries its own
+ * --cirth-typography-spacing-top, so reading them off the root would
  * compare a measurement against a value nothing on the page uses.
  * @param {import("@playwright/test").Page} page
  * @param {string} selector
@@ -121,7 +121,7 @@ for (const [build, css] of builds) {
 		});
 
 		// The panel opens on the same step the framework puts between any two
-		// blocks of prose — no more, because the padding that lifts the
+		// blocks of prose, and no more, because the padding that lifts the
 		// trigger to its target is not content spacing and must not be
 		// counted twice.
 		expect(measured.inkGap).toBeCloseTo(
@@ -311,7 +311,7 @@ for (const [build, css] of builds) {
 			return { shut: marker("shut"), open: marker("open") };
 		});
 
-		// Closed, the chevron points down — at the panel that is about to
+		// Closed, the chevron points down, at the panel that is about to
 		// appear. It used to rest at -90deg, pointing along the row at
 		// nothing, and swing to 0 on open: the closed state said "more this
 		// way" and the open state said "more below" about content that was

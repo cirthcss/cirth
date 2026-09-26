@@ -95,7 +95,7 @@ downloads *more* than one that advertises only gzip.
 incompressible, so gzip in the npm tarball cannot recover any of them. They
 added 40% to the published archive, charged to every `npm install`, to serve
 a consumer who self-hosts, runs a server with precompressed-static support,
-and serves Cirth's CSS unmodified — and a consumer who bundles or concatenates
+and serves Cirth's CSS unmodified, and a consumer who bundles or concatenates
 it invalidates the sidecar anyway.
 
 Removed in the same release cycle that introduced them, so no published
@@ -120,7 +120,7 @@ beside it as a best case a host arranges.
 
 The lever is the delivery path, not the encoder. Two things would change the
 answer: a documented CDN that serves high-quality static Brotli, or shipping
-the sidecars outside the npm tarball — as release assets — so the people who
+the sidecars outside the npm tarball, as release assets, so the people who
 can use them get them and nobody else pays. Either is a new spec, not an
 amendment to this one.
 

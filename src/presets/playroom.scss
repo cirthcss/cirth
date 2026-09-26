@@ -1,6 +1,6 @@
 // Playroom preset
 // ––––––––––––––––––––
-// For interfaces with a friendly voice — a consumer app, a community site,
+// For interfaces with a friendly voice: a consumer app, a community site,
 // a tool aimed at children or the people helping them. A rounded system
 // face and softer colour make it approachable without replacing Cirth's
 // geometry, density or interaction model.
@@ -8,7 +8,7 @@
 // changes five declarations and lets the theme derive the rest, this one
 // reaches across colour and typography while preserving the framework's
 // permanent silhouette. It also overrides two *derived* tokens on purpose, which is
-// the other thing worth demonstrating — see the note further down.
+// the other thing worth demonstrating ; see the note further down.
 // Import after the main Cirth stylesheet. No @import, no webfont: the
 // rounded stack below is whatever the operating system already has.
 @use "../helpers/cascade";
@@ -51,7 +51,7 @@
     );
 
     // Status colours warm up with the rest of the theme. They stay
-    // recognisable — a red-orange error, a green success, an amber warning —
+    // recognisable (a red-orange error, a green success, an amber warning)
     // but sit at the same softness as the accent instead of cutting through
     // it. Each is an input: the field borders, meter readings, <ins>/<del>
     // inks and status surfaces all follow from these three. <mark> follows
@@ -100,7 +100,7 @@
     // which is the right instinct for a reference manual and the wrong one
     // here: on a friendly interface the hover should feel like the control
     // lighting up, not pressing down. Setting these two directly opts them
-    // out of the derivation — which is exactly what a derived token is for,
+    // out of the derivation, which is exactly what a derived token is for,
     // as long as you mean it.
     --cirth-primary-active: light-dark(
       oklch(56% 0.18 300deg),
@@ -115,7 +115,7 @@
   // Increased contrast (prefers-contrast: more)
   // Restated for the same reason as in plain.scss: this file loads after the
   // theme's own pass and would otherwise hand the softer values back. The
-  // softness is what gives way here, not the character — the hue is the
+  // softness is what gives way here, not the character: the hue is the
   // same, it simply stops being gentle about it.
   @media (prefers-contrast: more) {
     @include selectors.theme-roots {

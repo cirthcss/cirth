@@ -7,7 +7,7 @@ const { classifyCommand, classifyPush } = require("./lib/release-guard");
 // Both guards refuse things, which is the hard kind of code to trust: a
 // guard that blocks nothing looks exactly like a guard that works, right
 // up until the day it matters. So every case below is asserted in both
-// directions — the dangerous forms are blocked, and the ordinary ones a
+// directions: the dangerous forms are blocked, and the ordinary ones a
 // contributor runs all day are not.
 //
 // The allow list is the more important half. A guard that blocks `git
@@ -110,7 +110,7 @@ check("local npm publishing is blocked", () => {
 	}
 });
 
-check("approving a stage is blocked — it is the human checkpoint", () => {
+check("approving a stage is blocked: it is the human checkpoint", () => {
 	blocks("npm stage approve abc123");
 });
 
@@ -240,6 +240,6 @@ check("empty input is not an error", () => {
 
 process.stdout.write(
 	checks.map((label) => `  ok  ${label}\n`).join("") +
-		`\n[@cirthcss/cirth] Release guards verified — ${checks.length} checks ` +
+		`\n[@cirthcss/cirth] Release guards verified: ${checks.length} checks ` +
 		`passed.\n`,
 );

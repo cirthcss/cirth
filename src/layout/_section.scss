@@ -5,7 +5,7 @@
    */
 
 // Reviewed and kept. A page of full-bleed bands does not want this gap, and
-// that is a real argument — but <article> carries the identical
+// that is a real argument, but <article> carries the identical
 // margin-bottom in components/_card.scss, and HTML's two sectioning
 // containers should not disagree about whether they sit in document flow.
 // The value is a token, so a theme that re-times the document re-times this

@@ -17,7 +17,7 @@ const { execFileSync } = require("node:child_process");
 //   node scripts/check-audit-snapshot.js
 //
 // The race this closes: `docs/dist` is a build output, and
-// `npm run docs:build` replaces files in it — eleventy's passthrough copy
+// `npm run docs:build` replaces files in it: eleventy's passthrough copy
 // *replaces* styles/style.css rather than editing it, so there is a window
 // in which a page loads with no stylesheet at all. The dead-CSS audit takes
 // tens of minutes and read that directory directly, so a build started
@@ -31,12 +31,12 @@ const { execFileSync } = require("node:child_process");
 // ways, and each check is written so that it would fail if the snapshot
 // were removed:
 //
-//   1. a snapshot does not see its source change — including the exact
+//   1. a snapshot does not see its source change, including the exact
 //      mutation a build makes, replacing the stylesheet;
 //   2. an open corpus keeps serving the build it started with, while
 //      docs/dist is being rewritten underneath it, with a control that
 //      proves the rewrite was real;
-//   3. the copy is cleaned up — on the way out, and on the way out of a
+//   3. the copy is cleaned up: on the way out, and on the way out of a
 //      run that threw.
 
 /** @type {string[]} */
@@ -260,7 +260,7 @@ const checkLiveCorpus = async () => {
 		assert.equal(
 			seen[1].marked,
 			false,
-			"the rewrite reached the corpus — the snapshot is not isolating it",
+			"the rewrite reached the corpus: the snapshot is not isolating it",
 		);
 		passed(
 			`the corpus kept measuring the build it opened (${seen[0].declarations} declarations, before and after)`,
@@ -284,8 +284,8 @@ const checkLiveCorpus = async () => {
 //
 // The snapshot above protects what the audit *measures*. This protects what
 // a person *acts on* afterwards: the sheet the report names declarations in.
-// Checked against a throwaway git repository, so all three verdicts —
-// unchanged, edited, restored — can be produced without touching this one.
+// Checked against a throwaway git repository, so all three verdicts
+// (unchanged, edited, restored) can be produced without touching this one.
 
 const checkSourceGuard = () => {
 	const root = fs.mkdtempSync(path.join(os.tmpdir(), "cirth-guard-"));
@@ -310,7 +310,7 @@ const checkSourceGuard = () => {
 		passed("an undisturbed run passes the source guard silently");
 
 		// An edited file throws, and the message names the file and the size
-		// it moved by — the two things needed to tell what happened.
+		// it moved by: the two things needed to tell what happened.
 		const edited = watchSources({ files: ["sheet.css"], label: "edited", root });
 		fs.writeFileSync(tracked, "p { color: rgb(9, 9, 9); }\np { margin: 0; }\n");
 		assert.throws(
@@ -371,7 +371,7 @@ const run = async () => {
 	checkSourceGuard();
 
 	console.log(
-		`\n[@cirthcss/cirth] Audit isolation and source guard verified — ${checks.length} checks passed\n`,
+		`\n[@cirthcss/cirth] Audit isolation and source guard verified: ${checks.length} checks passed\n`,
 	);
 	return 0;
 };

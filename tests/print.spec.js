@@ -19,7 +19,7 @@ const { setContent } = require("./helpers/render");
 // The pass ships as its own stylesheet (dist/cirth.print*.css) rather than
 // inside the main bundle, so each fixture loads the pair in the order a
 // consumer would: the build first, its print sheet after. Concatenating
-// them here reproduces that order exactly — which is what the pass needs,
+// them here reproduces that order exactly, which is what the pass needs,
 // since it wins over component rules by source position.
 
 const projectRoot = path.join(__dirname, "..");
@@ -126,7 +126,7 @@ for (const build of builds) {
 		}
 
 		// The scheme overrides have to land on the element that inherits to
-		// the document, not on :root — that is what lets them outrank the
+		// the document, not on :root: that is what lets them outrank the
 		// color schemes and any preset loaded afterwards.
 		const printBlock = source.slice(source.indexOf("@media print"));
 		const root = build.scope || "body";

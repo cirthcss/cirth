@@ -7,8 +7,8 @@
 | Baseline | `c4dcd4c5` on `master`; implemented in `7a98b5d6` on `feat/issue-124-cascade-layers` |
 | Breaking | Yes — cascade only; no class, token, file or markup change |
 
-Every stylesheet Cirth publishes — the four screen builds, their four print
-sheets and every preset — puts all of its rules inside one cascade layer,
+Every stylesheet Cirth publishes (the four screen builds, their four print
+sheets and every preset) puts all of its rules inside one cascade layer,
 `@layer cirth`. CSS a consumer writes outside a layer now beats Cirth whatever
 its specificity and wherever it loads. That affects anyone who relied on Cirth
 overriding other CSS: a stylesheet loaded *before* Cirth so that Cirth would
@@ -25,8 +25,8 @@ After this lands:
   is at the top level except `@charset`. There are no sub-layers and no other
   layer names.
 - Inside that block the rules, their order and their specificity are exactly
-  what the unlayered build emitted. Cirth's own cascade — theme against
-  components, preset against theme, print against components — resolves as it
+  what the unlayered build emitted. Cirth's own cascade (theme against
+  components, preset against theme, print against components) resolves as it
   did before.
 - A declaration outside any layer beats every Cirth declaration, whatever its
   specificity and whatever the loading order.
@@ -37,7 +37,7 @@ After this lands:
 - Presets and print sheets are in the same layer, so between Cirth's own
   stylesheets source order still decides: build, then preset, then print.
 - Scoped builds are layered like the others. Their containment promise is
-  unchanged — no rule matches outside `.cirth`.
+  unchanged: no rule matches outside `.cirth`.
 - A preset declares on `:root`, `:host` and `.cirth`, so it applies inside a
   scoped build's wrapper as well as on an unscoped page.
 - Importing Cirth into a layer yourself, the gh#110 path
@@ -73,8 +73,8 @@ It does **not** promise:
 
 ## Evidence ledger
 
-Browsers are Playwright 1.61.1's engines — Chromium 149.0.7827.55, Firefox
-151.0, WebKit 26.5 — on macOS 26.6.2, measured 2026-09-19. "Baseline dist"
+Browsers are Playwright 1.61.1's engines (Chromium 149.0.7827.55, Firefox
+151.0, WebKit 26.5) on macOS 26.6.2, measured 2026-09-19. "Baseline dist"
 means `npm run build` at `c4dcd4c5`; "branch dist" means `npm run build` of
 the source committed in `7a98b5d6`.
 
@@ -82,9 +82,9 @@ the source committed in `7a98b5d6`.
 | --- | --- | --- | --- |
 | Consumer CSS competes with Cirth on specificity | 609 of the 757 selectors in `dist/cirth.css` are more specific than a bare type selector. In `dist/cirth.scoped.css` all 755 are at least `(0,1,0)` | Baseline dist, selector specificity computed with `postcss-selector-parser` | Verified |
 | The issue's count of 71 `:where()` uses | 71 in `dist/cirth.css`, 71 in `dist/cirth.min.css` | Baseline dist, `grep -o` | Verified |
-| Natural overrides lose today and win once layered | 8 one-line overrides (`summary {color}`, `html {--cirth-primary}`, a dropdown link, a striped `th`, `.secondary`, `nav a`, …). Default build: 4 of 8 lose as shipped, 0 of 8 when wrapped in `@layer cirth`. Scoped build: 7 of 8 lose as shipped, 1 of 8 when wrapped — the `html` token case, which is inheritance (see Contract) | Baseline dist, Chromium 149 | Verified |
+| Natural overrides lose today and win once layered | 8 one-line overrides (`summary {color}`, `html {--cirth-primary}`, a dropdown link, a striped `th`, `.secondary`, `nav a`, …). Default build: 4 of 8 lose as shipped, 0 of 8 when wrapped in `@layer cirth`. Scoped build: 7 of 8 lose as shipped, 1 of 8 when wrapped: the `html` token case, which is inheritance (see Contract) | Baseline dist, Chromium 149 | Verified |
 | Wrapping with `meta.load-css()` inside `@layer` changes nothing inside the layer | The docs' `@use "src"; @use "src/utilities/print"` compiled plain and inside `@layer cirth { @include meta.load-css(…) }`: the unwrapped rule text is identical, ignoring blank lines | sass-embedded 1.100 over `c4dcd4c5` source | Verified |
-| Ordered sub-layers would change Cirth's own rendering | The docs' `src` build compiled twice — one flat `cirth` layer, and seven sub-layers in source order (`layout`, `content`, `forms`, `components`, `utilities`, `theme`, `print`) — and each swapped in for `cirth-docs.css`. Computed styles of every element and generated pseudo-element on 50 pages, light and dark: all 100 renders differ, 2,102 (element, property) pairs. Among them `<select>` inline padding 40px → 8px, which runs text under the chevron, and `cursor: pointer` → `not-allowed` on busy `.secondary` buttons | Docs build of `c4dcd4c5`, Chromium 149 | Verified |
+| Ordered sub-layers would change Cirth's own rendering | The docs' `src` build compiled twice: one flat `cirth` layer, and seven sub-layers in source order (`layout`, `content`, `forms`, `components`, `utilities`, `theme`, `print`), and each swapped in for `cirth-docs.css`. Computed styles of every element and generated pseudo-element on 50 pages, light and dark: all 100 renders differ, 2,102 (element, property) pairs. Among them `<select>` inline padding 40px → 8px, which runs text under the chevron, and `cursor: pointer` → `not-allowed` on busy `.secondary` buttons | Docs build of `c4dcd4c5`, Chromium 149 | Verified |
 | Inside the layer, every shipped artifact is the unlayered build | All 20 files in `dist/` are one `@layer cirth` block. Unwrapped, the minified files are byte-identical to baseline dist and the expanded ones identical but for the block's two spaces of indentation; the presets differ only in the added `.cirth` root | Branch dist against baseline dist | Verified |
 | Layering changes nothing the docs site renders at rest | The same 50-page, two-scheme computed-style comparison, unlayered against flat-layered: 0 differing pairs once custom-property values are compared with whitespace collapsed. Uncollapsed, 5,028,360 pairs differ, all of them the extra indentation Sass writes into multi-line custom-property values inside the block, which `getPropertyValue()` preserves and rendering ignores | Docs build of `c4dcd4c5`, Chromium 149 | Verified |
 | The first, uncollapsed comparison showed the layer changing the docs' rendering | Its 5,028,360 differing pairs were whitespace inside custom-property values, not rendering (row above) | As above | Invalid |
@@ -139,8 +139,8 @@ the source committed in `7a98b5d6`.
   - [x] every preset beats the theme and loses to the consumer in every build,
         in either loading order of consumer and preset;
   - [x] scoped: nothing outside `.cirth` is styled, host rules now win inside
-        it, and both remedies — a host layer declared before `cirth`, and a
-        shadow root — hold;
+        it, and both remedies (a host layer declared before `cirth`, and a
+        shadow root) hold;
   - [x] the gh#110 `@import … layer(cirth)` path nests as `cirth.cirth` and
         keeps every outcome above;
   - [x] a consumer order statement places `cirth` deterministically.
@@ -151,14 +151,14 @@ the source committed in `7a98b5d6`.
       rule that reaches it. The docs Popover demo opens centred.
 - [x] The docs site renders as before apart from its edited text: computed
       styles unchanged, and `npm run check:visual` failing only on the pages
-      whose copy changed, with those baselines regenerated — the Darwin
+      whose copy changed, with those baselines regenerated: the Darwin
       set in `33e775f0`; the Linux set is left to
       `update-visual-baselines.yml` on push.
 - [x] Documentation: `docs/src/pages/customization.md#cascade-layers`, plus
       `get-started.md`, `colors.md`, `upgrading.md`,
       `utilities/print.md` and `about.md` no longer contradict it.
-- [x] gh#110's remaining acceptance — a documentation fixture that catches
-      a broken import example — met by the Customization-page examples in
+- [x] gh#110's remaining acceptance (a documentation fixture that catches
+      a broken import example) met by the Customization-page examples in
       `tests/cascade-layers.spec.js`.
 - [x] `CHANGELOG.md` states what stops winning and what starts winning.
 - [x] `npm run lint`, `build`, `check:dist`, `check:size`, `check:package`,
@@ -187,8 +187,8 @@ path, and the loading order of build, preset and print sheet.
 
 ## Open questions
 
-1. **gh#110 is still open.** Its decision — "do not wrap the standard build in
-   `@layer`" — is reversed here, and its documentation acceptance is met by
+1. **gh#110 is still open.** Its decision ("do not wrap the standard build in
+   `@layer`") is reversed here, and its documentation acceptance is met by
    `customization.md#cascade-layers`. Closing it against this change is the
    maintainer's call.
 
@@ -208,6 +208,6 @@ path, and the loading order of build, preset and print sheet.
    `scripts/lib/dist-manifest.js` are the two places to change, and
    `check:dist` will refuse a build where they disagree.
 
-   *Closed: it does not* — see Decisions. A trial merge of the two branches
+   *Closed: it does not* ; see Decisions. A trial merge of the two branches
    proved they compose unchanged (Evidence ledger). Whichever lands second
    regenerates the Contributions-page baselines, the one conflict.

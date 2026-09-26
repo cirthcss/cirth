@@ -26,7 +26,7 @@
 
   // The mirror of the rule above, on the axis it was missing. A heading
   // that follows a block takes --cirth-typography-spacing-top so a new
-  // section separates itself from the prose above it — 32px to 48px,
+  // section separates itself from the prose above it: 32px to 48px,
   // depending on the level. That is a document-flow measure, and a card's
   // header or footer is not document flow: it is a band padded to
   // `block-spacing-vertical - space-2`. An eyebrow above a title in a card

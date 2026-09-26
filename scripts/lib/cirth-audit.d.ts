@@ -6,7 +6,7 @@
 
 /** One declaration in the audited stylesheet, with the at-rules it sits under. */
 interface AuditDeclaration {
-	/** `<rule path>|<property>` — stable for as long as the sheet is. */
+	/** `<rule path>|<property>`: stable for as long as the sheet is. */
 	id: string;
 	/** Index path from the sheet's top level down to the rule. */
 	path: number[];

@@ -3,7 +3,7 @@ const { spawnSync } = require("node:child_process");
 // Shared error handling around spawnSync: build.js (prettier, stylelint,
 // the check-css-variables step) and process-css.js (the Lightning CSS
 // binary) both need "run this, print the underlying error, and exit
-// non-zero on failure" — this is that, once.
+// non-zero on failure": this is that, once.
 /**
  * @param {string} command
  * @param {readonly string[]} args

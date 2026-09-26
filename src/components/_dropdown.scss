@@ -30,11 +30,11 @@
         float: right;
 
         // The float pins the marker at the content edge, i.e. the trigger's
-        // horizontal padding away from its border — but a regular <select>
+        // horizontal padding away from its border, but a regular <select>
         // paints its chevron at --cirth-space-3 from the border (see
         // forms/_basics.scss). The translate bridges exactly that
         // difference, so the chevron lands at --cirth-space-3 from the edge
-        // for any trigger padding. (Inherited Pico hardcoded 0.2rem here —
+        // for any trigger padding. (Inherited Pico hardcoded 0.2rem here:
         // an eyeballed approximation of this 0.25rem gap.)
         transform: rotate(0deg)
           translateX(
@@ -45,7 +45,7 @@
             )
           );
 
-        // Masked over a theme token — see components/_accordion.scss for
+        // Masked over a theme token ; see components/_accordion.scss for
         // why the matching <select> chevron cannot follow.
         background-color: var(--cirth-muted-color);
         mask-image: var(--cirth-icon-chevron);
@@ -310,7 +310,7 @@
   // Nested dropdown
   // ––––––––––––––––––––
   // A dropdown nested inside another open dropdown's menu gets its own
-  // close-catcher too — but that catcher is position: fixed, so it belongs
+  // close-catcher too, but that catcher is position: fixed, so it belongs
   // to the outer menu's stacking context (its nearest positioned ancestor,
   // not the viewport it visually covers). There it paints above the outer
   // menu's own non-positioned items, in front of DOM order and regardless
@@ -334,7 +334,7 @@
   // RTL
   // ––––––––––––––––––––
   // The marker floats toward the end of the trigger; float has no logical
-  // values within the Browserslist floor (Chrome 111), so mirror it — and
+  // values within the Browserslist floor (Chrome 111), so mirror it, and
   // the translateX bridging the <select> chevron gap flips sign with it.
   [dir="rtl"] {
     #{$parent-selector} details.dropdown {

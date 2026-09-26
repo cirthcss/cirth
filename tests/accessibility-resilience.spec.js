@@ -374,7 +374,7 @@ for (const theme of themeVariants) {
 
 				// The showcase strip says which example is showing with a
 				// background, and a background is the first thing forced
-				// colors takes away — both states came out Canvas, and the
+				// colors takes away: both states came out Canvas, and the
 				// only cue left was `aria-selected`, which a sighted reader
 				// does not get. Every button's transparent border is forced
 				// to CanvasText as well, so the border cannot carry it

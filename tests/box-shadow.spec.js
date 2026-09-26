@@ -4,8 +4,8 @@ const { expect, test } = require("@playwright/test");
 const { setContent } = require("./helpers/render");
 
 // --cirth-box-shadow used to wrap two whole shadow lists in light-dark(),
-// which only accepts colours. The declaration parsed — custom properties
-// accept any tokens — but every box-shadow that read it was invalid at
+// which only accepts colours. The declaration parsed: custom properties
+// accept any tokens, but every box-shadow that read it was invalid at
 // computed-value time and resolved to none, in every engine, so dropdowns
 // and popovers shipped without their elevation and nothing noticed. The
 // scheme choice now sits on each layer's colour.

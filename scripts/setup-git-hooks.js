@@ -7,8 +7,8 @@ const { hooksPath } = require("./lib/release-guard");
 // Points this clone's Git at the tracked hooks, and verifies it stayed
 // pointed there.
 //
-// Git will not run a hook a repository ships — .githooks/ is just a
-// directory until `core.hooksPath` names it — so a fresh clone has no
+// Git will not run a hook a repository ships: .githooks/ is just a
+// directory until `core.hooksPath` names it, so a fresh clone has no
 // guard at all until this runs. That is a property of Git, not an
 // oversight: a repository that could execute code on clone would be a
 // remarkable thing to hand a stranger.
@@ -55,7 +55,7 @@ const main = () => {
 	} else if (checkOnly) {
 		problems.push(
 			`core.hooksPath is ${current === null ? "not set" : `\`${current}\``}, ` +
-				`not \`${hooksPath}\` — this clone is running no release guard. ` +
+				`not \`${hooksPath}\`: this clone is running no release guard. ` +
 				`Run \`npm run setup:hooks\`.`,
 		);
 	} else {
@@ -104,7 +104,7 @@ const main = () => {
 	);
 	if (guard.status === 0) {
 		problems.push(
-			"the pre-push guard allowed a push to master — it is not working.",
+			"the pre-push guard allowed a push to master: it is not working.",
 		);
 	} else {
 		console.log("  ✓ the guard refuses a push to master when asked");
@@ -124,7 +124,7 @@ const main = () => {
 	console.log(
 		`\n[@cirthcss/cirth] Git hooks ${checkOnly ? "verified" : "configured"}: ` +
 			`direct pushes to master and release tags are refused locally.\n` +
-			`  Git LFS keeps working — its hooks are carried in ${hooksPath}/ too.\n` +
+			`  Git LFS keeps working: its hooks are carried in ${hooksPath}/ too.\n` +
 			`  This is defense in depth, not a boundary: --no-verify skips it. ` +
 			`See RELEASING.md.`,
 	);

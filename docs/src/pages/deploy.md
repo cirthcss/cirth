@@ -7,7 +7,7 @@ layout: docs.njk
 Cirth is one static stylesheet. This page is about how that file reaches a
 browser: which path it travels, how many bytes arrive, and what your server
 has to say about it. None of it changes the CSS, and none of it is required
-to use Cirth — the snippet in [Get Started](/get-started) works as it
+to use Cirth: the snippet in [Get Started](/get-started) works as it
 stands.
 
 ## Where the file comes from
@@ -20,7 +20,7 @@ edge near your visitor.
 
 What it costs is a second connection. The stylesheet lives on another
 origin, so the browser resolves a new hostname, opens a new TCP connection
-and completes a new TLS handshake before the first byte of CSS arrives — and
+and completes a new TLS handshake before the first byte of CSS arrives, and
 a stylesheet in the `<head>` blocks rendering until it does. That setup is
 usually worth more milliseconds than any compression choice further down
 this page will win back.
@@ -58,7 +58,7 @@ uncompressed length, which is the one number you are not asking about.
 
 Two answers are worth expecting. Some hosts never negotiate Brotli at all
 and reply `content-encoding: gzip` whatever you ask for. Others do negotiate
-it, but compress on the fly, which trades ratio for encoder speed — no CDN
+it, but compress on the fly, which trades ratio for encoder speed: no CDN
 can afford to spend a second per file.
 
 That second case has a result people rarely expect: at a low enough quality
@@ -90,7 +90,7 @@ gzip_static on;
 
 Caddy does the same with `precompressed br gzip` inside its `file_server`
 block. Apache has no equivalent switch: there you rewrite onto the `.br`
-file and set the response headers yourself — the three listed below.
+file and set the response headers yourself: the three listed below.
 
 **Keep the `.css` URL in your markup.** A `.br` file is an HTTP
 representation, not a stylesheet. Linking it directly hands the browser
@@ -148,7 +148,7 @@ right one.
 before the browser knows the stylesheet exists, so it is the response that
 actually competes for that first window.
 
-None of which makes a smaller stylesheet worthless — fewer bytes are fewer
+None of which makes a smaller stylesheet worthless: fewer bytes are fewer
 bytes on a slow link, and the budgets in
 [`check-css-size.js`](https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js)
 exist so growth is noticed. It makes the threshold a reason the project
@@ -176,7 +176,7 @@ to ship a fix.
 The CDN snippet in [Get Started](/get-started#cdn) carries a Subresource
 Integrity hash, and it is worth keeping. The digest is taken over the
 decoded stylesheet, not over the transferred bytes, so it is unaffected by
-whether the response arrives gzipped, Brotli-compressed or plain — but it is
+whether the response arrives gzipped, Brotli-compressed or plain, but it is
 tied to the exact version in the URL. Change the version and take that
 release's hash with it.
 

@@ -4,7 +4,7 @@ layout: home.njk
 hero:
   tagline: >-
     Cirth turns native HTML elements into accessible, themeable interfaces.
-    There is no class vocabulary to learn — the API is the markup you
+    There is no class vocabulary to learn. The API is the markup you
     already write, and the markup a model already knows. Load one
     stylesheet, customize it with runtime design tokens, and ship an
     interface that needs no JavaScript runtime and no build step.
@@ -19,7 +19,7 @@ hero:
 pitch:
   lede: >-
     Not everything below is the same kind of statement. Some are
-    guarantees — properties the project intends to keep, where a break
+    guarantees: properties the project intends to keep, where a break
     would be a bug. Some are capabilities: things Cirth lets you do, which
     say nothing about what you build with them. Each cell says which it is,
     and how to check it.
@@ -29,8 +29,8 @@ faq:
     - q: Do I need to write any JavaScript?
       a: >-
         Cirth itself does not require or ship any. The package is compiled
-        CSS, and the interactive patterns it styles — accordion, dropdown,
-        modal, popover — are native <code>&lt;details&gt;</code>,
+        CSS, and the interactive patterns it styles (accordion, dropdown,
+        modal, popover) are native <code>&lt;details&gt;</code>,
         <code>&lt;dialog&gt;</code> and <code>[popover]</code> elements
         driven by the browser. Your application can still use JavaScript
         wherever its own behavior needs it: data, state, routing, anything
@@ -38,8 +38,8 @@ faq:
         there.
     - q: Is a build step required?
       a: >-
-        No. One <code>&lt;link rel="stylesheet"&gt;</code> — or one
-        <code>import</code> where you already bundle — and standard
+        No. One <code>&lt;link rel="stylesheet"&gt;</code>, or one
+        <code>import</code> where you already bundle, and standard
         elements are styled. It also drops into a Vite, PostCSS or bundler
         pipeline unchanged when you have one; neither way is the blessed
         one. The SCSS in the repository is how the published CSS is
@@ -50,7 +50,7 @@ faq:
         measurement, not a promise:
         <a href="https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js">a
         script</a> gzips every bundle on every build and fails past the
-        current budget, so the number stays honest — and it is free to move
+        current budget, so the number stays honest, and it is free to move
         when covering more HTML, or a better accessibility default, is
         worth the bytes. What actually arrives at a browser depends on who
         serves the file; <a href="/deploy#compression">Deploy</a> covers
@@ -58,7 +58,7 @@ faq:
     - q: Which browsers are supported?
       a: >-
         <!--browsers-->. That is the Browserslist target in
-        <code>package.json</code> — what Lightning CSS compiles the output
+        <code>package.json</code>: what Lightning CSS compiles the output
         against, and what
         <a href="https://github.com/cirthcss/cirth/blob/master/scripts/check-browserslist.js">check-browserslist.js</a>
         holds to one engine floor across every family, so a Chromium fork
@@ -69,8 +69,8 @@ faq:
         Cirth began as a fork of Pico CSS and remains indebted to it, but
         it is an independent framework now rather than a promise of
         compatibility. What has moved since the fork: the published package
-        is CSS only, in classless and scoped forms — four builds today,
-        default, classless, scoped and scoped classless — with print sheets
+        is CSS only, in classless and scoped forms (four builds today:
+        default, classless, scoped and scoped classless) with print sheets
         and token presets as separate outputs beside them; the twenty inherited accent themes are one theme (copper)
         plus <code>plain</code> and <code>playroom</code> as token-override
         presets; <code>.grid</code> is now an intrinsically wrapping grid
@@ -87,9 +87,9 @@ faq:
         No. The project is not affiliated with, endorsed by, or associated
         with the Tolkien estate, the Tolkien Society, Amazon's Middle-earth
         adaptations, or any other rights holder. The name points at the
-        Cirth runic alphabet — an angular script cut for carving, where
-        every letter is reduced to the strokes the material allows — because
-        that reduction is the constraint this framework is built around. It
+        Cirth runic alphabet, an angular script cut for carving, where
+        every letter is reduced to the strokes the material allows. That
+        reduction is the constraint this framework is built around. It
         is a reference, not a claim of license or partnership. The mark, the
         wordmark and the rest of the project's identity are Cirth's own work
         and are unrelated to Tolkien's; <a href="/brand">Brand</a> sets out
@@ -104,7 +104,7 @@ faq:
         including as part of a larger product, provided you keep the license
         and copyright notices and state what you changed; it also grants a
         patent license, and it comes with no warranty. Cirth is a fork of
-        Pico CSS, which was MIT —
+        Pico CSS, which was MIT.
         <a href="https://github.com/cirthcss/cirth/blob/master/NOTICE.md">NOTICE.md</a>
         records that history. The name and the logo are not covered by the
         code license: they are brand assets with their own terms, set out on

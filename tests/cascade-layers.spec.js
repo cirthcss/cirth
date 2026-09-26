@@ -18,8 +18,8 @@ const { setContent } = require("./helpers/render");
 //
 // Where a case claims that a rule wins *because of the layer*, it first
 // proves the rule would have lost without it. The control is the same
-// stylesheet with the layer block unwrapped — identical rules, identical
-// order — so the only variable between the two renders is the layer.
+// stylesheet with the layer block unwrapped: identical rules, identical
+// order, so the only variable between the two renders is the layer.
 
 const projectRoot = path.join(__dirname, "..");
 
@@ -155,7 +155,7 @@ const overrides = [
 		css: `html { --cirth-primary: ${ink}; }`,
 		read: "color",
 		// A scoped wrapper declares the token on itself, which beats one it
-		// would inherit from html at any layer — inheritance, not cascade.
+		// would inherit from html at any layer: inheritance, not cascade.
 		// The scoped equivalent is the preset/consumer case further down.
 		only: (build) => !build.scoped,
 	},
@@ -274,8 +274,8 @@ test.describe("a consumer's own layers", () => {
 // --- Presets: same layer, after the build ------------------------------
 
 // A preset is one file for every build, so it is checked against all four.
-// The token is read where it is used — inside the wrapper, in a scoped
-// build — so a preset that only reached :root would show the theme's value.
+// The token is read where it is used: inside the wrapper, in a scoped
+// build, so a preset that only reached :root would show the theme's value.
 /**
  * @param {import("@playwright/test").Page} page
  * @param {(typeof builds)[number]} build
@@ -317,7 +317,7 @@ for (const preset of presets) {
 				"and resolves exactly as it does on an unscoped page",
 			).toEqual(reference);
 
-			// Loaded before the build, the preset loses to it on source order —
+			// Loaded before the build, the preset loses to it on source order:
 			// the same order rule as before the layer, and still documented.
 			const reversed = await accentOf(
 				page,
