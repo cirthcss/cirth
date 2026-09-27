@@ -122,6 +122,56 @@ const reportsPreference = async (page) => {
 	return (await styleOf(page, "s", "color")) === "rgb(0, 255, 0)";
 };
 
+// A page that forces its scheme with data-theme on the root has to get the
+// same pass as one that follows the system. The dark block's selector,
+// :where([data-theme="dark"]), weighs nothing, and on the root it lost to
+// every token theme/_dual.scss declares at :root: ink, muted text, the
+// accent and the hairlines kept their normal values under "more". The
+// documentation site forces its scheme exactly this way.
+for (const scheme of /** @type {const} */ (["light", "dark"])) {
+	test(`a root forcing the ${scheme} scheme gets the same pass as the system ${scheme} scheme`, async ({
+		page,
+	}) => {
+		test.skip(!(await reportsPreference(page)), "engine does not emulate prefers-contrast");
+
+		const tokens = [
+			"--cirth-ink",
+			"--cirth-muted-color",
+			"--cirth-primary",
+			"--cirth-muted-border-color",
+			"--cirth-form-element-border-color",
+			"--cirth-primary-focus",
+			"--cirth-primary-surface",
+		];
+		/** @param {boolean} forced */
+		const resolve = async (forced) => {
+			await page.emulateMedia({
+				colorScheme: forced ? (scheme === "dark" ? "light" : "dark") : scheme,
+				contrast: "more",
+			});
+			await setContent(page, `<style>${css}</style>${markup}`);
+			if (forced) {
+				await page.evaluate(
+					(value) => document.documentElement.setAttribute("data-theme", value),
+					scheme,
+				);
+			}
+			return page.evaluate((names) => {
+				const probe = document.getElementById("text");
+				if (!probe) throw new Error("missing #text");
+				return names.map((name) => {
+					probe.style.color = `var(${name})`;
+					return getComputedStyle(probe).color;
+				});
+			}, tokens);
+		};
+
+		const system = await resolve(false);
+		const forced = await resolve(true);
+		expect(forced).toEqual(system);
+	});
+}
+
 // --- The CSS contract, asserted on the built stylesheets ---------------
 
 for (const build of builds) {
