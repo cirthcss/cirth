@@ -80,6 +80,7 @@
   );
   --docs-shell-max: 92rem;
   --docs-reading-max: 48rem;
+  --docs-measure: 30em;
   --docs-rail-width: 15rem;
   --docs-toc-width: 13rem;
   --docs-grid-dots: radial-gradient(
@@ -931,6 +932,20 @@
   max-width: var(--docs-reading-max);
   min-width: 0;
   margin-inline: auto;
+
+  /* The token alone re-times nothing: the library reads
+     --cirth-line-height once, on the document root, and every paragraph
+     inherits the number computed there. The column has to apply the value
+     it sets, or its prose stays at the root's 1.5. */
+  line-height: var(--cirth-line-height);
+}
+
+/* The measure belongs to the text, not to the column. The column stays wide
+   enough for a demo, a table or a listing; running prose stops at about
+   seventy characters, where the eye still finds the start of the next line.
+   In em, so a lead paragraph set larger keeps the same count. */
+.docs-content > :is(p, ul, ol, dl, blockquote, h1, h2, h3, h4, h5, h6) {
+  max-inline-size: var(--docs-measure);
 }
 
 /* Page outline, top variant (small screens): a disclosure, no scroll-spy.
@@ -1431,6 +1446,10 @@ pre > button.copy.copied::before {
   --cirth-typography-spacing-vertical: var(
     --docs-cirth-typography-spacing-vertical
   );
+
+  /* The column applies its line-height as well as setting the token, and
+     the applied value inherits too: hand that back with the token. */
+  line-height: var(--cirth-line-height);
 }
 
 /* The frame's padding contract, not a restyle of the example: a padded box

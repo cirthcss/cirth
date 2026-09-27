@@ -2115,6 +2115,52 @@ test("a live example resolves the framework's own rhythm, not the reading column
 	expect(readings.preview).toEqual(readings.root);
 });
 
+// The other side of the same boundary: the column re-times its own prose,
+// and the re-timing has to arrive. The library reads --cirth-line-height
+// once, on the root, so a token set on the column and never applied left
+// every paragraph at the root's 1.5, on lines of about 107 characters.
+test("the reading column applies its rhythm and stops prose at the measure", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/components/card/`);
+
+	const lines = await page.evaluate(() => {
+		const paragraphs = [...document.querySelectorAll(".docs-content > p")].filter(
+			(element) => (element.textContent ?? "").length > 250,
+		);
+		return paragraphs.map((paragraph) => {
+			const style = getComputedStyle(paragraph);
+			const range = document.createRange();
+			/** @type {Map<number, number>} */
+			const perLine = new Map();
+			const walker = document.createTreeWalker(paragraph, NodeFilter.SHOW_TEXT);
+			while (walker.nextNode()) {
+				const node = /** @type {Text} */ (walker.currentNode);
+				for (let index = 0; index < node.length; index++) {
+					range.setStart(node, index);
+					range.setEnd(node, index + 1);
+					const box = range.getClientRects()[0];
+					if (!box) continue;
+					const top = Math.round(box.top);
+					perLine.set(top, (perLine.get(top) ?? 0) + 1);
+				}
+			}
+			return {
+				ratio:
+					Number.parseFloat(style.lineHeight) /
+					Number.parseFloat(style.fontSize),
+				longest: Math.max(...perLine.values()),
+			};
+		});
+	});
+
+	expect(lines.length).toBeGreaterThan(0);
+	for (const line of lines) {
+		expect(line.ratio).toBeGreaterThanOrEqual(1.6);
+		expect(line.longest).toBeLessThanOrEqual(75);
+	}
+});
+
 // The same claim, made against the thing itself rather than against two
 // tokens: every element inside a preview renders exactly as it does on a
 // page that loads nothing but the compiled build.
