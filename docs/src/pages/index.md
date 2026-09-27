@@ -1,28 +1,82 @@
 ---
 layout: home.njk
+stylesheets:
+  - home.css
 
 hero:
   tagline: >-
-    Cirth turns native HTML elements into accessible, themeable interfaces.
-    There is no class vocabulary to learn. The API is the markup you
-    already write, and the markup a model already knows. Load one
-    stylesheet, customize it with runtime design tokens, and ship an
-    interface that needs no JavaScript runtime and no build step.
+    Cirth is a CSS framework for the HTML you already write. There are no
+    class names to learn and no JavaScript to ship: one stylesheet turns
+    standard elements into an accessible, themeable interface, whatever
+    renders them.
   actions:
     - theme: brand
-      text: Get Started
+      text: Get started
       link: /installation
     - theme: alt
-      text: Examples
+      text: Browse examples
       link: /examples
+
+# The scroll story: three beats, each paired with what it shows. The third
+# heading keeps its point verbatim, because it is the whole argument.
+story:
+  - title: Don't reinvent every interface.
+    text: >-
+      Buttons, fields, tables and dialogs are rebuilt in every project, then
+      restyled, then maintained. Most of that work repeats what the browser
+      already provides.
+  - title: Instead of writing 100 class names,
+    text: >-
+      describe what each part is. An article, a label, a select, a footer:
+      the element already carries the meaning, the keyboard behaviour and
+      the accessibility.
+  - title: use only semantic HTML tags.
+    text: >-
+      Cirth styles those elements directly. The same markup becomes a
+      finished card with a title band, labelled fields and an action, in
+      light or dark, with no class added.
+
+# The proof strip. `kind` says what sort of statement each one is:
+# a guarantee is something the project would treat a break of as a bug;
+# a capability is something Cirth lets you do.
+claims:
+  - kind: guarantee
+    title: 0 B of JavaScript
+    text: Cirth ships no runtime. Your application keeps whatever JavaScript it needs for its own behaviour.
+    check: How it works
+    link: /why-cirth#pure-css-nothing-to-run
+  - kind: guarantee
+    title: WCAG 2.2 AA baseline
+    text: Axe audits every page of this site in every theme, scheme and forced colors. A floor to build on, not a verdict on your interface.
+    check: The method
+    link: /guides/accessibility#the-baseline
+  - kind: guarantee
+    title: Semantic elements first
+    text: Native elements are styled directly, and the examples on this site carry no class they do not need.
+    check: See the examples
+    link: /examples
+  - kind: guarantee
+    title: Small by construction
+    text: Element selectors and custom properties, no component catalogue and nothing to run. Every bundle has a size budget.
+    check: Why it stays small
+    link: /about#size-and-what-it-is-a-budget-for
+  - kind: capability
+    title: Runtime design tokens
+    text: Every colour, space, radius and font is a <code>--cirth-*</code> property you can override in plain CSS.
+    check: Override one
+    link: /customization
+  - kind: capability
+    title: Four builds
+    text: Default, classless, scoped and scoped classless, with print sheets and presets beside them.
+    check: Compare builds
+    link: /installation/#choose-a-build
 
 pitch:
   lede: >-
-    Not everything below is the same kind of statement. Some are
-    guarantees: properties the project intends to keep, where a break
-    would be a bug. Some are capabilities: things Cirth lets you do, which
-    say nothing about what you build with them. Each cell says which it is,
-    and how to check it.
+    Two kinds of statement. A guarantee is a property the project would
+    treat a break of as a bug; a capability is something Cirth lets you do.
+    Each one links to where you can check it.
+
 faq:
   title: Before you install
   items:

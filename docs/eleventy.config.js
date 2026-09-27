@@ -596,6 +596,15 @@ module.exports = (eleventyConfig) => {
 			hljs.highlight(String(code), { language, ignoreIllegals: true }).value,
 	);
 
+	// How many class names a snippet carries, counted rather than claimed:
+	// the home page's story quotes the number beside the markup it counts.
+	eleventyConfig.addFilter("classCount", (html) =>
+		[...String(html).matchAll(/\sclass="([^"]*)"/g)].reduce(
+			(total, [, value]) => total + value.split(/\s+/).filter(Boolean).length,
+			0,
+		),
+	);
+
 	// Page URLs always end in "/" (one <path>/index.html per page) while
 	// nav-config links don't — normalize before comparing for active state.
 	const withSlash = (link) => (link.endsWith("/") ? link : `${link}/`);

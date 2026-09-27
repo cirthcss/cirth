@@ -1,0 +1,1363 @@
+/**
+ * The home page, and only the home page: loaded after style.css by
+ * index.md's `stylesheets`, so no documentation page carries it.
+ *
+ * Composition and storytelling. Every surface is one of Cirth's own (the
+ * canvas, the sectioning band, the card, the code recess, the elevation
+ * shadow) and every live sample on the page is rendered by the stylesheet
+ * the page loads, with nothing here reaching inside it except the one
+ * thing a container owes its contents: closing their outer margins.
+ *
+ * Mobile first. The base rules are the phone; every width query adds.
+ */
+
+.docs-home {
+  --docs-home-gutter: clamp(1rem, 4vw, 2rem);
+  --docs-home-max: 76rem;
+
+  overflow: clip;
+}
+
+.docs-home > section {
+  margin: 0;
+  padding-block: clamp(3.5rem, 8vw, 6.5rem);
+}
+
+.docs-home-inner {
+  width: min(100% - var(--docs-home-gutter) * 2, var(--docs-home-max));
+  margin-inline: auto;
+}
+
+/* A band: the sectioning surface between two hairlines, so the page
+   alternates between the canvas and a quieter ground rather than being one
+   continuous sheet. */
+.docs-band {
+  border-block: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+  background: var(--cirth-card-sectioning-background-color);
+}
+
+/* Section heading: a kicker in the annotation voice, the heading at
+   display size, one sentence under it. */
+.docs-section-head {
+  max-inline-size: 46rem;
+  margin-block-end: clamp(2rem, 4vw, 3rem);
+}
+
+.docs-kicker {
+  margin-block: 0 var(--cirth-space-3);
+  color: var(--cirth-primary-text);
+  font-family: var(--cirth-font-family-mono);
+  font-size: var(--cirth-font-size-sm);
+  font-weight: var(--cirth-font-weight-medium);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Display size through the slot every heading resolves through, with its
+   bounds read off the shipped scale. */
+.docs-section-head h2,
+.docs-cta h2 {
+  --cirth-font-size: clamp(
+    var(--cirth-font-size-3xl),
+    1.25rem + 2.4vw,
+    var(--cirth-font-size-5xl)
+  );
+  --cirth-line-height: var(--cirth-line-height-tight);
+
+  margin-block: 0 var(--cirth-space-4);
+}
+
+.docs-section-head > p:last-child {
+  margin: 0;
+  color: var(--cirth-secondary-text);
+  font-size: var(--cirth-font-size-lg);
+}
+
+/* The annotation voice: muted monospace capitals for the name of a claim's
+   kind or of an example. Never below the reading floor. */
+.docs-proof-state,
+.docs-example-name {
+  color: var(--cirth-muted-color);
+  font-family: var(--cirth-font-family-mono);
+  font-size: var(--cirth-font-size-sm);
+  font-weight: var(--cirth-font-weight-regular);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* A pane label: the file name on one side, what it is on the other. */
+.docs-pane-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cirth-space-3);
+  min-block-size: 2.5rem;
+  margin: 0;
+  padding: var(--cirth-space-2) var(--cirth-space-4);
+  border-block-end: var(--cirth-border-width) solid
+    var(--cirth-card-border-color);
+  background: var(--cirth-card-sectioning-background-color);
+  color: var(--cirth-muted-color);
+  font-family: var(--cirth-font-family-mono);
+  font-size: var(--cirth-font-size-sm);
+}
+
+/* Hero
+   ––––––––––––––––––––
+   Copy first, then the demo under it at full width: code beside the card it
+   renders from 64rem, one after the other below that, where a pane beside
+   another would be narrower than the snippet's longest line. Nothing overlaps at
+   any width. The glow is the one decoration on the page, behind everything,
+   and gone in forced colors and print with the rest of the backgrounds. */
+.docs-hero {
+  position: relative;
+  isolation: isolate;
+}
+
+.docs-home > .docs-hero {
+  padding-block: clamp(2rem, 6vw, 5rem) clamp(3rem, 7vw, 5.5rem);
+}
+
+.docs-hero::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    radial-gradient(
+      46rem 28rem at 88% -8%,
+      color-mix(in oklab, var(--cirth-primary) 18%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      36rem 24rem at 0% 42%,
+      color-mix(in oklab, var(--cirth-secondary-text) 10%, transparent),
+      transparent 70%
+    );
+  content: "";
+  pointer-events: none;
+}
+
+/* A dot grid under the glow, fading out toward the fold. */
+.docs-hero::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image: var(--docs-grid-dots);
+  background-size: 1.5rem 1.5rem;
+  content: "";
+  mask-image: radial-gradient(
+    ellipse 80% 60% at 70% 0%,
+    black,
+    transparent 75%
+  );
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.docs-hero-copy {
+  max-inline-size: 50rem;
+}
+
+.docs-hero-eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cirth-space-2);
+  margin: 0 0 var(--cirth-space-5);
+}
+
+.docs-hero-eyebrow span {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2rem;
+  padding: 0 var(--cirth-space-3);
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-radius-pill);
+  background: var(--cirth-card-background-color);
+  color: var(--cirth-secondary-text);
+  font-size: var(--cirth-font-size-sm);
+  font-weight: var(--cirth-font-weight-medium);
+}
+
+/* The one headline on the site set larger than the scale's top step:
+   through --cirth-font-size, from the scale's 5xl on a phone to a quarter
+   above its 7xl on a wide screen. */
+.docs-hero h1 {
+  --cirth-font-size: clamp(
+    var(--cirth-font-size-5xl),
+    1rem + 5vw,
+    calc(var(--cirth-font-size-7xl) * 1.25)
+  );
+  --cirth-line-height: var(--cirth-line-height-none);
+
+  margin: 0;
+  text-wrap: balance;
+}
+
+.docs-hero-lede {
+  max-inline-size: 40rem;
+  margin-block: var(--cirth-space-6);
+  color: var(--cirth-secondary-text);
+  font-size: clamp(var(--cirth-font-size-lg), 1rem + 0.5vw, var(--cirth-font-size-xl));
+  line-height: var(--cirth-line-height-normal);
+}
+
+/* The calls to action at a size that says they are the next step: the
+   buttons are Cirth's, only their type and padding grow. */
+.docs-hero .docs-hero-actions,
+.docs-cta .docs-hero-actions {
+  gap: var(--cirth-space-3);
+  margin-block: 0;
+}
+
+.docs-hero .docs-hero-actions [role="button"],
+.docs-cta .docs-hero-actions [role="button"] {
+  padding-inline: var(--cirth-space-6);
+  font-size: var(--cirth-font-size-lg);
+}
+
+/* The install command, copyable in place. A `$` prompt that copy leaves
+   behind, because it is generated content rather than text. */
+pre.docs-hero-install {
+  display: inline-block;
+  max-inline-size: 100%;
+  margin: var(--cirth-space-5) 0 0;
+  padding-inline-end: 3rem;
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-border-radius);
+}
+
+.docs-hero-install code::before {
+  color: var(--cirth-muted-color);
+  content: "$ ";
+}
+
+.docs-hero-demo {
+  margin: clamp(2.5rem, 5vw, 4rem) 0 0;
+}
+
+/* The window: one card holding the source pane, the connector and the
+   rendered card. The elevation is the framework's own shadow, which now
+   has a dark half worth the name. */
+.docs-hero-panes {
+  display: grid;
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: calc(var(--cirth-card-border-radius) * 1.5);
+  background: var(--cirth-card-background-color);
+  box-shadow: var(--cirth-box-shadow);
+  overflow: clip;
+}
+
+.docs-hero-pane {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-inline-size: 0;
+}
+
+.docs-hero-source pre {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+/* The snippet's longest line is 38 columns, written to fit a phone's pane
+   whole: at 13px down to 390px, and at 12px, the site's reading floor,
+   with a narrower gutter down to 360px. */
+@media (width < 26rem) {
+  .docs-hero-source pre {
+    font-size: var(--cirth-font-size-xs);
+  }
+
+  .docs-hero-source pre > code {
+    padding-inline: var(--cirth-space-3);
+  }
+}
+
+.docs-hero-connector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cirth-space-2);
+  margin: 0;
+  padding: var(--cirth-space-2);
+  border-block: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  background: var(--cirth-card-sectioning-background-color);
+  color: var(--cirth-muted-color);
+  font-family: var(--cirth-font-family-mono);
+  font-size: var(--cirth-font-size-sm);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.docs-hero-connector span::before {
+  content: "↓ ";
+}
+
+/* The result stands on the page's own canvas, with the dot grid a little
+   stronger, so it reads as the thing produced rather than as another
+   pane. */
+.docs-hero-render {
+  display: grid;
+  align-content: center;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  background-color: var(--cirth-background-color);
+  background-image: var(--docs-grid-dots);
+  background-size: 1.25rem 1.25rem;
+}
+
+.docs-hero-render > article {
+  margin: 0;
+}
+
+@media (width >= 64rem) {
+  .docs-hero-panes {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.1fr);
+  }
+
+  .docs-hero-source pre {
+    font-size: var(--cirth-font-size-sm);
+  }
+
+  .docs-hero-connector {
+    padding: var(--cirth-space-3) var(--cirth-space-2);
+    border-block: 0;
+    border-inline: var(--cirth-border-width) solid
+      var(--cirth-card-border-color);
+    writing-mode: vertical-rl;
+  }
+
+  .docs-hero-connector span::before {
+    content: none;
+  }
+}
+
+/* The facts under the demo: four values, divided by their own gap. */
+.docs-hero-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--cirth-border-width);
+  margin: var(--cirth-space-6) 0 0;
+  padding: 0;
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-card-border-radius);
+  background: var(--cirth-card-border-color);
+  list-style: none;
+  overflow: clip;
+}
+
+.docs-hero-facts li {
+  margin: 0;
+  padding: var(--cirth-space-3) var(--cirth-space-4);
+  background: var(--cirth-card-background-color);
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-font-size-sm);
+  list-style: none;
+}
+
+.docs-hero-facts strong {
+  display: block;
+  color: var(--cirth-contrast-text);
+  font-size: var(--cirth-font-size-xl);
+  line-height: var(--cirth-line-height-snug);
+}
+
+@media (width >= 48rem) {
+  .docs-hero-facts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Story
+   ––––––––––––––––––––
+   Served as three steps, each followed by its own visual: that is the
+   phone, the no-script reader, the reduced-motion reader and print. From
+   64rem the steps sit beside their visuals, still all three at once. The
+   script adds `.is-enhanced` (wide screen, motion allowed), which folds
+   the three visuals into one sticky stage beside the headings. */
+.docs-story-steps {
+  display: grid;
+  gap: clamp(3rem, 7vw, 5rem);
+}
+
+.docs-story-step {
+  display: grid;
+  gap: var(--cirth-space-5);
+  min-inline-size: 0;
+}
+
+.docs-story-index {
+  margin: 0 0 var(--cirth-space-2);
+  color: var(--cirth-primary-text);
+  font-family: var(--cirth-font-family-mono);
+  font-size: var(--cirth-font-size-sm);
+  font-weight: var(--cirth-font-weight-medium);
+}
+
+.docs-story-text h3 {
+  --cirth-font-size: clamp(
+    var(--cirth-font-size-2xl),
+    1rem + 2.2vw,
+    var(--cirth-font-size-5xl)
+  );
+  --cirth-line-height: var(--cirth-line-height-tight);
+
+  margin: 0 0 var(--cirth-space-3);
+  letter-spacing: var(--cirth-letter-spacing-tight);
+}
+
+.docs-story-text > p:last-child {
+  max-inline-size: 34rem;
+  margin: 0;
+  color: var(--cirth-secondary-text);
+  font-size: var(--cirth-font-size-lg);
+}
+
+.docs-story-visual {
+  display: grid;
+  gap: var(--cirth-space-2);
+  min-inline-size: 0;
+  margin: 0;
+}
+
+.docs-story-code,
+.docs-story-render {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-inline-size: 0;
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-card-border-radius);
+  background: var(--cirth-card-background-color);
+  box-shadow: var(--cirth-box-shadow);
+  overflow: clip;
+}
+
+.docs-story-code pre {
+  max-block-size: 26rem;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+/* Wrapped, not scrolled: the point of the first listing is its mass, and
+   a wall of class names makes it better than a horizontal scrollbar does.
+   The indentation survives the wrap because it is part of each line. */
+.docs-story-code pre > code {
+  white-space: pre-wrap;
+}
+
+.docs-story-render-stage {
+  display: grid;
+  align-content: center;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  background-color: var(--cirth-background-color);
+  background-image: var(--docs-grid-dots);
+  background-size: 1.25rem 1.25rem;
+}
+
+.docs-story-render-stage > article {
+  margin: 0;
+}
+
+.docs-story-visual figcaption {
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-font-size-sm);
+}
+
+@media screen and (width >= 64rem) {
+  .docs-story-step {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: center;
+    column-gap: clamp(2.5rem, 5vw, 5rem);
+  }
+
+  /* The sticky stage. The steps give up their boxes so that the three
+     texts and the three visuals are items of one grid: the texts one per
+     row down the first column, the visuals all in the second, spanning
+     every row and stacked in the same cell. Sticky inside that span, the
+     stage stays in view while the headings pass it, and the script only
+     changes which visual is opaque. */
+  .docs-story-steps.is-enhanced {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: clamp(2.5rem, 5vw, 5rem);
+    row-gap: 0;
+  }
+
+  .docs-story-steps.is-enhanced > .docs-story-step {
+    display: contents;
+  }
+
+  .is-enhanced .docs-story-text {
+    display: grid;
+    grid-column: 1;
+    align-content: center;
+    min-block-size: 72vh;
+  }
+
+  .is-enhanced > :nth-child(1) > .docs-story-text {
+    grid-row: 1;
+  }
+
+  .is-enhanced > :nth-child(2) > .docs-story-text {
+    grid-row: 2;
+  }
+
+  .is-enhanced > :nth-child(3) > .docs-story-text {
+    grid-row: 3;
+  }
+
+  .is-enhanced .docs-story-visual {
+    position: sticky;
+    inset-block-start: max(5.5rem, calc(50vh - 17rem));
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    align-self: start;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .is-enhanced .is-active .docs-story-visual {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .is-enhanced :is(.docs-story-code, .docs-story-render) {
+    block-size: min(30rem, 66vh);
+  }
+
+  .is-enhanced .docs-story-code pre {
+    max-block-size: none;
+  }
+
+  .is-enhanced .docs-story-text :is(h3, p) {
+    color: var(--cirth-muted-color);
+  }
+
+  .is-enhanced .is-active .docs-story-text h3 {
+    color: var(--cirth-contrast-text);
+  }
+
+  .is-enhanced .docs-story-text .docs-story-index {
+    color: var(--cirth-muted-color);
+  }
+
+  .is-enhanced .is-active .docs-story-text .docs-story-index {
+    color: var(--cirth-primary-text);
+  }
+
+  .is-enhanced .is-active .docs-story-text > p:last-child {
+    color: var(--cirth-secondary-text);
+  }
+}
+
+/* The crossfade, under no-preference only. The script never enhances
+   with the preference set, so this is belt and braces. */
+@media screen and (width >= 64rem) and (prefers-reduced-motion: no-preference) {
+  .is-enhanced .docs-story-visual {
+    transform: translateY(0.75rem);
+    transition:
+      opacity 0.35s ease,
+      transform 0.35s ease;
+  }
+
+  .is-enhanced .is-active .docs-story-visual {
+    transform: none;
+  }
+
+  .is-enhanced .docs-story-text :is(h3, p) {
+    transition: color 0.3s ease;
+  }
+}
+
+/* Framework agnostic
+   –––––––––––––––––––– */
+.docs-frameworks-layout {
+  display: grid;
+  gap: clamp(2rem, 5vw, 3.5rem);
+}
+
+@media (width >= 64rem) {
+  .docs-frameworks-layout {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: start;
+  }
+}
+
+.docs-dom-diagram {
+  margin: 0;
+  padding: clamp(0.75rem, 3vw, 1.75rem);
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: calc(var(--cirth-card-border-radius) * 1.5);
+  background: var(--cirth-card-background-color);
+  box-shadow: var(--cirth-box-shadow);
+}
+
+.docs-syntax-list {
+  display: grid;
+  gap: var(--cirth-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-syntax-list li {
+  display: grid;
+  gap: var(--cirth-space-1);
+  margin: 0;
+  padding: var(--cirth-space-2) var(--cirth-space-3);
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-border-radius);
+  background: var(--cirth-code-background-color);
+  list-style: none;
+}
+
+.docs-syntax-list span {
+  color: var(--cirth-muted-color);
+  font-family: var(--cirth-font-family-mono);
+  font-size: var(--cirth-font-size-sm);
+}
+
+/* Wraps between attributes, never inside one. */
+.docs-syntax-list code {
+  padding: 0;
+  background: none;
+  font-size: 0.8125rem;
+  overflow-wrap: normal;
+}
+
+@media (width >= 36rem) {
+  .docs-syntax-list li {
+    grid-template-columns: 5rem minmax(0, 1fr);
+    align-items: center;
+    gap: var(--cirth-space-3);
+  }
+}
+
+/* The arrow between the four syntaxes and the one element: two hairlines
+   and a label, drawn as the section's own annotation. */
+.docs-dom-arrow {
+  display: flex;
+  align-items: center;
+  gap: var(--cirth-space-3);
+  margin: var(--cirth-space-4) 0;
+  color: var(--cirth-muted-color);
+  font-family: var(--cirth-font-family-mono);
+  font-size: var(--cirth-font-size-sm);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.docs-dom-arrow::before,
+.docs-dom-arrow::after {
+  flex: 1;
+  border-block-start: var(--cirth-border-width) solid
+    var(--cirth-muted-border-color);
+  content: "";
+}
+
+.docs-dom-arrow span::before {
+  content: "↓ ";
+}
+
+.docs-dom-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--cirth-space-3);
+  padding: var(--cirth-space-4);
+  border: var(--cirth-border-width) dashed var(--cirth-card-border-color);
+  border-radius: var(--cirth-border-radius);
+  background: var(--cirth-background-color);
+}
+
+.docs-dom-result button {
+  margin: 0;
+}
+
+.docs-dom-diagram figcaption {
+  margin-block-start: var(--cirth-space-3);
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-font-size-sm);
+}
+
+.docs-ecosystems h3 {
+  margin-block: 0 var(--cirth-space-4);
+}
+
+.docs-ecosystem-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cirth-space-2);
+  margin: 0 0 var(--cirth-space-5);
+  padding: 0;
+}
+
+.docs-ecosystem-list li {
+  margin: 0;
+  list-style: none;
+}
+
+.docs-ecosystem-list a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2.75rem;
+  padding: 0 var(--cirth-space-4);
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-radius-pill);
+  background: var(--cirth-card-background-color);
+  color: var(--cirth-ink);
+  font-weight: var(--cirth-font-weight-medium);
+  text-decoration: none;
+}
+
+.docs-ecosystem-list a:hover {
+  border-color: var(--cirth-primary-border);
+}
+
+.docs-ecosystems > p {
+  color: var(--cirth-secondary-text);
+}
+
+.docs-ecosystems > p.docs-ecosystem-note {
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-font-size-sm);
+}
+
+/* Showcase and theme stages
+   –––––––––––––––––––––––––– */
+.docs-stage {
+  box-shadow: var(--cirth-box-shadow);
+}
+
+.docs-stage {
+  display: grid;
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-card-border-radius);
+
+  /* The container's own colour shows through the grid gaps, and that is
+     where every divider in a stage comes from. One declaration instead of
+     a border per pane and the nth-child arithmetic to take it off again,
+     and it stays correct at any column count, which is what lets the
+     panes reflow intrinsically. */
+  background: var(--cirth-card-border-color);
+  gap: var(--cirth-border-width);
+  overflow: clip;
+}
+
+/* The band names the example and carries whatever operates it: the same
+   plate grammar as the hero's Source panel. */
+.docs-stage-band {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  min-height: 2.75rem;
+  padding: 0.375rem 0.75rem;
+  background: var(--cirth-card-sectioning-background-color);
+  color: var(--cirth-muted-color);
+  font-family: var(--cirth-font-family-mono);
+  font-size: var(--cirth-font-size-sm);
+}
+
+.docs-stage-note code {
+  background: none;
+  font-size: inherit;
+}
+
+/* The panes get their own grid rather than being items of the stage: a
+   band spanning `1 / -1` over an auto-fit track list holds the spare
+   tracks open: they are not empty, the band is in them, and the unused
+   ones then show as a slab of the container's colour. Nested, nothing
+   spans, and auto-fit collapses what it should. */
+.docs-stage-body {
+  display: grid;
+  gap: var(--cirth-border-width);
+  background: var(--cirth-card-border-color);
+}
+
+/* Source beside result. Intrinsic, not a breakpoint: the pair sits side by
+   side while both halves clear 22rem and stacks when they cannot, so 1440,
+   the tablet band, the phone and 200% zoom are all the same rule. The
+   result takes the larger share of the row: it is the product, and the
+   listing is the explanation. */
+.docs-stage-split {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+}
+
+@media (width >= 60rem) {
+  .docs-stage-split {
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  }
+
+  /* The theme stage's listing is three declarations, so it takes the space
+     a short thing takes and the interface it causes gets the rest.
+     Declared after the split above, so it wins on order rather than on a
+     second class of specificity. */
+  .docs-stage-split-narrow {
+    grid-template-columns: minmax(0, 0.62fr) minmax(0, 1fr);
+  }
+}
+
+/* Centred in the pane rather than hanging off the top of it: a stylesheet
+   that is four lines long next to an interface that is three hundred
+   pixels tall otherwise leaves a column of empty code surface under it. */
+.docs-stage-code {
+  display: grid;
+  align-content: center;
+  min-width: 0;
+  background: var(--cirth-code-background-color);
+}
+
+/* The theme pane has two rows and only one of them floats: the legend is
+   the pane's footer, so it sits on the end edge and the listing centres in
+   what is left. Centre the pair together and the legend hangs in the
+   middle of the pane with its rule across nothing. */
+.docs-theme-showcase .docs-stage-code {
+  align-content: stretch;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.docs-theme-showcase .docs-stage-code pre {
+  align-self: center;
+}
+
+/* Below the widest layout the listings wrap rather than scroll: a table
+   row wrapped onto a second line is still readable, a row half off the
+   pane is not. */
+@media (width < 80rem) {
+  .docs-stage-code pre > code {
+    white-space: pre-wrap;
+  }
+}
+
+.docs-stage-code pre {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+}
+
+/* The contextual way out to the examples page, at the point where a reader
+   has just been shown that the page is real. A link in the flow, not a
+   button: the page already asked twice at the top. */
+.docs-showcase-more {
+  margin-block: clamp(1.25rem, 2.5vw, 2rem) 0;
+}
+
+/* The preview half is the canvas, like the hero's output: what is in here
+   is a component the framework has already finished, and a second frame
+   around it would read as the thing on the page instead of it. */
+.docs-stage-preview {
+  display: grid;
+  align-content: center;
+  min-width: 0;
+  padding: clamp(1rem, 2.5vw, 2rem);
+  background: var(--cirth-background-color);
+}
+
+/* The specimen is the page's, not the shell's: nothing in here restyles an
+   article, a table, a details or a control. The only declaration is the
+   one a container owes its contents: the first and last child must not
+   push against the pane's edges with margins document flow gave them.
+
+   `:first-child` reads inert because every specimen in the corpus happens
+   to open with an element carrying no block-start margin. Which element
+   opens a specimen is the page author's choice, not this rule's
+   assumption. */
+.docs-stage-preview > * > :first-child {
+  margin-block-start: 0;
+}
+
+.docs-stage-preview > * > :last-child {
+  margin-block-end: 0;
+}
+
+
+/* The switcher, the deck, and one example at a time.
+   ––––––––––––––––––––
+   Three examples share one stage, and the strip that chooses between them
+   sits in the stage's band beside the note: the control belongs to the
+   environment rather than to the sample.
+
+   The strip is served `hidden` and the script turns it on, so a reader
+   without script gets three complete examples stacked under their own
+   headings. Every rule here therefore describes the enhanced state only,
+   and the deck's resting state has to be the readable one. */
+.docs-switch {
+  /* Above the stage and part of the section, not of the listing's toolbar:
+     it chooses which example the section is about, so it takes the
+     section's type rather than the band's monospace annotation voice.
+
+     The buttons below read `--cirth-ink` and
+     `--cirth-card-background-color` directly. Not `--cirth-color`: a
+     <button> rebinds that to its own fill, so a tab reaching for it inside
+     itself gets the button's white. `--cirth-ink` is the page role no
+     component can shadow. */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-block-end: 0.625rem;
+  font-size: var(--cirth-font-size-sm);
+}
+
+/* `display: flex` above beats the UA's `[hidden] { display: none }`, so
+   without this the attribute the strip ships with does nothing and a
+   reader with no script gets three buttons that cannot change anything.
+   Same reason `.docs-example[hidden]` restates it below. */
+.docs-switch[hidden] {
+  display: none;
+}
+
+/* Not tiny: a tab is the only thing a reader has to hit before the section
+   works, so it takes a control's height and padding. The labels are one
+   word each, so three fit a 320px band without scrolling. */
+.docs-switch button {
+  min-height: 2.75rem;
+  margin: 0;
+  padding: 0.25rem 0.75rem;
+  border: var(--cirth-border-width) solid transparent;
+  border-radius: var(--docs-chrome-radius);
+  background: none;
+  color: var(--cirth-muted-color);
+  font-size: inherit;
+}
+
+.docs-switch button:hover {
+  background: var(--cirth-card-background-color);
+  color: var(--cirth-ink);
+}
+
+/* The selected tab is the one carrying the panel, so it takes the panel's
+   own surface and edge: the strip reads as three cells of which one is
+   open onto what is below it. */
+.docs-switch button[aria-selected="true"] {
+  border-color: var(--cirth-card-border-color);
+  background: var(--cirth-card-background-color);
+  color: var(--cirth-ink);
+}
+
+.docs-stage-deck {
+  display: grid;
+}
+
+/* One row of the stage, like the split it contains: the panes divide on the
+   container's colour showing through the gaps, and the note is a row of
+   its own under them. */
+.docs-example {
+  display: grid;
+  gap: var(--cirth-border-width);
+  background: var(--cirth-card-border-color);
+}
+
+/* `display: grid` above beats the UA's `[hidden] { display: none }`, so the
+   attribute the script sets would otherwise do nothing at all. */
+.docs-example[hidden] {
+  display: none;
+}
+
+/* The panel's own heading names it without script. With the strip on, the
+   tab says it, and a heading repeating the tab above it labels the section
+   twice: the tab is a real `aria-labelledby` target, so this leaves both
+   the flow and the accessibility tree. Keyed on the grid because the strip
+   is a sibling of the stage, not a row inside it. */
+.docs-home-inner:has(> .docs-switch:not([hidden])) .docs-example-name {
+  display: none;
+}
+
+.docs-example-name {
+  margin: 0;
+  padding: 0.75rem;
+  background: var(--cirth-card-background-color);
+}
+
+/* What the example is demonstrating, written beside the sample it is true
+   of rather than as a section of its own. */
+.docs-example-note {
+  margin: 0;
+  padding: 0.75rem;
+  background: var(--cirth-card-background-color);
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-font-size-sm);
+}
+
+/* The panel takes a ring: the tab hands focus to it, and it holds a
+   scrollable listing and a form. Inset, because the panel's edges are the
+   stage's frame. */
+.docs-example:focus-visible {
+  outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
+  outline-offset: calc(var(--cirth-outline-width) * -1);
+}
+
+
+/* The theme demo's preview element.
+   ––––––––––––––––––––
+   <cirth-theme-preview> holds its own copy of Cirth in a shadow root, and
+   almost nothing about it is styled from here, and that is the point: what is
+   inside is painted by the stylesheet the element loaded.
+
+   The page owns the box only. The pane gives up its padding to the
+   element, which carries it inside the shadow root instead, so the surface
+   painted in there is the whole half of the stage and the two grounds meet
+   across the stage's own hairline. */
+.docs-theme-showcase .docs-stage-preview {
+  align-content: stretch;
+  padding: 0;
+}
+
+cirth-theme-preview {
+  min-width: 0;
+}
+
+/* Before the element upgrades, and for a reader with no script at all:
+   its children are ordinary light-DOM markup, rendered by the page's own
+   Cirth. It is the same specimen, finished, and it needs the padding the
+   pane just gave away. `:not(:defined)` is exactly this state and nothing
+   else, so the rule retires itself the moment the script runs. */
+cirth-theme-preview:not(:defined) {
+  display: block;
+  padding: clamp(1rem, 2.5vw, 2rem);
+}
+
+/* The band's control: it pauses a demo that changes on its own, which is
+   what WCAG asks of anything that auto-updates beside other content. A
+   real control in the band, at the band's size, not a hover affordance.
+
+   Its colours resolve on the band and are inherited as values, like the
+   tab strip's: a <button> rebinds --cirth-color and
+   --cirth-background-color to its own fill, so a rule inside the button
+   reaching for either gets white-on-accent: 1.07:1 against this band.
+
+   Every interactive state is pinned in the selector for the same reason:
+   the framework's `button:is(:hover, :active, :focus)` outweighs a single
+   class, so leaving one out hands that state back. */
+.docs-stage-toggle,
+.docs-stage-toggle:is(:hover, :active, :focus, :focus-visible) {
+  min-height: 1.75rem;
+  margin: 0;
+  padding: 0.125rem 0.625rem;
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--docs-chrome-radius);
+  background: var(--cirth-canvas);
+  color: var(--cirth-muted-color);
+  font-size: inherit;
+}
+
+.docs-stage-toggle:is(:hover, :active, :focus, :focus-visible) {
+  color: var(--cirth-ink);
+}
+
+/* A theme's declarations, and what each one paints.
+   ––––––––––––––––––––
+   One line group per token, holding every preset's version of that line
+   with all but the current one hidden (docs/eleventy.config.js builds it).
+   Switching swaps a line rather than a listing, so the declaration that
+   moved can be marked where it stands and a reader can see that the others
+   did not move. */
+.docs-token.is-changed {
+  /* A declaration whose value wraps is one inline box across several line
+     boxes: cloned, the mark is drawn on each of them, the way a
+     highlighter works. The alternative is a block-level line, which cannot
+     be done without taking the newlines out of the content and breaking
+     copy. */
+  box-decoration-break: clone;
+  border-radius: var(--cirth-radius-xs);
+  background: var(--cirth-mark-background-color);
+  color: var(--cirth-mark-color);
+}
+
+/* Switching an example, and marking a token that moved.
+   ––––––––––––––––––––
+   Both beats are subtractive: under no-preference, and only ever taking
+   something away from a resting state the CSS above already describes in
+   full. With the preference set, the panel simply is the new panel and the
+   marked line simply stays marked.
+
+   `steps()` on a clip-path inset, because the unit being revealed is a
+   line of markup, deliberately not a per-character type-out, which says
+   the markup is a performance.
+
+   The mark is information, not decoration, which is why it is declared in
+   the resting state and only its *fade* is motion. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes docs-example-enter {
+    from {
+      opacity: 0;
+      transform: translateY(0.375rem);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes docs-example-reveal {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes docs-token-settle {
+    0%,
+    55% {
+      background: var(--cirth-mark-background-color);
+      color: var(--cirth-mark-color);
+    }
+
+    100% {
+      background: transparent;
+      color: inherit;
+    }
+  }
+
+  .docs-example:not([hidden]) .docs-stage-preview {
+    animation: docs-example-enter 0.22s ease-out both;
+  }
+
+  .docs-example:not([hidden]) .docs-stage-code pre > code {
+    animation: docs-example-reveal 0.26s steps(12, end) both;
+  }
+
+  .docs-token.is-changed {
+    animation: docs-token-settle 1.6s ease-out both;
+  }
+}
+
+/* The chips are painted by the custom properties themselves: nothing
+   scripts them, so they retheme because the stylesheet changed, which is
+   the section's argument running on the section itself.
+
+   One per line: this is the narrow half of the stage, and three token
+   names as a wrapping row break after the second. A column also stacks the
+   chips where the eye can compare them. */
+.docs-token-legend {
+  display: grid;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0.625rem 0.75rem;
+  border-block-start: var(--cirth-border-width) solid
+    var(--cirth-card-border-color);
+  list-style: none;
+}
+
+.docs-token-legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--cirth-muted-color);
+}
+
+.docs-token-legend code {
+  background: none;
+}
+
+/* 1.5rem, not 1rem: at 16px a 0.5rem radius is half the box, so the chip
+   comes out a circle under Playroom and reads as a different kind of mark
+   rather than as a corner. At 24px the same radius is unmistakably a
+   rounded square. */
+.docs-token-chip {
+  flex: none;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+}
+
+.docs-token-legend li[data-token="--cirth-primary"] .docs-token-chip {
+  background: var(--cirth-primary);
+}
+
+/* The radius chip shows the radius, which is the only honest way to swatch
+   one: a square with the theme's own corner on it. */
+.docs-token-legend li[data-token="--cirth-border-radius"] .docs-token-chip {
+  border-color: var(--cirth-primary-text);
+  border-radius: var(--cirth-border-radius);
+}
+
+.docs-token-legend li[data-token="--cirth-canvas"] .docs-token-chip {
+  background: var(--cirth-canvas);
+}
+
+
+/* Claims
+   ––––––––––––––––––––
+   One card per claim, full width on a phone: its kind, a heading, one
+   sentence, and a check path that is a real target at the foot of the
+   card. Two columns from 40rem, three from 64rem. */
+.docs-claim-list {
+  display: grid;
+  gap: var(--cirth-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (width >= 40rem) {
+  .docs-claim-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width >= 64rem) {
+  .docs-claim-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.docs-claim {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: var(--cirth-space-2);
+  margin: 0;
+  padding: var(--cirth-space-5);
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-card-border-radius);
+  background: var(--cirth-card-background-color);
+  list-style: none;
+}
+
+.docs-claim h3 {
+  --cirth-font-size: var(--cirth-font-size-xl);
+
+  margin: var(--cirth-space-1) 0 0;
+}
+
+.docs-claim p {
+  margin: 0;
+  color: var(--cirth-secondary-text);
+}
+
+.docs-claim > a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cirth-space-2);
+  min-block-size: 2.75rem;
+  margin-block-start: var(--cirth-space-2);
+  padding-block-start: var(--cirth-space-3);
+  border-block-start: var(--cirth-border-width) solid
+    var(--cirth-muted-border-color);
+  font-weight: var(--cirth-font-weight-medium);
+  text-decoration: none;
+}
+
+.docs-claim > a::after {
+  content: "→";
+}
+
+.docs-claim > a:hover {
+  text-decoration: underline;
+}
+
+.docs-proof-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.docs-proof-state .is-verified {
+  color: var(--cirth-ins-color);
+}
+
+.docs-proof-state .is-enhanced {
+  color: var(--cirth-primary-text);
+}
+
+/* Questions
+   –––––––––––––––––––– */
+.docs-native-faq .docs-home-inner {
+  display: grid;
+  gap: var(--cirth-space-6);
+}
+
+@media (width >= 64rem) {
+  .docs-native-faq .docs-home-inner {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: clamp(2rem, 5vw, 4rem);
+  }
+}
+
+.docs-native-faq .docs-section-head {
+  margin: 0;
+}
+
+/* Closing call to action: the one centred composition on the page, on
+   the card surface with the hero's glow reflected at the bottom. */
+.docs-cta {
+  position: relative;
+  isolation: isolate;
+  border-block-start: var(--cirth-border-width) solid
+    var(--cirth-muted-border-color);
+  text-align: center;
+}
+
+.docs-cta::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: radial-gradient(
+    50rem 22rem at 50% 110%,
+    color-mix(in oklab, var(--cirth-primary) 16%, transparent),
+    transparent 70%
+  );
+  content: "";
+  pointer-events: none;
+}
+
+.docs-cta .docs-home-inner > p {
+  margin-inline: auto;
+  color: var(--cirth-secondary-text);
+  font-size: var(--cirth-font-size-lg);
+}
+
+.docs-cta .docs-install {
+  max-inline-size: 34rem;
+  margin-inline: auto;
+  text-align: start;
+}
+
+.docs-cta .docs-install > .segmented {
+  justify-content: center;
+}
+
+.docs-cta .docs-hero-actions {
+  justify-content: center;
+}
+
+@media (forced-colors: active) {
+  /* The selected tab is a background against a transparent one, and forced
+     colors resolves both to Canvas, while every button's transparent
+     border is forced to CanvasText, so the border cannot carry the state
+     either. `Highlight`/`HighlightText` is the pair the system reserves
+     for exactly this. */
+  .docs-switch button[aria-selected="true"] {
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  /* Same problem, same shape of answer: the mark on a declaration that
+     moved is a background, and a background is what forced colors takes
+     away. `Mark`/`MarkText` is the system's own highlighter. */
+  .docs-token.is-changed {
+    background: Mark;
+    color: MarkText;
+  }
+}
+
+@media print {
+  .docs-hero::before,
+  .docs-hero::after,
+  .docs-cta::before {
+    display: none;
+  }
+}

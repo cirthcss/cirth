@@ -2,6 +2,7 @@
 layout: base.njk
 bodyClass: docs-home-page
 ---
+{% from "install.njk" import packageManagers %}
 {#- The specimens below are declared once and used twice: rendered live, and
     highlighted into the source pane beside them. One string, so the markup a
     reader copies is the markup that produced what they are looking at: the
@@ -183,58 +184,267 @@ bodyClass: docs-home-page
 </details>
 {%- endmacro -%}
 
-<main id="main-content" class="docs-native-home" data-pagefind-body>
-	<section class="docs-native-hero" aria-labelledby="home-title">
-		<div class="docs-native-grid">
-			<header class="docs-native-claim">
-				<h1 id="home-title">Production-ready UI<br />from <span class="docs-accent">semantic HTML</span>.</h1>
-				<p class="docs-native-lede">{{ hero.tagline }}</p>
+{#- The hero's specimen: the source pane and the rendered card beside it
+    are this one string, so the markup a reader copies is the markup that
+    produced the card. Written to fit a phone's code pane without a
+    horizontal scrollbar: one attribute set per line, nothing optional. -#}
+{%- set heroSpecimen -%}
+<article>
+  <h2>Sign in</h2>
+  <form>
+    <label>
+      Email
+      <input type="email" required>
+    </label>
+    <label>
+      Password
+      <input type="password" required>
+    </label>
+    <label>
+      <input type="checkbox" checked>
+      Remember me
+    </label>
+    <button>Sign in</button>
+  </form>
+</article>
+{%- endset -%}
+
+{#- The scroll story's two listings: the same card written with a class
+    vocabulary, then as semantic HTML. The first is deliberately ordinary:
+    the classes are the kind any utility or component vocabulary asks for,
+    and the count beside it is taken from the string, not asserted. The
+    second is what the third beat renders. -#}
+{%- set storySoup -%}
+<div class="rounded-xl border border-neutral-200 bg-white shadow-sm
+            dark:border-neutral-800 dark:bg-neutral-900">
+  <div class="border-b border-neutral-200 px-6 py-4
+              dark:border-neutral-800">
+    <h3 class="text-lg font-semibold tracking-tight
+               text-neutral-900 dark:text-neutral-50">
+      Invite a teammate
+    </h3>
+  </div>
+  <div class="flex flex-col gap-4 px-6 py-5">
+    <label class="flex flex-col gap-1.5 text-sm font-medium
+                  text-neutral-700 dark:text-neutral-300">
+      Email
+      <input type="email" required class="h-10 w-full rounded-md
+             border border-neutral-300 bg-transparent px-3
+             text-sm focus-visible:outline-none
+             focus-visible:ring-2 focus-visible:ring-orange-600
+             dark:border-neutral-700">
+    </label>
+    <label class="flex flex-col gap-1.5 text-sm font-medium
+                  text-neutral-700 dark:text-neutral-300">
+      Role
+      <select class="h-10 w-full appearance-none rounded-md
+              border border-neutral-300 bg-transparent px-3
+              text-sm dark:border-neutral-700">
+        <option>Editor</option>
+        <option>Viewer</option>
+      </select>
+    </label>
+  </div>
+  <div class="flex justify-end border-t border-neutral-200
+              px-6 py-4 dark:border-neutral-800">
+    <button class="inline-flex h-10 items-center rounded-md
+                   bg-orange-700 px-4 text-sm font-medium
+                   text-white hover:bg-orange-800">
+      Send invite
+    </button>
+  </div>
+</div>
+{%- endset -%}
+
+{%- set storySemantic -%}
+<article>
+  <header>
+    <h3>Invite a teammate</h3>
+  </header>
+  <label>
+    Email
+    <input type="email" required>
+  </label>
+  <label>
+    Role
+    <select>
+      <option>Editor</option>
+      <option>Viewer</option>
+    </select>
+  </label>
+  <footer>
+    <button>Send invite</button>
+  </footer>
+</article>
+{%- endset -%}
+
+{#- Four syntaxes that put the same element in the DOM. -#}
+{%- set syntaxes = [
+  { name: "HTML", code: '<button type="button">Save</button>' },
+  { name: "React", code: '<button onClick={save}>Save</button>' },
+  { name: "Vue", code: '<button @click="save">Save</button>' },
+  { name: "Svelte", code: '<button onclick={save}>Save</button>' }
+] -%}
+
+{#- Where each ecosystem's guide lives. Names only, as text: no logo is
+    drawn, and the note under the list says why they are here. -#}
+{%- set ecosystems = [
+  { name: "HTML", link: "/installation/cdn" },
+  { name: "React", link: "/installation/react" },
+  { name: "Next.js", link: "/installation/nextjs" },
+  { name: "Vue", link: "/installation/vue" },
+  { name: "Nuxt", link: "/installation/vue" },
+  { name: "Svelte", link: "/installation/sveltekit" },
+  { name: "SvelteKit", link: "/installation/sveltekit" },
+  { name: "Astro", link: "/installation/astro" },
+  { name: "Angular", link: "/installation/angular" },
+  { name: "Vite", link: "/installation/vite" },
+  { name: "Eleventy", link: "/installation/eleventy" },
+  { name: "Server-rendered", link: "/installation/cdn" }
+] -%}
+
+<main id="main-content" class="docs-home" data-pagefind-body>
+	{#- The hero. Copy first in the document and on every screen: the
+	    headline states the relationship, the demo below proves it. The
+	    demo is a source pane and the card that source renders, side by
+	    side from 48rem and stacked under it, never overlapping. The card
+	    is rendered by the page's own Cirth, not a screenshot, and is
+	    inert: it is a picture of the output, not a form on the home page. -#}
+	<section class="docs-hero" aria-labelledby="home-title">
+		<div class="docs-home-inner">
+			<div class="docs-hero-copy">
+				<p class="docs-hero-eyebrow"><span>Pure CSS</span><span>No classes to learn</span><span>0 B JavaScript</span></p>
+				<h1 id="home-title">Semantic HTML in.<br /><span class="docs-accent">Finished UI out.</span></h1>
+				<p class="docs-hero-lede">{{ hero.tagline }}</p>
 				<p class="docs-hero-actions">
 					{% for action in hero.actions %}
 						<a href="{{ action.link }}" role="button"{% if action.theme != "brand" %} class="secondary outline"{% endif %}>{{ action.text }}</a>
 					{% endfor %}
 				</p>
+				<pre class="docs-hero-install" tabindex="0"><code class="hljs language-sh">npm install @cirthcss/cirth</code></pre>
+			</div>
+			<figure class="docs-hero-demo">
+				<div class="docs-hero-panes">
+					<div class="docs-hero-pane docs-hero-source">
+						<p class="docs-pane-label" aria-hidden="true"><span>sign-in.html</span><span>HTML</span></p>
+						<pre tabindex="0"><code class="hljs language-html">{{ heroSpecimen | highlight | safe }}</code></pre>
+					</div>
+					<p class="docs-hero-connector" aria-hidden="true"><span>renders</span></p>
+					<div class="docs-hero-pane docs-hero-result">
+						<p class="docs-pane-label" aria-hidden="true"><span>Result</span><span>cirth.min.css</span></p>
+						<div class="docs-hero-render" inert>{{ heroSpecimen | safe }}</div>
+					</div>
+				</div>
+				<figcaption id="hero-demo-caption" class="sr-only">A sign-in card: the HTML on one side and, on the other, the interface Cirth renders from it with no class added.</figcaption>
+			</figure>
+			<ul class="docs-hero-facts" aria-label="At a glance">
+				<li><strong>0 B</strong> JavaScript runtime</li>
+				<li><strong>{{ proof.size.label if proof.size else "About 15 KB" }}</strong> gzipped</li>
+				<li><strong>WCAG 2.2 AA</strong> baseline</li>
+				<li><strong>Any</strong> framework</li>
+			</ul>
+		</div>
+	</section>
+
+	{#- The story, in three beats. Served complete: every beat carries its
+	    own visual, so without script, on a phone, or with reduced motion,
+	    this is three headed steps each followed by what it shows. The
+	    script in this file upgrades it, on a wide screen with motion
+	    allowed, to a sticky stage whose visual follows the heading in view.
+	    Scrolling is never taken over: the page moves as it always does, and
+	    only which visual is shown changes. -#}
+	<section class="docs-story" aria-labelledby="story-title">
+		<div class="docs-home-inner">
+			<header class="docs-section-head">
+				<p class="docs-kicker">How it works</p>
+				<h2 id="story-title">Less markup. The same interface.</h2>
 			</header>
-			<div class="docs-native-lab">
-				{% include "home-demo.njk" %}
+			<div class="docs-story-steps" data-docs-story>
+				{% for step in story %}
+					<div class="docs-story-step" data-docs-story-step="{{ loop.index }}">
+						<div class="docs-story-text">
+							<p class="docs-story-index" aria-hidden="true">0{{ loop.index }}</p>
+							<h3>{{ step.title }}</h3>
+							<p>{{ step.text }}</p>
+						</div>
+						<figure class="docs-story-visual">
+							{% if loop.index == 1 %}
+								<div class="docs-story-code">
+									<p class="docs-pane-label" aria-hidden="true"><span>invite.html</span><span>{{ storySoup | classCount }} class names</span></p>
+									<pre tabindex="0"><code class="hljs language-html">{{ storySoup | highlight | safe }}</code></pre>
+								</div>
+								<figcaption id="story-visual-1">The card with a class vocabulary: {{ storySoup | classCount }} class names to write, read and keep in step.</figcaption>
+							{% elif loop.index == 2 %}
+								<div class="docs-story-code">
+									<p class="docs-pane-label" aria-hidden="true"><span>invite.html</span><span>{{ storySemantic | classCount }} class names</span></p>
+									<pre tabindex="0"><code class="hljs language-html">{{ storySemantic | highlight | safe }}</code></pre>
+								</div>
+								<figcaption id="story-visual-2">The same card as semantic HTML: {{ storySemantic | classCount }} class names, and every element says what it is.</figcaption>
+							{% else %}
+								<div class="docs-story-render">
+									<p class="docs-pane-label" aria-hidden="true"><span>Result</span><span>cirth.min.css</span></p>
+									<div class="docs-story-render-stage" inert>{{ storySemantic | safe }}</div>
+								</div>
+								<figcaption id="story-visual-3">What Cirth renders from it: a card with a title band, two labelled fields and a footer action.</figcaption>
+							{% endif %}
+						</figure>
+					</div>
+				{% endfor %}
 			</div>
 		</div>
 	</section>
 
-	{#- The showcase. Three examples, one stage, and a strip above it, the
-	    arrangement FastHTML's "this home page is a FastHTML app" uses, for
-	    the reason it uses it: one example proves that the
-	    markup renders, three prove that *different* semantic markup renders
-	    a different finished interface, which is the actual claim.
-
-	    It absorbs three sections. "Native behavior stays native" was a row
-	    of three specimens with no source pane at all; its <details> group
-	    and its validated field are examples two and three here, each with
-	    its markup beside it and each shaped like a small plausible
-	    interface rather than a swatch. "You're already looking at Cirth"
-	    was a whole section restating that the FAQ below is a real
-	    component; it is one sentence under the Details example now, next to
-	    the element it is talking about.
-
-	    Every panel is served rendered and unhidden. The tab strip ships
-	    `hidden` and the script below turns it on, so without script this is
-	    three complete examples stacked under their own headings rather than
-	    a row of controls that cannot do anything, the same rule the pause
-	    control in the next section follows. -#}
-	<section class="docs-showcase" aria-labelledby="semantic-title">
-		<div class="docs-native-grid">
-			<header class="docs-showcase-lede">
-				<h2 id="semantic-title">Start with the HTML you already know.</h2>
-				<p>Standard elements carry the styling <em>and</em> the behaviour. Change the markup and you change the interface. There is no component API in between, and nothing in these three samples is wired to a script.</p>
+	{#- Framework agnostic. The diagram is the argument: four syntaxes, and
+	    by the time the browser styles them they are one element. The
+	    rendered button below it is inert for the same reason the hero's
+	    card is. -#}
+	<section class="docs-frameworks docs-band" aria-labelledby="frameworks-title">
+		<div class="docs-home-inner">
+			<header class="docs-section-head">
+				<p class="docs-kicker">Framework agnostic</p>
+				<h2 id="frameworks-title">Pure CSS. Framework agnostic. Works everywhere.</h2>
+				<p>Cirth ships no React, Vue or Svelte components, and needs none. It styles the HTML that reaches the browser, so it makes no difference whether a template, a server or a client framework wrote it.</p>
 			</header>
-			{#- The strip chooses what the section is about, so it sits with the
-			    section's own copy rather than inside the stage. In the band it
-			    read as part of the listing's toolbar: one row, beside a file
-			    name and above a copy affordance, which is where a reader looks
-			    for something belonging to the code block rather than for the
-			    editorial choice of which example is on. Above the stage it is
-			    what it is: three examples, pick one, and the whole object
-			    below follows. -#}
+			<div class="docs-frameworks-layout">
+				<figure class="docs-dom-diagram">
+					<ul class="docs-syntax-list">
+						{% for syntax in syntaxes %}
+							<li><span>{{ syntax.name }}</span><code>{{ syntax.code }}</code></li>
+						{% endfor %}
+					</ul>
+					<p class="docs-dom-arrow" aria-hidden="true"><span>one element in the DOM</span></p>
+					<div class="docs-dom-result" inert>
+						<code>&lt;button&gt;</code>
+						<button type="button">Save</button>
+					</div>
+					<figcaption id="dom-diagram-caption">Four ways to write a button. Each one reaches the browser as the same <code>&lt;button&gt;</code>, and Cirth styles that.</figcaption>
+				</figure>
+				<div class="docs-ecosystems">
+					<h3>Guides for the tools you use</h3>
+					<ul class="docs-ecosystem-list">
+						{% for ecosystem in ecosystems %}
+							<li><a href="{{ ecosystem.link }}">{{ ecosystem.name }}</a></li>
+						{% endfor %}
+					</ul>
+					<p>Rails, Django, Laravel or a Go template: if it sends HTML, Cirth styles it. Every guide was checked in a real project with that tool's own starter.</p>
+					<p class="docs-ecosystem-note">Names belong to their owners and appear only to say where Cirth has been checked. None of these projects is affiliated with Cirth or endorses it.</p>
+					<p><a href="/installation/#framework-guides">All framework guides</a></p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	{#- The showcase: three examples, one stage, and a strip above it. Every
+	    panel is served rendered and unhidden; the tab strip ships `hidden`
+	    and the script below turns it on, so without script this is three
+	    complete examples stacked under their own headings. -#}
+	<section class="docs-showcase" aria-labelledby="semantic-title">
+		<div class="docs-home-inner">
+			<header class="docs-section-head">
+				<p class="docs-kicker">Native behaviour</p>
+				<h2 id="semantic-title">Start with the HTML you already know.</h2>
+				<p>Standard elements carry the styling <em>and</em> the behaviour. Change the markup and you change the interface. Nothing in these three samples is wired to a script.</p>
+			</header>
 			<div class="docs-switch" data-docs-switch aria-label="Example" hidden>
 				{% for example in examples %}
 					<button type="button" id="tab-{{ example.id }}" data-docs-tab="{{ example.id }}">{{ example.tab }}</button>
@@ -260,70 +470,34 @@ bodyClass: docs-home-page
 					{% endfor %}
 				</div>
 			</div>
-			<p class="docs-showcase-more"><a href="/examples">Browse the examples</a></p>
+			<p class="docs-showcase-more"><a href="/examples">Browse complete examples</a></p>
 		</div>
 	</section>
 
-	{#- The stylesheet and what it does, in one object, and the one section
-	    on this page where the code is the cause rather than the subject.
-
-	    The preview is a custom element, and the reason is isolation. This
-	    section has to move --cirth-* values around while the page it sits in
-	    keeps the theme the reader chose in the header, and the only honest
-	    way to do that is to give the demo its own copy of Cirth: the element
-	    attaches a shadow root, loads the scoped build into it, and applies
-	    the declarations there. Nothing in the page's cascade is touched, no
-	    selector on this page has to out-specify the framework, and the two
-	    themes are visible at once: the page's around the stage, the demo's
-	    inside it.
-
-	    The listing is the stylesheet the element really carries: one block,
-	    with one line group per token, and the script swaps a line and applies
-	    the same string it just wrote (themePreview() in
-	    docs/eleventy.config.js reads both out of the compiled files). One
-	    block rather than one per state is also what keeps the shell's copy
-	    button honest: it copies `textContent`, so a hidden variant inside
-	    the block would come along with it.
-
-	    No preset control. The selector this section used to carry drove the
-	    whole site's theme from inside a demo about theming, which made the
-	    page the demo, and left the reader to operate something before the
-	    section said anything. The header's switcher still does that job for
-	    the site; this section demonstrates instead of asking. -#}
+	{#- The theme demo, with its own copy of Cirth in a shadow root, so the
+	    values it moves never touch the theme the reader picked for the
+	    page. The listing is the stylesheet the element really carries. -#}
 	<section class="docs-showcase docs-theme-showcase" aria-labelledby="theme-title">
-		<div class="docs-native-grid">
-			<header class="docs-showcase-lede">
+		<div class="docs-home-inner">
+			<header class="docs-section-head">
+				<p class="docs-kicker">Customization</p>
 				<h2 id="theme-title">Your theme. Same HTML.</h2>
 				<p>Every colour, radius and font is a <code>--cirth-*</code> custom property. The markup on the right never changes and no class is added to it. The declarations on the left do, one at a time, and the finished interface follows them.</p>
 			</header>
 			<div class="docs-stage">
 				<header class="docs-stage-band">
 					<span class="docs-stage-note"><code>&lt;cirth-theme-preview&gt;</code> · its own Cirth, in a shadow root</span>
-					{#- Ships `hidden` and the script below turns it on: with no
-					    script nothing is playing, and a pause button for a demo that
-					    is not moving is a control that cannot be applied. -#}
 					<button type="button" class="docs-stage-toggle" data-docs-theme-toggle hidden>Pause</button>
 				</header>
 				<div class="docs-stage-body docs-stage-split docs-stage-split-narrow">
 					<div class="docs-stage-code">
 						<pre tabindex="0"><code class="hljs language-css" data-docs-theme-block>{{ themePreview.block | safe }}</code></pre>
-						{#- The chips carry the values the element is carrying, not the
-						    page's: the same declarations are set on this list, so a
-						    swatch cannot show one thing while the preview shows
-						    another. They are painted by the custom properties
-						    themselves. No script picks a colour. -#}
 						<ul class="docs-token-legend" data-docs-theme-legend>
 							{% for token in themePreview.tokens %}
 								<li data-token="{{ token }}"><span class="docs-token-chip" aria-hidden="true"></span><code>{{ token }}</code></li>
 							{% endfor %}
 						</ul>
 					</div>
-					{#- The specimen is served as the element's own children, which is
-					    what a reader without script gets: the page's Cirth renders it
-					    in the light DOM, finished, exactly as the section says it
-					    would. With script the element clones it into the shadow root,
-					    where the demo's stylesheet is. One markup source either
-					    way. -#}
 					<div class="docs-stage-preview">
 						<cirth-theme-preview data-docs-theme-preview>{{ themeSpecimen | safe }}</cirth-theme-preview>
 					</div>
@@ -333,99 +507,33 @@ bodyClass: docs-home-page
 		</div>
 	</section>
 
-	{#- One proof section, and what each claim in it actually is.
-
-	    Three kinds, said out loud in every cell, because they age
-	    differently. A *guarantee* is something the project intends to keep
-	    and would treat a break as a bug. A *capability* is something Cirth
-	    lets you do; it does not promise anything about your application. A
-	    *current fact* would be true of this build and free to move: the
-	    gzipped size used to be one here, and it has moved to /deploy, where
-	    a reader is deciding something with it rather than scoring the
-	    project by it.
-
-	    So no number is a claim by itself here. "4 builds" went for the same
-	    reason: the count was accurate and the promise it implied (that
-	    there will always be exactly four) is not one worth making, when
-	    what actually matters is that the distribution has classless and
-	    scoped forms and optional outputs beside them.
-
-	    No frame. The two showcases above are each a hairline stage on the
-	    canvas; this one is a tinted band with its cells divided by hairlines
-	    and nothing around them, so the page changes shape here rather than
-	    presenting a third bordered panel. -#}
-	<section class="docs-proof docs-band-tinted" aria-labelledby="proof-title">
-		<div class="docs-native-grid">
-			<header class="docs-showcase-lede">
+	{#- The proof, one claim per card. Each says what kind of statement it
+	    is and where to check it, and the check path is a full-width link
+	    at the foot of its card rather than a word at the end of a line. -#}
+	<section class="docs-proof docs-band" aria-labelledby="proof-title">
+		<div class="docs-home-inner">
+			<header class="docs-section-head">
+				<p class="docs-kicker">Evidence</p>
 				<h2 id="proof-title">Every claim has a check path.</h2>
 				<p>{{ pitch.lede }}</p>
 			</header>
-			<dl class="grid docs-proof-metrics">
-				<div>
-					<dt>{{ proofKind("guarantee") }}</dt>
-					<dd>
-						<strong>0 B JS runtime</strong>
-						<small>No runtime shipped by Cirth. Your application can still use JavaScript for anything it needs.</small>
-						<a href="/why-cirth#pure-css-nothing-to-run">Inspect</a>
-					</dd>
-				</div>
-				<div>
-					<dt>{{ proofKind("guarantee") }}</dt>
-					<dd>
-						<strong>WCAG 2.2 AA baseline</strong>
-						<small>Automated checks over Cirth's own components and defaults: a floor to build on, not a verdict on your interface.</small>
-						<a href="/why-cirth#accessible-by-default">Method</a>
-					</dd>
-				</div>
-				<div>
-					<dt>{{ proofKind("capability") }}</dt>
-					<dd>
-						<strong>Flexible distribution</strong>
-						<small>Classless and scoped builds, with print sheets and token presets as optional outputs beside them.</small>
-						<a href="/installation/#choose-a-build">Compare</a>
-					</dd>
-				</div>
-				<div>
-					<dt>{{ proofKind("guarantee") }}</dt>
-					<dd>
-						{#- The cause, not the symptom. This used to print the gzipped
-						    size, which invited the one comparison the project does not
-						    want made: a byte count read as a score. What is actually
-						    being promised is the model (element selectors and custom
-						    properties, no component catalogue, nothing to run), and the
-						    size is downstream of it. The measured figure still exists,
-						    on /deploy, where a reader can act on it. -#}
-						<strong>Small by construction</strong>
-						<small>Element selectors and custom properties: no component catalogue, and nothing to run. The size follows from that model rather than from leaving native elements unfinished.</small>
-						<a href="/about#size-and-what-it-is-a-budget-for">Why</a>
-					</dd>
-				</div>
-			</dl>
-			{#- The two claims that are not about the package's shape. A list,
-			    because two rows of four columns is a table's shape without a
-			    table's reason; the strip above is the part that compares. Same
-			    three kinds, same vocabulary. -#}
-			<ul class="docs-proof-claims">
-				<li>
-					{{ proofKind("guarantee") }}
-					<strong>Semantic elements first</strong>
-					<span>Element selectors and semantic demos, checked on every build</span>
-					<a href="/examples">Inspect</a>
-				</li>
-				<li>
-					{{ proofKind("capability") }}
-					<strong>Design tokens</strong>
-					<span>Every colour, space, radius and font is a <code>--cirth-*</code> property you can override at runtime</span>
-					<a href="/customization">Override</a>
-				</li>
+			<ul class="docs-claim-list">
+				{% for claim in claims %}
+					<li class="docs-claim">
+						{{ proofKind(claim.kind) }}
+						<h3>{{ claim.title }}</h3>
+						<p>{{ claim.text | safe }}</p>
+						<a href="{{ claim.link }}">{{ claim.check }}<span class="sr-only">: {{ claim.title }}</span></a>
+					</li>
+				{% endfor %}
 			</ul>
 		</div>
 	</section>
 
 	{% if faq %}
 		<section class="docs-native-faq" aria-labelledby="faq-title">
-			<div class="docs-native-grid">
-				<header>
+			<div class="docs-home-inner">
+				<header class="docs-section-head">
 					<h2 id="faq-title">{{ faq.title }}</h2>
 				</header>
 				<div class="docs-faq-list">
@@ -437,9 +545,89 @@ bodyClass: docs-home-page
 			</div>
 		</section>
 	{% endif %}
+
+	<section class="docs-cta" aria-labelledby="cta-title">
+		<div class="docs-home-inner">
+			<h2 id="cta-title">Add one stylesheet. Keep your HTML.</h2>
+			<p>Start from a CDN link or an npm import. The framework guides cover the rest.</p>
+			{{ packageManagers("home") }}
+			<p class="docs-hero-actions">
+				<a href="/installation" role="button">Read the installation guide</a>
+				<a href="/why-cirth" role="button" class="secondary outline">Why Cirth</a>
+			</p>
+		</div>
+	</section>
 </main>
 
+
 <script>
+	// The story's sticky stage: progressive enhancement over three complete
+	// steps. Only on a wide screen with motion allowed; anywhere else the
+	// steps stay as served, each with its own visual. Nothing here moves the
+	// page: the reader scrolls, and the script only chooses which of the
+	// three visuals the sticky stage shows, from the heading nearest the
+	// middle of the viewport.
+	(() => {
+		const root = document.querySelector("[data-docs-story]");
+		if (!root || !("IntersectionObserver" in window)) return;
+		const steps = [...root.querySelectorAll("[data-docs-story-step]")];
+		if (steps.length === 0) return;
+		const wide = window.matchMedia("(width >= 64rem)");
+		const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+		/** @type {IntersectionObserver | null} */
+		let observer = null;
+
+		/** @param {number} index */
+		const activate = (index) => {
+			if (index < 0) return;
+			for (const [position, step] of steps.entries()) {
+				step.classList.toggle("is-active", position === index);
+			}
+		};
+
+		const apply = () => {
+			const enhanced = wide.matches && !calm.matches;
+			root.classList.toggle("is-enhanced", enhanced);
+			observer?.disconnect();
+			observer = null;
+			if (!enhanced) {
+				for (const step of steps) step.classList.remove("is-active");
+				return;
+			}
+			activate(0);
+			observer = new IntersectionObserver(
+				(entries) => {
+					for (const entry of entries) {
+						if (!entry.isIntersecting) continue;
+						const step = entry.target.closest("[data-docs-story-step]");
+						activate(steps.indexOf(/** @type {HTMLElement} */ (step)));
+					}
+				},
+				// A band across the middle of the viewport: a step is current
+				// while its text crosses it.
+				{ rootMargin: "-45% 0px -45% 0px" },
+			);
+			for (const step of steps) {
+				const text = step.querySelector(".docs-story-text");
+				if (text) observer.observe(text);
+			}
+		};
+
+		// A visual that is not on stage is transparent, not removed: it is
+		// still in the reading order. When keyboard focus or a screen
+		// reader's cursor reaches one, it comes forward.
+		root.addEventListener("focusin", (event) => {
+			if (!root.classList.contains("is-enhanced")) return;
+			const step = /** @type {HTMLElement} */ (event.target).closest?.(
+				"[data-docs-story-step]",
+			);
+			if (step) activate(steps.indexOf(/** @type {HTMLElement} */ (step)));
+		});
+		wide.addEventListener("change", apply);
+		calm.addEventListener("change", apply);
+		apply();
+	})();
+
 	// The showcase's tab strip. Everything it needs is already in the page:
 	// three rendered examples, each with its own heading, served visible.
 	// This turns them into one tab panel at a time and turns the strip on,
