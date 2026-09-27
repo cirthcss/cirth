@@ -110,9 +110,9 @@ test("the hero demo surface uses the card radius and clips its panels", async ({
 }) => {
 	await page.goto(origin, { waitUntil: "networkidle" });
 
-	// One plate per region now; the source card is the one that has to clip
-	// a code pane running flush to its own edge.
-	const figure = page.locator(".docs-source-panel");
+	// One window holds the source pane and the card it renders, and it is
+	// the one that has to clip a code pane running flush to its own edge.
+	const figure = page.locator(".docs-hero-panes");
 	const style = await styleOf(figure, [
 		"borderTopLeftRadius",
 		"borderBottomRightRadius",
@@ -135,7 +135,7 @@ test("the hero demo surface uses the card radius and clips its panels", async ({
 test("the colour swatches paint a surface, not the canvas", async ({
 	page,
 }) => {
-	await page.goto(`${origin}/colors/`, { waitUntil: "networkidle" });
+	await page.goto(`${origin}/themes/`, { waitUntil: "networkidle" });
 
 	const swatch = page.locator(".docs-color-swatch").first();
 	const surface = await styleOf(swatch, ["backgroundColor"]);
@@ -188,6 +188,15 @@ test("the home page's specimen cards all share one card contract", async ({
 			properties,
 		),
 	);
+	// The hero's card and the story's rendered card are the same element
+	// under the same stylesheet: the shell closes their outer margin and
+	// nothing else.
+	for (const selector of [
+		".docs-hero-render > article",
+		".docs-story-render-stage > article",
+	]) {
+		cards.push(await styleOf(page.locator(selector), properties));
+	}
 
 	const [first, ...rest] = cards;
 	expect(cards.length).toBeGreaterThan(1);
@@ -348,7 +357,7 @@ test("no documentation page draws a rule under its title", async ({ page }) => {
 		"/about/",
 		"/brand/",
 		"/colors/",
-		"/get-started/",
+		"/installation/",
 		"/customization/",
 		"/upgrading/",
 		"/contributions/",
@@ -357,7 +366,7 @@ test("no documentation page draws a rule under its title", async ({ page }) => {
 		"/content/button/",
 		"/forms/",
 		"/utilities/breakout/",
-		"/utilities/reduce-motion/",
+		"/guides/accessibility/",
 		"/utilities/truncate/",
 	];
 

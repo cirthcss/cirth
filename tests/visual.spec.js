@@ -25,11 +25,15 @@ const visualPages = [
 	"about/index.html",
 	"brand/index.html",
 	"colors/index.html",
+	"compatibility/index.html",
 	"contributions/index.html",
 	"customization/index.html",
-	"deploy/index.html",
 	"examples/index.html",
-	"get-started/index.html",
+	"guides/accessibility/index.html",
+	"installation/index.html",
+	"installation/vite/index.html",
+	"themes/index.html",
+	"why-cirth/index.html",
 	"components/accordion/index.html",
 	"components/card/index.html",
 	"components/dropdown/index.html",
@@ -56,6 +60,10 @@ const visualPages = [
 	"forms/input-file/index.html",
 	"forms/input-range/index.html",
 	"forms/input-search/index.html",
+	"forms/select/index.html",
+	"forms/text-inputs/index.html",
+	"forms/textarea/index.html",
+	"forms/validation/index.html",
 	"layout/container/index.html",
 	"layout/grid/index.html",
 	"layout/landmarks/index.html",
@@ -72,7 +80,7 @@ const representativePresetPages = [
 	"colors/index.html",
 	"components/meter/index.html",
 	"content/button/index.html",
-	"forms/index.html",
+	"forms/validation/index.html",
 ];
 
 // No docs shell or logo: the public theme has to carry the family resemblance.
@@ -294,7 +302,7 @@ test("readonly number input affordance", async ({ page }, testInfo) => {
 		"one focused light capture per engine covers the native affordance",
 	);
 
-	await capture(page, "forms/index.html", defaultTheme);
+	await capture(page, "forms/validation/index.html", defaultTheme);
 	await expect(
 		page.locator("[data-readonly-number-example]"),
 	).toHaveScreenshot("readonly-number-inputs.png");

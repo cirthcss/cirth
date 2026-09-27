@@ -42,92 +42,54 @@ test.afterAll(() => {
 const tabSkipsButtons = (browserName) => browserName === "webkit";
 
 /**
- * The hero is a source card and the interface it produces, overlapping:
- * not one panel split in two, and not two panels: only the source is in a
- * frame. The geometry worth pinning is the relationship between them: the
- * output reaches back over the source by a real, bounded amount, sits
- * below it, and neither leaves the stage. An overlap built out of flow
- * rather than out of absolute positioning is exactly the thing that can
- * quietly start clipping at some width, which is what this asserts
- * against.
+ * The hero is one window: the source pane, a connector, and the card that
+ * source renders. Stacked on a phone and a tablet, side by side from the
+ * 64rem tier, and never overlapping, which is what the previous hero did
+ * and what made it clip at some widths. The geometry worth pinning is that
+ * relationship, and that the source never needs a horizontal scrollbar
+ * down to a 360px phone.
  * @param {import("@playwright/test").Page} page
  */
 const assertHeroDemoGeometry = async (page) => {
-	const stageBox = await page.locator(".docs-lab-stage").boundingBox();
-	const sourceBox = await page.locator(".docs-source-panel").boundingBox();
-	const outputBox = await page.locator(".docs-output-frame").boundingBox();
-	const frameBox = await page.locator("[data-lab-frame]").boundingBox();
-	if (!stageBox || !sourceBox || !outputBox || !frameBox) {
-		throw new Error("Expected the source card and the output");
+	const windowBox = await page.locator(".docs-hero-panes").boundingBox();
+	const sourceBox = await page.locator(".docs-hero-source").boundingBox();
+	const resultBox = await page.locator(".docs-hero-result").boundingBox();
+	if (!windowBox || !sourceBox || !resultBox) {
+		throw new Error("Expected the source pane and the result");
 	}
 
-	// The iframe fills its surface exactly: no letterbox, no overhang.
-	// The surface is the output itself now, and there is no panel around it:
-	// so this is the frame against its own box.
-	expect(Math.abs(frameBox.y - outputBox.y)).toBeLessThanOrEqual(1);
-	expect(
-		Math.abs(
-			frameBox.y + frameBox.height - (outputBox.y + outputBox.height),
-		),
-	).toBeLessThanOrEqual(1);
-
-	// Neither card escapes the stage on either edge, at any width.
-	expect(Math.min(sourceBox.x, outputBox.x)).toBeGreaterThanOrEqual(
-		stageBox.x - 1,
-	);
-	expect(
-		Math.max(sourceBox.x + sourceBox.width, outputBox.x + outputBox.width),
-	).toBeLessThanOrEqual(stageBox.x + stageBox.width + 1);
-
-	// Stacked is the case where the two cards share a column: same x, same
-	// width. Reading it off the vertical relation instead would get mobile
-	// backwards, where the output is ordered first and therefore sits
-	// entirely above the source.
-	const stacked =
-		Math.abs(outputBox.x - sourceBox.x) <= 1 &&
-		Math.abs(outputBox.width - sourceBox.width) <= 1;
-	if (!stacked) {
-		// Overlapping: the output reaches back over the source by an amount
-		// you can see rather than by a hairline.
-		const overlapX = sourceBox.x + sourceBox.width - outputBox.x;
-		expect(overlapX).toBeGreaterThan(8);
-		expect(overlapX).toBeLessThan(sourceBox.width / 2);
-
-		// And it is centred on the card it overlaps. It used to sit on the
-		// row's end edge, which put its middle 154px below the source's and
-		// read as a stack that had slipped. Measured against the *card*
-		// rather than the row, which is the whole point: a row-centred
-		// output would be 20px low, on the source's own bottom margin.
-		const sourceCentre = sourceBox.y + sourceBox.height / 2;
-		const outputCentre = outputBox.y + outputBox.height / 2;
-		expect(
-			Math.abs(outputCentre - sourceCentre),
-			"the output is optically centred on the source",
-		).toBeLessThanOrEqual(2);
-
-		// Which, the output being the shorter of the two, means it sits
-		// inside the source's span on both edges rather than hanging past
-		// it.
-		expect(outputBox.y).toBeGreaterThan(sourceBox.y);
-		expect(outputBox.y + outputBox.height).toBeLessThan(
-			sourceBox.y + sourceBox.height,
+	// Neither pane escapes the window on either edge, at any width.
+	for (const box of [sourceBox, resultBox]) {
+		expect(box.x).toBeGreaterThanOrEqual(windowBox.x - 1);
+		expect(box.x + box.width).toBeLessThanOrEqual(
+			windowBox.x + windowBox.width + 1,
 		);
-	} else {
-		// Stacked: the offset is unwound completely rather than shrunk, so
-		// the two cards read as a column and not as a misalignment.
-		expect(
-			Math.abs(outputBox.x + outputBox.width - (sourceBox.x + sourceBox.width)),
-		).toBeLessThanOrEqual(1);
 	}
 
-	// Whatever follows the demo starts below both halves of it: the stage
-	// is intrinsically as tall as the taller of the two, which is the
-	// property an overlap built out of flow has and an absolutely
-	// positioned one does not.
-	expect(stageBox.y + stageBox.height).toBeGreaterThanOrEqual(
-		Math.max(sourceBox.y + sourceBox.height, outputBox.y + outputBox.height) -
-			1,
+	const sideBySide = await page.evaluate(
+		() => matchMedia("(width >= 64rem)").matches,
 	);
+	if (sideBySide) {
+		// Source first on the inline axis, result after it, no overlap.
+		expect(sourceBox.x + sourceBox.width).toBeLessThanOrEqual(resultBox.x + 1);
+		expect(Math.abs(sourceBox.y - resultBox.y)).toBeLessThanOrEqual(1);
+		// The result is the product: it takes at least as much of the row.
+		expect(resultBox.width).toBeGreaterThanOrEqual(sourceBox.width - 1);
+	} else {
+		// Stacked: source above result, same column, no overlap. The sequence
+		// this page argues for is markup, then interface.
+		expect(Math.abs(sourceBox.x - resultBox.x)).toBeLessThanOrEqual(1);
+		expect(Math.abs(sourceBox.width - resultBox.width)).toBeLessThanOrEqual(1);
+		expect(sourceBox.y + sourceBox.height).toBeLessThanOrEqual(resultBox.y + 1);
+	}
+
+	const width = page.viewportSize()?.width ?? 0;
+	if (width >= 360) {
+		const overflow = await page
+			.locator(".docs-hero-source pre")
+			.evaluate((element) => element.scrollWidth - element.clientWidth);
+		expect(overflow, `the source scrolls sideways at ${width}px`).toBeLessThanOrEqual(0);
+	}
 };
 
 test("homepage keeps the source and authentic output comparison focused on mobile", async ({
@@ -136,40 +98,26 @@ test("homepage keeps the source and authentic output comparison focused on mobil
 	await page.setViewportSize({ width: 390, height: 844 });
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
-	const output = page.locator(".docs-output-frame");
-	const source = page.locator(".docs-source-panel");
-	await expect(output).toHaveCount(1);
-	await expect(source.locator("[data-lab-source]")).toContainText(
-		'<main class="container">',
-	);
-	await expect(source.locator("[data-lab-source]")).toContainText(
-		'name="email"',
-	);
-	await expect(source.locator("[data-lab-source]")).not.toContainText("…");
+	const source = page.locator(".docs-hero-source pre code");
+	const result = page.locator(".docs-hero-render");
+	await expect(source).toContainText("<article>");
+	await expect(source).toContainText('<input type="email" required>');
+	await expect(source).toContainText("<button>Sign in</button>");
+	await expect(source).not.toContainText("…");
 	await expect(
-		page.getByRole("button", { name: "Get Started" }),
-	).toHaveAttribute("href", "/get-started");
-	await expect(page.getByRole("button", { name: "Examples" })).toHaveAttribute(
-		"href",
-		"/examples",
-	);
+		page.getByRole("button", { name: "Get started" }),
+	).toHaveAttribute("href", "/installation");
+	await expect(
+		page.getByRole("button", { name: "Browse examples" }),
+	).toHaveAttribute("href", "/examples");
 
-	// Source first, output second. Stacked, the two are read in sequence
-	// rather than compared side by side, and the sequence this page argues
-	// for is markup → interface: the output used to be ordered first, which
-	// put the result above its own cause.
-	const order = await Promise.all(
-		[source, output].map((locator) =>
-			locator.evaluate((element) => Number(getComputedStyle(element).order)),
-		),
-	);
-	expect(order).toEqual([1, 2]);
-
-	const frame = page.frameLocator("[data-lab-frame]");
-	await expect(frame.getByRole("heading", { name: "Sign in" })).toBeVisible();
-	await expect(frame.locator("header, footer")).toHaveCount(0);
-	await expect(frame.locator("article")).toHaveCount(1);
-	await expect(frame.locator("form")).toHaveCount(1);
+	// The result is the page's own Cirth rendering the card, not an image
+	// or a frame, and it is a picture of the output rather than a form on
+	// the home page: inert, so it adds no tab stops.
+	await expect(result).toHaveAttribute("inert", "");
+	await expect(result.locator("article")).toHaveCount(1);
+	await expect(result.locator("form")).toHaveCount(1);
+	await expect(result.locator("h2")).toHaveText("Sign in");
 
 	const builds = [
 		{
@@ -197,12 +145,10 @@ test("homepage keeps the source and authentic output comparison focused on mobil
 			scoped: true,
 		},
 	];
-	// The hero shows the default build and offers no switch, so each
-	// specimen is checked where it lives rather than through a control on
-	// the home page. The assertions are the ones that matter either way:
-	// every build's page is the real distributed stylesheet rendering the
-	// real markup, with the wrapper and the container class the build is
-	// supposed to have and nothing else.
+	// The four build specimens the Examples page frames. Each is checked
+	// where it lives: every build's page is the real distributed stylesheet
+	// rendering the real markup, with the wrapper and the container class
+	// the build is supposed to have and nothing else.
 	for (const build of builds) {
 		await page.goto(`${origin}/lab/${build.name}/`, {
 			waitUntil: "networkidle",
@@ -222,12 +168,13 @@ test("homepage keeps the source and authentic output comparison focused on mobil
 	}
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
-	await assertHeroDemoGeometry(page);
-	await page.setViewportSize({ width: 1440, height: 900 });
-	await assertHeroDemoGeometry(page);
+	for (const width of [390, 360, 768, 1024, 1440]) {
+		await page.setViewportSize({ width, height: 900 });
+		await assertHeroDemoGeometry(page);
+	}
 
 	const actionAlignment = await page
-		.locator(".docs-hero-actions")
+		.locator(".docs-hero .docs-hero-actions")
 		.evaluate((element) => ({
 			containerX: element.getBoundingClientRect().x,
 			firstActionX: element.firstElementChild?.getBoundingClientRect().x,
@@ -526,7 +473,7 @@ test("the homepage FAQ exposes consistent interactive states", async ({
 test("documentation active navigation uses the public registered state", async ({
 	page,
 }) => {
-	await page.goto(`${origin}/get-started/`, { waitUntil: "networkidle" });
+	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
 	const active = page.locator('.docs-sidebar a[aria-current="page"]');
 	const inactive = page.locator(".docs-sidebar a:not([aria-current])").first();
 	const inactiveStyle = await inactive.evaluate((element) => ({
@@ -540,9 +487,12 @@ test("documentation active navigation uses the public registered state", async (
 		document.body.append(probe);
 		probe.style.color = "var(--cirth-primary-border)";
 		const accent = getComputedStyle(probe).color;
+		probe.style.color = "var(--cirth-contrast-text)";
+		const contrast = getComputedStyle(probe).color;
 		probe.remove();
 		return {
 			accent,
+			contrast,
 			backgroundColor: style.backgroundColor,
 			backgroundImage: style.backgroundImage,
 			borderRadius: style.borderRadius,
@@ -555,15 +505,21 @@ test("documentation active navigation uses the public registered state", async (
 		};
 	});
 
-	// One marker and no more: the registered edge. Text stays neutral and
-	// keeps the same weight, with no tint, pill, or generic link underline.
+	// One accent marker and no more: the registered edge. Position is also
+	// carried by contrast, the convention the header's current entry follows:
+	// full-contrast ink and a heavier weight, never the accent, and no tint,
+	// pill, or generic link underline.
 	expect(geometry.backgroundImage).toBe("none");
 	expect(geometry.backgroundColor).toBe("rgba(0, 0, 0, 0)");
 	expect(geometry.borderRadius).toBe("0px");
 	expect(geometry.leadingEdge).toBe(2);
 	expect(geometry.leadingEdgeColor).toBe(geometry.accent);
-	expect(geometry.color).toBe(inactiveStyle.color);
-	expect(geometry.fontWeight).toBe(inactiveStyle.fontWeight);
+	expect(geometry.color).toBe(geometry.contrast);
+	expect(geometry.color).not.toBe(geometry.accent);
+	expect(geometry.color).not.toBe(inactiveStyle.color);
+	expect(Number(geometry.fontWeight)).toBeGreaterThan(
+		Number(inactiveStyle.fontWeight),
+	);
 	expect(geometry.textDecoration).toBe("none");
 
 	// One rail. The shell used to add a second amber bar as a ::before on
@@ -595,7 +551,7 @@ test("the navbar collapses at a single breakpoint with a complete menu", async (
 
 	for (const width of widths) {
 		await page.setViewportSize({ width, height: 800 });
-		await page.goto(`${origin}/get-started/`, { waitUntil: "networkidle" });
+		await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
 
 		// Ask the browser the question the stylesheet asks, rather than
 		// recomputing it from a width. Chromium evaluates a width media
@@ -667,7 +623,7 @@ test("the collapsed menu is complete, ordered, and returns focus", async ({
 }) => {
 	// 900px: squarely inside the range that used to be broken.
 	await page.setViewportSize({ width: 900, height: 800 });
-	await page.goto(`${origin}/get-started/`, { waitUntil: "networkidle" });
+	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
 
 	const actions = page.locator(".docs-header-actions");
 	const search = page.locator("[data-docs-search-trigger]");
@@ -734,7 +690,7 @@ test("the navbar states are a contrast ladder, not the accent", async ({
 	// below the current item, current at full contrast, and none of the
 	// three is the accent, which in chrome belongs to actions.
 	await page.setViewportSize({ width: 1280, height: 800 });
-	await page.goto(`${origin}/get-started/`, { waitUntil: "networkidle" });
+	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
 
 	const current = page.locator('.docs-nav-item a[aria-current="page"]');
 	const other = page.locator(".docs-nav-item a:not([aria-current])");
@@ -810,97 +766,61 @@ test("the navbar states are a contrast ladder, not the accent", async ({
 
 // --- The proof band -----------------------------------------------------
 
-// Four claims and two more below them, and what is worth pinning is no
-// longer only that each has a path to check it: it is that each says what
-// kind of claim it is. A guarantee and a capability age differently, and a
-// page that presents them identically is promising the weaker one. The
-// strip used to carry a measurement as well; the byte count now lives on
-// /deploy, where a reader is deciding something with it.
+// Six claims, one card each, and what is worth pinning is that every card
+// says what kind of claim it is and where to check it. A guarantee and a
+// capability age differently, and a page that presents them identically is
+// promising the weaker one.
 test("every claim says what kind it is, and how to check it", async ({
 	page,
 }) => {
 	await page.setViewportSize({ width: 1280, height: 900 });
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
-	const cells = page.locator(".docs-proof-metrics > div");
-	await expect(cells).toHaveCount(4);
+	const cards = page.locator(".docs-claim");
+	await expect(cards).toHaveCount(6);
 
-	for (const value of [
-		"0 B JS runtime",
-		"WCAG 2.2 AA baseline",
-		"Flexible distribution",
-		"Small by construction",
-	]) {
-		await expect(
-			page.locator(".docs-proof-metrics", { hasText: value }),
-			`${value} is stated`,
-		).toBeVisible();
-	}
-
-	// Every cell: a kind, a claim, what it means, and a way to check it.
-	const count = await cells.count();
+	// Every card: a kind, a heading, one sentence, and a way to check it,
+	// the last a real target rather than a word at the end of a line.
+	const count = await cards.count();
 	for (let index = 0; index < count; index++) {
-		const cell = cells.nth(index);
-		await expect(cell.locator("dt .docs-proof-state")).toHaveCount(1);
-		await expect(cell.locator("dd > strong")).toHaveCount(1);
-		await expect(cell.locator("dd small")).toHaveCount(1);
-		const link = cell.locator("dd a");
-		await expect(link, `cell ${index} has a check path`).toHaveCount(1);
+		const card = cards.nth(index);
+		await expect(card.locator(".docs-proof-state")).toHaveCount(1);
+		await expect(card.locator("h3")).toHaveCount(1);
+		await expect(card.locator("p")).toHaveCount(1);
+		const link = card.locator(":scope > a");
+		await expect(link, `card ${index} has a check path`).toHaveCount(1);
 		expect(
 			(await link.getAttribute("href")) || "",
-			`cell ${index} path is real`,
+			`card ${index} path is real`,
 		).not.toBe("");
+		const height = await link.evaluate(
+			(element) => element.getBoundingClientRect().height,
+		);
+		expect(height, `card ${index} check path is a 44px target`).toBeGreaterThanOrEqual(44);
 	}
 
-	// The vocabulary is shared by both halves of the section, the strip and
-	// the list under it, so a reader learns it once. Two of its three words
-	// are in use here; "Current fact" left with the size cell and the macro
-	// keeps it for whatever states a measurement next.
 	const kinds = await page
 		.locator(".docs-proof .docs-proof-state")
 		.evaluateAll((marks) => marks.map((mark) => mark.textContent?.trim()));
 	expect(kinds).toEqual([
 		"Guarantee",
 		"Guarantee",
+		"Guarantee",
+		"Guarantee",
 		"Capability",
-		"Guarantee",
-		"Guarantee",
 		"Capability",
 	]);
 
-	// The size is not a claim on this page at all now. What the strip states
-	// is the model the size follows from, and the byte count moved to
-	// /deploy where it is something a reader acts on rather than scores the
-	// project by. A bare "<14 KB" headline is the shape of a promise the
-	// project does not make; so is any figure standing on its own up here,
-	// which is why the strip is asserted to carry no byte count.
-	const model = cells.nth(3);
-	await expect(model.locator("dd > strong")).toHaveText("Small by construction");
-	await expect(model.locator("dd small")).toContainText("no component catalogue");
+	// The size is not a claim here, and neither is a count of builds: a
+	// figure standing on its own is the shape of a promise the project does
+	// not make. The model is what is claimed, and the measured size lives on
+	// Compatibility and About, where a reader acts on it.
 	await expect(page.locator(".docs-proof")).not.toContainText("<14 KB");
 	await expect(page.locator(".docs-proof")).not.toContainText(/\d+(\.\d+)? KB/);
-
-	// No claim rests on a count of builds either. "4 builds" was accurate,
-	// and the promise it implied (that there will always be exactly four)
-	// is not one worth making when print sheets and presets already sit
-	// beside them.
 	await expect(page.locator(".docs-proof")).not.toContainText(/\d+ builds/);
 
-	// The two claims that are not about the package's shape are a list, not
-	// a second table of the four above.
-	const claims = page.locator(".docs-proof-claims li");
-	await expect(claims).toHaveCount(2);
-	await expect(page.locator(".docs-proof table")).toHaveCount(0);
-	for (const value of ["0 B JS", "WCAG 2.2", "footprint"]) {
-		await expect(
-			page.locator(".docs-proof-claims", { hasText: value }),
-			`${value} is not restated below the strip`,
-		).toHaveCount(0);
-	}
-
-	// The marks are still glyphs from the shell's own set: one size, no
-	// container, hidden from assistive technology because the word is right
-	// beside them.
+	// The marks are glyphs from the shell's own set: one size, no container,
+	// hidden from assistive technology because the word is right beside them.
 	const marks = await page
 		.locator(".docs-proof-state svg")
 		.evaluateAll((nodes) =>
@@ -921,196 +841,293 @@ test("every claim says what kind it is, and how to check it", async ({
 		expect(Number.parseFloat(mark.border)).toBe(0);
 	}
 
-	// The band has no frame of its own: the two showcases above are each a
-	// hairline plate, and a third would be the shape this page was rebuilt
-	// to stop having. Its tint is what separates it from them, and from the
-	// FAQ below, which is back on the canvas for the same reason.
+	// The band's ground differs from the sections either side of it, so the
+	// page alternates rather than reading as one sheet.
 	const grounds = await page.evaluate(() => {
 		const read = (/** @type {string} */ selector) => {
 			const element = document.querySelector(selector);
-			if (!element) return null;
-			const style = getComputedStyle(element);
-			return {
-				background: style.backgroundColor,
-				border: Number.parseFloat(style.borderTopWidth),
-			};
+			return element ? getComputedStyle(element).backgroundColor : null;
 		};
 		return {
 			proof: read(".docs-proof"),
 			faq: read(".docs-native-faq"),
-			metrics: read(".docs-proof-metrics"),
-			showcase: read(".docs-showcase"),
+			showcase: read(".docs-theme-showcase"),
 		};
 	});
-	expect(grounds.metrics?.border, "the metric strip has no frame").toBe(0);
-	expect(
-		grounds.proof?.background,
-		"the proof band is tinted away from its neighbours",
-	).not.toBe(grounds.faq?.background);
-	expect(grounds.proof?.background).not.toBe(grounds.showcase?.background);
+	expect(grounds.proof).not.toBe(grounds.faq);
+	expect(grounds.proof).not.toBe(grounds.showcase);
 
-	// It stays a hairline grid at every width: two columns on a phone, four
-	// once the row can hold them, and never a set of stacked cards with the
-	// claims' relationship to each other taken out.
+	// One full-width card per row on a phone, two from 40rem, three from
+	// 64rem, and never a two-column grid of small type on a phone.
 	for (const width of [1440, 1023, 767, 390, 320]) {
 		await page.setViewportSize({ width, height: 900 });
-		const columns = await page
-			.locator(".docs-proof-metrics")
-			.evaluate(
-				(element) =>
-					getComputedStyle(element).gridTemplateColumns.split(" ").length,
-			);
-		expect(columns, `metric columns at ${width}px`).toBe(width >= 960 ? 4 : 2);
+		const layout = await page.locator(".docs-claim-list").evaluate((element) => {
+			const first = /** @type {HTMLElement} */ (element.firstElementChild);
+			return {
+				columns: getComputedStyle(element).gridTemplateColumns.split(" ").length,
+				listWidth: element.getBoundingClientRect().width,
+				cardWidth: first.getBoundingClientRect().width,
+				heading: Number.parseFloat(
+					getComputedStyle(/** @type {HTMLElement} */ (first.querySelector("h3"))).fontSize,
+				),
+				body: Number.parseFloat(
+					getComputedStyle(/** @type {HTMLElement} */ (first.querySelector("p"))).fontSize,
+				),
+			};
+		});
+		const expected = width >= 1024 ? 3 : width >= 640 ? 2 : 1;
+		expect(layout.columns, `claim columns at ${width}px`).toBe(expected);
+		if (expected === 1) {
+			expect(layout.cardWidth).toBeCloseTo(layout.listWidth, 0);
+		}
+		expect(layout.heading, `claim heading size at ${width}px`).toBeGreaterThanOrEqual(18);
+		expect(layout.body, `claim text size at ${width}px`).toBeGreaterThanOrEqual(16);
 	}
 });
 
 // --- The hero composition -----------------------------------------------
 
-/**
- * What the hero has to be true about, now that the reveal is a CSS wipe
- * over markup that never changes: the source is whole and highlighted at
- * every moment, the output is the real build, and neither of those facts
- * depends on JavaScript having run, on the animation having finished, or
- * on a preference being set one way rather than the other.
- * @param {import("@playwright/test").Page} page
- */
-const heroState = (page) =>
-	page.evaluate(() => {
-		const code = /** @type {HTMLElement} */ (
-			document.querySelector("[data-lab-source]")
-		);
-		const pre = /** @type {HTMLElement} */ (
-			document.querySelector(".docs-source-panel pre")
-		);
-		return {
-			text: code.textContent?.length ?? 0,
-			highlighted: code.querySelectorAll(".hljs-name, .hljs-attr").length,
-			preHeight: Math.round(pre.getBoundingClientRect().height),
-			preScrollWidth: pre.scrollWidth,
-			cardHeight: Math.round(
-				/** @type {HTMLElement} */ (
-					document.querySelector(".docs-source-panel")
-				).getBoundingClientRect().height,
-			),
-		};
-	});
+// The source pane and the card beside it are one string in home.njk,
+// highlighted into one and rendered into the other. The contract is that
+// they cannot drift: the rendered card is exactly the markup listed.
+test("the hero's result is exactly the markup in its source pane", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
-test("the hero writes the source in without ever changing it", async ({
+	const [listed, rendered] = await Promise.all([
+		page.locator(".docs-hero-source pre code").evaluate((element) => element.textContent ?? ""),
+		page.locator(".docs-hero-render").evaluate((element) => element.innerHTML),
+	]);
+	expect(normalizeMarkup(rendered)).toBe(normalizeMarkup(listed));
+	// Highlighted at build time: there is no highlighter in the browser.
+	expect(
+		await page.locator(".docs-hero-source .hljs-name").count(),
+	).toBeGreaterThan(10);
+});
+
+test("the hero has no controls and no motion, and its result follows the page", async ({
 	page,
 }) => {
 	await page.emulateMedia({ reducedMotion: "no-preference" });
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
-	// Mid-animation.
-	const during = await heroState(page);
-	expect(during.text).toBeGreaterThan(300);
-	expect(during.highlighted).toBeGreaterThan(10);
+	// The demo makes its argument by being read. The copy button stays: it
+	// is the affordance every code block on the site carries. Everything
+	// else operable in there belongs to the rendered card, which is inert,
+	// so the card adds no tab stops.
+	await expect(page.locator(".docs-hero-demo select")).toHaveCount(0);
+	await expect(page.locator(".docs-hero-render")).toHaveAttribute("inert", "");
+	const stray = await page.locator(".docs-hero-demo").evaluate((element) =>
+		[...element.querySelectorAll("a, button, input, select, textarea")].filter(
+			(node) => !node.closest("[inert]") && !node.classList.contains("copy"),
+		).length,
+	);
+	expect(stray, "operable controls outside the inert card").toBe(0);
 
-	const animation = await page
-		.locator(".docs-source-panel pre > code")
-		.evaluate((element) => {
-			const running = element.getAnimations();
-			return {
-				count: running.length,
-				// One pass and done: a hero that keeps re-typing itself is a
-				// thing to look away from, not a thing to read.
-				iterations: running.map(
-					(item) =>
-						/** @type {CSSAnimation & { effect: KeyframeEffect }} */ (item)
-							.effect.getTiming().iterations,
-				),
-			};
-		});
-	expect(animation.count).toBe(1);
-	expect(animation.iterations).toEqual([1]);
+	// Nothing in the hero animates, with or without the preference.
+	const animations = await page
+		.locator(".docs-hero")
+		.evaluate((element) => element.getAnimations({ subtree: true }).length);
+	expect(animations).toBe(0);
 
-	// Let it finish, then compare. The wipe only ever changed the ink, so
-	// nothing about the pane (its height, its scroll extent, the card
-	// around it, the text inside it, or the highlighting) is allowed to
-	// differ between a half-written state and a finished one.
-	await page
-		.locator(".docs-source-panel pre > code")
-		.evaluate((element) =>
-			Promise.all(element.getAnimations().map((item) => item.finished)),
-		);
-	const after = await heroState(page);
-	expect(after).toEqual(during);
-
-	// And the whole snippet is selectable and copyable throughout, because
-	// it was never taken out of the document to begin with. The last line
-	// of the markup, so reaching it means none of it was cut.
-	await expect(page.locator("[data-lab-source]")).toContainText("</main>");
+	// The result is rendered by the page's own stylesheet, so it follows the
+	// page's scheme without being told.
+	const card = page.locator(".docs-hero-render article");
+	const light = await card.evaluate((element) => getComputedStyle(element).backgroundColor);
+	await page.locator(".docs-theme-toggle").click();
+	await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+	const dark = await card.evaluate((element) => getComputedStyle(element).backgroundColor);
+	expect(dark).not.toBe(light);
 });
 
-test("the hero holds still under reduced motion", async ({ page }) => {
-	// The behavior project already runs reduced, which is what makes the
-	// screenshot suite deterministic; assert the contract rather than
-	// assume it.
-	await page.emulateMedia({ reducedMotion: "reduce" });
+// --- The scroll story ---------------------------------------------------
+
+/** @param {import("@playwright/test").Page} page */
+const storyState = (page) =>
+	page.evaluate(() => {
+		const root = /** @type {HTMLElement} */ (document.querySelector("[data-docs-story]"));
+		return {
+			enhanced: root.classList.contains("is-enhanced"),
+			active: [...root.querySelectorAll("[data-docs-story-step]")].map((step) =>
+				step.classList.contains("is-active"),
+			),
+			opacities: [...root.querySelectorAll(".docs-story-visual")].map((visual) =>
+				Number(getComputedStyle(visual).opacity),
+			),
+			positions: [...root.querySelectorAll(".docs-story-visual")].map(
+				(visual) => getComputedStyle(visual).position,
+			),
+		};
+	});
+
+test("the story keeps its three beats and their order", async ({ page }) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	const headings = await page
+		.locator(".docs-story-text h3")
+		.evaluateAll((items) => items.map((item) => item.textContent?.trim()));
+	expect(headings).toHaveLength(3);
+	expect(headings[0]).toBe("Don't reinvent every interface.");
+	expect(headings[1]).toMatch(/100 class names/);
+	expect(headings[2]).toBe("use only semantic HTML tags.");
+
+	// Overloaded markup, then semantic markup, then the interface: the
+	// counts are read off the listings, and the semantic one has none.
+	const labels = await page
+		.locator(".docs-story-code .docs-pane-label span:last-child")
+		.evaluateAll((items) => items.map((item) => item.textContent?.trim()));
+	expect(Number.parseInt(labels[0] ?? "", 10)).toBeGreaterThan(40);
+	expect(labels[1]).toBe("0 class names");
+	await expect(
+		page.locator("[data-docs-story-step='3'] .docs-story-render-stage article"),
+	).toHaveCount(1);
+});
+
+test("the story becomes one sticky stage on a wide screen, and never moves the page", async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 1440, height: 900 });
+	await page.emulateMedia({ reducedMotion: "no-preference" });
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
-	const animations = await page.evaluate(() =>
-		document
-			.getAnimations()
-			.map((item) => /** @type {CSSAnimation} */ (item).animationName)
-			.filter(Boolean),
-	);
-	expect(animations).not.toContain("docs-lab-write");
-	expect(animations).not.toContain("docs-lab-render");
+	const initial = await storyState(page);
+	expect(initial.enhanced).toBe(true);
+	expect(initial.positions).toEqual(["sticky", "sticky", "sticky"]);
 
-	// The finished composition is the resting state, so removing the
-	// animation removes nothing: full source, unclipped, output visible.
-	const state = await heroState(page);
-	expect(state.text).toBeGreaterThan(300);
-	expect(state.highlighted).toBeGreaterThan(10);
-	expect(
-		await page
-			.locator(".docs-source-panel pre > code")
-			.evaluate((element) => getComputedStyle(element).clipPath),
-	).toBe("none");
-	await expect(page.locator(".docs-output-frame")).toBeVisible();
-	expect(
-		await page
-			.locator(".docs-output-frame")
-			.evaluate((element) => getComputedStyle(element).opacity),
-	).toBe("1");
+	for (const step of [1, 2, 3]) {
+		const target = await page
+			.locator(`[data-docs-story-step="${step}"] .docs-story-text`)
+			.evaluate((element) => {
+				const box = element.getBoundingClientRect();
+				const y = Math.round(window.scrollY + box.top + box.height / 2 - innerHeight / 2);
+				window.scrollTo(0, y);
+				return y;
+			});
+		await expect
+			.poll(async () => (await storyState(page)).active)
+			.toEqual([1, 2, 3].map((index) => index === step));
+		// No scroll hijacking: the page is exactly where the reader put it.
+		expect(await page.evaluate(() => Math.round(window.scrollY))).toBe(target);
+		await expect
+			.poll(async () => (await storyState(page)).opacities[step - 1])
+			.toBe(1);
+	}
+
+	// Keyboard focus reaching a visual that is not on stage brings it
+	// forward instead of leaving focus inside something transparent.
+	await page.locator("[data-docs-story-step='1'] .docs-story-code pre").focus();
+	await expect
+		.poll(async () => (await storyState(page)).active)
+		.toEqual([true, false, false]);
 });
 
-test("the hero has no controls, and its output follows the page", async ({
+test("the story holds still under reduced motion and on a phone", async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 1440, height: 900 });
+	await page.emulateMedia({ reducedMotion: "reduce" });
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	let state = await storyState(page);
+	expect(state.enhanced).toBe(false);
+	expect(state.opacities).toEqual([1, 1, 1]);
+	expect(state.positions).toEqual(["static", "static", "static"]);
+
+	await page.emulateMedia({ reducedMotion: "no-preference" });
+	await page.setViewportSize({ width: 390, height: 844 });
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	state = await storyState(page);
+	expect(state.enhanced).toBe(false);
+	expect(state.opacities).toEqual([1, 1, 1]);
+
+	// Each beat is followed by its own visual in the reading order.
+	const order = await page.locator("[data-docs-story-step]").evaluateAll((steps) =>
+		steps.map((step) => {
+			const text = /** @type {HTMLElement} */ (step.querySelector(".docs-story-text"));
+			const visual = /** @type {HTMLElement} */ (step.querySelector(".docs-story-visual"));
+			return text.getBoundingClientRect().bottom <= visual.getBoundingClientRect().top + 1;
+		}),
+	);
+	expect(order).toEqual([true, true, true]);
+});
+
+// --- Framework agnostic --------------------------------------------------
+
+test("the framework section names each ecosystem and leads to a checked guide", async ({
 	page,
 }) => {
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	// The demo makes its argument by being read, not by being operated:
-	// the build and theme selects that used to sit in the two title bands
-	// are gone, and nothing replaced them.
-	await expect(page.locator(".docs-lab-stage select")).toHaveCount(0);
-	// The copy button stays: it belongs to the code block, is the same
-	// affordance every <pre> on the site carries, and asks nothing of a
-	// reader who ignores it.
-	await expect(
-		page.locator(".docs-lab-stage button:not(.copy)"),
-	).toHaveCount(0);
-
-	// The one thing markup cannot express: the framed document is a
-	// separate document and does not inherit the page's colour scheme. So
-	// it follows it, rather than asking the reader to pick.
-	const before = await heroState(page);
-	await expect(page.locator("[data-lab-frame]")).toHaveAttribute(
-		"src",
-		/theme=light/,
+	const section = page.locator(".docs-frameworks");
+	await expect(section.locator("h2")).toHaveText(
+		"Pure CSS. Framework agnostic. Works everywhere.",
 	);
-	await page.locator(".docs-theme-toggle").click();
-	await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-	await expect(page.locator("[data-lab-frame]")).toHaveAttribute(
-		"src",
-		/theme=dark/,
-	);
+	// No third-party logo: the ecosystems are text links.
+	await expect(section.locator("img, svg")).toHaveCount(0);
+	const links = await section
+		.locator(".docs-ecosystem-list a")
+		.evaluateAll((items) =>
+			items.map((item) => ({ text: item.textContent?.trim(), href: item.getAttribute("href") })),
+		);
+	for (const name of ["HTML", "React", "Next.js", "Vue", "Nuxt", "Svelte", "SvelteKit", "Astro", "Angular", "Vite", "Eleventy"]) {
+		const link = links.find((item) => item.text === name);
+		expect(link, `${name} is listed`).toBeTruthy();
+		expect(link?.href ?? "").toMatch(/^\/installation\//);
+	}
+	await expect(section).toContainText("None of these projects is affiliated with Cirth or endorses it");
 
-	// And the markup on the other side is untouched by any of it.
-	const after = await heroState(page);
-	expect(after.text).toBe(before.text);
-	expect(after.highlighted).toBeGreaterThan(10);
+	// Four syntaxes, one element: the rendered button is the page's own.
+	await expect(section.locator(".docs-syntax-list li")).toHaveCount(4);
+	await expect(section.locator(".docs-dom-result button")).toHaveText("Save");
+});
+
+// --- Installation widgets -----------------------------------------------
+
+test("the package manager switch shows one command and remembers the choice", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
+	const install = page.locator("[data-docs-install]").first();
+	const visible = () =>
+		install.locator("pre").evaluateAll((items) =>
+			items
+				.filter((item) => getComputedStyle(item).display !== "none")
+				.map((item) => item.textContent?.trim()),
+		);
+	expect(await visible()).toEqual(["npm install @cirthcss/cirth"]);
+
+	await install.getByLabel("pnpm").check();
+	expect(await visible()).toEqual(["pnpm add @cirthcss/cirth"]);
+
+	// A radio group named by its legend, with every segment a 44px target.
+	await expect(install.getByRole("group", { name: "Package manager" })).toHaveCount(1);
+	const heights = await install
+		.locator("label")
+		.evaluateAll((items) => items.map((item) => Math.round(item.getBoundingClientRect().height)));
+	for (const height of heights) expect(height).toBeGreaterThanOrEqual(44);
+
+	// The choice follows the reader to the next guide.
+	await page.goto(`${origin}/installation/vite/`, { waitUntil: "networkidle" });
+	await expect(page.locator("[data-docs-install] input[value='pnpm']")).toBeChecked();
+});
+
+// --- Pages that moved ---------------------------------------------------
+
+test("an old address forwards to the page that replaced it", async ({ page }) => {
+	for (const [from, to] of [
+		["/get-started/#cdn", "/installation/#cdn"],
+		["/get-started/#excluding-a-third-party-component", "/compatibility/#excluding-a-third-party-component"],
+		["/deploy/#caching", "/compatibility/#caching"],
+		["/utilities/reduce-motion/", "/guides/accessibility/#reduced-motion"],
+	]) {
+		await page.goto(`${origin}${from}`);
+		await page.waitForURL(`${origin}${to}`);
+		expect(page.url()).toBe(`${origin}${to}`);
+	}
+	// And says so without script, with a canonical link and a way to go on.
+	const response = await page.request.get(`${origin}/deploy/`);
+	const html = await response.text();
+	expect(html).toMatch(/<link rel="canonical" href="\/compatibility\/"/);
+	expect(html).toMatch(/<meta name="robots" content="noindex"/);
+	expect(html).toMatch(/<a href="\/compatibility\/">Compatibility<\/a>/);
 });
 
 test.describe("without JavaScript", () => {
@@ -1121,26 +1138,36 @@ test.describe("without JavaScript", () => {
 	}) => {
 		await page.goto(`${origin}/`, { waitUntil: "load" });
 
-		const code = page.locator("[data-lab-source]");
-		await expect(code).toContainText('<main class="container">');
-		await expect(code).toContainText('name="password"');
+		const code = page.locator(".docs-hero-source pre code");
+		await expect(code).toContainText("<article>");
+		await expect(code).toContainText('<input type="password" required>');
 		await expect(code).toContainText("<button>Sign in</button>");
 		await expect(code).not.toContainText("…");
 		// Highlighted at build time, so it is highlighted here too.
 		expect(await code.locator("span").count()).toBeGreaterThan(10);
-		// The output is the real build, not a placeholder.
-		await expect(page.locator("[data-lab-frame]")).toHaveAttribute(
-			"src",
-			/\/lab\/default\//,
-		);
+		// The output is the real stylesheet rendering the real card.
 		await expect(
-			page.frameLocator("[data-lab-frame]").getByRole("heading", {
-				name: "Sign in",
-			}),
-		).toBeVisible();
-		// And the proof band is readable without a line of script.
-		await expect(page.locator(".docs-proof-metrics > div")).toHaveCount(4);
-		await expect(page.locator(".docs-proof-claims li")).toHaveCount(2);
+			page.locator(".docs-hero-render").getByRole("heading", { name: "Sign in" }),
+		).toHaveCount(1);
+		await expect(page.locator(".docs-hero-render article")).toBeVisible();
+		// The proof band is readable without a line of script.
+		await expect(page.locator(".docs-claim")).toHaveCount(6);
+	});
+
+	// The story is served complete: three beats, each followed by what it
+	// shows, all of them visible. The sticky stage is an enhancement only.
+	test("the story serves every beat and every visual", async ({ page }) => {
+		await page.setViewportSize({ width: 1440, height: 900 });
+		await page.goto(`${origin}/`, { waitUntil: "load" });
+		await expect(page.locator("[data-docs-story]")).not.toHaveClass(/is-enhanced/);
+		for (const step of [1, 2, 3]) {
+			await expect(
+				page.locator(`[data-docs-story-step="${step}"] .docs-story-text h3`),
+			).toBeVisible();
+			await expect(
+				page.locator(`[data-docs-story-step="${step}"] .docs-story-visual`),
+			).toBeVisible();
+		}
 	});
 
 	// The showcase's fallback is the whole reason its tab strip ships
@@ -1880,19 +1907,24 @@ test("the home page states its argument in one heading outline", async ({
 		).toBeLessThanOrEqual(1);
 	}
 
-	// Five sections, because eight was the problem. "Native behavior stays
-	// native" and "You're already looking at Cirth" are examples and a
-	// sentence inside the showcase now; "Small surface, finished defaults"
-	// and "Claims with a check path" are one proof band.
+	// The argument in order: the claim and its proof, how it works, where
+	// it works, the native behaviour, the theme, the evidence, the
+	// questions, and the way in. "Native behavior stays native" and "You're
+	// already looking at Cirth" stay examples and a sentence inside the
+	// showcase; "Small surface, finished defaults" and "Claims with a check
+	// path" stay one proof band.
 	const sections = await page
 		.locator("main > section")
 		.evaluateAll((items) => items.map((item) => item.className.split(" ")[0]));
 	expect(sections).toEqual([
-		"docs-native-hero",
+		"docs-hero",
+		"docs-story",
+		"docs-frameworks",
 		"docs-showcase",
 		"docs-showcase",
 		"docs-proof",
 		"docs-native-faq",
+		"docs-cta",
 	]);
 	for (const gone of [
 		"Native behavior stays native",
@@ -1913,7 +1945,7 @@ test("every showcase is one contained stage, not three loose columns", async ({
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
 	const grid = await page
-		.locator(".docs-native-grid")
+		.locator(".docs-showcase .docs-home-inner")
 		.first()
 		.evaluate((element) => element.getBoundingClientRect().width);
 
@@ -2197,13 +2229,13 @@ test("a demo renders the same as the same markup under cirth.css alone", async (
 
 // The documentation's chapter separators are the documentation's. As
 // descendant selectors they reached headings inside live examples: an <h2>
-// in the classless demo on /get-started/ took a 1px rule and 12px of
+// in the classless demo on the install page took a 1px rule and 12px of
 // padding, and three <h3>s took 32px of editorial margin.
 test("no shell chapter rule or margin lands on a heading inside a live example", async ({
 	page,
 }) => {
 	for (const url of [
-		"/get-started/",
+		"/installation/",
 		"/examples/",
 		"/layout/landmarks/",
 		"/colors/",
@@ -2432,15 +2464,6 @@ test("the shell's flush panels are cards with their knobs moved", async ({
 		}, selector);
 
 	await page.setViewportSize({ width: 1440, height: 900 });
-	await page.goto(`${origin}/`);
-	const source = await readPanel(".docs-source-panel");
-	expect(source.tag).toBe("ARTICLE");
-	expect(source.horizontal).toBe("0");
-	expect(source.vertical).toBe("0");
-	expect(source.padding).toBe("0px");
-	expect(source.headerInset).toBeCloseTo(1, 1);
-	expect(source.headerRule).toBe("1px");
-
 	await page.goto(`${origin}/components/nav/`);
 	await page.evaluate(() => {
 		const trigger = /** @type {HTMLElement} */ (
@@ -2510,7 +2533,7 @@ test("the metrics panels are gridded description lists divided by their gap", as
 	};
 
 	for (const [url, selector] of [
-		["/", ".docs-proof-metrics"],
+		["/why-cirth/", ".docs-facts"],
 		["/brand/", ".docs-brand-measures"],
 		["/about/", ".docs-proof-strip dl"],
 	]) {
