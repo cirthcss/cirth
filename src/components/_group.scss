@@ -93,68 +93,35 @@ $visible-group-item: ':not([hidden], input[type="hidden"])';
     width: auto;
   }
 
-  // Group box shadow when a button is focused
-  &:has(
-    button:focus,
-    [type="submit"]:focus,
-    [type="button"]:focus,
-    [role="button"]:focus
-  ) {
-    --cirth-group-box-shadow: var(--cirth-group-box-shadow-focus-with-button);
+  // Focus: one ring around the whole row, in the colour of whatever inside
+  // it has focus. A ring offset from one segment would overlap the
+  // segments beside it, so the group draws the ring and its members draw
+  // none. The geometry is every other control's (content/_button.scss).
+  &:has(:focus-visible) {
+    outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
+    outline-offset: var(--cirth-outline-offset);
+  }
 
-    // [aria-invalid] siblings keep their state border: hiding it while
-    // the button has focus dropped the invalid signal (upstream #536)
-    input:not([type="checkbox"], [type="radio"], [aria-invalid]),
-    select:not([aria-invalid]) {
-      border-color: transparent;
+  @if $enable-classes {
+    &:has(.secondary:focus-visible) {
+      outline-color: var(--cirth-secondary-focus);
+    }
+
+    &:has(.contrast:focus-visible) {
+      outline-color: var(--cirth-contrast-focus);
     }
   }
 
-  // Group box shadow when an input is focused
-  &:has(input:not([type="submit"], [type="button"]):focus, select:focus) {
-    --cirth-group-box-shadow: var(--cirth-group-box-shadow-focus-with-input);
-
-    // Adapt box shadow for buttons
-    button,
-    [type="submit"],
-    [type="button"],
-    [role="button"] {
-      --cirth-button-box-shadow: 0 0 0 var(--cirth-border-width)
-        var(--cirth-primary-border);
-      --cirth-button-hover-box-shadow: 0 0 0 var(--cirth-border-width)
-        var(--cirth-primary-border-active);
-    }
+  &:has([aria-invalid="false"]:focus-visible) {
+    outline-color: var(--cirth-form-element-valid-focus-color);
   }
 
-  // Remove button box shadow if we have a group box shadow
-  button,
-  [type="submit"],
-  [type="reset"],
-  [type="button"],
-  [role="button"] {
-    &:focus {
-      box-shadow: none;
-    }
-  }
-}
-
-#{$parent-selector} [role="search"] {
-  > #{$visible-group-item} {
-    &:nth-child(1 of #{$visible-group-item}) {
-      border-start-start-radius: var(--cirth-radius-pill);
-      border-end-start-radius: var(--cirth-radius-pill);
-    }
-
-    &:nth-last-child(1 of #{$visible-group-item}) {
-      border-start-end-radius: var(--cirth-radius-pill);
-      border-end-end-radius: var(--cirth-radius-pill);
-    }
+  &:has([aria-invalid="true"]:focus-visible) {
+    outline-color: var(--cirth-form-element-invalid-focus-color);
   }
 
-  // Same trailing-helper compensation as above, with the pill radius
-  > :has(+ small:last-child) {
-    border-start-end-radius: var(--cirth-radius-pill);
-    border-end-end-radius: var(--cirth-radius-pill);
+  :is(button, input, select, textarea, [role="button"], [type]):focus-visible {
+    outline: none;
   }
 }
 

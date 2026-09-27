@@ -164,9 +164,22 @@
     }
   }
 
-  &[disabled] {
-    --cirth-background-color: var(--cirth-border-color);
+  // The track takes the disabled wash (forms/_basics.scss); the thumb
+  // takes the disabled ink, since a white thumb on a faint wash is gone.
+  &[disabled]::before {
+    background-color: var(--cirth-disabled-color);
   }
+}
+
+// Disabled marks. The field rule paints a disabled box with the neutral
+// wash, and a mark or a dot drawn in the on-surface ink (white) would
+// vanish into it: the mark and the ring take the disabled ink instead.
+#{$parent-selector} [type="checkbox"]:not([role="switch"]):disabled::before {
+  background-color: var(--cirth-disabled-color);
+}
+
+#{$parent-selector} [type="radio"]:checked:disabled {
+  border-color: var(--cirth-disabled-color);
 }
 
 // Aria-invalid

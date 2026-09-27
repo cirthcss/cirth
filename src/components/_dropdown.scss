@@ -107,39 +107,19 @@
       }
     }
 
-    &:active,
-    &:focus {
-      border-color: var(--cirth-form-element-active-border-color);
-    }
-
-    &:focus {
-      box-shadow: 0
-        0
-        0
-        var(--cirth-outline-width)
-        var(--cirth-form-element-focus-color);
-    }
-
-    // Reset the accordion's visible outline: the box-shadow ring above is
-    // the indicator here. Kept transparent instead of none so forced-colors
-    // mode (which strips box-shadow) still paints a system-color ring.
-    // The offset is reset too, and not left to inherit the accordion's: a
-    // disclosure row is a rule and holds its ring clear of the text, but a
-    // dropdown is a framed control whose real indicator is the box-shadow
-    // above, drawn at the border box. Anchoring the forced-colors outline
-    // to the same edge keeps the two modes showing the same ring.
+    // The field's ring, in the field's focus slot: a dropdown trigger is
+    // a field, and a validation state rebinds the slot below.
     &:focus-visible {
-      outline: var(--cirth-outline-width) solid transparent;
-      outline-offset: 0;
+      outline: var(--cirth-outline-width)
+        solid
+        var(--cirth-form-element-focus-color);
+      outline-offset: var(--cirth-outline-offset);
     }
 
     // Aria-invalid
     &[aria-invalid="false"] {
       --cirth-form-element-border-color: var(
         --cirth-form-element-valid-border-color
-      );
-      --cirth-form-element-active-border-color: var(
-        --cirth-form-element-valid-focus-color
       );
       --cirth-form-element-focus-color: var(
         --cirth-form-element-valid-focus-color
@@ -149,9 +129,6 @@
     &[aria-invalid="true"] {
       --cirth-form-element-border-color: var(
         --cirth-form-element-invalid-border-color
-      );
-      --cirth-form-element-active-border-color: var(
-        --cirth-form-element-invalid-focus-color
       );
       --cirth-form-element-focus-color: var(
         --cirth-form-element-invalid-focus-color

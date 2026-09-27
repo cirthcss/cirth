@@ -10,6 +10,7 @@ const {
 } = require("../scripts/lib/dist-manifest");
 const { listPresetNames } = require("../scripts/lib/presets");
 const { setContent } = require("./helpers/render");
+const { parseColor } = require("../scripts/lib/color");
 
 // gh#124 — every stylesheet Cirth ships puts all of its rules in one
 // cascade layer, `@layer cirth` (specs/cascade-layer.md). The contract is
@@ -92,6 +93,17 @@ const styleOf = (page, id, property) =>
 	);
 
 const ink = "rgb(1, 2, 3)";
+
+// A painted colour as 8-bit sRGB. The accent reaches a link through its text
+// role, a relative colour (specs/surface-and-edge-model.md), which engines
+// serialise as oklch() even when it resolves to the very rgb() it started
+// from. What these tests assert is the colour, not its notation.
+/** @param {string} value */
+const asRgb = (value) => {
+	if (!/^(oklch|oklab|rgb)/.test(value)) return value;
+	const { r, g, b } = parseColor(value);
+	return `rgb(${[r, g, b].map((channel) => Math.round(channel * 255)).join(", ")})`;
+};
 
 // --- The artifacts, as a browser parses them ---------------------------
 
@@ -214,7 +226,7 @@ for (const build of builds) {
 				`<style>${unlayered(build.css)}</style><style>${item.css}</style>${markup}`,
 			);
 			expect(
-				await styleOf(page, "target", item.read),
+				asRgb(await styleOf(page, "target", item.read)),
 				"without the layer, Cirth's heavier selector wins",
 			).not.toBe(ink);
 
@@ -225,7 +237,7 @@ for (const build of builds) {
 			]) {
 				await setContent(page, `${head}${markup}`);
 				expect(
-					await styleOf(page, "target", item.read),
+					asRgb(await styleOf(page, "target", item.read)),
 					`author CSS loaded ${label} Cirth wins`,
 				).toBe(ink);
 			}
@@ -336,7 +348,7 @@ for (const preset of presets) {
 				`<style>${build.css}</style>${consumer}<style>${preset.css}</style>`,
 				`<style>${build.css}</style><style>${preset.css}</style>${consumer}`,
 			]) {
-				expect((await accentOf(page, build, head)).link).toBe(ink);
+				expect(asRgb((await accentOf(page, build, head)).link)).toBe(ink);
 			}
 		});
 	}
@@ -428,7 +440,7 @@ for (const build of builds.filter(({ scoped }) => scoped)) {
 			);
 
 			expect(cirthOnly.button).not.toBe(ink);
-			expect(customised.link).toBe(ink);
+			expect(asRgb(customised.link)).toBe(ink);
 		});
 	});
 }

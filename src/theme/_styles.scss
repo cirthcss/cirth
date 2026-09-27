@@ -67,6 +67,11 @@
   --cirth-border-width: var(--cirth-border-width-1);
   --cirth-outline-width: var(--cirth-border-width-2);
 
+  // Focus is one ring, drawn as an outline and held off the control by a
+  // gap as wide as the ring: the ring used to be a band of the accent
+  // pressed against a fill of the same accent. See specs/control-emphasis.md.
+  --cirth-outline-offset: var(--cirth-outline-width);
+
   // The page surface slot, defaulting to the canvas input. Declared here
   // rather than in the scheme files because the value it copies is an
   // unresolved light-dark() pair: an alias to one carries the pair rather
@@ -154,10 +159,6 @@
 
   // Group (role="group")
   --cirth-group-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
-  --cirth-group-box-shadow-focus-with-button: 0 0 0 var(--cirth-outline-width)
-    var(--cirth-primary-focus);
-  --cirth-group-box-shadow-focus-with-input: 0 0 0 var(--cirth-border-width-1)
-    var(--cirth-form-element-border-color);
 
   // Card (<article>)
   // A card is a sheet on the page, not a floating one: the raised surface
@@ -403,11 +404,9 @@
   }
 
   // Checkboxes, Radios and Switches
-  [type="checkbox"],
-  [type="radio"] {
-    --cirth-border-width: var(--cirth-border-width-2);
-  }
-
+  // One stroke, like every other resting edge: the control edge clears 3:1
+  // at 1px on every surface level, so the 2px these two used to carry was
+  // an exception with no reason left behind it.
   // A 1.5em box at the full control radius would read as a circle:
   // keep checkboxes visibly square-cornered
   [type="checkbox"] {
@@ -418,23 +417,6 @@
     --cirth-border-width: 0.1875rem;
   }
 
-  // Dropdown (details.dropdown)
-  @if $enable-classes {
-    details.dropdown {
-      summary:not([role="button"]) {
-        --cirth-outline-width: var(--cirth-border-width-1);
-      }
-    }
-
-    nav {
-      details.dropdown {
-        summary:focus-visible {
-          --cirth-outline-width: var(--cirth-border-width-2);
-        }
-      }
-    }
-  }
-
   // Group (role="group")
   [role="search"] {
     --cirth-border-radius: var(--cirth-radius-pill);
@@ -442,34 +424,6 @@
 
   [role="search"],
   #{$group-selector} {
-    @if $enable-classes {
-      &:has(
-        button.secondary:focus,
-        [type="submit"].secondary:focus,
-        [type="button"].secondary:focus,
-        [role="button"].secondary:focus
-      ) {
-        --cirth-group-box-shadow-focus-with-button: 0
-          0
-          0
-          var(--cirth-outline-width)
-          var(--cirth-secondary-focus);
-      }
-
-      &:has(
-        button.contrast:focus,
-        [type="submit"].contrast:focus,
-        [type="button"].contrast:focus,
-        [role="button"].contrast:focus
-      ) {
-        --cirth-group-box-shadow-focus-with-button: 0
-          0
-          0
-          var(--cirth-outline-width)
-          var(--cirth-contrast-focus);
-      }
-    }
-
     button,
     [type="submit"],
     [type="button"],

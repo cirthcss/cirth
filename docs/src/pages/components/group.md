@@ -50,13 +50,11 @@ at both ends:
 * Elements with `[hidden]` and `input[type="hidden"]` are ignored when the
   first and last visible controls are calculated, so hidden form metadata
   does not break the group's outer corners.
-* Focusing any child raises it above its siblings (`z-index: 2`) and
-  recolors the whole group's shadow to match whichever child (button or
-  input) is focused:
-  `--cirth-group-box-shadow-focus-with-button` /
-  `-focus-with-input`.
-* A focused button's own shadow is suppressed in favor of the group's,
-  so the ring doesn't double up.
+* Focusing any child raises it above its siblings (`z-index: 2`) and draws
+  one ring around the whole group, in the colour the focused child would
+  use on its own (the accent, `.secondary`, `.contrast`, or a validation
+  state). The child draws none, so the ring does not overlap its
+  neighbours.
 * A `small` inside the group drops below the row as full-width helper
   text, wherever it sits in the markup, keeping the usual muted helper
   style; the control before a trailing `small` keeps the group's end

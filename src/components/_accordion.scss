@@ -98,19 +98,17 @@
 
     &:focus-visible {
       &:not([role]) {
-        // Outset by a quarter step, not inset by the ring's own width.
-        // A summary carries `padding-block` but no `padding-inline`: the
-        // trigger text starts exactly where the panel text below it does,
-        // which is the alignment this component wants, so the border box
-        // and the first glyph share an edge. An inset ring was therefore
-        // drawn *over* the first character: measured, the gap from the
-        // ring to the text was 0px horizontally against 6px vertically.
-        // Offsetting outward buys the same 4px on all four sides without
-        // indenting the trigger away from its own panel. The row is a rule
-        // rather than a box, so there is no frame for the ring to collide
-        // with on the way out.
+        // Outset, not inset by the ring's own width. A summary carries
+        // `padding-block` but no `padding-inline`: the trigger text starts
+        // exactly where the panel text below it does, which is the
+        // alignment this component wants, so the border box and the first
+        // glyph share an edge, and an inset ring was drawn *over* the
+        // first character. The shared offset holds the ring clear of it on
+        // all four sides without indenting the trigger away from its own
+        // panel; the row is a rule rather than a box, so there is no frame
+        // for the ring to collide with on the way out.
         outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
-        outline-offset: var(--cirth-space-1);
+        outline-offset: var(--cirth-outline-offset);
         color: var(--cirth-accordion-active-summary-color);
       }
     }

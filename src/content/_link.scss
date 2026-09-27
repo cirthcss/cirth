@@ -55,13 +55,10 @@ $visited-exceptions: $visited-class-exceptions +
     --cirth-text-decoration: underline;
   }
 
+  // The same ring every control draws (content/_button.scss).
   &:focus-visible {
-    box-shadow: 0 0 0 var(--cirth-outline-width) var(--cirth-primary-focus);
-
-    // Invisible in normal rendering, but forced-colors mode strips
-    // box-shadow and repaints transparent outlines with a system color:
-    // without this, keyboard focus disappears in Windows High Contrast.
-    outline: var(--cirth-outline-width) solid transparent;
+    outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
+    outline-offset: var(--cirth-outline-offset);
   }
 
   @if $enable-classes {

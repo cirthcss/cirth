@@ -114,14 +114,31 @@
     #{color.change($neutral-300, $alpha: 0.5)}
   );
   --cirth-secondary-active: light-dark(#{$neutral-750}, #{$neutral-200});
-  --cirth-secondary-surface-active: light-dark(
-    #{$neutral-650},
-    #{$neutral-550}
-  );
-  --cirth-secondary-focus: light-dark(
-    #{color.change($neutral-600, $alpha: 0.7)},
-    #{color.change($neutral-350, $alpha: 0.7)}
-  );
+
+  // The secondary button is tonal: a wash of the page ink over whatever
+  // surface it sits on, with the ink as its label. The filled neutral it
+  // replaces outweighed the primary on the light canvas (5.99:1 against
+  // 5.18:1); a wash reads as a control at about 1.2:1 and never competes
+  // with the fill. Translucent on purpose, so it composites over a card,
+  // a band or a dialog without being told which. The same formula holds in
+  // both schemes, so it is stated once here. See specs/control-emphasis.md.
+  --cirth-secondary-surface: oklch(from var(--cirth-ink) l c h / 9%);
+  --cirth-secondary-surface-active: oklch(from var(--cirth-ink) l c h / 14%);
+  --cirth-secondary-on-surface: var(--cirth-ink);
+  --cirth-secondary-border: transparent;
+  --cirth-secondary-border-active: transparent;
+
+  // Focus colours are the family's text, opaque. A translucent ring's
+  // contrast depends on what it lands on; a text role already keeps 4.5:1
+  // on every surface level, so the ring keeps 3:1 wherever it is drawn.
+  --cirth-secondary-focus: var(--cirth-secondary-text);
+
+  // Disabled is a state, not a transparency: a faint wash of the ink and a
+  // label at half of it, the same whatever the variant was. Nothing is
+  // composited at an opacity, so no accent turns into a paler colour of
+  // its own; there is no accent left to change.
+  --cirth-disabled-surface: oklch(from var(--cirth-ink) l c h / 6%);
+  --cirth-disabled-color: oklch(from var(--cirth-ink) l c h / 50%);
 
   // Contrast colors
   --cirth-contrast-text: light-dark(#{$neutral-900}, #{$neutral-100});
@@ -132,10 +149,7 @@
   );
   --cirth-contrast-active: light-dark(#{$black}, #{$white});
   --cirth-contrast-surface-active: light-dark(#{$black}, #{$white});
-  --cirth-contrast-focus: light-dark(
-    #{color.change($neutral-600, $alpha: 0.7)},
-    #{color.change($neutral-150, $alpha: 0.5)}
-  );
+  --cirth-contrast-focus: var(--cirth-contrast-text);
   --cirth-contrast-on-surface: light-dark(#{$white}, #{$black});
 
   // Visited links: the accent drained to neutral, so a followed link reads

@@ -111,21 +111,19 @@
 // whole comma-separated rule, including the focus ring for ordinary buttons.
 // The file control receives its ring through the focused host input in
 // forms/_input-file.scss instead.
+// Focus is one opaque ring, held off the fill by a gap as wide as itself,
+// so it never merges with a fill of the same colour. An outline rather than
+// a box-shadow: it follows the radius, takes no transition, and
+// forced-colors mode repaints it in a system colour. Variants below change
+// its colour, never its geometry. See specs/control-emphasis.md.
 #{$parent-selector} button,
 #{$parent-selector} [type="submit"],
 #{$parent-selector} [type="reset"],
 #{$parent-selector} [type="button"],
 #{$parent-selector} [role="button"] {
-  &:focus-visible,
-  &:is([aria-current]:not([aria-current="false"])):focus-visible {
-    --cirth-box-shadow:
-      var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
-      0 0 0 var(--cirth-outline-width) var(--cirth-primary-focus);
-
-    // Invisible in normal rendering, but forced-colors mode strips
-    // box-shadow and repaints transparent outlines with a system color:
-    // without this, keyboard focus disappears in Windows High Contrast.
-    outline: var(--cirth-outline-width) solid transparent;
+  &:focus-visible {
+    outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
+    outline-offset: var(--cirth-outline-offset);
   }
 }
 
@@ -163,18 +161,8 @@
       [type="button"],
       [role="button"]
     ).secondary:focus-visible,
-  #{$parent-selector}
-    :is(button, [type="submit"], [type="button"], [role="button"]).secondary:is(
-      [aria-current]:not([aria-current="false"])
-    ):focus-visible,
-  #{$parent-selector} [type="reset"]:focus-visible,
-  #{$parent-selector}
-    [type="reset"]:is(
-      [aria-current]:not([aria-current="false"])
-    ):focus-visible {
-    --cirth-box-shadow:
-      var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
-      0 0 0 var(--cirth-outline-width) var(--cirth-secondary-focus);
+  #{$parent-selector} [type="reset"]:focus-visible {
+    outline-color: var(--cirth-secondary-focus);
   }
 
   // Contrast
@@ -190,11 +178,8 @@
       --cirth-color: var(--cirth-contrast-on-surface);
     }
 
-    &:focus-visible,
-    &:is([aria-current]:not([aria-current="false"])):focus-visible {
-      --cirth-box-shadow:
-        var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
-        0 0 0 var(--cirth-outline-width) var(--cirth-contrast-focus);
+    &:focus-visible {
+      outline-color: var(--cirth-contrast-focus);
     }
   }
 
@@ -224,15 +209,8 @@
       --cirth-color: var(--cirth-primary-on-surface);
     }
 
-    &:focus-visible,
-    &:is([aria-current]:not([aria-current="false"])):focus-visible {
-      --cirth-box-shadow:
-        var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
-        0
-          0
-          0
-          var(--cirth-outline-width)
-          var(--cirth-form-element-invalid-focus-color);
+    &:focus-visible {
+      outline-color: var(--cirth-form-element-invalid-focus-color);
     }
   }
 
@@ -459,13 +437,19 @@
   }
 
   #{$parent-selector} [type="reset"]:focus-visible {
-    --cirth-box-shadow:
-      var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
-      0 0 0 var(--cirth-outline-width) var(--cirth-secondary-focus);
+    outline-color: var(--cirth-secondary-focus);
   }
 }
 
 // Button [disabled]
+// A state, not a transparency: every variant becomes the same neutral wash
+// with its label at half the ink, and keeps its geometry. Painted here
+// rather than through the variant slots, because every variant sets those
+// at a higher weight; the paint itself is set once, above, at (0,1,0) at
+// most, and this rule matches that weight later in the sheet, so it wins
+// whatever the variant was. Half opacity used to
+// composite the accent toward the page and turn it into a paler colour of
+// its own (copper into a salmon at L 0.75).
 
 #{$parent-selector}
   :where(
@@ -484,7 +468,10 @@
     [type="reset"],
     [role="button"]
   ) {
-  opacity: var(--cirth-opacity-disabled);
+  border-color: transparent;
+  background-color: var(--cirth-disabled-surface);
+  background-image: none;
+  color: var(--cirth-disabled-color);
   pointer-events: none;
 }
 

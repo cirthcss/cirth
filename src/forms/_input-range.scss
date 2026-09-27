@@ -82,7 +82,19 @@ $border-thumb: var(--cirth-border-width-2);
 
   &:focus-visible {
     outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
-    outline-offset: var(--cirth-space-1);
+    outline-offset: var(--cirth-outline-offset);
+  }
+
+  // Disabled: the thumb takes the disabled ink and the groove stays a
+  // separator, the same neutral state every other control takes, with no
+  // opacity to turn the accent into a paler colour.
+  &:disabled,
+  :where(fieldset[disabled]) & {
+    --cirth-range-thumb-color: var(--cirth-disabled-color);
+    --cirth-range-thumb-active-color: var(--cirth-disabled-color);
+    --cirth-range-border-color: var(--cirth-muted-border-color);
+
+    pointer-events: none;
   }
 
   &:active {

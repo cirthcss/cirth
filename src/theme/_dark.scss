@@ -130,11 +130,7 @@
   --cirth-range-active-border-color: var(--cirth-card-border-color);
 
   // Secondary and contrast
-  --cirth-secondary-surface: #{$neutral-600};
-  --cirth-secondary-border: var(--cirth-secondary-surface);
-  --cirth-secondary-border-active: var(--cirth-secondary-surface-active);
   --cirth-secondary-underline-active: var(--cirth-secondary-active);
-  --cirth-secondary-on-surface: #{$white};
   --cirth-contrast-border: var(--cirth-contrast-surface);
   --cirth-contrast-border-active: var(--cirth-contrast-surface-active);
   --cirth-contrast-underline-active: var(--cirth-contrast-active);
@@ -173,23 +169,20 @@
   --cirth-code-kbd-background-color: var(--cirth-ink);
   --cirth-code-kbd-color: var(--cirth-background-color);
   --cirth-form-element-placeholder-color: var(--cirth-muted-color);
-  --cirth-form-element-active-border-color: var(--cirth-primary-border);
 
-  // Translucent, not the solid border colour: this paints the ring
-  // *outside* the border, and a ring the same colour and width as the edge
-  // it surrounds is not a ring. Buttons, checkboxes and radios already
-  // asked for exactly this in a rule of their own, which is now gone.
+  // A field's focus ring is the same opaque ring a button draws, held off
+  // the edge by --cirth-outline-offset: the gap, not a translucency, is
+  // what keeps a ring distinct from the edge it surrounds. A validation
+  // state rebinds this slot on the field (forms/_basics.scss), so its
+  // ring is always the colour of its edge.
   --cirth-form-element-focus-color: var(--cirth-primary-focus);
-  --cirth-form-element-disabled-opacity: var(--cirth-opacity-disabled);
   --cirth-form-element-invalid-border-color: var(--cirth-error-border);
-  --cirth-form-element-invalid-active-border-color: var(--cirth-error-active);
   --cirth-form-element-invalid-focus-color: var(
-    --cirth-form-element-invalid-active-border-color
+    --cirth-form-element-invalid-border-color
   );
   --cirth-form-element-valid-border-color: var(--cirth-success-border);
-  --cirth-form-element-valid-active-border-color: var(--cirth-success-active);
   --cirth-form-element-valid-focus-color: var(
-    --cirth-form-element-valid-active-border-color
+    --cirth-form-element-valid-border-color
   );
   --cirth-switch-thumb-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
   --cirth-switch-checked-background-color: var(--cirth-primary-surface);

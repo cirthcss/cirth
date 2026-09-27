@@ -69,8 +69,9 @@ question, which is always the case for radios and usually for checkboxes.
   which wraps to one column when there is no room.
 - An input with a `size` attribute keeps its natural width instead of
   filling the row.
-- A submit `button` inside a form is full width, like the fields above it.
-  To attach a button to a field instead, use a [group](/components/group).
+- A submit `button` sizes to its label, like any button. A form that wants
+  a full-width one says so with `width: 100%`. To attach a button to a
+  field instead, use a [group](/components/group).
 
 ## Accessibility
 
@@ -108,7 +109,6 @@ Every control reads the same family, so one override reaches all of them:
 | --- | --- |
 | `--cirth-form-element-background-color` | A fill of its own. Unset by default: a field paints `--cirth-surface`, the surface it sits on |
 | `--cirth-form-element-border-color` | The field's edge |
-| `--cirth-form-element-active-border-color` | The edge while focused |
 | `--cirth-form-element-color` | The text inside a field |
 | `--cirth-form-element-placeholder-color` | Placeholder text |
 | `--cirth-form-element-focus-color` | The focus ring |

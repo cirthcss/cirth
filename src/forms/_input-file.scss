@@ -40,12 +40,11 @@
     }
   }
 
-  &:focus {
-    &::file-selector-button {
-      --cirth-box-shadow:
-        var(--cirth-button-hover-box-shadow, 0 0 0 rgb(0 0 0 / 0%)),
-        0 0 0 var(--cirth-outline-width) var(--cirth-secondary-focus);
-    }
+  // The ring goes around the input, which is the target (see above), in
+  // the secondary family's colour its button is drawn in.
+  &:focus-visible {
+    outline: var(--cirth-outline-width) solid var(--cirth-secondary-focus);
+    outline-offset: var(--cirth-outline-offset);
   }
 }
 

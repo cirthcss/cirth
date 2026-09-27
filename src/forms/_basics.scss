@@ -157,7 +157,6 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 // input out of the full-width default and lets UA-native sizing apply.
 
 #{$parent-selector} input:not([type="checkbox"], [type="radio"], [size]),
-#{$parent-selector} button[type="submit"],
 #{$parent-selector} select,
 #{$parent-selector} textarea {
   width: 100%;
@@ -233,31 +232,6 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   margin: 0;
 }
 
-// Active & Focus
-
-// An explicitly validated field keeps its state colour while it has focus:
-// the validation block below paints its focused border and ring together.
-// Left in this list, the input branch outweighed that block, (0,2,1)
-// against (0,2,0), and a valid field took the accent border inside a green
-// ring. Excluding the state here fixes it without raising either weight.
-// Native :user-invalid needs no entry: its selector already outweighs this
-// one.
-#{$parent-selector}
-  input:not(
-    [type="submit"],
-    [type="button"],
-    [type="reset"],
-    [role="switch"],
-    [readonly],
-    [aria-invalid="true"],
-    [aria-invalid="false"]
-  ),
-#{$parent-selector} :where(select, textarea):not([readonly]) {
-  &:is(:active, :focus) {
-    --cirth-border-color: var(--cirth-form-element-active-border-color);
-  }
-}
-
 // Hover
 
 // Every other interactive control in the library answers the pointer, and
@@ -296,6 +270,11 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 }
 
 // Focus
+// One ring, the same geometry as a button's, and nothing else: the edge
+// keeps the colour it has at rest, so focus is carried by one signal
+// rather than by an accent border inside an accent ring. A field with a
+// validation state rebinds --cirth-form-element-focus-color below, which
+// is how its border and its ring always agree.
 
 #{$parent-selector}
   input:not(
@@ -307,37 +286,48 @@ $helper-previous-tags: "input, select, textarea, fieldset";
     [readonly]
   ),
 #{$parent-selector} :where(select, textarea):not([readonly]) {
-  &:focus {
-    --cirth-box-shadow: 0 0 0 var(--cirth-outline-width)
+  &:focus-visible {
+    outline: var(--cirth-outline-width) solid
       var(--cirth-form-element-focus-color);
-
-    // Invisible in normal rendering, but forced-colors mode strips
-    // box-shadow and repaints transparent outlines with a system color:
-    // without this, keyboard focus disappears in Windows High Contrast.
-    outline: var(--cirth-outline-width) solid transparent;
+    outline-offset: var(--cirth-outline-offset);
   }
 }
 
 // Disabled
+// The same state a disabled button takes: a faint wash, the separator for
+// an edge, and the ink at half strength. No opacity, so an accent-filled
+// control (a checked box) does not turn into a paler colour of its own.
+// Painted directly, as the button's is, so it wins over whatever state
+// slot the field was in.
+
+// A range is excluded: its box is not what it paints, and a wash there
+// would draw a rectangle behind the slider (forms/_input-range.scss).
 
 #{$parent-selector}
-  input:not([type="submit"], [type="button"], [type="reset"])[disabled],
+  input:not(
+    [type="submit"],
+    [type="button"],
+    [type="reset"],
+    [type="range"]
+  )[disabled],
 #{$parent-selector} select[disabled],
 #{$parent-selector} textarea[disabled],
-#{$parent-selector} label[aria-disabled="true"],
 #{$parent-selector}
   :where(fieldset[disabled])
   :is(
-    input:not([type="submit"], [type="button"], [type="reset"]),
+    input:not([type="submit"], [type="button"], [type="reset"], [type="range"]),
     select,
     textarea
   ) {
-  opacity: var(--cirth-form-element-disabled-opacity);
+  border-color: var(--cirth-muted-border-color);
+  background-color: var(--cirth-disabled-surface);
+  color: var(--cirth-disabled-color);
   pointer-events: none;
 }
 
-#{$parent-selector} label[aria-disabled="true"] input[disabled] {
-  opacity: 1;
+#{$parent-selector} label[aria-disabled="true"] {
+  color: var(--cirth-disabled-color);
+  pointer-events: none;
 }
 
 // Explicit ARIA validity & native invalidity
@@ -386,32 +376,20 @@ $validation-any: "[aria-invalid], #{$invalid-native}";
     }
   }
 
+  // A state colours the edge and the focus ring together: the ring reads
+  // the focus slot, and the state rebinds it here, on the element.
   &:is(#{$valid-explicit}) {
     --cirth-border-color: var(--cirth-form-element-valid-border-color);
-
-    &:is(:active, :focus) {
-      --cirth-border-color: var(--cirth-form-element-valid-active-border-color);
-
-      &:not([type="checkbox"], [type="radio"]) {
-        --cirth-box-shadow: 0 0 0 var(--cirth-outline-width)
-          var(--cirth-form-element-valid-focus-color);
-      }
-    }
+    --cirth-form-element-focus-color: var(
+      --cirth-form-element-valid-focus-color
+    );
   }
 
   &:is(#{$invalid-any}) {
     --cirth-border-color: var(--cirth-form-element-invalid-border-color);
-
-    &:is(:active, :focus) {
-      --cirth-border-color: var(
-        --cirth-form-element-invalid-active-border-color
-      );
-
-      &:not([type="checkbox"], [type="radio"]) {
-        --cirth-box-shadow: 0 0 0 var(--cirth-outline-width)
-          var(--cirth-form-element-invalid-focus-color);
-      }
-    }
+    --cirth-form-element-focus-color: var(
+      --cirth-form-element-invalid-focus-color
+    );
   }
 }
 

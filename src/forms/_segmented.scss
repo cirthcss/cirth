@@ -77,18 +77,17 @@
       &:has(:focus-visible) {
         z-index: 2;
         outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
-        outline-offset: var(--cirth-outline-width);
+        outline-offset: var(--cirth-outline-offset);
       }
 
-      // Faded once, on the segment: the radio's own disabled opacity
-      // would otherwise compound with it.
+      // The disabled state every control takes: a faint wash and the ink
+      // at half strength, on the segment. No opacity, so a selected
+      // disabled segment does not turn its accent into a paler colour.
       &:has(:disabled) {
-        opacity: var(--cirth-form-element-disabled-opacity);
+        border-color: var(--cirth-muted-border-color);
+        background-color: var(--cirth-disabled-surface);
+        color: var(--cirth-disabled-color);
         cursor: not-allowed;
-
-        :disabled {
-          opacity: 1;
-        }
       }
     }
   }

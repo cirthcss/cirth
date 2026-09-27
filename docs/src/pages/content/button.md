@@ -76,14 +76,16 @@ there's no way to add `.secondary` to them.
 
 * `:hover` / `:active` / `:focus` / `[aria-current]` switch to the
   hover background and hover border tokens.
-* `:focus` additionally layers a focus ring in `--cirth-primary-focus` (or
-  the matching `-focus` token for the active color group) on top of the
-  hover shadow.
-* `[disabled]` drops opacity to `--cirth-opacity-disabled` and disables
-  pointer events.
+* `:focus-visible` draws one opaque ring in `--cirth-primary-focus` (or the
+  matching `-focus` token for the active color group), held
+  `--cirth-outline-offset` off the edge so it never merges with a fill of
+  the same colour.
+* `[disabled]` gives every variant the same neutral state: the
+  `--cirth-disabled-surface` wash and the `--cirth-disabled-color` label,
+  with no opacity and no accent. It also disables pointer events.
 * A submit button (`[type="submit"]`, or a plain `button` with no `type`,
-  which defaults to submit) inside a `form:invalid` drops to
-  `--cirth-opacity-disabled` too, but stays **fully clickable**: no
+  which defaults to submit) in a form the reader has left invalid loses its
+  colour (`filter: grayscale(1)`), but stays **fully clickable**: no
   `pointer-events: none`, no `[disabled]`. This is deliberate: a truly
   disabled submit button can't be activated, so it can never trigger the
   browser's own constraint-validation messages, and screen reader users get

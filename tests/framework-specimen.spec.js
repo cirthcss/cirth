@@ -303,7 +303,13 @@ for (const specimen of specimens) {
 				`${specimen} ${scheme}: disabled range is inert`,
 			).toEqual(disabledRest);
 			expect(disabledRest.pointerEvents).toBe("none");
-			expect(Number.parseFloat(disabledRest.opacity)).toBeLessThan(1);
+			// Disabled is a neutral state, not a transparency
+			// (specs/control-emphasis.md): the thumb takes the disabled ink
+			// instead of fading the accent.
+			expect(Number.parseFloat(disabledRest.opacity)).toBe(1);
+			// The custom property holds the resolved relative colour, so its
+			// signature is the half-strength ink rather than the token name.
+			expect(disabledRest.thumb.trim()).toMatch(/l c h \/ 50%\)$/);
 		});
 	}
 }
@@ -399,6 +405,8 @@ const controlStyle = (locator) =>
 			borderTopColor: style.borderTopColor,
 			borderTopWidth: style.borderTopWidth,
 			boxShadow: style.boxShadow,
+			outline: `${style.outlineStyle} ${style.outlineWidth} ${style.outlineColor}`,
+			outlineOffset: style.outlineOffset,
 			color: style.color,
 			height: element.getBoundingClientRect().height,
 			radius: style.borderRadius,
@@ -462,8 +470,11 @@ for (const specimen of specimens) {
 				true,
 			);
 			const focusInput = await controlStyle(input);
-			expect(focusInput.boxShadow).not.toBe("none");
-			expect(focusInput.boxShadow).not.toBe(hoverInput.boxShadow);
+			// Focus is one outline held off the edge (specs/control-emphasis.md),
+			// not a box-shadow band against it; the edge keeps its rest colour.
+			expect(focusInput.outline).toMatch(/solid/);
+			expect(focusInput.outline).not.toBe(hoverInput.outline);
+			expect(focusInput.outlineOffset).not.toBe("0px");
 
 			await page.goto(url);
 			const primary = page.locator("[data-state-button]");
@@ -505,8 +516,10 @@ for (const specimen of specimens) {
 				await focusVisibly(page, variant);
 				await page.waitForTimeout(transitionDuration);
 				const focus = await controlStyle(variant);
-				expect(focus.boxShadow).not.toBe("none");
-				expect(focus.boxShadow).not.toBe(rest.boxShadow);
+				// One outline, held off the fill (specs/control-emphasis.md).
+				expect(focus.outline).toMatch(/^solid/);
+				expect(focus.outline).not.toBe(rest.outline);
+				expect(focus.outlineOffset).not.toBe("0px");
 			}
 
 			await page.goto(url);

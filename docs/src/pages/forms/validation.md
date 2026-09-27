@@ -63,11 +63,16 @@ stays neutral while it has focus.
 
 ## Disabled and read-only
 
-- `disabled` on a control, or on a `fieldset` around it, fades it to
-  `--cirth-form-element-disabled-opacity` and ignores the pointer.
-  `aria-disabled="true"` on a `label` fades the label too.
-- `readonly` keeps the value selectable and submitted, with a dashed edge and
-  the sectioning surface so it does not look editable. A read-only `number`
+- `disabled` on a control, or on a `fieldset` around it, gives it the
+  disabled state every control shares: a faint wash of the ink
+  (`--cirth-disabled-surface`), the separator for an edge, and its text at
+  half the ink (`--cirth-disabled-color`). Nothing fades by opacity, so a
+  checked box does not turn its accent into a paler colour. It also ignores
+  the pointer. `aria-disabled="true"` on a `label` gives the label the same
+  ink.
+- `readonly` keeps the value selectable and submitted, with a dashed edge so
+  it does not look editable; its fill is the surface's, like any field's. A
+  read-only `number`
   hides its stepper buttons.
 
 ## Focus
@@ -90,12 +95,12 @@ state the edge and ring take that state's colour instead.
 | Token | What it sets |
 | --- | --- |
 | `--cirth-form-element-invalid-border-color` | Invalid edge |
-| `--cirth-form-element-invalid-active-border-color` | Invalid edge while focused |
+| `--cirth-form-element-invalid-focus-color` | Invalid focus ring: the edge's colour by default |
 | `--cirth-form-element-valid-border-color` | Valid edge |
-| `--cirth-form-element-valid-active-border-color` | Valid edge while focused |
+| `--cirth-form-element-valid-focus-color` | Valid focus ring: the edge's colour by default |
 | `--cirth-del-color`, `--cirth-ins-color` | Help text in each state |
 | `--cirth-icon-invalid`, `--cirth-icon-valid` | The state icons |
-| `--cirth-form-element-disabled-opacity` | Disabled fade |
+| `--cirth-disabled-surface`, `--cirth-disabled-color` | The disabled wash and ink |
 
 The border tokens derive from the status inputs `--cirth-error` and
 `--cirth-success`; see [Colors](/colors#status-colours).

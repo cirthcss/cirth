@@ -63,6 +63,7 @@ const look = (page, selector) =>
 			boxShadow: style.boxShadow,
 			opacity: style.opacity,
 			outlineStyle: style.outlineStyle,
+			outline: `${style.outlineStyle} ${style.outlineWidth} ${style.outlineColor} ${style.outlineOffset}`,
 			backgroundColor: style.backgroundColor,
 			marginBottom: Number.parseFloat(style.marginBottom),
 			height: box.height,
@@ -150,8 +151,9 @@ test("every state looks the same inside the table as outside it", async ({ page 
 	const focusedInside = await look(page, field);
 	await page.locator("#ref-number").focus();
 	const focusedOutside = await look(page, "#ref-number");
-	expect(focusedInside.boxShadow).toBe(focusedOutside.boxShadow);
-	expect(focusedInside.boxShadow).not.toBe("none");
+	// Focus is an outline since specs/control-emphasis.md.
+	expect(focusedInside.outline).toBe(focusedOutside.outline);
+	expect(focusedInside.outlineStyle).toBe("solid");
 });
 
 test("each control is named by its row and column headers", async ({ page }) => {

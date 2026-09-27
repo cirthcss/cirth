@@ -192,7 +192,9 @@ test("a focused field keeps the colour of its explicit state", async ({
 	// Border and ring say the same thing. The accent-focus rule used to
 	// outweigh the validation block on inputs, so a focused valid field drew
 	// the accent border inside a green ring, and an invalid one the accent
-	// inside a red ring.
+	// inside a red ring. Since specs/control-emphasis.md focus does not
+	// touch the border at all: the edge keeps its state colour and the one
+	// ring is drawn in the same colour.
 	const token = (/** @type {string} */ name) =>
 		page.evaluate((property) => {
 			const probe = document.createElement("span");
@@ -203,19 +205,30 @@ test("a focused field keeps the colour of its explicit state", async ({
 			return value;
 		}, name);
 
-	const accent = await token("--cirth-form-element-active-border-color");
+	const accent = await token("--cirth-primary-focus");
 
 	for (const [selector, state] of [
 		["#valid-reference", "valid"],
 		["#invalid-reference", "invalid"],
 	]) {
+		const rest = await stateOf(page.locator(selector));
 		await page.locator(selector).focus();
-		const focused = await stateOf(page.locator(selector));
+		const focused = await page.locator(selector).evaluate((element) => {
+			const style = getComputedStyle(element);
+			return {
+				focused: element.matches(":focus"),
+				borderColor: style.borderColor,
+				outlineColor: style.outlineColor,
+				outlineStyle: style.outlineStyle,
+			};
+		});
+		const stateColor = await token(`--cirth-form-element-${state}-border-color`);
 		expect(focused.focused).toBe(true);
-		expect(focused.borderColor).toBe(
-			await token(`--cirth-form-element-${state}-active-border-color`),
-		);
-		expect(focused.borderColor).not.toBe(accent);
+		expect(focused.borderColor).toBe(rest.borderColor);
+		expect(focused.borderColor).toBe(stateColor);
+		expect(focused.outlineStyle).toBe("solid");
+		expect(focused.outlineColor).toBe(stateColor);
+		expect(focused.outlineColor).not.toBe(accent);
 	}
 });
 

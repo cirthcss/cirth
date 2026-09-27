@@ -50,31 +50,39 @@
 #{$parent-selector} code,
 #{$parent-selector} kbd,
 #{$parent-selector} samp {
-  border-radius: var(--cirth-border-radius);
-  background: var(--cirth-code-background-color);
   color: var(--cirth-code-color);
   font-weight: var(--cirth-font-weight);
-  line-height: initial;
 }
 
+// Code in a sentence is text in the code face: no box, no padding, the
+// body's ink and the body's line. The chip it used to sit in broke the
+// rhythm of every line that held one, and its lighter ink said the code
+// mattered less than the sentence around it. A long URL, token or hash
+// still breaks inside the line instead of widening the document.
 #{$parent-selector} code,
-#{$parent-selector} kbd,
 #{$parent-selector} samp {
-  display: inline-block;
-
-  // Keep a long URL, token, or hash inside the available line instead of
-  // letting the inline box widen the document at narrow viewports. `pre`
-  // overrides these elements to `display: block` below and remains the
-  // intentionally scrollable variant.
-  max-inline-size: 100%;
-  padding: var(--cirth-space-1) var(--cirth-space-2);
   overflow-wrap: anywhere;
 }
 
+// A key is an object, not a word: <kbd> keeps its cap.
+#{$parent-selector} kbd {
+  display: inline-block;
+  max-inline-size: 100%;
+  padding: var(--cirth-space-1) var(--cirth-space-2);
+  border-radius: var(--cirth-border-radius);
+  line-height: initial;
+  overflow-wrap: anywhere;
+}
+
+// The block listing: the recessed surface level, framed by the
+// container edge.
 #{$parent-selector} pre {
   display: block;
   margin-bottom: var(--cirth-spacing);
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-border-radius);
+  background: var(--cirth-code-background-color);
+  line-height: initial;
   overflow-x: auto;
 
   // The block above is the deliberately scrollable one, which makes it a

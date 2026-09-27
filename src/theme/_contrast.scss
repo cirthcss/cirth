@@ -55,12 +55,6 @@
   --cirth-primary: light-dark(#{$accent-700}, #{$accent-250});
   --cirth-secondary-underline: var(--cirth-secondary-text);
   --cirth-contrast-underline: var(--cirth-contrast-text);
-
-  // Focus rings drop their alpha: a translucent ring composites against
-  // whatever it lands on, which is exactly what "more contrast" asks us
-  // to stop doing.
-  --cirth-secondary-focus: light-dark(#{$neutral-600}, #{$neutral-350});
-  --cirth-contrast-focus: light-dark(#{$neutral-600}, #{$neutral-150});
 }
 
 @mixin light {

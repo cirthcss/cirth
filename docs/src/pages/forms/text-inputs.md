@@ -42,12 +42,13 @@ accent. Choose the `type` for the data, not for its appearance.
 ## States
 
 - **Placeholder** text uses `--cirth-form-element-placeholder-color`.
-- **Focus** lifts the field back to the page surface, turns its edge to the
-  accent and adds a ring.
-- **Read-only** fields get a dashed edge and the sectioning surface, so they
-  read as text you can select but not change. A read-only `number` also
-  hides its stepper buttons.
-- **Disabled** fields fade to `--cirth-form-element-disabled-opacity` and
+- **Focus** adds one ring in the accent, held 2px off the edge; the edge
+  and the fill do not change.
+- **Read-only** fields get a dashed edge, so they read as text you can
+  select but not change. A read-only `number` also hides its stepper
+  buttons.
+- **Disabled** fields take the shared disabled state: a faint wash, the
+  separator for an edge and the ink at half strength, with no opacity. They
   ignore the pointer.
 - **Valid and invalid** states, set by you or by the browser, are on
   [Validation and states](/forms/validation).
@@ -69,7 +70,6 @@ accent. Choose the `type` for the data, not for its appearance.
 | --- | --- |
 | `--cirth-form-element-background-color` | A fill of its own. Unset by default: a field paints `--cirth-surface`, the surface it sits on |
 | `--cirth-form-element-border-color` | Edge at rest |
-| `--cirth-form-element-active-border-color` | Edge while focused |
 | `--cirth-form-element-color` | Text |
 | `--cirth-form-element-placeholder-color` | Placeholder |
 | `--cirth-form-element-focus-color` | Focus ring |

@@ -161,12 +161,18 @@ test("the selection is not conveyed by colour alone", async ({ page }) => {
 	expect(checked.radioBorder).toBeGreaterThanOrEqual(unchecked.radioBorder * 3);
 });
 
-test("a disabled option fades its segment once", async ({ page }) => {
+// Disabled is a neutral state, not a transparency (specs/control-emphasis.md):
+// the segment takes the wash every disabled control takes, once, with
+// nothing composited at an opacity on the segment or on its radio.
+test("a disabled option takes the disabled state once", async ({ page }) => {
 	await render(page);
-	const disabled = (await segments(page))[2];
+	const all = await segments(page);
+	const disabled = all[2];
+	const enabled = all[1];
 
-	expect(disabled.opacity).toBeLessThan(1);
+	expect(disabled.opacity).toBe(1);
 	expect(disabled.radioOpacity).toBe(1);
+	expect(disabled.background).not.toBe(enabled.background);
 });
 
 /**
