@@ -129,6 +129,14 @@
       margin-inline: calc(var(--cirth-nav-element-spacing-horizontal) * -1);
       padding: var(--cirth-nav-link-spacing-vertical)
         var(--cirth-nav-link-spacing-horizontal);
+
+      // WCAG 2.5.8's 24px floor, on the inline axis too. The block axis
+      // already clears it (the padding makes a 40px band); the inline axis
+      // did not for a one-character entry: a pagination "1" measured 23px,
+      // and axe failed it, because adjacent links tile with no spacing to
+      // make up the difference. Longer labels are wider than this anyway.
+      // See specs/nav-link-target-size.md.
+      min-inline-size: var(--cirth-space-6);
       border-block-end: var(--cirth-border-width-2) solid transparent;
       border-radius: var(--cirth-border-radius);
 

@@ -15,6 +15,10 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   about as much as it darkens the paper canvas. Geometry and the light
   scheme are unchanged; an override of the token still replaces it whole.
 
+- **A one-character nav link is a 24px target.** Links in a `nav` now have a
+  24px minimum inline size, so a numbered pagination entry meets WCAG 2.5.8
+  instead of measuring 23px. Wider labels and stacked navs are unchanged.
+
 ## [0.16.0] - 2026-09-25
 
 ### Added
