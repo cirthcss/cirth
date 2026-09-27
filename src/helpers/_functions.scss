@@ -30,10 +30,23 @@
 // scheme choice has to sit on each layer's colour: wrapping two whole
 // shadow lists in one light-dark() is invalid at computed-value time, and
 // every box-shadow that read it resolved to none.
+
+// The dark half takes its own, larger alpha. One opacity for both schemes
+// darkened the paper canvas by about 0.035 of OKLab lightness beside a
+// floating panel and the graphite canvas by under 0.01, so dropdowns,
+// popovers and modals had no elevation at all in the dark scheme. A shadow
+// is read as a lightness step against what it falls on, and a canvas at
+// L 0.20 has little room left below it: the same step needs several times
+// the ink. See specs/dark-elevation-shadow.md for the measurements.
+$shadow-dark-opacity-factor: 4;
+
 @function shadow-color($light, $dark, $opacity) {
   @return light-dark(
     #{color.change($light, $alpha: $opacity)},
-    #{color.change($dark, $alpha: $opacity)}
+    #{color.change(
+        $dark,
+        $alpha: math.min($opacity * $shadow-dark-opacity-factor, 1)
+      )}
   );
 }
 

@@ -7,6 +7,14 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Dropdowns and popovers have visible elevation in the dark scheme.** The
+  dark half of `--cirth-box-shadow` now carries four times the alpha of the
+  light half, so a floating panel darkens the graphite canvas beside it by
+  about as much as it darkens the paper canvas. Geometry and the light
+  scheme are unchanged; an override of the token still replaces it whole.
+
 ## [0.16.0] - 2026-09-25
 
 ### Added

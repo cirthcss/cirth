@@ -71,3 +71,90 @@ test("a forced dark subtree draws the dark shadow on a light page", async ({
 		light.replace(/oklch\([^)]*\)|rgba?\([^)]*\)/g, ""),
 	);
 });
+
+// The elevation has to be *visible* in both schemes, not only present. One
+// alpha for both used to darken the paper canvas by about 0.035 of OKLab
+// lightness beside a floating panel and the graphite canvas by under 0.01:
+// seven valid layers, and no elevation anyone could see in the dark. This
+// reads the real pixels under an open popover, so it measures what a reader
+// gets rather than restating the token. See specs/dark-elevation-shadow.md.
+
+/**
+ * OKLab lightness of the pixel `offset` px below the popover's bottom edge,
+ * minus the canvas's own, measured on the screenshot the browser paints.
+ *
+ * @param {import("@playwright/test").Page} page
+ * @param {"light" | "dark"} theme
+ * @param {number} offset
+ */
+const edgeStep = async (page, theme, offset) => {
+	await setContent(
+		page,
+		`<html data-theme="${theme}"><head><style>${css}</style></head><body>
+		<main class="container">
+			<div id="panel" popover style="inset: 120px auto auto 200px; margin: 0; width: 320px; height: 160px">Floating panel</div>
+		</main></body></html>`,
+	);
+	await page.locator("#panel").evaluate((element) => {
+		if (!(element instanceof HTMLElement)) throw new Error("no panel");
+		element.showPopover();
+	});
+	await expect(page.locator("#panel")).toBeVisible();
+	await page.waitForTimeout(300);
+	const shot = (await page.screenshot()).toString("base64");
+
+	return page.evaluate(
+		async ({ png, offset }) => {
+			const panel = /** @type {HTMLElement} */ (document.getElementById("panel"));
+			const box = panel.getBoundingClientRect();
+			const image = await createImageBitmap(
+				await (await fetch(`data:image/png;base64,${png}`)).blob(),
+			);
+			const canvas = new OffscreenCanvas(image.width, image.height);
+			const context = /** @type {OffscreenCanvasRenderingContext2D} */ (
+				canvas.getContext("2d")
+			);
+			context.drawImage(image, 0, 0);
+			const scale = image.width / window.innerWidth;
+			/** @param {number} x @param {number} y */
+			const lightness = (x, y) => {
+				const [r, g, b] = context.getImageData(
+					Math.round(x * scale),
+					Math.round(y * scale),
+					1,
+					1,
+				).data;
+				/** @param {number} c */
+				const lin = (c) => {
+					const v = c / 255;
+					return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+				};
+				const [R, G, B] = [lin(r), lin(g), lin(b)];
+				const l = Math.cbrt(0.4122214708 * R + 0.5363325363 * G + 0.0514459929 * B);
+				const m = Math.cbrt(0.2119034982 * R + 0.6806995451 * G + 0.1073969566 * B);
+				const s = Math.cbrt(0.0883024619 * R + 0.2817188376 * G + 0.6299787005 * B);
+				return 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s;
+			};
+			const canvasLightness = lightness(5, window.innerHeight - 5);
+			return (
+				lightness(box.left + box.width / 2, box.bottom + offset) -
+				canvasLightness
+			);
+		},
+		{ png: shot, offset },
+	);
+};
+
+test("a floating panel lifts off the dark canvas as far as off the light one", async ({
+	page,
+}) => {
+	const light = await edgeStep(page, "light", 2);
+	const dark = await edgeStep(page, "dark", 2);
+
+	// Both are shadows: the canvas under the edge is darker than the canvas.
+	expect(light).toBeLessThan(0);
+	expect(dark).toBeLessThan(0);
+	// And the dark step is a real one. Measured before the fix: -0.0095
+	// against -0.033 to -0.037 in light, in all three engines.
+	expect(Math.abs(dark)).toBeGreaterThan(Math.abs(light) * 0.75);
+});
