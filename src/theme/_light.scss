@@ -38,7 +38,7 @@
   --cirth-primary-underline: oklch(from var(--cirth-primary) l c h / 50%);
 
   // 83.5% and 91.7% of the accent mixed toward black land exactly on
-  // $copper-650 and $copper-600: the ladder is proportional in L and C at
+  // $accent-650 and $accent-600: the ladder is proportional in L and C at
   // this end, so a single mix reproduces a step.
   --cirth-primary-active: color-mix(
     in oklch,
@@ -180,7 +180,7 @@
   // implies "text/icon on top of the primary color". Verified >= 3:1
   // (WCAG 1.4.11) against both tracks with the shipped values: 3.77:1
   // unchecked (white on neutral-450), 5.60:1 checked (white on
-  // copper-550): the tightest of the two is the one to re-check if
+  // accent-550): the tightest of the two is the one to re-check if
   // --cirth-primary-on-surface or --cirth-switch-background-color changes.
   --cirth-switch-color: var(--cirth-primary-on-surface);
   --cirth-range-thumb-border-color: var(--cirth-background-color);
@@ -196,7 +196,7 @@
   // The card surface goes in with its chroma zeroed, so it contributes
   // lightness and nothing else. Rectangular space stops a hue from
   // *rotating*, but it does not stop two hues from averaging: this scheme's
-  // canvas is warm (the brand hue) while the neutral scale is a cool stone,
+  // canvas is warm (the accent's hue) while the neutral scale is cool,
   // and once the neutral's chroma decays toward the pale end the two
   // contributions are the same order of magnitude. Mixed whole they cancel
   // into a hue two thirds of the way to magenta: 349deg, against a 308deg

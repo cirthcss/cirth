@@ -141,12 +141,12 @@ defaults for public inputs such as `--cirth-primary`; relationships from those
 inputs to derived semantic tokens remain in the compiled CSS as `var()`,
 `color-mix()`, and relative `oklch()` rather than being baked into literals.
 
-Scales are named for what they visually are (`$copper-*` the brand accent,
-`$neutral-*` the graphite) except the status colors, which are named for
-the role they play instead of their hue: `$error-*`, `$success-*`, and
-`$warning-*`, not `$red-*`, `$moss-*`, or `$gold-*`, because that's what
-they actually mean everywhere they're used (invalid/valid form state,
-deleted/inserted text, the `<mark>` highlight).
+Scales are named for the role they play, not for their hue: `$accent-*`
+seeds the default accent, `$neutral-*` carries ink, lines and the dark
+canvas, and the status colors are `$error-*`, `$success-*` and
+`$warning-*`, not `$red-*`, `$moss-*` or `$gold-*`, because that's what
+they mean everywhere they're used (invalid/valid form state,
+deleted/inserted text).
 
 All five scales share one lightness ladder with 19 steps, from 950
 (darkest) to 50 (lightest) in increments of 50 and evenly spaced from 18%
@@ -158,7 +158,7 @@ Each chromatic scale is pinned to one hue and held at a constant fraction
 of that hue's own maximum sRGB chroma within the gamut at every step. The
 fraction is the family's voice. `$error-*`, `$success-*` and `$warning-*`
 sit at 85%: a status color has to be recognisable at a glance in a small,
-rare mark. `$copper-*` sits at 70%, because the brand accent is the
+rare mark. `$accent-*` sits at 70%, because the brand accent is the
 opposite case: it covers whole surfaces and appears on every screen, so
 the fraction that makes a status mark legible would make the accent shout.
 The families don't peak at the same step because sRGB's gamut boundary
@@ -183,7 +183,7 @@ the graphite is what the accent is measured against rather than a bystander:
 move the family round toward plum and the page loses its blue, leaving
 every surface, ink and signal reading as one temperature.
 
-`$copper-*`'s hue (44deg) isn't an arbitrary pick; it's lifted directly
+`$accent-*`'s hue (44deg) isn't an arbitrary pick; it's lifted directly
 from the brand mark, so the theme's primary accent and the logo are the
 same color by construction rather than by manual matching. `$error-*` sits
 a deliberate 22deg away from it: a destructive action and a primary one

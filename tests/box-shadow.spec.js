@@ -73,8 +73,8 @@ test("a forced dark subtree draws the dark shadow on a light page", async ({
 });
 
 // The elevation has to be *visible* in both schemes, not only present. One
-// alpha for both used to darken the paper canvas by about 0.035 of OKLab
-// lightness beside a floating panel and the graphite canvas by under 0.01:
+// alpha for both used to darken the light canvas by about 0.035 of OKLab
+// lightness beside a floating panel and the dark canvas by under 0.01:
 // seven valid layers, and no elevation anyone could see in the dark. This
 // reads the real pixels under an open popover, so it measures what a reader
 // gets rather than restating the token. See specs/dark-elevation-shadow.md.

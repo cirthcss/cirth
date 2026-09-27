@@ -32,8 +32,8 @@
 // every box-shadow that read it resolved to none.
 
 // The dark half takes its own, larger alpha. One opacity for both schemes
-// darkened the paper canvas by about 0.035 of OKLab lightness beside a
-// floating panel and the graphite canvas by under 0.01, so dropdowns,
+// darkened the light canvas by about 0.035 of OKLab lightness beside a
+// floating panel and the dark canvas by under 0.01, so dropdowns,
 // popovers and modals had no elevation at all in the dark scheme. A shadow
 // is read as a lightness step against what it falls on, and a canvas at
 // L 0.20 has little room left below it: the same step needs several times

@@ -24,12 +24,12 @@
 // Runs through the same schemes.apply() wiring as the base themes, so
 // each override lands on exactly the selector it overrides and wins on
 // source order. Ratios in the comments below are measured against the
-// worst surface of each scheme: the paper canvas in light, a card in
+// worst surface of each scheme: the canvas in light, a card in
 // dark, so they hold everywhere the token is used.
 
 @mixin light {
-  // Text: 16.0:1 on paper, and the heading ramp collapses onto it rather
-  // than fading out over six steps. Set as --cirth-ink, the page role:
+  // Text: 16.0:1 on the canvas, and the heading ramp collapses onto it
+  // rather than fading out over six steps. Set as --cirth-ink, the page role:
   // --cirth-color aliases it at the root, so the slot follows, and so does
   // anything else reading the page's ink.
   --cirth-ink: #{$neutral-900};
@@ -68,8 +68,8 @@
 
   // Link accent: 8.9:1, with the underline at full strength instead of
   // the 50%-alpha tint.
-  --cirth-primary: #{$copper-700};
-  --cirth-primary-active: #{$copper-800};
+  --cirth-primary: #{$accent-700};
+  --cirth-primary-active: #{$accent-800};
   --cirth-primary-underline: var(--cirth-primary);
   --cirth-secondary-underline: var(--cirth-secondary-text);
   --cirth-contrast-underline: var(--cirth-contrast-text);
@@ -77,7 +77,7 @@
   // Focus rings drop their alpha: a translucent ring composites against
   // whatever it lands on, which is exactly what "more contrast" asks us
   // to stop doing.
-  --cirth-primary-focus: #{$copper-600};
+  --cirth-primary-focus: #{$accent-600};
   --cirth-secondary-focus: #{$neutral-600};
   --cirth-contrast-focus: #{$neutral-600};
 
@@ -132,8 +132,8 @@
   --cirth-form-element-valid-border-color: #{$success-250};
 
   // 8.2:1, underlines at full strength.
-  --cirth-primary: #{$copper-250};
-  --cirth-primary-active: #{$copper-150};
+  --cirth-primary: #{$accent-250};
+  --cirth-primary-active: #{$accent-150};
 
   // The accent above lightens for *text* legibility, and the button fill
   // derives from it, so left alone it would lighten too, and the white
@@ -141,14 +141,14 @@
   // no preference at all. Pinning the fill keeps the two moving in the
   // directions they each need: white on these clears 7:1 (WCAG 1.4.6) at
   // 8.1:1 resting and 9.6:1 on hover.
-  --cirth-primary-surface: #{$copper-650};
-  --cirth-primary-surface-active: #{$copper-700};
+  --cirth-primary-surface: #{$accent-650};
+  --cirth-primary-surface-active: #{$accent-700};
   --cirth-primary-underline: var(--cirth-primary);
   --cirth-secondary-underline: var(--cirth-secondary-text);
   --cirth-contrast-underline: var(--cirth-contrast-text);
 
   // Opaque focus rings, as in the light scheme above.
-  --cirth-primary-focus: #{$copper-350};
+  --cirth-primary-focus: #{$accent-350};
   --cirth-secondary-focus: #{$neutral-350};
   --cirth-contrast-focus: #{$neutral-150};
 

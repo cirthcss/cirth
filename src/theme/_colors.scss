@@ -10,16 +10,17 @@
 // family defines every step.
 // Chroma is derived, not hand-picked. Each chromatic family is pinned to
 // one hue and held at a constant fraction of that hue's own maximum
-// in-gamut sRGB chroma at every lightness step; the fraction is the
-// family's voice:
+// in-gamut sRGB chroma at every lightness step; the fraction follows
+// from the family's role:
 //   - $error-*, $success-*, $warning-* sit at 85%. A status color has to
 //     be recognised at a glance in a small mark: a validation border, a
 //     meter segment, a word of inserted text, and it appears rarely.
-//   - $copper-* sits at 70%. The brand accent is the opposite case: it
-//     covers whole surfaces (a filled button, a focus ring, a checked
-//     control) and shows up on every screen, so the same 85% that makes a
-//     status mark legible would make the accent shout. 70% is what keeps
-//     it reading as oxidized metal rather than as an orange.
+//   - $accent-* sits at 70%. The accent is the opposite case: it covers
+//     whole surfaces (a filled button, a focus ring, a checked control)
+//     and shows up on every screen, so the same 85% that makes a status
+//     mark legible would make the accent the loudest thing on every page.
+//     At 70% a filled button is still the one action on its row without
+//     the hue saturating into a generic orange.
 // Because the sRGB gamut boundary shape differs per hue (e.g. red's
 // ceiling peaks earlier, at a darker lightness, than green's does), the
 // families don't hit peak saturation at the same step: that's the gamut
@@ -32,39 +33,38 @@
 // peak instead, because the dark scheme builds its canvas out of the two
 // darkest steps, and a bell that closed symmetrically left that canvas
 // achromatic no matter which hue the family was given.
-// The hue is the other half of the graphite. At 280deg the family is
-// predominantly blue with a violet lift: it reads as shadow iron, and it
-// sits 124deg from the brand hue, far enough to be the cool counterweight
-// the copper is measured against. Pulled further round toward the plum end
-// of the moodboard it stops being a counterweight: the page loses its
-// blue and every surface, ink and signal reads as a variation on the same
-// warm temperature.
-// Status colors (error, success, warning) are named for the role they
-// play, not the hue they happen to be: $error-500 is what most people
-// would call "red", but naming it that way would hide why it's actually
-// used (invalid form state, deleted/removed text). $copper and $neutral
-// are named for what they visually are (brand accent; graphite) since
-// neither is tied to a single semantic role. $copper's hue (44deg) is
-// lifted directly from the brand mark, not picked independently of it.
+// The hue is the neutral family's other half. At 280deg it is
+// predominantly blue with a violet lift, and it sits 124deg from the
+// accent's hue: far enough for ink, lines and the dark canvas to be the
+// cool side the warm accent is read against. Pulled further round toward
+// violet it stops being that: the page loses its blue, and every surface,
+// ink and signal reads as a variation on one warm temperature.
+// Every family is named for the role it plays, not for the hue it happens
+// to be: $error-500 is what most people would call "red", but naming it
+// that way would hide why it's used (invalid form state, deleted/removed
+// text). $accent-* seeds the default of the one accent input,
+// --cirth-primary; $neutral-* carries ink, lines, the secondary controls
+// and the dark canvas. The accent's hue (44deg) is lifted directly from
+// the brand mark, not picked independently of it.
 
 // B&W
 $black: oklch(0% 0 0deg);
 $white: oklch(100% 0 0deg);
 
-// Canvas — mineral paper. The light theme's page background: white pulled
-// faintly toward the brand hue (44deg), far short of a tint, so the
-// derived near-white surfaces read as sheets of the same stone lying on
-// it. Off the 19-step ladder on purpose: it's a surface color, not a scale
-// step. Verified against WCAG AA: every text token keeps >= 4.5:1 and
-// every 3:1 non-text claim in _light.scss still holds on this background.
-// Chroma stays low deliberately: the page should read as the material,
-// the accent as the signal on top of it, not as a wash across everything.
-// Presets already made this same call independently (the plain preset's
-// own page sits at zero chroma).
-$paper: oklch(97.3% 0.006 44deg);
+// Light canvas. The light scheme's page background: white pulled faintly
+// toward the accent's hue (44deg), far short of a tint, so every surface
+// derived from it above and below keeps one temperature. Off the 19-step
+// ladder on purpose: it's a surface color, not a scale step. Verified
+// against WCAG AA: every text token keeps >= 4.5:1 and every 3:1 non-text
+// claim in _light.scss still holds on this background. Chroma stays low
+// deliberately: the canvas is the ground and the accent the signal on it,
+// not a wash across everything. Presets already made this same call
+// independently (the plain preset's own page sits at zero chroma).
+$canvas-light: oklch(97.3% 0.006 44deg);
 
-// Neutral — graphite. Cool enough to be the temperature the warm accent is
-// read against; see the derivation note above.
+// Neutral: ink, lines, secondary controls and the dark canvas. Cool enough
+// to be the temperature the warm accent is read against; see the
+// derivation note above.
 $neutral-950: oklch(18% 0.022 280deg);
 $neutral-900: oklch(22.3% 0.023 280deg);
 $neutral-850: oklch(26.7% 0.025 280deg);
@@ -85,29 +85,30 @@ $neutral-150: oklch(87.3% 0.007 280deg);
 $neutral-100: oklch(91.7% 0.004 280deg);
 $neutral-50: oklch(96% 0 280deg);
 
-// Copper (primary brand accent)
-$copper-950: oklch(18% 0.037 44deg);
-$copper-900: oklch(22.3% 0.045 44deg);
-$copper-850: oklch(26.7% 0.054 44deg);
-$copper-800: oklch(31% 0.063 44deg);
-$copper-750: oklch(35.3% 0.072 44deg);
-$copper-700: oklch(39.7% 0.081 44deg);
-$copper-650: oklch(44% 0.09 44deg);
-$copper-600: oklch(48.3% 0.098 44deg);
-$copper-550: oklch(52.7% 0.107 44deg);
-$copper-500: oklch(57% 0.116 44deg);
-$copper-450: oklch(61.3% 0.125 44deg);
-$copper-400: oklch(65.7% 0.134 44deg);
-$copper-350: oklch(70% 0.141 44deg);
-$copper-300: oklch(74.3% 0.115 44deg);
-$copper-250: oklch(78.7% 0.092 44deg);
-$copper-200: oklch(83% 0.07 44deg);
-$copper-150: oklch(87.3% 0.051 44deg);
-$copper-100: oklch(91.7% 0.032 44deg);
-$copper-50: oklch(96% 0.015 44deg);
+// Accent: the default --cirth-primary and the steps the increased-contrast
+// pass pins it to.
+$accent-950: oklch(18% 0.037 44deg);
+$accent-900: oklch(22.3% 0.045 44deg);
+$accent-850: oklch(26.7% 0.054 44deg);
+$accent-800: oklch(31% 0.063 44deg);
+$accent-750: oklch(35.3% 0.072 44deg);
+$accent-700: oklch(39.7% 0.081 44deg);
+$accent-650: oklch(44% 0.09 44deg);
+$accent-600: oklch(48.3% 0.098 44deg);
+$accent-550: oklch(52.7% 0.107 44deg);
+$accent-500: oklch(57% 0.116 44deg);
+$accent-450: oklch(61.3% 0.125 44deg);
+$accent-400: oklch(65.7% 0.134 44deg);
+$accent-350: oklch(70% 0.141 44deg);
+$accent-300: oklch(74.3% 0.115 44deg);
+$accent-250: oklch(78.7% 0.092 44deg);
+$accent-200: oklch(83% 0.07 44deg);
+$accent-150: oklch(87.3% 0.051 44deg);
+$accent-100: oklch(91.7% 0.032 44deg);
+$accent-50: oklch(96% 0.015 44deg);
 
 // Error (invalid form state, deleted/removed text)
-// 22deg is 22deg away from the brand hue, and the distance is the point:
+// 22deg sits 22deg from the accent's hue, and the distance is the point:
 // a destructive action and a primary one share a page, and the palette
 // has to keep them apart without either of them raising its voice.
 $error-950: oklch(18% 0.062 22deg);

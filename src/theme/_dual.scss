@@ -50,7 +50,7 @@
   // wanting an opaque background, a hover tint mixing toward it) needs a
   // name the components are not allowed to shadow. That is this one.
   --cirth-canvas: light-dark(
-    #{$paper},
+    #{$canvas-light},
     #{color.mix($neutral-950, $neutral-900, $method: oklab)}
   );
 
@@ -100,11 +100,12 @@
   // any derived token directly if you want to break the relationship on
   // purpose.
   // The dark anchor is 400, not the 350 that would mirror the light 550:
-  // copper's gamut ceiling climbs steeply above L 65%, so the mirror step
-  // comes out an orange rather than a metal. One step deeper keeps the
-  // family reading as copper on a graphite page and still clears AA on
-  // every surface in the scheme (4.97:1 on a card, the worst of them).
-  --cirth-primary: light-dark(#{$copper-550}, #{$copper-400});
+  // this hue's gamut ceiling climbs steeply above L 65%, so the mirror step
+  // lands on the family's chroma peak and saturates into an orange. One
+  // step deeper keeps the accent recognisably the same hue on the dark
+  // canvas and still clears AA on every surface in the scheme (4.97:1 on a
+  // card, the worst of them).
+  --cirth-primary: light-dark(#{$accent-550}, #{$accent-400});
 
   // Secondary colors. This is the neutral family, not another input graph:
   // its fixed scale keeps the public runtime relationships concentrated on
@@ -143,7 +144,7 @@
   // as spent without leaving the palette. A step darker than
   // --cirth-secondary-text so the two aren't the same colour by accident.
   // Drained means *achromatic*, not "the grey from the neutral scale".
-  // The scale's own steps carry the graphite tint, which next to a warm
+  // The neutral scale's own steps carry its cool tint, which next to a warm
   // accent is a hue change at almost the same lightness: the weakest
   // possible way to say "you have been here". Zero chroma says it with the
   // one channel that is unambiguous. Lightness is unchanged, so is the
@@ -163,7 +164,7 @@
   // Headings colors: one step darker across the board than a plain
   // extension of --cirth-color (neutral-750) would give: bolder, more
   // confident headline weight, closer to how assertively dark Ruby's own
-  // headings sit against its paper canvas. Still short of true black:
+  // headings sit against its light canvas. Still short of true black:
   // this is a page of prose most of the time, not a poster.
   --cirth-h1-color: light-dark(#{$neutral-900}, #{$neutral-50});
   --cirth-h2-color: light-dark(#{$neutral-850}, #{$neutral-100});
@@ -184,7 +185,7 @@
   );
 
   // >= 3:1 against both the field and the page background (WCAG 1.4.11).
-  // 450, not 400: on the paper canvas the 400 step drops to 2.92:1.
+  // 450, not 400: on the light canvas the 400 step drops to 2.92:1.
   --cirth-form-element-border-color: light-dark(
     #{$neutral-450},
     #{$neutral-550}
@@ -206,7 +207,7 @@
   // Progress
   // The border marks the track's extent at >= 3:1 against the page
   // background (WCAG 1.4.11); the track itself stays subtle.
-  // 450, not 400: on the paper canvas the 400 step drops to 2.92:1.
+  // 450, not 400: on the light canvas the 400 step drops to 2.92:1.
   --cirth-progress-background-color: light-dark(
     #{$neutral-100},
     #{$neutral-850}

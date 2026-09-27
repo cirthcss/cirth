@@ -206,8 +206,8 @@ at 85%.
 | --- | --- |
 | Mark, light backgrounds | `#BD5928` (`oklch(58% 0.143 44deg)`) |
 | Mark, dark backgrounds | `#E16B31` (`oklch(66% 0.163 44deg)`) |
-| UI primary (light theme) | `oklch(52.7% 0.107 44deg)`, from `$copper-550` |
-| UI primary (dark theme) | `oklch(65.7% 0.134 44deg)`, from `$copper-400` |
+| UI primary (light theme) | `oklch(52.7% 0.107 44deg)`, from `$accent-550` |
+| UI primary (dark theme) | `oklch(65.7% 0.134 44deg)`, from `$accent-400` |
 
 The dark UI primary is one ladder step deeper than a mirror of the light one
 would be. Copper's gamut ceiling climbs steeply past 65% lightness, so the

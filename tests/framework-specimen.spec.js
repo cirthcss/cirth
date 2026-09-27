@@ -243,7 +243,7 @@ for (const specimen of specimens) {
 					`${specimen} ${scheme} ${name}: danger label`,
 				).toBeGreaterThanOrEqual(4.5);
 				// A label carries the meaning; this modest perceptual-distance floor
-				// additionally prevents copper and destructive red collapsing into
+				// additionally prevents the accent and destructive red collapsing into
 				// one fill when red/green discrimination is reduced.
 				expect(
 					oklabDistance(primaryFill, dangerFill),

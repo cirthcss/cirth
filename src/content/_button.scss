@@ -204,8 +204,8 @@
   // makes their meaning depend on wording alone; this modifier connects the
   // action to the existing error input without adding a parallel color API.
   // The dark fill is deliberately deeper than the bright error input so a
-  // white label keeps AA and copper/error retain a lightness difference when
-  // red/green hue discrimination is reduced.
+  // white label keeps AA, and the accent and error fills keep a lightness
+  // difference when red/green hue discrimination is reduced.
   #{$parent-selector}
     :is(button, [type="submit"], [type="button"], [role="button"]).danger {
     --cirth-background-color: light-dark(

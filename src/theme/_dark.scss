@@ -43,7 +43,7 @@
   // ratios are bounded by the same constraint: they have to keep white
   // legible on the fill when --cirth-primary is replaced by the shipped
   // Plain value or by the documented custom blue, which are lighter than
-  // the default copper and so darken less for the same ratio. Raising the
+  // the default accent and so darken less for the same ratio. Raising the
   // resting one to land on a ladder step drops Plain's on-surface ink to
   // 4.36:1, under AA: that is why it is not a round number. Override any
   // derived token directly if you want to break the relationship.
@@ -93,7 +93,7 @@
   // the current browser floor cannot derive a reliable light-or-dark choice.
   --cirth-primary-on-surface: #{$white};
 
-  // Surface model. Code is deeply recessed below the graphite canvas and
+  // Surface model. Code is deeply recessed below the dark canvas and
   // fields sit part-way back toward it; section bands and cards rise in
   // measured steps. Focus lifts a field to canvas while the accent edge and
   // ring carry the state. Keeping chroma and hue coherent lets Plain stay
@@ -126,7 +126,7 @@
   --cirth-contrast-underline-active: var(--cirth-contrast-active);
 
   // Highlighted text (<mark>): same semantic relationship as light, with
-  // enough accent in the mix to remain visible on the graphite canvas.
+  // enough accent in the mix to remain visible on the dark canvas.
   --cirth-mark-background-color: color-mix(
     in oklab,
     var(--cirth-primary) 24%,
@@ -198,7 +198,7 @@
   // The surface goes in whole here, unlike the light scheme: this canvas and
   // the neutral scale share a hue, so there is no second temperature for the
   // mix to average toward, and keeping the surface's chroma leaves the edge
-  // with the stone tint the rest of the scheme carries. See theme/_light.scss
+  // with the cool tint the rest of the scheme carries. See theme/_light.scss
   // for what happens when the two hues differ, and for the fix if a theme
   // moves this canvas off the neutral's hue.
   --cirth-card-border-color: color-mix(
@@ -236,7 +236,7 @@
 
   // Progress is part of the active-control language, not a brand specimen.
   // Following the public primary keeps Plain, Playroom and custom themes
-  // recognisable as the same framework without leaking the default copper.
+  // recognisable as the same framework without leaking the default accent.
   --cirth-progress-color: var(--cirth-primary-text);
 
   // Icons painted as background-image on replaced form controls. They
