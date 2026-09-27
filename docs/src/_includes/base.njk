@@ -140,6 +140,33 @@
 				});
 			}
 
+			// The package manager switch (install.njk): pure CSS on its own.
+			// This only remembers the choice and applies it to every switch on
+			// the page and on the next one, so a reader who picked pnpm is not
+			// asked again on every guide.
+			if (document.querySelector("[data-docs-install]")) {
+				const applyManager = (value) => {
+					for (const input of document.querySelectorAll(
+						`[data-docs-install] input[value="${value}"]`,
+					)) {
+						input.checked = true;
+					}
+				};
+				try {
+					const stored = localStorage.getItem("cirth-package-manager");
+					if (stored && /^(npm|pnpm|yarn|bun)$/.test(stored)) applyManager(stored);
+				} catch {}
+				document.addEventListener("change", (event) => {
+					const input = event.target;
+					if (!(input instanceof HTMLInputElement)) return;
+					if (!input.closest("[data-docs-install]")) return;
+					applyManager(input.value);
+					try {
+						localStorage.setItem("cirth-package-manager", input.value);
+					} catch {}
+				});
+			}
+
 			// Live preset switcher (gh#80): the <head> script above already
 			// applied a remembered choice before first paint; this wires up
 			// the header <select> for changes after load. Swapping the

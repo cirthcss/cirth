@@ -6,7 +6,7 @@ layout: base.njk
 <main id="main-content" class="container docs-page-shell">
 	<div class="docs-mobile-tools">
 		<details class="docs-mobile-nav">
-			<summary>Browse documentation</summary>
+			<summary>Documentation</summary>
 			<nav aria-label="Mobile documentation navigation">
 				{% for group in nav.sidebar %}
 					<section>
@@ -58,16 +58,16 @@ layout: base.njk
 				{% set prevPage = nav.flatPages[pageIndex - 1] if pageIndex > 0 %}
 				{% set nextPage = nav.flatPages[pageIndex + 1] if pageIndex < nav.flatPages.length - 1 %}
 				{% if prevPage or nextPage %}
-					<footer class="docs-prev-next">
-						{% if prevPage %}
-							<a href="{{ prevPage.link }}" class="secondary">← {{ prevPage.text }}</a>
-						{% else %}
-							<span></span>
-						{% endif %}
-						{% if nextPage %}
-							<a href="{{ nextPage.link }}" class="secondary">{{ nextPage.text }} →</a>
-						{% endif %}
-					</footer>
+					<nav class="docs-prev-next" aria-label="Previous and next page">
+						<ul>
+							{% if prevPage %}
+								<li><a href="{{ prevPage.link }}" rel="prev"><small>← Previous{% if prevPage.group != nav.flatPages[pageIndex].group %} · {{ prevPage.group }}{% endif %}</small><strong>{{ prevPage.text }}</strong></a></li>
+							{% endif %}
+							{% if nextPage %}
+								<li><a href="{{ nextPage.link }}" rel="next"><small>Next{% if nextPage.group != nav.flatPages[pageIndex].group %} · {{ nextPage.group }}{% endif %} →</small><strong>{{ nextPage.text }}</strong></a></li>
+							{% endif %}
+						</ul>
+					</nav>
 				{% endif %}
 			{% endif %}
 		</div>

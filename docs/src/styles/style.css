@@ -570,6 +570,19 @@
   line-height: 1;
 }
 
+@supports (backdrop-filter: blur(1px)) {
+  @media (prefers-contrast: no-preference) {
+    .docs-header {
+      background: color-mix(
+        in oklab,
+        var(--cirth-background-color) 86%,
+        transparent
+      );
+      backdrop-filter: blur(14px) saturate(1.3);
+    }
+  }
+}
+
 /* Only where it lands. `.sr-only-focusable` brings the reveal itself:
    out of flow, canvas, ink, radius, padding. This shell has a sticky
    header, so the link is pinned to the viewport corner instead of the
@@ -768,7 +781,7 @@
 .docs-mobile-controls > strong {
   display: block;
   padding: var(--cirth-space-2) var(--cirth-space-4) 0;
-  font-size: var(--cirth-font-size-xs);
+  font-size: var(--cirth-font-size-sm);
 }
 
 .docs-header .docs-mobile-controls > ul {
@@ -996,21 +1009,73 @@
   font-size: var(--cirth-font-size-sm);
 }
 
-/* Prev / next pagination */
+/* Prev / next pagination: two cards, each saying which way it goes and
+   where it lands, at reading size. Two columns where they fit, stacked on
+   a phone, and the next page always on the end edge. */
 .docs-prev-next {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--cirth-spacing);
   margin-top: calc(var(--cirth-spacing) * 3);
-  padding-top: var(--cirth-spacing);
+  padding-top: calc(var(--cirth-spacing) * 1.5);
   border-top: var(--cirth-border-width) solid var(--cirth-muted-border-color);
 }
 
-/* Site footer: on the canvas like everything else, separated by a
-   hairline: one continuous surface per scheme. */
+.docs-prev-next ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--cirth-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-prev-next li {
+  margin: 0;
+  list-style: none;
+}
+
+.docs-prev-next [rel="next"] {
+  text-align: end;
+}
+
+.docs-prev-next li:has([rel="next"]):only-child {
+  grid-column: -2;
+}
+
+.docs-prev-next a {
+  display: grid;
+  gap: var(--cirth-space-1);
+  min-block-size: 4.5rem;
+  padding: var(--cirth-space-3) var(--cirth-space-4);
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-card-border-radius);
+  background: var(--cirth-card-background-color);
+  text-decoration: none;
+}
+
+.docs-prev-next small {
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-font-size-sm);
+}
+
+.docs-prev-next strong {
+  font-size: var(--cirth-font-size-md);
+}
+
+.docs-prev-next a:hover {
+  border-color: var(--cirth-primary-border);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .docs-prev-next a {
+    transition: border-color var(--cirth-transition);
+  }
+}
+
+/* Site footer: the card-band surface under a hairline, so the page has
+   an end in both schemes rather than a canvas that simply stops. */
 .docs-footer {
   margin-top: calc(var(--cirth-spacing) * 4);
   border-top: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+  background: var(--cirth-card-sectioning-background-color);
 }
 
 /* The footer's own margin is air for a documentation page, where the prose
@@ -1507,6 +1572,11 @@ pre > button.copy.copied::before {
   z-index: 50;
   border-block-end: var(--cirth-border-width) solid
     var(--cirth-muted-border-color);
+  /* Chrome over the page rather than a slab on top of it: the canvas at
+     most of its strength, with what scrolls beneath blurred out of
+     legibility, so the header reads as a layer in both schemes instead of
+     a second copy of the canvas. The fallback and the increased-contrast
+     answer are the opaque canvas the header always had. */
   background: var(--cirth-background-color);
 
   /* The navbar's own padding, not the container's: the link band already
@@ -1514,22 +1584,6 @@ pre > button.copy.copied::before {
 	   on top of it takes permanently sticky chrome to 99px to present a
 	   40px row of controls. */
   padding-block: var(--cirth-space-2);
-}
-
-.docs-native-home {
-  overflow: clip;
-}
-
-.docs-native-home :where(section) {
-  margin: 0;
-}
-
-.docs-native-grid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: clamp(1rem, 1.8vw, 2rem);
-  width: min(100% - clamp(2rem, 6vw, 6rem), var(--docs-shell-max));
-  margin-inline: auto;
 }
 
 .docs-demo-caption {
@@ -1545,289 +1599,12 @@ pre > button.copy.copied::before {
   line-height: 1.35;
 }
 
-.docs-native-hero {
-  padding-block: clamp(2rem, 5vw, 5rem) clamp(2.5rem, 5vw, 4.5rem);
-}
-
-/* The hero splits on its own ratio, not on the section grid's column
-   count. An even 6/6 is a dead heat between a headline that is 20ch wide
-   by its own rule and a two-pane code panel that has to show real markup
-   and a real rendered form: the source pane lands at 246px, and the first
-   thing a reader sees of this project's source is a scrollbar.
-
-   5/7 is measured: the coarsest ratio that gets the source pane past the
-   snippet's longest line while leaving the headline over 30ch and the lede
-   over its 40ch cap. Stated as fractions of the hero's own row, so it
-   survives the 12 → 6 → 4 column changes below. */
-.docs-native-hero .docs-native-grid {
-  grid-template-columns: 5fr 7fr;
-}
-
-/* No rule down the gutter: the composition on the right is two
-   overlapping cards with their own frames, so a hairline behind them
-   separates nothing. The column gap is the separation.
-
-   Centred against the demo, not stretched beside it: a headline, a
-   sentence and two buttons against a composition twice their height leave
-   the hero's lower left quarter as the largest empty area on the page. */
-.docs-native-claim {
-  grid-column: 1;
-  align-self: center;
-  padding-block-end: 1rem;
-}
-
-/* The one place on this site that opts into display type, and it opts in
-   through --cirth-font-size (the slot every heading already resolves
-   through) reading its bounds off the shipped scale rather than declaring
-   a parallel typography beside it.
-
-   No font-weight, deliberately. On a system-font stack with no webfont an
-   off-scale weight is not real: macOS resolves 720 against SF's variable
-   axis, while Segoe UI and Roboto snap to 700, so the flagship headline
-   renders at a different weight per operating system. An h1 is already
-   --cirth-font-weight-bold, which is the same step everywhere. */
-.docs-native-claim h1 {
-  --cirth-font-size: clamp(
-    var(--cirth-font-size-6xl),
-    2rem + 1.9vw,
-    var(--cirth-font-size-7xl)
-  );
-  --cirth-line-height: var(--cirth-line-height-none);
-
-  max-width: 20ch;
-  margin: 0;
-}
-
-.docs-native-lede {
-  max-width: 40ch;
-  margin-block: 1.5rem;
-  color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-lg);
-}
-
 .docs-hero-actions {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin: 1.5rem 0;
-}
-
-.docs-native-lab {
-  grid-column: 2;
-}
-
-/* Source and Output, overlapping.
-   ––––––––––––––––––––
-   The claim is one move long: this markup produces this interface, so
-   the two halves are two cards that touch, not two panes of one panel.
-   Each carries its own control in its own title band: Build changes the
-   source, Theme changes the rendering.
-
-   The overlap is expressed in the flow, not on top of it: both are
-   ordinary grid items and the output is pulled back by a negative inline
-   margin of exactly --docs-lab-overlap. Nothing is absolutely positioned,
-   so the stage is intrinsically as tall as the taller card and the
-   composition cannot overflow its column: the output moves inward,
-   never out. */
-.docs-lab-stage {
-  --docs-lab-overlap: clamp(1.5rem, 3vw, 3rem);
-
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.72fr);
-  align-items: start;
-}
-
-.docs-source-panel {
-  grid-column: 1;
-}
-
-/* Centred on the source card, not dropped to the row's end edge: the two
-   have to read as one object rather than as a stack that has slipped. The
-   centring is measured against the *card*, so the source carries no bottom
-   margin: any margin there is inside the row and pushes the row's centre
-   below the card's. */
-.docs-output-frame {
-  z-index: 1;
-  grid-column: 2;
-  align-self: center;
-  margin-inline-start: calc(var(--docs-lab-overlap) * -1);
-}
-
-/* A source pane: a plate whose two rows are a title band and a code block.
-   The showcase sections below use the same object, so the shape is named
-   once here and the hero keeps only what is the hero's. */
-.docs-code-plate {
-  /* The flush-card knobs, straight off the Card page: zeroing the two
-     block-spacing tokens puts the title band on the frame's own edges and
-     hands the padding to each cell. `clip` is the plate's own: a grid of
-     cells inside a rounded frame has to clip its corners. */
-  --cirth-block-spacing-horizontal: 0;
-  --cirth-block-spacing-vertical: 0;
-  --cirth-card-sectioning-background-color: transparent;
-
-  display: grid;
-  min-width: 0;
-  overflow: clip;
-}
-
-/* The plate's title band: the frame's own stroke, the card's horizontal
-   rhythm, no tint, holding the region's name. */
-.docs-code-plate > header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  min-height: 2.5rem;
-  padding: 0.375rem 0.75rem;
-  color: var(--cirth-muted-color);
-  font-family: var(--cirth-font-family-mono);
-  font-size: var(--cirth-font-size-xs);
-}
-
-/* A cell of the plate, not a code block standing on its own: the frame,
-   the corners and the outer margin belong to the card around it. No
-   padding here either: the framework pads `pre > code`, which is where it
-   belongs, so the gutter scrolls with the markup instead of standing still
-   while a long attribute passes under it. */
-.docs-code-plate pre {
-  /* No block-size, deliberately: a height measured against the snippet has
-     to be re-derived every time the snippet changes, and a source panel
-     that scrolls is one hiding its source. The pane is as tall as the
-     markup. The cap comes back on a phone (the 48rem block), where the
-     full snippet would be the whole screen. */
-  border: 0;
-  border-radius: 0;
-  background: var(--cirth-code-background-color);
-  font-size: var(--cirth-font-size-xs);
-  line-height: 1.65;
-
-  /* Scrolls rather than wraps, on the library's own `pre` rule, which is
-	   where the scroll container and its focus ring come from. Wrapping
-	   would break a long attribute mid-token. */
-}
-
-/* The hero has no controls in it, and the copy button is one. The showcase
-   panes below keep theirs: their snippets exist to be taken. */
-.docs-source-panel pre > button.copy {
-  display: none;
-}
-
-/* The rendered page, lifted, not a plate.
-
-   A radius and a shadow, so it reads as sitting above the source, and
-   deliberately not the plate's hairline: that hairline is the mark this
-   shell puts on its own surfaces, and this is the one surface here that is
-   not the shell's. The shadow is the card's, doubled in reach, because it
-   separates two surfaces rather than lifting one off the page.
-
-   The height must clear the rendered content in every build: 433px in the
-   scoped ones, against 417px in the default. A frame one pixel short
-   becomes a scroll container, which keeps a tab stop alive on an iframe
-   that has nothing to scroll to and paints no focus ring. Sizing past the
-   content is what removes that stop; a tabindex is not. */
-.docs-output-frame {
-  position: relative;
-  block-size: 27.5rem;
-  min-width: 0;
-  border-radius: var(--cirth-card-border-radius);
-  background: var(--cirth-background-color);
-  overflow: clip;
-}
-
-.docs-output-frame iframe {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: var(--cirth-background-color);
-}
-
-/* Two beats: the markup arrives, then the interface it produces.
-
-   A wipe, not a rebuild: the source is complete in the DOM on the first
-   frame and never touched again, so the panel's height and scroll extent
-   are the same before and after, and selection, copy and assistive
-   technology get the whole snippet whether or not the animation has run.
-   `steps()` because the unit being revealed is a line of markup.
-
-   Under no-preference, and only ever *subtracting* from the resting state:
-   with the preference set, the finished composition is what the CSS
-   already says. */
-@media (prefers-reduced-motion: no-preference) {
-  @keyframes docs-lab-write {
-    from {
-      clip-path: inset(0 0 100% 0);
-    }
-
-    to {
-      clip-path: inset(0 0 0 0);
-    }
-  }
-
-  @keyframes docs-lab-render {
-    from {
-      opacity: 0;
-      transform: translateY(0.75rem);
-    }
-
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
-  .docs-source-panel pre > code {
-    animation: docs-lab-write 1.2s steps(16, end) 0.3s both;
-  }
-
-  .docs-output-frame {
-    animation: docs-lab-render 0.45s ease-out 1.4s both;
-  }
-}
-
-/* No rules between the sections: the tone alternates from one to the next,
-   so each already begins where the tone changes and a hairline there is a
-   second signal for one boundary. The footer keeps the one rule it draws
-   itself.
-
-   3.5rem at the top of the range, not 7: every section holds a stage and a
-   stage carries its own frame, so the gutter only has to keep two objects
-   apart. At 112px a heading, its sentence and the top of its stage stop
-   fitting one 900px viewport together: the measure that matters on a page
-   whose argument is what it shows. */
-.docs-proof,
-.docs-showcase,
-.docs-native-faq {
-  padding-block: clamp(2rem, 3.5vw, 3.5rem);
-}
-
-/* A modifier, not a property of any one section: the tone has to alternate
-   down the page, and a section that declares its own band colour cannot
-   alternate with its neighbours.
-
-   Only the proof band takes it, because it is the one section with no
-   frame of its own. A showcase holds a stage, and a stage is already a
-   card-coloured plate on the canvas: tinting the band behind it flattens
-   the frame it depends on. */
-.docs-band-tinted {
-  background: var(--cirth-card-background-color);
-}
-
-.docs-native-faq > .docs-native-grid > header {
-  grid-column: 1 / span 3;
-}
-
-/* Section headings are the framework's h2 and nothing else: a clamp of
-   their own is the same "the home page is a different product" problem the
-   hero had. Only the spacing under them is this page's business. */
-.docs-native-home
-  :where(.docs-showcase-lede, .docs-native-faq header)
-  h2 {
-  margin-block: 0 1rem;
-}
-
-.docs-native-home .docs-showcase-lede > p:last-child {
-  color: var(--cirth-muted-color);
 }
 
 /* The annotation voice, defined once.
@@ -1838,12 +1615,7 @@ pre > button.copy.copied::before {
    application does not want its <dt>s shouting in monospace, and one rule
    rather than three, which is how the tracking drifted last time.
 
-   The state marks it carries are Phosphor glyphs from the set the shell
-   already ships: one 16px box per state, no container, no new artwork.
-   Shape carries the state as much as colour does, and the word beside it
-   carries it in text, so the glyph is aria-hidden. */
-.docs-proof-state,
-.docs-example-name,
+   home.css repeats it for the home page's claim kinds. */
 .docs-brand-measures dt {
   color: var(--cirth-muted-color);
   font-family: var(--cirth-font-family-mono);
@@ -1857,765 +1629,10 @@ pre > button.copy.copied::before {
   text-transform: uppercase;
 }
 
-.docs-proof-state {
-  white-space: nowrap;
-}
-
-.docs-proof-state svg {
-  margin-inline-end: 0.4rem;
-  vertical-align: -0.2em;
-}
-
-.docs-proof-state .is-verified {
-  color: var(--cirth-ins-color);
-}
-
-/* Only the verified mark takes a colour of its own: the others are already
-   the muted ink they inherit from the strip around them.
-
-   Showcase sections: a heading, one sentence, and a stage.
-   ––––––––––––––––––––
-   A stage is one object: a hairline container, a title band, and the
-   panes inside it, so the eye reads "one example" rather than "three
-   widgets". The heading sits above it at full width. Spreading copy,
-   source and result across three columns of the section grid instead
-   leaves the live half at under half the content width and the listing
-   taller than the interface it explains, which is a specimen sheet rather
-   than an example. */
-.docs-showcase-lede {
-  grid-column: 1 / -1;
-  max-width: 52ch;
-  margin-block-end: clamp(1.25rem, 2.5vw, 2rem);
-}
-
-.docs-stage,
-.docs-proof-metrics,
-.docs-proof-claims {
-  grid-column: 1 / -1;
-}
-
-.docs-stage {
-  display: grid;
-  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
-  border-radius: var(--cirth-card-border-radius);
-
-  /* The container's own colour shows through the grid gaps, and that is
-     where every divider in a stage comes from. One declaration instead of
-     a border per pane and the nth-child arithmetic to take it off again,
-     and it stays correct at any column count, which is what lets the
-     panes reflow intrinsically. */
-  background: var(--cirth-card-border-color);
-  gap: var(--cirth-border-width);
-  overflow: clip;
-}
-
-/* The band names the example and carries whatever operates it: the same
-   plate grammar as the hero's Source panel. */
-.docs-stage-band {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.5rem 1rem;
-  min-height: 2.75rem;
-  padding: 0.375rem 0.75rem;
-  background: var(--cirth-card-background-color);
-  color: var(--cirth-muted-color);
-  font-family: var(--cirth-font-family-mono);
-  font-size: var(--cirth-font-size-xs);
-}
-
-.docs-stage-note code {
-  background: none;
-  font-size: inherit;
-}
-
-/* The panes get their own grid rather than being items of the stage: a
-   band spanning `1 / -1` over an auto-fit track list holds the spare
-   tracks open: they are not empty, the band is in them, and the unused
-   ones then show as a slab of the container's colour. Nested, nothing
-   spans, and auto-fit collapses what it should. */
-.docs-stage-body {
-  display: grid;
-  gap: var(--cirth-border-width);
-  background: var(--cirth-card-border-color);
-}
-
-/* Source beside result. Intrinsic, not a breakpoint: the pair sits side by
-   side while both halves clear 22rem and stacks when they cannot, so 1440,
-   the tablet band, the phone and 200% zoom are all the same rule. The
-   result takes the larger share of the row: it is the product, and the
-   listing is the explanation. */
-.docs-stage-split {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-}
-
-@media (width >= 60rem) {
-  .docs-stage-split {
-    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-  }
-
-  /* The theme stage's listing is three declarations, so it takes the space
-     a short thing takes and the interface it causes gets the rest.
-     Declared after the split above, so it wins on order rather than on a
-     second class of specificity. */
-  .docs-stage-split-narrow {
-    grid-template-columns: minmax(0, 0.62fr) minmax(0, 1fr);
-  }
-}
-
-/* Centred in the pane rather than hanging off the top of it: a stylesheet
-   that is four lines long next to an interface that is three hundred
-   pixels tall otherwise leaves a column of empty code surface under it. */
-.docs-stage-code {
-  display: grid;
-  align-content: center;
-  min-width: 0;
-  background: var(--cirth-code-background-color);
-}
-
-/* The theme pane has two rows and only one of them floats: the legend is
-   the pane's footer, so it sits on the end edge and the listing centres in
-   what is left. Centre the pair together and the legend hangs in the
-   middle of the pane with its rule across nothing. */
-.docs-theme-showcase .docs-stage-code {
-  align-content: stretch;
-  grid-template-rows: minmax(0, 1fr) auto;
-}
-
-.docs-theme-showcase .docs-stage-code pre {
-  align-self: center;
-}
-
-.docs-stage-code pre {
-  margin: 0;
-  border: 0;
-  border-radius: 0;
-  background: none;
-  font-size: var(--cirth-font-size-xs);
-  line-height: 1.65;
-}
-
-/* The contextual way out to the examples page, at the point where a reader
-   has just been shown that the page is real. A link in the flow, not a
-   button: the page already asked twice at the top. */
-.docs-showcase-more {
-  grid-column: 1 / -1;
-  margin-block: clamp(1.25rem, 2.5vw, 2rem) 0;
-  font-size: var(--cirth-font-size-sm);
-}
-
-/* The preview half is the canvas, like the hero's output: what is in here
-   is a component the framework has already finished, and a second frame
-   around it would read as the thing on the page instead of it. */
-.docs-stage-preview {
-  display: grid;
-  align-content: center;
-  min-width: 0;
-  padding: clamp(1rem, 2.5vw, 2rem);
-  background: var(--cirth-background-color);
-}
-
-/* The specimen is the page's, not the shell's: nothing in here restyles an
-   article, a table, a details or a control. The only declaration is the
-   one a container owes its contents: the first and last child must not
-   push against the pane's edges with margins document flow gave them.
-
-   `:first-child` reads inert because every specimen in the corpus happens
-   to open with an element carrying no block-start margin. Which element
-   opens a specimen is the page author's choice, not this rule's
-   assumption. */
-.docs-stage-preview > * > :first-child {
-  margin-block-start: 0;
-}
-
-.docs-stage-preview > * > :last-child {
-  margin-block-end: 0;
-}
-
-/* The proof band: measurements, then the two claims that are not one.
-   ––––––––––––––––––––
-   A number and the way to verify it are one statement, so the check path
-   sits in the cell with the number rather than in a table of its own.
-
-   No frame, deliberately. The two showcases above are each a hairline
-   plate on the canvas, and a third would be the shape the page is being
-   accused of: heading, sentence, bordered box, three times. The band's
-   tint is the containment here.
-
-   The dividers are the gap, which is the house answer for a hairline grid
-   (see .docs-stage and .docs-brand-grid): the container paints the divider
-   colour, the cells paint over it, and what shows through is the line. A
-   border per cell needs nth-child arithmetic to take it off again at the
-   end of each row, re-derived by hand every time the column count changes.
-   At two columns and at four, this rule is the same rule.
-
-   `.grid` is the class and the <dl> is the grid: the framework's answer to
-   a metrics panel is a gridded description list, not a component. The
-   class supplies the grid, the min-width: 0 on cells holding long values
-   and the margin reset, so what is left here is the column count and the
-   divider. */
-.docs-proof-metrics {
-  gap: var(--cirth-border-width);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin: 0;
-  background: var(--cirth-muted-border-color);
-}
-
-.docs-proof-metrics > div {
-  display: grid;
-  align-content: start;
-  gap: 0.375rem;
-  padding: clamp(1rem, 2vw, 1.5rem);
-  background: var(--cirth-card-background-color);
-}
-
-/* The value leads, then what it measures, then how to check it: the order
-   the question arrives in. No `margin: 0` anywhere in this block: the core
-   finished <dl>, so a <dt> arrives with no margin and a <dd> with neither
-   the user agent's 40px indent nor a stray block margin. */
-.docs-proof-metrics dd {
-  display: grid;
-  align-content: start;
-  gap: 0.375rem;
-}
-
-/* The claim, at the strip's own size. A direct child, because the size
-   cell carries a second <strong> inside its caption: the measured figure
-, and that one is an annotation rather than the headline. */
-.docs-proof-metrics dd > strong {
-  font-size: var(--cirth-font-size-2xl);
-  line-height: var(--cirth-line-height-none);
-}
-
-.docs-proof-metrics dd small {
-  color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-xs);
-}
-
-/* The one number left in the strip, inside the sentence that dates it. It
-   is set as a value rather than as running text, but in the caption,
-   because "14.7 KB" on its own is the shape of a promise and "14.7 KB
-   gzipped in this build" is the shape of a measurement. */
-.docs-proof-metrics dd small .docs-proof-figure {
-  color: var(--cirth-color);
-  font-family: var(--cirth-font-family-mono);
-}
-
-/* The check path, in every cell. This is the whole reason the two sections
-   became one: a number and the way to verify it are one statement, and
-   they were two sections apart. */
-.docs-proof-metrics dd a {
-  justify-self: start;
-  font-size: var(--cirth-font-size-sm);
-}
-
-.docs-proof-metrics dd a::after {
-  content: " →";
-}
-
-/* The claims that are not a measurement. A list, because two rows of four
-   columns is a table's shape without a table's reason. Each row is state,
-   claim, evidence, path, and it wraps rather than scrolling. */
-.docs-proof-claims {
-  display: grid;
-  gap: 0.75rem;
-  margin-block: clamp(1.25rem, 2.5vw, 2rem) 0;
-  padding: 0;
-  list-style: none;
-}
-
-.docs-proof-claims li {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 0.375rem 0.75rem;
-  padding-block-start: 0.75rem;
-  border-block-start: var(--cirth-border-width) solid
-    var(--cirth-muted-border-color);
-  font-size: var(--cirth-font-size-sm);
-}
-
-/* The evidence takes the rest of the row, so the path lands on the end
-   edge and the two rows line up on both margins. */
-.docs-proof-claims li > span:not(.docs-proof-state) {
-  flex: 1 1 16rem;
-  color: var(--cirth-muted-color);
-}
-
-.docs-proof-claims li > a::after {
-  content: " →";
-}
-
-@media (width >= 60rem) {
-  .docs-proof-metrics {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  /* Nothing about the dividers here: the gap draws them, and it draws them
-     the same way at two columns and at four. */
-}
-
-/* The switcher, the deck, and one example at a time.
-   ––––––––––––––––––––
-   Three examples share one stage, and the strip that chooses between them
-   sits in the stage's band beside the note: the control belongs to the
-   environment rather than to the sample.
-
-   The strip is served `hidden` and the script turns it on, so a reader
-   without script gets three complete examples stacked under their own
-   headings. Every rule here therefore describes the enhanced state only,
-   and the deck's resting state has to be the readable one. */
-.docs-switch {
-  /* Above the stage and part of the section, not of the listing's toolbar:
-     it chooses which example the section is about, so it takes the
-     section's type rather than the band's monospace annotation voice.
-
-     The buttons below read `--cirth-ink` and
-     `--cirth-card-background-color` directly. Not `--cirth-color`: a
-     <button> rebinds that to its own fill, so a tab reaching for it inside
-     itself gets the button's white. `--cirth-ink` is the page role no
-     component can shadow. */
-  grid-column: 1 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  margin-block-end: 0.625rem;
-  font-size: var(--cirth-font-size-sm);
-}
-
-/* `display: flex` above beats the UA's `[hidden] { display: none }`, so
-   without this the attribute the strip ships with does nothing and a
-   reader with no script gets three buttons that cannot change anything.
-   Same reason `.docs-example[hidden]` restates it below. */
-.docs-switch[hidden] {
-  display: none;
-}
-
-/* Not tiny: a tab is the only thing a reader has to hit before the section
-   works, so it takes a control's height and padding. The labels are one
-   word each, so three fit a 320px band without scrolling. */
-.docs-switch button {
-  min-height: 2.25rem;
-  margin: 0;
-  padding: 0.25rem 0.75rem;
-  border: var(--cirth-border-width) solid transparent;
-  border-radius: var(--docs-chrome-radius);
-  background: none;
-  color: var(--cirth-muted-color);
-  font-size: inherit;
-}
-
-.docs-switch button:hover {
-  background: var(--cirth-card-background-color);
-  color: var(--cirth-ink);
-}
-
-/* The selected tab is the one carrying the panel, so it takes the panel's
-   own surface and edge: the strip reads as three cells of which one is
-   open onto what is below it. */
-.docs-switch button[aria-selected="true"] {
-  border-color: var(--cirth-card-border-color);
-  background: var(--cirth-card-background-color);
-  color: var(--cirth-ink);
-}
-
-.docs-stage-deck {
-  display: grid;
-}
-
-/* One row of the stage, like the split it contains: the panes divide on the
-   container's colour showing through the gaps, and the note is a row of
-   its own under them. */
-.docs-example {
-  display: grid;
-  gap: var(--cirth-border-width);
-  background: var(--cirth-card-border-color);
-}
-
-/* `display: grid` above beats the UA's `[hidden] { display: none }`, so the
-   attribute the script sets would otherwise do nothing at all. */
-.docs-example[hidden] {
-  display: none;
-}
-
-/* The panel's own heading names it without script. With the strip on, the
-   tab says it, and a heading repeating the tab above it labels the section
-   twice: the tab is a real `aria-labelledby` target, so this leaves both
-   the flow and the accessibility tree. Keyed on the grid because the strip
-   is a sibling of the stage, not a row inside it. */
-.docs-native-grid:has(> .docs-switch:not([hidden])) .docs-example-name {
-  display: none;
-}
-
-.docs-example-name {
-  margin: 0;
-  padding: 0.75rem;
-  background: var(--cirth-card-background-color);
-}
-
-/* What the example is demonstrating, written beside the sample it is true
-   of rather than as a section of its own. */
-.docs-example-note {
-  margin: 0;
-  padding: 0.75rem;
-  background: var(--cirth-card-background-color);
-  color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-sm);
-}
-
-.docs-example-note code {
-  font-size: var(--cirth-font-size-xs);
-}
-
-/* The panel takes a ring: the tab hands focus to it, and it holds a
-   scrollable listing and a form. Inset, because the panel's edges are the
-   stage's frame. */
-.docs-example:focus-visible {
-  outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
-  outline-offset: calc(var(--cirth-outline-width) * -1);
-}
-
-/* The theme demo's preview element.
-   ––––––––––––––––––––
-   <cirth-theme-preview> holds its own copy of Cirth in a shadow root, and
-   almost nothing about it is styled from here, and that is the point: what is
-   inside is painted by the stylesheet the element loaded.
-
-   The page owns the box only. The pane gives up its padding to the
-   element, which carries it inside the shadow root instead, so the surface
-   painted in there is the whole half of the stage and the two grounds meet
-   across the stage's own hairline. */
-.docs-theme-showcase .docs-stage-preview {
-  align-content: stretch;
-  padding: 0;
-}
-
-cirth-theme-preview {
-  min-width: 0;
-}
-
-/* Before the element upgrades, and for a reader with no script at all:
-   its children are ordinary light-DOM markup, rendered by the page's own
-   Cirth. It is the same specimen, finished, and it needs the padding the
-   pane just gave away. `:not(:defined)` is exactly this state and nothing
-   else, so the rule retires itself the moment the script runs. */
-cirth-theme-preview:not(:defined) {
-  display: block;
-  padding: clamp(1rem, 2.5vw, 2rem);
-}
-
-/* The band's control: it pauses a demo that changes on its own, which is
-   what WCAG asks of anything that auto-updates beside other content. A
-   real control in the band, at the band's size, not a hover affordance.
-
-   Its colours resolve on the band and are inherited as values, like the
-   tab strip's: a <button> rebinds --cirth-color and
-   --cirth-background-color to its own fill, so a rule inside the button
-   reaching for either gets white-on-accent: 1.07:1 against this band.
-
-   Every interactive state is pinned in the selector for the same reason:
-   the framework's `button:is(:hover, :active, :focus)` outweighs a single
-   class, so leaving one out hands that state back. */
-.docs-stage-toggle,
-.docs-stage-toggle:is(:hover, :active, :focus, :focus-visible) {
-  min-height: 1.75rem;
-  margin: 0;
-  padding: 0.125rem 0.625rem;
-  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
-  border-radius: var(--docs-chrome-radius);
-  background: var(--cirth-canvas);
-  color: var(--cirth-muted-color);
-  font-size: inherit;
-}
-
-.docs-stage-toggle:is(:hover, :active, :focus, :focus-visible) {
-  color: var(--cirth-ink);
-}
-
-/* A theme's declarations, and what each one paints.
-   ––––––––––––––––––––
-   One line group per token, holding every preset's version of that line
-   with all but the current one hidden (docs/eleventy.config.js builds it).
-   Switching swaps a line rather than a listing, so the declaration that
-   moved can be marked where it stands and a reader can see that the others
-   did not move. */
-.docs-token.is-changed {
-  /* A declaration whose value wraps is one inline box across several line
-     boxes: cloned, the mark is drawn on each of them, the way a
-     highlighter works. The alternative is a block-level line, which cannot
-     be done without taking the newlines out of the content and breaking
-     copy. */
-  box-decoration-break: clone;
-  border-radius: var(--cirth-radius-xs);
-  background: var(--cirth-mark-background-color);
-  color: var(--cirth-mark-color);
-}
-
-/* Switching an example, and marking a token that moved.
-   ––––––––––––––––––––
-   Both beats are subtractive: under no-preference, and only ever taking
-   something away from a resting state the CSS above already describes in
-   full. With the preference set, the panel simply is the new panel and the
-   marked line simply stays marked.
-
-   `steps()` on a clip-path inset, because the unit being revealed is a
-   line of markup, deliberately not a per-character type-out, which says
-   the markup is a performance.
-
-   The mark is information, not decoration, which is why it is declared in
-   the resting state and only its *fade* is motion. */
-@media (prefers-reduced-motion: no-preference) {
-  @keyframes docs-example-enter {
-    from {
-      opacity: 0;
-      transform: translateY(0.375rem);
-    }
-
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
-  @keyframes docs-example-reveal {
-    from {
-      clip-path: inset(0 0 100% 0);
-    }
-
-    to {
-      clip-path: inset(0 0 0 0);
-    }
-  }
-
-  @keyframes docs-token-settle {
-    0%,
-    55% {
-      background: var(--cirth-mark-background-color);
-      color: var(--cirth-mark-color);
-    }
-
-    100% {
-      background: transparent;
-      color: inherit;
-    }
-  }
-
-  .docs-example:not([hidden]) .docs-stage-preview {
-    animation: docs-example-enter 0.22s ease-out both;
-  }
-
-  .docs-example:not([hidden]) .docs-stage-code pre > code {
-    animation: docs-example-reveal 0.26s steps(12, end) both;
-  }
-
-  .docs-token.is-changed {
-    animation: docs-token-settle 1.6s ease-out both;
-  }
-}
-
-/* The chips are painted by the custom properties themselves: nothing
-   scripts them, so they retheme because the stylesheet changed, which is
-   the section's argument running on the section itself.
-
-   One per line: this is the narrow half of the stage, and three token
-   names as a wrapping row break after the second. A column also stacks the
-   chips where the eye can compare them. */
-.docs-token-legend {
-  display: grid;
-  gap: 0.375rem;
-  margin: 0;
-  padding: 0.625rem 0.75rem;
-  border-block-start: var(--cirth-border-width) solid
-    var(--cirth-card-border-color);
-  list-style: none;
-}
-
-.docs-token-legend li {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  color: var(--cirth-muted-color);
-}
-
-.docs-token-legend code {
-  background: none;
-  font-size: var(--cirth-font-size-xs);
-}
-
-/* 1.5rem, not 1rem: at 16px a 0.5rem radius is half the box, so the chip
-   comes out a circle under Playroom and reads as a different kind of mark
-   rather than as a corner. At 24px the same radius is unmistakably a
-   rounded square. */
-.docs-token-chip {
-  flex: none;
-  inline-size: 1.5rem;
-  block-size: 1.5rem;
-  border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-}
-
-.docs-token-legend li[data-token="--cirth-primary"] .docs-token-chip {
-  background: var(--cirth-primary);
-}
-
-/* The radius chip shows the radius, which is the only honest way to swatch
-   one: a square with the theme's own corner on it. */
-.docs-token-legend li[data-token="--cirth-border-radius"] .docs-token-chip {
-  border-color: var(--cirth-primary-text);
-  border-radius: var(--cirth-border-radius);
-}
-
-.docs-token-legend li[data-token="--cirth-canvas"] .docs-token-chip {
-  background: var(--cirth-canvas);
-}
-
-/* Placement, and nothing else. A FAQ is the canonical use of the
-   disclosure component and should look like it, and the showcase above
-   lists this very element as its source, so anything the shell restyles
-   here makes that listing describe something the reader is not looking
-   at. */
-.docs-native-faq .docs-faq-list {
-  grid-column: 5 / -1;
-}
-
-@media (width < 80rem) {
-  .docs-native-grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
-
-  .docs-native-faq > .docs-native-grid > header {
-    grid-column: 1 / span 2;
-  }
-
-  .docs-native-faq .docs-faq-list {
-    grid-column: 3 / -1;
-  }
-}
-
-/* The hero stacks when the demo runs out of room, and that width is a
-   measurement of the *content*, not of the boxes.
-
-   The output overlaps the source by --docs-lab-overlap, so below some
-   width the source pane is narrower than its own longest line plus that
-   overlap and the floating output covers code. Swept at 20px steps, 1240px
-   is where the clearance between the end of the longest line and the edge
-   of the output becomes a gap rather than a coincidence: 29px, against
-   -10px at 1100. Below it the demo takes the full row, where the same
-   measurement reads 76px.
-
-   Re-measure this if the snippet changes: a minimum derived from the
-   panes' declared widths says nothing about what is in them. */
-@media (width < 77.5rem) {
-  .docs-native-hero .docs-native-grid {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 2rem;
-  }
-
-  .docs-native-claim,
-  .docs-native-lab {
-    grid-column: 1;
-  }
-
-  .docs-native-claim::after {
-    display: none;
-  }
-
-  .docs-native-lab {
-    max-width: 46rem;
-  }
-}
-
-@media (width < 48rem) {
-  .docs-native-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    width: min(100% - 1.5rem, var(--docs-shell-max));
-  }
-
-  .docs-native-hero {
-    padding-block: 1rem 2.5rem;
-  }
-
-  .docs-native-lede {
-    margin-block: 1rem;
-  }
-
-  /* The overlap unwinds rather than shrinking: at one column there is no
-	   second column to reach into, and two cards offset by a few
-	   millimetres read as a misalignment. */
-  .docs-lab-stage {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 1rem;
-  }
-
-  /* Source first: stacked, the two are read in sequence rather than
-     compared, and the sequence this page argues for is markup → interface.
-     Only the order is this tier's decision: the column is already 1
-     unconditionally, further up.
-
-     Read this with `.docs-output-frame { order: 2 }` below; the two are one
-     statement. This half measures inert on its own, because 0 comes before
-     2 as surely as 1 does. Its sibling does not: drop that one and the
-     output sorts to 0, ahead of this at 1, and the phone shows the result
-     above its own cause. Remove both or neither. */
-  .docs-source-panel {
-    order: 1;
-  }
-
-  .docs-output-frame {
-    order: 2;
-    grid-column: 1;
-
-    /* Measured against the tallest rendering in this range: 405px at
-       767px, with the container's bottom padding in. Anything looser
-       leaves empty lab canvas under the card, which reads as a gap between
-       the two halves of the demo. */
-    block-size: 26rem;
-    margin-inline-start: 0;
-  }
-
-  /* The cap the desktop pane gave up: here the full snippet is 626px on an
-     844px screen, so this is the one place the pane is deliberately a
-     window onto the markup rather than all of it. Not tighter than this:
-     at 14rem the window held nine of thirty-three lines and the panel read
-     as a scrollbar with some code in it. */
-  .docs-source-panel pre {
-    block-size: 20rem;
-  }
-
-  .docs-native-faq > .docs-native-grid > header,
-  .docs-native-faq .docs-faq-list {
-    grid-column: 1 / -1;
-  }
-
-  .docs-native-faq > .docs-native-grid > header {
-    margin-block-end: 2rem;
-  }
-
-}
-
 @media (forced-colors: active) {
-  /* The selected tab is a background against a transparent one, and forced
-     colors resolves both to Canvas, while every button's transparent
-     border is forced to CanvasText, so the border cannot carry the state
-     either. `Highlight`/`HighlightText` is the pair the system reserves
-     for exactly this. */
-  .docs-switch button[aria-selected="true"] {
-    background: Highlight;
-    color: HighlightText;
-  }
-
-  /* Same problem, same shape of answer: the mark on a declaration that
-     moved is a background, and a background is what forced colors takes
-     away. `Mark`/`MarkText` is the system's own highlighter. */
-  .docs-token.is-changed {
-    background: Mark;
-    color: MarkText;
-  }
-
-  /* Only the two surfaces that actually carry a shadow:
-     --cirth-card-box-shadow is `none` in every theme and preset the project
-     ships, so listing the plates here removes what was never painted. */
-  .docs-output-frame,
+  /* --cirth-card-box-shadow is `none` in every theme and preset the
+     project ships; the one surface here that paints a shadow of its own
+     loses it with the rest. */
   .docs-theme-lab figure {
     box-shadow: none;
   }
@@ -2701,7 +1718,16 @@ cirth-theme-preview:not(:defined) {
    disclosure takes that slot on most pages, so such a rule would apply to
    four pages and no others. */
 .docs-content > h1 {
-  margin-block: 0 clamp(var(--cirth-space-6), 4vw, var(--cirth-space-12));
+  margin-block: 0 clamp(var(--cirth-space-4), 2.5vw, var(--cirth-space-6));
+}
+
+/* The paragraph under a page's title says what the page is for, so it
+   reads a step larger than the prose it introduces. */
+.docs-content > h1 + p {
+  margin-block-end: clamp(var(--cirth-space-6), 4vw, var(--cirth-space-10));
+  color: var(--cirth-secondary-text);
+  font-size: var(--cirth-font-size-lg);
+  line-height: var(--cirth-line-height-normal);
 }
 
 /* Chapter separators, on the prose and nowhere else. `>`, never a
@@ -2833,7 +1859,7 @@ details.docs-demo-source {
    ink. Muting it drops below 4.5:1 on the code surface under plain dark. */
 details.docs-demo-source > summary {
   padding: 0.75rem 1rem;
-  font-size: var(--cirth-font-size-sm);
+  font-weight: var(--cirth-font-weight-semibold);
 }
 
 details.docs-demo-source[open] {
@@ -2870,6 +1896,7 @@ details.docs-demo-source[open] > summary {
 .docs-sidebar details > summary {
   padding: 0.5rem var(--cirth-space-3);
   font-size: var(--cirth-font-size-sm);
+  font-weight: var(--cirth-font-weight-semibold);
 }
 
 .docs-sidebar details[open] > summary {
@@ -2902,14 +1929,31 @@ details.docs-demo-source > :not(summary) {
   padding-inline: 0;
 }
 
+/* Reading size, not annotation size: this is the site's primary
+   navigation, and at 12px it was the smallest text on the page. Each row is
+   a 36px band, with the whole band the link's box, so the target is the
+   row rather than the words in it. */
 .docs-sidebar nav li a,
 .docs-toc a {
+  display: flex;
+  align-items: center;
+  min-block-size: 2.25rem;
   margin: 0;
   margin-inline-start: calc(var(--cirth-border-width-2) * -1);
-  padding-block: 0.35rem;
+  padding-block: 0.375rem;
   padding-inline: var(--cirth-space-3) 0;
   color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-xs);
+  font-size: var(--cirth-font-size-sm);
+  line-height: var(--cirth-line-height-snug);
+}
+
+/* Position is carried by contrast and the rail, never by the accent: the
+   current entry takes the full-contrast ink and a heavier weight, and the
+   framework paints the rail from aria-current. */
+.docs-sidebar nav li a[aria-current="page"],
+.docs-toc a[aria-current="true"] {
+  color: var(--cirth-contrast-text);
+  font-weight: var(--cirth-font-weight-semibold);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -2954,7 +1998,7 @@ details.docs-toc-top {
      same stack; preset-dependent. */
   .docs-mobile-tools > details > summary {
     font-family: var(--cirth-font-family-sans);
-    font-size: var(--cirth-font-size-xs);
+    font-size: var(--cirth-font-size-sm);
   }
 
   /* The third stacked nav here, and the third to say so with the gutter
@@ -2997,8 +2041,11 @@ details.docs-toc-top {
   .docs-mobile-nav nav a {
     display: block;
     margin-block: 0;
+    display: flex;
+    align-items: center;
+    min-block-size: 2.75rem;
     padding: var(--cirth-space-1) var(--cirth-space-2);
-    font-size: var(--cirth-font-size-xs);
+    font-size: var(--cirth-font-size-sm);
   }
 
   .docs-sidebar {
@@ -3047,7 +2094,7 @@ details.docs-toc-top {
   margin-block: 2rem 5rem;
 }
 
-/* `.grid` plus a <dl>, divided by its own gap ; see .docs-proof-metrics.
+/* `.grid` plus a <dl>, divided by its own gap, like .docs-proof-strip.
    The block-start border stays: it is the seam between this panel and the
    specimen above it, not a divider between cells.
 
@@ -3302,6 +2349,278 @@ details.docs-toc-top {
   }
 }
 
+/* Shell components added with the reorganisation
+   ––––––––––––––––––––
+   Composition only. Each is built from Cirth's own surfaces and tokens:
+   the card background and border, the sectioning band, the muted ink.
+   Nothing here restyles an element the framework styles. */
+
+/* A grid of link cards: the installation paths, the framework guides and
+   the form controls. The whole card is the link, so the target is the
+   card; the title is at reading size and the line under it is muted. */
+.docs-link-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr));
+  gap: var(--cirth-space-3);
+  margin: var(--cirth-space-6) 0 var(--cirth-space-8);
+  padding: 0;
+  list-style: none;
+}
+
+.docs-link-grid li {
+  margin: 0;
+  list-style: none;
+}
+
+.docs-link-grid a {
+  display: grid;
+  align-content: start;
+  gap: var(--cirth-space-1);
+  block-size: 100%;
+  min-block-size: 4.5rem;
+  padding: var(--cirth-space-4);
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-card-border-radius);
+  background: var(--cirth-card-background-color);
+  color: var(--cirth-ink);
+  text-decoration: none;
+}
+
+.docs-link-grid a:hover {
+  border-color: var(--cirth-primary-border);
+  box-shadow: var(--cirth-box-shadow);
+}
+
+.docs-link-grid strong {
+  color: var(--cirth-contrast-text);
+}
+
+.docs-link-grid span {
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-font-size-sm);
+  line-height: var(--cirth-line-height-snug);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .docs-link-grid a {
+    transition:
+      border-color var(--cirth-transition),
+      box-shadow var(--cirth-transition);
+  }
+}
+
+/* Facts at a glance: a gridded description list divided by its own gap,
+   the house answer for a hairline grid (see .docs-brand-measures). */
+.docs-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: var(--cirth-border-width);
+  margin: var(--cirth-space-6) 0 var(--cirth-space-8);
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-card-border-radius);
+  background: var(--cirth-card-border-color);
+  overflow: clip;
+}
+
+.docs-facts > div {
+  display: grid;
+  align-content: start;
+  gap: var(--cirth-space-1);
+  padding: var(--cirth-space-3) var(--cirth-space-4);
+  background: var(--cirth-card-background-color);
+}
+
+.docs-facts dt {
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-font-size-sm);
+  font-weight: var(--cirth-font-weight-regular);
+}
+
+.docs-facts dd {
+  margin: 0;
+  color: var(--cirth-contrast-text);
+  font-weight: var(--cirth-font-weight-medium);
+  line-height: var(--cirth-line-height-snug);
+}
+
+/* The package manager switch: Cirth's segmented radio group choosing which
+   of four commands shows. All four are in the document; without :has()
+   they are simply all listed. */
+.docs-install {
+  margin-block: var(--cirth-space-4) var(--cirth-space-6);
+}
+
+/* A tighter segment, set through the control's own padding token: four
+   choices then share one row on a 360px phone instead of wrapping one of
+   them onto a row of its own. The segments keep their 44px height. */
+.docs-install > .segmented {
+  --cirth-form-element-spacing-horizontal: var(--cirth-space-2);
+
+  margin-block-end: var(--cirth-space-2);
+  font-size: var(--cirth-font-size-sm);
+}
+
+.docs-install > pre {
+  margin: 0;
+}
+
+.docs-install:has(input[value="npm"]:checked) > pre:not([data-pm="npm"]),
+.docs-install:has(input[value="pnpm"]:checked) > pre:not([data-pm="pnpm"]),
+.docs-install:has(input[value="yarn"]:checked) > pre:not([data-pm="yarn"]),
+.docs-install:has(input[value="bun"]:checked) > pre:not([data-pm="bun"]) {
+  display: none;
+}
+
+/* Where a guide says when and how it was checked: a quiet note at the end
+   of the page, not a badge. */
+.docs-verified {
+  margin-block-start: var(--cirth-space-8);
+  padding-block-start: var(--cirth-space-3);
+  border-block-start: var(--cirth-border-width) solid
+    var(--cirth-muted-border-color);
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-font-size-sm);
+}
+
+/* A narrow stage for a screen that is narrow by nature. The stage's own
+   padding grows; nothing inside the preview is touched. */
+.docs-demo-narrow .docs-demo-preview {
+  padding-inline: max(
+    clamp(var(--cirth-spacing), 3vw, calc(var(--cirth-spacing) * 2)),
+    (100% - 28rem) / 2
+  );
+}
+
+/* The examples showcase: wider than a documentation page, because a
+   dashboard needs the room to look like one. */
+.docs-showcase-page {
+  --cirth-container-max-width: 76rem;
+
+  padding-block: clamp(var(--cirth-space-6), 4vw, var(--cirth-space-12))
+    var(--cirth-space-16);
+}
+
+.docs-showcase-intro {
+  max-inline-size: 48rem;
+  margin-block-end: var(--cirth-space-8);
+}
+
+.docs-showcase-intro > p {
+  color: var(--cirth-secondary-text);
+  font-size: var(--cirth-font-size-lg);
+}
+
+/* Category links as chips: a row that wraps, each a comfortable target. */
+.docs-chip-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cirth-space-2);
+  margin: 0;
+  padding: 0;
+}
+
+.docs-chip-nav li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-chip-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2.75rem;
+  margin: 0;
+  padding: 0 var(--cirth-space-4);
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-radius-pill);
+  background: var(--cirth-card-background-color);
+  color: var(--cirth-ink);
+  font-size: var(--cirth-font-size-sm);
+  text-decoration: none;
+}
+
+.docs-chip-nav a:hover {
+  border-color: var(--cirth-primary-border);
+}
+
+.docs-example-category {
+  padding-block-start: var(--cirth-space-10);
+  scroll-margin-block-start: 5rem;
+}
+
+.docs-example-category > header {
+  max-inline-size: 48rem;
+  margin-block-end: var(--cirth-space-6);
+  padding-block-start: var(--cirth-space-4);
+  border-block-start: var(--cirth-border-width) solid
+    var(--cirth-muted-border-color);
+}
+
+.docs-example-category > header > h2 {
+  margin-block-end: var(--cirth-space-2);
+}
+
+.docs-example-category > header > p {
+  margin: 0;
+  color: var(--cirth-muted-color);
+}
+
+.docs-example-block {
+  margin-block-end: var(--cirth-space-12);
+}
+
+.docs-example-block > header {
+  max-inline-size: 48rem;
+}
+
+.docs-example-block > header > h3 {
+  margin-block-end: var(--cirth-space-1);
+}
+
+.docs-example-block > header > p {
+  margin-block-end: var(--cirth-space-2);
+  color: var(--cirth-secondary-text);
+}
+
+.docs-example-block .docs-demo {
+  margin-block-start: var(--cirth-space-4);
+}
+
+/* What an example is built from, as links into the reference. */
+.docs-example-uses {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cirth-space-1) var(--cirth-space-3);
+  font-size: var(--cirth-font-size-sm);
+}
+
+.docs-example-uses > span {
+  color: var(--cirth-muted-color);
+}
+
+.docs-showcase-page .docs-build-comparison {
+  margin-block-start: 0;
+}
+
+.docs-showcase-next {
+  margin-block-start: var(--cirth-space-12);
+  padding-block-start: var(--cirth-space-8);
+  border-block-start: var(--cirth-border-width) solid
+    var(--cirth-muted-border-color);
+  text-align: center;
+}
+
+.docs-showcase-next .docs-hero-actions {
+  justify-content: center;
+}
+
+/* A page kept only to forward an old address. */
+.docs-moved {
+  max-inline-size: 40rem;
+  min-block-size: 50vh;
+}
+
 /* Print: this site's half of the bargain
    ––––––––––––––––––––
    The framework's own print pass (src/utilities/_print.scss) flattens
@@ -3324,16 +2643,6 @@ details.docs-toc-top {
   .docs-demo-caption,
   pre > button.copy {
     display: none;
-  }
-
-  /* The home page's demo is a live document in a frame. On paper the frame
-	   has nothing to show, so the stage keeps only its source half. */
-  .docs-output-frame {
-    display: none;
-  }
-
-  .docs-lab-stage {
-    display: block;
   }
 
   /* With the side columns gone, the document takes the full measure of
