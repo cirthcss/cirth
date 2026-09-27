@@ -1,15 +1,19 @@
 ---
 layout: base.njk
-title: "404"
+title: Page not found
 permalink: 404.html
 eleventyExcludeFromCollections: true
 ---
-<main id="main-content">
-	<section class="container docs-hero">
-		<hgroup>
-			<h1>404</h1>
-			<p>Page not found.</p>
-		</hgroup>
-		<p><a href="/" class="secondary">Back to home</a></p>
-	</section>
+<main id="main-content" class="container docs-page-shell docs-moved">
+	<h1>Page not found</h1>
+	<p>
+		Nothing lives at this address. The documentation was reorganised
+		recently, so the page you were looking for may have a new home: search
+		from the header, or start from one of these.
+	</p>
+	<ul class="docs-link-grid">
+		<li><a href="/"><strong>Home</strong><span>What Cirth is, in one page.</span></a></li>
+		<li><a href="/installation"><strong>Installation</strong><span>A CDN link or an npm import, and the framework guides.</span></a></li>
+		<li><a href="/examples"><strong>Examples</strong><span>Complete screens built from plain elements.</span></a></li>
+	</ul>
 </main>

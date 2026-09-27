@@ -9,7 +9,7 @@ What to know before adopting Cirth: where it runs, what the package
 contains, how it sits beside the CSS you already have, and how the file gets
 to a browser.
 
-<dl class="docs-facts">
+<dl class="grid docs-facts">
 <div><dt>Browsers</dt><dd>{{ browsers.sentence }}</dd></div>
 <div><dt>JavaScript</dt><dd>None shipped, none required</dd></div>
 <div><dt>Package</dt><dd>Compiled CSS, four builds, print sheets, presets, design tokens as JSON</dd></div>

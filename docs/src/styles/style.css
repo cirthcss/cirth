@@ -1012,7 +1012,13 @@
 /* Prev / next pagination: two cards, each saying which way it goes and
    where it lands, at reading size. Two columns where they fit, stacked on
    a phone, and the next page always on the end edge. */
+/* A stacked nav, said the way the framework asks: the gutter token zero
+   releases the bar idiom's inline insets, and `display: block` lets the
+   list take the full width instead of shrinking to a flex item. */
 .docs-prev-next {
+  --cirth-nav-element-spacing-horizontal: 0;
+
+  display: block;
   margin-top: calc(var(--cirth-spacing) * 3);
   padding-top: calc(var(--cirth-spacing) * 1.5);
   border-top: var(--cirth-border-width) solid var(--cirth-muted-border-color);
@@ -1029,6 +1035,7 @@
 
 .docs-prev-next li {
   margin: 0;
+  padding: 0;
   list-style: none;
 }
 
@@ -1043,6 +1050,7 @@
 .docs-prev-next a {
   display: grid;
   gap: var(--cirth-space-1);
+  margin: 0;
   min-block-size: 4.5rem;
   padding: var(--cirth-space-3) var(--cirth-space-4);
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);

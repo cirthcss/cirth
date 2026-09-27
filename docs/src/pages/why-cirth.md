@@ -10,7 +10,7 @@ A `<button>`, a `<nav>`, an `<article>`, a `<table>` or a `<dialog>` comes out
 finished, accessible and themeable, without a class vocabulary to learn first
 and without a script to run.
 
-<dl class="docs-facts">
+<dl class="grid docs-facts">
 <div><dt>Markup</dt><dd>Semantic HTML. Classes only where you want them</dd></div>
 <div><dt>Runtime</dt><dd>0 B of JavaScript</dd></div>
 <div><dt>Frameworks</dt><dd>Any: it styles the DOM, whoever renders it</dd></div>

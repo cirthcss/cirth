@@ -6,7 +6,6 @@ const siteDescription =
 
 const topNav = [
 	{ text: "Docs", link: "/installation" },
-	{ text: "Components", link: "/components/accordion" },
 	{ text: "Examples", link: "/examples" },
 ];
 

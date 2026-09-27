@@ -66,8 +66,8 @@ claims:
     check: Override one
     link: /customization
   - kind: capability
-    title: Four builds
-    text: Default, classless, scoped and scoped classless, with print sheets and presets beside them.
+    title: Flexible distribution
+    text: Classless and scoped builds, with print sheets and token presets as optional outputs beside them.
     check: Compare builds
     link: /installation/#choose-a-build
 

@@ -11,7 +11,7 @@ checked baseline for contrast, focus and target size, and follows the
 preferences a reader sets in their system, with no class, attribute or
 script from you.
 
-<dl class="docs-facts">
+<dl class="grid docs-facts">
 <div><dt>Contrast</dt><dd>WCAG 2.2 AA in both schemes and every shipped preset</dd></div>
 <div><dt>Focus</dt><dd>Always visible, including under forced colors</dd></div>
 <div><dt>Targets</dt><dd>44px buttons and controls, 40px inside a nav bar</dd></div>
