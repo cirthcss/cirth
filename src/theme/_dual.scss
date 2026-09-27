@@ -69,16 +69,12 @@
   // Text color
   --cirth-color: var(--cirth-ink);
 
-  // Muted colors
-  // The dark value clears AA on the highest surface in the runtime graph.
-  // neutral-450 was only 4.33:1 on a card after the surface hierarchy gained
-  // enough separation to be legible; neutral-400 leaves useful rounding room
-  // across engines while remaining visibly secondary to the main ink.
-  --cirth-muted-color: light-dark(#{$neutral-550}, #{$neutral-400});
-  --cirth-muted-border-color: light-dark(
-    #{color.mix($neutral-100, $neutral-50, $method: oklab)},
-    #{$neutral-850}
-  );
+  // Muted ink: metadata, placeholders, the quietest text that still has to
+  // be read. The step is chosen against the worst surface level in each
+  // scheme, not against the canvas: the recessed level in light (5.27:1)
+  // and the overlay in dark (5.35:1). One step lighter fails there in both
+  // schemes (4.39:1 and 4.33:1).
+  --cirth-muted-color: light-dark(#{$neutral-600}, #{$neutral-350});
 
   // Status colours
   // Three inputs (error, success and warning) each driving four roles.
@@ -109,13 +105,15 @@
 
   // Secondary colors. This is the neutral family, not another input graph:
   // its fixed scale keeps the public runtime relationships concentrated on
-  // primary, status, and surfaces.
-  --cirth-secondary-text: light-dark(#{$neutral-550}, #{$neutral-350});
+  // primary, status, and surfaces. The text sits one step stronger than the
+  // muted ink, so a secondary action never reads as metadata, and the
+  // active step one further again.
+  --cirth-secondary-text: light-dark(#{$neutral-650}, #{$neutral-300});
   --cirth-secondary-underline: light-dark(
-    #{color.change($neutral-550, $alpha: 0.5)},
-    #{color.change($neutral-350, $alpha: 0.5)}
+    #{color.change($neutral-650, $alpha: 0.5)},
+    #{color.change($neutral-300, $alpha: 0.5)}
   );
-  --cirth-secondary-active: light-dark(#{$neutral-650}, #{$neutral-250});
+  --cirth-secondary-active: light-dark(#{$neutral-750}, #{$neutral-200});
   --cirth-secondary-surface-active: light-dark(
     #{$neutral-650},
     #{$neutral-550}
@@ -154,9 +152,12 @@
     #{color.change($neutral-400, $chroma: 0)}
   );
 
-  // Box shadow
+  // Box shadow: the overlay elevation (dialog, popover, dropdown). The
+  // light half is the deepest neutral, not a pale grey: a shadow is read as
+  // a lightness step against what it falls on, and a pale one on a
+  // near-white page is a step nobody sees.
   --cirth-box-shadow: #{functions.shadow(
-      $neutral-400,
+      $neutral-950,
       color.mix($black, $neutral-950, $method: oklab)
     )};
 
@@ -174,9 +175,11 @@
   --cirth-h6-color: light-dark(#{$neutral-650}, #{$neutral-400});
   --cirth-mark-color: light-dark(#{$neutral-950}, #{$white});
 
-  // Code ink. Its surface is derived from --cirth-canvas in the scheme
-  // mixins, alongside the other surface roles.
-  --cirth-code-color: light-dark(#{$neutral-550}, #{$neutral-400});
+  // Code ink: the body ink. Code in a document is content, and the muted
+  // ink it used to take told the reader it mattered less than the sentence
+  // around it; the code face alone says what it is. Its surface is the
+  // recessed level, derived in the scheme mixins.
+  --cirth-code-color: var(--cirth-ink);
 
   // Form elements
   --cirth-form-element-selected-background-color: light-dark(
@@ -184,33 +187,7 @@
     #{$neutral-800}
   );
 
-  // >= 3:1 against both the field and the page background (WCAG 1.4.11).
-  // 450, not 400: on the light canvas the 400 step drops to 2.92:1.
-  --cirth-form-element-border-color: light-dark(
-    #{$neutral-450},
-    #{$neutral-550}
-  );
+  // The field's ink. Its edge is one of the three edge roles derived from
+  // the canvas in the scheme mixins, alongside the surface levels.
   --cirth-form-element-color: light-dark(#{$neutral-850}, #{$neutral-100});
-
-  // Switch (input[type="checkbox"][role="switch"])
-  // Unchecked track needs >= 3:1 against the page background so the
-  // control's off state stays perceivable (WCAG 1.4.11)
-  --cirth-switch-background-color: light-dark(#{$neutral-450}, #{$neutral-550});
-
-  // Range (input[type="range"])
-  --cirth-range-border-color: light-dark(#{$neutral-100}, #{$neutral-850});
-  --cirth-range-active-border-color: light-dark(
-    #{$neutral-200},
-    #{$neutral-800}
-  );
-
-  // Progress
-  // The border marks the track's extent at >= 3:1 against the page
-  // background (WCAG 1.4.11); the track itself stays subtle.
-  // 450, not 400: on the light canvas the 400 step drops to 2.92:1.
-  --cirth-progress-background-color: light-dark(
-    #{$neutral-100},
-    #{$neutral-850}
-  );
-  --cirth-progress-border-color: light-dark(#{$neutral-450}, #{$neutral-550});
 }

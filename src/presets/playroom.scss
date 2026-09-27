@@ -26,24 +26,23 @@
     --cirth-primary: light-dark(oklch(50% 0.16 300deg), oklch(70% 0.14 300deg));
 
     // The page carries a trace of the accent instead of being neutral: at
-    // this chroma it reads as "warm paper, but violet", which is what keeps
-    // the whole thing from feeling clinical.
+    // this chroma it reads as a pale violet ground, which is what keeps the
+    // whole thing from feeling clinical. At 96.5% rather than 98%, so the
+    // raised level a card sits on has room above it.
     --cirth-canvas: light-dark(
-      oklch(98% 0.012 300deg),
+      oklch(96.5% 0.012 300deg),
       oklch(24% 0.028 295deg)
     );
 
-    // The full surface hierarchy follows this canvas at runtime. Playroom no
-    // longer repeats card, form, code, dropdown, or popover merely to carry
-    // the violet temperature through the system.
+    // The full surface hierarchy follows this canvas at runtime, and so do
+    // the three edges: separators, container edges and control edges come
+    // out violet because the canvas is. Playroom repeats none of them.
+    // Its muted ink sits one step darker than the default's lightness
+    // would suggest, for the 4.5:1 it owes the recessed level.
     --cirth-ink: light-dark(oklch(36% 0.03 295deg), oklch(93% 0.012 300deg));
     --cirth-muted-color: light-dark(
-      oklch(52% 0.035 295deg),
+      oklch(48% 0.035 295deg),
       oklch(70% 0.028 295deg)
-    );
-    --cirth-muted-border-color: light-dark(
-      oklch(90% 0.02 300deg),
-      oklch(36% 0.03 295deg)
     );
     --cirth-link-visited-color: light-dark(
       oklch(50% 0.03 295deg),
@@ -57,11 +56,11 @@
     // inks and status surfaces all follow from these three. <mark> follows
     // the primary accent instead, because relevance is not a warning state.
     // The error anchor sits where the default theme's does (a 44%-ish
-    // lightness): the invalid border derives *lighter* than its input, so an
-    // anchor picked for how it reads as a fill leaves the border under the
-    // 3:1 non-text floor against a white card.
-    // Warning follows the same constraint: 50% keeps its derived light border
-    // above 3:1 against the form surface without losing the warm amber hue.
+    // lightness): an invalid field's border is the input itself, so an
+    // anchor picked only for how it reads as a fill could leave the border
+    // under the 3:1 non-text floor against a white card. Warning follows
+    // the same constraint: 50% keeps its border above 3:1 against every
+    // surface level without losing the warm amber hue.
     --cirth-error: light-dark(oklch(45% 0.16 25deg), oklch(74% 0.13 25deg));
     --cirth-success: light-dark(oklch(52% 0.11 155deg), oklch(72% 0.11 155deg));
     --cirth-warning: light-dark(oklch(50% 0.1 75deg), oklch(74% 0.11 75deg));
@@ -141,10 +140,6 @@
       --cirth-muted-color: light-dark(
         oklch(40% 0.035 295deg),
         oklch(82% 0.02 295deg)
-      );
-      --cirth-muted-border-color: light-dark(
-        oklch(58% 0.03 295deg),
-        oklch(62% 0.03 295deg)
       );
       --cirth-link-visited-color: light-dark(
         oklch(36% 0.03 295deg),

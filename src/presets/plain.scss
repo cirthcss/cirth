@@ -26,10 +26,13 @@
     // scheme too: no second block, no scheme wiring.
     --cirth-primary: light-dark(oklch(52% 0.17 258deg), oklch(72% 0.13 258deg));
 
-    // Plain white rather than warm paper. Card, form, code, dropdown and
-    // popover keep their elevation/recession relationships and lose the warm
-    // cast automatically; no surface role is repeated here.
-    --cirth-canvas: light-dark(oklch(98.5% 0 0deg), oklch(20% 0.008 264deg));
+    // A neutral page rather than a warm one. Cards, fields, code, dropdowns
+    // and popovers keep their surface levels and lose the warm cast
+    // automatically; no surface role is repeated here. Light grey, not
+    // white: the raised level a card sits on needs room above the canvas,
+    // and at 98.5% it had 0.015 of lightness to use (1.03:1). At 97% the
+    // cards are white and the page is the one thing that is not.
+    --cirth-canvas: light-dark(oklch(97% 0 0deg), oklch(20% 0.008 264deg));
 
     // Keep headings in the body face even when the consumer has replaced the
     // display role independently.

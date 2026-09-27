@@ -10,9 +10,9 @@
   --cirth-error-text: oklch(
     from var(--cirth-error) calc(l * 1.059) calc(c * 0.797) h
   );
-  --cirth-error-border: oklch(
-    from var(--cirth-error) calc(l * 0.942) calc(c * 1.226) h
-  );
+
+  // Status borders are the inputs; see theme/_light.scss.
+  --cirth-error-border: var(--cirth-error);
   --cirth-error-active: oklch(
     from var(--cirth-error) calc(l * 1.059) calc(c * 0.797) h
   );
@@ -20,9 +20,7 @@
   --cirth-success-text: oklch(
     from var(--cirth-success) calc(l * 1.198) calc(c * 1.2) h
   );
-  --cirth-success-border: oklch(
-    from var(--cirth-success) calc(l * 1.065) calc(c * 1.064) h
-  );
+  --cirth-success-border: var(--cirth-success);
   --cirth-success-active: oklch(
     from var(--cirth-success) calc(l * 1.198) calc(c * 1.2) h
   );
@@ -50,7 +48,12 @@
 
   // The input is not also a component role. Keeping the alias explicit lets
   // consumers retune the accent once while components say what they need.
-  --cirth-primary-text: var(--cirth-primary);
+  // The text role holds the accent's lightness at 0.72 or above, which is
+  // what keeps 4.5:1 on the overlay, the lightest level in this scheme, for
+  // any accent. The shipped accent (L 0.657) reads 4.34:1 there unlifted;
+  // lifting the text rather than darkening the overlay keeps the levels
+  // from being tuned to it.
+  --cirth-primary-text: oklch(from var(--cirth-primary) max(l, 0.72) c h);
   --cirth-primary-surface: color-mix(
     in oklch,
     var(--cirth-primary) 75.2%,
@@ -74,13 +77,8 @@
   --cirth-primary-border-active: var(--cirth-primary-surface-active);
   --cirth-primary-underline-active: var(--cirth-primary-active);
 
-  // Focus rings composite to >= 3:1 against the page background (WCAG
-  // 1.4.11 as applied to focus indicators); don't lower these alphas.
-  // 80%, where the light scheme uses 75%: this scheme's accent sits a step
-  // deeper on the ladder (see theme/_dual.scss), so the same alpha would
-  // have left the ring at 3.11:1 on a card. At 80% it composites to
-  // 3.68:1 there and 3.93:1 on the canvas.
-  --cirth-primary-focus: oklch(from var(--cirth-primary) l c h / 80%);
+  // Opaque, from the text role; see theme/_light.scss.
+  --cirth-primary-focus: var(--cirth-primary-text);
 
   // Text selection ; see theme/_light.scss for why this is derived rather
   // than pinned. The accent already sits high on the ladder in this scheme,
@@ -93,27 +91,43 @@
   // the current browser floor cannot derive a reliable light-or-dark choice.
   --cirth-primary-on-surface: #{$white};
 
-  // Surface model. Code is deeply recessed below the dark canvas and
-  // fields sit part-way back toward it; section bands and cards rise in
-  // measured steps. Focus lifts a field to canvas while the accent edge and
-  // ring carry the state. Keeping chroma and hue coherent lets Plain stay
-  // neutral and Playroom carry its temperature without either preset
-  // declaring a parallel scale.
-  --cirth-code-background-color: oklch(
-    from var(--cirth-canvas) calc(l - 0.02) c h
-  );
+  // Surface levels, as in theme/_light.scss, with the direction a dark
+  // interface reads elevation in: every level above the canvas is lighter,
+  // and the overlay has room to rise past the raised level instead of
+  // sharing it. Hue and chroma are the canvas's own, so plain stays neutral
+  // and playroom keeps its violet without restating a scale.
+  --cirth-surface-recessed: oklch(from var(--cirth-canvas) calc(l - 0.035) c h);
+  --cirth-surface-raised: oklch(from var(--cirth-canvas) calc(l + 0.05) c h);
+  --cirth-surface-overlay: oklch(from var(--cirth-canvas) calc(l + 0.085) c h);
+  --cirth-code-background-color: var(--cirth-surface-recessed);
+  --cirth-card-background-color: var(--cirth-surface-raised);
   --cirth-card-sectioning-background-color: oklch(
     from var(--cirth-canvas) calc(l + 0.025) c h
   );
-  --cirth-form-element-background-color: oklch(
-    from var(--cirth-canvas) calc(l - 0.008) c h
+  --cirth-dropdown-background-color: var(--cirth-surface-overlay);
+  --cirth-popover-background-color: var(--cirth-surface-overlay);
+  --cirth-modal-background-color: var(--cirth-surface-overlay);
+
+  // Edge roles, as in theme/_light.scss, lightened from the canvas. The
+  // control edge clears 3:1 against the overlay, the lightest level here
+  // (3.79:1).
+  --cirth-muted-border-color: oklch(
+    from var(--cirth-canvas) calc(l + 0.12) c h
   );
-  --cirth-card-background-color: oklch(
-    from var(--cirth-canvas) calc(l + 0.04) c h
+  --cirth-form-element-border-color: oklch(
+    from var(--cirth-canvas) calc(l + 0.41) c h
   );
-  --cirth-form-element-active-background-color: var(--cirth-canvas);
-  --cirth-dropdown-background-color: var(--cirth-card-background-color);
-  --cirth-popover-background-color: var(--cirth-card-background-color);
+  --cirth-card-border-color: color-mix(
+    in oklab,
+    var(--cirth-muted-border-color),
+    var(--cirth-form-element-border-color) 25%
+  );
+  --cirth-popover-border-color: var(--cirth-card-border-color);
+  --cirth-switch-background-color: var(--cirth-form-element-border-color);
+  --cirth-progress-border-color: var(--cirth-form-element-border-color);
+  --cirth-progress-background-color: var(--cirth-surface-recessed);
+  --cirth-range-border-color: var(--cirth-muted-border-color);
+  --cirth-range-active-border-color: var(--cirth-card-border-color);
 
   // Secondary and contrast
   --cirth-secondary-surface: #{$neutral-600};
@@ -150,16 +164,15 @@
   // To disable box-shadow, remove the var or set to '0 0 0 rgba(0, 0, 0, 0)'
   // Don't use, 'none, 'false, 'null', '0', etc.
 
-  // Table separators use the same neutral edge as the card that most often
-  // contains them. See theme/_light.scss for why that edge mixes in oklab.
-  --cirth-table-border-color: var(--cirth-card-border-color);
+  // A table's rules divide rows, which is the separator's job.
+  --cirth-table-border-color: var(--cirth-muted-border-color);
   --cirth-table-row-stripped-background-color: #{color.change(
       $neutral-500,
       $alpha: 0.0375
     )};
   --cirth-code-kbd-background-color: var(--cirth-ink);
   --cirth-code-kbd-color: var(--cirth-background-color);
-  --cirth-form-element-placeholder-color: #{$neutral-400};
+  --cirth-form-element-placeholder-color: var(--cirth-muted-color);
   --cirth-form-element-active-border-color: var(--cirth-primary-border);
 
   // Translucent, not the solid border colour: this paints the ring
@@ -194,18 +207,6 @@
   --cirth-accordion-active-summary-color: var(--cirth-primary-active);
   --cirth-accordion-close-summary-color: var(--cirth-ink);
   --cirth-accordion-open-summary-color: var(--cirth-ink);
-
-  // The surface goes in whole here, unlike the light scheme: this canvas and
-  // the neutral scale share a hue, so there is no second temperature for the
-  // mix to average toward, and keeping the surface's chroma leaves the edge
-  // with the cool tint the rest of the scheme carries. See theme/_light.scss
-  // for what happens when the two hues differ, and for the fix if a theme
-  // moves this canvas off the neutral's hue.
-  --cirth-card-border-color: color-mix(
-    in oklab,
-    var(--cirth-form-element-border-color) 46%,
-    var(--cirth-card-background-color)
-  );
 
   // Dropdown (details.dropdown)
   @if $enable-classes {

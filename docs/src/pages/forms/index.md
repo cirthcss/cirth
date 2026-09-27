@@ -106,8 +106,7 @@ Every control reads the same family, so one override reaches all of them:
 
 | Token | What it sets |
 | --- | --- |
-| `--cirth-form-element-background-color` | A field at rest |
-| `--cirth-form-element-active-background-color` | A focused field |
+| `--cirth-form-element-background-color` | A fill of its own. Unset by default: a field paints `--cirth-surface`, the surface it sits on |
 | `--cirth-form-element-border-color` | The field's edge |
 | `--cirth-form-element-active-border-color` | The edge while focused |
 | `--cirth-form-element-color` | The text inside a field |

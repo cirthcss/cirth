@@ -7,6 +7,10 @@
    */
 
 #{$parent-selector} article {
+  // The raised level, rebound as the surface its contents sit on: a field
+  // in a card is the card's colour, and its edge alone marks it.
+  --cirth-surface: var(--cirth-card-background-color);
+
   margin-bottom: var(--cirth-block-spacing-vertical);
   padding: var(--cirth-block-spacing-vertical)
     var(--cirth-block-spacing-horizontal);
@@ -39,6 +43,8 @@
 
   > header,
   > footer {
+    --cirth-surface: var(--cirth-card-sectioning-background-color);
+
     margin-inline: calc(var(--cirth-block-spacing-horizontal) * -1);
     padding: calc(var(--cirth-block-spacing-vertical) - var(--cirth-space-2))
       var(--cirth-block-spacing-horizontal);

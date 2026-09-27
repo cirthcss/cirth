@@ -1,5 +1,4 @@
 @use "sass:meta";
-@use "../config" as *;
 @use "../helpers/functions";
 @use "../helpers/selectors";
 @use "colors" as *;
@@ -54,18 +53,7 @@
   // dark (up from 5.2:1), still subordinate, no longer AA-and-no-further.
   --cirth-muted-color: light-dark(#{$neutral-700}, #{$neutral-250});
   --cirth-secondary-text: light-dark(#{$neutral-700}, #{$neutral-250});
-  --cirth-code-color: light-dark(#{$neutral-750}, #{$neutral-200});
   --cirth-link-visited-color: light-dark(#{$neutral-750}, #{$neutral-250});
-
-  // Hairlines and control borders: 4.2:1 and 8.7:1 in light, 3.7:1 and
-  // 6.2:1 in dark, up from about 1.1:1 and 3.3:1. Table, blockquote and
-  // accordion borders derive from --cirth-muted-border-color, so they
-  // follow this one line.
-  --cirth-muted-border-color: #{$neutral-500};
-  --cirth-form-element-border-color: light-dark(
-    #{$neutral-700},
-    #{$neutral-350}
-  );
 
   // Link accent: 8.9:1 in light and 8.2:1 in dark, with underlines at full
   // strength instead of the 50%-alpha tint.
@@ -78,13 +66,6 @@
   // to stop doing.
   --cirth-secondary-focus: light-dark(#{$neutral-600}, #{$neutral-350});
   --cirth-contrast-focus: light-dark(#{$neutral-600}, #{$neutral-150});
-
-  // Non-text controls whose *state* is a fill: the unchecked switch track
-  // and the progress track's extent. In dark the track stops at the 400
-  // step: the thumb riding on it is --cirth-primary-on-surface (white),
-  // and 400 is where white still clears 3:1 against it (WCAG 1.4.11).
-  --cirth-switch-background-color: light-dark(#{$neutral-600}, #{$neutral-400});
-  --cirth-progress-border-color: light-dark(#{$neutral-600}, #{$neutral-350});
 }
 
 @mixin light {
@@ -98,23 +79,31 @@
   --cirth-icon-date: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-700)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
   --cirth-icon-time: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-700)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpolyline points='12 6 12 12 16 14'%3E%3C/polyline%3E%3C/svg%3E");
   --cirth-icon-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-700)}' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
-  --cirth-form-element-invalid-border-color: #{$error-600};
+
+  // Edges: the same three roles, derived from the canvas the same way,
+  // further from it. The separator clears 3:1 on every surface level (up
+  // from about 1.2:1), the control 7:1; the container follows its relation
+  // between them. The switch track and the progress frame follow the
+  // control edge.
+  --cirth-muted-border-color: oklch(
+    from var(--cirth-canvas) calc(l - 0.34) c h
+  );
+  --cirth-form-element-border-color: oklch(
+    from var(--cirth-canvas) calc(l - 0.56) c h
+  );
+
+  // The invalid border is the error input at rest (theme/_light.scss), so
+  // this pass has to go darker than it, not lighter: 700 against 650.
+  --cirth-form-element-invalid-border-color: #{$error-700};
   --cirth-form-element-valid-border-color: #{$success-600};
   --cirth-primary-active: #{$accent-800};
   --cirth-primary-underline: var(--cirth-primary);
-
-  // Opaque, as the root pairs above explain.
-  --cirth-primary-focus: #{$accent-600};
 
   // A meter's three readings: 5.8:1, 7.3:1 and 9.3:1 against the track,
   // up from 4.0:1, 5.1:1 and 6.6:1.
   --cirth-meter-optimum-color: #{$success-650};
   --cirth-meter-suboptimum-color: #{$warning-700};
   --cirth-meter-even-less-good-color: #{$error-750};
-
-  @if $enable-classes {
-    --cirth-dropdown-border-color: var(--cirth-muted-border-color);
-  }
 }
 
 @mixin dark {
@@ -124,9 +113,18 @@
   --cirth-icon-time: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-250)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpolyline points='12 6 12 12 16 14'%3E%3C/polyline%3E%3C/svg%3E");
   --cirth-icon-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-250)}' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
 
-  // The card border is normally the card background: an invisible seam,
-  // and becomes a real edge here.
-  --cirth-card-border-color: var(--cirth-muted-border-color);
+  // Edges, as in the light mixin: the separator at 2.4:1 or better on
+  // every level, the control at 6.4:1.
+  --cirth-muted-border-color: oklch(from var(--cirth-canvas) calc(l + 0.3) c h);
+  --cirth-form-element-border-color: oklch(
+    from var(--cirth-canvas) calc(l + 0.55) c h
+  );
+
+  // The one control that cannot follow the edge all the way: the thumb
+  // riding on the unchecked switch track is --cirth-primary-on-surface
+  // (white), and the 400 step is where white still clears 3:1 against it
+  // (WCAG 1.4.11).
+  --cirth-switch-background-color: #{$neutral-400};
   --cirth-form-element-invalid-border-color: #{$error-250};
   --cirth-form-element-valid-border-color: #{$success-250};
   --cirth-primary-active: #{$accent-150};
@@ -141,18 +139,11 @@
   --cirth-primary-surface-active: #{$accent-700};
   --cirth-primary-underline: var(--cirth-primary);
 
-  // Opaque focus ring, as in the light scheme.
-  --cirth-primary-focus: #{$accent-350};
-
   // 7.2:1, 7.8:1 and 8.8:1 against the track, up from 5.2:1, 5.7:1
   // and 6.3:1.
   --cirth-meter-optimum-color: #{$success-300};
   --cirth-meter-suboptimum-color: #{$warning-250};
   --cirth-meter-even-less-good-color: #{$error-200};
-
-  @if $enable-classes {
-    --cirth-dropdown-border-color: var(--cirth-muted-border-color);
-  }
 }
 
 @media (prefers-contrast: more) {

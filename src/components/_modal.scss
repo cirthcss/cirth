@@ -65,7 +65,13 @@
   }
 
   // Content
+  // The overlay level: the card rule paints it, and rebinds it as the
+  // surface the dialog's own fields sit on, through the card's own tokens.
+  // A dialog is the one card that floats, so it takes the overlay shadow.
   > article {
+    --cirth-card-background-color: var(--cirth-modal-background-color);
+    --cirth-card-box-shadow: var(--cirth-modal-box-shadow);
+
     transition:
       opacity var(--cirth-transition),
       transform var(--cirth-transition);

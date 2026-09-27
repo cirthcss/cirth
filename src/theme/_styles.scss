@@ -59,6 +59,15 @@
   // wherever it is used.
   --cirth-background-color: var(--cirth-canvas);
 
+  // The surface level an element sits on, inherited: the canvas here, and
+  // rebound by every container that paints a level of its own (a card, its
+  // bands, a dialog, a popover, a dropdown). A control paints this, so a
+  // field in a card is the card's colour and its edge alone marks it as a
+  // field. A container of your own that paints a background sets this to
+  // the same colour. Declared beside --cirth-background-color for the same
+  // reason: it copies an unresolved light-dark() pair.
+  --cirth-surface: var(--cirth-canvas);
+
   // Transitions
   --cirth-transition: var(--cirth-duration-normal) var(--cirth-ease-out);
 
@@ -135,7 +144,11 @@
     var(--cirth-form-element-border-color);
 
   // Card (<article>)
+  // A card is a sheet on the page, not a floating one: the raised surface
+  // level carries it. The overlays (dialog, popover, dropdown) are what
+  // float, and they share --cirth-box-shadow.
   --cirth-card-box-shadow: none;
+  --cirth-modal-box-shadow: var(--cirth-box-shadow);
 
   // Meter (<meter>)
   // The frame is progress's, borrowed rather than duplicated: same track,
@@ -148,9 +161,9 @@
   --cirth-meter-border-color: var(--cirth-progress-border-color);
 
   // Popover ([popover])
-  // Its background aliases the card surface in the scheme mixins so the
-  // relationship re-resolves inside forced-theme subtrees.
-  --cirth-popover-border-color: var(--cirth-muted-border-color);
+  // Its background and border alias the overlay level and the container
+  // edge in the scheme mixins, so the relationship re-resolves inside
+  // forced-theme subtrees.
   --cirth-popover-color: var(--cirth-ink);
   --cirth-popover-box-shadow: var(--cirth-box-shadow);
 

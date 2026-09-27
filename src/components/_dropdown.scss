@@ -81,7 +81,12 @@
       solid
       var(--cirth-form-element-border-color);
     border-radius: var(--cirth-border-radius);
-    background-color: var(--cirth-form-element-background-color);
+
+    // A field, so it paints the surface it sits on; see forms/_basics.scss.
+    background-color: var(
+      --cirth-form-element-background-color,
+      var(--cirth-surface)
+    );
     color: var(--cirth-form-element-placeholder-color);
     line-height: inherit;
     cursor: pointer;
@@ -105,7 +110,6 @@
     &:active,
     &:focus {
       border-color: var(--cirth-form-element-active-border-color);
-      background-color: var(--cirth-form-element-active-background-color);
     }
 
     &:focus {
@@ -195,6 +199,9 @@
   // Submenu
   // ––––––––––––––––––––
   #{$parent-selector} details.dropdown > summary + ul {
+    // The overlay level, rebound as the surface its items sit on.
+    --cirth-surface: var(--cirth-dropdown-background-color);
+
     display: flex;
     z-index: var(--cirth-z-index-dropdown);
     position: absolute;

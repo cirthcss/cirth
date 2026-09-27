@@ -135,7 +135,11 @@ test("primary on-surface ink remains an explicit contrast choice", () => {
 });
 
 // One from each scheme layer, so a regression in any of them shows up:
-// text, an accent, a surface, and a border.
+// text, an accent, a surface, and a border. The accent is read where it is
+// painted unmodified: a link paints the accent's text role, which holds its
+// lightness inside the range every surface level can carry
+// (specs/surface-and-edge-model.md), so a dark override reaches a link in
+// the dark scheme lifted, on purpose.
 const overrides = {
 	"--cirth-card-background-color": "rgb(7, 8, 9)",
 	"--cirth-color": "rgb(4, 5, 6)",
@@ -146,6 +150,7 @@ const overrides = {
 const markup = `
 	<p id="text">Body copy.</p>
 	<p><a id="link" href="#anchor">A link</a></p>
+	<p id="accent" style="color: var(--cirth-primary)">The accent input, painted as set.</p>
 	<article id="card">On a card.</article>
 	<hr id="rule">
 `;
@@ -169,7 +174,7 @@ const painted = (page) =>
 			"--cirth-card-background-color": style("card").backgroundColor,
 			"--cirth-color": style("text").color,
 			"--cirth-muted-border-color": style("rule").borderTopColor,
-			"--cirth-primary": style("link").color,
+			"--cirth-primary": style("accent").color,
 		};
 	});
 

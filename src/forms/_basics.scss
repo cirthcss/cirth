@@ -157,10 +157,18 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 
 // Commons styles
 
+// A field has no surface level of its own: it paints the one it sits on
+// (--cirth-surface, rebound by every container that paints a level), so
+// its edge is the only thing marking it as a control. Recessed fields said
+// it twice, with a fill below the page and a border around it. Setting
+// --cirth-form-element-background-color still gives every field a fill.
 #{$parent-selector} input,
 #{$parent-selector} select,
 #{$parent-selector} textarea {
-  --cirth-background-color: var(--cirth-form-element-background-color);
+  --cirth-background-color: var(
+    --cirth-form-element-background-color,
+    var(--cirth-surface)
+  );
   --cirth-border-color: var(--cirth-form-element-border-color);
   --cirth-color: var(--cirth-form-element-color);
   --cirth-box-shadow: none;
@@ -180,10 +188,10 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 }
 
 // Read-only is a state, not simply the absence of focus. The dashed frame
-// remains legible without colour and keeps it distinct from disabled input.
+// remains legible without colour and keeps it distinct from disabled input;
+// the fill stays the surface's, like any other field's.
 #{$parent-selector} :where(input, textarea)[readonly] {
   border-style: dashed;
-  background-color: var(--cirth-card-sectioning-background-color);
 }
 
 // A readonly number has no operation for its native stepper to perform. The
@@ -199,23 +207,6 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 #{$parent-selector} input[type="number"][readonly]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
-}
-
-// Active & Focus
-
-#{$parent-selector}
-  input:not(
-    [type="submit"],
-    [type="button"],
-    [type="reset"],
-    [type="checkbox"],
-    [type="radio"],
-    [readonly]
-  ),
-#{$parent-selector} :where(select, textarea):not([readonly]) {
-  &:is(:active, :focus) {
-    --cirth-background-color: var(--cirth-form-element-active-background-color);
-  }
 }
 
 // Active & Focus

@@ -54,13 +54,17 @@ $white: oklch(100% 0 0deg);
 // Light canvas. The light scheme's page background: white pulled faintly
 // toward the accent's hue (44deg), far short of a tint, so every surface
 // derived from it above and below keeps one temperature. Off the 19-step
-// ladder on purpose: it's a surface color, not a scale step. Verified
-// against WCAG AA: every text token keeps >= 4.5:1 and every 3:1 non-text
-// claim in _light.scss still holds on this background. Chroma stays low
-// deliberately: the canvas is the ground and the accent the signal on it,
-// not a wash across everything. Presets already made this same call
-// independently (the plain preset's own page sits at zero chroma).
-$canvas-light: oklch(97.3% 0.006 44deg);
+// ladder on purpose: it's a surface color, not a scale step.
+// Its lightness is set by the levels around it, not by how white a page
+// can be. The raised level (a card, a field's container) is placed most of
+// the way from the canvas to white, and the recessed level (code, a
+// specimen) 0.03 below it; at 97.3% the raised level had 0.027 of
+// lightness to use and read at 1.07:1. At 96% it reads at 1.10:1 and the
+// recessed level at 1.09:1, while every text token keeps >= 4.5:1 on all
+// four levels. See specs/surface-and-edge-model.md for the table.
+// Chroma stays low deliberately: the canvas is the ground and the accent
+// the signal on it, not a wash across everything.
+$canvas-light: oklch(96% 0.006 44deg);
 
 // Neutral: ink, lines, secondary controls and the dark canvas. Cool enough
 // to be the temperature the warm accent is read against; see the

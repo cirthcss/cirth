@@ -256,7 +256,10 @@
   #{$parent-selector}
     :is(button, [type="submit"], [type="button"], [role="button"]).outline,
   #{$parent-selector} [type="reset"].outline {
-    --cirth-background-color: var(--cirth-form-element-background-color);
+    --cirth-background-color: var(
+      --cirth-form-element-background-color,
+      var(--cirth-surface)
+    );
   }
 
   #{$parent-selector}
@@ -276,7 +279,7 @@
       --cirth-background-color: color-mix(
         in oklch,
         var(--cirth-primary-text) 12%,
-        var(--cirth-form-element-background-color)
+        var(--cirth-form-element-background-color, var(--cirth-surface))
       );
       --cirth-color: var(--cirth-primary-active);
       --cirth-border-color: var(--cirth-primary-active);
@@ -299,7 +302,7 @@
       --cirth-background-color: color-mix(
         in oklch,
         var(--cirth-secondary-text) 12%,
-        var(--cirth-form-element-background-color)
+        var(--cirth-form-element-background-color, var(--cirth-surface))
       );
       --cirth-color: var(--cirth-secondary-active);
       --cirth-border-color: var(--cirth-secondary-active);
@@ -322,7 +325,7 @@
       --cirth-background-color: color-mix(
         in oklch,
         var(--cirth-contrast-text) 12%,
-        var(--cirth-form-element-background-color)
+        var(--cirth-form-element-background-color, var(--cirth-surface))
       );
       --cirth-color: var(--cirth-contrast-active);
       --cirth-border-color: var(--cirth-contrast-active);
@@ -403,7 +406,10 @@
       [type="button"],
       [role="button"]
     ).outline.danger {
-    --cirth-background-color: var(--cirth-form-element-background-color);
+    --cirth-background-color: var(
+      --cirth-form-element-background-color,
+      var(--cirth-surface)
+    );
     --cirth-color: var(--cirth-error-text);
     --cirth-border-color: var(--cirth-error-border);
 

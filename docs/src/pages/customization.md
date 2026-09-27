@@ -616,7 +616,7 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-card-sectioning-background-color` | derived |
 | `--cirth-code-background-color` | derived |
 | `--cirth-code-border-radius` | role |
-| `--cirth-code-color` | role |
+| `--cirth-code-color` | derived |
 | `--cirth-code-kbd-background-color` | derived |
 | `--cirth-code-kbd-color` | derived |
 | `--cirth-color` | slot |
@@ -626,8 +626,12 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-link-visited-color` | role |
 | `--cirth-mark-background-color` | derived |
 | `--cirth-mark-color` | role |
-| `--cirth-muted-border-color` | role |
+| `--cirth-muted-border-color` | derived |
 | `--cirth-muted-color` | role |
+| `--cirth-surface` | slot |
+| `--cirth-surface-overlay` | derived |
+| `--cirth-surface-raised` | derived |
+| `--cirth-surface-recessed` | derived |
 | `--cirth-text-selection-color` | role |
 
 #### Typography
@@ -752,10 +756,9 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | Token | Kind |
 | --- | --- |
 | `--cirth-checkbox-border-radius` | role |
-| `--cirth-form-element-active-background-color` | derived |
 | `--cirth-form-element-active-border-color` | derived |
 | `--cirth-form-element-background-color` | derived |
-| `--cirth-form-element-border-color` | role |
+| `--cirth-form-element-border-color` | derived |
 | `--cirth-form-element-color` | role |
 | `--cirth-form-element-disabled-opacity` | derived |
 | `--cirth-form-element-focus-color` | derived |
@@ -788,15 +791,15 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-meter-even-less-good-color` | derived |
 | `--cirth-meter-optimum-color` | derived |
 | `--cirth-meter-suboptimum-color` | derived |
-| `--cirth-progress-background-color` | role |
-| `--cirth-progress-border-color` | role |
+| `--cirth-progress-background-color` | derived |
+| `--cirth-progress-border-color` | derived |
 | `--cirth-progress-color` | derived |
-| `--cirth-range-active-border-color` | role |
-| `--cirth-range-border-color` | role |
+| `--cirth-range-active-border-color` | derived |
+| `--cirth-range-border-color` | derived |
 | `--cirth-range-thumb-active-color` | derived |
 | `--cirth-range-thumb-border-color` | derived |
 | `--cirth-range-thumb-color` | derived |
-| `--cirth-switch-background-color` | role |
+| `--cirth-switch-background-color` | derived |
 | `--cirth-switch-checked-background-color` | derived |
 | `--cirth-switch-color` | derived |
 | `--cirth-switch-thumb-box-shadow` | role |
@@ -816,6 +819,8 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-group-box-shadow` | role |
 | `--cirth-group-box-shadow-focus-with-button` | role |
 | `--cirth-group-box-shadow-focus-with-input` | role |
+| `--cirth-modal-background-color` | derived |
+| `--cirth-modal-box-shadow` | role |
 | `--cirth-modal-max-width` | role |
 | `--cirth-modal-overlay-backdrop-filter` | role |
 | `--cirth-modal-overlay-background-color` | derived |

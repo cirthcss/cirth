@@ -1,5 +1,4 @@
 @use "sass:color";
-@use "sass:list";
 @use "sass:math";
 @use "sass:string";
 
@@ -38,7 +37,12 @@
 // is read as a lightness step against what it falls on, and a canvas at
 // L 0.20 has little room left below it: the same step needs several times
 // the ink. See specs/dark-elevation-shadow.md for the measurements.
-$shadow-dark-opacity-factor: 4;
+// Eight since the shadow became two layers with the deepest neutral as its
+// light colour (specs/surface-and-edge-model.md): two pixels under a panel
+// the light step is -0.034 to -0.039 and the dark one -0.038 to -0.044 in
+// Chromium, Firefox and WebKit. At four the dark step was under half the
+// light one, because the contact layer alone decides that pixel.
+$shadow-dark-opacity-factor: 8;
 
 @function shadow-color($light, $dark, $opacity) {
   @return light-dark(
@@ -50,40 +54,20 @@ $shadow-dark-opacity-factor: 4;
   );
 }
 
-// Generate a shadow layer
-@function shadow-layer($elevation, $blur, $opacity, $light, $dark) {
-  @return #{($elevation * 0.5)} #{$elevation} #{$blur}
-    shadow-color($light, $dark, $opacity);
+// An overlay's elevation, in two layers: a tight contact shadow that draws
+// the panel's edge onto whatever is under it, and a wide ambient one that
+// says how far above it the panel sits. Light falls from straight above, so
+// neither layer is offset sideways. This replaced a seven-layer ramp
+// inherited from Pico: the eye reads an edge and a distance, and the five
+// layers in between said neither more clearly. See
+// specs/surface-and-edge-model.md.
+@function shadow-layer($y, $blur, $spread, $opacity, $light, $dark) {
+  @return 0 #{$y} #{$blur} #{$spread} shadow-color($light, $dark, $opacity);
 }
 
-// Generate a shadow with 7 layers, one geometry for both schemes
 @function shadow($light, $dark) {
-  $box-shadow-elevation: 1rem;
-  $box-shadow-blur-strength: 6rem;
-  $box-shadow-opacity: 0.06;
-  $layers: ();
-
-  // Elevation and blur scale together; opacity has its own ramp.
-  @each $scale,
-    $opacity
-      in (0.029: 0.283, 0.067: 0.4, 0.125: 0.5, 0.225: 0.6, 0.417: 0.717, 1: 1)
-  {
-    $layers: list.append(
-      $layers,
-      shadow-layer(
-        $box-shadow-elevation * $scale,
-        $box-shadow-blur-strength * $scale,
-        $box-shadow-opacity * $opacity,
-        $light,
-        $dark
-      ),
-      comma
-    );
-  }
-
-  @return list.append(
-    $layers,
-    0 0 0 0.0625rem shadow-color($light, $dark, $box-shadow-opacity * 0.25),
-    comma
+  @return (
+    shadow-layer(0.0625rem, 0.1875rem, 0, 0.05, $light, $dark),
+    shadow-layer(0.75rem, 2rem, -0.25rem, 0.08, $light, $dark)
   );
 }

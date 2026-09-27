@@ -115,12 +115,16 @@ $print-root-selector: "body";
       // already the lightest thing on offer.
       --cirth-box-shadow: none;
       --cirth-card-box-shadow: none;
+      --cirth-modal-box-shadow: none;
+      --cirth-surface-recessed: transparent;
+      --cirth-surface-raised: transparent;
+      --cirth-surface-overlay: transparent;
       --cirth-card-background-color: transparent;
+      --cirth-modal-background-color: transparent;
       --cirth-card-sectioning-background-color: transparent;
       --cirth-code-background-color: transparent;
       --cirth-code-kbd-background-color: transparent;
       --cirth-form-element-background-color: transparent;
-      --cirth-form-element-active-background-color: transparent;
       --cirth-table-row-stripped-background-color: transparent;
       --cirth-modal-overlay-background-color: transparent;
 

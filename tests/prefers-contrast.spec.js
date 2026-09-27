@@ -271,9 +271,12 @@ for (const scheme of /** @type {const} */ (["light", "dark"])) {
 			);
 		}
 
-		// A translucent ring composites against whatever is behind it:
-		// exactly what "more contrast" asks us to stop doing.
-		expect(base.focus.alpha).toBeLessThan(1);
+		// The ring is opaque in both modes: a translucent ring composites
+		// against whatever is behind it, and since
+		// specs/surface-and-edge-model.md the base ring is the accent's text
+		// role, which already keeps 4.5:1 on every surface level. Under
+		// "more" it follows the stronger accent.
+		expect(base.focus.alpha).toBe(1);
 		expect(more.focus.alpha).toBe(1);
 
 		// The underline drops its half-alpha tint for the link color itself.

@@ -119,40 +119,46 @@ for (const build of builds) {
 			);
 		}
 
+		// Four levels, told apart by lightness alone: recessed code, the
+		// canvas, the band a card groups its header in, and the raised card.
+		// See specs/surface-and-edge-model.md.
 		for (const sample of [lightAfter, forcedAfter]) {
-			const ladder = [
-				sample.code,
-				sample.field,
-				sample.canvas,
-				sample.band,
-				sample.card,
-			];
+			const ladder = [sample.code, sample.canvas, sample.band, sample.card];
 			expect(
 				new Set(ladder).size,
-				`the surface ladder has five perceptible roles: ${ladder.join(" | ")}`,
+				`the surface ladder has four perceptible levels: ${ladder.join(" | ")}`,
 			).toBe(ladder.length);
 		}
 
+		// A field has no level of its own: it paints the surface it sits on,
+		// here the card, and focus does not change it. The old contract
+		// recessed the field below the canvas and raised it back to the
+		// canvas on focus, which encoded "field" twice.
 		for (const suffix of ["", "-forced"]) {
-			const rest = (suffix ? forcedAfter : lightAfter).field;
+			const sample = suffix ? forcedAfter : lightAfter;
+			expect(sample.field, `a field${suffix} takes the card's surface`).toBe(
+				sample.card,
+			);
 			await page.locator(`#field${suffix}`).focus();
 			const focused = await page
 				.locator(`#field${suffix}`)
 				.evaluate((element) => getComputedStyle(element).backgroundColor);
-			expect(focused, `a focused field${suffix} rises from rest`).not.toBe(rest);
-			expect(focused, `a focused field${suffix} rises to canvas`).toBe(
-				(suffix ? forcedAfter : lightAfter).canvas,
+			expect(focused, `a focused field${suffix} keeps its fill`).toBe(
+				sample.field,
 			);
 		}
 
+		// Overlays share one level: equal to the raised one in light, where
+		// there is no room above it, and lighter than it in dark.
 		// Classless builds intentionally omit the dropdown component.
 		if (!build.file.includes("classless")) {
 			expect(lightAfter.dropdown).not.toBe(lightBefore.dropdown);
 			expect(lightAfter.dropdown).toBe(lightAfter.card);
-			expect(forcedAfter.dropdown).toBe(forcedAfter.card);
+			expect(forcedAfter.dropdown).toBe(forcedAfter.popover);
+			expect(forcedAfter.dropdown).not.toBe(forcedAfter.card);
 		}
 		expect(lightAfter.popover).toBe(lightAfter.card);
-		expect(forcedAfter.popover).toBe(forcedAfter.card);
+		expect(forcedAfter.popover).not.toBe(forcedAfter.card);
 
 		await page.emulateMedia({ colorScheme: "dark" });
 		await render(page, build, `${build.root} { --cirth-canvas: ${input}; }`);

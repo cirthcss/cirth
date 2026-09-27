@@ -40,14 +40,16 @@ const layers = (value) =>
 	value === "none" ? [] : value.split(/,(?![^(]*\))/).map((layer) => layer.trim());
 
 for (const theme of /** @type {const} */ (["light", "dark"])) {
-	test(`the shared shadow resolves to seven layers in ${theme}`, async ({ page }) => {
+	// Two layers since specs/surface-and-edge-model.md: a contact shadow and
+	// an ambient one. The seven-layer ramp before it came from Pico.
+	test(`the shared shadow resolves to two layers in ${theme}`, async ({ page }) => {
 		await render(page, theme);
 
 		for (const selector of ["details.dropdown > ul", "#probe"]) {
 			const shadow = await page
 				.locator(selector)
 				.evaluate((element) => getComputedStyle(element).boxShadow);
-			expect(layers(shadow), selector).toHaveLength(7);
+			expect(layers(shadow), selector).toHaveLength(2);
 		}
 	});
 }
@@ -64,7 +66,7 @@ test("a forced dark subtree draws the dark shadow on a light page", async ({
 				.evaluate((element) => getComputedStyle(element).boxShadow),
 		),
 	);
-	expect(layers(dark)).toHaveLength(7);
+	expect(layers(dark)).toHaveLength(2);
 	// Same geometry, different colour.
 	expect(dark).not.toBe(light);
 	expect(dark.replace(/oklch\([^)]*\)|rgba?\([^)]*\)/g, "")).toBe(
@@ -150,6 +152,10 @@ test("a floating panel lifts off the dark canvas as far as off the light one", a
 }) => {
 	const light = await edgeStep(page, "light", 2);
 	const dark = await edgeStep(page, "dark", 2);
+	test.info().annotations.push({
+		type: "edge step",
+		description: `light ${light.toFixed(4)}, dark ${dark.toFixed(4)}`,
+	});
 
 	// Both are shadows: the canvas under the edge is darker than the canvas.
 	expect(light).toBeLessThan(0);

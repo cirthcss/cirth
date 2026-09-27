@@ -187,12 +187,11 @@
     var(--cirth-form-element-border-color) 65%,
     var(--cirth-form-element-color)
   );
-  background: var(--cirth-form-element-background-color);
+  background: var(--cirth-surface);
 }
 
 .docs-search-trigger:is(:active, :focus-visible) {
   border-color: var(--cirth-form-element-active-border-color);
-  background: var(--cirth-form-element-active-background-color);
   box-shadow: 0 0 0 var(--cirth-outline-width)
     var(--cirth-form-element-focus-color);
 }

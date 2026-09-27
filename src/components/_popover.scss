@@ -59,6 +59,9 @@ $popover-selector: '[popover=""], [popover="auto"], [popover="hint"]';
   // any help.
   --cirth-popover-display: block;
 
+  // The overlay level, rebound as the surface its contents sit on.
+  --cirth-surface: var(--cirth-popover-background-color);
+
   display: none;
 
   &:popover-open {

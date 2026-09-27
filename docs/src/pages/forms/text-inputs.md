@@ -6,9 +6,9 @@ description: Single-line fields in Cirth. Text, email, password, URL, phone and 
 # Text inputs
 
 Every single-line field (`text`, `email`, `password`, `url`, `tel`,
-`number` and the rest) shares one look: a recessed surface, a hairline
-edge, the accent on focus. Choose the `type` for the data, not for its
-appearance.
+`number` and the rest) shares one look: the surface of whatever it sits
+on, a control edge that clears 3:1 against it, and a focus ring in the
+accent. Choose the `type` for the data, not for its appearance.
 
 {% demo "forms-text-inputs" %}
 
@@ -67,8 +67,7 @@ appearance.
 
 | Token | What it sets |
 | --- | --- |
-| `--cirth-form-element-background-color` | Surface at rest |
-| `--cirth-form-element-active-background-color` | Surface while focused |
+| `--cirth-form-element-background-color` | A fill of its own. Unset by default: a field paints `--cirth-surface`, the surface it sits on |
 | `--cirth-form-element-border-color` | Edge at rest |
 | `--cirth-form-element-active-border-color` | Edge while focused |
 | `--cirth-form-element-color` | Text |
