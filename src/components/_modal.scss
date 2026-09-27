@@ -119,8 +119,17 @@
     > footer {
       text-align: end;
 
-      button,
-      [role="button"] {
+      // Named by type as well as by element: content/_button.scss gives
+      // [type="button"] and its siblings a flow margin at (0,1,0), which
+      // outweighed a bare `button` here: the footer measured 13px above its
+      // buttons and 28px below them.
+      :is(
+        button,
+        [type="submit"],
+        [type="reset"],
+        [type="button"],
+        [role="button"]
+      ) {
         margin-bottom: 0;
 
         &:not(:first-of-type) {
