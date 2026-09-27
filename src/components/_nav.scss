@@ -151,7 +151,13 @@
         --cirth-text-decoration: none;
 
         border-radius: 0;
-        border-block-end-color: var(--cirth-primary-border);
+
+        // The accent's text role, not the fill's edge: this line sits on
+        // the surface, not on a fill, and the text role is the one that
+        // keeps its contrast on every surface level (the fill's edge is
+        // the accent darkened for a white label, 2.84:1 on the dark
+        // canvas).
+        border-block-end-color: var(--cirth-primary-text);
       }
     }
 
@@ -296,7 +302,7 @@ $navbar-selector: "header:not(:is(article, aside, dialog, figure, li, nav, secti
     &:is([aria-current]:not([aria-current="false"]), [aria-selected="true"]) {
       --cirth-color: var(--cirth-contrast-text);
 
-      font-weight: var(--cirth-font-weight-semibold);
+      font-weight: var(--cirth-font-weight-medium);
     }
 
     // Below the resting step, and out of the pointer's reach. Attenuated
@@ -399,7 +405,7 @@ $navbar-selector: "header:not(:is(article, aside, dialog, figure, li, nav, secti
       // edge to the inline-start one, where it reads as a rail.
       &:is([aria-current]:not([aria-current="false"]), [aria-selected="true"]) {
         border-block-end-color: transparent;
-        border-inline-start-color: var(--cirth-primary-border);
+        border-inline-start-color: var(--cirth-primary-text);
       }
     }
 

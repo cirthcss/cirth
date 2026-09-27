@@ -20,7 +20,11 @@
 #{$parent-selector} code,
 #{$parent-selector} kbd,
 #{$parent-selector} samp {
-  font-size: 0.875em; // 2
+  // The code face is set a step smaller than the text around it, so that
+  // its larger x-height does not outweigh the sentence, but never under
+  // the 12px reading floor: in a 13px meta line (a caption, a column
+  // head) 0.875em alone came out at 11.4px.
+  font-size: max(0.875em, var(--cirth-font-size-xs)); // 2
   font-family: var(--cirth-font-family); // 1
 }
 
@@ -104,7 +108,7 @@
 #{$parent-selector} var {
   color: var(--cirth-code-color);
   font-style: italic;
-  font-size: 0.875em;
+  font-size: max(0.875em, var(--cirth-font-size-xs));
   font-family: var(--cirth-font-family);
 }
 

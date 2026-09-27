@@ -26,7 +26,10 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 #{$parent-selector} select,
 #{$parent-selector} textarea {
   margin: 0; // 2
-  font-size: var(--cirth-font-size-md); // 1
+
+  // Never under 16px: iOS zooms the page into a field whose text is
+  // smaller, whatever the author set the type scale to.
+  font-size: max(var(--cirth-font-size-md), 16px); // 1
   line-height: var(--cirth-line-height); // 1
   font-family: inherit; // 1
   letter-spacing: inherit; // 2
@@ -123,6 +126,10 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 }
 
 // Label & legend
+// Two roles. A label names one field: smaller than the value it names, at
+// the label weight. A legend names a group of fields and outranks every
+// label in it: body size, title weight, strong ink. Neither changes the
+// field's own text, which forms/_basics.scss keeps at 16px or more.
 
 #{$parent-selector} label,
 #{$parent-selector} fieldset legend {
@@ -130,6 +137,18 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   margin-bottom: calc(var(--cirth-spacing) * 0.5);
   color: var(--cirth-color);
   font-weight: var(--cirth-form-label-font-weight, var(--cirth-font-weight));
+  letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
+}
+
+#{$parent-selector} label {
+  font-size: var(--cirth-label-font-size);
+}
+
+#{$parent-selector} fieldset legend {
+  --cirth-form-label-font-weight: var(--cirth-title-font-weight);
+
+  color: var(--cirth-ink-strong);
+  font-size: var(--cirth-font-size-md);
 }
 
 // Blocks, 100%
@@ -180,6 +199,11 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   box-shadow: var(--cirth-box-shadow);
   color: var(--cirth-color);
   font-weight: var(--cirth-font-weight);
+
+  // The reset above inherits letter-spacing, which would hand a field the
+  // tracking of the label wrapped around it. Its own size decides, as for
+  // every other role: zero at 16px.
+  letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
   transition:
     background-color var(--cirth-transition),
     border-color var(--cirth-transition),
@@ -501,12 +525,15 @@ $validation-any: "[aria-invalid], #{$invalid-native}";
 }
 
 #{$parent-selector} :where(#{$helper-previous-tags}) {
+  // Help text is the meta role.
   + small {
     display: block;
     width: 100%;
     margin-top: calc(var(--cirth-spacing) * -0.75);
     margin-bottom: var(--cirth-spacing);
     color: var(--cirth-muted-color);
+    font-weight: var(--cirth-font-weight-medium);
+    font-size: var(--cirth-meta-font-size);
   }
 
   &:is(#{$valid-explicit}) {

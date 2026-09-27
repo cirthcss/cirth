@@ -20,6 +20,21 @@
   --cirth-font-size: 100%;
   --cirth-text-underline-offset: 0.15em;
 
+  // Typographic roles
+  // Type is assigned by role: display, heading (h1, h2), title (h3 to h6),
+  // body, label (a field's name, a button's text, a summary, a term),
+  // group (a legend), meta (column heads, captions, help text) and code.
+  // Each differs from its neighbours on at least two of size, weight, ink
+  // and tracking. The weights and the two sizes that are not already a step
+  // of the scale are named here; the rules below assign them. See
+  // specs/typographic-roles.md.
+  --cirth-heading-font-weight: 650;
+  --cirth-title-font-weight: var(--cirth-font-weight-semibold);
+  --cirth-display-font-weight: var(--cirth-heading-font-weight);
+  --cirth-display-font-size: clamp(2.5rem, 1.5rem + 3.5vw, 4rem);
+  --cirth-label-font-size: var(--cirth-font-size-sm);
+  --cirth-meta-font-size: 0.8125rem;
+
   // Borders
   // --cirth-border-radius stays the single knob presets and users override;
   // the per-component radii below are derived from it (var() substitutes at
@@ -133,7 +148,8 @@
   --cirth-form-element-spacing-vertical: var(--cirth-space-2);
   --cirth-form-element-spacing-horizontal: var(--cirth-space-4);
 
-  // Font weight for form labels & fieldsets legend
+  // Font weight for a field's label: the label role. A legend names a
+  // group of fields and reads at the title weight instead.
   --cirth-form-label-font-weight: var(--cirth-font-weight-medium);
 
   // Group (role="group")
@@ -250,94 +266,63 @@
   }
 
   // Headings
-  // Calibrated for the interface Cirth is actually for: a dense internal
-  // tool, where an h1 sits above a form rather than above a hero. It used
-  // to top out at 2.75rem (44px at the shipped root size), which is a
-  // landing-page heading; every product page and this project's own
-  // documentation inherited that campaign scale by default and nobody
-  // asked for it. The ladder below runs 44 / 32 / 24 / 20 / 18 / 16:
-  // six distinct steps read straight off the font-size scale, fluid down
-  // to h3, because that is where viewport width still makes a
-  // difference and below it a heading is just a label.
-  // A campaign scale is one declaration away and does not need a second
-  // API to reach: --cirth-font-size is the slot every heading resolves
-  // through, so `h1 { --cirth-font-size: clamp(2.75rem, 5vw, 4.5rem); }`
-  // opts one page into display type without moving the defaults for the
-  // application screens. The documentation's own home page is that
-  // worked example.
-  h1,
-  h2,
-  h3 {
-    --cirth-font-weight: var(--cirth-font-weight-bold);
-  }
-
-  h4,
-  h5,
-  h6 {
-    --cirth-font-weight: var(--cirth-font-weight-semibold);
-  }
-
-  // Tracking and leading come off the scales that exist for them rather
-  // than off literals. --cirth-letter-spacing-tight declared -0.02em while
-  // h1/h2/h3 each set a different hand-written value, so the token named a
-  // relationship it did not govern and overriding it did nothing to any
-  // heading on the page. Both tracking steps now have a consumer, and both
-  // keep the value they always declared.
+  // Two roles. Heading (h1, h2) names a page and its chapters, at 650 and
+  // tight leading; title (h3 to h6) names a group inside them, at 600 and
+  // snug leading. The ladder is fluid down to h3 and compresses at small
+  // widths: 28 / 22 / 19px at 390px against 40 / 28 / 22px at 1440px, then
+  // 18, 16 and 14px. Calibrated for the interface Cirth is for, where an h1
+  // sits above a form rather than above a hero; a campaign scale is one
+  // declaration away, because --cirth-font-size is the slot every heading
+  // resolves through (the display role's tokens are the documented one).
   h1,
   h2 {
-    --cirth-letter-spacing: var(--cirth-letter-spacing-tight);
+    --cirth-font-weight: var(--cirth-heading-font-weight);
+    --cirth-line-height: var(--cirth-line-height-tight);
   }
 
   h3,
-  h4 {
-    --cirth-letter-spacing: var(--cirth-letter-spacing-snug);
+  h4,
+  h5,
+  h6 {
+    --cirth-font-weight: var(--cirth-title-font-weight);
+    --cirth-line-height: var(--cirth-line-height-snug);
   }
 
   h1 {
     --cirth-font-size: clamp(
       var(--cirth-font-size-3xl),
-      1.31rem + 1.8vw,
-      var(--cirth-font-size-6xl)
+      1.35rem + 1.6vw,
+      2.5rem
     );
-    --cirth-line-height: var(--cirth-line-height-tight);
     --cirth-typography-spacing-top: var(--cirth-space-12);
   }
 
   h2 {
     --cirth-font-size: clamp(
-      var(--cirth-font-size-2xl),
-      1.28rem + 0.9vw,
-      var(--cirth-font-size-4xl)
+      1.375rem,
+      1.2rem + 0.75vw,
+      var(--cirth-font-size-3xl)
     );
-    --cirth-line-height: var(--cirth-line-height-snug);
     --cirth-typography-spacing-top: var(--cirth-space-12);
   }
 
   h3 {
-    --cirth-font-size: clamp(
-      var(--cirth-font-size-xl),
-      1.14rem + 0.45vw,
-      var(--cirth-font-size-2xl)
-    );
-    --cirth-line-height: var(--cirth-line-height-snug);
+    --cirth-font-size: clamp(1.1875rem, 1.1rem + 0.35vw, 1.375rem);
     --cirth-typography-spacing-top: var(--cirth-space-10);
   }
 
   h4 {
-    --cirth-font-size: var(--cirth-font-size-xl);
-    --cirth-line-height: var(--cirth-line-height-snug);
+    --cirth-font-size: var(--cirth-font-size-lg);
     --cirth-typography-spacing-top: var(--cirth-space-8);
   }
 
   h5 {
-    --cirth-font-size: var(--cirth-font-size-lg);
-    --cirth-line-height: var(--cirth-line-height-snug);
+    --cirth-font-size: var(--cirth-font-size-md);
     --cirth-typography-spacing-top: var(--cirth-space-8);
   }
 
   h6 {
-    --cirth-font-size: var(--cirth-font-size-md);
-    --cirth-line-height: var(--cirth-line-height-snug);
+    --cirth-font-size: var(--cirth-font-size-sm);
     --cirth-typography-spacing-top: var(--cirth-space-8);
   }
 
@@ -359,12 +344,18 @@
   }
 
   // Table
+  // Column heads and footers are the meta role: they describe the cells,
+  // which are the content. Row heads name a row, which is the label role.
   thead,
   tfoot {
     th,
     td {
-      --cirth-font-weight: var(--cirth-font-weight-semibold);
+      --cirth-font-weight: var(--cirth-font-weight-medium);
     }
+  }
+
+  tbody th {
+    --cirth-font-weight: var(--cirth-font-weight-medium);
   }
 
   // Code
@@ -385,7 +376,7 @@
   }
 
   kbd {
-    --cirth-font-weight: bolder;
+    --cirth-font-weight: var(--cirth-font-weight-medium);
   }
 
   [type="search"] {
@@ -400,13 +391,14 @@
 
   // Buttons and fields inherit the same normal line-height and share the
   // 44px floor emitted from helpers/_metrics.scss. Their variants differ
-  // in colour, never in geometry.
+  // in colour, never in geometry. A button's text is the label role: it
+  // names an action, and the fill already says how much it matters.
   button,
   [type="submit"],
   [type="reset"],
   [type="button"],
   [role="button"] {
-    --cirth-font-weight: var(--cirth-font-weight-semibold);
+    --cirth-font-weight: var(--cirth-font-weight-medium);
     --cirth-form-element-spacing-horizontal: var(--cirth-space-4);
   }
 

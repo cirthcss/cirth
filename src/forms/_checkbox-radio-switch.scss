@@ -9,11 +9,15 @@
 // Labels
 
 // A label wrapping its own control shrinks to the control and its text, so
-// the pointer cursor covers exactly what is clickable and no further.
+// the pointer cursor covers exactly what is clickable and no further. Its
+// text is an option, not a field's name: the body role, not the label one.
 
 #{$parent-selector} label {
   &:has([type="checkbox"], [type="radio"]) {
+    --cirth-form-label-font-weight: var(--cirth-font-weight-regular);
+
     width: fit-content;
+    font-size: var(--cirth-font-size-md);
     cursor: pointer;
   }
 }

@@ -43,6 +43,19 @@
 
 /* cirth-component:start */
 
+// Emphasis is one step, semibold, and never lighter than the text it
+// sits in. `bolder` jumped 400 to 700 in a paragraph and 650 to 900 in a
+// heading; the role slot (--cirth-font-weight) is what the surrounding text
+// is set in, so the larger of the two keeps a <strong> in a heading at the
+// heading's weight.
+
+#{$parent-selector} :is(b, strong) {
+  font-weight: max(
+    var(--cirth-font-weight-semibold),
+    var(--cirth-font-weight, 400)
+  );
+}
+
 #{$parent-selector} address,
 #{$parent-selector} blockquote,
 #{$parent-selector} dl,
@@ -76,7 +89,10 @@
   font-size: var(--cirth-font-size);
   line-height: var(--cirth-line-height);
   font-family: var(--cirth-font-family-display);
-  letter-spacing: var(--cirth-letter-spacing, normal);
+  letter-spacing: var(
+    --cirth-letter-spacing,
+    calc(var(--cirth-tracking-optical) * (1rem - 1em))
+  );
   text-wrap: balance;
 }
 
@@ -183,8 +199,10 @@
 // metadata, product specs, a detail panel, a glossary: every application
 // has one.
 
+// A term names what follows it: the label role's weight at body size.
+
 #{$parent-selector} dt {
-  font-weight: var(--cirth-font-weight-semibold);
+  font-weight: var(--cirth-font-weight-medium);
 }
 
 #{$parent-selector} dd {
@@ -242,9 +260,13 @@
     margin-bottom: 0;
   }
 
+  // The attribution is the meta role.
   footer {
     margin-top: calc(var(--cirth-typography-spacing-vertical) * 0.5);
     color: var(--cirth-blockquote-footer-color);
+    font-weight: var(--cirth-font-weight-medium);
+    font-size: var(--cirth-meta-font-size);
+    letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
   }
 }
 

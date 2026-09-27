@@ -42,12 +42,7 @@
   // root, so the slot follows, and so does anything else reading the
   // page's ink.
   --cirth-ink: light-dark(#{$neutral-900}, #{$neutral-50});
-  --cirth-h1-color: var(--cirth-color);
-  --cirth-h2-color: var(--cirth-color);
-  --cirth-h3-color: var(--cirth-color);
-  --cirth-h4-color: var(--cirth-color);
-  --cirth-h5-color: var(--cirth-color);
-  --cirth-h6-color: var(--cirth-color);
+  --cirth-ink-strong: var(--cirth-ink);
 
   // Secondary inks: 8.7:1 or better in light (up from 5.0:1) and 8.4:1 in
   // dark (up from 5.2:1), still subordinate, no longer AA-and-no-further.

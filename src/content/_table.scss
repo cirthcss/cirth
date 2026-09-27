@@ -49,7 +49,9 @@
 #{$parent-selector} caption {
   padding-block-end: calc(var(--cirth-spacing) * 0.5);
   color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-sm);
+  font-weight: var(--cirth-font-weight-medium);
+  font-size: var(--cirth-meta-font-size);
+  letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
   line-height: var(--cirth-line-height-normal);
   text-align: start;
 }
@@ -67,6 +69,14 @@
   font-weight: var(--cirth-font-weight);
   font-variant-numeric: tabular-nums;
   text-align: start;
+}
+
+// Column heads and footers: the meta role, in the muted ink.
+
+#{$parent-selector} :is(thead, tfoot) :is(th, td) {
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-meta-font-size);
+  letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
 }
 
 // Footer

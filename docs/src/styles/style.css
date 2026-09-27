@@ -144,7 +144,7 @@
   margin: 0;
   padding: 0.375rem 0.625rem;
   border-color: var(--cirth-form-element-border-color);
-  background: var(--cirth-form-element-background-color);
+  background: var(--cirth-surface);
   box-shadow: none;
 
   /* A button pretending to be a search field, so its text has to be a
@@ -496,7 +496,12 @@
   margin-block: calc((var(--docs-brand-height) - var(--cirth-space-10)) / 2);
   padding-block: calc((var(--cirth-space-10) - var(--docs-brand-height)) / 2);
   font-family: var(--cirth-font-family-mono);
-  letter-spacing: var(--cirth-letter-spacing-tight);
+
+  /* The lockup is rendered as it was when the mark was frozen, pending the
+     new one: the tracking is the literal the removed
+     --cirth-letter-spacing-tight carried, not the optical relation the
+     library's roles use now. */
+  letter-spacing: -0.03em;
 }
 
 /* One value in every state: the name of the site does not brighten on the

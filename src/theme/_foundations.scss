@@ -47,14 +47,15 @@
   --cirth-font-weight-semibold: 600;
   --cirth-font-weight-bold: 700;
 
-  // Letter spacing
-  // Negative tracking for display sizes only: body text stays at normal.
-  // Both steps have consumers: -tight on h1/h2, -snug on h3/h4 (see
-  // theme/_styles.scss). -tight moved from -0.02em to -0.03em when the
-  // heading scale went back up: a token that names the tracking for the
-  // largest type on the page has to be worth setting at that size.
-  --cirth-letter-spacing-tight: -0.03em;
-  --cirth-letter-spacing-snug: -0.01em;
+  // Tracking
+  // One optical correction for every size, declared once instead of a
+  // literal per heading: large type set at the body's spacing reads loose,
+  // small type reads cramped. The role rules apply it as
+  //   letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em))
+  // which is zero at the body size, positive below it and negative above:
+  // +0.009em at 13px, -0.018em at 28px, -0.024em at 40px, -0.03em at 64px.
+  // 0 turns the correction off. See specs/typographic-roles.md.
+  --cirth-tracking-optical: 0.04;
 
   // Line heights
   --cirth-line-height-none: 1;

@@ -313,7 +313,6 @@ pre.docs-hero-install {
   --cirth-line-height: var(--cirth-line-height-tight);
 
   margin: 0 0 var(--cirth-space-3);
-  letter-spacing: var(--cirth-letter-spacing-tight);
 }
 
 .docs-story-text > p:last-child {

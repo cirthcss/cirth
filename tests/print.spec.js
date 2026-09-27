@@ -143,7 +143,7 @@ for (const scheme of /** @type {const} */ (["light", "dark"])) {
 	}) => {
 		await render(page, { scheme });
 
-		for (const id of ["heading", "text", "cell", "link", "button", "field"]) {
+		for (const id of ["heading", "text", "link", "button", "field"]) {
 			const color = parseColor(await styleOf(page, id, "color"));
 
 			expect(
@@ -154,9 +154,14 @@ for (const scheme of /** @type {const} */ (["light", "dark"])) {
 		}
 
 		// Muted stays muted, and stays readable: AA for body text on white.
-		expect(
-			contrastRatio(await styleOf(page, "caption", "color"), "rgb(255, 255, 255)"),
-		).toBeGreaterThanOrEqual(4.5);
+		// A column head is metadata about the cells, the caption's own role
+		// since specs/typographic-roles.md, so it prints in the same ink.
+		for (const id of ["caption", "cell"]) {
+			expect(
+				contrastRatio(await styleOf(page, id, "color"), "rgb(255, 255, 255)"),
+				`#${id} against paper`,
+			).toBeGreaterThanOrEqual(4.5);
+		}
 	});
 
 	test(`${scheme} scheme: surfaces flatten`, async ({ page }) => {

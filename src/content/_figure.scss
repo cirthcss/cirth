@@ -11,10 +11,13 @@
   margin: 0;
   padding: 0;
 
+  // The meta role, as a table's caption is.
   figcaption {
     padding: calc(var(--cirth-spacing) * 0.5) 0;
     color: var(--cirth-muted-color);
-    font-size: var(--cirth-font-size-sm);
+    font-weight: var(--cirth-font-weight-medium);
+    font-size: var(--cirth-meta-font-size);
+    letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
     line-height: var(--cirth-line-height-normal);
   }
 }

@@ -650,7 +650,7 @@ for (const [name, css] of builds) {
 			`<table>
 				<caption id="caption">Project team and roles</caption>
 				<thead><tr><th id="head" scope="col">Name</th></tr></thead>
-				<tbody><tr><td>Alex Doe</td></tr></tbody>
+				<tbody><tr><td id="data">Alex Doe</td></tr></tbody>
 			</table>`,
 		);
 
@@ -661,12 +661,17 @@ for (const [name, css] of builds) {
 			const cell = getComputedStyle(
 				/** @type {Element} */ (document.getElementById("head")),
 			);
+			// The data, not the column head: since specs/typographic-roles.md
+			// the head is metadata too, in the caption's own role.
+			const data = getComputedStyle(
+				/** @type {Element} */ (document.getElementById("data")),
+			);
 			const root = getComputedStyle(document.documentElement);
 			return {
 				captionAlign: caption.textAlign,
 				cellAlign: cell.textAlign,
 				captionColor: caption.color,
-				cellColor: cell.color,
+				cellColor: data.color,
 				muted: root.getPropertyValue("--cirth-muted-color").trim(),
 				spaceBelow: Number.parseFloat(caption.paddingBlockEnd),
 			};

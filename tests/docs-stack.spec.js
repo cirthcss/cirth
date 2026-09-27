@@ -485,7 +485,10 @@ test("documentation active navigation uses the public registered state", async (
 		const marker = getComputedStyle(element, "::before");
 		const probe = document.createElement("div");
 		document.body.append(probe);
-		probe.style.color = "var(--cirth-primary-border)";
+		// The rail is the accent's text role: it sits on the surface, not
+		// on a fill, and the fill's edge falls to 2.84:1 on the dark canvas
+		// (specs/surface-and-edge-model.md).
+		probe.style.color = "var(--cirth-primary-text)";
 		const accent = getComputedStyle(probe).color;
 		probe.style.color = "var(--cirth-contrast-text)";
 		const contrast = getComputedStyle(probe).color;

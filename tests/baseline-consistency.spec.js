@@ -592,10 +592,13 @@ test("navigation links reserve the accent for position, while header chrome uses
 				sample.muted,
 			);
 		}
+		// The label role's weight since specs/typographic-roles.md: the
+		// current item is marked by ink and weight together, and the weight
+		// step is 400 to 500, as for every other named control.
 		expect(sample.current).toEqual({
 			borderBottomWidth: "0px",
 			color: sample.contrast,
-			fontWeight: "600",
+			fontWeight: "500",
 			textDecorationLine: "none",
 		});
 		// Full contrast, and still not the accent: in chrome the accent

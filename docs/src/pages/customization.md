@@ -216,11 +216,17 @@ than moving the scale everyone else reads:
 
 `--cirth-line-height`, `--cirth-font-weight` and `--cirth-letter-spacing`
 are slots: set at the root they change the page default, and elements that
-were given their own value keep it. The two tracking steps have consumers:
-`--cirth-letter-spacing-tight` on `h1`/`h2`, `--cirth-letter-spacing-snug`
-on `h3`/`h4`, so overriding one moves the headings that read it.
-`--cirth-form-label-font-weight` is separate so labels can be heavier than
-the prose around them.
+were given their own value keep it. Tracking is one relation of size rather
+than a value per heading: every role element applies
+`calc(var(--cirth-tracking-optical) * (1rem - 1em))`, which is zero at the
+body size, slightly positive below it and negative above it. Set
+`--cirth-tracking-optical` to change how strong the correction is (0 turns
+it off), or `--cirth-letter-spacing` on one heading to override it there.
+The role weights (`--cirth-heading-font-weight`,
+`--cirth-title-font-weight`, `--cirth-form-label-font-weight`) and the two
+role sizes that are not steps of the scale (`--cirth-label-font-size`,
+`--cirth-meta-font-size`) are named so a theme can move a role without
+restating the elements in it.
 
 ## Spacing and layout
 
@@ -622,6 +628,7 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-color` | slot |
 | `--cirth-del-color` | derived |
 | `--cirth-ink` | input |
+| `--cirth-ink-strong` | input |
 | `--cirth-ins-color` | derived |
 | `--cirth-link-visited-color` | role |
 | `--cirth-mark-background-color` | derived |
@@ -638,6 +645,8 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 
 | Token | Kind |
 | --- | --- |
+| `--cirth-display-font-size` | role |
+| `--cirth-display-font-weight` | role |
 | `--cirth-font-family` | role |
 | `--cirth-font-family-display` | role |
 | `--cirth-font-family-emoji` | scale |
@@ -662,9 +671,9 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-font-weight-medium` | scale |
 | `--cirth-font-weight-regular` | scale |
 | `--cirth-font-weight-semibold` | scale |
+| `--cirth-heading-font-weight` | role |
+| `--cirth-label-font-size` | role |
 | `--cirth-letter-spacing` | slot |
-| `--cirth-letter-spacing-snug` | scale |
-| `--cirth-letter-spacing-tight` | scale |
 | `--cirth-line-height` | slot |
 | `--cirth-line-height-loose` | scale |
 | `--cirth-line-height-none` | scale |
@@ -672,7 +681,10 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-line-height-relaxed` | scale |
 | `--cirth-line-height-snug` | scale |
 | `--cirth-line-height-tight` | scale |
+| `--cirth-meta-font-size` | role |
 | `--cirth-text-underline-offset` | role |
+| `--cirth-title-font-weight` | role |
+| `--cirth-tracking-optical` | scale |
 | `--cirth-typography-spacing-top` | role |
 | `--cirth-typography-spacing-vertical` | role |
 
@@ -844,9 +856,9 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | --- | --- |
 | `--cirth-button-box-shadow` | derived |
 | `--cirth-button-hover-box-shadow` | derived |
-| `--cirth-h1-color` | role |
-| `--cirth-h2-color` | role |
-| `--cirth-h3-color` | role |
-| `--cirth-h4-color` | role |
-| `--cirth-h5-color` | role |
-| `--cirth-h6-color` | role |
+| `--cirth-h1-color` | derived |
+| `--cirth-h2-color` | derived |
+| `--cirth-h3-color` | derived |
+| `--cirth-h4-color` | derived |
+| `--cirth-h5-color` | derived |
+| `--cirth-h6-color` | derived |

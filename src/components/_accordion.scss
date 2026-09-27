@@ -174,7 +174,9 @@ $surface-details: "details";
   > summary {
     min-block-size: 2.75rem;
     padding-block: var(--cirth-space-2);
-    font-weight: var(--cirth-font-weight-semibold);
+
+    // The label role: a summary names what opens under it.
+    font-weight: var(--cirth-font-weight-medium);
   }
 
   &[open] {
