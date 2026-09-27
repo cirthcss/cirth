@@ -109,12 +109,15 @@ npm run docs:build    # build this site (input for the browser checks below)
 npm run check:behavior # interaction, reflow, user styles, and input parity across three engines
 npm run check:a11y    # axe WCAG 2.0–2.2 A/AA audit of every docs page
 npm run check:visual  # screenshot diff across docs pages and maintained presets
-npm run check:tooling # the dead-CSS audit measures a frozen copy of the build
+npm run check:tooling # the audit's frozen copy, the release guards, the accent's distance from the error hue
 ```
 
-`check:tooling` is the only one of these that checks a tool rather than the
-library; it is seconds, and it runs locally rather than in CI because it
-rewrites `docs/dist` on purpose. Two more tools run on demand: a rendering
+`check:tooling` checks tools rather than the library, with one exception:
+`scripts/check-accent-distance.js` compiles the theme and every preset and
+fails if an accent comes within 20° of OKLCh hue of the error input, in
+either scheme, with or without `prefers-contrast: more`. It lives here
+because it guards the next retheme rather than the current build. The
+whole command takes seconds, and it rewrites `docs/dist` on purpose. Two more tools run on demand: a rendering
 fingerprint and a dead-CSS audit. See
 [On demand](#on-demand-the-rendering-fingerprint-and-the-dead-css-audit)
 below.

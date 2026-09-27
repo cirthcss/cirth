@@ -111,6 +111,8 @@ $accent-50: oklch(96% 0.015 44deg);
 // 22deg sits 22deg from the accent's hue, and the distance is the point:
 // a destructive action and a primary one share a page, and the palette
 // has to keep them apart without either of them raising its voice.
+// scripts/check-accent-distance.js fails the tooling check if an accent,
+// shipped or preset, comes within 20deg of the error input.
 $error-950: oklch(18% 0.062 22deg);
 $error-900: oklch(22.3% 0.076 22deg);
 $error-850: oklch(26.7% 0.091 22deg);

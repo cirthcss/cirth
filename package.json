@@ -71,7 +71,7 @@
 		"check:brand-assets": "node scripts/check-brand-assets.js",
 		"check:doc-links": "node scripts/check-doc-links.js",
 		"check:size": "node scripts/check-css-size.js",
-		"check:tooling": "node scripts/check-audit-snapshot.js && node scripts/check-interaction-model.js && node scripts/check-flaky-report.js && node scripts/check-guards.js",
+		"check:tooling": "node scripts/check-audit-snapshot.js && node scripts/check-interaction-model.js && node scripts/check-flaky-report.js && node scripts/check-guards.js && node scripts/check-accent-distance.js",
 		"check:guards": "node scripts/check-guards.js",
 		"check:hooks": "node scripts/setup-git-hooks.js --check",
 		"check:release": "node scripts/check-release.js",
