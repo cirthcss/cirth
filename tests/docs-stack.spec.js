@@ -819,27 +819,10 @@ test("every claim says what kind it is, and how to check it", async ({
 	await expect(page.locator(".docs-proof")).not.toContainText(/\d+(\.\d+)? KB/);
 	await expect(page.locator(".docs-proof")).not.toContainText(/\d+ builds/);
 
-	// The marks are glyphs from the shell's own set: one size, no container,
-	// hidden from assistive technology because the word is right beside them.
-	const marks = await page
-		.locator(".docs-proof-state svg")
-		.evaluateAll((nodes) =>
-			nodes.map((node) => ({
-				tag: node.tagName.toLowerCase(),
-				hidden: node.getAttribute("aria-hidden"),
-				width: Math.round(node.getBoundingClientRect().width),
-				height: Math.round(node.getBoundingClientRect().height),
-				border: getComputedStyle(node).borderTopWidth,
-			})),
-		);
-	expect(marks).toHaveLength(6);
-	for (const mark of marks) {
-		expect(mark.tag).toBe("svg");
-		expect(mark.hidden).toBe("true");
-		expect(mark.width).toBe(16);
-		expect(mark.height).toBe(16);
-		expect(Number.parseFloat(mark.border)).toBe(0);
-	}
+	// The kind is a word, and only a word. A glyph beside it (a shield for a
+	// guarantee) said the same thing twice, as an ornament, and was removed
+	// with the rest of the page's decoration.
+	await expect(page.locator(".docs-proof-state svg")).toHaveCount(0);
 
 	// The band's ground differs from the sections either side of it, so the
 	// page alternates rather than reading as one sheet.

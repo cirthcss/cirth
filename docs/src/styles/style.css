@@ -83,11 +83,6 @@
   --docs-measure: 30em;
   --docs-rail-width: 15rem;
   --docs-toc-width: 13rem;
-  --docs-grid-dots: radial-gradient(
-    circle,
-    var(--cirth-muted-border-color) 0.75px,
-    transparent 0.9px
-  );
 
   /* The framework's own reading rhythm, captured before the reading column
      below re-times it: both are *inherited*, so every live example inside

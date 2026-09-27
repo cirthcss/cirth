@@ -36,21 +36,10 @@
   background: var(--cirth-card-sectioning-background-color);
 }
 
-/* Section heading: a kicker in the annotation voice, the heading at
-   display size, one sentence under it. */
+/* Section heading: the heading at display size, one sentence under it. */
 .docs-section-head {
   max-inline-size: 46rem;
   margin-block-end: clamp(2rem, 4vw, 3rem);
-}
-
-.docs-kicker {
-  margin-block: 0 var(--cirth-space-3);
-  color: var(--cirth-primary-text);
-  font-family: var(--cirth-font-family-mono);
-  font-size: var(--cirth-font-size-sm);
-  font-weight: var(--cirth-font-weight-medium);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 /* Display size through the slot every heading resolves through, with its
@@ -73,16 +62,13 @@
   font-size: var(--cirth-font-size-lg);
 }
 
-/* The annotation voice: muted monospace capitals for the name of a claim's
-   kind or of an example. Never below the reading floor. */
+/* The name of a claim's kind or of an example: muted text in the reading
+   face, one step below the prose. Never below the reading floor. */
 .docs-proof-state,
 .docs-example-name {
   color: var(--cirth-muted-color);
-  font-family: var(--cirth-font-family-mono);
   font-size: var(--cirth-font-size-sm);
   font-weight: var(--cirth-font-weight-regular);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 /* A pane label: the file name on one side, what it is on the other. */
@@ -107,75 +93,13 @@
    Copy first, then the demo under it at full width: code beside the card it
    renders from 64rem, one after the other below that, where a pane beside
    another would be narrower than the snippet's longest line. Nothing overlaps at
-   any width. The glow is the one decoration on the page, behind everything,
-   and gone in forced colors and print with the rest of the backgrounds. */
-.docs-hero {
-  position: relative;
-  isolation: isolate;
-}
-
+   any width, and nothing sits behind it: the page's canvas is the ground. */
 .docs-home > .docs-hero {
   padding-block: clamp(2rem, 6vw, 5rem) clamp(3rem, 7vw, 5.5rem);
 }
 
-.docs-hero::before {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  background:
-    radial-gradient(
-      46rem 28rem at 88% -8%,
-      color-mix(in oklab, var(--cirth-primary) 18%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      36rem 24rem at 0% 42%,
-      color-mix(in oklab, var(--cirth-secondary-text) 10%, transparent),
-      transparent 70%
-    );
-  content: "";
-  pointer-events: none;
-}
-
-/* A dot grid under the glow, fading out toward the fold. */
-.docs-hero::after {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  background-image: var(--docs-grid-dots);
-  background-size: 1.5rem 1.5rem;
-  content: "";
-  mask-image: radial-gradient(
-    ellipse 80% 60% at 70% 0%,
-    black,
-    transparent 75%
-  );
-  opacity: 0.8;
-  pointer-events: none;
-}
-
 .docs-hero-copy {
   max-inline-size: 50rem;
-}
-
-.docs-hero-eyebrow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--cirth-space-2);
-  margin: 0 0 var(--cirth-space-5);
-}
-
-.docs-hero-eyebrow span {
-  display: inline-flex;
-  align-items: center;
-  min-block-size: 2rem;
-  padding: 0 var(--cirth-space-3);
-  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
-  border-radius: var(--cirth-radius-pill);
-  background: var(--cirth-card-background-color);
-  color: var(--cirth-secondary-text);
-  font-size: var(--cirth-font-size-sm);
-  font-weight: var(--cirth-font-weight-medium);
 }
 
 /* The one headline on the site set larger than the scale's top step:
@@ -284,26 +208,20 @@ pre.docs-hero-install {
   border-block: var(--cirth-border-width) solid var(--cirth-card-border-color);
   background: var(--cirth-card-sectioning-background-color);
   color: var(--cirth-muted-color);
-  font-family: var(--cirth-font-family-mono);
   font-size: var(--cirth-font-size-sm);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 .docs-hero-connector span::before {
   content: "↓ ";
 }
 
-/* The result stands on the page's own canvas, with the dot grid a little
-   stronger, so it reads as the thing produced rather than as another
-   pane. */
+/* The result stands on the page's own canvas, so it reads as the thing
+   produced rather than as another pane. */
 .docs-hero-render {
   display: grid;
   align-content: center;
   padding: clamp(1.25rem, 4vw, 2.5rem);
   background-color: var(--cirth-background-color);
-  background-image: var(--docs-grid-dots);
-  background-size: 1.25rem 1.25rem;
 }
 
 .docs-hero-render > article {
@@ -386,14 +304,6 @@ pre.docs-hero-install {
   min-inline-size: 0;
 }
 
-.docs-story-index {
-  margin: 0 0 var(--cirth-space-2);
-  color: var(--cirth-primary-text);
-  font-family: var(--cirth-font-family-mono);
-  font-size: var(--cirth-font-size-sm);
-  font-weight: var(--cirth-font-weight-medium);
-}
-
 .docs-story-text h3 {
   --cirth-font-size: clamp(
     var(--cirth-font-size-2xl),
@@ -453,8 +363,6 @@ pre.docs-hero-install {
   align-content: center;
   padding: clamp(1.25rem, 4vw, 2.5rem);
   background-color: var(--cirth-background-color);
-  background-image: var(--docs-grid-dots);
-  background-size: 1.25rem 1.25rem;
 }
 
 .docs-story-render-stage > article {
@@ -537,14 +445,6 @@ pre.docs-hero-install {
 
   .is-enhanced .is-active .docs-story-text h3 {
     color: var(--cirth-contrast-text);
-  }
-
-  .is-enhanced .docs-story-text .docs-story-index {
-    color: var(--cirth-muted-color);
-  }
-
-  .is-enhanced .is-active .docs-story-text .docs-story-index {
-    color: var(--cirth-primary-text);
   }
 
   .is-enhanced .is-active .docs-story-text > p:last-child {
@@ -643,10 +543,7 @@ pre.docs-hero-install {
   gap: var(--cirth-space-3);
   margin: var(--cirth-space-4) 0;
   color: var(--cirth-muted-color);
-  font-family: var(--cirth-font-family-mono);
   font-size: var(--cirth-font-size-sm);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 .docs-dom-arrow::before,
@@ -1291,27 +1188,11 @@ cirth-theme-preview:not(:defined) {
   margin: 0;
 }
 
-/* Closing call to action: the one centred composition on the page, on
-   the card surface with the hero's glow reflected at the bottom. */
+/* Closing call to action: the one centred composition on the page. */
 .docs-cta {
-  position: relative;
-  isolation: isolate;
   border-block-start: var(--cirth-border-width) solid
     var(--cirth-muted-border-color);
   text-align: center;
-}
-
-.docs-cta::before {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  background: radial-gradient(
-    50rem 22rem at 50% 110%,
-    color-mix(in oklab, var(--cirth-primary) 16%, transparent),
-    transparent 70%
-  );
-  content: "";
-  pointer-events: none;
 }
 
 .docs-cta .docs-home-inner > p {
@@ -1351,13 +1232,5 @@ cirth-theme-preview:not(:defined) {
   .docs-token.is-changed {
     background: Mark;
     color: MarkText;
-  }
-}
-
-@media print {
-  .docs-hero::before,
-  .docs-hero::after,
-  .docs-cta::before {
-    display: none;
   }
 }

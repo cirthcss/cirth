@@ -153,17 +153,15 @@ bodyClass: docs-home-page
       your application does with it.
     · current fact: true of this build, measured, and free to move.
 
-    The glyphs are the shell's own (eleventy.config.js): shield-check for
-    what a suite holds, sliders for what the reader can change, and the
-    lightning bolt this site already uses for a measurement. aria-hidden,
-    because the word is right there. -#}
+    The kind is a word and nothing else: a glyph beside it said the same
+    thing a second time, in a register the page does not otherwise use. -#}
 {%- macro proofKind(kind) -%}
 {%- if kind == "guarantee" -%}
-<span class="docs-proof-state">{% icon "shield", 16, "is-verified" %}Guarantee</span>
+<span class="docs-proof-state">Guarantee</span>
 {%- elif kind == "capability" -%}
-<span class="docs-proof-state">{% icon "sliders", 16, "is-enhanced" %}Capability</span>
+<span class="docs-proof-state">Capability</span>
 {%- else -%}
-<span class="docs-proof-state">{% icon "zap", 16, "is-measured" %}Current fact</span>
+<span class="docs-proof-state">Current fact</span>
 {%- endif -%}
 {%- endmacro -%}
 
@@ -313,7 +311,6 @@ bodyClass: docs-home-page
 	<section class="docs-hero" aria-labelledby="home-title">
 		<div class="docs-home-inner">
 			<div class="docs-hero-copy">
-				<p class="docs-hero-eyebrow"><span>Pure CSS</span><span>No classes to learn</span><span>0 B JavaScript</span></p>
 				<h1 id="home-title">Semantic HTML in.<br /><span class="docs-accent">Finished UI out.</span></h1>
 				<p class="docs-hero-lede">{{ hero.tagline }}</p>
 				<p class="docs-hero-actions">
@@ -356,14 +353,12 @@ bodyClass: docs-home-page
 	<section class="docs-story" aria-labelledby="story-title">
 		<div class="docs-home-inner">
 			<header class="docs-section-head">
-				<p class="docs-kicker">How it works</p>
 				<h2 id="story-title">Less markup. The same interface.</h2>
 			</header>
 			<div class="docs-story-steps" data-docs-story>
 				{% for step in story %}
 					<div class="docs-story-step" data-docs-story-step="{{ loop.index }}">
 						<div class="docs-story-text">
-							<p class="docs-story-index" aria-hidden="true">0{{ loop.index }}</p>
 							<h3>{{ step.title }}</h3>
 							<p>{{ step.text }}</p>
 						</div>
@@ -401,7 +396,6 @@ bodyClass: docs-home-page
 	<section class="docs-frameworks docs-band" aria-labelledby="frameworks-title">
 		<div class="docs-home-inner">
 			<header class="docs-section-head">
-				<p class="docs-kicker">Framework agnostic</p>
 				<h2 id="frameworks-title">Pure CSS. Framework agnostic. Works everywhere.</h2>
 				<p>Cirth ships no React, Vue or Svelte components, and needs none. It styles the HTML that reaches the browser, so it makes no difference whether a template, a server or a client framework wrote it.</p>
 			</header>
@@ -441,7 +435,6 @@ bodyClass: docs-home-page
 	<section class="docs-showcase" aria-labelledby="semantic-title">
 		<div class="docs-home-inner">
 			<header class="docs-section-head">
-				<p class="docs-kicker">Native behaviour</p>
 				<h2 id="semantic-title">Start with the HTML you already know.</h2>
 				<p>Standard elements carry the styling <em>and</em> the behaviour. Change the markup and you change the interface. Nothing in these three samples is wired to a script.</p>
 			</header>
@@ -480,7 +473,6 @@ bodyClass: docs-home-page
 	<section class="docs-showcase docs-theme-showcase" aria-labelledby="theme-title">
 		<div class="docs-home-inner">
 			<header class="docs-section-head">
-				<p class="docs-kicker">Customization</p>
 				<h2 id="theme-title">Your theme. Same HTML.</h2>
 				<p>Every colour, radius and font is a <code>--cirth-*</code> custom property. The markup on the right never changes and no class is added to it. The declarations on the left do, one at a time, and the finished interface follows them.</p>
 			</header>
@@ -513,7 +505,6 @@ bodyClass: docs-home-page
 	<section class="docs-proof docs-band" aria-labelledby="proof-title">
 		<div class="docs-home-inner">
 			<header class="docs-section-head">
-				<p class="docs-kicker">Evidence</p>
 				<h2 id="proof-title">Every claim has a check path.</h2>
 				<p>{{ pitch.lede }}</p>
 			</header>
