@@ -85,18 +85,33 @@ for (const build of builds) {
 		}
 	});
 
+	// Since specs/container-owned-flow.md a list carries no margin of its
+	// own: the space before it is its relation to the block before it. So
+	// the spacing is measured where a reader sees it, between boxes.
 	test(`top-level lists keep their spacing (${build.name} build)`, async ({
 		page,
 	}) => {
 		await render(page, build);
 
-		const paragraph = await marginsOf(page, "lead");
+		const gaps = await page.evaluate(() => {
+			/** @param {string} id */
+			const box = (id) =>
+				/** @type {HTMLElement} */ (document.getElementById(id)).getBoundingClientRect();
+			return {
+				paragraphToList: box("top-level-ul").top - box("lead").bottom,
+				listToList: box("top-level-ol").top - box("top-level-ul").bottom,
+				// Read where the list is: a scoped build declares the knob on
+				// its wrapper, not on the root.
+				element: Number.parseFloat(
+					getComputedStyle(
+						/** @type {HTMLElement} */ (document.getElementById("lead")),
+					).getPropertyValue("--cirth-spacing"),
+				) * 16,
+			};
+		});
 
-		for (const id of ["top-level-ul", "top-level-ol"]) {
-			const margins = await marginsOf(page, id);
-			expect(margins.top, `${id} top margin`).toBe("0px");
-			expect(margins.bottom, `${id} bottom margin`).toBe(paragraph.bottom);
-		}
+		expect(gaps.paragraphToList).toBeCloseTo(gaps.element, 0);
+		expect(gaps.listToList).toBeCloseTo(gaps.element, 0);
 	});
 
 	test(`a nested list sits closer to its parent item than a top-level list does to the next block (${build.name} build)`, async ({
@@ -104,11 +119,21 @@ for (const build of builds) {
 	}) => {
 		await render(page, build);
 
-		const nested = await marginsOf(page, "ul-in-ul");
-		const topLevel = await marginsOf(page, "top-level-ul");
+		const gaps = await page.evaluate(() => {
+			const nested = /** @type {HTMLElement} */ (document.getElementById("ul-in-ul"));
+			const parentItem = /** @type {HTMLElement} */ (nested.parentElement);
+			const range = document.createRange();
+			range.selectNodeContents(parentItem);
+			range.setEndBefore(nested);
+			const text = range.getClientRects();
+			return {
+				nested: nested.getBoundingClientRect().top - text[text.length - 1].bottom,
+				topLevel:
+					/** @type {HTMLElement} */ (document.getElementById("top-level-ol")).getBoundingClientRect().top -
+					/** @type {HTMLElement} */ (document.getElementById("top-level-ul")).getBoundingClientRect().bottom,
+			};
+		});
 
-		expect(Number.parseFloat(nested.top)).toBeLessThan(
-			Number.parseFloat(topLevel.bottom),
-		);
+		expect(gaps.nested).toBeLessThan(gaps.topLevel);
 	});
 }

@@ -56,6 +56,31 @@
   );
 }
 
+// No flow element carries a margin of its own: the space between two of
+// them is their relation's (content/_flow.scss). The reset weighs nothing,
+// so those relations, later in the sheet, set the space.
+
+#{$parent-selector}
+  :where(
+    address,
+    blockquote,
+    dl,
+    ol,
+    p,
+    pre,
+    table,
+    ul,
+    hr,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6
+  ) {
+  margin-block: 0;
+}
+
 #{$parent-selector} address,
 #{$parent-selector} blockquote,
 #{$parent-selector} dl,
@@ -64,7 +89,6 @@
 #{$parent-selector} pre,
 #{$parent-selector} table,
 #{$parent-selector} ul {
-  margin-block: 0 var(--cirth-typography-spacing-vertical);
   color: var(--cirth-color);
   font-style: normal;
 }
@@ -83,7 +107,6 @@
 #{$parent-selector} h4,
 #{$parent-selector} h5,
 #{$parent-selector} h6 {
-  margin-block: 0 calc(var(--cirth-typography-spacing-vertical) * 0.5);
   color: var(--cirth-color);
   font-weight: var(--cirth-font-weight);
   font-size: var(--cirth-font-size);
@@ -120,32 +143,12 @@
   --cirth-color: var(--cirth-h6-color);
 }
 
-// Margin-top for headings after a block
-
-#{$parent-selector}
-  :where(
-    article,
-    address,
-    blockquote,
-    dl,
-    figure,
-    form,
-    ol,
-    p,
-    pre,
-    table,
-    ul
-  ) {
-  ~ :is(h1, h2, h3, h4, h5, h6) {
-    margin-top: var(--cirth-typography-spacing-top);
-  }
-}
-
 // Heading group
 
-#{$parent-selector} hgroup {
-  margin-bottom: var(--cirth-typography-spacing-vertical);
+// A heading group is one unit: its title and subtitle sit together, with
+// none of the line a heading keeps under it elsewhere.
 
+#{$parent-selector} hgroup {
   > * {
     margin-block: 0;
   }
@@ -158,29 +161,21 @@
   }
 }
 
-// Lists
-
-#{$parent-selector} :where(ol, ul) {
-  li {
-    margin-bottom: calc(var(--cirth-typography-spacing-vertical) * 0.25);
-  }
-}
-
 // Margin-top for nested lists
 
 // 1. Remove the margin on nested lists in Chrome, Edge, IE, and Safari
 
-// :is(), not :where(): a nested list has to outrank the `dl, ol, ul` type
-// selectors that give every list its bottom margin above. With :where() on
-// both compounds this rule weighed nothing, silently lost the cascade, and
-// nested lists kept a full bottom margin, a visibly larger gap before the
-// next parent item than between the nested items themselves (gh#76).
-// Components that style their own nested lists (nav, dropdown) still win:
-// they either match this specificity later in the sheet or exceed it.
+// A nested list belongs to the item it sits in: a line above it, and
+// nothing below, so the next parent item is as close as a sibling (gh#76).
+// :is(), not :where(): it has to outrank the zero-weight flow relations,
+// which would otherwise give a nested list after a paragraph in its item
+// the element step. Components that style their own nested lists (nav,
+// dropdown) still win: they either match this specificity later in the
+// sheet or exceed it.
 
 #{$parent-selector} :is(dl, ol, ul) :is(dl, ol, ul) {
   margin: 0; // 1
-  margin-top: calc(var(--cirth-typography-spacing-vertical) * 0.25);
+  margin-top: var(--cirth-flow-line);
 }
 
 #{$parent-selector} ul li {
@@ -223,7 +218,7 @@
 // author's.
 
 #{$parent-selector} dl > dd + dt {
-  margin-top: calc(var(--cirth-typography-spacing-vertical) * 0.5);
+  margin-top: var(--cirth-flow-line);
 }
 
 // Highlighted text
@@ -249,20 +244,14 @@
 // Blockquote
 
 #{$parent-selector} blockquote {
-  margin: var(--cirth-typography-spacing-vertical) 0;
+  margin-inline: 0;
   padding: var(--cirth-spacing);
   border-inline-start: var(--cirth-border-width-4) solid
     var(--cirth-blockquote-border-color);
   border-inline-end: none;
 
-  > :last-child,
-  > :has(+ footer) {
-    margin-bottom: 0;
-  }
-
-  // The attribution is the meta role.
+  // The attribution is the meta role, a line under the quote.
   footer {
-    margin-top: calc(var(--cirth-typography-spacing-vertical) * 0.5);
     color: var(--cirth-blockquote-footer-color);
     font-weight: var(--cirth-font-weight-medium);
     font-size: var(--cirth-meta-font-size);

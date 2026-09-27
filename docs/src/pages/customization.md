@@ -244,14 +244,22 @@ at the root, which is where the tokens that derive from it are declared:
 
 | Token | What it moves |
 | --- | --- |
-| `--cirth-typography-spacing-vertical` | Space between paragraphs, lists and tables |
-| `--cirth-block-spacing-vertical` | Space between landmarks and sections |
+| `--cirth-flow-line`, `-element`, `-group`, `-section`, `-chapter` | The five steps of the flow: 0.5, 1, 2, 3 and 5 times the knob |
+| `--cirth-typography-spacing-vertical` | The element step under its older name |
+| `--cirth-block-spacing-vertical` | The block padding of the page's `<header>`, `<main>` and `<footer>` |
 | `--cirth-grid-column-gap`, `--cirth-grid-row-gap` | The gaps in a `.grid` and a `.row` |
 
-Nothing else has to be restated to move with it. A few document blocks read
-`--cirth-spacing` directly for the same reason: `<pre>`, `<blockquote>` and
-table cells are running text with a box around it, so their padding is part
-of the same rhythm.
+No element carries a margin of its own. The space between two siblings is
+set on the second one by what the two are to each other: a line between a
+label and its field, a heading and its first paragraph, two list items; an
+element between two paragraphs or two fields; a group between two fieldsets
+or two cards, and before an `h3` to `h6`; a section before an `h1`, an `h2`
+or a `<section>`; a chapter between the top-level sections of `<main>`.
+Those rules weigh nothing, so any rule you write about a margin wins, and a
+layout of your own that sets `gap` sets `margin: 0` on its children. A few
+document blocks read `--cirth-spacing` directly for their padding:
+`<pre>`, `<blockquote>` and table cells are running text with a box around
+it, so their padding is part of the same rhythm.
 
 ### What deliberately does not
 
@@ -685,7 +693,6 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-text-underline-offset` | role |
 | `--cirth-title-font-weight` | role |
 | `--cirth-tracking-optical` | scale |
-| `--cirth-typography-spacing-top` | role |
 | `--cirth-typography-spacing-vertical` | role |
 
 #### Spacing and layout
@@ -696,6 +703,11 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-block-spacing-vertical` | role |
 | `--cirth-container-gutter` | role |
 | `--cirth-container-max-width` | role |
+| `--cirth-flow-chapter` | scale |
+| `--cirth-flow-element` | scale |
+| `--cirth-flow-group` | scale |
+| `--cirth-flow-line` | scale |
+| `--cirth-flow-section` | scale |
 | `--cirth-grid-column-gap` | role |
 | `--cirth-grid-min-column` | role |
 | `--cirth-grid-row-gap` | role |

@@ -102,13 +102,27 @@
   // or tightens the rhythm of a page without moving a single target size.
   --cirth-spacing: var(--cirth-space-4);
 
-  // Spacings for typography elements
-  // Derived, not a second independent step. Paragraph rhythm *is* flow
-  // spacing: with the two declared apart, a preset that opened the flow up
-  // moved grids and sections and left prose at the default unless it
-  // remembered to restate this token, and every future preset would have
-  // had to remember too. Identical to --cirth-space-4 at the default scale.
-  --cirth-typography-spacing-vertical: var(--cirth-spacing);
+  // The flow scale: five steps named by distance of meaning, all derived
+  // from the one knob so a preset that opens the flow moves every step in
+  // proportion. A line binds a thing to what belongs to it (a label to its
+  // field, a heading to its first paragraph, one list item to the next);
+  // an element separates two things of one kind (two paragraphs, two
+  // fields); a group separates sets of them (two fieldsets, two cards); a
+  // section opens a new subject; a chapter a new part of the page. 8, 16,
+  // 32, 48 and 80px at the default: each step at least 1.5 times the one
+  // below, so a larger gap reads as a larger distance rather than as a
+  // slightly different amount. Nothing carries a margin of its own; the
+  // relation between two siblings picks the step (content/_flow.scss).
+  // See specs/container-owned-flow.md.
+  --cirth-flow-line: calc(var(--cirth-spacing) * 0.5);
+  --cirth-flow-element: var(--cirth-spacing);
+  --cirth-flow-group: calc(var(--cirth-spacing) * 2);
+  --cirth-flow-section: calc(var(--cirth-spacing) * 3);
+  --cirth-flow-chapter: calc(var(--cirth-spacing) * 5);
+
+  // The element step under its older name, kept for the padding of the
+  // running-text blocks (<pre>, <blockquote>, table cells) that read it.
+  --cirth-typography-spacing-vertical: var(--cirth-flow-element);
 
   // Spacings for body > header, body > main, body > footer, section, article
   --cirth-block-spacing-vertical: var(--cirth-spacing);
@@ -295,7 +309,6 @@
       1.35rem + 1.6vw,
       2.5rem
     );
-    --cirth-typography-spacing-top: var(--cirth-space-12);
   }
 
   h2 {
@@ -304,27 +317,22 @@
       1.2rem + 0.75vw,
       var(--cirth-font-size-3xl)
     );
-    --cirth-typography-spacing-top: var(--cirth-space-12);
   }
 
   h3 {
     --cirth-font-size: clamp(1.1875rem, 1.1rem + 0.35vw, 1.375rem);
-    --cirth-typography-spacing-top: var(--cirth-space-10);
   }
 
   h4 {
     --cirth-font-size: var(--cirth-font-size-lg);
-    --cirth-typography-spacing-top: var(--cirth-space-8);
   }
 
   h5 {
     --cirth-font-size: var(--cirth-font-size-md);
-    --cirth-typography-spacing-top: var(--cirth-space-8);
   }
 
   h6 {
     --cirth-font-size: var(--cirth-font-size-sm);
-    --cirth-typography-spacing-top: var(--cirth-space-8);
   }
 
   // Card (<article>)

@@ -27,8 +27,9 @@ optional `header`/`footer` sections, with no `.card` class.
   cancels the card's own horizontal padding) and gets its own background,
   `--cirth-card-sectioning-background-color`, plus a border separating it
   from the body (`--cirth-card-border-color`).
-* Cards stack with `--cirth-block-spacing-vertical` between them, matching
-  [Section](/layout/section) rhythm.
+* Two cards in a row of the flow are a group step apart
+  (`--cirth-flow-group`): each is a group of content. Nothing inside a card
+  carries a margin of its own, so its padding is exactly its edge.
 
 ## A flush card
 

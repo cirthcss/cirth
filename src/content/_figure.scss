@@ -6,9 +6,12 @@
    * Figure
    */
 
+#{$parent-selector} :where(figure) {
+  margin: 0;
+}
+
 #{$parent-selector} figure {
   display: block;
-  margin: 0;
   padding: 0;
 
   // The meta role, as a table's caption is.

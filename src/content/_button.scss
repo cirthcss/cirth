@@ -17,8 +17,11 @@
 
 // 2. Remove the margin on controls in Safari
 
-#{$parent-selector} button {
+#{$parent-selector} :where(button) {
   margin: 0; // 2
+}
+
+#{$parent-selector} button {
   font-family: inherit; // 1
   text-transform: none; // 1
 }
@@ -125,12 +128,6 @@
     outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
     outline-offset: var(--cirth-outline-offset);
   }
-}
-
-#{$parent-selector} [type="submit"],
-#{$parent-selector} [type="reset"],
-#{$parent-selector} [type="button"] {
-  margin-bottom: var(--cirth-spacing);
 }
 
 // .secondary, .contrast & .outline

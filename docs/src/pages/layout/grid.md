@@ -52,9 +52,9 @@ fit comfortably on one row:
   `--cirth-grid-row-gap` (both default to `--cirth-spacing`).
 * Children get `min-width: 0` so long content (text, tables) doesn't force
   a column wider than its track.
-* A form control (`input`, `select`, `textarea`, `button`, …) that is a
-  direct child of `.grid` drops its own `margin-bottom`: the row-gap
-  already provides that rhythm (upstream pico#738).
+* The grid owns the space between its cells: the gap, on both axes. Its
+  children take no flow spacing from each other (upstream pico#738), so a
+  grid of fields and a stack of fields are spaced identically.
 
 Tune `--cirth-grid-min-column` per grid to change how eagerly it wraps:
 a smaller value packs in more, narrower columns; a larger one wraps

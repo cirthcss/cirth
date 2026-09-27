@@ -27,11 +27,12 @@ no typography classes exist in Cirth.
 
 ## Headings
 
-Each heading level (`h1`–`h6`) has its own font size, line height, color
-token (`--cirth-h1-color` through `--cirth-h6-color`), and top spacing
-(`--cirth-typography-spacing-top`) applied only when the heading follows a
-block element, so a heading at the very top of a container doesn't get
-extra space above it.
+Each heading level (`h1`–`h6`) has its own font size, line height and color
+token (`--cirth-h1-color` through `--cirth-h6-color`). A heading is closer
+to what it introduces than to what precedes it: a section step before an
+`h1` or an `h2`, a group step before the four below them, and a line under
+any of them. A heading at the very top of a container gets no space above
+it, because there is no block for it to relate to.
 
 ## `hgroup`
 
@@ -40,9 +41,9 @@ one) is demoted visually: muted color, regular weight, `--cirth-font-size-md`.
 
 ## Lists
 
-`ul`/`ol` items get a small bottom margin; nested lists lose their own
-top level margin and get a quarter spacing top margin instead, to avoid
-duplicated spacing. `ul` uses square bullets.
+List items are a line apart (`--cirth-flow-line`); a nested list sits a
+line under its item's text and adds nothing below, so the next parent item
+is as close as a sibling. `ul` uses square bullets.
 
 ## Blockquote
 

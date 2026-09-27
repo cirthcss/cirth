@@ -4,22 +4,10 @@
    * Section
    */
 
-// Reviewed and kept. A page of full-bleed bands does not want this gap, and
-// that is a real argument, but <article> carries the identical
-// margin-bottom in components/_card.scss, and HTML's two sectioning
-// containers should not disagree about whether they sit in document flow.
-// The value is a token, so a theme that re-times the document re-times this
-// with it; and a composition that wants no gap opts out in one declaration,
-// at zero added specificity (`.landing :where(section) { margin: 0 }`),
-// which is what this project's own front page does. See
+// A section carries no margin of its own. The space before one is its
+// relation's (content/_flow.scss): the section step after any block, the
+// chapter step between the top-level sections of <main>. Those rules weigh
+// nothing, so a composition of full-bleed bands that wants no gap opts out
+// in one declaration at any specificity (`.landing :where(section)
+// { margin: 0 }`), which is what this project's own front page does. See
 // docs/src/pages/layout/section.md.
-#{$parent-selector} section {
-  margin-bottom: var(--cirth-block-spacing-vertical);
-}
-
-// Adjacent top-level sections are chapters, not consecutive paragraphs.
-// Keep the general section margin compact for nested application regions,
-// then add one extra beat only where <main> establishes the page outline.
-#{$parent-selector} main > section + section {
-  margin-block-start: var(--cirth-space-8);
-}

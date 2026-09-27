@@ -2277,12 +2277,27 @@ test("no shell chapter rule or margin lands on a heading inside a live example",
 			[...document.querySelectorAll(".docs-demo-preview :is(h1,h2,h3,h4,h5,h6)")].map(
 				(heading) => {
 					const style = getComputedStyle(heading);
+					/** @param {string} name */
+					const step = (name) => {
+						const probe = document.createElement("div");
+						probe.style.marginTop = `var(${name})`;
+						heading.after(probe);
+						const value = getComputedStyle(probe).marginTop;
+						probe.remove();
+						return value;
+					};
 					return {
 						tag: heading.tagName,
 						text: (heading.textContent ?? "").trim().slice(0, 24),
 						borderBlockStart: style.borderBlockStartWidth,
 						paddingBlockStart: style.paddingBlockStart,
 						marginBlockStart: style.marginBlockStart,
+						steps: [
+							"0px",
+							step("--cirth-flow-line"),
+							step("--cirth-flow-group"),
+							step("--cirth-flow-section"),
+						],
 					};
 				},
 			),
@@ -2290,12 +2305,13 @@ test("no shell chapter rule or margin lands on a heading inside a live example",
 		for (const heading of headings) {
 			expect(heading.borderBlockStart, `${url} ${heading.text}`).toBe("0px");
 			expect(heading.paddingBlockStart, `${url} ${heading.text}`).toBe("0px");
-			// The shell's h3 step is 2rem; the framework's own values for a
-			// heading in a specimen are 0 or its typography-spacing-top.
-			expect(
-				Number.parseFloat(heading.marginBlockStart),
-				`${url} ${heading.text}`,
-			).not.toBe(32);
+			// The framework's own values for a heading in a specimen are the
+			// flow relations' (specs/container-owned-flow.md): nothing, a
+			// line, a group or a section. The shell's chapter spacing is a
+			// clamp that lands on none of them.
+			expect(heading.steps, `${url} ${heading.text}`).toContain(
+				heading.marginBlockStart,
+			);
 		}
 	}
 });

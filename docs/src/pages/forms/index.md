@@ -61,8 +61,9 @@ question, which is always the case for radios and usually for checkboxes.
 
 ## Layout
 
-- Text inputs, `select` and `textarea` are full width, with a bottom margin
-  of `--cirth-spacing`, so stacked fields space themselves.
+- Text inputs, `select` and `textarea` are full width. Stacked fields are an
+  element step apart and fieldsets a group step apart, so a form reads as
+  groups of fields; a label's text sits a line above its field.
 - Buttons and one-line controls share one height formula and are at least
   44px tall, so a field and a button beside it line up without offsets.
 - To place fields side by side, wrap them in a [`.grid`](/layout/grid),

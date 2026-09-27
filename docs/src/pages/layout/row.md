@@ -38,11 +38,10 @@ one, use [`.grid`](/layout/grid) instead.
   `--cirth-grid-row-gap` (both default to `--cirth-spacing`).
 * Children get `min-width: 0` so long content (text, tables) doesn't force
   the column wider than its share of the row.
-* A form control (`input`, `select`, `textarea`, `button`, …) that is a
-  direct child of `.row` drops its own `margin-bottom`: the row-gap
-  already provides that rhythm, and a trailing `<small>` after one of
-  those controls gets the same full-width helper-text treatment it gets
-  after a bare `input`/`select`/`textarea`/`fieldset`.
+* The row owns the space between its columns: its children take no flow
+  spacing from each other, and a trailing `<small>` after one of those
+  controls gets the same full-width helper-text treatment it gets after a
+  bare `input`/`select`/`textarea`/`fieldset`.
 
 `.row` only exists in the default build with classes enabled; there's no
 classless equivalent since it requires a class to opt in.

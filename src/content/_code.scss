@@ -78,7 +78,6 @@
 // container edge.
 #{$parent-selector} pre {
   display: block;
-  margin-bottom: var(--cirth-spacing);
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
   border-radius: var(--cirth-border-radius);
   background: var(--cirth-code-background-color);

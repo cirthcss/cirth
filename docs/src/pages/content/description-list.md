@@ -22,16 +22,16 @@ class, no wrapper required.
 
 ## Behavior
 
-* `<dt>` is set in `--cirth-font-weight-semibold`, so the term reads as the
-  term rather than as another line of the description.
+* `<dt>` is set at the label weight (`--cirth-font-weight-medium`), so the
+  term reads as the term rather than as another line of the description.
 * `<dd>` has the browser's 40px indent removed. That indent is a user-agent
   default, not a typographic decision.
-* Consecutive pairs get half a rhythm step between them
-  (`calc(var(--cirth-typography-spacing-vertical) * 0.5)`), applied to a
-  `<dt>` that follows a `<dd>`, so the space falls between pairs and never
-  inside one. Several `<dd>`s under one `<dt>`, or several `<dt>`s sharing one
+* Consecutive pairs are a line apart (`--cirth-flow-line`), set on a `<dt>`
+  that follows a `<dd>`, so the space falls between pairs and never inside
+  one. Several `<dd>`s under one `<dt>`, or several `<dt>`s sharing one
   `<dd>`, stay together.
-* The list itself keeps the bottom margin every flow element gets.
+* The list itself is spaced from its neighbours like any other flow
+  element: by its relation to them.
 
 ## Laying pairs out in columns
 

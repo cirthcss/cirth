@@ -39,6 +39,10 @@
 @use "components/popover"; // [popover]
 @use "components/progress"; // progress
 
+// After every component, so its zero-weight relations follow every
+// zero-weight reset in the sheet.
+@use "content/flow"; // space between siblings, by relation
+
 // Utilities
 @use "utilities/accessibility"; // aria-*, [dir="rtl"]
 @use "utilities/reduce-motion"; // prefers-reduced-motion

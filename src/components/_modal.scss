@@ -107,7 +107,7 @@
 
     > header {
       > * {
-        margin-bottom: 0;
+        margin-block: 0;
       }
 
       #{$close-selector} {
@@ -136,7 +136,7 @@
         [type="button"],
         [role="button"]
       ) {
-        margin-bottom: 0;
+        margin-block: 0;
 
         &:not(:first-of-type) {
           margin-inline-start: calc(var(--cirth-spacing) * 0.5);

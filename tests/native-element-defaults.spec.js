@@ -1073,6 +1073,7 @@ const flowRhythm = async (page, css, spacing) => {
 			(spacing ? `<style>:root { --cirth-spacing: ${spacing} }</style>` : "") +
 			`<main>
 				<p id="copy">Body copy.</p>
+				<p id="copy2">More body copy.</p>
 				<section id="section">A section.</section>
 				<article id="card">On a card.</article>
 				<input id="field" type="text">
@@ -1088,9 +1089,12 @@ const flowRhythm = async (page, css, spacing) => {
 
 		return {
 			spacing: root.getPropertyValue("--cirth-spacing").trim(),
-			// Flow: follows the knob.
-			paragraph: style("copy").marginBottom,
-			section: style("section").marginBottom,
+			// Flow: follows the knob. Since specs/container-owned-flow.md the
+			// space is set on the second of two siblings, by their relation:
+			// the element step between two paragraphs, the section step
+			// before a section.
+			paragraph: style("copy2").marginTop,
+			section: style("section").marginTop,
 			// Components: pinned, on purpose.
 			cardPadding: style("card").paddingTop,
 			fieldPadding: style("field").paddingTop,
@@ -1118,9 +1122,10 @@ for (const [name, css] of builds) {
 				dense.paragraph,
 				"paragraph rhythm did not follow --cirth-spacing",
 			).toBe(expected);
-			expect(dense.section, "section rhythm did not follow --cirth-spacing").toBe(
-				expected,
-			);
+			expect(
+				Number.parseFloat(dense.section),
+				"section rhythm did not follow --cirth-spacing",
+			).toBeCloseTo(Number.parseFloat(expected) * 3, 1);
 			expect(dense.paragraph).not.toBe(control.paragraph);
 
 			expect(dense.cardPadding, "card padding followed the flow knob").toBe(
@@ -1166,7 +1171,8 @@ test("default: the playroom preset retimes prose through --cirth-spacing alone",
 		`<style>${defaultBuild}</style><style>${read(
 			"dist/presets/playroom.css",
 		)}</style><main class="container">
-			<p id="copy">Body copy.</p>
+			<p>Body copy.</p>
+			<p id="copy">More body copy.</p>
 			<div class="grid" id="grid"><div>a</div><div>b</div></div>
 		</main>`,
 	);
@@ -1184,7 +1190,7 @@ test("default: the playroom preset retimes prose through --cirth-spacing alone",
 			typography: root
 				.getPropertyValue("--cirth-typography-spacing-vertical")
 				.trim(),
-			paragraph: copy.marginBottom,
+			paragraph: copy.marginTop,
 			columnGap: grid.columnGap,
 		};
 	});

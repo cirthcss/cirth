@@ -66,8 +66,8 @@
   // inside a nav
   // ––––––––––––––––––––
   #{$parent-selector} nav details.dropdown {
-    // Override height
-    margin-bottom: 0;
+    // A nav item, on the nav's own rhythm.
+    margin-block: 0;
   }
 
   // Button as a select
@@ -202,7 +202,7 @@
 
     li {
       width: 100%;
-      margin-bottom: 0;
+      margin-block: 0;
       padding: calc(var(--cirth-form-element-spacing-vertical) * 0.5)
         var(--cirth-form-element-spacing-horizontal);
       list-style: none;

@@ -65,7 +65,7 @@
   ol,
   ul {
     align-items: center;
-    margin-bottom: 0;
+    margin-block: 0;
     padding: 0;
     list-style: none;
 
@@ -166,7 +166,7 @@
     #{$group-selector},
     [role="search"] {
       width: auto;
-      margin-bottom: 0;
+      margin-block: 0;
     }
 
     // Minimal support for buttons and forms elements

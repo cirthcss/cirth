@@ -21,12 +21,16 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 
 // 2. Remove the margin in Firefox and Safari
 
+// Zero-weight, so the flow relations (content/_flow.scss) set the space
+// between fields.
+#{$parent-selector} :where(input, optgroup, select, textarea) {
+  margin: 0; // 2
+}
+
 #{$parent-selector} input,
 #{$parent-selector} optgroup,
 #{$parent-selector} select,
 #{$parent-selector} textarea {
-  margin: 0; // 2
-
   // Never under 16px: iOS zooms the page into a field whose text is
   // smaller, whatever the author set the type scale to.
   font-size: max(var(--cirth-font-size-md), 16px); // 1
@@ -117,10 +121,12 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 
 // Fieldset
 
+#{$parent-selector} :where(fieldset) {
+  margin: 0;
+}
+
 #{$parent-selector} fieldset {
   width: 100%;
-  margin: 0;
-  margin-bottom: var(--cirth-spacing);
   padding: 0;
   border: 0;
 }
@@ -134,7 +140,6 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 #{$parent-selector} label,
 #{$parent-selector} fieldset legend {
   display: block;
-  margin-bottom: calc(var(--cirth-spacing) * 0.5);
   color: var(--cirth-color);
   font-weight: var(--cirth-form-label-font-weight, var(--cirth-font-weight));
   letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
@@ -144,9 +149,12 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   font-size: var(--cirth-label-font-size);
 }
 
+// A legend is followed by the line, the same as a heading: it binds the
+// group's name to the first field in it.
 #{$parent-selector} fieldset legend {
   --cirth-form-label-font-weight: var(--cirth-title-font-weight);
 
+  margin-bottom: var(--cirth-flow-line);
   color: var(--cirth-ink-strong);
   font-size: var(--cirth-font-size-md);
 }
@@ -420,14 +428,6 @@ $validation-any: "[aria-invalid], #{$invalid-native}";
   opacity: 1;
 }
 
-// Margin bottom (Not Checkboxes and Radios)
-
-#{$parent-selector} input:not([type="checkbox"], [type="radio"]),
-#{$parent-selector} select,
-#{$parent-selector} textarea {
-  margin-bottom: var(--cirth-spacing);
-}
-
 // Select
 
 #{$parent-selector} select {
@@ -503,12 +503,11 @@ $validation-any: "[aria-invalid], #{$invalid-native}";
 }
 
 #{$parent-selector} :where(#{$helper-previous-tags}) {
-  // Help text is the meta role.
+  // Help text is the meta role, a line under what it describes.
   + small {
     display: block;
     width: 100%;
-    margin-top: calc(var(--cirth-spacing) * -0.75);
-    margin-bottom: var(--cirth-spacing);
+    margin-top: var(--cirth-flow-line);
     color: var(--cirth-muted-color);
     font-weight: var(--cirth-font-weight-medium);
     font-size: var(--cirth-meta-font-size);
@@ -529,9 +528,11 @@ $validation-any: "[aria-invalid], #{$invalid-native}";
 
 // Styles for Input inside a label
 
+// A field inside its label sits a line under the label's text.
+
 #{$parent-selector} label {
   > :where(input, select, textarea) {
-    margin-top: calc(var(--cirth-spacing) * 0.25);
+    margin-top: var(--cirth-flow-line);
   }
 }
 

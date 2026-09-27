@@ -172,7 +172,7 @@ styling hook is not a reason to write invalid ARIA.
   button/form spacing.
 * A [group](/components/group) (`.group`/`[role="search"]`; `[role="group"]`
   alone in the classless build) inside a nav item sizes to its content and
-  drops its stacking margin, sitting on the nav's rhythm like any other item.
+  takes no flow spacing, sitting on the nav's rhythm like any other item.
 * A [dropdown](/components/dropdown) nested in a nav item collapses its own
   vertical margin so it lines up with sibling links; see that page's
   "Inside a nav" example.

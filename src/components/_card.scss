@@ -11,7 +11,6 @@
   // in a card is the card's colour, and its edge alone marks it.
   --cirth-surface: var(--cirth-card-background-color);
 
-  margin-bottom: var(--cirth-block-spacing-vertical);
   padding: var(--cirth-block-spacing-vertical)
     var(--cirth-block-spacing-horizontal);
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
@@ -19,26 +18,22 @@
   background: var(--cirth-card-background-color);
   box-shadow: var(--cirth-card-box-shadow);
 
-  // Container padding owns the final rhythm. Text and forms keep their
-  // normal flow spacing everywhere else, but do not stack a second gutter
-  // against the card edge. Adjacent body/footer margins already collapse to
-  // one rhythm step, so they need no selector or compensation here.
-  > :last-child:not(header, footer),
-  > :is(header, footer) > :last-child {
-    margin-bottom: 0;
-  }
+  // The padding owns the card's edges. Nothing inside carries a margin of
+  // its own (content/_flow.scss), so there is no trailing margin to cancel
+  // against the bottom edge.
 
-  // The mirror of the rule above, on the axis it was missing. A heading
-  // that follows a block takes --cirth-typography-spacing-top so a new
-  // section separates itself from the prose above it: 32px to 48px,
-  // depending on the level. That is a document-flow measure, and a card's
-  // header or footer is not document flow: it is a band padded to
-  // `block-spacing-vertical - space-2`. An eyebrow above a title in a card
-  // header therefore opened a 40px hole inside a 12px band, three times
-  // the padding that defines it. Inside the band the rhythm is the
-  // ordinary one its own elements already carry.
+  // A heading in a card's header or footer is not document flow: the band
+  // is a group, padded to `block-spacing-vertical - space-2`, and the
+  // section or group step a heading opens elsewhere (48px, 32px) would
+  // open a hole three times the band's own padding. Inside the band a
+  // heading sits on the padding when it comes first, and a line under
+  // whatever precedes it (an eyebrow) otherwise.
   > :is(header, footer) :is(h1, h2, h3, h4, h5, h6) {
     margin-top: 0;
+  }
+
+  > :is(header, footer) > * + :is(h1, h2, h3, h4, h5, h6) {
+    margin-top: var(--cirth-flow-line);
   }
 
   > header,
