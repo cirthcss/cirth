@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | None yet: technical-language foundations, `design/technical-language-system` |
-| Status | Draft |
+| Status | Implementing |
 | Baseline | `806fea7a` on `design/technical-language-system` |
 | Breaking | Yes: the secondary variant, disabled state, focus ring, submit width, status borders and inline code change by default |
 

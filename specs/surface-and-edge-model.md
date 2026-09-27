@@ -3,9 +3,10 @@
 | | |
 | --- | --- |
 | Issue | None yet: technical-language foundations, `design/technical-language-system` |
-| Status | Draft |
+| Status | Implementing |
 | Baseline | `806fea7a` on `design/technical-language-system` (token values identical to `94f7c669`) |
 | Breaking | Yes: custom property defaults redefined, two removed, four added |
+| Decisions | 2026-09-27, maintainer: nothing frozen except accent hues; size budget not a constraint |
 
 The page is built from four named surface levels (recessed, canvas, raised,
 overlay) and three named edge roles (separator, container, control), each a
@@ -127,9 +128,6 @@ and `tests/prefers-contrast.spec.js` gains the case.
 
 ### What this does not promise
 
-- **A visible raised step under `plain`.** Its canvas is L 0.985 and the
-  preset is frozen, so the raised level has 0.015 of lightness above it
-  (1.03:1). Plain cards separate by their edge.
 - **The 3:1 control floor on a canvas nobody tested.** The formulas keep the
   order for any canvas; the floor is verified for the four accents and the
   two presets above, in both schemes. A consumer canvas far outside L
@@ -253,8 +251,7 @@ repository, by design): `before/`, `prototype/`, `evidence/`,
 
 - [ ] With every border made transparent, canvas, recessed, raised and overlay
       are told apart in grayscale in both schemes at 1440 and 390px
-      (default, plain dark, playroom, probe). Plain light raised is the known
-      exception above.
+      (default, plain, playroom, probe).
 - [ ] Control border ≥ 3:1 on every level, separator < container ≤ control on
       every level, in both schemes, with and without `more`, for the four
       accents, in Chromium, Firefox and WebKit:
@@ -268,8 +265,8 @@ repository, by design): `before/`, `prototype/`, `evidence/`,
 - [ ] `tests/box-shadow.spec.js` asserts two layers and passes the dark
       elevation ratio in three engines; `specs/dark-elevation-shadow.md` gets a
       row pointing here.
-- [ ] `npm run check:size` green; `npm run check:tokens` green with the token
-      export regenerated.
+- [ ] `npm run check:size` reported (not gated; see Open questions, 3);
+      `npm run check:tokens` green with the token export regenerated.
 - [ ] `docs/src/pages/colors.md` (Surfaces) and `docs/src/pages/upgrading.md`
       (migration) updated.
 
@@ -290,12 +287,17 @@ repository, by design): `before/`, `prototype/`, `evidence/`,
 
 ## Open questions
 
-1. **Plain's raised step.** Its canvas leaves no room. Settled by leaving the
-   preset frozen unless the maintainer reopens presets.
+1. **Plain's raised step.** Its canvas leaves no room. Closed on 2026-09-27:
+   presets are not frozen, so plain's canvas moves down to make room for its
+   cards, like the default one, and stays achromatic.
 2. **Is `--cirth-surface` public?** It has to be settable by consumers for
    their own containers, which makes it public in practice. Proposed: public,
    documented on Colors and Customization.
-3. **Size budget.** `cirth.min.css` is 15129 B of a 15200 B budget. This spec
-   pays with the shadow (99 B) and by deleting the derived status borders and
-   the active field background; if the four specs together do not fit, the
-   budget is a maintainer decision, not something to work around.
+3. **Size budget.** `cirth.min.css` is 15129 B of a 15200 B budget. Closed on
+   2026-09-27: the maintainer does not treat the budget as a constraint on
+   this work and will revisit the numbers; `npm run check:size` is reported,
+   not gated on, and a cleanup pass follows if it is needed.
+4. **What stays fixed.** On 2026-09-27 the maintainer lifted every freeze
+   except the accent hues, which a later palette round chooses. Lightness,
+   chroma and ladder steps of any family may move; the accent's hue (44°)
+   and the error, success and warning hues do not.

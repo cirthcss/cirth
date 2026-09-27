@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | None yet: technical-language foundations, `design/technical-language-system` |
-| Status | Draft: the mechanism is a decision for the maintainer (Open questions, 1) |
+| Status | Implementing: the relation model was accepted on 2026-09-27 (Open questions, 1) |
 | Baseline | `806fea7a` on `design/technical-language-system` |
 | Breaking | 💥 Yes: every flow element loses its own outer margin |
 
@@ -175,11 +175,9 @@ larger than the one below it.
 
 ## Open questions
 
-1. **Take the breaking change, or the conservative fallback?** The relation
-   model is what the direction asks for and removes the class of bug; the
-   fallback fixes the three measured bugs inside the Pico model with no
-   migration. This is the one decision in the four specs that is the
-   maintainer's rather than the design's.
+1. **Take the breaking change, or the conservative fallback?** Closed on
+   2026-09-27: the maintainer took the relation model, and asked that no
+   compatibility limit of this kind be carried forward.
 2. **Should `div` be a block?** Including it restores spacing after
    wrappers and offsets every consumer row built from `div`s. Proposed: no.
 3. **Nav, dropdown, segmented control and accordion** set their own internal
