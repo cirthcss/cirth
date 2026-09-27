@@ -186,6 +186,39 @@ test("explicit aria-invalid states override native validity", async ({ page }) =
 	expect(invalidState.borderColor).toBe(invalid.borderColor);
 });
 
+test("a focused field keeps the colour of its explicit state", async ({
+	page,
+}) => {
+	// Border and ring say the same thing. The accent-focus rule used to
+	// outweigh the validation block on inputs, so a focused valid field drew
+	// the accent border inside a green ring, and an invalid one the accent
+	// inside a red ring.
+	const token = (/** @type {string} */ name) =>
+		page.evaluate((property) => {
+			const probe = document.createElement("span");
+			probe.style.color = `var(${property})`;
+			document.querySelector("main")?.append(probe);
+			const value = getComputedStyle(probe).color;
+			probe.remove();
+			return value;
+		}, name);
+
+	const accent = await token("--cirth-form-element-active-border-color");
+
+	for (const [selector, state] of [
+		["#valid-reference", "valid"],
+		["#invalid-reference", "invalid"],
+	]) {
+		await page.locator(selector).focus();
+		const focused = await stateOf(page.locator(selector));
+		expect(focused.focused).toBe(true);
+		expect(focused.borderColor).toBe(
+			await token(`--cirth-form-element-${state}-active-border-color`),
+		);
+		expect(focused.borderColor).not.toBe(accent);
+	}
+});
+
 test("Firefox keeps an opened required select neutral and a valid choice does not turn green", async ({
 	browserName,
 	page,

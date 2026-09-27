@@ -220,13 +220,22 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 
 // Active & Focus
 
+// An explicitly validated field keeps its state colour while it has focus:
+// the validation block below paints its focused border and ring together.
+// Left in this list, the input branch outweighed that block, (0,2,1)
+// against (0,2,0), and a valid field took the accent border inside a green
+// ring. Excluding the state here fixes it without raising either weight.
+// Native :user-invalid needs no entry: its selector already outweighs this
+// one.
 #{$parent-selector}
   input:not(
     [type="submit"],
     [type="button"],
     [type="reset"],
     [role="switch"],
-    [readonly]
+    [readonly],
+    [aria-invalid="true"],
+    [aria-invalid="false"]
   ),
 #{$parent-selector} :where(select, textarea):not([readonly]) {
   &:is(:active, :focus) {
