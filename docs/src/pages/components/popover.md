@@ -115,7 +115,7 @@ so it is a future addition, not a thing to ship now.
   and a paragraph all keep the styling they would have anywhere else.
 * It fades in and out using `@starting-style` and discrete transitions:
   no class toggling, no script. Under
-  [reduced motion](/utilities/reduce-motion) the fade collapses with
+  [reduced motion](/guides/accessibility#reduced-motion) the fade collapses with
   everything else.
 * `<dialog popover>` is left alone: dialogs have their own component and
   their own surface. See [Modal](/components/modal).

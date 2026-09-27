@@ -1,0 +1,82 @@
+---
+layout: base.njk
+bodyClass: docs-examples-page
+title: Examples
+description: Complete interfaces built only from semantic HTML and Cirth, from app navigation and dashboards to checkout, articles and pricing. Every block shows its exact source.
+---
+{#- A showcase, not a documentation page: no sidebar and no pager, and a
+    wider stage, because a dashboard or a checkout needs the room to look
+    like one. The examples themselves are data (_data/examples.js) rendered
+    through the same `demo` shortcode as every other live example, so each
+    block's "Show HTML" is the exact markup on screen, styled by the
+    stylesheet this site loads with nothing added. -#}
+<main id="main-content" class="container docs-showcase-page" data-pagefind-body>
+	<header class="docs-showcase-intro">
+		<h1>Examples</h1>
+		<p>
+			Complete screens built from the elements documented on this site and
+			nothing else: no example below adds a stylesheet of its own. Each one
+			is rendered live by the stylesheet this page loads, follows the theme
+			and preset you pick in the header, and opens its exact source under
+			<strong>Show HTML</strong>.
+		</p>
+		<nav aria-label="Example categories" class="docs-chip-nav">
+			<ul>
+				{% for category in examples %}
+					<li><a href="#{{ category.id }}">{{ category.title }}</a></li>
+				{% endfor %}
+				<li><a href="#builds">Builds</a></li>
+			</ul>
+		</nav>
+	</header>
+
+	{% for category in examples %}
+		<section class="docs-example-category" id="{{ category.id }}" aria-labelledby="{{ category.id }}-title">
+			<header>
+				<h2 id="{{ category.id }}-title">{{ category.title }}</h2>
+				<p>{{ category.summary }}</p>
+			</header>
+			{% for item in category.items %}
+				<section class="docs-example-block" aria-labelledby="{{ item.demo }}-title">
+					<header>
+						<h3 id="{{ item.demo }}-title">{{ item.title }}</h3>
+						<p>{{ item.summary }}</p>
+						<p class="docs-example-uses">
+							<span>Built from</span>
+							{% for use in item.uses %}<a href="{{ use.link }}">{{ use.text }}</a>{% endfor %}
+						</p>
+					</header>
+					{% demo item.demo, "default", item.frame or "" %}
+				</section>
+			{% endfor %}
+		</section>
+	{% endfor %}
+
+	<section class="docs-example-category" id="builds" aria-labelledby="builds-title">
+		<header>
+			<h2 id="builds-title">One interface, four builds</h2>
+			<p>
+				The same sign-in form under each published build. Every frame is
+				isolated from this site and loads a stylesheet compiled from
+				<code>src/</code> with the switches of the real entry point.
+			</p>
+		</header>
+		<div class="docs-build-comparison">
+			<div>
+				<figure><figcaption><strong>Default</strong><code>cirth.min.css</code></figcaption><iframe tabindex="-1" title="Default Cirth build example" src="/lab/default/?theme=light"></iframe></figure>
+				<figure><figcaption><strong>Classless</strong><code>cirth.classless.min.css</code></figcaption><iframe tabindex="-1" title="Classless Cirth build example" src="/lab/classless/?theme=light"></iframe></figure>
+				<figure><figcaption><strong>Scoped</strong><code>cirth.scoped.min.css</code></figcaption><iframe tabindex="-1" title="Scoped Cirth build example" src="/lab/scoped/?theme=dark"></iframe></figure>
+				<figure><figcaption><strong>Scoped + classless</strong><code>cirth.classless.scoped.min.css</code></figcaption><iframe tabindex="-1" title="Scoped classless Cirth build example" src="/lab/scoped-classless/?theme=dark"></iframe></figure>
+			</div>
+			<footer>No documentation JavaScript is needed for these frames: theme and build are separate static URLs.</footer>
+		</div>
+	</section>
+
+	<footer class="docs-showcase-next">
+		<p>Every element in these screens has its own page with the details.</p>
+		<p class="docs-hero-actions">
+			<a href="/installation" role="button">Install Cirth</a>
+			<a href="/components/accordion" role="button" class="secondary outline">Browse components</a>
+		</p>
+	</footer>
+</main>

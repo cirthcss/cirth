@@ -1,161 +1,64 @@
 ---
 layout: docs.njk
+description: Where Cirth came from, what its name means, how it relates to Pico CSS, how the project thinks about size, and the license it is released under.
 ---
 
-# About Cirth
+# About
 
-Cirth is an HTML-native CSS framework: a stylesheet that styles standard
-HTML elements directly (`<button>`, `<nav>`, `<article>`, `<table>`,
-`<dialog>`) instead of asking you to learn a parallel vocabulary of class
-names first. Load it, write semantic markup, and most of an interface is
-already a finished, accessible baseline.
+Cirth is an open-source CSS framework, designed and maintained by Riccardo
+Pastori with help from its
+[contributors](https://github.com/cirthcss/cirth/graphs/contributors). This
+page is the project's own story: where it came from, what the name means, and
+a few decisions that shape what goes into it. For what Cirth does and whether
+it fits your project, read [Why Cirth](/why-cirth).
 
 <section class="docs-proof-strip" aria-labelledby="about-proof-title">
-  <header><h2 id="about-proof-title">The contract, at a glance.</h2></header>
+  <header><h2 id="about-proof-title">The project, at a glance.</h2></header>
   <dl class="grid">
-    <div><dt>Semantic baseline</dt><dd><strong>covered</strong><small>native element selectors</small></dd></div>
-    <div><dt>Accessibility</dt><dd><strong>verified</strong><small>WCAG 2.2 AA floor</small></dd></div>
+    <div><dt>Package</dt><dd><strong>@cirthcss/cirth</strong><small>compiled CSS, on npm and jsDelivr</small></dd></div>
     <div><dt>Distributed runtime</dt><dd><strong>0 B JS</strong><small>CSS package only</small></dd></div>
     <div><dt>Default footprint</dt><dd><strong>{{ proof.size.label }}</strong><small>gzipped, measured in this build</small></dd></div>
     <div><dt>Build modes</dt><dd><strong>{{ proof.buildCount }}</strong><small>default / classless / scoped</small></dd></div>
     <div><dt>Runtime surface</dt><dd><strong>{{ proof.tokenCount }}</strong><small><code>--cirth-*</code> tokens</small></dd></div>
+    <div><dt>License</dt><dd><strong>Apache 2.0</strong><small>code; the brand has its own terms</small></dd></div>
   </dl>
 </section>
 
-## What Cirth is
+## Origin
 
-- A CSS framework distributed as compiled stylesheets, published to npm as
-  `@cirthcss/cirth` and available from a CDN with no install step.
-- A runtime design token system: hundreds of `--cirth-` custom properties
-  drive color, spacing, radius, type, and motion, overridable in plain CSS
-  after the stylesheet loads.
-- No JavaScript runtime. Cirth ships none and requires none: interactive
-  patterns (accordion, dropdown, modal) are built on native `<details>`
-  and `<dialog>` behavior. It is a statement about what the package
-  contains, not about your application, which is free to use JavaScript for
-  anything it needs.
-- Four builds: default, classless, scoped, and scoped classless, so the
-  same token system can style a page directly, style zero-class markup, or
-  stay scoped inside a `.cirth` wrapper.
+Cirth began as a fork of [Pico CSS](https://picocss.com), which pioneered
+styling semantic HTML directly, and it remains indebted to that work. It has
+since become an independent framework with its own theme, builds, token
+system and accessibility baseline, rather than a promise of compatibility
+with its origin.
 
-## How it works
+## Relationship to Pico CSS
 
-The framework ships compiled CSS only; there's nothing to run. Add one
-`<link rel="stylesheet">` (or one `import` in a bundler) and standard
-elements pick up their styling immediately: no template step, no
-JavaScript hydration, no class list to author. Customization happens by
-overriding CSS custom properties in an ordinary stylesheet of your own,
-which wins because Cirth keeps its rules in a cascade layer: change
-`--cirth-primary` once, and every button, link, and focus ring that derives
-from it updates, with no compiler in between. SCSS exists
-in the repository as internal build infrastructure for producing the
-compiled output; it is not a published Sass API.
+The most important differences for someone who knows Pico:
 
-## Technical constraints
-
-Cirth is deliberately small, and stays that way by design, not by
-accident:
-
-- **No JavaScript.** Nothing to initialize, no client-side runtime to keep
-  in sync with the DOM.
-- **No large component catalog.** Layout primitives, forms, typography,
-  and a small set of components. A pattern that needs a tower of `div`
-  elements to work doesn't belong in the default build.
-- **Runtime tokens, not build-time variables.** Every color, spacing,
-  radius, font, and shadow is a `--cirth-` custom property, overridable
-  after the stylesheet loads: no Sass, no rebuild.
-- **A monitored compressed size for every shipped stylesheet** (below).
-
-## Size, and what it is a budget for
-
-The default stylesheet is **{{ proof.size.label }} gzipped in this build**,
-measured from `dist/cirth.min.css`. Every shipped bundle carries its own
-budget, checked automatically on every build by
-[`scripts/check-css-size.js`](https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js)
-which covers the four root builds, the four print sheets and both
-presets, each with deliberate local headroom above what it currently
-measures.
-
-The quoted figure is gzip because that is what the delivery paths documented
-here actually send. A host that precompresses the file itself and serves it
-with `Content-Encoding: br` gets the same bundle in
-{{ proof.size.brotliLabel }}, but that is a best case you arrange, not
-something installing the package provides.
-
-### Why small matters here
-
-Around 14 KiB is a meaningful threshold, and it is why this project pays
-attention at all: it approximates what a server can send on a new connection
-before it has to stop and wait for the client's first acknowledgment.
-
-It was never a guarantee about any individual request, and on the delivery
-paths most consumers actually use it is not the number that decides
-anything: the connection the stylesheet arrives on has usually moved the
-threshold already.
-[Deploy](/deploy#what-a-smaller-stylesheet-actually-buys) works through what
-it does and does not buy.
-
-What it is here is a reason to notice growth. That is a different job from
-promising a ceiling, and the difference is the rest of this section.
-
-### Why it is a guard and not a promise
-
-It used to be written as a single ceiling, "under 14 KB", applied to every
-file in `dist/`. That number was doing two jobs, and doing both badly.
-
-As a guard it watched one bundle. The print sheets are under 900 bytes, so a
-shared 14 KB ceiling would have let them grow sixteenfold in silence, and the
-classless builds had two kilobytes of unwatched room. Only the scoped build
-was ever near the line.
-
-As a promise it was worse, because a round number a reader can hold you to
-starts buying the wrong things. By the end it was the reason `<dl>` still
-carried the browser's 40px indent, a disclosure marker sat four pixels above
-its own line, and a vertical nav painted its current-page rail outside the
-container that clipped it. Those are defects, and none of them was worth
-226 bytes.
-
-Cirth is small because its model is small: element selectors and custom
-properties, no component catalogue, and nothing to run. It is not small
-because it leaves native elements unfinished. So the number is now a
-per-bundle regression guard (cross a line and the build stops and asks),
-raised deliberately, in the change that needs it, with the reason in the
-commit.
-
-## Accessibility baseline
-
-WCAG 2.2 AA contrast, visible focus rings that survive Windows High
-Contrast / forced-colors mode, 44px touch targets, and
-`prefers-reduced-motion` / `prefers-contrast: more` support are checked in
-the source rather than left to integrators to add. This is a floor Cirth verifies for its own
-components and default theme: a baseline, not a substitute for testing
-the accessibility of the interface you build on top of it.
-
-## Where Cirth fits
-
-- Sites and internal tools where standard HTML elements (forms, tables,
-  nav, articles) cover most of the interface.
-- Projects that want a production-ready baseline without adopting or
-  maintaining a design system.
-- Teams that want zero shipped JavaScript and no required build step.
-- Embedding a consistent baseline into an existing app, CMS, or design
-  system through the scoped build, without it leaking into surrounding
-  markup.
-
-## Where Cirth does not fit
-
-- Highly custom, brand-driven interfaces designed and built
-  component-by-component: a utility-first workflow or a bespoke design
-  system fits that job better.
-- Projects that need a large, pre-built component catalog beyond layout,
-  forms, and Cirth's small component set.
-- Teams already standardized on a different workflow with no specific
-  reason to add a second one.
+- The package name is `@cirthcss/cirth` and the custom property prefix is
+  `--cirth-`.
+- The published package is CSS only; SCSS is repository source, not a public
+  Sass API.
+- The builds are default, classless, scoped and scoped classless. Scoped
+  builds target a `.cirth` wrapper, including custom properties, document
+  styles, colour schemes and modal states.
+- The twenty inherited accent themes became one official theme (copper),
+  with `plain` and `playroom` published as optional token presets; see
+  [Colors](/colors).
+- `.grid` is an intrinsically wrapping grid, and the single-row
+  equal-column layout is [`.row`](/layout/row).
+- The CSS-only `[data-tooltip]` is gone, replaced by the native
+  [popover](/components/popover), because a message drawn with
+  `content: attr()` cannot be reached by assistive technology.
+- A WCAG 2.2 AA baseline (contrast, focus visibility, target size) is
+  verified on every page of this site, and every shipped stylesheet is held
+  to a gzipped size budget checked on every build.
 
 ## Origin of the name
 
-The Cirth are an invented alphabet, devised by Tolkien for his languages:
-a small set of signs where related sounds are given related shapes, so the
+The Cirth are an invented alphabet, devised by Tolkien for his languages: a
+small set of signs where related sounds are given related shapes, so the
 script can be learned as a system rather than memorised sign by sign.
 
 That is the part worth borrowing. A framework is a notation you write an
@@ -168,34 +71,90 @@ everywhere. Every resting edge is the same hairline. Learning one part tells
 you what the next one does.
 
 Nothing here requires the reference. It explains where the name came from,
-not how the framework works, and the [Brand](/brand) page documents the
-mark, the copper and the terms the name is used under. Cirth is not
-affiliated with the Tolkien estate or any rights holder: the name points at
-a writing system, and is not a claim of association.
+not how the framework works, and the [Brand](/brand) page documents the mark,
+the copper and the terms the name is used under. Cirth is not affiliated with
+the Tolkien estate or any rights holder: the name points at a writing system,
+and is not a claim of association.
 
-## Relationship to Pico CSS
+## What the project includes
 
-Cirth began as a fork of [Pico CSS](https://picocss.com), which pioneered
-this approach, and it remains indebted to that work. Treat Cirth as an
-independent framework rather than a promise of permanent direct
-compatibility. The most important differences for users are:
+Cirth stays small by design:
 
-- The package name is `@cirthcss/cirth` and the custom property prefix is
-  `--cirth-`.
-- The published package is CSS only; SCSS is repository source, not a
-  public Sass API.
-- The active build set is default, classless, scoped, and scoped
-  classless.
-- Scoped builds target a `.cirth` wrapper, including custom properties,
-  document styles, color schemes, and modal states.
-- The inherited set of twenty accent themes has been reduced to a single
-  official theme (copper), with `plain` and `playroom` published as optional
-  token override presets; see [Colors](/colors).
-- A WCAG 2.2 AA baseline (contrast, focus visibility, target size) is
-  verified in the source, and every shipped stylesheet is held to a gzipped
-  size budget checked on every build.
+- **No JavaScript.** Nothing to initialize, and no client-side runtime to
+  keep in step with the DOM.
+- **No large component catalogue.** Layout primitives, forms, typography and
+  a small set of components. A pattern that needs a tower of `div` elements
+  to work does not belong in the default build.
+- **Runtime tokens, not build-time variables.** Every colour, spacing step,
+  radius, font and shadow is a `--cirth-*` custom property you can override
+  after the stylesheet loads.
+- **A monitored compressed size for every shipped stylesheet**, described
+  below.
+
+## Size, and what it is a budget for
+
+The default stylesheet is **{{ proof.size.label }} gzipped in this build**,
+measured from `dist/cirth.min.css`. Every shipped bundle carries its own
+budget, checked on every build by
+[`scripts/check-css-size.js`](https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js),
+which covers the four builds, the four print sheets and both presets, each
+with deliberate headroom above what it measures today.
+
+The quoted figure is gzip because that is what ordinary delivery sends. A
+host that precompresses the file and serves it with `Content-Encoding: br`
+gets the same bundle in {{ proof.size.brotliLabel }}, but that is a best
+case you arrange, not something installing the package provides.
+
+### Why small matters here
+
+Around 14 KiB approximates the
+[initial congestion window](https://datatracker.ietf.org/doc/html/rfc6928)
+that TCP and [QUIC](https://www.rfc-editor.org/rfc/rfc9002.html#section-7.2)
+use for a new connection: what a server may send before it has to wait for
+the client's first acknowledgment. That is why the project pays attention to
+size at all.
+
+It is not a line to design against. The window belongs to the connection,
+not to the stylesheet, and by the time a stylesheet is requested the
+connection has usually carried the HTML and grown past it. A cross-origin
+stylesheet pays for DNS, TCP and TLS before any of this applies. So the
+threshold is a reason to notice growth, not a promise about any one request;
+[Compatibility](/compatibility#delivering-the-stylesheet) covers what
+actually decides how fast the file arrives.
+
+### Why it is a guard and not a promise
+
+It used to be written as one ceiling, "under 14 KB", applied to every file.
+That number was doing two jobs, and doing both badly.
+
+As a guard it watched one bundle. The print sheets are under 900 bytes, so a
+shared 14 KB ceiling would have let them grow sixteenfold in silence, and the
+classless builds had two kilobytes of unwatched room.
+
+As a promise it was worse, because a round number a reader can hold you to
+starts buying the wrong things. By the end it was the reason `<dl>` still
+carried the browser's 40px indent, a disclosure marker sat four pixels above
+its own line, and a vertical nav painted its current-page rail outside the
+container that clipped it. Those were defects, and none of them was worth
+226 bytes.
+
+Cirth is small because its model is small: element selectors and custom
+properties, no component catalogue, and nothing to run. It is not small
+because it leaves native elements unfinished. So the number is a per-bundle
+regression guard: cross a line and the build stops and asks. It is raised
+deliberately, in the change that needs it, with the reason in the commit.
 
 ## Project and license
 
+- Source, issues and releases:
+  [github.com/cirthcss/cirth](https://github.com/cirthcss/cirth)
 - Contributing: [Contributions](/contributions)
-- License: [Apache License 2.0](https://github.com/cirthcss/cirth/blob/master/LICENSE.md)
+- Code license:
+  [Apache License 2.0](https://github.com/cirthcss/cirth/blob/master/LICENSE.md).
+  You can use Cirth in commercial and closed-source work, modify it and
+  redistribute it, provided you keep the license and copyright notices and
+  state what you changed. Pico CSS, which Cirth was forked from, is MIT;
+  [NOTICE.md](https://github.com/cirthcss/cirth/blob/master/NOTICE.md)
+  records that history.
+- The name and the logo are not covered by the code license. They are brand
+  assets with their own terms, set out on the [Brand](/brand) page.

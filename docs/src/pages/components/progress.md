@@ -35,7 +35,7 @@ colors, including an animated indeterminate state.
 * A `progress` with no `value` attribute is indeterminate: an animated
   gradient sweep, reversed in `[dir="rtl"]`, disabled entirely under
   `prefers-reduced-motion: reduce` (see
-  [Reduce motion](/utilities/reduce-motion)).
+  [Reduce motion](/guides/accessibility#reduced-motion)).
 * For a measurement inside a known range rather than a task running to
   completion (disk used, a score, capacity), reach for
   [meter](/components/meter) instead. It is styled as this component's

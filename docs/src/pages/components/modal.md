@@ -104,4 +104,4 @@ present the component.
   and the dialog simply disappears where they cannot. Nothing is lost by
   that: closing means the dialog goes away.
 * All of the motion collapses under
-  [reduced motion](/utilities/reduce-motion).
+  [reduced motion](/guides/accessibility#reduced-motion).

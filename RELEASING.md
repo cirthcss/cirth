@@ -298,7 +298,7 @@ from. The trusted publisher is bound to the workflow **filename**, so
 
 ## Subresource Integrity
 
-The CDN snippets in `README.md` and on the Get Started page carry a
+The CDN snippets in `README.md` and on the Installation pages carry a
 `sha384` `integrity` hash and `crossorigin="anonymous"`, so a browser
 refuses a jsDelivr response whose bytes are not the ones documented here.
 A hash only means anything next to the version it was taken from, which is
@@ -308,8 +308,9 @@ bump one by hand.
 Run it **after the last change to the CSS**. It hashes what is in `dist/`
 at the moment it runs, so anything that touches the source afterwards
 leaves the snippets pointing at a build that will never be published, and
-browsers refuse the file. The rewritten `README.md` and
-`docs/src/pages/get-started.md` belong in the release commit.
+browsers refuse the file. The rewritten `README.md` and every page under
+`docs/src/pages/` that carries a snippet (the Installation page and its
+framework guides) belong in the release commit.
 
 `npm run check:sri` runs as part of `npm run lint`. It is offline and
 structural: every snippet pins the documented version, carries a

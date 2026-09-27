@@ -1,12 +1,23 @@
+{#- A page's title is its own <h1> unless front matter names one: every
+    documentation page used to be titled "Cirth", which leaves a reader
+    with thirty identical tabs and a screen reader announcing the site
+    name on every navigation (WCAG 2.4.2). The home page keeps the bare
+    site name. -#}
+{%- set pageTitle = title or (content | firstHeading if page.url != "/" else "") -%}
 <!doctype html>
 <html lang="en" data-base="{{ '/' | htmlBaseUrl }}">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>{% if title %}{{ title }} — {{ nav.siteTitle }}{% else %}{{ nav.siteTitle }}{% endif %}</title>
+		<title>{% if pageTitle %}{{ pageTitle }} — {{ nav.siteTitle }}{% else %}{{ nav.siteTitle }}{% endif %}</title>
 		<meta name="description" content="{{ description or nav.siteDescription }}" />
+		{%- if moved %}
+		<meta name="robots" content="noindex" />
+		<link rel="canonical" href="{{ moved.to }}" />
+		<meta http-equiv="refresh" content="0; url={{ moved.to | htmlBaseUrl }}" />
+		{%- endif %}
 		<meta property="og:type" content="website" />
-		<meta property="og:title" content="{% if title %}{{ title }} — {{ nav.siteTitle }}{% else %}{{ nav.siteTitle }}{% endif %}" />
+		<meta property="og:title" content="{% if pageTitle %}{{ pageTitle }} — {{ nav.siteTitle }}{% else %}{{ nav.siteTitle }}{% endif %}" />
 		<meta property="og:description" content="{{ description or nav.siteDescription }}" />
 		<meta property="og:image" content="https://cirthcss.github.io/cirth/social-preview.png" />
 		<meta property="og:image:width" content="1200" />
@@ -18,6 +29,9 @@
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 		<link rel="manifest" href="/site.webmanifest" />
 		<link rel="stylesheet" href="/styles/style.css" />
+		{#- Page-specific composition (the home page, the examples) in its own
+		    file, so the shell every page loads does not carry it. -#}
+		{% for sheet in stylesheets %}<link rel="stylesheet" href="/styles/{{ sheet }}" />{% endfor %}
 		{% if usesClassless %}<link rel="stylesheet" href="/styles/generated/cirth-docs-classless.css" />{% endif %}
 		<script>
 			// Set data-theme before first paint to avoid a light-mode flash.

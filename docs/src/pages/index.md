@@ -11,7 +11,7 @@ hero:
   actions:
     - theme: brand
       text: Get Started
-      link: /get-started
+      link: /installation
     - theme: alt
       text: Examples
       link: /examples
@@ -53,7 +53,7 @@ faq:
         current budget, so the number stays honest, and it is free to move
         when covering more HTML, or a better accessibility default, is
         worth the bytes. What actually arrives at a browser depends on who
-        serves the file; <a href="/deploy#compression">Deploy</a> covers
+        serves the file; <a href="/compatibility#compression">Compatibility</a> covers
         that.
     - q: Which browsers are supported?
       a: >-

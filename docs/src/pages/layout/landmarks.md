@@ -40,4 +40,4 @@ When `$enable-classes` is disabled (the classless build), the same
 fluid at every viewport size. It reads the same
 `--cirth-container-gutter` and `--cirth-container-max-width` tokens, but
 does not expose `.breakout` because there is no class with which to express
-that visual exception. See [Get Started → Classless](/get-started#classless).
+that visual exception. See [Installation: Classless](/installation/#classless).

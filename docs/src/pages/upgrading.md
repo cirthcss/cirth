@@ -250,7 +250,7 @@ To vary a token by scheme, write the pair rather than two rules:
 The pair is resolved wherever the token is used, against the color scheme in
 effect at that point, so one line covers the page and any subtree that
 forces a scheme. See
-[Customization](/customization#light-and-dark).
+[Customization](/themes#light-and-dark).
 
 ### The presets are renamed and redesigned
 
@@ -423,7 +423,7 @@ Worth grepping your stylesheets for `--cirth-` before upgrading. Two
 things to know: a bare `:root` override now applies to **both** color
 schemes, and anything written against the old workaround
 (`:root:not([data-theme="dark"])`, `[data-theme="dark"]`) is more specific
-and keeps winning. [Customization](/customization#light-and-dark)
+and keeps winning. [Customization](/themes#light-and-dark)
 covers overriding one scheme at a time.
 
 ### The browser floor moved

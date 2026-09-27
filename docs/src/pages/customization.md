@@ -153,7 +153,7 @@ these.
 
 The `plain` preset is those first two plus three role choices, and nothing
 else, see
-[Colors](/colors) for what it looks like. It exists partly to prove the
+[Themes](/themes#presets) for what it looks like. It exists partly to prove the
 point: a coherent, accessible, light-and-dark theme in five declarations.
 
 Here is a custom accent applied live, which is two declarations (the pair
@@ -163,204 +163,12 @@ and a radius) over the build this page is already using:
 
 ## Colour
 
-### The accent
+<span id="the-accent"></span><span id="status-colours"></span><span id="surfaces"></span><span id="light-and-dark"></span><span id="data-theme-in-scoped-builds"></span><span id="increased-contrast"></span>
 
-`--cirth-primary` is the input. These follow it, and you do not normally
-set them:
-
-| Token | Relationship |
-| --- | --- |
-| `--cirth-primary-text` | The accent as text: links and quiet controls |
-| `--cirth-primary-surface` | The filled surface. Same as the accent in light; darker in dark |
-| `--cirth-primary-border` | The edge of that filled surface |
-| `--cirth-primary-active` | Active text and quiet-control edges; darker in light, lighter in dark |
-| `--cirth-primary-surface-active` | The filled surface, one step further |
-| `--cirth-primary-border-active` | The active edge of that surface |
-| `--cirth-primary-underline` | The accent at 50% alpha |
-| `--cirth-primary-underline-active` | The underline while its link is active |
-| `--cirth-primary-focus` | The accent at 75% alpha, the focus ring |
-| `--cirth-primary-on-surface` | The text that sits *on* the accent |
-
-`--cirth-primary-on-surface` is the one to check when you pick an unusual
-accent. It is white by default, which is right for most accents and wrong
-for a light one: a pale yellow accent with white text on it is
-unreadable. It is a plain value rather than a derivation because choosing
-between light and dark text is a decision, not a mix. A relative-color
-threshold was tested across 936 accents: 10 results missed 4.5:1 and it
-chose the worse of black and white in 14 cases, concentrated around
-cyan–teal. The exact `contrast-color()` decision is outside Cirth's browser
-floor, so the role remains explicit until the platform can choose reliably.
-A future theme generator can make the same choice before it emits a theme.
-
-```css
-:root {
-  --cirth-primary: #fbbf24;          /* a light amber */
-  --cirth-primary-on-surface: #1c1917;  /* so the label stays readable */
-}
-```
-
-The name now says the role before it says the state: `text`, `surface`,
-`border`, `underline`, `focus`, and `on-surface`, with `-active` appended
-where a state needs another value. That is the same vocabulary the status
-families use below, rather than the former mix of `background`, `hover` and
-`inverse`.
-
-`--cirth-secondary-text` and `--cirth-contrast-text` anchor the other two
-colour groups, with the same shape. They are roles rather than inputs: the
-default theme chooses their neutral and maximum-contrast values directly.
-`.secondary` and `.contrast` on a button or link swap which group it reads
-from; `.outline` and `.ghost` keep the group and drop the fill. See
-[Button](/content/button).
-
-### Status colours
-
-Three inputs, each driving four roles:
-
-| Role | Used by |
-| --- | --- |
-| `--cirth-error` | The solid reading: a worst-band `<meter>` and the `.danger` button fill |
-| `--cirth-error-text` | `<del>`, and status text on the page |
-| `--cirth-error-border` | An `[aria-invalid="true"]` field |
-| `--cirth-error-active` | That field while it has focus |
-| `--cirth-error-surface` | A tint to sit status content on |
-
-`--cirth-success` and `--cirth-warning` are identical in shape. A `<mark>`
-does not imply warning: its background is derived from `--cirth-primary`, so
-highlighted evidence follows the chosen accent while status content stays on
-the explicit `*-surface` families.
-
-Status hues are deliberately not fixed constants. If your brand overlaps a
-conventional status hue, move the status family rather than avoiding the
-brand: what has to stay true is that the two remain distinguishable, and
-that state is never signalled by colour alone (WCAG 1.4.1). Cirth's own
-validity styling pairs colour with an icon for that reason.
-
-### Surfaces
-
-| Token | What it is |
-| --- | --- |
-| `--cirth-canvas` | The page surface |
-| `--cirth-ink` | The page text colour |
-| `--cirth-code-background-color` | A recessed band: `<pre>`, inline `<code>` |
-| `--cirth-form-element-background-color` | A field at rest |
-| `--cirth-card-sectioning-background-color` | A card's header and footer band |
-| `--cirth-card-background-color` | An `<article>`; a dropdown and a popover follow it |
-| `--cirth-form-element-active-background-color` | A focused field; rises back to the canvas |
-| `--cirth-muted-color` | Subordinate text |
-| `--cirth-muted-border-color` | Hairlines: tables, cards, blockquotes |
-
-`--cirth-canvas` and `--cirth-ink` are the two inputs in this family: the
-page's surface and the page's ink. Set either and the tokens that alias it
-follow: `--cirth-background-color` and the surface ladder from the canvas,
-`--cirth-color` and the component inks (accordion summary, dropdown,
-popover, the `<kbd>` fill) from the ink. The others are runtime
-relationships: code is the deepest recess, the resting field sits between it
-and the canvas, the band and card add lightness, and a focused field rises to
-the canvas. Dropdown and popover alias the card because they are floating
-sheets. Overriding any derived token directly still breaks its relationship
-on purpose.
-
-The ladder preserves the canvas hue and chroma, so warm paper stays warm,
-Plain becomes neutral, and Playroom carries its violet temperature without
-restating a parallel scale. Both schemes now tell the same semantic story:
-
-```
-light: code 95.5 < control 96.6 < canvas 97.4 < band 98.3 < card 99.2
-dark:  code 18.2 < control 19.4 < canvas 20.2 < band 22.7 < card 24.2
-```
-
-A single `--cirth-canvas` override therefore moves card, form, code, dropdown,
-and popover in light, dark, and forced-theme subtrees. Plain uses that one
-surface input; it does not enumerate the ladder.
-
-### Light and dark
-
-Cirth ships both schemes. The scheme follows the operating system, and
-`data-theme="light"` or `data-theme="dark"` on any element forces one for
-that subtree.
-
-```html
-<html data-theme="dark">
-```
-
-A `:root` override applies to **both** schemes, and it applies everywhere:
-including inside a subtree that forces one:
-
-```css
-:root {
-  --cirth-primary: #2563eb;
-}
-```
-
-When light and dark should differ, give the token both values at once with
-[`light-dark()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark):
-
-```css
-:root {
-  --cirth-primary: light-dark(#2563eb, #93c5fd);
-}
-```
-
-This is the same shape Cirth uses internally. The pair is resolved where
-the token is *used*, against the colour scheme in effect at that point, so
-one line covers the page and any widget that forces its own scheme.
-
-You can still target the scheme selectors directly, which is the tool for
-changing one scheme without touching the other. They are also more specific
-than a plain `:root`, so they win over a `:root` rule of your own:
-
-```css
-:root:not([data-theme="dark"]) {
-  --cirth-primary: #2563eb;
-}
-
-[data-theme="dark"] {
-  --cirth-primary: #93c5fd;
-}
-```
-
-For a value that should hold everywhere, prefer the pair: it is one line,
-and it cannot fall out of step with itself.
-
-### `data-theme` in scoped builds
-
-The builds differ in *where* they look for the attribute.
-
-* **Unscoped builds** respond to `data-theme` on any ancestor.
-* **Scoped builds** only look at the `.cirth` element itself, or elements
-  inside it. `<html data-theme="dark">` around a `.cirth` widget has no
-  effect, because every generated selector is anchored to the wrapper.
-
-If you embed a scoped widget in a host page that manages its own dark mode,
-mirror the host's choice onto the wrapper:
-
-```html
-<div class="cirth" data-theme="dark">…</div>
-```
-
-### Increased contrast
-
-Cirth carries a `prefers-contrast: more` pass that strengthens inks,
-hairlines and focus rings. Your overrides sit outside Cirth's
-[layer](#cascade-layers), so a token you set unconditionally wins there too,
-wherever you load it, which usually means the preference stops working for
-that token.
-
-```css
-/* your accent, in both modes */
-:root {
-  --cirth-primary: #2563eb;
-}
-
-/* and a stronger one where the user asked for it */
-@media (prefers-contrast: more) {
-  :root {
-    --cirth-primary: #1e3a8a;
-  }
-}
-```
-
-Both presets do this, and it is worth copying if you set colours at all.
+Colour has its own pages. [Colors](/colors) covers the accent and the roles
+derived from it, the status colours and the surface ladder;
+[Themes](/themes) covers the light and dark schemes, `data-theme`, the
+presets and increased contrast in a theme of your own.
 
 ## Typography
 
@@ -561,57 +369,11 @@ to come in too:
 Controls keep their 44px floor either way: the padding shrinks, the target
 does not.
 
-### Change the dark scheme only
+<span id="change-the-dark-scheme-only"></span><span id="theme-one-embedded-widget"></span><span id="verifying-your-theme"></span>
 
-```css
-[data-theme="dark"] {
-  --cirth-canvas: #0b1120;
-  --cirth-card-background-color: #111827;
-}
-```
+Changing one scheme only, theming a single embedded widget, and checking a
+theme's contrast are on [Themes](/themes#your-own-theme).
 
-Or, as a pair, if you are setting the light value anyway:
-
-```css
-:root {
-  --cirth-canvas: light-dark(#ffffff, #0b1120);
-}
-```
-
-### Theme one embedded widget
-
-Scoped builds put everything under `.cirth`, so a widget can carry a theme
-the host page knows nothing about:
-
-```html
-<link rel="stylesheet" href="dist/cirth.scoped.min.css">
-
-<div class="cirth" data-theme="dark" style="--cirth-primary: #34d399">
-  <article>
-    <h2>Settings</h2>
-    <button type="button">Save</button>
-  </article>
-</div>
-```
-
-## Verifying your theme
-
-Cirth's shipped themes, the default and both presets, are verified: every
-text pair clears WCAG AA (4.5:1, or 7:1 under `prefers-contrast: more`) and
-every non-text indicator clears 3:1, checked in light and dark on every page
-of this site.
-
-That verification covers the values Cirth ships. **It does not extend to
-values you set.** The relationships hold: a derived hover stays
-proportionally darker than whatever accent you give it, but whether the
-result clears a threshold depends on the colour you chose. When you change
-an input, the pairs worth checking are:
-
-* your accent against the page, as link text;
-* `--cirth-primary-on-surface` against `--cirth-primary-surface`, as a
-  button label;
-* `--cirth-muted-color` against the page;
-* the status borders against a field.
 
 ## Cascade layers
 
@@ -739,7 +501,8 @@ they change which selectors exist at all:
 * **The `.row` breakpoint** is fixed in `src/_breakpoints.scss`.
 
 If you need different values for these you are choosing a different
-published build, not overriding a variable. See [Get Started](/get-started).
+published build, not overriding a variable. See
+[Choose a build](/installation/#choose-a-build).
 
 ## Tokens outside CSS
 

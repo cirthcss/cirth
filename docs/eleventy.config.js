@@ -503,7 +503,7 @@ module.exports = (eleventyConfig) => {
 	// (this silently broke the customization demo's <style> overrides). The
 	// shortcode emits a single-line placeholder comment — inert to markdown
 	// — and the transform below swaps in the real HTML after rendering.
-	const buildDemo = (src, variant) => {
+	const buildDemo = (src, variant, frame) => {
 		const file = path.join(demosFolder, `${src}.html`);
 		if (!fs.existsSync(file)) {
 			throw new Error(`[demo] missing snippet: ${src}.html`);
@@ -511,7 +511,8 @@ module.exports = (eleventyConfig) => {
 		const html = fs.readFileSync(file, "utf8").trim();
 		const classlessClass = variant === "classless" ? " cirth-classless" : "";
 		const variantLabel = variant === "classless" ? "Classless build" : "Default build";
-		return `<figure class="docs-demo">
+		const frameClass = frame === "narrow" ? " docs-demo-narrow" : "";
+		return `<figure class="docs-demo${frameClass}">
 <figcaption class="docs-demo-caption"><span><strong>Live UI</strong> · ${variantLabel}</span><span>Authentic Cirth · shell overrides declared in source</span></figcaption>
 <div class="docs-demo-preview${classlessClass}">${html}</div>
 <details class="docs-demo-source">
@@ -523,16 +524,20 @@ module.exports = (eleventyConfig) => {
 </figure>`;
 	};
 
+	// `frame` is the stage's width, not the example's: "narrow" gives a
+	// screen that is narrow by nature (a sign-in card) a stage its own size
+	// instead of the full column. Nothing inside the preview changes.
 	eleventyConfig.addShortcode(
 		"demo",
-		(src, variant = "default") => `<!--cirth-demo:${src}:${variant}-->`,
+		(src, variant = "default", frame = "") =>
+			`<!--cirth-demo:${src}:${variant}${frame ? `:${frame}` : ""}-->`,
 	);
 
 	eleventyConfig.addTransform("cirth-demos", (content, outputPath) => {
 		if (!outputPath?.endsWith(".html")) return content;
 		return content.replace(
-			/<!--cirth-demo:([\w-]+):(\w+)-->/g,
-			(_, src, variant) => buildDemo(src, variant),
+			/<!--cirth-demo:([\w-]+):(\w+)(?::(\w+))?-->/g,
+			(_, src, variant, frame) => buildDemo(src, variant, frame),
 		);
 	});
 
@@ -605,6 +610,27 @@ module.exports = (eleventyConfig) => {
 		flatPages.findIndex((item) => withSlash(item.link) === pageUrl),
 	);
 
+	// A page's own title, read off its first <h1>, for <title> and the
+	// Open Graph title when front matter does not name one. Markup inside
+	// the heading (an accent span, a permalink) is dropped and entities are
+	// left as they are, since the value lands in an attribute and a <title>
+	// that the template escapes again.
+	eleventyConfig.addFilter("firstHeading", (content) => {
+		const match = /<h1\b[^>]*>([\s\S]*?)<\/h1>/.exec(String(content ?? ""));
+		if (!match) return "";
+		return match[1]
+			.replace(/<a\b[^>]*class="header-anchor"[\s\S]*?<\/a>/g, "")
+			.replace(/<br\s*\/?>/g, " ")
+			.replace(/<[^>]+>/g, "")
+			.replace(/&amp;/g, "&")
+			.replace(/&lt;/g, "<")
+			.replace(/&gt;/g, ">")
+			.replace(/&quot;/g, '"')
+			.replace(/&#39;/g, "'")
+			.replace(/\s+/g, " ")
+			.trim();
+	});
+
 	// "On this page" data: h2/h3 headings of the rendered page content.
 	eleventyConfig.addFilter("headings", (content) => {
 		if (!content) return [];
@@ -633,6 +659,7 @@ module.exports = (eleventyConfig) => {
 	eleventyConfig.addPassthroughCopy({
 		"docs/public": "/",
 		"docs/src/styles/style.css": "styles/style.css",
+		"docs/src/styles/home.css": "styles/home.css",
 		"docs/src/styles/generated": "styles/generated",
 	});
 

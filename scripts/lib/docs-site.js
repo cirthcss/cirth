@@ -172,6 +172,10 @@ const snapshotDocs = ({ attempts = 3, label, source = docsDist }) => {
 const excludedTopLevel =
 	/^(v\d+\.\d+|next|lab|specimen|social-preview|readme-preview-light|readme-preview-dark|favicon-preview)$/;
 
+/** @param {string} file */
+const isForwardingPage = (file) =>
+	/<meta http-equiv="refresh"/.test(fs.readFileSync(file, "utf8").slice(0, 4096));
+
 /**
  * @param {string} [dir]
  * @param {string} [prefix]
@@ -191,7 +195,11 @@ const listPages = (dir = docsDist, prefix = "") => {
 			entry.name.endsWith(".html") &&
 			// Skip macOS/iCloud "name 2.html" duplicates that can appear in
 			// local gitignored build output.
-			!/ \d+\.html$/.test(entry.name)
+			!/ \d+\.html$/.test(entry.name) &&
+			// A page kept only to forward an old address (docs/src/pages/
+			// moved.njk) navigates away as it loads, so an audit would measure
+			// whichever page it lands on, twice, and race the navigation.
+			!isForwardingPage(path.join(dir, entry.name))
 		) {
 			pages.push(relative);
 		}

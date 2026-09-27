@@ -1,73 +1,138 @@
 ---
 layout: docs.njk
+description: The copper accent and the roles derived from it, the status colours, the surface ladder, and how the default palette is built.
 ---
-
 
 # Colors
 
-Cirth has one official theme: copper, with hand tuned light and dark
-variants. `plain` and `playroom` are optional **presets**: stylesheets that
-override CSS custom properties on top of the default theme. No component
-styles, reset rules, or light/dark switching logic are duplicated.
+Cirth's colour is a handful of inputs and the roles derived from them. Set
+`--cirth-primary` and every link, button, focus ring and checked control
+follows; set `--cirth-canvas` and the whole surface ladder moves with it.
+This page lists what each input drives. For light and dark, the `plain` and
+`playroom` presets and writing a theme of your own, see [Themes](/themes).
 
-They are also deliberately the two ends of the same worked example. One
-changes as little as a preset can; the other changes as much as one
-reasonably should.
+The default theme is copper on mineral paper in light, and on graphite in
+dark. Copper is reserved for signal: links, primary actions, focus and
+selection. Everything else is ink, surface and hairline.
 
-{% colorSwatches %}
+## The accent
 
-* **`plain`** is the conventional application baseline: a familiar blue
-  accent and a plain white page. It is the whole point of the token model
-  in five declarations: two colour inputs and three role choices. The accent
-  states and the complete surface ladder follow on their own. Reach for it
-  when you want an interface that looks unremarkable in the good sense.
-* **`playroom`** is the expressive end: a soft violet accent, surfaces
-  tinted toward it, large radii, a rounded system face, generous spacing,
-  springy motion, and a wide soft shadow. It reaches across colour,
-  geometry, typography, motion and depth, and overrides two *derived*
-  tokens on purpose, so its hover lightens rather than darkens. Suited to a
-  consumer app, a community site, or a tool aimed at children.
+`--cirth-primary` is the input. These follow it, and you do not normally
+set them:
 
-The default theme uses the system sans stack for product UI and headings;
-monospace is reserved for code, token names, values, and technical proof.
+| Token | Relationship |
+| --- | --- |
+| `--cirth-primary-text` | The accent as text: links and quiet controls |
+| `--cirth-primary-surface` | The filled surface. Same as the accent in light; darker in dark |
+| `--cirth-primary-border` | The edge of that filled surface |
+| `--cirth-primary-active` | Active text and quiet-control edges; darker in light, lighter in dark |
+| `--cirth-primary-surface-active` | The filled surface, one step further |
+| `--cirth-primary-border-active` | The active edge of that surface |
+| `--cirth-primary-underline` | The accent at 50% alpha |
+| `--cirth-primary-underline-active` | The underline while its link is active |
+| `--cirth-primary-focus` | The accent at 75% alpha, the focus ring |
+| `--cirth-primary-on-surface` | The text that sits *on* the accent |
 
-Like the default theme, presets use font stacks that ship with every major
-OS: no `@import`, no webfont, zero network requests beyond the stylesheet
-itself. To use a custom font, load it yourself (hosted by you or from a CDN
-you trust) and point `--cirth-font-family` at it after the preset.
-
-## Using a preset
-
-Load the main stylesheet, then load a preset after it. The preset only sets
-the custom properties it needs to change, so it works with any of the
-default, classless, or scoped builds. It shares the build's
-[cascade layer](/customization#cascade-layers), which is why the order
-matters between the two, and why a token you set yourself beats both
-wherever you load it:
-
-```html
-<link rel="stylesheet" href="dist/cirth.min.css">
-<link rel="stylesheet" href="dist/presets/plain.min.css">
-```
+`--cirth-primary-on-surface` is the one to check when you pick an unusual
+accent. It is white by default, which is right for most accents and wrong
+for a light one: a pale yellow accent with white text on it is
+unreadable. It is a plain value rather than a derivation because choosing
+between light and dark text is a decision, not a mix. A relative-color
+threshold was tested across 936 accents: 10 results missed 4.5:1 and it
+chose the worse of black and white in 14 cases, concentrated around
+cyan–teal. The exact `contrast-color()` decision is outside Cirth's browser
+floor, so the role remains explicit until the platform can choose reliably.
+A future theme generator can make the same choice before it emits a theme.
 
 ```css
-@import "@cirthcss/cirth";
-@import "@cirthcss/cirth/presets/plain";
+:root {
+  --cirth-primary: #fbbf24;          /* a light amber */
+  --cirth-primary-on-surface: #1c1917;  /* so the label stays readable */
+}
 ```
 
-Presets are generated from `src/presets/` by `scripts/build-presets.js`
-during `npm run build`; see [Contributions](/contributions) for how the build works.
+The name now says the role before it says the state: `text`, `surface`,
+`border`, `underline`, `focus`, and `on-surface`, with `-active` appended
+where a state needs another value. That is the same vocabulary the status
+families use below, rather than the former mix of `background`, `hover` and
+`inverse`.
 
-## Picking a different primary without a preset
+`--cirth-secondary-text` and `--cirth-contrast-text` anchor the other two
+colour groups, with the same shape. They are roles rather than inputs: the
+default theme chooses their neutral and maximum-contrast values directly.
+`.secondary` and `.contrast` on a button or link swap which group it reads
+from; `.outline` and `.ghost` keep the group and drop the fill. See
+[Button](/content/button).
 
-If you only need a single custom accent, override the primary color group with
-your own values directly instead of loading a preset; see
-[Customization](/customization#the-accent). This is the
-right tool when a single page or component needs a custom brand color; read
-`plain` when you want to see how little a retheme can be, and `playroom`
-when you want to see how far one can go.
+## Status colours
+
+Three inputs, each driving four roles:
+
+| Role | Used by |
+| --- | --- |
+| `--cirth-error` | The solid reading: a worst-band `<meter>` and the `.danger` button fill |
+| `--cirth-error-text` | `<del>`, and status text on the page |
+| `--cirth-error-border` | An `[aria-invalid="true"]` field |
+| `--cirth-error-active` | That field while it has focus |
+| `--cirth-error-surface` | A tint to sit status content on |
+
+`--cirth-success` and `--cirth-warning` are identical in shape. A `<mark>`
+does not imply warning: its background is derived from `--cirth-primary`, so
+highlighted evidence follows the chosen accent while status content stays on
+the explicit `*-surface` families.
+
+Status hues are deliberately not fixed constants. If your brand overlaps a
+conventional status hue, move the status family rather than avoiding the
+brand: what has to stay true is that the two remain distinguishable, and
+that state is never signalled by colour alone (WCAG 1.4.1). Cirth's own
+validity styling pairs colour with an icon for that reason.
+
+## Surfaces
+
+| Token | What it is |
+| --- | --- |
+| `--cirth-canvas` | The page surface |
+| `--cirth-ink` | The page text colour |
+| `--cirth-code-background-color` | A recessed band: `<pre>`, inline `<code>` |
+| `--cirth-form-element-background-color` | A field at rest |
+| `--cirth-card-sectioning-background-color` | A card's header and footer band |
+| `--cirth-card-background-color` | An `<article>`; a dropdown and a popover follow it |
+| `--cirth-form-element-active-background-color` | A focused field; rises back to the canvas |
+| `--cirth-muted-color` | Subordinate text |
+| `--cirth-muted-border-color` | Hairlines: tables, cards, blockquotes |
+
+`--cirth-canvas` and `--cirth-ink` are the two inputs in this family: the
+page's surface and the page's ink. Set either and the tokens that alias it
+follow: `--cirth-background-color` and the surface ladder from the canvas,
+`--cirth-color` and the component inks (accordion summary, dropdown,
+popover, the `<kbd>` fill) from the ink. The others are runtime
+relationships: code is the deepest recess, the resting field sits between it
+and the canvas, the band and card add lightness, and a focused field rises to
+the canvas. Dropdown and popover alias the card because they are floating
+sheets. Overriding any derived token directly still breaks its relationship
+on purpose.
+
+The ladder preserves the canvas hue and chroma, so warm paper stays warm,
+Plain becomes neutral, and Playroom carries its violet temperature without
+restating a parallel scale. Both schemes now tell the same semantic story:
+
+```
+light: code 95.5 < control 96.6 < canvas 97.4 < band 98.3 < card 99.2
+dark:  code 18.2 < control 19.4 < canvas 20.2 < band 22.7 < card 24.2
+```
+
+A single `--cirth-canvas` override therefore moves card, form, code, dropdown,
+and popover in light, dark, and forced-theme subtrees. Plain uses that one
+surface input; it does not enumerate the ladder.
 
 ## Underlying palette
+
+How the default palette is built. None of this is needed to use or retheme
+Cirth: it is the reasoning behind the values, for anyone proposing a change
+to them.
+
+<details>
+<summary>How the scales are derived</summary>
 
 The theme's primitive color scales are Sass `oklch()` literals declared in
 `src/theme/_colors.scss` and consumed by `_dual.scss`, `_light.scss`, and
@@ -135,6 +200,8 @@ Cirth targets browsers with native `oklch()` support (see the `browserslist`
 field in `package.json`), so the compiled CSS ships `oklch()` directly rather
 than converting it to a `hex` / `lab()` fallback.
 
+</details>
+
 ## Theme history
 
 Cirth previously inherited a set of twenty accent color themes from Pico CSS, then
@@ -143,5 +210,5 @@ reduced further to a single official theme plus two token override presets,
 `plain` and `playroom`. The official theme's accent was an amber until
 0.15; it is now the copper described above, with the neutral, surface and
 status families rebuilt around it rather than adapted to it. See
-[About Cirth](/about) for the project philosophy and
+[About](/about) for the project's history and
 [Contributions](/contributions) before proposing color system changes.

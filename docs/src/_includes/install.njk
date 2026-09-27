@@ -1,0 +1,31 @@
+{#- Installation widgets, shared by the Installation page and the framework
+    guides.
+
+    packageManagers(id, verb): one command per package manager, chosen with
+    Cirth's own segmented radio group. The choice is pure CSS
+    (`.docs-install:has(:checked)` in styles/style.css), so every command is
+    in the document and the right one shows with no script at all; without
+    `:has()` all four are simply listed. A small script in base.njk
+    remembers the choice and applies it to every group on the next page.
+
+    Everything is written on single lines on purpose: markdown-it ends an
+    HTML block at the first blank line, and whitespace inside <pre> is
+    content. -#}
+{%- macro packageManagers(id, args = "@cirthcss/cirth") -%}
+<div class="docs-install" data-docs-install>
+<fieldset class="segmented"><legend class="sr-only">Package manager</legend><label><input type="radio" name="pm-{{ id }}" value="npm" checked> npm</label><label><input type="radio" name="pm-{{ id }}" value="pnpm"> pnpm</label><label><input type="radio" name="pm-{{ id }}" value="yarn"> Yarn</label><label><input type="radio" name="pm-{{ id }}" value="bun"> Bun</label></fieldset>
+<pre tabindex="0" data-pm="npm"><code class="hljs language-sh">npm install {{ args }}</code></pre>
+<pre tabindex="0" data-pm="pnpm"><code class="hljs language-sh">pnpm add {{ args }}</code></pre>
+<pre tabindex="0" data-pm="yarn"><code class="hljs language-sh">yarn add {{ args }}</code></pre>
+<pre tabindex="0" data-pm="bun"><code class="hljs language-sh">bun add {{ args }}</code></pre>
+</div>
+{%- endmacro -%}
+
+{#- The framework guides as a grid of links, from nav.frameworks. -#}
+{%- macro frameworkGrid(frameworks) -%}
+<ul class="docs-link-grid">
+{%- for framework in frameworks %}
+<li><a href="{{ framework.link }}"><strong>{{ framework.text }}</strong><span>{{ framework.summary }}</span></a></li>
+{%- endfor %}
+</ul>
+{%- endmacro -%}

@@ -1,28 +1,63 @@
 ---
 layout: docs.njk
+description: Date, time, datetime-local, month and week inputs in Cirth. The field chrome of every other input, with a calendar or clock icon.
 ---
 
+# Date and time inputs
 
-# Input date
-
-`[type="date"]`, `[type="datetime-local"]`, `[type="month"]`,
-`[type="time"]`, and `[type="week"]` share the same field chrome as other
-text inputs, plus a calendar/clock icon.
+`date`, `time`, `datetime-local`, `month` and `week` inputs share the look
+of the text fields, plus a calendar or clock icon. The picker that opens is
+the browser's own.
 
 {% demo "input-date" %}
 
 ```html
-<input type="date">
-<input type="time">
-<input type="datetime-local">
+<label>
+  Date
+  <input type="date" name="date">
+</label>
+
+<label>
+  Time
+  <input type="time" name="time">
+</label>
+
+<label>
+  Date and time
+  <input type="datetime-local" name="when">
+</label>
 ```
 
-The native calendar picker indicator is kept but made transparent and
-shifted to overlay Cirth's own icon, so only one icon is visible. In
-Firefox, where the picker indicator can't be hidden this way, the icon is
-dropped instead and normal input padding is restored. In `[dir="rtl"]`,
-text aligns right. In Safari/WebKit, the internal date/time segments are
-also reset to inherit text alignment and drop their default vertical
-padding, avoiding the centered/misaligned rendering iOS otherwise applies.
-Date-like controls can also shrink as flex items, so paired ranges remain
-on one row inside grouped grid columns.
+## Behaviour
+
+- The native picker indicator is kept but made transparent and laid over
+  Cirth's icon, so only one icon shows and clicking it still opens the
+  picker.
+- In Firefox, where the indicator cannot be hidden this way, Cirth's icon is
+  dropped and the normal padding restored.
+- In Safari, the internal date and time segments are reset to follow the
+  field's text alignment and lose their extra vertical padding.
+- Under `[dir="rtl"]` the text aligns right.
+- Date fields can shrink as flex items, so a start and end date stay on one
+  row inside a grouped grid.
+
+## Accessibility
+
+- Label each field; for a range, label both ends ("Check-in", "Check-out")
+  rather than relying on their order.
+- Put the expected format in help text if you also accept typed input: the
+  segments differ between browsers and locales.
+
+## Tokens
+
+| Token | What it sets |
+| --- | --- |
+| `--cirth-icon-date` | The calendar icon, one per colour scheme |
+| `--cirth-icon-time` | The clock icon, one per colour scheme |
+
+The field itself reads the shared [text input tokens](/forms/text-inputs#tokens).
+
+## Related
+
+- [Text inputs](/forms/text-inputs) and [Validation and states](/forms/validation).
+- [Group](/components/group), to put two dates side by side as one control.

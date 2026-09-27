@@ -163,7 +163,7 @@ an ownership decision fails the check.
 
 ### CDN integrity — `check:sri`
 
-The `<link>` snippets on [Get Started](/get-started#cdn) and in the README
+The `<link>` snippets on [Installation](/installation/#cdn) and in the README
 pin a version *and* carry the `sha384` hash of the file that version
 serves. `check:sri` (part of `npm run lint`) keeps the two honest: every
 snippet has to pin the version in `package.json`, carry a well-formed hash,
@@ -265,7 +265,7 @@ compares each against a committed baseline in `tests/__screenshots__/`. The
 shared documentation chrome has its own viewport-sized baseline, so changes to
 the header, sidebar or outline remain covered without invalidating every page
 capture. The set includes the
-prose-heavy About, Customization, Get Started, Upgrading, and Contributions
+prose-heavy About, Customization, Installation, Upgrading, and Contributions
 pages: a large editorial rewrite must produce a reviewable visual diff too.
 
 Every preset discovered from `src/presets/` also renders a representative

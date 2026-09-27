@@ -1,0 +1,42 @@
+---
+layout: base.njk
+pagination:
+  data: nav.redirects
+  size: 1
+  alias: moved
+permalink: "{{ moved.from }}index.html"
+eleventyExcludeFromCollections: true
+eleventyComputed:
+  title: "Moved: {{ moved.title }}"
+---
+{#- One page per path that moved in the reorganisation (nav.redirects).
+    GitHub Pages cannot answer with a 301, so the forwarding happens here:
+    a canonical link and a meta refresh in <head> (base.njk reads `moved`),
+    a script that carries the fragment across before the refresh fires, and
+    this body for a reader with neither, which names the new page and links
+    to it. Excluded from search, from the page audits (scripts/lib/
+    docs-site.js skips a page that refreshes) and from every collection. -#}
+<main id="main-content" class="container docs-page-shell docs-moved">
+	<h1>This page has moved</h1>
+	<p>
+		It is now part of
+		<a href="{{ moved.to }}">{{ moved.title }}</a>.
+		Links to the old address keep working, and update your bookmark when
+		you get there.
+	</p>
+</main>
+<script>
+	(() => {
+		// A meta refresh drops the fragment, and a fragment is often the
+		// whole point of an old link. Map the ones whose content moved to a
+		// different page; carry any other one across as it is.
+		const base = (document.documentElement.dataset.base || "/").replace(/\/$/, "");
+		const anchors = {{ moved.anchors | dump | safe }};
+		const fragment = location.hash.slice(1);
+		const target =
+			(fragment && anchors[fragment]) ||
+			`{{ moved.to }}`.replace(/#.*$/, "") +
+				(fragment ? `#${fragment}` : `{{ moved.to }}`.replace(/^[^#]*/, ""));
+		location.replace(base + target);
+	})();
+</script>
