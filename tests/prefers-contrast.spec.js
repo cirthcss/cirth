@@ -291,7 +291,8 @@ for (const scheme of /** @type {const} */ (["light", "dark"])) {
 // accent lightened for text legibility drags the fill up under the label.
 // That regressed once, in the dark scheme, to 4.2:1, below where it sat
 // with no preference expressed at all, because the pass boosted the accent
-// and let the fill follow. Both the theme and every preset now pin the fill.
+// and let the fill follow. The theme now holds the fill at a fixed
+// lightness, and every preset sets its own.
 for (const scheme of /** @type {const} */ (["light", "dark"])) {
 	test(`${scheme} scheme: a button label clears AAA on its own fill`, async ({
 		page,
@@ -318,6 +319,81 @@ for (const scheme of /** @type {const} */ (["light", "dark"])) {
 		expect(more, "never worse than with no preference").toBeGreaterThanOrEqual(
 			plain,
 		);
+	});
+}
+
+// The pass derives every accent role from --cirth-primary, as the scheme
+// files do. It used to pin four of them to steps of the default scale, so
+// an author who set their own accent got it back under the preference with
+// the default accent's hue on the pressed link, and in dark on the button
+// fill: a teal theme with brown buttons. The probe is the capture accent
+// from specs/surface-and-edge-model.md, set the way an author sets one.
+const accentRoles = [
+	"primary-text",
+	"primary-active",
+	"primary-surface",
+	"primary-surface-active",
+	"primary-border",
+	"primary-focus",
+];
+
+/** @param {{ r: number, g: number, b: number }} color */
+const oklchHue = ({ r, g, b }) => {
+	/** @param {number} value */
+	const linear = (value) =>
+		value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+	const [lr, lg, lb] = [r, g, b].map((value) => linear(value / 255));
+	const l = Math.cbrt(0.4122214708 * lr + 0.5363325363 * lg + 0.0514459929 * lb);
+	const m = Math.cbrt(0.2119034982 * lr + 0.6806995451 * lg + 0.1073969566 * lb);
+	const s = Math.cbrt(0.0883024619 * lr + 0.2817188376 * lg + 0.6299787005 * lb);
+	const a = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s;
+	const bb = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
+	return {
+		chroma: Math.hypot(a, bb),
+		hue: ((Math.atan2(bb, a) * 180) / Math.PI + 360) % 360,
+	};
+};
+
+for (const scheme of /** @type {const} */ (["light", "dark"])) {
+	test(`${scheme} scheme: an author's accent keeps its hue on every accent role`, async ({
+		page,
+	}) => {
+		test.skip(
+			!(await reportsPreference(page)),
+			"this engine does not expose prefers-contrast to automation",
+		);
+
+		await render(page, {
+			more: true,
+			preset: ":root { --cirth-primary: light-dark(oklch(50% 0.09 200deg), oklch(72% 0.1 200deg)); }",
+			scheme,
+		});
+		const painted = await page.evaluate((roles) => {
+			const canvas = document.createElement("canvas");
+			canvas.width = canvas.height = 1;
+			const context = /** @type {CanvasRenderingContext2D} */ (
+				canvas.getContext("2d", { willReadFrequently: true })
+			);
+			const probe = document.createElement("i");
+			document.body.append(probe);
+			return roles.map((role) => {
+				probe.style.color = `var(--cirth-${role})`;
+				context.clearRect(0, 0, 1, 1);
+				context.fillStyle = getComputedStyle(probe).color;
+				context.fillRect(0, 0, 1, 1);
+				const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
+				return { role, r, g, b };
+			});
+		}, accentRoles);
+
+		for (const { role, ...color } of painted) {
+			const { chroma, hue } = oklchHue(color);
+			expect(chroma, `${role} is a colour, not a grey`).toBeGreaterThan(0.02);
+			expect(
+				Math.abs(((hue - 200 + 540) % 360) - 180),
+				`${role} sits on the author's hue (${hue.toFixed(1)}deg)`,
+			).toBeLessThan(15);
+		}
 	});
 }
 

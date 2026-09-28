@@ -223,6 +223,7 @@ bug below; with it fixed the pass's own copper-250 applies.
 | A two-layer shadow saves 99 B gzip on `cirth.min.css` | gzip -9 of `dist/cirth.min.css` with the seven-layer value replaced by a two-layer one | `806fea7a`, Node 24.18.0 | Verified |
 | The two-layer shadow keeps the dark elevation contract | Not measured | Implementation acceptance | Reported |
 | The prototype's upper-bound byte cost | Appending the whole override, which in the real change replaces existing declarations, adds 718 B gzip | Same | Verified |
+| Under `prefers-contrast: more` an author's accent loses its hue on four roles | With the probe accent (hue 200deg) set at the root: `--cirth-primary-active` `#4a2514` in light; `--cirth-primary-active` `#f3cbbb`, `--cirth-primary-surface` `#7b4026` and `-surface-active` `#6a3720` in dark, all the default accent's hue. The contrast pass pinned them to `$accent-*` steps | `dist/cirth.css` at `ede35b65`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5 | Verified; fixed on 2026-09-28 by deriving them from `--cirth-primary`. The default accent's roles are byte-identical before and after in every scheme and preference; with the probe, white on the dark fill reads 7.13:1. `tests/prefers-contrast.spec.js` holds every accent role within 15deg of an author's hue |
 
 The captures and the JSON behind every row are in
 `~/crithcss/cirth-captures/technical-language-system/` (outside the
@@ -246,6 +247,7 @@ repository, by design): `before/`, `prototype/`, `evidence/`,
 | Two shadow layers | Design | The seven-layer ramp is inherited, costs 99 B gzip that the budget needs, and a contact plus an ambient layer is what an overlay's edge is read from |
 | Rejected: a shadow on the card | Existing contract | Cards are sheets on the page, not floating; the raised level now carries what a shadow would have |
 | Card band halfway between canvas and raised | Design | A group inside a container, told apart by surface; the line under it is the division |
+| The contrast pass derives the accent's roles, and the dark fill takes a fixed lightness | Constraint | Changing the accent must need only the documented inputs. A fixed lightness (0.44, pressed 0.397) is what holds a white label above 7:1 for any hue; the other coefficients are the default ladder's own ratios |
 
 ## Acceptance
 

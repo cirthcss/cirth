@@ -85,7 +85,16 @@
   // this pass has to go darker than it, not lighter: 700 against 650.
   --cirth-form-element-invalid-border-color: #{$error-700};
   --cirth-form-element-valid-border-color: #{$success-600};
-  --cirth-primary-active: #{$accent-800};
+
+  // Derived from the accent, never a step of the default scale, so an
+  // author's own accent keeps its hue here too. 78.1% toward black is the
+  // ratio of the default ladder at this end: $accent-700 lands on
+  // $accent-800.
+  --cirth-primary-active: color-mix(
+    in oklch,
+    var(--cirth-primary) 78.1%,
+    black
+  );
   --cirth-primary-underline: var(--cirth-primary);
 
   // A meter's three readings: 5.8:1, 7.3:1 and 9.3:1 against the track,
@@ -116,16 +125,27 @@
   --cirth-switch-background-color: #{$neutral-400};
   --cirth-form-element-invalid-border-color: #{$error-250};
   --cirth-form-element-valid-border-color: #{$success-250};
-  --cirth-primary-active: #{$accent-150};
+
+  // Derived from the accent, never a step of the default scale, so an
+  // author's own accent keeps its hue here too. The coefficients are the
+  // default ladder's own ratios: from $accent-250 they land on
+  // $accent-150, $accent-650 and $accent-700.
+  --cirth-primary-active: oklch(
+    from var(--cirth-primary) calc(l * 1.1093) calc(c * 0.5544) h
+  );
 
   // The accent lightens for *text* legibility, and the button fill derives
   // from it, so left alone it would lighten too, and the white label on
   // top would come out at 4.2:1, worse than the 5.5:1 it has with no
-  // preference at all. Pinning the fill keeps the two moving in the
-  // directions they each need: white on these clears 7:1 (WCAG 1.4.6) at
-  // 8.1:1 resting and 9.6:1 on hover.
-  --cirth-primary-surface: #{$accent-650};
-  --cirth-primary-surface-active: #{$accent-700};
+  // preference at all. The fill takes a fixed lightness instead, which is
+  // what keeps white on it above 7:1 (WCAG 1.4.6) whatever the accent's
+  // hue: 8.1:1 resting and 9.6:1 on hover with the default one.
+  --cirth-primary-surface: oklch(
+    from var(--cirth-primary) 44% calc(c * 0.978) h
+  );
+  --cirth-primary-surface-active: oklch(
+    from var(--cirth-primary) 39.7% calc(c * 0.88) h
+  );
   --cirth-primary-underline: var(--cirth-primary);
 
   // 7.2:1, 7.8:1 and 8.8:1 against the track, up from 5.2:1, 5.7:1
