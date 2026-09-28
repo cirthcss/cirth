@@ -1883,6 +1883,22 @@ pre > button.copy.copied::before {
   );
 }
 
+/* The modal demo holds an open dialog inside a box of its own, over a
+   stand-in for the page, so its backdrop and elevation show without
+   covering the documentation. Only while it is not modal: opened with
+   showModal(), it is the library's own dialog in the top layer, and none
+   of this applies. */
+.docs-modal-stage {
+  position: relative;
+  min-block-size: 22rem;
+  overflow: hidden;
+}
+
+.docs-modal-stage > dialog:not(:modal) {
+  position: absolute;
+  min-block-size: 100%;
+}
+
 /* The source is the well's last band: the listing the page wrote for the
    reader when there is one (adopted by eleventy.config.js), otherwise the
    rendered snippet behind a disclosure. Flush to the well's edge, which

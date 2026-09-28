@@ -49,8 +49,9 @@ matches `:is(ol, ul)`.
 A `nav` that is a direct child of the page's banner `header` is a navbar:
 application chrome rather than an in-page position map. Its links run a
 four-step contrast ladder instead of the accent edge: muted ink at rest,
-an intermediate step on hover and focus, full contrast plus semibold for
-`aria-current`/`aria-selected`, and a further-attenuated step for
+an intermediate step on hover and focus, full contrast plus the label
+role's weight (500) for `aria-current`/`aria-selected`, and a
+further-attenuated step for
 `aria-disabled="true"`, which also stops responding to the pointer. None
 of the four is the accent colour: in chrome the accent belongs to actions,
 and position is carried by contrast. The current entry gets weight as well
