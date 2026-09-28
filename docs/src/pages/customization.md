@@ -298,16 +298,19 @@ a height.
 }
 ```
 
-`--cirth-border-radius` is the single knob. The per-component radii are
-derived from it: a card is softer, a checkbox and inline code are capped
-so they never read as circles, so zeroing it zeroes them too.
+`--cirth-border-radius` is the single knob. Every corner takes one of two
+radii by what it is: something you operate (a field, a button, a code
+block) takes the control radius, and something that holds content (a card,
+a dialog, a popover) takes the container radius derived from it, so no box
+is ever rounder than the one around it. A checkbox and a key cap are capped
+so they never read as circles. Zeroing the knob zeroes them all.
 
 | Token | Relationship |
 | --- | --- |
 | `--cirth-card-border-radius` | `--cirth-border-radius` × 1.5, the container/control pair |
 | `--cirth-checkbox-border-radius` | Capped at `--cirth-radius-sm` |
 | `--cirth-code-border-radius` | Capped at `--cirth-radius-sm` |
-| `--cirth-radius-pill` | Untouched by the knob: switches stay pills |
+| `--cirth-radius-pill` | Untouched by the knob: a switch is a pill and a radio a circle, because the shape is what they mean |
 
 `--cirth-border-width` and `--cirth-outline-width` read steps from one
 stroke ladder, `--cirth-border-width-*`.

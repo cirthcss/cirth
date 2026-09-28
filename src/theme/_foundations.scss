@@ -53,9 +53,12 @@
   // small type reads cramped. The role rules apply it as
   //   letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em))
   // which is zero at the body size, positive below it and negative above:
-  // +0.009em at 13px, -0.018em at 28px, -0.024em at 40px, -0.03em at 64px.
-  // 0 turns the correction off. See specs/typographic-roles.md.
-  --cirth-tracking-optical: 0.04;
+  // +0.006em at 13px, -0.011em at 28px, -0.015em at 40px, -0.019em at 64px.
+  // Gentle, because the default face is the system's, and the faces behind
+  // system-ui already tighten their display sizes. 0 turns the correction
+  // off; a text face with no optical sizes takes more (0.04 or so).
+  // See specs/typographic-roles.md.
+  --cirth-tracking-optical: 0.025;
 
   // Line heights
   --cirth-line-height-none: 1;

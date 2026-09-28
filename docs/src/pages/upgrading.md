@@ -15,11 +15,11 @@ working the way it already does.
 ## Next release, from v0.16.x
 
 Not released yet: this section describes the development line. The class
-list stays the same; the defaults underneath it change in four places.
+list stays the same; the defaults underneath it change in five places.
 Surfaces and edges come from four named levels and three named edges, type
-comes from roles, the primary is always the heaviest action, and space
-between elements comes from their relation rather than from margins they
-carry. Each change has a spec in the repository's `specs/` directory.
+comes from roles, the primary is always the heaviest action, every corner
+takes one of two radii by what it is, and space between elements comes from
+their relation rather than from margins they carry. Each change has a spec in the repository's `specs/` directory.
 
 ### Surfaces and edges
 
@@ -58,6 +58,13 @@ carry. Each change has a spec in the repository's `specs/` directory.
 | Styled a focus ring through `box-shadow` | Focus is an `outline` with `outline-offset: var(--cirth-outline-offset)` |
 | Styled inline `code` expecting the chip | Set `padding`, `background` and `display: inline-block` on it |
 | Relied on 2px checkbox and radio borders | Set `--cirth-border-width` on `[type="checkbox"], [type="radio"]` |
+
+### Radii
+
+| If you | Then |
+| --- | --- |
+| Relied on the pill search field or search group | Search takes the control radius. To keep the pill: `[type="search"], [role="search"] { --cirth-border-radius: var(--cirth-radius-pill); }`, plus `.group [type="search"] { --cirth-border-radius: inherit; }` for a search field inside a generic group |
+| Relied on popovers at the control radius | They take the container radius, as a dialog does; set `border-radius: var(--cirth-border-radius)` on `[popover]` |
 
 ### Space between elements
 

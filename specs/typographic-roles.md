@@ -26,7 +26,7 @@ see new weights and a slightly smaller heading ladder; a consumer who set
 | --- | --- |
 | Every text element maps to exactly one role | The mapping table below |
 | A role differs from the next one on at least two of size, weight, ink step, tracking | Checked per pair in the role table |
-| Tracking is a function of size, declared once: positive below the body size, zero at it, negative above | `letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em))`, with `--cirth-tracking-optical: 0.04`. That is +0.009em at 13px, 0 at 16px, −0.018em at 28px, −0.024em at 40px, −0.03em at 64px |
+| Tracking is a function of size, declared once: positive below the body size, zero at it, negative above | `letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em))`, with `--cirth-tracking-optical: 0.025`. That is +0.006em at 13px, 0 at 16px, −0.011em at 28px, −0.015em at 40px, −0.019em at 64px |
 | Leading narrows as size grows, and widens with the length of what is read | Headings `tight` (1.125), titles `snug` (1.25), controls and application body `normal` (1.5), long-form reading `relaxed` (1.625): the existing line-height scale, assigned by role |
 | The heading ladder compresses at small widths | Fluid clamps whose minimums sit closer together than their maximums: 28/22/19 at 390px against 40/28/22 at 1440px |
 | Weight by role, never by element habit | 650 heading and display, 600 title and group, 500 label and meta, 400 body and code; `<strong>` is 600 |
@@ -64,7 +64,7 @@ and tracking; code/body by size and face.
 | `--cirth-muted-color` | Redefined | neutral 600 in light (was 550), 350 in dark (was 400) |
 | `--cirth-secondary-text` | Redefined | neutral 650 in light (was 550), 300 in dark (was 350) |
 | `--cirth-code-color` | Redefined | `var(--cirth-ink)` (was the muted value) |
-| `--cirth-tracking-optical` | New | `0.04` |
+| `--cirth-tracking-optical` | New | `0.025` (0.04 until 2026-09-28, see Decisions) |
 | `--cirth-letter-spacing-tight`, `--cirth-letter-spacing-snug` | Removed | Replaced by the relation; `--cirth-letter-spacing` stays as the per-element slot |
 | `--cirth-display-font-size`, `--cirth-display-font-weight`, `--cirth-heading-font-weight`, `--cirth-title-font-weight`, `--cirth-label-font-size`, `--cirth-meta-font-size` | New | As in the role table |
 | `--cirth-form-label-font-weight` | Kept, becomes the label role's weight (500) | Legends read `--cirth-title-font-weight` instead |
@@ -144,6 +144,7 @@ work that follows these specs brings onto the same roles.
 | The proposed inks clear AA on every level in every variant | Table above | Prototype, Chromium 149 | Verified |
 | The census after the prototype | Table above | `prototype-source/census.js`, Chromium 149 | Verified |
 | 650 falls back to 700 on static families | CSS Fonts 4 font-matching for weights above 500 | Specification text, not reproduced on a static-font machine here | Reported |
+| At 0.04 the 64px display line sets glyphs touching in the default face | "Semantic HTML in." at 64px/650: `n`–`t` and `i`–`c` meet at 0.04 and nearly at 0.03; clear at 0.025 and 0.02 | Docs home at `cf4c9ae3`, `--cirth-tracking-optical` overridden on the root, system-ui resolving to SF Pro, Chromium 149 and WebKit 26.5, macOS 26.7 | Verified |
 
 ## Decisions
 
@@ -151,6 +152,7 @@ work that follows these specs brings onto the same roles.
 | --- | --- | --- |
 | Tracking as one relation of size, not a value per heading | Design | The correction is optical, so it belongs to size; declaring it once covers headings, labels and meta and any size a consumer sets |
 | Rejected: tracking tokens per role | Design | Eight literals that would drift out of step with the sizes they correct |
+| 2026-09-28: the coefficient drops from 0.04 to 0.025 | Measured, ledger row above | The default face is system-ui, and SF Pro and Segoe UI Variable already tighten their display cuts; 0.04 corrected a face that had corrected itself. The relation is unchanged; only its strength moves, and a theme with a single-cut text face can raise it |
 | Rejected: a length-based line height at the root (`1em + 0.5rem`) | Existing contract | `line-height` would inherit as a computed length and overlap the lines of any consumer block with a larger font |
 | Headings at 650, not 700 | Design | The weight carries the role; at 40px, 700 in a system face reads as a poster |
 | Buttons at 500 | Design | A button is a label for an action, not a heading; the fill carries its emphasis |

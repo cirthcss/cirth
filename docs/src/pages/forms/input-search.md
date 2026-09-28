@@ -1,13 +1,14 @@
 ---
 layout: docs.njk
-description: The search input in Cirth. A search icon and, in the default build, a pill shape.
+description: The search input in Cirth. A field like any other, marked by a search icon.
 ---
 
 # Search input
 
-`<input type="search">` gets a search icon and, in the default build, a
-fully rounded shape (`--cirth-radius-pill`), so it reads as a search box
-rather than a form field.
+`<input type="search">` is a field like any other, with the same edge,
+height and radius, and a search icon at its start. The icon is what says
+search, so the field stays in step with every other control when a theme
+moves the radius.
 
 {% demo "input-search" %}
 
@@ -39,7 +40,7 @@ rather than a form field.
 | Token | What it sets |
 | --- | --- |
 | `--cirth-icon-search` | The search icon, one per colour scheme |
-| `--cirth-radius-pill` | The pill radius, default build only |
+| `--cirth-border-radius` | The control radius, shared with every field |
 
 ## Related
 

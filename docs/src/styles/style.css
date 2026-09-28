@@ -2552,6 +2552,8 @@ details.docs-toc-top {
   list-style: none;
 }
 
+/* A link you operate, so the control radius: the library draws no box
+   rounder than the containers around it (specs/radius-relations.md). */
 .docs-chip-nav a {
   display: inline-flex;
   align-items: center;
@@ -2559,7 +2561,7 @@ details.docs-toc-top {
   margin: 0;
   padding: 0 var(--cirth-space-4);
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
-  border-radius: var(--cirth-radius-pill);
+  border-radius: var(--cirth-border-radius);
   background: var(--cirth-card-background-color);
   color: var(--cirth-ink);
   font-size: var(--cirth-font-size-sm);

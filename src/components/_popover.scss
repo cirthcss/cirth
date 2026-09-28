@@ -84,7 +84,10 @@ $popover-selector: '[popover=""], [popover="auto"], [popover="hint"]';
     // A menu whose items carry their own padding sets this to 0.
     padding: var(--cirth-space-2) var(--cirth-space-3);
     border: var(--cirth-border-width) solid var(--cirth-popover-border-color);
-    border-radius: var(--cirth-border-radius);
+
+    // A container on the overlay level, like the dialog's article, so it
+    // takes the container radius rather than a control's.
+    border-radius: var(--cirth-card-border-radius);
     background-color: var(--cirth-popover-background-color);
     box-shadow: var(--cirth-popover-box-shadow);
     color: var(--cirth-popover-color);

@@ -31,8 +31,8 @@ so it keeps `[role="group"]` as its only opt-in, but still excludes
 
 ## Search group
 
-`role="search"` additionally pills the whole group (`--cirth-radius-pill`)
-at both ends:
+`role="search"` makes the row a search landmark. It is drawn exactly as a
+group is, with the control radius at both ends:
 
 {% demo "group-search" %}
 

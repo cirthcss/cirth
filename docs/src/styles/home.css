@@ -104,7 +104,7 @@
 
 /* The one headline on the site in the display role: its size and weight
    are the library's display tokens, its tracking the same optical relation
-   every heading takes (-0.03em at 64px), its leading tight. */
+   every heading takes (-0.019em at 64px), its leading tight. */
 .docs-hero h1 {
   --cirth-font-size: var(--cirth-display-font-size);
   --cirth-font-weight: var(--cirth-display-font-weight);
@@ -509,7 +509,7 @@ pre.docs-hero-install {
   min-block-size: 2.75rem;
   padding: 0 var(--cirth-space-4);
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
-  border-radius: var(--cirth-radius-pill);
+  border-radius: var(--cirth-border-radius);
   background: var(--cirth-card-background-color);
   color: var(--cirth-ink);
   font-weight: var(--cirth-font-weight-medium);

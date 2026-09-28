@@ -388,16 +388,6 @@
     --cirth-font-weight: var(--cirth-font-weight-medium);
   }
 
-  [type="search"] {
-    --cirth-border-radius: var(--cirth-radius-pill);
-  }
-
-  // Search owns a recognisable native silhouette. A search field in a
-  // generic group becomes an ordinary segment so its joined corners match.
-  #{$group-selector} [type="search"] {
-    --cirth-border-radius: inherit;
-  }
-
   // Buttons and fields inherit the same normal line-height and share the
   // 44px floor emitted from helpers/_metrics.scss. Their variants differ
   // in colour, never in geometry. A button's text is the label role: it
@@ -426,10 +416,9 @@
   }
 
   // Group (role="group")
-  [role="search"] {
-    --cirth-border-radius: var(--cirth-radius-pill);
-  }
-
+  // A search field and the search group take the control radius like any
+  // other field: the magnifier says search, and no box Cirth draws is
+  // rounder than the containers around it (specs/radius-relations.md).
   [role="search"],
   #{$group-selector} {
     button,
