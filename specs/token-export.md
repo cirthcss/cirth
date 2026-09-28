@@ -75,7 +75,7 @@ unrepresented instead of guessing a value the stylesheet never produces.
 | One complete file per scheme | Design | Tools map files to modes. Rejected: one file with both schemes, which needs a non-standard mode convention; a base file plus a dark overlay, which needs merging. |
 | Unrepresentable values are listed, not coerced | Existing contract | Coercing `.15em` into `rem` or `calc()` into a number would ship a wrong value that looks right. |
 | The browser comparison runs in CI, not in the build | Constraint | `npm run build` must not require Playwright. The check runs after CI installs the browsers. |
-| The resolver implements only the colour syntax the theme uses | Design | That is `oklch()`, `oklch(from …)`, `color-mix()` in oklch/oklab, hex and named colours. Anything else becomes unrepresented rather than guessed, and `check:tokens` proves the supported subset against engines. |
+| The resolver implements only the colour syntax the theme uses | Design | That is `oklch()`, `oklch(from …)` with `calc()`, `min()` and `max()` over its channels, `color-mix()` in oklch/oklab, hex and named colours. Anything else becomes unrepresented rather than guessed, and `check:tokens` proves the supported subset against engines. `min()` and `max()` were added on 2026-09-28 for the accent's text role, which clamps the origin's lightness; `check:tokens` then compared 711 colours in three engines within ΔOklab 0.002. |
 
 ## Acceptance
 
