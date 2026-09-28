@@ -1231,12 +1231,12 @@ pre:not(.docs-demo-preview *) {
   background-size: 3.5rem 2.75rem;
 }
 
-/* Highlight.js theme — light. A cool ramp (plum, violet, steel, teal,
-   mineral green) chosen to sit outside the hue range the framework's own
-   palette signals in (copper at 44deg through the warning gold at 89.5).
-   A keyword that shared a hue with the accent would read as a link, and one
-   that shared it with the error family would read as a mistake. Every value
-   clears AA on the code surface it sits on.
+/* Highlight.js theme — light. Five cool hues, from about 160deg to
+   310deg, chosen to sit outside the range the default palette signals in
+   (the accent at 44deg through the warning hue at 89.5deg). A keyword that
+   shared a hue with the accent would read as a link, and one that shared it
+   with the error family would read as a mistake. Every value clears AA on
+   the code surface it sits on.
 
    Docs-owned on purpose: syntax highlighting is editorial composition, not
    a library concern, and nothing in src/ derives from these.

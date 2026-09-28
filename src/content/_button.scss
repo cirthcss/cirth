@@ -446,7 +446,7 @@
 // most, and this rule matches that weight later in the sheet, so it wins
 // whatever the variant was. Half opacity used to
 // composite the accent toward the page and turn it into a paler colour of
-// its own (copper into a salmon at L 0.75).
+// its own (the default accent into a pale tint at L 0.75).
 
 #{$parent-selector}
   :where(

@@ -43,7 +43,7 @@ The most important differences for someone who knows Pico:
 - The builds are default, classless, scoped and scoped classless. Scoped
   builds target a `.cirth` wrapper, including custom properties, document
   styles, colour schemes and modal states.
-- The twenty inherited accent themes became one official theme (copper),
+- The twenty inherited accent themes became one official default theme,
   with `plain` and `playroom` published as optional token presets; see
   [Colors](/colors).
 - `.grid` is an intrinsically wrapping grid, and the single-row
@@ -72,7 +72,7 @@ you what the next one does.
 
 Nothing here requires the reference. It explains where the name came from,
 not how the framework works, and the [Brand](/brand) page documents the mark,
-the copper and the terms the name is used under. Cirth is not affiliated with
+the accent and the terms the name is used under. Cirth is not affiliated with
 the Tolkien estate or any rights holder: the name points at a writing system,
 and is not a claim of association.
 
