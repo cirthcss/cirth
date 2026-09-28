@@ -533,7 +533,7 @@ test("documentation active navigation uses the public registered state", async (
 	);
 	expect(geometry.textDecoration).toBe("none");
 
-	// One rail. The shell used to add a second amber bar as a ::before on
+	// One rail. The shell used to add a second accent-coloured bar as a ::before on
 	// top of the one the framework paints.
 	expect(geometry.markerContent).toBe("none");
 });

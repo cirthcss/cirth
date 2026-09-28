@@ -323,7 +323,7 @@ test("the outline highlights an entry with exactly one indicator", async ({
 			return { content: before.content, width: before.width };
 		});
 
-	// The outline used to draw its own amber bar as a ::before on top of the
+	// The outline used to draw its own accent-coloured bar as a ::before on top of the
 	// rail the framework already paints for aria-current.
 	expect(["none", "normal", ""]).toContain(marker.content);
 });

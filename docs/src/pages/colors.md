@@ -307,7 +307,7 @@ than converting it to a `hex` / `lab()` fallback.
 Cirth previously inherited a set of twenty accent color themes from Pico CSS, then
 briefly maintained three full themes (azure, jade, slate). That has been
 reduced further to a single official theme plus two token override presets,
-`plain` and `playroom`. The official theme's accent was an amber until
+`plain` and `playroom`. The official theme's accent was a yellow-orange until
 0.15; it is now the accent described above, with the neutral, surface and
 status families rebuilt around it rather than adapted to it. See
 [About](/about) for the project's history and

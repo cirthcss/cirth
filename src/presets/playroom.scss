@@ -50,7 +50,7 @@
     );
 
     // Status colours warm up with the rest of the theme. They stay
-    // recognisable (a red-orange error, a green success, an amber warning)
+    // recognisable (a red-orange error, a green success, a yellow warning)
     // but sit at the same softness as the accent instead of cutting through
     // it. Each is an input: the field borders, meter readings, <ins>/<del>
     // inks and status surfaces all follow from these three. <mark> follows
@@ -60,7 +60,7 @@
     // anchor picked only for how it reads as a fill could leave the border
     // under the 3:1 non-text floor against a white card. Warning follows
     // the same constraint: 50% keeps its border above 3:1 against every
-    // surface level without losing the warm amber hue.
+    // surface level without losing its yellow hue.
     --cirth-error: light-dark(oklch(45% 0.16 25deg), oklch(74% 0.13 25deg));
     --cirth-success: light-dark(oklch(52% 0.11 155deg), oklch(72% 0.11 155deg));
     --cirth-warning: light-dark(oklch(50% 0.1 75deg), oklch(74% 0.11 75deg));
