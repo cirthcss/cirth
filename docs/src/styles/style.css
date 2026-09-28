@@ -181,9 +181,14 @@
   --cirth-color: var(--cirth-form-element-placeholder-color);
 }
 
-/* Hover deepens the wash, as a secondary button's does; focus is the ring
-   every control draws. Nothing here changes the trigger's size. */
+/* Hover deepens the wash, as a secondary button's does, and the text steps
+   up from the placeholder ink to the secondary ink with it: the placeholder
+   ink on the deeper wash measured 4.21:1 in playroom's dark scheme. Focus
+   is the ring every control draws. Nothing here changes the trigger's
+   size. */
 .docs-search-trigger:is(:hover, :active) {
+  --cirth-color: var(--cirth-secondary-text);
+
   border-color: transparent;
   background: var(--cirth-secondary-surface-active);
 }
@@ -1131,10 +1136,14 @@
   font-size: var(--cirth-font-size-sm);
 }
 
+/* Inline margins only: the space above the list is the flow relation's
+   (element step after the credit line), and a `margin: 0` here would
+   outweigh it and leave the two rows of links 3px apart, under the 24px
+   spacing WCAG 2.5.8 asks of targets this small. */
 .docs-footer-social {
   display: flex;
   gap: var(--cirth-spacing);
-  margin: 0;
+  margin-inline: 0;
   padding: 0;
   list-style: none;
 }

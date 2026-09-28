@@ -284,7 +284,10 @@ test("header keeps navigation, search, and automatic versioning distinct", async
 
 	// The header's controls are quiet chrome with no edge: hover deepens the
 	// wash on the trigger exactly as it does on the field beside it, and
-	// leaves the placeholder, the edge and the size where they are.
+	// leaves the edge and the size where they are. The text keeps every
+	// property of a placeholder but its ink, which steps up to the secondary
+	// ink: the placeholder ink on the deeper wash measured 4.21:1 in
+	// playroom's dark scheme, under AA.
 	await version.hover();
 	const fieldHover = await box(version);
 	await searchTrigger.hover();
@@ -293,7 +296,15 @@ test("header keeps navigation, search, and automatic versioning distinct", async
 	expect(searchHover.background).toBe(fieldHover.background);
 	expect(searchHover.border).toBe(searchRest.border);
 	expect(searchHover.height).toBe(searchRest.height);
-	expect(await type(searchTrigger)).toEqual(placeholder);
+	const secondaryInk = await page.evaluate(() => {
+		const probe = document.createElement("span");
+		probe.style.color = "var(--cirth-secondary-text)";
+		document.body.append(probe);
+		const color = getComputedStyle(probe).color;
+		probe.remove();
+		return color;
+	});
+	expect(await type(searchTrigger)).toEqual({ ...placeholder, color: secondaryInk });
 
 	// Focus is the one ring every control draws, outside the box.
 	await page.mouse.move(0, 0);
