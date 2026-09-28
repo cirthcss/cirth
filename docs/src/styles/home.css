@@ -128,8 +128,9 @@
   line-height: var(--cirth-line-height-normal);
 }
 
-/* The calls to action at a size that says they are the next step: the
-   buttons are Cirth's, only their type and padding grow. */
+/* The calls to action are Cirth's buttons as they ship: the primary is
+   the next step because it is the heaviest fill in the pair, not because
+   its type grows. Only the padding widens, so the pair reads as a row. */
 .docs-hero .docs-hero-actions,
 .docs-cta .docs-hero-actions {
   gap: var(--cirth-space-3);
@@ -139,7 +140,6 @@
 .docs-hero .docs-hero-actions [role="button"],
 .docs-cta .docs-hero-actions [role="button"] {
   padding-inline: var(--cirth-space-6);
-  font-size: var(--cirth-font-size-lg);
 }
 
 /* The install command, copyable in place. A `$` prompt that copy leaves
@@ -311,9 +311,11 @@ pre.docs-hero-install {
   min-inline-size: 0;
 }
 
-/* The heading role one step under the section's own heading. */
+/* The heading role one step under the section's own heading: its size,
+   and its weight, which an h3 would otherwise take from the title role. */
 .docs-story-text h3 {
   --cirth-font-size: clamp(1.375rem, 1.15rem + 0.9vw, 1.75rem);
+  --cirth-font-weight: var(--cirth-heading-font-weight);
 
   margin: 0 0 var(--cirth-flow-line);
 }

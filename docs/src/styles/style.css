@@ -197,7 +197,8 @@
 	   the name for the page that components may not shadow. */
   background: var(--cirth-canvas);
   color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-xs);
+  font-size: var(--cirth-meta-font-size);
+  font-weight: var(--cirth-font-weight-medium);
   white-space: nowrap;
 }
 
@@ -1154,10 +1155,14 @@
   gap: calc(var(--cirth-spacing) * 2);
 }
 
+/* A column's name is the meta role, as a sidebar group's is. */
 .docs-footer-column strong {
   display: block;
-  margin-bottom: calc(var(--cirth-spacing) * 0.5);
-  font-size: var(--cirth-font-size-sm);
+  margin-bottom: var(--cirth-flow-line);
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-meta-font-size);
+  font-weight: var(--cirth-font-weight-medium);
+  letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
 }
 
 .docs-footer-column ul {
@@ -1730,16 +1735,13 @@ pre > button.copy.copied::before {
 }
 
 /* Two treatments, by what the page is for (eleventy.config.js, docsKind).
-   A guide is read from the top, so the reading rhythm leads: running text
-   a step larger than the library's body, and chapters divided by space
-   rather than by a rule. A reference page is consulted, so the grammar
-   leads: body size, and a separator over every chapter, punctuation for a
-   reader who scans. Prose only: a live example, a table or a listing in
-   either keeps the size the library gives it. */
-.docs-content[data-docs-kind="guide"] > :is(p, ul, ol, dl, blockquote) {
-  font-size: 1.0625rem;
-}
-
+   A guide is read from the top, so the reading rhythm leads: a larger
+   lead, and chapters divided by more space rather than by a rule. A
+   reference page is consulted, so the grammar leads: a separator over
+   every chapter, punctuation for a reader who scans. Both set running text
+   at the library's body size: a second body size would add a size and
+   weight pair for every role that sits in prose (bold, code, links)
+   without changing what the page is. */
 .docs-content[data-docs-kind="guide"] > h1 + p {
   font-size: var(--cirth-font-size-xl);
 }

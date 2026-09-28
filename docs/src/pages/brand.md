@@ -48,11 +48,11 @@ than a value chosen for one element.
 The same rules hold everywhere; which half leads depends on what the page
 is for. On this site:
 
-- **A guide** is read from the top, so the tuning leads: running text at
-  17px instead of 16, leading {{ measured.type.leading.relaxed if measured else "relaxed" }},
-  a measure of 30em, and chapters divided by space alone.
-- **A reference page** is consulted, so the grammar leads: body size, a
-  separator over every chapter, column heads in the meta role, and token
+- **A guide** is read from the top, so the tuning leads: a lead at 20px,
+  leading {{ measured.type.leading.relaxed if measured else "relaxed" }} at
+  a measure of 30em, and chapters divided by more space instead of a rule.
+- **A reference page** is consulted, so the grammar leads: a lead at 18px,
+  a separator over every chapter, column heads in the meta role, and token
   names in the code face with no chip behind them.
 - **A demo** shows a component instead of framing it. The example stands
   on the recessed level with no border, rebinds `--cirth-surface` so the
