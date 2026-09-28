@@ -338,11 +338,12 @@
   gap: 0.5rem 1rem;
   padding: 0.5rem 1rem;
 
-  /* Same band, same contrast reason as the status line above. */
+  /* Same band, same contrast reason as the status line above. The hints
+     are the meta role; the keys in them are <kbd>, which carries its own
+     face. */
   background: var(--cirth-canvas);
   color: var(--cirth-muted-color);
-  font-family: var(--cirth-font-family-mono);
-  font-size: var(--cirth-font-size-sm);
+  font-size: var(--cirth-meta-font-size);
   text-align: start;
 }
 

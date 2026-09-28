@@ -71,7 +71,9 @@
   letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
 }
 
-/* A pane label: the file name on one side, what it is on the other. */
+/* A pane label: the file name on one side, what it is on the other. The
+   label is the meta role; only the file name, which is data, is set in the
+   code face, by its own <code>. */
 .docs-pane-label {
   display: flex;
   align-items: center;
@@ -84,8 +86,13 @@
     var(--cirth-card-border-color);
   background: var(--cirth-card-sectioning-background-color);
   color: var(--cirth-muted-color);
-  font-family: var(--cirth-font-family-mono);
-  font-size: var(--cirth-font-size-sm);
+  font-size: var(--cirth-meta-font-size);
+  font-weight: var(--cirth-font-weight-medium);
+}
+
+.docs-pane-label code {
+  color: var(--cirth-ink);
+  font-weight: var(--cirth-font-weight-regular);
 }
 
 /* Hero
@@ -546,8 +553,8 @@ pre.docs-hero-install {
   overflow: clip;
 }
 
-/* The band names the example and carries whatever operates it: the same
-   plate grammar as the hero's Source panel. */
+/* The band names the example and carries whatever operates it, in the
+   meta role like the hero's pane labels; a file name in it is a <code>. */
 .docs-stage-band {
   display: flex;
   align-items: center;
@@ -558,8 +565,8 @@ pre.docs-hero-install {
   padding: 0.375rem 0.75rem;
   background: var(--cirth-card-sectioning-background-color);
   color: var(--cirth-muted-color);
-  font-family: var(--cirth-font-family-mono);
-  font-size: var(--cirth-font-size-sm);
+  font-size: var(--cirth-meta-font-size);
+  font-weight: var(--cirth-font-weight-medium);
 }
 
 .docs-stage-note code {

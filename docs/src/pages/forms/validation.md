@@ -103,7 +103,7 @@ state the edge and ring take that state's colour instead.
 | `--cirth-disabled-surface`, `--cirth-disabled-color` | The disabled wash and ink |
 
 The border tokens derive from the status inputs `--cirth-error` and
-`--cirth-success`; see [Colors](/colors#status-colours).
+`--cirth-success`; see [Colors](/colors#states).
 
 ## Related
 

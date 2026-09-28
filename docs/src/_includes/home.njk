@@ -323,12 +323,12 @@ bodyClass: docs-home-page
 			<figure class="docs-hero-demo">
 				<div class="docs-hero-panes">
 					<div class="docs-hero-pane docs-hero-source">
-						<p class="docs-pane-label" aria-hidden="true"><span>sign-in.html</span><span>HTML</span></p>
+						<p class="docs-pane-label" aria-hidden="true"><span><code>sign-in.html</code></span><span>HTML</span></p>
 						<pre tabindex="0"><code class="hljs language-html">{{ heroSpecimen | highlight | safe }}</code></pre>
 					</div>
 					<p class="docs-hero-connector" aria-hidden="true"><span>renders</span></p>
 					<div class="docs-hero-pane docs-hero-result">
-						<p class="docs-pane-label" aria-hidden="true"><span>Result</span><span>cirth.min.css</span></p>
+						<p class="docs-pane-label" aria-hidden="true"><span>Result</span><span><code>cirth.min.css</code></span></p>
 						<div class="docs-hero-render" inert>{{ heroSpecimen | safe }}</div>
 					</div>
 				</div>
@@ -365,19 +365,19 @@ bodyClass: docs-home-page
 						<figure class="docs-story-visual">
 							{% if loop.index == 1 %}
 								<div class="docs-story-code">
-									<p class="docs-pane-label" aria-hidden="true"><span>invite.html</span><span>{{ storySoup | classCount }} class names</span></p>
+									<p class="docs-pane-label" aria-hidden="true"><span><code>invite.html</code></span><span>{{ storySoup | classCount }} class names</span></p>
 									<pre tabindex="0"><code class="hljs language-html">{{ storySoup | highlight | safe }}</code></pre>
 								</div>
 								<figcaption id="story-visual-1">The card with a class vocabulary: {{ storySoup | classCount }} class names to write, read and keep in step.</figcaption>
 							{% elif loop.index == 2 %}
 								<div class="docs-story-code">
-									<p class="docs-pane-label" aria-hidden="true"><span>invite.html</span><span>{{ storySemantic | classCount }} class names</span></p>
+									<p class="docs-pane-label" aria-hidden="true"><span><code>invite.html</code></span><span>{{ storySemantic | classCount }} class names</span></p>
 									<pre tabindex="0"><code class="hljs language-html">{{ storySemantic | highlight | safe }}</code></pre>
 								</div>
 								<figcaption id="story-visual-2">The same card as semantic HTML: {{ storySemantic | classCount }} class names, and every element says what it is.</figcaption>
 							{% else %}
 								<div class="docs-story-render">
-									<p class="docs-pane-label" aria-hidden="true"><span>Result</span><span>cirth.min.css</span></p>
+									<p class="docs-pane-label" aria-hidden="true"><span>Result</span><span><code>cirth.min.css</code></span></p>
 									<div class="docs-story-render-stage" inert>{{ storySemantic | safe }}</div>
 								</div>
 								<figcaption id="story-visual-3">What Cirth renders from it: a card with a title band, two labelled fields and a footer action.</figcaption>

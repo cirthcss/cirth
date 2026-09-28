@@ -10,37 +10,62 @@ integrations, and anywhere else the project is named.
 <section class="docs-brand-spec" aria-labelledby="signature-title">
   <header class="docs-brand-spec-header">
     <h2 id="signature-title">The part that survives a retheme.</h2>
-    <p>Cirth's identity is not the copper. The accent is the first token any
-    adopter replaces, and a framework whose character lives entirely in one
-    hue has no character left the moment it is adopted. What stays is
-    below: proportions, strokes and target sizes that hold in every preset,
-    every scheme and every build. Compare
-    <a href="/specimen/default/">the default specimen</a> with
-    <a href="/specimen/plain/">the plain one</a>: same six measurements,
-    different pigment.</p>
+    <p>Cirth's identity is not its accent. The accent is the first token an
+    adopter replaces, and a system whose character lives in one hue has
+    none left once it is adopted. What stays is a grammar and its tuning:
+    every text element takes a role, every surface a level, every edge one
+    of three weights, and every gap the distance between the things it
+    separates. Compare <a href="/specimen/default/">the default specimen</a>
+    with <a href="/specimen/plain/">the plain one</a>: the values move, and
+    the relations between them do not.</p>
   </header>
   <dl class="grid docs-brand-measures">
-    <div><dt>Container corner</dt><dd>{% if proof.radius and proof.radius.container %}<code>{{ proof.radius.container }}</code> · {% endif %}<code>--cirth-card-border-radius</code></dd></div>
-    <div><dt>Control corner</dt><dd>{% if proof.radius and proof.radius.control %}<code>{{ proof.radius.control }}</code> · {% endif %}<code>--cirth-border-radius</code></dd></div>
-    <div><dt>Resting edge</dt><dd><code>1px</code>, all four sides, every button variant</dd></div>
+    <div><dt>Surface levels</dt><dd>Recessed · canvas · raised · overlay, all from <code>--cirth-canvas</code></dd></div>
+    <div><dt>Edges</dt><dd>Separator · container · control{% if measured %}: <code>{{ measured.edges[0].light.onCanvas | ratio }}</code> · <code>{{ measured.edges[1].light.onCanvas | ratio }}</code> · <code>{{ measured.edges[2].light.onCanvas | ratio }}</code> on the canvas{% endif %}</dd></div>
+    <div><dt>Type roles</dt><dd>Display · heading · title · group · body · label · meta · code</dd></div>
+    <div><dt>Flow</dt><dd>Line to chapter{% if measured %}: {% for step in measured.flow %}<code>{{ step.px }}px</code>{% if not loop.last %} · {% endif %}{% endfor %}{% endif %}</dd></div>
+    <div><dt>Corners</dt><dd>{% if proof.radius and proof.radius.control %}<code>{{ proof.radius.control }}</code> control · <code>{{ proof.radius.container }}</code> container; {% endif %}none rounder than its container</dd></div>
     <div><dt>Target floor</dt><dd><code>44px</code> controls · <code>40px</code> in a nav</dd></div>
-    <div><dt>Card contract</dt><dd>Tinted header band · <code>12/20px</code> · padded body</dd></div>
-    <div><dt>Spacing unit</dt><dd><code>4px</code> scale · <code>16px</code> default step</dd></div>
   </dl>
 </section>
 
-The pairing is the recognisable part. A container is one radius step softer
-than the controls inside it, so a card reads as a sheet holding buttons
-rather than as a big button. Every resting edge is the same single hairline:
-a filled button, an outline button, a field, a card and a popover all draw
-the same 1px on all four sides, and none of them fakes relief on one edge.
-Interactive targets sit on a 44px floor (WCAG 2.5.5), except inside a
-`<nav>`, which opts down to a 40px band while staying above the 24px WCAG
-2.5.8 minimum.
+The grammar is the engineered half: rules stated once in the stylesheet
+and checked by a test. The tuning is the organic half: it follows how
+people read and scan, and each part of it is a declared relation rather
+than a value chosen for one element.
 
-Those are the marks to preserve when Cirth is restyled. Replacing
-`--cirth-primary` is expected and supported; flattening the radius pair to a
-single value, thickening one edge of a control, or dropping the target floor
+{% if measured %}
+| Rule | Its tuning |
+| --- | --- |
+| Every text element maps to one role | Leading narrows as type grows: {{ measured.type.leading.tight }} for headings, {{ measured.type.leading.normal }} for controls, {{ measured.type.leading.relaxed }} in a reading column |
+| Tracking is one relation of size | `calc({{ measured.tracking.coefficient }} * (1rem - 1em))`: {% for point in measured.tracking.at %}{{ point.label }} at {{ point.size }}px{% if not loop.last %}, {% endif %}{% endfor %} |
+| A gap is set by the relation between two siblings | The steps are not evenly spaced: {% for step in measured.flow %}{{ step.multiple }}{% if not loop.last %}, {% endif %}{% endfor %} times `--cirth-spacing`, so the gap between two chapters is {{ (measured.flow[4].multiple / measured.flow[0].multiple) | round }} times the gap between two lines of one item |
+| Surfaces are levels derived from one canvas | Every level keeps the canvas's hue: chroma {{ measured.levels[1].light.c }} at {{ measured.levels[1].light.h }}° in light, {{ measured.levels[1].dark.c }} at {{ measured.levels[1].dark.h }}° in dark |
+| Edges come in three weights | Only the control edge is held to 3:1, on every level; the separator and the container divide and bound content, and sit at {{ measured.edges[0].light.onCanvas | ratio }} and {{ measured.edges[1].light.onCanvas | ratio }} on the light canvas |
+| Two radii, assigned by kind | The container's is one and a half times the control's, so nothing is rounder than what holds it |
+{% endif %}
+
+The same rules hold everywhere; which half leads depends on what the page
+is for. On this site:
+
+- **A guide** is read from the top, so the tuning leads: running text at
+  17px instead of 16, leading {{ measured.type.leading.relaxed if measured else "relaxed" }},
+  a measure of 30em, and chapters divided by space alone.
+- **A reference page** is consulted, so the grammar leads: body size, a
+  separator over every chapter, column heads in the meta role, and token
+  names in the code face with no chip behind them.
+- **A demo** shows a component instead of framing it. The example stands
+  on the recessed level with no border, rebinds `--cirth-surface` so the
+  fields in it paint the level they sit on, and its source is one listing
+  under it.
+- **A component** is where the engineering is least negotiable: a 44px
+  target, a control edge at 3:1 or more, one opaque focus ring offset from
+  the fill, and a primary that is the heaviest action in its group.
+
+Those are the relations to keep when Cirth is restyled. Replacing
+`--cirth-primary`, the canvas, the radius or the spacing unit is expected
+and supported. Collapsing two surface levels into one, drawing a control
+edge under 3:1, or setting a gap by hand where a relation already sets it
 takes the interface out of the system.
 
 ## The mark
@@ -170,53 +195,65 @@ contrast against, repeat it as wallpaper, or pair it with fantasy imagery.
 
 ## Color
 
-The brand color is copper, and in an interface it has exactly two jobs:
-**action** and **current position**. A primary button, a focus ring and a
-link in running prose are actions. The rail beside the page you are on, the
-edge on an active in-page nav item and a selected control are position.
-Header navbars are quieter chrome: they use ink and weight rather than an
-accent edge. Nothing else in a Cirth interface is copper.
+The accent has two jobs in an interface: **action** and **current
+position**. A primary button, a link in running prose and a focus ring are
+actions. The rail beside the page you are on, the edge under an active
+in-page nav item and a checked control are position. Navigation at rest
+takes the ink of whatever it sits in, so a menu is not a row of
+accent-coloured words beside the one button that asks to be pressed.
+Nothing else in a Cirth interface takes the accent: not a heading, not a
+band behind a section, not a word picked out for emphasis.
 
-Editorial typography is the one place outside those two, and it is a
-deliberate exception rather than a leak: a word or phrase set in the accent
-inside a heading, the way this site's home page sets *semantic HTML*. It is
-a single named class, applied by hand, in prose, not a component state.
+Everything else belongs to four families of roles:
 
-It used to do five. Navigation links carried the accent at rest, which meant
-a menu of eight entries was eight brand-coloured words next to one button
-that also wanted the colour, and the accent stopped meaning "act on this"
-and started meaning "this is a Cirth screen". Navigation now takes the ink
-of whatever it sits in and the accent marks only where you are, so the one
-thing copper still says, it says alone.
+- **Surface levels**, derived from `--cirth-canvas`: recessed, canvas,
+  raised and overlay. Each keeps the canvas's hue, so a theme that tints
+  its canvas tints every level with it, and no level is a wash of the
+  accent.
+- **Edges**, derived from the same canvas: separator, container and
+  control, in rising contrast.
+- **Inks**: strong, ink, secondary and muted, each measured against every
+  level.
+- **States**: error, success and warning, each with a text, an edge and a
+  surface. Disabled is not a state colour but a neutral wash, with the
+  label at half the ink, the same for every variant.
 
-The light theme's base surface is a mineral paper rather than white, and the
-card sheet carries the same temperature: the page is not neutral, but the
-warmth is a surface property, not a wash of the accent. In dark the base is
-a graphite carrying the same stone tint as the neutral scale. Neither scheme
-paints the brand hue across backgrounds.
+{% if measured %}
+Measured on this build, as the lowest contrast on any of the four levels:
 
-The mark's hue, **44°** in oklch, is the exact hue the framework's entire
-copper scale is generated from; the logo sits brighter and more saturated
-than the UI tokens because it is an identity color, not a text color. The
-scale holds the accent at 70% of its own gamut ceiling so it can cover whole
-surfaces without shouting; the mark, which covers a monogram, is free to sit
-at 85%.
+| Role | Light | Dark |
+| --- | --- | --- |
+{%- for ink in measured.inks %}
+| {{ ink.name }}, `--cirth-{{ ink.token }}` | {{ ink.light.worst | ratio }} | {{ ink.dark.worst | ratio }} |
+{%- endfor %}
+{%- for edge in measured.edges %}
+| {{ edge.name }} edge, `--cirth-{{ edge.token }}` | {{ edge.light.worst | ratio }} | {{ edge.dark.worst | ratio }} |
+{%- endfor %}
+
+A primary button's label on its fill: {{ measured.accent.light.label | ratio }}
+in light, {{ measured.accent.dark.label | ratio }} in dark.
+{% endif %}
+
+The mark and the accent share a hue: {{ measured.accent.hue if measured else 44 }}° in
+OKLCH, the hue the default accent scale is generated from, so the theme's
+accent and the logo match by construction rather than by eye. The mark is
+more saturated than the interface tokens because it is a sign to
+recognise, not a colour that text has to clear 4.5:1 against.
 
 | Role | Value |
 | --- | --- |
-| Mark, light backgrounds | `#BD5928` (`oklch(58% 0.143 44deg)`) |
-| Mark, dark backgrounds | `#E16B31` (`oklch(66% 0.163 44deg)`) |
-| UI primary (light theme) | `oklch(52.7% 0.107 44deg)`, from `$accent-550` |
-| UI primary (dark theme) | `oklch(65.7% 0.134 44deg)`, from `$accent-400` |
+| Mark, light backgrounds | `#BD5928` (`oklch(0.58 0.143 44.2)`) |
+| Mark, dark backgrounds | `#E16B31` (`oklch(0.66 0.163 44.2)`) |
+{%- if measured %}
+| Accent, light | `{{ measured.accent.light.primary.hex }}` (`{{ measured.accent.light.primary.oklch }}`), from `$accent-550` |
+| Accent, dark | `{{ measured.accent.dark.primary.hex }}` (`{{ measured.accent.dark.primary.oklch }}`), from `$accent-400` |
+| Accent as text, light | `{{ measured.accent.light.text.hex }}` (`{{ measured.accent.light.text.oklch }}`) |
+| Accent as text, dark | `{{ measured.accent.dark.text.hex }}` (`{{ measured.accent.dark.text.oklch }}`) |
+{%- endif %}
 
-The dark UI primary is one ladder step deeper than a mirror of the light one
-would be. Copper's gamut ceiling climbs steeply past 65% lightness, so the
-mirroring step comes out an orange; a step down keeps it reading as metal
-and still clears AA on every surface in the scheme.
-
-In interfaces, always use the `--cirth-primary*` tokens rather than the
-logo hexes: the tokens are variants verified for WCAG. See
-[Colors](/colors) for the full system.
+In interfaces, use the `--cirth-primary*` tokens rather than the logo
+hexes: the tokens are the values measured for contrast. See
+[Colors](/colors) for every role and its value.
 
 ## The lockup
 
@@ -276,14 +313,31 @@ each asset stops working at is a measurement, and it is
 
 ## Typography
 
-Sans-serif is the primary typographic voice for product surfaces, headings,
-and UI chrome, and it is the voice the lockup is set in. Monospace is
-reserved for code, size metrics, and proof points (`13.6 KB`,
-`--cirth-primary`), and for the site's own chrome, where the name appears as
-a navigational label rather than as the wordmark. Serif remains available as
-a primitive token for an author to opt into, but is not part of Cirth's
-product voice. There is no custom font to install: the brand uses the same
-system stacks the framework ships, on purpose.
+Type is assigned by role, not by element. Each role differs from the next
+in at least two of size, weight, ink and tracking:
+
+| Role | Size | Weight | Ink | Used by |
+| --- | --- | --- | --- | --- |
+| Display | 40 to 64px | {{ measured.type.headingWeight if measured else 650 }} | Strong | One headline on a page, opted into |
+| Heading | 22 to 40px | {{ measured.type.headingWeight if measured else 650 }} | Strong | `h1`, `h2` |
+| Title | 14 to 22px | {{ measured.type.titleWeight if measured else 600 }} | Strong, body ink from `h5` | `h3` to `h6` |
+| Group | 16px | {{ measured.type.titleWeight if measured else 600 }} | Strong | A fieldset's `legend` |
+| Body | 16px | 400 | Ink | Running text, table cells, option labels |
+| Label | {{ measured.type.labelSize if measured else 14 }}px, 16px as a control's text | {{ measured.type.labelWeight if measured else 500 }} | Ink | Field labels, buttons, `summary`, `dt` |
+| Meta | {{ measured.type.metaSize if measured else 13 }}px | 500 | Muted | Captions, column heads, help text, attributions |
+| Code and data | 0.875em, never under 12px | 400 | Ink | `pre`, `code`, `kbd`, `samp`, `var` |
+
+Monospace is for code and data only: a listing, a token name, a file name,
+a key. It is not a voice for labels or annotations, and nothing is set in
+capitals to look technical. The name in this site's header is the one
+exception, and it belongs to the lockup as it is drawn today rather than to
+the typographic system: the header sets "Cirth" in the code face beside the
+mark, and no other label on the site does.
+
+There is no font to install. Cirth ships the platform's own sans and mono
+stacks, `system-ui` first, and this site uses them. Serif remains
+available as a primitive token for an author to opt into; it is not part
+of Cirth's product voice.
 
 Write the name as **Cirth** (capitalized, never uppercase); the npm scope
 is `@cirthcss/cirth`.
@@ -302,11 +356,25 @@ tool.
 
 ## Voice
 
-Cirth's writing is technical but accessible, precise, and evidence-led:
-assertive about what is verified, transparent about trade-offs, and never
-ideological. Prefer *claim → mechanism → proof*. State what the framework
-does, explain how it does it, then point at something checkable: a script,
-a number, a source file.
+Cirth's writing is technical language written for people. It is precise
+and evidence-led: assertive about what is verified, open about trade-offs,
+and never ideological. Prefer *claim → mechanism → proof*. State what the
+framework does, explain how it does it, then point at something checkable:
+a script, a number, a source file.
+
+Written for people means four habits:
+
+- **Plain words.** "Sets", "keeps" and "draws", not "leverages" or
+  "empowers". A technical term is used where it is the precise one
+  (`light-dark()`, a cascade layer) and explained the first time a page
+  uses it.
+- **The example before the abstraction.** Show the `<article>` and the
+  card it renders, then name the relation that produced it.
+- **Sentences with rhythm.** Vary their length, and let a short one land
+  the point a longer one set up. One idea to a sentence.
+- **Precision without jargon.** "Clears 4.5:1 on every surface level" is
+  precise. "WCAG-compliant by design" is jargon, and it promises less than
+  it sounds.
 
 The subject is a language and what it is made of, so the vocabulary is
 too. Favour **semantics**, **structure**, **syntax**, **vocabulary**,
@@ -314,14 +382,21 @@ too. Favour **semantics**, **structure**, **syntax**, **vocabulary**,
 **output**, **native**, **integrate**, **baseline**, **verify** and
 **transformation**.
 
-Two habits to avoid. The first is the workshop register: **carving**,
+Three habits to avoid. The first is the workshop register: **carving**,
 **forging**, **craft**, **tooling**, **hardness**, **purity**, **metal**
 and engineering as a metaphor for manual labour. Cirth is named after a
 writing system, not a trade, and a page that reaches for the anvil is
 describing an atmosphere instead of a mechanism. The material reading of
 the name belongs in the origin story, once, and nowhere else.
 
-The second is the unfalsifiable claim: **timeless**, **philosophy**,
+The second is its mirror image, the organic register used as atmosphere:
+**breathing**, **alive**, **natural**, **fluid** and their kin, with no
+mechanism behind the word. A page does not breathe; its reading column has
+a leading of 1.625 and a measure of 30em. A layout is not fluid; its gap is
+a `clamp()`. Where the mechanism exists, name it instead of the feeling it
+produces. Where it does not, the word is decoration.
+
+The third is the unfalsifiable claim: **timeless**, **philosophy**,
 "nothing to break", "fully accessible", "always delivered in one round
 trip". If a sentence cannot be checked against a script, a measurement or
 a source file, it is not doing the work this voice is for.

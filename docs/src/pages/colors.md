@@ -1,37 +1,56 @@
 ---
 layout: docs.njk
-description: The copper accent and the roles derived from it, the status colours, the surface ladder, and how the default palette is built.
+description: The accent and the roles derived from it, the surface levels, edges, inks and states, and how the default palette is built.
 ---
 
 # Colors
 
-Cirth's colour is a handful of inputs and the roles derived from them. Set
-`--cirth-primary` and every link, button, focus ring and checked control
-follows; set `--cirth-canvas` and the whole surface ladder moves with it.
-This page lists what each input drives. For light and dark, the `plain` and
+Cirth's colour is a few inputs and the roles derived from them. Set
+`--cirth-primary` and every link, primary button, focus ring and checked
+control follows; set `--cirth-canvas` and every surface level and every
+edge moves with it. This page lists each role, what it is for, and its
+value in the build this site loads. For light and dark, the `plain` and
 `playroom` presets and writing a theme of your own, see [Themes](/themes).
 
-The default theme is copper on mineral paper in light, and on graphite in
-dark. Copper is reserved for signal: links, primary actions, focus and
-selection. Everything else is ink, surface and hairline.
+The accent is for action and position. Everything else is a surface level,
+an edge, an ink or a state.
+
+{% if not measured %}
+The measured values on this page are read from `dist/tokens/` when the
+site is built, and this build ran without it, so only the token names are
+shown.
+{% endif %}
 
 ## The accent
 
 `--cirth-primary` is the input. These follow it, and you do not normally
 set them:
 
-| Token | Relationship |
+| Token | Role |
 | --- | --- |
-| `--cirth-primary-text` | The accent as text: links and quiet controls |
-| `--cirth-primary-surface` | The filled surface. Same as the accent in light; darker in dark |
-| `--cirth-primary-border` | The edge of that filled surface |
-| `--cirth-primary-active` | Active text and quiet-control edges; darker in light, lighter in dark |
-| `--cirth-primary-surface-active` | The filled surface, one step further |
-| `--cirth-primary-border-active` | The active edge of that surface |
-| `--cirth-primary-underline` | The accent at 50% alpha |
+| `--cirth-primary-text` | The accent as text: links and the current position. Its lightness is held at or under 0.52 in light and at or over 0.72 in dark, the range every surface level can carry text in |
+| `--cirth-primary-surface` | The fill of a primary button. The accent itself in light; a deeper step in dark, so a white label keeps 4.5:1 |
+| `--cirth-primary-border` | The edge of that fill |
+| `--cirth-primary-active` | Text while active; darker in light, lighter in dark |
+| `--cirth-primary-surface-active` | The fill while pressed |
+| `--cirth-primary-border-active` | Its edge while pressed |
+| `--cirth-primary-underline` | A link's underline: the accent at 50% alpha |
 | `--cirth-primary-underline-active` | The underline while its link is active |
-| `--cirth-primary-focus` | The accent at 75% alpha, the focus ring |
-| `--cirth-primary-on-surface` | The text that sits *on* the accent |
+| `--cirth-primary-focus` | The focus ring: the accent's text role, opaque |
+| `--cirth-primary-on-surface` | The label on the fill |
+
+{% if measured %}
+Measured on this build:
+
+| Role | Light | Dark |
+| --- | --- | --- |
+| `--cirth-primary` | `{{ measured.accent.light.primary.hex }}`, `{{ measured.accent.light.primary.oklch }}` | `{{ measured.accent.dark.primary.hex }}`, `{{ measured.accent.dark.primary.oklch }}` |
+| `--cirth-primary-text` | `{{ measured.accent.light.text.hex }}`, `{{ measured.accent.light.text.oklch }}` | `{{ measured.accent.dark.text.hex }}`, `{{ measured.accent.dark.text.oklch }}` |
+| `--cirth-primary-surface` | `{{ measured.accent.light.surface.hex }}`, `{{ measured.accent.light.surface.oklch }}` | `{{ measured.accent.dark.surface.hex }}`, `{{ measured.accent.dark.surface.oklch }}` |
+| Accent text, lowest contrast on any level | {{ measured.accent.light.textWorst | ratio }} | {{ measured.accent.dark.textWorst | ratio }} |
+| Focus ring, lowest contrast on any level | {{ measured.accent.light.focusWorst | ratio }} | {{ measured.accent.dark.focusWorst | ratio }} |
+| Label on the fill | {{ measured.accent.light.label | ratio }} | {{ measured.accent.dark.label | ratio }} |
+{% endif %}
 
 `--cirth-primary-on-surface` is the one to check when you pick an unusual
 accent. It is white by default, which is right for most accents and wrong
@@ -42,88 +61,169 @@ threshold was tested across 936 accents: 10 results missed 4.5:1 and it
 chose the worse of black and white in 14 cases, concentrated around
 cyan–teal. The exact `contrast-color()` decision is outside Cirth's browser
 floor, so the role remains explicit until the platform can choose reliably.
-A future theme generator can make the same choice before it emits a theme.
 
 ```css
 :root {
-  --cirth-primary: #fbbf24;          /* a light amber */
+  --cirth-primary: #fbbf24;             /* a light yellow */
   --cirth-primary-on-surface: #1c1917;  /* so the label stays readable */
 }
 ```
 
-The name now says the role before it says the state: `text`, `surface`,
-`border`, `underline`, `focus`, and `on-surface`, with `-active` appended
-where a state needs another value. That is the same vocabulary the status
-families use below, rather than the former mix of `background`, `hover` and
-`inverse`.
+Each name says the role before the state: `text`, `surface`, `border`,
+`underline`, `focus` and `on-surface`, with `-active` appended where a
+state needs another value. The status families below use the same
+vocabulary.
 
 `--cirth-secondary-text` and `--cirth-contrast-text` anchor the other two
-colour groups, with the same shape. They are roles rather than inputs: the
-default theme chooses their neutral and maximum-contrast values directly.
-`.secondary` and `.contrast` on a button or link swap which group it reads
-from; `.outline` and `.ghost` keep the group and drop the fill. See
+colour groups, with the same shape. The secondary group is tonal: its fill
+is the ink at 9% (14% pressed) with no edge, so a secondary button never
+outweighs the primary beside it. The contrast group is the maximum-contrast
+fill. `.secondary` and `.contrast` on a button or link swap which group it
+reads from; `.outline` and `.ghost` keep the group and drop the fill. See
 [Button](/content/button).
 
-## Status colours
+## Surface levels
 
-Three inputs, each driving four roles:
+Four levels, each derived from `--cirth-canvas` with relative colour
+syntax, lowest first. In light the levels above the canvas use the
+headroom up to white; in dark every level steps up from the canvas.
+
+{% if measured %}
+| Level | Token | Rule | Light | Dark |
+| --- | --- | --- | --- | --- |
+{%- for level in measured.levels %}
+| {{ level.name }} | `--cirth-{{ level.token }}` | {% if level.light.rule %}`{{ level.light.rule }}`{% if level.dark.rule != level.light.rule %}; dark: `{{ level.dark.rule }}`{% endif %}{% else %}The input{% endif %} | `{{ level.light.hex }}`, L {{ level.light.l }} | `{{ level.dark.hex }}`, L {{ level.dark.l }} |
+{%- endfor %}
+{% else %}
+| Level | Token |
+| --- | --- |
+| Recessed | `--cirth-surface-recessed` |
+| Canvas | `--cirth-canvas` |
+| Raised | `--cirth-surface-raised` |
+| Overlay | `--cirth-surface-overlay` |
+{% endif %}
+
+What sits on each:
+
+- **Recessed**: a code block, a live example's stage, a band that groups a
+  section of a page.
+- **Canvas**: the page.
+- **Raised**: an `<article>`. A card's header and footer bands sit halfway
+  between the canvas and this level
+  (`--cirth-card-sectioning-background-color`).
+- **Overlay**: a dialog, a popover, a dropdown list. In light it is the
+  raised level and its shadow lifts it; in dark it is also a step lighter
+  than the raised level, so a floating sheet is lighter than what it
+  covers as well as shadowed.
+
+Every level keeps the canvas's hue and chroma (the raised level in light
+halves the chroma on its way to white), so a preset that tints its canvas
+tints every level with it: `plain` is neutral, `playroom` keeps its own
+hue, and no level is a wash of the accent.
+
+`--cirth-surface` is the level the current element sits on: the canvas at
+the root, rebound by every container that paints a level (an `<article>`,
+a card's bands, a dialog, a popover, a dropdown list). A field paints
+`--cirth-surface`, so it takes the level of whatever holds it. If you paint
+a container of your own, set `--cirth-surface` on it to the same colour and
+the fields inside follow.
+
+Component tokens alias a level: `--cirth-card-background-color` is the
+raised level, `--cirth-code-background-color` the recessed one, and the
+dropdown and popover backgrounds the overlay one. Override the level to
+move every component on it, or the component token to move one.
+
+## Edges
+
+Three roles, derived from the same canvas, in rising contrast. Every edge
+is one stroke, `--cirth-border-width`, on all four sides.
+
+{% if measured %}
+| Edge | Token | Rule | Light | Dark | On the canvas | Lowest on any level |
+| --- | --- | --- | --- | --- | --- | --- |
+{%- for edge in measured.edges %}
+| {{ edge.name }} | `--cirth-{{ edge.token }}` | `{{ edge.light.rule }}`{% if edge.dark.rule != edge.light.rule %}; dark: `{{ edge.dark.rule }}`{% endif %} | `{{ edge.light.hex }}` | `{{ edge.dark.hex }}` | {{ edge.light.onCanvas | ratio }} · {{ edge.dark.onCanvas | ratio }} | {{ edge.light.worst | ratio }} · {{ edge.dark.worst | ratio }} |
+{%- endfor %}
+
+Contrast columns read light · dark.
+{% endif %}
+
+- **Separator** divides content inside a surface: table rows, a card's
+  bands, a rule, a blockquote's edge.
+- **Container** bounds a surface: a card, a popover, a dropdown list. It
+  sits a quarter of the way from the separator to the control edge unless
+  you set it.
+- **Control** bounds something you operate: a field, a checkbox, a select,
+  a meter.
+
+Only the control edge carries a contrast requirement, WCAG 1.4.11's 3:1
+for the boundary of a control, and it keeps it on every level in both
+schemes. The separator and the container divide and bound content, and
+stay as light as that job allows. Under `prefers-contrast: more` all three
+move further from the canvas.
+
+## Inks
+
+{% if measured %}
+| Ink | Token | Light | Dark | Lowest on any level | For |
+| --- | --- | --- | --- | --- | --- |
+{%- for ink in measured.inks %}
+| {{ ink.name }} | `--cirth-{{ ink.token }}` | `{{ ink.light.hex }}` | `{{ ink.dark.hex }}` | {{ ink.light.worst | ratio }} · {{ ink.dark.worst | ratio }} | {{ ink.job }} |
+{%- endfor %}
+
+Contrast reads light · dark.
+{% else %}
+`--cirth-ink-strong` for headings, `--cirth-ink` for body text and code,
+`--cirth-secondary-text` for secondary actions, `--cirth-muted-color` for
+metadata, and `--cirth-primary-text` for links.
+{% endif %}
+
+`--cirth-ink` is the input of this family: `--cirth-color` and the
+component inks (accordion summary, dropdown, popover, the `<kbd>` fill)
+alias it. Headings `h1` to `h4` take the strong ink; `h5` and `h6` take the
+body ink, because at body size a stronger ink is the one thing that would
+separate them from bold text.
+
+## States
+
+Three families, each driving the same roles:
 
 | Role | Used by |
 | --- | --- |
 | `--cirth-error` | The solid reading: a worst-band `<meter>` and the `.danger` button fill |
 | `--cirth-error-text` | `<del>`, and status text on the page |
-| `--cirth-error-border` | An `[aria-invalid="true"]` field |
-| `--cirth-error-active` | That field while it has focus |
+| `--cirth-error-border` | An `[aria-invalid="true"]` field, and its focus ring |
+| `--cirth-error-active` | The edge of an outline `.danger` button while hovered or pressed |
 | `--cirth-error-surface` | A tint to sit status content on |
 
-`--cirth-success` and `--cirth-warning` are identical in shape. A `<mark>`
-does not imply warning: its background is derived from `--cirth-primary`, so
-highlighted evidence follows the chosen accent while status content stays on
-the explicit `*-surface` families.
+`--cirth-success` and `--cirth-warning` have the same shape.
+
+{% if measured %}
+| State | Hue | Text, lowest on any level | Edge, lowest on any level |
+| --- | --- | --- | --- |
+{%- for status in measured.statuses %}
+| {{ status.name | capitalize }} | {{ status.hue }}° | {{ status.light.textWorst | ratio }} · {{ status.dark.textWorst | ratio }} | {{ status.light.borderWorst | ratio }} · {{ status.dark.borderWorst | ratio }} |
+{%- endfor %}
+
+Contrast reads light · dark.
+{% endif %}
+
+A field in a validation state draws its focus ring in the state's edge
+colour, so focus and validity never show two different colours on one
+control. Disabled is not a state colour: every control takes
+`--cirth-disabled-surface` (the ink at 6%) and `--cirth-disabled-color`
+(the ink at 50%) and keeps its geometry, so a disabled primary button is
+the same neutral as a disabled secondary one.
+
+A `<mark>` does not imply warning: its background is derived from
+`--cirth-primary`, so highlighted evidence follows the chosen accent while
+status content stays on the explicit `*-surface` families.
 
 Status hues are deliberately not fixed constants. If your brand overlaps a
 conventional status hue, move the status family rather than avoiding the
 brand: what has to stay true is that the two remain distinguishable, and
 that state is never signalled by colour alone (WCAG 1.4.1). Cirth's own
 validity styling pairs colour with an icon for that reason.
-
-## Surfaces
-
-| Token | What it is |
-| --- | --- |
-| `--cirth-canvas` | The page surface |
-| `--cirth-ink` | The page text colour |
-| `--cirth-code-background-color` | A recessed band: `<pre>`, inline `<code>` |
-| `--cirth-form-element-background-color` | A field at rest |
-| `--cirth-card-sectioning-background-color` | A card's header and footer band |
-| `--cirth-card-background-color` | An `<article>`; a dropdown and a popover follow it |
-| `--cirth-form-element-active-background-color` | A focused field; rises back to the canvas |
-| `--cirth-muted-color` | Subordinate text |
-| `--cirth-muted-border-color` | Hairlines: tables, cards, blockquotes |
-
-`--cirth-canvas` and `--cirth-ink` are the two inputs in this family: the
-page's surface and the page's ink. Set either and the tokens that alias it
-follow: `--cirth-background-color` and the surface ladder from the canvas,
-`--cirth-color` and the component inks (accordion summary, dropdown,
-popover, the `<kbd>` fill) from the ink. The others are runtime
-relationships: code is the deepest recess, the resting field sits between it
-and the canvas, the band and card add lightness, and a focused field rises to
-the canvas. Dropdown and popover alias the card because they are floating
-sheets. Overriding any derived token directly still breaks its relationship
-on purpose.
-
-The ladder preserves the canvas hue and chroma, so warm paper stays warm,
-Plain becomes neutral, and Playroom carries its violet temperature without
-restating a parallel scale. Both schemes now tell the same semantic story:
-
-```
-light: code 95.5 < control 96.6 < canvas 97.4 < band 98.3 < card 99.2
-dark:  code 18.2 < control 19.4 < canvas 20.2 < band 22.7 < card 24.2
-```
-
-A single `--cirth-canvas` override therefore moves card, form, code, dropdown,
-and popover in light, dark, and forced-theme subtrees. Plain uses that one
-surface input; it does not enumerate the ladder.
 
 ## Underlying palette
 
@@ -144,7 +244,7 @@ inputs to derived semantic tokens remain in the compiled CSS as `var()`,
 Scales are named for the role they play, not for their hue: `$accent-*`
 seeds the default accent, `$neutral-*` carries ink, lines and the dark
 canvas, and the status colors are `$error-*`, `$success-*` and
-`$warning-*`, not `$red-*`, `$moss-*` or `$gold-*`, because that's what
+`$warning-*`, not `$red-*`, `$green-*` or `$yellow-*`, because that's what
 they mean everywhere they're used (invalid/valid form state,
 deleted/inserted text).
 
@@ -158,9 +258,9 @@ Each chromatic scale is pinned to one hue and held at a constant fraction
 of that hue's own maximum sRGB chroma within the gamut at every step. The
 fraction is the family's voice. `$error-*`, `$success-*` and `$warning-*`
 sit at 85%: a status color has to be recognisable at a glance in a small,
-rare mark. `$accent-*` sits at 70%, because the brand accent is the
-opposite case: it covers whole surfaces and appears on every screen, so
-the fraction that makes a status mark legible would make the accent shout.
+rare mark. `$accent-*` sits at 70%, because the accent is the opposite
+case: it fills a primary button on every screen, so the fraction that makes
+a status mark legible would make the accent the loudest thing on the page.
 The families don't peak at the same step because sRGB's gamut boundary
 shape differs per hue. For example, red's ceiling sits at a darker
 lightness than green's, but every step of every scale sits at the same
@@ -176,12 +276,12 @@ dark scheme builds its canvas out of the two darkest steps, and a bell that
 closed symmetrically left that canvas achromatic whatever hue the family
 was given.
 
-The neutral's hue does real work: at 280deg it is predominantly blue with a
-violet lift, and it sits 124deg from the brand hue. That distance is the
-point. Copper is only legible *as* a warm signal against something cool, so
-the graphite is what the accent is measured against rather than a bystander:
-move the family round toward plum and the page loses its blue, leaving
-every surface, ink and signal reading as one temperature.
+The neutral's hue does real work: at {{ measured.neutralHue if measured else 280 }}deg it
+sits 124deg from the accent's. That distance is what lets the accent read
+as a signal: the inks and the dark canvas are measured against it rather
+than beside it, and a neutral moved round toward the accent's hue would
+leave lightness as the only thing separating a link from the text around
+it.
 
 `$accent-*`'s hue (44deg) isn't an arbitrary pick; it's lifted directly
 from the brand mark, so the theme's primary accent and the logo are the
@@ -192,7 +292,7 @@ its voice.
 
 `plain` and `playroom` (`src/presets/`) declare only the values for the
 inputs and roles they intentionally change. They do not duplicate the theme's
-surface ladder, component styles, reset rules, or scheme wiring: each scheme
+surface levels, component styles, reset rules, or scheme wiring: each scheme
 difference is stated once as a `light-dark()` pair, which is why `plain` fits
 in five declarations.
 
@@ -208,7 +308,7 @@ Cirth previously inherited a set of twenty accent color themes from Pico CSS, th
 briefly maintained three full themes (azure, jade, slate). That has been
 reduced further to a single official theme plus two token override presets,
 `plain` and `playroom`. The official theme's accent was an amber until
-0.15; it is now the copper described above, with the neutral, surface and
+0.15; it is now the accent described above, with the neutral, surface and
 status families rebuilt around it rather than adapted to it. See
 [About](/about) for the project's history and
 [Contributions](/contributions) before proposing color system changes.

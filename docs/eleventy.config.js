@@ -9,6 +9,7 @@ const { buildPagefindIndex } = require("../scripts/build-pagefind");
 const { brotliSize, gzipSize } = require("../scripts/lib/compressed-size");
 const { listPresetNames, presetLabel } = require("../scripts/lib/presets");
 const { docsPathPrefix } = require("../scripts/lib/docs-site");
+const { measuredTheme } = require("../scripts/lib/measured-theme");
 
 // Eleventy replacement for the previous Astro setup. Same site shape:
 // docs/src/pages -> docs/dist, one <path>/index.html per page, served at
@@ -408,6 +409,10 @@ module.exports = (eleventyConfig) => {
 	);
 	eleventyConfig.addGlobalData("themePreview", themePreview());
 	eleventyConfig.addGlobalData("browsers", browserTargets());
+	// Surface levels, edges, inks, the accent, the states and the rhythm,
+	// measured off dist/tokens for the Brand and Colors pages; null on a
+	// docs-only run with no build, where the pages print token names only.
+	eleventyConfig.addGlobalData("measured", measuredTheme(path.join(docsRoot, "..")));
 
 	// --- Markdown pipeline ------------------------------------------------
 	// Fenced code: highlight.js token classes (same .hljs-* classes the docs
@@ -629,6 +634,12 @@ ${caption}<div class="docs-demo-preview${classlessClass}">${html}</div>
 	// element, a component, a layout primitive, a utility) is consulted:
 	// the grammar leads, with chapter rules and dense tables. Everything
 	// else is a guide, read from the top: the reading rhythm leads.
+	// A contrast ratio as the pages print it: two decimals, so a value just
+	// over a threshold is not rounded onto it.
+	eleventyConfig.addFilter("ratio", (/** @type {number | null | undefined} */ value) =>
+		typeof value === "number" && Number.isFinite(value) ? `${value.toFixed(2)}:1` : "n/a",
+	);
+
 	eleventyConfig.addFilter("docsKind", (url = "") =>
 		/^\/(?:layout|content|forms|components|utilities)\//.test(url)
 			? "reference"
