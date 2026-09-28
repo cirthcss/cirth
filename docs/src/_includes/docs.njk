@@ -36,11 +36,14 @@ layout: base.njk
 		{% endif %}
 	</div>
 	<div class="docs-layout">
+		{#- An open index, not a set of accordions: every group is visible,
+		    named in the meta role, so the reader sees the whole structure
+		    of the documentation and where the current page sits in it. -#}
 		<aside class="docs-sidebar">
 			<nav aria-label="docs navigation">
 				{% for group in nav.sidebar %}
-					<details{% if group.items | hasActiveItem(page.url) %} open{% endif %}>
-						<summary>{{ group.text }}</summary>
+					<section class="docs-sidebar-group" aria-labelledby="docs-sidebar-{{ loop.index }}">
+						<p class="docs-sidebar-label" id="docs-sidebar-{{ loop.index }}">{{ group.text }}</p>
 						<ul>
 							{% for item in group.items %}
 								<li>
@@ -48,11 +51,11 @@ layout: base.njk
 								</li>
 							{% endfor %}
 						</ul>
-					</details>
+					</section>
 				{% endfor %}
 			</nav>
 		</aside>
-		<div class="docs-content" data-pagefind-body>
+		<div class="docs-content" data-docs-kind="{{ page.url | docsKind }}" data-pagefind-body>
 			{{ content | safe }}
 			{% if pageIndex > -1 %}
 				{% set prevPage = nav.flatPages[pageIndex - 1] if pageIndex > 0 %}

@@ -505,19 +505,37 @@ module.exports = (eleventyConfig) => {
 		}
 		const html = fs.readFileSync(file, "utf8").trim();
 		const classlessClass = variant === "classless" ? " cirth-classless" : "";
-		const variantLabel = variant === "classless" ? "Classless build" : "Default build";
 		const frameClass = frame === "narrow" ? " docs-demo-narrow" : "";
+		// A caption only when it says something the page does not: which
+		// build renders the example, when it is not the default one. The
+		// same two lines of metadata on every demo were read once and then
+		// skipped, on every page.
+		const caption =
+			variant === "classless"
+				? `<figcaption class="docs-demo-caption">Classless build</figcaption>\n`
+				: "";
 		return `<figure class="docs-demo${frameClass}">
-<figcaption class="docs-demo-caption"><span><strong>Live UI</strong> · ${variantLabel}</span><span>Authentic Cirth · shell overrides declared in source</span></figcaption>
-<div class="docs-demo-preview${classlessClass}">${html}</div>
+${caption}<div class="docs-demo-preview${classlessClass}">${html}</div>
 <details class="docs-demo-source">
-<summary>Show HTML</summary>
+<summary>HTML</summary>
 <pre tabindex="0"><code class="hljs language-html">${
 			hljs.highlight(html, { language: "html", ignoreIllegals: true }).value
 		}</code></pre>
 </details>
 </figure>`;
 	};
+
+	// One source per example. Most pages follow a demo with the listing a
+	// reader should copy, written for reading rather than rendered inline;
+	// with the demo's own disclosure beside it the same code appeared twice.
+	// When an HTML listing follows a demo directly it becomes the demo's
+	// source band, open, and the disclosure goes; a demo with no listing
+	// after it keeps the disclosure.
+	const adoptListing = (content) =>
+		content.replace(
+			/<details class="docs-demo-source">[\s\S]*?<\/details>\n<\/figure>\s*(<pre[^>]*><code class="hljs language-html">[\s\S]*?<\/code><\/pre>)/g,
+			(_, listing) => `<div class="docs-demo-source">${listing}</div>\n</figure>`,
+		);
 
 	// `frame` is the stage's width, not the example's: "narrow" gives a
 	// screen that is narrow by nature (a sign-in card) a stage its own size
@@ -530,9 +548,11 @@ module.exports = (eleventyConfig) => {
 
 	eleventyConfig.addTransform("cirth-demos", (content, outputPath) => {
 		if (!outputPath?.endsWith(".html")) return content;
-		return content.replace(
-			/<!--cirth-demo:([\w-]+):(\w+)(?::(\w+))?-->/g,
-			(_, src, variant, frame) => buildDemo(src, variant, frame),
+		return adoptListing(
+			content.replace(
+				/<!--cirth-demo:([\w-]+):(\w+)(?::(\w+))?-->/g,
+				(_, src, variant, frame) => buildDemo(src, variant, frame),
+			),
 		);
 	});
 
@@ -604,6 +624,16 @@ module.exports = (eleventyConfig) => {
 	// nav-config links don't — normalize before comparing for active state.
 	const withSlash = (link) => (link.endsWith("/") ? link : `${link}/`);
 	eleventyConfig.addFilter("withSlash", withSlash);
+
+	// What a page is for decides how it is set. A reference page (an
+	// element, a component, a layout primitive, a utility) is consulted:
+	// the grammar leads, with chapter rules and dense tables. Everything
+	// else is a guide, read from the top: the reading rhythm leads.
+	eleventyConfig.addFilter("docsKind", (url = "") =>
+		/^\/(?:layout|content|forms|components|utilities)\//.test(url)
+			? "reference"
+			: "guide",
+	);
 
 	// Nunjucks `set` inside a for-loop doesn't escape the loop scope, so
 	// active-item and prev/next lookups live here instead of the template.

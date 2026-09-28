@@ -1,15 +1,21 @@
-<!-- In real usage, open with dialog.showModal() from a button's onclick.
-     Position is forced static here only so the preview stays inline. -->
-<dialog open aria-labelledby="demo-confirm-title" style="position: static; width: 100%; min-width: 0; height: auto; min-height: 0; backdrop-filter: none; background: transparent;">
-  <article>
-    <header>
-      <button type="button" aria-label="Close" rel="prev" style="float: right;"></button>
-      <strong id="demo-confirm-title">Confirm action</strong>
-    </header>
-    <p>Are you sure you want to delete this item? This cannot be undone.</p>
-    <footer>
-      <button type="button" class="secondary">Cancel</button>
-      <button type="button">Confirm</button>
-    </footer>
-  </article>
-</dialog>
+<!-- In real usage the dialog is opened with showModal() or
+     command="show-modal" and covers the viewport. Here it is held inside a
+     box of its own, over a stand-in for the page, so the backdrop and the
+     dialog's elevation are visible without taking the documentation over. -->
+<div style="position: relative; min-block-size: 22rem; overflow: hidden;">
+  <p>The page behind the dialog: a settings screen, a list of items, whatever the reader was working on when they asked to delete something.</p>
+  <p>It stays where it was, dimmed and blurred by the backdrop, until the dialog closes.</p>
+  <dialog open aria-labelledby="demo-confirm-title" style="position: absolute; min-block-size: 100%;">
+    <article>
+      <header>
+        <button type="button" aria-label="Close" rel="prev"></button>
+        <strong id="demo-confirm-title">Delete this item?</strong>
+      </header>
+      <p>It is removed for everyone on the project, and it cannot be restored.</p>
+      <footer>
+        <button type="button" class="secondary">Cancel</button>
+        <button type="button" class="danger">Delete</button>
+      </footer>
+    </article>
+  </dialog>
+</div>

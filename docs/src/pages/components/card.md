@@ -5,16 +5,29 @@ layout: docs.njk
 
 # Card
 
-Any `<article>` is a card: padded, with a background, box shadow, and
-optional `header`/`footer` sections, with no `.card` class.
+Any `<article>` is a card: a raised surface with the container edge,
+padding, and optional `header`/`footer` bands, with no `.card` class.
 
 {% demo "card" %}
 
 ```html
 <article>
-  <header><strong>Card header</strong></header>
-  <p>Any semantic content goes here.</p>
-  <footer><button type="button">Action</button></footer>
+  <header>
+    <strong>Release 4.18.2 is ready</strong>
+  </header>
+  <p>The checkout service passed every check on staging.</p>
+  <dl>
+    <dt>Build</dt>
+    <dd><code>4.18.2+a91c3e0</code></dd>
+    <dt>Checks</dt>
+    <dd>212 passed, 0 failed</dd>
+  </dl>
+  <footer>
+    <p>
+      <button type="button">Promote</button>
+      <button type="button" class="secondary">View changes</button>
+    </p>
+  </footer>
 </article>
 ```
 

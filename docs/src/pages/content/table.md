@@ -12,11 +12,25 @@ alternating row backgrounds.
 
 ```html
 <table>
+  <caption>Deployments this week</caption>
   <thead>
-    <tr><th scope="col">#</th><th scope="col">Name</th><th scope="col">Role</th></tr>
+    <tr>
+      <th scope="col">Service</th>
+      <th scope="col">Region</th>
+      <th scope="col">Version</th>
+      <th scope="col">Duration</th>
+      <th scope="col">Result</th>
+    </tr>
   </thead>
   <tbody>
-    <tr><th scope="row">1</th><td>Alex Doe</td><td>Engineer</td></tr>
+    <tr>
+      <th scope="row">checkout-api</th>
+      <td>eu-west</td>
+      <td>4.18.2</td>
+      <td>3 min 12 s</td>
+      <td>Live</td>
+    </tr>
+    …
   </tbody>
 </table>
 ```
@@ -56,8 +70,11 @@ want it underneath.
 * Cell padding is `calc(var(--cirth-spacing) / 2) var(--cirth-spacing)`, with
   a bottom border in `--cirth-table-border-color`.
 * `tfoot` cells get a top border instead of a bottom one.
-* `thead`/`tfoot` cells are bolder (`--cirth-font-weight-semibold`) with a
-  thicker border.
+* `thead`/`tfoot` cells are metadata about the cells, in the meta role:
+  `--cirth-meta-font-size`, medium weight, the muted ink. Row heads
+  (`tbody th`) name their row at the label weight.
+* Rows are divided by the separator edge (`--cirth-table-border-color`).
+* Figures align in columns (`font-variant-numeric: tabular-nums`).
 * `<caption>` is aligned to `start` in the muted ink, with half a rhythm step
   below it.
 

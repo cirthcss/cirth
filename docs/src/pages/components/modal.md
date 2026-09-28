@@ -17,16 +17,20 @@ nothing else, and no longer asks your script for anything.
   <article>
     <header>
       <button type="button" aria-label="Close" rel="prev"></button>
-      <strong id="confirm-title">Confirm action</strong>
+      <strong id="confirm-title">Delete this item?</strong>
     </header>
-    <p>Are you sure you want to delete this item? This cannot be undone.</p>
+    <p>It is removed for everyone on the project, and it cannot be restored.</p>
     <footer>
       <button type="button" class="secondary">Cancel</button>
-      <button type="button">Confirm</button>
+      <button type="button" class="danger">Delete</button>
     </footer>
   </article>
 </dialog>
 ```
+
+The dialog is the overlay surface level, lifted by the overlay shadow, over
+a backdrop that dims and blurs the page: the example above holds it inside
+a box of its own so the elevation is visible without covering this page.
 
 ## Opening and closing
 

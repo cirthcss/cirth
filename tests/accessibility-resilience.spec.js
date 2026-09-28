@@ -434,7 +434,7 @@ for (const theme of themeVariants) {
 					element.showModal();
 				});
 				await expect(
-					page.getByRole("dialog", { name: "Confirm action" }),
+					page.getByRole("dialog", { name: "Delete this item?" }),
 				).toBeVisible();
 
 				await dialog.evaluate((element) => {

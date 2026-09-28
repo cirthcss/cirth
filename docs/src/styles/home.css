@@ -2,11 +2,13 @@
  * The home page, and only the home page: loaded after style.css by
  * index.md's `stylesheets`, so no documentation page carries it.
  *
- * Composition and storytelling. Every surface is one of Cirth's own (the
- * canvas, the sectioning band, the card, the code recess, the elevation
- * shadow) and every live sample on the page is rendered by the stylesheet
- * the page loads, with nothing here reaching inside it except the one
- * thing a container owes its contents: closing their outer margins.
+ * Composition and storytelling. Every surface is one of Cirth's levels
+ * (the canvas, the recessed band, the raised container, the code recess)
+ * and every edge one of its three roles. Nothing on the page is elevated:
+ * a shadow belongs to what floats over the page, and nothing here does.
+ * Every live sample is rendered by the stylesheet the page loads, with
+ * nothing here reaching inside it except the one thing a container owes
+ * its contents: closing their outer margins.
  *
  * Mobile first. The base rules are the phone; every width query adds.
  */
@@ -28,12 +30,14 @@
   margin-inline: auto;
 }
 
-/* A band: the sectioning surface between two hairlines, so the page
-   alternates between the canvas and a quieter ground rather than being one
-   continuous sheet. */
+/* A band is the recessed surface level, so the page alternates between
+   the canvas and a level below it: surfaces group, and the separators at
+   its edges are the division. Whatever sits in a band paints the band. */
 .docs-band {
+  --cirth-surface: var(--cirth-surface-recessed);
+
   border-block: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-  background: var(--cirth-card-sectioning-background-color);
+  background: var(--cirth-surface-recessed);
 }
 
 /* Section heading: the heading at display size, one sentence under it. */
@@ -42,18 +46,14 @@
   margin-block-end: clamp(2rem, 4vw, 3rem);
 }
 
-/* Display size through the slot every heading resolves through, with its
-   bounds read off the shipped scale. */
+/* A section's heading is the heading role at the size a page title takes
+   in the reference: the home is read, so it opens its chapters at that
+   size rather than at a second, larger scale of its own. */
 .docs-section-head h2,
 .docs-cta h2 {
-  --cirth-font-size: clamp(
-    var(--cirth-font-size-3xl),
-    1.25rem + 2.4vw,
-    var(--cirth-font-size-5xl)
-  );
-  --cirth-line-height: var(--cirth-line-height-tight);
+  --cirth-font-size: clamp(1.75rem, 1.35rem + 1.6vw, 2.5rem);
 
-  margin-block: 0 var(--cirth-space-4);
+  margin-block: 0 var(--cirth-flow-element);
 }
 
 .docs-section-head > p:last-child {
@@ -62,13 +62,13 @@
   font-size: var(--cirth-font-size-lg);
 }
 
-/* The name of a claim's kind or of an example: muted text in the reading
-   face, one step below the prose. Never below the reading floor. */
+/* The name of a claim's kind or of an example: the library's meta role. */
 .docs-proof-state,
 .docs-example-name {
   color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-sm);
-  font-weight: var(--cirth-font-weight-regular);
+  font-size: var(--cirth-meta-font-size);
+  font-weight: var(--cirth-font-weight-medium);
+  letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
 }
 
 /* A pane label: the file name on one side, what it is on the other. */
@@ -102,16 +102,12 @@
   max-inline-size: 50rem;
 }
 
-/* The one headline on the site set larger than the scale's top step:
-   through --cirth-font-size, from the scale's 5xl on a phone to a quarter
-   above its 7xl on a wide screen. */
+/* The one headline on the site in the display role: its size and weight
+   are the library's display tokens, its tracking the same optical relation
+   every heading takes (-0.03em at 64px), its leading tight. */
 .docs-hero h1 {
-  --cirth-font-size: clamp(
-    var(--cirth-font-size-5xl),
-    1rem + 5vw,
-    calc(var(--cirth-font-size-7xl) * 1.25)
-  );
-  --cirth-line-height: var(--cirth-line-height-none);
+  --cirth-font-size: var(--cirth-display-font-size);
+  --cirth-font-weight: var(--cirth-display-font-weight);
 
   margin: 0;
   text-wrap: balance;
@@ -159,15 +155,14 @@ pre.docs-hero-install {
   margin: clamp(2.5rem, 5vw, 4rem) 0 0;
 }
 
-/* The window: one card holding the source pane, the connector and the
-   rendered card. The elevation is the framework's own shadow, which now
-   has a dark half worth the name. */
+/* The window: one container holding the source pane, the connector and
+   the rendered card, on the raised level with the container edge. It sits
+   in the page, so it takes no shadow. */
 .docs-hero-panes {
   display: grid;
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
-  border-radius: calc(var(--cirth-card-border-radius) * 1.5);
+  border-radius: var(--cirth-card-border-radius);
   background: var(--cirth-card-background-color);
-  box-shadow: var(--cirth-box-shadow);
   overflow: clip;
 }
 
@@ -208,7 +203,8 @@ pre.docs-hero-install {
   border-block: var(--cirth-border-width) solid var(--cirth-card-border-color);
   background: var(--cirth-card-sectioning-background-color);
   color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-sm);
+  font-size: var(--cirth-meta-font-size);
+  font-weight: var(--cirth-font-weight-medium);
 }
 
 .docs-hero-connector span::before {
@@ -264,19 +260,24 @@ pre.docs-hero-install {
   overflow: clip;
 }
 
+/* A fact is a value over its name: the value in the title role with
+   tabular figures, the name in the meta role. */
 .docs-hero-facts li {
   margin: 0;
   padding: var(--cirth-space-3) var(--cirth-space-4);
   background: var(--cirth-card-background-color);
   color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-sm);
+  font-size: var(--cirth-meta-font-size);
+  font-weight: var(--cirth-font-weight-medium);
   list-style: none;
 }
 
 .docs-hero-facts strong {
   display: block;
-  color: var(--cirth-contrast-text);
+  color: var(--cirth-ink-strong);
   font-size: var(--cirth-font-size-xl);
+  font-weight: var(--cirth-title-font-weight);
+  font-variant-numeric: tabular-nums;
   line-height: var(--cirth-line-height-snug);
 }
 
@@ -288,11 +289,10 @@ pre.docs-hero-install {
 
 /* Story
    ––––––––––––––––––––
-   Served as three steps, each followed by its own visual: that is the
-   phone, the no-script reader, the reduced-motion reader and print. From
-   64rem the steps sit beside their visuals, still all three at once. The
-   script adds `.is-enhanced` (wide screen, motion allowed), which folds
-   the three visuals into one sticky stage beside the headings. */
+   Three steps, each a heading and a sentence followed by its own visual.
+   From 64rem each step sets its text beside its visual. Nothing moves:
+   the page is read, and a reader compares the three by scrolling between
+   them, which a stage that swaps its visual would take away. */
 .docs-story-steps {
   display: grid;
   gap: clamp(3rem, 7vw, 5rem);
@@ -300,19 +300,15 @@ pre.docs-hero-install {
 
 .docs-story-step {
   display: grid;
-  gap: var(--cirth-space-5);
+  gap: var(--cirth-flow-group);
   min-inline-size: 0;
 }
 
+/* The heading role one step under the section's own heading. */
 .docs-story-text h3 {
-  --cirth-font-size: clamp(
-    var(--cirth-font-size-2xl),
-    1rem + 2.2vw,
-    var(--cirth-font-size-5xl)
-  );
-  --cirth-line-height: var(--cirth-line-height-tight);
+  --cirth-font-size: clamp(1.375rem, 1.15rem + 0.9vw, 1.75rem);
 
-  margin: 0 0 var(--cirth-space-3);
+  margin: 0 0 var(--cirth-flow-line);
 }
 
 .docs-story-text > p:last-child {
@@ -324,7 +320,7 @@ pre.docs-hero-install {
 
 .docs-story-visual {
   display: grid;
-  gap: var(--cirth-space-2);
+  gap: var(--cirth-flow-line);
   min-inline-size: 0;
   margin: 0;
 }
@@ -337,7 +333,6 @@ pre.docs-hero-install {
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
   border-radius: var(--cirth-card-border-radius);
   background: var(--cirth-card-background-color);
-  box-shadow: var(--cirth-box-shadow);
   overflow: clip;
 }
 
@@ -368,105 +363,19 @@ pre.docs-hero-install {
   margin: 0;
 }
 
-.docs-story-visual figcaption {
+.docs-story-visual figcaption,
+.docs-dom-diagram figcaption {
   color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-sm);
+  font-size: var(--cirth-meta-font-size);
+  font-weight: var(--cirth-font-weight-medium);
+  letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
 }
 
-@media screen and (width >= 64rem) {
+@media (width >= 64rem) {
   .docs-story-step {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     align-items: center;
     column-gap: clamp(2.5rem, 5vw, 5rem);
-  }
-
-  /* The sticky stage. The steps give up their boxes so that the three
-     texts and the three visuals are items of one grid: the texts one per
-     row down the first column, the visuals all in the second, spanning
-     every row and stacked in the same cell. Sticky inside that span, the
-     stage stays in view while the headings pass it, and the script only
-     changes which visual is opaque. */
-  .docs-story-steps.is-enhanced {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    column-gap: clamp(2.5rem, 5vw, 5rem);
-    row-gap: 0;
-  }
-
-  .docs-story-steps.is-enhanced > .docs-story-step {
-    display: contents;
-  }
-
-  .is-enhanced .docs-story-text {
-    display: grid;
-    grid-column: 1;
-    align-content: center;
-    min-block-size: 72vh;
-  }
-
-  .is-enhanced > :nth-child(1) > .docs-story-text {
-    grid-row: 1;
-  }
-
-  .is-enhanced > :nth-child(2) > .docs-story-text {
-    grid-row: 2;
-  }
-
-  .is-enhanced > :nth-child(3) > .docs-story-text {
-    grid-row: 3;
-  }
-
-  .is-enhanced .docs-story-visual {
-    position: sticky;
-    inset-block-start: max(5.5rem, calc(50vh - 17rem));
-    grid-column: 2;
-    grid-row: 1 / span 3;
-    align-self: start;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .is-enhanced .is-active .docs-story-visual {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .is-enhanced :is(.docs-story-code, .docs-story-render) {
-    block-size: min(30rem, 66vh);
-  }
-
-  .is-enhanced .docs-story-code pre {
-    max-block-size: none;
-  }
-
-  .is-enhanced .docs-story-text :is(h3, p) {
-    color: var(--cirth-muted-color);
-  }
-
-  .is-enhanced .is-active .docs-story-text h3 {
-    color: var(--cirth-contrast-text);
-  }
-
-  .is-enhanced .is-active .docs-story-text > p:last-child {
-    color: var(--cirth-secondary-text);
-  }
-}
-
-/* The crossfade, under no-preference only. The script never enhances
-   with the preference set, so this is belt and braces. */
-@media screen and (width >= 64rem) and (prefers-reduced-motion: no-preference) {
-  .is-enhanced .docs-story-visual {
-    transform: translateY(0.75rem);
-    transition:
-      opacity 0.35s ease,
-      transform 0.35s ease;
-  }
-
-  .is-enhanced .is-active .docs-story-visual {
-    transform: none;
-  }
-
-  .is-enhanced .docs-story-text :is(h3, p) {
-    transition: color 0.3s ease;
   }
 }
 
@@ -488,9 +397,8 @@ pre.docs-hero-install {
   margin: 0;
   padding: clamp(0.75rem, 3vw, 1.75rem);
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
-  border-radius: calc(var(--cirth-card-border-radius) * 1.5);
+  border-radius: var(--cirth-card-border-radius);
   background: var(--cirth-card-background-color);
-  box-shadow: var(--cirth-box-shadow);
 }
 
 .docs-syntax-list {
@@ -514,8 +422,8 @@ pre.docs-hero-install {
 
 .docs-syntax-list span {
   color: var(--cirth-muted-color);
-  font-family: var(--cirth-font-family-mono);
-  font-size: var(--cirth-font-size-sm);
+  font-size: var(--cirth-meta-font-size);
+  font-weight: var(--cirth-font-weight-medium);
 }
 
 /* Wraps between attributes, never inside one. */
@@ -542,7 +450,8 @@ pre.docs-hero-install {
   gap: var(--cirth-space-3);
   margin: var(--cirth-space-4) 0;
   color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-sm);
+  font-size: var(--cirth-meta-font-size);
+  font-weight: var(--cirth-font-weight-medium);
 }
 
 .docs-dom-arrow::before,
@@ -574,9 +483,7 @@ pre.docs-hero-install {
 }
 
 .docs-dom-diagram figcaption {
-  margin-block-start: var(--cirth-space-3);
-  color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-sm);
+  margin-block-start: var(--cirth-flow-element);
 }
 
 .docs-ecosystems h3 {
@@ -619,15 +526,11 @@ pre.docs-hero-install {
 
 .docs-ecosystems > p.docs-ecosystem-note {
   color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-sm);
+  font-size: var(--cirth-meta-font-size);
 }
 
 /* Showcase and theme stages
    –––––––––––––––––––––––––– */
-.docs-stage {
-  box-shadow: var(--cirth-box-shadow);
-}
-
 .docs-stage {
   display: grid;
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
@@ -879,7 +782,7 @@ pre.docs-hero-install {
   padding: 0.75rem;
   background: var(--cirth-card-background-color);
   color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-sm);
+  font-size: var(--cirth-meta-font-size);
 }
 
 /* The panel takes a ring: the tab hands focus to it, and it holds a
@@ -1075,7 +978,7 @@ cirth-theme-preview:not(:defined) {
 /* The radius chip shows the radius, which is the only honest way to swatch
    one: a square with the theme's own corner on it. */
 .docs-token-legend li[data-token="--cirth-border-radius"] .docs-token-chip {
-  border-color: var(--cirth-primary-text);
+  border-color: var(--cirth-form-element-border-color);
   border-radius: var(--cirth-border-radius);
 }
 
@@ -1123,6 +1026,7 @@ cirth-theme-preview:not(:defined) {
 
 .docs-claim h3 {
   --cirth-font-size: var(--cirth-font-size-xl);
+  --cirth-font-weight: var(--cirth-title-font-weight);
 
   margin: var(--cirth-space-1) 0 0;
 }
@@ -1161,13 +1065,6 @@ cirth-theme-preview:not(:defined) {
   white-space: nowrap;
 }
 
-.docs-proof-state .is-verified {
-  color: var(--cirth-ins-color);
-}
-
-.docs-proof-state .is-enhanced {
-  color: var(--cirth-primary-text);
-}
 
 /* Questions
    –––––––––––––––––––– */

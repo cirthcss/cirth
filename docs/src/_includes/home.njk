@@ -311,7 +311,7 @@ bodyClass: docs-home-page
 	<section class="docs-hero" aria-labelledby="home-title">
 		<div class="docs-home-inner">
 			<div class="docs-hero-copy">
-				<h1 id="home-title">Semantic HTML in.<br /><span class="docs-accent">Finished UI out.</span></h1>
+				<h1 id="home-title">Semantic HTML in.<br />Finished UI out.</h1>
 				<p class="docs-hero-lede">{{ hero.tagline }}</p>
 				<p class="docs-hero-actions">
 					{% for action in hero.actions %}
@@ -552,73 +552,6 @@ bodyClass: docs-home-page
 
 
 <script>
-	// The story's sticky stage: progressive enhancement over three complete
-	// steps. Only on a wide screen with motion allowed; anywhere else the
-	// steps stay as served, each with its own visual. Nothing here moves the
-	// page: the reader scrolls, and the script only chooses which of the
-	// three visuals the sticky stage shows, from the heading nearest the
-	// middle of the viewport.
-	(() => {
-		const root = document.querySelector("[data-docs-story]");
-		if (!root || !("IntersectionObserver" in window)) return;
-		const steps = [...root.querySelectorAll("[data-docs-story-step]")];
-		if (steps.length === 0) return;
-		const wide = window.matchMedia("(width >= 64rem)");
-		const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
-		/** @type {IntersectionObserver | null} */
-		let observer = null;
-
-		/** @param {number} index */
-		const activate = (index) => {
-			if (index < 0) return;
-			for (const [position, step] of steps.entries()) {
-				step.classList.toggle("is-active", position === index);
-			}
-		};
-
-		const apply = () => {
-			const enhanced = wide.matches && !calm.matches;
-			root.classList.toggle("is-enhanced", enhanced);
-			observer?.disconnect();
-			observer = null;
-			if (!enhanced) {
-				for (const step of steps) step.classList.remove("is-active");
-				return;
-			}
-			activate(0);
-			observer = new IntersectionObserver(
-				(entries) => {
-					for (const entry of entries) {
-						if (!entry.isIntersecting) continue;
-						const step = entry.target.closest("[data-docs-story-step]");
-						activate(steps.indexOf(/** @type {HTMLElement} */ (step)));
-					}
-				},
-				// A band across the middle of the viewport: a step is current
-				// while its text crosses it.
-				{ rootMargin: "-45% 0px -45% 0px" },
-			);
-			for (const step of steps) {
-				const text = step.querySelector(".docs-story-text");
-				if (text) observer.observe(text);
-			}
-		};
-
-		// A visual that is not on stage is transparent, not removed: it is
-		// still in the reading order. When keyboard focus or a screen
-		// reader's cursor reaches one, it comes forward.
-		root.addEventListener("focusin", (event) => {
-			if (!root.classList.contains("is-enhanced")) return;
-			const step = /** @type {HTMLElement} */ (event.target).closest?.(
-				"[data-docs-story-step]",
-			);
-			if (step) activate(steps.indexOf(/** @type {HTMLElement} */ (step)));
-		});
-		wide.addEventListener("change", apply);
-		calm.addEventListener("change", apply);
-		apply();
-	})();
-
 	// The showcase's tab strip. Everything it needs is already in the page:
 	// three rendered examples, each with its own heading, served visible.
 	// This turns them into one tab panel at a time and turns the strip on,

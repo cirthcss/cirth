@@ -143,8 +143,12 @@
   min-block-size: 2.5rem;
   margin: 0;
   padding: 0.375rem 0.625rem;
-  border-color: var(--cirth-form-element-border-color);
-  background: var(--cirth-surface);
+
+  /* Quiet chrome, not a field: the header's three controls are the tonal
+     secondary wash with no edge, so the strongest lines on the screen
+     belong to the page's own controls, not to the bar above them. */
+  border-color: transparent;
+  background: var(--cirth-secondary-surface);
   box-shadow: none;
 
   /* A button pretending to be a search field, so its text has to be a
@@ -177,23 +181,11 @@
   --cirth-color: var(--cirth-form-element-placeholder-color);
 }
 
-/* Surface and border follow the form-control states, the same mix the
-   library applies to a hovered field (forms/_basics.scss), while the
-   placeholder above stays the placeholder. Nothing here changes the
-   trigger's size in any state. */
-.docs-search-trigger:hover:not(:active, :focus-visible) {
-  border-color: color-mix(
-    in oklch,
-    var(--cirth-form-element-border-color) 65%,
-    var(--cirth-form-element-color)
-  );
-  background: var(--cirth-surface);
-}
-
-.docs-search-trigger:is(:active, :focus-visible) {
-  border-color: var(--cirth-form-element-active-border-color);
-  box-shadow: 0 0 0 var(--cirth-outline-width)
-    var(--cirth-form-element-focus-color);
+/* Hover deepens the wash, as a secondary button's does; focus is the ring
+   every control draws. Nothing here changes the trigger's size. */
+.docs-search-trigger:is(:hover, :active) {
+  border-color: transparent;
+  background: var(--cirth-secondary-surface-active);
 }
 
 .docs-search-trigger kbd,
@@ -266,8 +258,7 @@
 	   --cirth-muted-color at 4.46:1, under AA. The canvas gives 4.82:1. */
   background: var(--cirth-canvas);
   color: var(--cirth-muted-color);
-  font-family: var(--cirth-font-family-mono);
-  font-size: var(--cirth-font-size-xs);
+  font-size: var(--cirth-meta-font-size);
 }
 
 /* The inset the article gave up: the list carries it, so result rows sit on
@@ -538,7 +529,17 @@
    and there the 16px is real. */
 .docs-preset-select,
 .docs-version-select {
-  margin-bottom: 0;
+  --cirth-form-element-background-color: var(--cirth-secondary-surface);
+
+  margin-block: 0;
+  border-color: transparent;
+}
+
+/* The same quiet chrome as the search trigger beside them. */
+:is(.docs-preset-select, .docs-version-select):hover {
+  --cirth-form-element-background-color: var(--cirth-secondary-surface-active);
+
+  border-color: transparent;
 }
 
 .docs-version-select {
@@ -608,22 +609,6 @@
   font-size: var(--cirth-font-size-sm);
   text-decoration: underline;
   text-underline-offset: var(--cirth-text-underline-offset);
-}
-
-/* An editorial accent on part of a heading: a small named utility rather
-   than a selector describing one element on one page. */
-.docs-accent {
-  color: var(--cirth-primary-text);
-}
-
-/* forced-colors strips author colour, so the emphasis has to survive as
-   something other than a hue. */
-@media (forced-colors: active) {
-  .docs-accent {
-    text-decoration: underline;
-    text-decoration-thickness: 0.08em;
-    text-underline-offset: 0.08em;
-  }
 }
 
 /* Compact-viewport menu toggle: a square icon button on the same 40px band
@@ -973,10 +958,14 @@
   }
 }
 
+/* The outline's title is metadata about the page: the meta role, as the
+   sidebar's group labels are. */
 .docs-toc strong {
   display: block;
-  margin-bottom: calc(var(--cirth-spacing) * 0.5);
-  font-size: var(--cirth-font-size-sm);
+  margin-bottom: var(--cirth-flow-line);
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-meta-font-size);
+  font-weight: var(--cirth-font-weight-medium);
 }
 
 /* Only the item padding is the shell's: `aside nav` already zeroes the
@@ -1233,8 +1222,8 @@ pre:not(.docs-demo-preview *) {
   position: relative;
   background-image: linear-gradient(
     to left,
-    var(--cirth-code-background-color) 0%,
-    var(--cirth-code-background-color) 40%,
+    var(--cirth-surface-recessed) 0%,
+    var(--cirth-surface-recessed) 40%,
     transparent 100%
   );
   background-repeat: no-repeat;
@@ -1612,17 +1601,13 @@ pre > button.copy.copied::before {
   padding-block: var(--cirth-space-2);
 }
 
+/* Only a demo rendered by a build other than the default one carries a
+   caption, and it names the build in the meta role. */
 .docs-demo-caption {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  min-height: 2.5rem;
-  padding: 0.5rem 0.75rem;
-  border-block-end: var(--cirth-border-width) solid
-    var(--cirth-card-border-color);
-  font-size: var(--cirth-font-size-sm);
-  line-height: 1.35;
+  padding: var(--cirth-space-3) var(--cirth-space-4) 0;
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-meta-font-size);
+  font-weight: var(--cirth-font-weight-medium);
 }
 
 .docs-hero-actions {
@@ -1633,26 +1618,14 @@ pre > button.copy.copied::before {
   margin: 1.5rem 0;
 }
 
-/* The annotation voice, defined once.
-   ––––––––––––––––––––
-   Muted, monospace, extra-small, uppercase, slightly tracked out: the label
-   this shell puts on a measurement, a claim type, or the name of a panel.
-   Editorial voice rather than anything the framework should own: an
-   application does not want its <dt>s shouting in monospace, and one rule
-   rather than three, which is how the tracking drifted last time.
-
-   home.css repeats it for the home page's claim kinds. */
+/* A measure's name is the library's meta role, as every other piece of
+   metadata on this site is: the shell used to invent a monospace capital
+   voice for it, which is decoration wearing the costume of data. */
 .docs-brand-measures dt {
   color: var(--cirth-muted-color);
-  font-family: var(--cirth-font-family-mono);
-  font-size: var(--cirth-font-size-xs);
-  /* Stated, not inherited. <dt> now arrives semibold from the framework
-     (content/_typography.scss), which is right for a term in a description
-     list and wrong for a monospace annotation label, so the voice says
-     what weight it is rather than taking whatever element it lands on. */
-  font-weight: var(--cirth-font-weight-regular);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: var(--cirth-meta-font-size);
+  font-weight: var(--cirth-font-weight-medium);
+  letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
 }
 
 @media (forced-colors: active) {
@@ -1753,7 +1726,21 @@ pre > button.copy.copied::before {
   margin-block-end: clamp(var(--cirth-space-6), 4vw, var(--cirth-space-10));
   color: var(--cirth-secondary-text);
   font-size: var(--cirth-font-size-lg);
-  line-height: var(--cirth-line-height-normal);
+}
+
+/* Two treatments, by what the page is for (eleventy.config.js, docsKind).
+   A guide is read from the top, so the reading rhythm leads: running text
+   a step larger than the library's body, and chapters divided by space
+   rather than by a rule. A reference page is consulted, so the grammar
+   leads: body size, and a separator over every chapter, punctuation for a
+   reader who scans. Prose only: a live example, a table or a listing in
+   either keeps the size the library gives it. */
+.docs-content[data-docs-kind="guide"] > :is(p, ul, ol, dl, blockquote) {
+  font-size: 1.0625rem;
+}
+
+.docs-content[data-docs-kind="guide"] > h1 + p {
+  font-size: var(--cirth-font-size-xl);
 }
 
 /* Chapter separators, on the prose and nowhere else. `>`, never a
@@ -1767,6 +1754,12 @@ pre > button.copy.copied::before {
   padding-block-start: var(--cirth-space-3);
   border-block-start: var(--cirth-border-width) solid
     var(--cirth-muted-border-color);
+}
+
+.docs-content[data-docs-kind="guide"] > h2 {
+  margin-block-start: clamp(var(--cirth-space-12), 6vw, var(--cirth-space-20));
+  padding-block-start: 0;
+  border-block-start: 0;
 }
 
 .docs-content > h3 {
@@ -1796,7 +1789,6 @@ pre > button.copy.copied::before {
    component: the hairline on all four edges and the container radius. See
    docs/brand.md; those survive a retheme, so a surface outside the
    component layer still has to carry them. */
-.docs-demo,
 .docs-brand-spec,
 .docs-proof-strip,
 .docs-build-comparison {
@@ -1851,12 +1843,20 @@ pre > button.copy.copied::before {
   inset-block-start: 0.25rem;
 }
 
+/* The stage shows the component; it does not frame it. A live example
+   stands in a recessed well, one surface level below the page, so that
+   whatever it holds reads at its own level: a card is raised off it, a
+   field paints the well it sits in, a dialog floats over it. No border:
+   the surface difference is the edge, and a frame in the card's own
+   stroke made every card on the site a card inside a card. The listing
+   under it is the well's last band, divided by the separator. */
 .docs-demo {
-  margin-block: var(--cirth-space-8) var(--cirth-space-12);
-}
+  --cirth-surface: var(--cirth-surface-recessed);
 
-.docs-demo-caption strong {
-  color: var(--cirth-color);
+  margin-block: var(--cirth-space-8) var(--cirth-space-12);
+  border-radius: var(--cirth-card-border-radius);
+  background: var(--cirth-surface-recessed);
+  overflow: clip;
 }
 
 /* The stage the example stands on. Its padding is spent through
@@ -1871,21 +1871,32 @@ pre > button.copy.copied::before {
   );
 }
 
-/* The source panel is the demo card's last band: flush to the card's edge,
-   which clips its corners for it. */
-details.docs-demo-source {
+/* The source is the well's last band: the listing the page wrote for the
+   reader when there is one (adopted by eleventy.config.js), otherwise the
+   rendered snippet behind a disclosure. Flush to the well's edge, which
+   clips its corners for it. */
+.docs-demo-source {
   margin: 0;
   border: 0;
   border-block-start: var(--cirth-border-width) solid
-    var(--cirth-card-border-color);
-  background: var(--cirth-code-background-color);
+    var(--cirth-muted-border-color);
+  background: transparent;
+}
+
+div.docs-demo-source > pre {
+  margin: 0;
+  padding: var(--cirth-space-4);
+  border: 0;
+  border-radius: 0;
+  background: none;
 }
 
 /* No colour here: the disclosure keeps the framework's accordion summary
    ink. Muting it drops below 4.5:1 on the code surface under plain dark. */
 details.docs-demo-source > summary {
-  padding: 0.75rem 1rem;
-  font-weight: var(--cirth-font-weight-semibold);
+  padding: var(--cirth-space-3) var(--cirth-space-4);
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-meta-font-size);
 }
 
 details.docs-demo-source[open] {
@@ -1893,10 +1904,10 @@ details.docs-demo-source[open] {
 }
 
 details.docs-demo-source pre {
-  padding: 1rem;
+  padding: var(--cirth-space-4);
   border: 0;
   border-block-start: var(--cirth-border-width) solid
-    var(--cirth-card-border-color);
+    var(--cirth-muted-border-color);
   border-radius: 0;
   background: none;
 }
@@ -1910,28 +1921,20 @@ details.docs-demo-source[open] > summary {
   background: transparent;
 }
 
-.docs-sidebar details {
-  margin: 0 0 0.5rem;
-  border: 0;
-  background: transparent;
+/* Groups are a group step apart and name themselves in the meta role, on
+   the same inline gutter as the entries under them, so a label never hangs
+   outside the column it introduces. */
+.docs-sidebar-group + .docs-sidebar-group {
+  margin-block-start: var(--cirth-flow-group);
 }
 
-/* Group headers sit on the same inline gutter as the entries under them,
-   or the heading hangs outside the column it introduces and its hover area
-   starts against the first letter. */
-.docs-sidebar details > summary {
-  padding: 0.5rem var(--cirth-space-3);
-  font-size: var(--cirth-font-size-sm);
-  font-weight: var(--cirth-font-weight-semibold);
-}
-
-.docs-sidebar details[open] > summary {
-  margin-bottom: 0;
-  background: transparent;
-}
-
-.docs-sidebar details[open] {
-  padding-block-end: 0;
+.docs-sidebar-label {
+  margin: 0 0 var(--cirth-flow-line);
+  padding-inline: var(--cirth-space-3);
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-meta-font-size);
+  font-weight: var(--cirth-font-weight-medium);
+  letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
 }
 
 /* One rail down both columns, and the active marker sits *in* it rather
@@ -1979,7 +1982,7 @@ details.docs-demo-source > :not(summary) {
 .docs-sidebar nav li a[aria-current="page"],
 .docs-toc a[aria-current="true"] {
   color: var(--cirth-contrast-text);
-  font-weight: var(--cirth-font-weight-semibold);
+  font-weight: var(--cirth-font-weight-medium);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -2101,10 +2104,6 @@ details.docs-toc-top {
     grid-template-columns: 1fr;
   }
 
-  .docs-demo-caption {
-    align-items: flex-start;
-    flex-direction: column;
-  }
 }
 
 @media (width < 22.5rem) {
@@ -2187,10 +2186,13 @@ details.docs-toc-top {
   gap: 0.25rem;
 }
 
+/* A measured figure is data: the code face, tabular, and the strong ink.
+   Not the accent, which is kept for action and position. */
 .docs-proof-strip dd strong {
-  color: var(--cirth-primary-text);
+  color: var(--cirth-ink-strong);
   font-family: var(--cirth-font-family-mono);
   font-size: var(--cirth-font-size-xl);
+  font-variant-numeric: tabular-nums;
 }
 
 /* Colour only: `small` is already 0.875em of its container, which tracks
@@ -2244,8 +2246,7 @@ details.docs-toc-top {
 .docs-build-comparison > footer {
   padding: 0.75rem 1rem;
   color: var(--cirth-muted-color);
-  font-family: var(--cirth-font-family-mono);
-  font-size: var(--cirth-font-size-xs);
+  font-size: var(--cirth-meta-font-size);
 }
 
 @media (width < 48rem) {

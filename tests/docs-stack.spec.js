@@ -282,26 +282,34 @@ test("header keeps navigation, search, and automatic versioning distinct", async
 	expect(await type(searchTrigger)).toEqual(placeholder);
 	expect(placeholder.weight).toBe("400");
 
-	// Hover and focus move the surface and the border, the way a field's
-	// do, and leave the placeholder, and the size, exactly where they are.
+	// The header's controls are quiet chrome with no edge: hover deepens the
+	// wash on the trigger exactly as it does on the field beside it, and
+	// leaves the placeholder, the edge and the size where they are.
+	await version.hover();
+	const fieldHover = await box(version);
 	await searchTrigger.hover();
 	const searchHover = await box(searchTrigger);
-	expect(searchHover.background).toBe(searchRest.background);
-	expect(searchHover.border).not.toBe(searchRest.border);
+	expect(searchHover.background).not.toBe(searchRest.background);
+	expect(searchHover.background).toBe(fieldHover.background);
+	expect(searchHover.border).toBe(searchRest.border);
 	expect(searchHover.height).toBe(searchRest.height);
 	expect(await type(searchTrigger)).toEqual(placeholder);
 
+	// Focus is the one ring every control draws, outside the box.
+	await page.mouse.move(0, 0);
 	await searchTrigger.focus();
 	const searchFocus = await searchTrigger.evaluate((element) => {
 		const style = getComputedStyle(element);
 		return {
-			border: style.borderColor,
-			shadow: style.boxShadow,
+			outline: style.outlineStyle,
+			outlineWidth: Number.parseFloat(style.outlineWidth),
+			offset: Number.parseFloat(style.outlineOffset),
 			height: Math.round(element.getBoundingClientRect().height),
 		};
 	});
-	expect(searchFocus.shadow).not.toBe("none");
-	expect(searchFocus.border).not.toBe(searchRest.border);
+	expect(searchFocus.outline).toBe("solid");
+	expect(searchFocus.outlineWidth).toBeGreaterThan(0);
+	expect(searchFocus.offset).toBeGreaterThan(0);
 	expect(searchFocus.height).toBe(searchRest.height);
 	expect(await type(searchTrigger)).toEqual(placeholder);
 	await searchTrigger.blur();
@@ -934,16 +942,21 @@ const storyState = (page) =>
 	page.evaluate(() => {
 		const root = /** @type {HTMLElement} */ (document.querySelector("[data-docs-story]"));
 		return {
-			enhanced: root.classList.contains("is-enhanced"),
-			active: [...root.querySelectorAll("[data-docs-story-step]")].map((step) =>
-				step.classList.contains("is-active"),
-			),
 			opacities: [...root.querySelectorAll(".docs-story-visual")].map((visual) =>
 				Number(getComputedStyle(visual).opacity),
 			),
 			positions: [...root.querySelectorAll(".docs-story-visual")].map(
 				(visual) => getComputedStyle(visual).position,
 			),
+			// Each step's text against its own visual: beside it (the text
+			// ends before the visual starts, inline) or above it (block).
+			layout: [...root.querySelectorAll("[data-docs-story-step]")].map((step) => {
+				const text = /** @type {HTMLElement} */ (step.querySelector(".docs-story-text")).getBoundingClientRect();
+				const visual = /** @type {HTMLElement} */ (step.querySelector(".docs-story-visual")).getBoundingClientRect();
+				if (text.right <= visual.left + 1) return "beside";
+				if (text.bottom <= visual.top + 1) return "above";
+				return "overlapping";
+			}),
 		};
 	});
 
@@ -969,71 +982,35 @@ test("the story keeps its three beats and their order", async ({ page }) => {
 	).toHaveCount(1);
 });
 
-test("the story becomes one sticky stage on a wide screen, and never moves the page", async ({
-	page,
-}) => {
-	await page.setViewportSize({ width: 1440, height: 900 });
-	await page.emulateMedia({ reducedMotion: "no-preference" });
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+// Three steps that hold still: nothing on the page moves or swaps a visual
+// as the reader scrolls, at any width and under either motion preference,
+// and each step's visual belongs to its own text.
+test("the story is three steps that hold still at every width", async ({ page }) => {
+	for (const [width, height, motion, layout] of /** @type {const} */ ([
+		[1440, 900, "no-preference", "beside"],
+		[1440, 900, "reduce", "beside"],
+		[390, 844, "no-preference", "above"],
+	])) {
+		await page.setViewportSize({ width, height });
+		await page.emulateMedia({ reducedMotion: motion });
+		await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+		const initial = await storyState(page);
+		expect(initial.opacities, `${width} ${motion}`).toEqual([1, 1, 1]);
+		expect(initial.positions, `${width} ${motion}`).toEqual(["static", "static", "static"]);
+		expect(initial.layout, `${width} ${motion}`).toEqual([layout, layout, layout]);
 
-	const initial = await storyState(page);
-	expect(initial.enhanced).toBe(true);
-	expect(initial.positions).toEqual(["sticky", "sticky", "sticky"]);
-
-	for (const step of [1, 2, 3]) {
+		// Scrolling the last step into view changes nothing but the scroll.
 		const target = await page
-			.locator(`[data-docs-story-step="${step}"] .docs-story-text`)
+			.locator('[data-docs-story-step="3"] .docs-story-text')
 			.evaluate((element) => {
 				const box = element.getBoundingClientRect();
 				const y = Math.round(window.scrollY + box.top + box.height / 2 - innerHeight / 2);
 				window.scrollTo(0, y);
 				return y;
 			});
-		await expect
-			.poll(async () => (await storyState(page)).active)
-			.toEqual([1, 2, 3].map((index) => index === step));
-		// No scroll hijacking: the page is exactly where the reader put it.
 		expect(await page.evaluate(() => Math.round(window.scrollY))).toBe(target);
-		await expect
-			.poll(async () => (await storyState(page)).opacities[step - 1])
-			.toBe(1);
+		expect(await storyState(page)).toEqual(initial);
 	}
-
-	// Keyboard focus reaching a visual that is not on stage brings it
-	// forward instead of leaving focus inside something transparent.
-	await page.locator("[data-docs-story-step='1'] .docs-story-code pre").focus();
-	await expect
-		.poll(async () => (await storyState(page)).active)
-		.toEqual([true, false, false]);
-});
-
-test("the story holds still under reduced motion and on a phone", async ({
-	page,
-}) => {
-	await page.setViewportSize({ width: 1440, height: 900 });
-	await page.emulateMedia({ reducedMotion: "reduce" });
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-	let state = await storyState(page);
-	expect(state.enhanced).toBe(false);
-	expect(state.opacities).toEqual([1, 1, 1]);
-	expect(state.positions).toEqual(["static", "static", "static"]);
-
-	await page.emulateMedia({ reducedMotion: "no-preference" });
-	await page.setViewportSize({ width: 390, height: 844 });
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-	state = await storyState(page);
-	expect(state.enhanced).toBe(false);
-	expect(state.opacities).toEqual([1, 1, 1]);
-
-	// Each beat is followed by its own visual in the reading order.
-	const order = await page.locator("[data-docs-story-step]").evaluateAll((steps) =>
-		steps.map((step) => {
-			const text = /** @type {HTMLElement} */ (step.querySelector(".docs-story-text"));
-			const visual = /** @type {HTMLElement} */ (step.querySelector(".docs-story-visual"));
-			return text.getBoundingClientRect().bottom <= visual.getBoundingClientRect().top + 1;
-		}),
-	);
-	expect(order).toEqual([true, true, true]);
 });
 
 // --- Framework agnostic --------------------------------------------------
@@ -1140,12 +1117,11 @@ test.describe("without JavaScript", () => {
 		await expect(page.locator(".docs-claim")).toHaveCount(6);
 	});
 
-	// The story is served complete: three beats, each followed by what it
-	// shows, all of them visible. The sticky stage is an enhancement only.
+	// The story needs no script: three beats, each with what it shows, all
+	// of them visible.
 	test("the story serves every beat and every visual", async ({ page }) => {
 		await page.setViewportSize({ width: 1440, height: 900 });
 		await page.goto(`${origin}/`, { waitUntil: "load" });
-		await expect(page.locator("[data-docs-story]")).not.toHaveClass(/is-enhanced/);
 		for (const step of [1, 2, 3]) {
 			await expect(
 				page.locator(`[data-docs-story-step="${step}"] .docs-story-text h3`),
@@ -2319,7 +2295,7 @@ test("no shell chapter rule or margin lands on a heading inside a live example",
 // A <pre> inside a preview is the example, and the copy affordance is
 // chrome: the shell's positioning context, its fade and its injected button
 // used to be painted onto the one demo on the site that renders a code
-// block. The disclosure under that demo keeps its button, because that
+// block. The listing under that demo keeps its button, because that
 // listing is the shell's.
 test("the shell's code-block chrome stops at the edge of a live example", async ({
 	page,
@@ -2344,7 +2320,7 @@ test("the shell's code-block chrome stops at the edge of a live example", async 
 	// And the shell's own listing still has all three.
 	const shellBlock = await page.evaluate(() => {
 		const block = /** @type {HTMLElement} */ (
-			document.querySelector("details.docs-demo-source pre")
+			document.querySelector(".docs-demo-source pre")
 		);
 		const style = getComputedStyle(block);
 		return {

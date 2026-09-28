@@ -333,8 +333,10 @@ test("the sidebar group headers share the inline gutter of their entries", async
 }) => {
 	await page.goto(`${origin}/about/`, { waitUntil: "networkidle" });
 
+	// The groups are an open index now: each is named by a label rather
+	// than a disclosure summary, and the label keeps the same gutter.
 	const summary = await styleOf(
-		page.locator(".docs-sidebar details > summary").first(),
+		page.locator(".docs-sidebar .docs-sidebar-label").first(),
 		["paddingInlineStart"],
 	);
 	const link = await styleOf(page.locator(".docs-sidebar nav li a").first(), [

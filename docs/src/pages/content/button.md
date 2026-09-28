@@ -12,14 +12,22 @@ same button styling, with no `.btn` class required.
 {% demo "buttons" %}
 
 ```html
-<button type="button">Primary</button>
-<button type="button" class="secondary">Secondary</button>
-<button type="button" class="contrast">Contrast</button>
-<button type="button" class="danger">Danger</button>
-<button type="button" class="outline">Primary outline</button>
-<button type="button" class="ghost">Primary ghost</button>
-<button type="button" disabled>Disabled</button>
+<p>
+  <button type="button">Primary</button>
+  <button type="button" class="secondary">Secondary</button>
+  <button type="button" class="contrast">Contrast</button>
+  <button type="button" class="danger">Danger</button>
+</p>
+<p>
+  <button type="button" class="outline">Primary outline</button>
+  <button type="button" class="ghost">Primary ghost</button>
+  <button type="button" disabled>Disabled</button>
+</p>
 ```
+
+Buttons in a row share a line and carry no margin of their own: a row of
+actions is a paragraph, a card footer or a `.grid`, and the space around it
+is that block's.
 
 ## Color modifiers
 
