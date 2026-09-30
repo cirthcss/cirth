@@ -1847,46 +1847,39 @@ test("a live example resolves the framework's own rhythm, not the reading column
 // The other side of the same boundary: the column re-times its own prose,
 // and the re-timing has to arrive. The library reads --cirth-line-height
 // once, on the root, so a token set on the column and never applied left
-// every paragraph at the root's 1.5, on lines of about 107 characters.
-test("the reading column applies its rhythm and stops prose at the measure", async ({
+// every paragraph at the root's 1.5. And prose runs the column's full
+// width, as the code blocks, tables and demos in it do: one edge for
+// everything in the column, not a narrower one for text.
+test("the reading column applies its rhythm and runs prose to its full width", async ({
 	page,
 }) => {
 	await page.goto(`${origin}/components/card/`);
 
-	const lines = await page.evaluate(() => {
-		const paragraphs = [...document.querySelectorAll(".docs-content > p")].filter(
+	const measured = await page.evaluate(() => {
+		const column = /** @type {HTMLElement} */ (document.querySelector(".docs-content"));
+		const inner = column.getBoundingClientRect().width -
+			Number.parseFloat(getComputedStyle(column).paddingLeft) -
+			Number.parseFloat(getComputedStyle(column).paddingRight);
+		const widths = (/** @type {string} */ selector) =>
+			[...column.querySelectorAll(selector)].map((element) => element.getBoundingClientRect().width);
+		const paragraphs = [...column.querySelectorAll(":scope > p")].filter(
 			(element) => (element.textContent ?? "").length > 250,
 		);
-		return paragraphs.map((paragraph) => {
-			const style = getComputedStyle(paragraph);
-			const range = document.createRange();
-			/** @type {Map<number, number>} */
-			const perLine = new Map();
-			const walker = document.createTreeWalker(paragraph, NodeFilter.SHOW_TEXT);
-			while (walker.nextNode()) {
-				const node = /** @type {Text} */ (walker.currentNode);
-				for (let index = 0; index < node.length; index++) {
-					range.setStart(node, index);
-					range.setEnd(node, index + 1);
-					const box = range.getClientRects()[0];
-					if (!box) continue;
-					const top = Math.round(box.top);
-					perLine.set(top, (perLine.get(top) ?? 0) + 1);
-				}
-			}
-			return {
-				ratio:
-					Number.parseFloat(style.lineHeight) /
-					Number.parseFloat(style.fontSize),
-				longest: Math.max(...perLine.values()),
-			};
-		});
+		return {
+			inner,
+			ratios: paragraphs.map((paragraph) => {
+				const style = getComputedStyle(paragraph);
+				return Number.parseFloat(style.lineHeight) / Number.parseFloat(style.fontSize);
+			}),
+			prose: widths(":scope > :is(p, ul, h2)"),
+			code: widths(":scope > pre"),
+		};
 	});
 
-	expect(lines.length).toBeGreaterThan(0);
-	for (const line of lines) {
-		expect(line.ratio).toBeGreaterThanOrEqual(1.6);
-		expect(line.longest).toBeLessThanOrEqual(75);
+	expect(measured.ratios.length).toBeGreaterThan(0);
+	for (const ratio of measured.ratios) expect(ratio).toBeGreaterThanOrEqual(1.6);
+	for (const width of [...measured.prose, ...measured.code]) {
+		expect(width).toBeCloseTo(measured.inner, 0);
 	}
 });
 

@@ -80,7 +80,11 @@
   );
   --docs-shell-max: 92rem;
   --docs-reading-max: 48rem;
-  --docs-measure: 30em;
+  /* The title of a group in an index (the sidebar, the page outline, the
+     compact menu, the footer's columns): one step above the entries it
+     heads, which are 14px, so a group reads as a heading rather than as
+     one more entry. One knob for all four, so they stay one size. */
+  --docs-index-title-size: 0.9375rem;
   --docs-rail-width: 15rem;
   --docs-toc-width: 13rem;
 
@@ -828,7 +832,7 @@
 .docs-mobile-controls > strong {
   display: block;
   padding: var(--cirth-space-2) var(--cirth-space-4) 0;
-  font-size: var(--cirth-font-size-sm);
+  font-size: var(--docs-index-title-size);
 }
 
 .docs-header .docs-mobile-controls > ul {
@@ -986,14 +990,6 @@
   line-height: var(--cirth-line-height);
 }
 
-/* The measure belongs to the text, not to the column. The column stays wide
-   enough for a demo, a table or a listing; running prose stops at about
-   seventy characters, where the eye still finds the start of the next line.
-   In em, so a lead paragraph set larger keeps the same count. */
-.docs-content > :is(p, ul, ol, dl, blockquote, h1, h2, h3, h4, h5, h6) {
-  max-inline-size: var(--docs-measure);
-}
-
 /* Page outline, top variant (small screens): a disclosure, no scroll-spy.
    Only the space it leaves under itself belongs here; its structure is set
    with the rest of the compact shell further down. */
@@ -1026,7 +1022,7 @@
   display: block;
   margin-bottom: var(--cirth-flow-line);
   color: var(--cirth-muted-color);
-  font-size: var(--cirth-meta-font-size);
+  font-size: var(--docs-index-title-size);
   font-weight: var(--cirth-font-weight-medium);
 }
 
@@ -1220,7 +1216,7 @@
 /* A column's name is the meta role, as a sidebar group's is: a heading
    for the outline, set as metadata. */
 .docs-footer-column h2 {
-  --cirth-font-size: var(--cirth-meta-font-size);
+  --cirth-font-size: var(--docs-index-title-size);
   --cirth-font-weight: var(--cirth-font-weight-medium);
 
   margin: 0 0 var(--cirth-space-3);
@@ -1792,7 +1788,7 @@ pre > button.copy.copied::before {
 }
 
 .docs-toc-top > summary {
-  font-size: var(--cirth-font-size-sm);
+  font-size: var(--docs-index-title-size);
 }
 
 /* A stacked nav outside an <aside>: naming the gutter token zero drops the
@@ -2046,7 +2042,7 @@ details.docs-demo-source[open] > summary {
   margin: 0 0 var(--cirth-flow-line);
   padding-inline: var(--cirth-space-3);
   color: var(--cirth-muted-color);
-  font-size: var(--cirth-meta-font-size);
+  font-size: var(--docs-index-title-size);
   font-weight: var(--cirth-font-weight-medium);
   letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
 }
@@ -2166,7 +2162,7 @@ details.docs-toc-top {
   }
 
   .docs-mobile-nav nav strong {
-    font-size: var(--cirth-font-size-sm);
+    font-size: var(--docs-index-title-size);
   }
 
   .docs-mobile-nav nav ul {
