@@ -19,7 +19,8 @@ list stays the same; the defaults underneath it change in five places.
 Surfaces and edges come from four named levels and three named edges, type
 comes from roles, the primary is always the heaviest action, every corner
 takes one of two radii by what it is, and space between elements comes from
-their relation rather than from margins they carry. Each change has a spec in the repository's `specs/` directory.
+their relation rather than from margins they carry. The `playroom` preset is
+replaced by `material`. Each change has a spec in the repository's `specs/` directory.
 
 ### Surfaces and edges
 
@@ -76,6 +77,26 @@ their relation rather than from margins they carry. Each change has a spec in th
 | Set `--cirth-typography-spacing-top` on a heading | Removed. Set `margin-block-start` on the heading, or change `--cirth-flow-section` or `--cirth-flow-group` |
 | Relied on 4px between list items | Items are a line apart (`--cirth-flow-line`, 8px at the default) |
 | Set `--cirth-spacing` | Nothing: every step of the flow follows it |
+
+### Presets
+
+`playroom` is removed, with no alias, and `material` takes its place as the
+preset that overrides broadly. The two are not the same design: `material`
+is Material Design 3's baseline scheme, not a recolouring of `playroom`.
+
+| If you | Then |
+| --- | --- |
+| Load `dist/presets/playroom.min.css` or import `@cirthcss/cirth/presets/playroom` | Load `dist/presets/material.min.css` or import `@cirthcss/cirth/presets/material`, or keep the values you want from the old file in a stylesheet of your own |
+| Relied on `playroom`'s rounded system face, 20px flow or 300ms easing | `material` sets none of them: it uses Roboto, the default flow and 200ms. Set `--cirth-font-family`, `--cirth-spacing` or `--cirth-transition` yourself |
+| Use `plain` | Nothing changes |
+
+```html
+<!-- before -->
+<link rel="stylesheet" href="dist/presets/playroom.min.css">
+
+<!-- after -->
+<link rel="stylesheet" href="dist/presets/material.min.css">
+```
 
 ## To v0.16.0, from v0.14.x
 

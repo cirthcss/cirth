@@ -8,7 +8,7 @@
 // declarations: two public colour inputs and three role-level choices. The
 // accent states and the entire surface hierarchy are absent because they
 // derive from --cirth-primary and --cirth-canvas at runtime.
-// See src/presets/playroom.scss for the other half: a preset that
+// See src/presets/material.scss for the other half: a preset that
 // overrides broadly, including derived tokens where it wants to break a
 // relationship on purpose.
 // Import after the main Cirth stylesheet. No @import, no webfont: like the

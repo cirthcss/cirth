@@ -83,7 +83,7 @@ the `dist/` filename convention:
   "./scoped": "./dist/cirth.scoped.min.css",
   "./classless/scoped": "./dist/cirth.classless.scoped.min.css",
   "./presets/plain": "./dist/presets/plain.min.css",
-  "./presets/playroom": "./dist/presets/playroom.min.css"
+  "./presets/material": "./dist/presets/material.min.css"
 }
 ```
 
@@ -245,7 +245,7 @@ component demos live on these pages, this continuously re-verifies the
 framework's own AA claim, not just the site around it.
 
 The shell-free framework and component-state specimens are audited separately
-in Default, Plain, Playroom, and a custom blue primary. Light and dark additionally
+in the default theme, every shipped preset, and a custom blue primary. Light and dark additionally
 cover real hover, keyboard-focus, and pointer-active states; forced colors keeps
 the complete static specimen and the dedicated resilience checks below.
 
@@ -410,7 +410,7 @@ node scripts/audit-dead-css.js --json .cache/dead-css.json
 node scripts/verify-dead-css.js --report .cache/dead-css.json
 ```
 
-`verify-dead-css.js` runs Firefox, WebKit and the `playroom` preset over
+`verify-dead-css.js` runs Firefox, WebKit and the `material` preset over
 that plan (a few dozen renderings rather than 800, minutes rather than
 hours), and turns each `inert` into one of:
 
@@ -418,7 +418,7 @@ hours), and turns each `inert` into one of:
   makes a declaration safe to delete.
 - **engine-dependent**: Chromium measured nothing, Firefox or WebKit did.
   Keep it, and name the engine in a comment beside it.
-- **preset-dependent**: the default theme measured nothing, `playroom`
+- **preset-dependent**: the default theme measured nothing, `material`
   did.
 - **unverified**: the configuration never entered the rule's media
   condition, never matched its selector, or could not take the declaration

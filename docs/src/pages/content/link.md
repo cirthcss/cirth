@@ -42,9 +42,8 @@ shows none of them as visited. Firefox still applies it globally.
 * `:visited` drops the accent for `--cirth-link-visited-color`, an
   achromatic grey at the same lightness as the accent, so a followed link in
   a long page shows as spent. Zero chroma on purpose: a grey carrying the
-  neutral scale's hue (280deg) read as a tint against the default canvas
-  (44deg), and against the accent it was a hue change at nearly the same
-  lightness: the weakest available way to say "you have been here". It applies to content links only: entries inside `nav` or a
+  neutral scale's hue (120deg) is, against the accent, a hue change at nearly
+  the same lightness: the weakest available way to say "you have been here". It applies to content links only: entries inside `nav` or a
   dropdown menu keep their color, since a menu that grays out one item at a
   time as the reader browses looks broken rather than oriented. `.secondary`
   and `.contrast` links stay in their own color group too, as do the states

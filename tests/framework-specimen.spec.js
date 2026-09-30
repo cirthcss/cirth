@@ -11,10 +11,11 @@ const {
 	parseColor,
 	simulateCvd,
 } = require("../scripts/lib/color");
+const { listPresetNames } = require("../scripts/lib/presets");
 
 assertDocsBuilt("framework-specimen.spec");
 
-const specimens = ["default", "plain", "playroom", "blue"];
+const specimens = ["default", ...listPresetNames(), "blue"];
 /** @type {import("node:http").Server} */
 let server;
 /** @type {string} */
@@ -107,7 +108,7 @@ for (const specimen of specimens) {
 		// The radius is a *pair*, not a number: a container is one step
 		// softer than the controls inside it, so a card reads as a sheet
 		// holding buttons rather than as a big button. A preset is expected
-		// to move both ends of that pair: plain squares them off, playroom
+		// to move both ends of that pair: plain squares them off, material
 		// rounds them, and the invariant is the relationship, not the value
 		// it had in the default theme.
 		const geometry = await page
@@ -126,10 +127,15 @@ for (const specimen of specimens) {
 			});
 		expect(geometry.bottom).toBe(geometry.top);
 		expect(geometry.radius).toBeGreaterThanOrEqual(0);
-		expect(
-			geometry.cardRadius,
-			`${specimen}: the container radius is not softer than the control radius`,
-		).toBeGreaterThan(geometry.radius);
+		// A square preset zeroes both ends; otherwise the container is softer.
+		if (geometry.radius === 0) {
+			expect(geometry.cardRadius, `${specimen}: a square preset squares its containers too`).toBe(0);
+		} else {
+			expect(
+				geometry.cardRadius,
+				`${specimen}: the container radius is not softer than the control radius`,
+			).toBeGreaterThan(geometry.radius);
+		}
 
 		const buttonGeometry = await page
 			.getByRole("button", { name: "Approve selected" })
@@ -320,7 +326,7 @@ for (const specimen of specimens) {
 // identical radius, identical stroke, which made the shipped presets a
 // demonstration of one token and left the rest of the contract unexercised.
 // A preset is supposed to be the worked example of what the token surface
-// can do, so plain and playroom now also move the radius pair, the spacing
+// can do, so the presets now also move the radius pair, the spacing
 // rhythm and the transition. What must not move is the part docs/brand.md
 // calls the structural signature: one hairline on every resting edge, the
 // 44px control floor, and the radius *pairing*. Those are asserted below,
@@ -371,16 +377,20 @@ test("presets change the dialect, not the grammar", async ({ page }) => {
 		// 24px AA minimum, and never as far as pretending to be a form.
 		expect(value.navButtonHeight, name).toBeGreaterThanOrEqual(40);
 		expect(value.navButtonHeight, name).toBeLessThan(44);
-		// The pair holds wherever the scale is moved to.
-		expect(value.cardRadius, name).toBeGreaterThan(value.controlRadius);
+		// The pair holds wherever the scale is moved to, zero included.
+		if (value.controlRadius === 0) {
+			expect(value.cardRadius, name).toBe(0);
+		} else {
+			expect(value.cardRadius, name).toBeGreaterThan(value.controlRadius);
+		}
 	}
 
 	// One stroke width across the whole lineup.
 	expect(
 		new Set(values.map(({ borderBottomWidth }) => borderBottomWidth)).size,
 	).toBe(1);
-	// Four distinct accents...
-	expect(new Set(values.map(({ primary }) => primary)).size).toBe(4);
+	// One distinct accent per specimen...
+	expect(new Set(values.map(({ primary }) => primary)).size).toBe(specimens.length);
 	// ...and at least two distinct geometries, which is what stops a preset
 	// from being a palette with extra steps.
 	expect(
@@ -655,7 +665,7 @@ test("dark progress follows each public primary instead of one fixed accent", as
 		);
 	}
 
-	expect(new Set(values).size).toBe(4);
+	expect(new Set(values).size).toBe(specimens.length);
 });
 
 test("dialog behavior is specimen-only and keyboard reachable", async ({

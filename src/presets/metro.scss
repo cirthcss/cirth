@@ -1,0 +1,151 @@
+// Metro preset
+// ––––––––––––––––––––
+// Cirth in the manner of Metro, the design language of Windows Phone 7
+// and 8 and of Windows 8 (2010 to 2012): type that works like airport and
+// street signage, one accent on black or white, square corners, no
+// shadows, generous space, quick decisive motion. A Windows Phone theme was
+// a background (dark or light) and an accent colour; this preset is that
+// theme in Cirth's tokens. specs/metro-preset.md records the sources and
+// what a preset cannot carry: the tiles, the panoramas and the lateral
+// motion belong to components and layouts, not to tokens.
+// Import after the main Cirth stylesheet. No @import, no webfont: Segoe UI
+// shows where Windows supplies it, and Selawik or Open Sans where the page
+// loads one; see the Presets page for how.
+@use "../helpers/cascade";
+@use "../helpers/selectors";
+
+// In Cirth's cascade layer, after the build: the theme's declarations and
+// these share their weight, so source order hands these the win, and any
+// rule a consumer writes outside a layer still beats both.
+@include cascade.layer {
+  @include selectors.theme-roots {
+    // Colour
+    // Cobalt, from Windows Phone 8's accent palette. Of the palette's blues
+    // it is the one that keeps a white label above 4.5:1 (6.19:1); cyan,
+    // the Windows Phone 7 default, reads 2.90:1 under white. On the phone
+    // the accent did not change with the background, and neither does the
+    // fill below; as the input, which text, links and their active states
+    // derive from, dark takes a light cobalt near the gamut's edge, since
+    // cobalt itself reads 3.39:1 on black.
+    --cirth-primary: light-dark(#0050ef, oklch(72% 0.14 262.6deg));
+
+    // Near white and near black, not white and black: the surface levels
+    // derive from the canvas, and the raised one needs room above it in
+    // light, the recessed one room below it in dark (see plain.scss).
+    --cirth-canvas: light-dark(oklch(97% 0 0deg), oklch(14% 0 0deg));
+
+    // Achromatic neutrals: the default's ink and secondary steps at chroma
+    // 0, the ink one step stronger, since Metro's foreground was black or
+    // white on its page.
+    --cirth-ink: light-dark(oklch(22.3% 0 0deg), oklch(96% 0 0deg));
+    --cirth-ink-strong: var(--cirth-ink);
+    --cirth-muted-color: light-dark(oklch(48.3% 0 0deg), oklch(70% 0 0deg));
+    --cirth-secondary-text: light-dark(oklch(44% 0 0deg), oklch(74.3% 0 0deg));
+    --cirth-secondary-active: light-dark(
+      oklch(35.3% 0 0deg),
+      oklch(83% 0 0deg)
+    );
+    --cirth-secondary-underline: light-dark(
+      oklch(44% 0 0deg / 50%),
+      oklch(74.3% 0 0deg / 50%)
+    );
+    --cirth-form-element-color: var(--cirth-ink);
+    --cirth-form-element-selected-background-color: light-dark(
+      oklch(91.7% 0 0deg),
+      oklch(31% 0 0deg)
+    );
+    --cirth-contrast-text: var(--cirth-ink);
+    --cirth-contrast-surface: var(--cirth-ink);
+
+    // Visited: grey at about the accent's own lightness in light, where a
+    // darker one met the success text under deuteranopia (0.028).
+    --cirth-link-visited-color: light-dark(
+      oklch(50% 0 0deg),
+      oklch(65.7% 0 0deg)
+    );
+
+    // Typography
+    // Segoe, Metro's typeface: the variable Windows 11 cut, then Segoe UI,
+    // then Selawik, Microsoft's open replacement for it, and Open Sans, a
+    // humanist sans a font service carries. Nothing here loads either.
+    --cirth-font-family:
+      "Segoe UI Variable", "Segoe UI", Selawik, "Open Sans",
+      var(--cirth-font-family-sans);
+    --cirth-font-family-display: var(--cirth-font-family);
+
+    // Headings semilight, as Windows Phone set its titles and large text;
+    // display light, as its huge text. Titles keep their semibold, the
+    // weight Windows Phone gave accent and contrast text. The heading
+    // ladder opens to 32px, Windows Phone's large size, and display runs
+    // up to 72px, the size of its first title style.
+    --cirth-heading-font-weight: 350;
+    --cirth-display-font-weight: var(--cirth-font-weight-light);
+    --cirth-font-size-3xl: 2rem;
+    --cirth-display-font-size: clamp(3rem, 1.5rem + 5vw, 4.5rem);
+
+    // Geometry and space
+    // Square corners on everything Cirth draws as a box; the radio, the
+    // switch and the range thumb keep their shapes. The flow opens to
+    // 20px, one unit of the Windows 8 grid, so the steps land on its
+    // units: 10, 20, 40, 60 and 100px.
+    --cirth-border-radius: var(--cirth-radius-none);
+    --cirth-spacing: var(--cirth-space-5);
+
+    // Flat: no shadow anywhere, the overlays included. A floating surface
+    // is told apart by its level and its edge, and a dialog by the dimmed
+    // page behind it.
+    --cirth-box-shadow: none;
+    --cirth-modal-overlay-backdrop-filter: none;
+
+    // Motion: the Windows animation library's curve, a sharp ease-out,
+    // at the 167ms it gave a press.
+    --cirth-transition: 167ms cubic-bezier(0.1, 0.9, 0.2, 1);
+  }
+
+  // Derived roles, restated wherever a scheme is applied, as material.scss
+  // does and for the same reason (helpers/_selectors.scss).
+  @include selectors.scheme-roots {
+    // The accent fills the same in both schemes, as it did on the phone,
+    // and darkens the same on hover: the light scheme's own mix, which the
+    // dark one would otherwise take from the light cobalt above.
+    --cirth-primary-surface: #0050ef;
+    --cirth-primary-surface-active: color-mix(in oklch, #0050ef 91.7%, black);
+
+    // The page dims to black, without the default's tint.
+    --cirth-modal-overlay-background-color: light-dark(
+      rgb(0 0 0 / 37.5%),
+      rgb(0 0 0 / 75%)
+    );
+  }
+
+  // Increased contrast (prefers-contrast: more)
+  // Restated for the same reason as in plain.scss. Cobalt stays cobalt:
+  // deeper as text and fill in light, lighter as text in dark, where the
+  // fill keeps a deep cobalt so that white stays above 7:1 on it.
+  @media (prefers-contrast: more) {
+    @include selectors.theme-roots {
+      --cirth-primary: light-dark(
+        oklch(40% 0.2 262.6deg),
+        oklch(84% 0.08 262.6deg)
+      );
+      --cirth-muted-color: light-dark(oklch(39.7% 0 0deg), oklch(78.7% 0 0deg));
+      --cirth-secondary-text: light-dark(
+        oklch(39.7% 0 0deg),
+        oklch(78.7% 0 0deg)
+      );
+      --cirth-link-visited-color: light-dark(
+        oklch(35.3% 0 0deg),
+        oklch(78.7% 0 0deg)
+      );
+    }
+
+    @include selectors.scheme-roots {
+      --cirth-primary-surface: oklch(40% 0.2 262.6deg);
+      --cirth-primary-surface-active: oklch(34% 0.17 262.6deg);
+      --cirth-switch-background-color: light-dark(
+        var(--cirth-form-element-border-color),
+        oklch(65.7% 0 0deg)
+      );
+    }
+  }
+}

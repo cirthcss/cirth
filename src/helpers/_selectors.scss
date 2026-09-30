@@ -37,6 +37,29 @@
   }
 }
 
+// The theme roots, plus every element that forces a scheme. For a preset
+// that overrides a *derived* token: the build re-derives those on each
+// [data-theme] element (theme/_schemes.scss), so a value set only on the
+// roots stops at the edge of a forced-scheme subtree. Declaring it here
+// too keeps the subtree on the preset. Inputs do not belong here: they
+// are declared once at the root, and restating one on a [data-theme]
+// element would stop a consumer's :root override at that edge.
+// Each branch weighs just enough to beat the build it follows and no
+// more. The unscoped build re-derives at zero specificity, so a zero-weight
+// :where() wins on source order; the scoped build at (0,1,0) inside
+// .cirth, so `.cirth [data-theme]`. A separate Cirth with its own wrapper
+// (a scoped build under another prefix) declares every one of these
+// tokens on that wrapper at (0,1,0) and keeps its own.
+@mixin scheme-roots {
+  :root,
+  :host,
+  .cirth,
+  :where([data-theme]),
+  .cirth [data-theme] {
+    @content;
+  }
+}
+
 @mixin state($selector) {
   @if $parent-selector == "" {
     #{$selector} {

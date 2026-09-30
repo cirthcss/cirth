@@ -52,7 +52,8 @@ Modifier classes (default build only) swap which color group a button reads
 Use `.danger` for a destructive action that needs to remain visibly distinct
 beside the primary action. It reuses the existing error family and keeps the
 action's explicit label as a second cue; colour alone must not carry the
-meaning. Like the other colour modifiers, `.danger` is available in builds
+meaning. Its label is `--cirth-danger-on-surface`, white by default, and
+independent of the primary button's label. Like the other colour modifiers, `.danger` is available in builds
 with `$enable-classes`; classless builds do not infer intent from button text.
 
 ### Quiet variants

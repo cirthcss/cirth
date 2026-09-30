@@ -3,6 +3,7 @@ const path = require("node:path");
 const postcss = require("postcss");
 const sass = require("sass-embedded");
 
+const { srgbToOklab } = require("./lib/color");
 const { listPresetNames, presetsSourceDir } = require("./lib/presets");
 
 // The accent and the error colour have to stay apart.
@@ -11,7 +12,7 @@ const { listPresetNames, presetsSourceDir } = require("./lib/presets");
 //
 // A destructive action and a primary one share a decision surface, and
 // the palette is what keeps them from reading as the same thing. The
-// shipped accent sits 22deg of OKLCh hue from the error input. When the
+// shipped accent sits 62deg of OKLCh hue from the error input. When the
 // accent is replaced (a preset, a retheme, a new brand colour), nothing
 // else in the build notices if it lands on the error's hue, so this does.
 //
@@ -65,15 +66,25 @@ const splitLightDark = (value) => {
 };
 
 /**
+ * An oklch() literal, or a six-digit hex one: a preset that transcribes
+ * another design system (material.scss) keeps that system's own notation.
+ *
  * @param {string} value
  * @returns {Oklch}
  */
 const parseOklch = (value) => {
+	const hex = /^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(value.trim());
+	if (hex) {
+		const [r, g, b] = hex.slice(1).map((channel) => Number.parseInt(channel, 16) / 255);
+		const { lightness, a, b: blue } = srgbToOklab({ r, g, b, alpha: 1 });
+		const hue = ((Math.atan2(blue, a) * 180) / Math.PI + 360) % 360;
+		return { l: lightness, c: Math.hypot(a, blue), h: Math.round(hue * 10) / 10 };
+	}
 	const match = /^oklch\(\s*([\d.]+)(%?)\s+([\d.]+)\s+([\d.]+)(?:deg)?\s*\)$/.exec(
 		value.trim(),
 	);
 	if (!match) {
-		throw new Error(`check-accent-distance: not an oklch() literal: ${value}`);
+		throw new Error(`check-accent-distance: not an oklch() or hex literal: ${value}`);
 	}
 	const lightness = Number.parseFloat(match[1]);
 	return {
@@ -104,12 +115,22 @@ const ancestors = (decl) => {
 };
 
 /**
- * Which scheme a declaration outside light-dark() applies to.
+ * Which scheme a declaration outside light-dark() applies to. A rule that
+ * selects no scheme at all (a preset's `:root, :host, .cirth`) applies to
+ * both: a single accent for both schemes is a value, not a light one.
  *
  * @param {import("postcss").Declaration} decl
+ * @returns {"light" | "dark" | "both"}
  */
 const schemeOf = (decl) => {
-	for (const node of ancestors(decl)) {
+	const chain = ancestors(decl);
+	const chooses = chain.some(
+		(node) =>
+			(node.type === "rule" && /data-theme/.test(node.selector)) ||
+			(node.type === "atrule" && /prefers-color-scheme/.test(node.params)),
+	);
+	if (!chooses) return "both";
+	for (const node of chain) {
 		// The light block names the dark attribute too, inside :not(), which
 		// is exactly how it excludes it. Only a positive match means dark.
 		if (
@@ -164,7 +185,11 @@ const applyInputs = (css, base, moreContrast) => {
 			if (pair) {
 				state[key] = { light: pair[0], dark: pair[1] };
 			} else {
-				state[key] = { ...state[key], [schemeOf(decl)]: decl.value };
+				const scheme = schemeOf(decl);
+				state[key] =
+					scheme === "both"
+						? { light: decl.value, dark: decl.value }
+						: { ...state[key], [scheme]: decl.value };
 			}
 		}
 	}
@@ -204,6 +229,7 @@ const controls = () => {
 	assert.equal(judge({ l: 0.5, c: 0.12, h: 10 }, { l: 0.44, c: 0.15, h: 355 }).verdict, "fail", "15deg across the 0/360 seam must fail");
 	assert.equal(hueDistance(350, 10), 20, "the hue circle wraps");
 	assert.equal(judge({ l: 0.5, c: 0.01, h: 24 }, error).verdict, "neutral", "a near-neutral accent has no hue to judge");
+	assert.ok(Math.abs(parseOklch("#ff0000").h - 29.2) < 0.1, "a hex literal reads as its OKLCh hue");
 
 	// And the reading of the stylesheet: a pair at the root, then a contrast
 	// pass that restates one scheme on its own selector.
@@ -219,6 +245,8 @@ const controls = () => {
 	assert.equal(parseOklch(/** @type {string} */ (moreRead.primary.light)).h, 200, "the contrast pass overrides the light scheme");
 	assert.equal(parseOklch(/** @type {string} */ (moreRead.primary.dark)).h, 201, "and the dark one, by its selector");
 	assert.equal(parseOklch(/** @type {string} */ (moreRead.error.dark)).h, 22, "an input the pass does not restate is inherited");
+	const single = applyInputs(":root, :host, .cirth { --cirth-primary: #0050ef; }", plainRead, false);
+	assert.equal(single.primary.dark, "#0050ef", "one value on the theme roots holds in both schemes");
 	assert.equal(
 		judge(parseOklch(/** @type {string} */ (plainRead.primary.light)), parseOklch(/** @type {string} */ (plainRead.error.light))).verdict,
 		"fail",

@@ -477,8 +477,8 @@ for (const [name, css] of builds) {
 }
 
 // A preset, or the high-contrast pass, that moves the page's ink has to move
-// the *role* and let the slot follow, not the other way round. Playroom set
-// --cirth-color directly, so under it --cirth-ink still held the base
+// the *role* and let the slot follow, not the other way round. The removed
+// playroom preset set --cirth-color directly, so under it --cirth-ink still held the base
 // theme's near-black: the two names disagreed about what the page's ink was,
 // which is the one thing a page role must never do.
 const presetFiles = fs
@@ -1047,7 +1047,7 @@ for (const [name, css] of builds) {
 // It reads as the density control and it was only half wired. `.grid` gaps
 // and section margins followed it; paragraph rhythm did not, because
 // --cirth-typography-spacing-vertical was declared as its own copy of
-// --cirth-space-4, so the playroom preset had to restate it, and every
+// --cirth-space-4, so a preset that opened the flow had to restate it, and every
 // future preset would have had to remember. It is derived now.
 //
 // The other half of the contract is what deliberately does *not* follow:
@@ -1161,16 +1161,16 @@ for (const [name, css] of builds) {
 
 // And the reason the derivation was worth making: a preset that opens the
 // flow up no longer has to restate the typography token to be consistent.
-// Playroom does not declare it any more; measured against the default
-// build, prose and grid gaps move together under it.
-test("default: the playroom preset retimes prose through --cirth-spacing alone", async ({
+// The preset here is written the way the shipped ones are, one declaration
+// in Cirth's layer after the build, so the test holds whichever shipped
+// preset happens to move the knob; measured against the default build,
+// prose and grid gaps move together under it.
+test("default: a preset retimes prose through --cirth-spacing alone", async ({
 	page,
 }) => {
 	await setContent(
 		page,
-		`<style>${defaultBuild}</style><style>${read(
-			"dist/presets/playroom.css",
-		)}</style><main class="container">
+		`<style>${defaultBuild}</style><style>@layer cirth { :root { --cirth-spacing: var(--cirth-space-5); } }</style><main class="container">
 			<p>Body copy.</p>
 			<p id="copy">More body copy.</p>
 			<div class="grid" id="grid"><div>a</div><div>b</div></div>

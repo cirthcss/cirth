@@ -1,4 +1,5 @@
 const { expect, test } = require("@playwright/test");
+const { listPresetNames, presetLabel } = require("../scripts/lib/presets");
 const { setContent } = require("./helpers/render");
 const {
 	assertDocsBuilt,
@@ -84,7 +85,7 @@ const representativePresetPages = [
 ];
 
 // No docs shell or logo: the public theme has to carry the family resemblance.
-const frameworkSpecimens = ["default", "plain", "playroom", "blue"];
+const frameworkSpecimens = ["default", ...listPresetNames(), "blue"];
 
 /**
  * @type {{
@@ -519,7 +520,7 @@ test("framework interactive state matrix", async ({ page }, testInfo) => {
 			img { display: block; max-width: 100%; height: auto; }
 		</style>
 		<h1>Cirth interactive state matrix</h1>
-		<p>Real browser states · Default, Plain, Playroom and custom blue · light and dark</p>
+		<p>Real browser states · Default, ${listPresetNames().map(presetLabel).join(", ")} and custom blue · light and dark</p>
 		<div class="matrix">${cells}</div>`);
 	await expect(page).toHaveScreenshot(
 		"framework-interactive-state-matrix.png",

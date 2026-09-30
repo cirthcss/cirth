@@ -31,28 +31,29 @@
 // _dual.scss's `:root` for every token that file owns, so ink, muted text,
 // the accent and every hairline kept their normal values. See
 // specs/surface-and-edge-model.md.
-// Ratios in the comments below are measured against the worst surface of
-// each scheme: the canvas in light, a card in dark, so they hold
-// everywhere the token is used.
+// Ratios in the comments below are measured against the worst surface
+// level of each scheme: the recessed one in light, the overlay in dark, so
+// they hold everywhere the token is used.
 
 @mixin root {
-  // Text: 16.0:1 on the canvas in light, 14.7:1 on a card in dark, and the
-  // heading ramp collapses onto it rather than fading out over six steps.
+  // Text: 13.9:1 in light, 12.7:1 in dark, and the heading ramp
+  // collapses onto it rather than fading out over six steps.
   // Set as --cirth-ink, the page role: --cirth-color aliases it at the
   // root, so the slot follows, and so does anything else reading the
   // page's ink.
   --cirth-ink: light-dark(#{$neutral-900}, #{$neutral-50});
   --cirth-ink-strong: var(--cirth-ink);
 
-  // Secondary inks: 8.7:1 or better in light (up from 5.0:1) and 8.4:1 in
-  // dark (up from 5.2:1), still subordinate, no longer AA-and-no-further.
+  // Secondary inks: 7.5:1 or better in light (up from 5.2:1) and 7.3:1 in
+  // dark (up from 4.5:1), still subordinate, no longer AA-and-no-further.
   --cirth-muted-color: light-dark(#{$neutral-700}, #{$neutral-250});
   --cirth-secondary-text: light-dark(#{$neutral-700}, #{$neutral-250});
   --cirth-link-visited-color: light-dark(#{$neutral-750}, #{$neutral-250});
 
-  // Link accent: 8.9:1 in light and 8.2:1 in dark, with underlines at full
-  // strength instead of the 50%-alpha tint.
-  --cirth-primary: light-dark(#{$accent-700}, #{$accent-250});
+  // Link accent: 8.2:1 in light and 8.1:1 in dark, with underlines at full
+  // strength instead of the 50%-alpha tint. In dark the step is 200, not
+  // 250: from 250 the text role stays under 7:1 (6.9:1).
+  --cirth-primary: light-dark(#{$accent-700}, #{$accent-200});
   --cirth-secondary-underline: var(--cirth-secondary-text);
   --cirth-contrast-underline: var(--cirth-contrast-text);
 }
@@ -70,8 +71,9 @@
   --cirth-icon-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-700)}' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
 
   // Edges: the same three roles, derived from the canvas the same way,
-  // further from it. The separator clears 3:1 on every surface level (up
-  // from about 1.2:1), the control 7:1; the container follows its relation
+  // further from it. The separator clears 3:1 on the canvas and on the
+  // raised level, and reads 2.95:1 on the recessed one (up from about
+  // 1.2:1); the control clears 7:1; the container follows its relation
   // between them. The switch track and the progress frame follow the
   // control edge.
   --cirth-muted-border-color: oklch(
@@ -82,8 +84,8 @@
   );
 
   // The invalid border is the error input at rest (theme/_light.scss), so
-  // this pass has to go darker than it, not lighter: 700 against 650.
-  --cirth-form-element-invalid-border-color: #{$error-700};
+  // this pass has to go darker than it, not lighter: 750 against 700.
+  --cirth-form-element-invalid-border-color: #{$error-750};
   --cirth-form-element-valid-border-color: #{$success-600};
 
   // Derived from the accent, never a step of the default scale, so an
@@ -97,8 +99,8 @@
   );
   --cirth-primary-underline: var(--cirth-primary);
 
-  // A meter's three readings: 5.8:1, 7.3:1 and 9.3:1 against the track,
-  // up from 4.0:1, 5.1:1 and 6.6:1.
+  // A meter's three readings: 6.0:1, 7.7:1 and 9.6:1 against the track,
+  // up from 3.4:1, 4.4:1 and 8.1:1.
   --cirth-meter-optimum-color: #{$success-650};
   --cirth-meter-suboptimum-color: #{$warning-700};
   --cirth-meter-even-less-good-color: #{$error-750};
@@ -112,7 +114,7 @@
   --cirth-icon-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-250)}' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
 
   // Edges, as in the light mixin: the separator at 2.4:1 or better on
-  // every level, the control at 6.4:1.
+  // every level, the control at 6.5:1.
   --cirth-muted-border-color: oklch(from var(--cirth-canvas) calc(l + 0.3) c h);
   --cirth-form-element-border-color: oklch(
     from var(--cirth-canvas) calc(l + 0.55) c h
@@ -123,23 +125,24 @@
   // (white), and the 400 step is where white still clears 3:1 against it
   // (WCAG 1.4.11).
   --cirth-switch-background-color: #{$neutral-400};
-  --cirth-form-element-invalid-border-color: #{$error-250};
+  --cirth-form-element-invalid-border-color: #{$error-150};
   --cirth-form-element-valid-border-color: #{$success-250};
 
   // Derived from the accent, never a step of the default scale, so an
   // author's own accent keeps its hue here too. The coefficients are the
-  // default ladder's own ratios: from $accent-250 they land on
-  // $accent-150, $accent-650 and $accent-700.
+  // ratios the ladder had at 44deg, from its 250 step onto its 150, 650
+  // and 700; at 324deg, and from $accent-200, they no longer land on a
+  // step.
   --cirth-primary-active: oklch(
     from var(--cirth-primary) calc(l * 1.1093) calc(c * 0.5544) h
   );
 
   // The accent lightens for *text* legibility, and the button fill derives
   // from it, so left alone it would lighten too, and the white label on
-  // top would come out at 4.2:1, worse than the 5.5:1 it has with no
+  // top would come out at 3.7:1, worse than the 7.8:1 it has with no
   // preference at all. The fill takes a fixed lightness instead, which is
   // what keeps white on it above 7:1 (WCAG 1.4.6) whatever the accent's
-  // hue: 8.1:1 resting and 9.6:1 on hover with the default one.
+  // hue: 8.2:1 resting and 9.8:1 on hover with the default one.
   --cirth-primary-surface: oklch(
     from var(--cirth-primary) 44% calc(c * 0.978) h
   );
@@ -148,11 +151,11 @@
   );
   --cirth-primary-underline: var(--cirth-primary);
 
-  // 7.2:1, 7.8:1 and 8.8:1 against the track, up from 5.2:1, 5.7:1
-  // and 6.3:1.
+  // 9.0:1, 9.7:1 and 12.8:1 against the track, up from 6.4:1, 7.1:1
+  // and 11.0:1.
   --cirth-meter-optimum-color: #{$success-300};
   --cirth-meter-suboptimum-color: #{$warning-250};
-  --cirth-meter-even-less-good-color: #{$error-200};
+  --cirth-meter-even-less-good-color: #{$error-150};
 }
 
 @media (prefers-contrast: more) {

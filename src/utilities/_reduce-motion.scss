@@ -34,8 +34,8 @@
 
     // 5. `transition-duration` above reaches elements, ::before and ::after,
     //    and nothing else, so the engine pseudo-elements that make up a
-    //    control's interior kept animating. Measured in Firefox with the
-    //    playroom preset: the host input went to 0s while
+    //    control's interior kept animating. Measured in Firefox with a
+    //    preset at 300ms (the former playroom): the host input went to 0s while
     //    ::-moz-range-track and ::-moz-range-thumb stayed at 0.3s. Those
     //    cannot be added to the list above, because a selector list
     //    containing one engine's pseudo-element is discarded whole by the

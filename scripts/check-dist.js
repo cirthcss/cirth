@@ -305,7 +305,10 @@ for (const { name, classless, scoped } of rootBuilds) {
 
 // Presets are single-knob token overlays: only custom-property
 // declarations, only on theme roots (:root/:host/[data-theme]/.cirth),
-// only inside plain @media blocks.
+// only inside plain @media blocks. A descendant combinator is allowed
+// between two of them: `.cirth [data-theme]` is where the scoped build
+// applies a forced scheme, and a preset that restates derived tokens has to
+// reach it (helpers/_selectors.scss, scheme-roots).
 /** @param {import("postcss-selector-parser").Node} node */
 const isPresetSelectorNode = (node) => {
 	switch (node.type) {
@@ -320,6 +323,8 @@ const isPresetSelectorNode = (node) => {
 			);
 		case "attribute":
 			return node.attribute === "data-theme";
+		case "combinator":
+			return node.value === " ";
 		case "class":
 			return node.value === scopeClass;
 		default:

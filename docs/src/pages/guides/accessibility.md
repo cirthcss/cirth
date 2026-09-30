@@ -21,8 +21,8 @@ script from you.
 ## The baseline
 
 - **Contrast.** Text, icons, control borders and focus rings meet WCAG 2.2 AA
-  against the surfaces they sit on, in the light and dark schemes and in the
-  `plain` and `playroom` presets. Every page of this site is audited with axe
+  against the surfaces they sit on, in the light and dark schemes and in
+  every shipped preset. Every page of this site is audited with axe
   in each of those, on every push.
 - **Focus.** Every interactive element shows a focus ring when it is reached
   from the keyboard. The ring is backed by an `outline`, so it survives modes
@@ -80,7 +80,7 @@ Geometry does not change: no border grows and no control resizes. A thicker
 border would make every control taller, so the extra contrast is bought with
 colour.
 
-The `plain` and `playroom` presets carry their own version of this pass,
+The shipped presets carry their own version of this pass,
 because a preset redeclares the same tokens after Cirth and would otherwise
 hand the screen values back. If you write your own theme, restate the colour
 tokens you override inside the same media query:

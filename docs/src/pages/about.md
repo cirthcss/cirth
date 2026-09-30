@@ -44,8 +44,8 @@ The most important differences for someone who knows Pico:
   builds target a `.cirth` wrapper, including custom properties, document
   styles, colour schemes and modal states.
 - The twenty inherited accent themes became one official default theme,
-  with `plain` and `playroom` published as optional token presets; see
-  [Colors](/colors).
+  with optional token presets published beside it; see
+  [Presets](/presets).
 - `.grid` is an intrinsically wrapping grid, and the single-row
   equal-column layout is [`.row`](/layout/row).
 - The CSS-only `[data-tooltip]` is gone, replaced by the native
@@ -97,7 +97,7 @@ The default stylesheet is **{{ proof.size.label }} gzipped in this build**,
 measured from `dist/cirth.min.css`. Every shipped bundle carries its own
 budget, checked on every build by
 [`scripts/check-css-size.js`](https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js),
-which covers the four builds, the four print sheets and both presets, each
+which covers the four builds, the four print sheets and every preset, each
 with deliberate headroom above what it measures today.
 
 The quoted figure is gzip because that is what ordinary delivery sends. A

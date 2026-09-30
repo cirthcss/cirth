@@ -20,41 +20,46 @@
 //     and shows up on every screen, so the same 85% that makes a status
 //     mark legible would make the accent the loudest thing on every page.
 //     At 70% a filled button is still the one action on its row without
-//     the hue saturating into a generic orange.
+//     the hue saturating to the edge of the gamut.
 // Because the sRGB gamut boundary shape differs per hue (e.g. red's
 // ceiling peaks earlier, at a darker lightness, than green's does), the
 // families don't hit peak saturation at the same step: that's the gamut
 // speaking, not an inconsistency. What stays consistent is the method.
 // $neutral-* is derived differently, because it is not an accent. Its
 // chroma is a bell that peaks mid-ladder and fades to nothing at the pale
-// end: a light grey needs more chroma than a dark one to read as cool
+// end: a light grey needs more chroma than a dark one to read as tinted
 // rather than as plain grey, and a large pale surface needs none at all:
 // but it does not return to zero at the dark end. It floors at 70% of the
 // peak instead, because the dark scheme builds its canvas out of the two
 // darkest steps, and a bell that closed symmetrically left that canvas
 // achromatic no matter which hue the family was given.
-// The hue is the neutral family's other half. At 280deg it is
-// predominantly blue with a violet lift, and it sits 124deg from the
-// accent's hue: far enough for ink, lines and the dark canvas to be the
-// cool side the warm accent is read against. Pulled further round toward
-// violet it stops being that: the page loses its blue, and every surface,
-// ink and signal reads as a variation on one warm temperature.
+// The hue is the neutral family's other half. At 120deg it is a grey with
+// a trace of olive, 156deg from the accent's hue and opposite it on both
+// axes of Oklab: green where the accent is red, yellow where it is blue.
+// That is what keeps the accent apart from the neutrals for a reader who
+// loses either axis. At the same lightness the neutral stays 0.121 away
+// from the light accent in Oklab (6 JND) in normal vision and under
+// protanopia, deuteranopia and tritanopia; an achromatic family would
+// stay 0.101 away, and one on the accent's own hue 0.084.
 // Every family is named for the role it plays, not for the hue it happens
 // to be: $error-500 is what most people would call "red", but naming it
 // that way would hide why it's used (invalid form state, deleted/removed
 // text). $accent-* seeds the default of the one accent input,
 // --cirth-primary; $neutral-* carries ink, lines, the secondary controls
-// and the dark canvas. The accent's hue (44deg) is lifted directly from
-// the brand mark, not picked independently of it.
+// and the dark canvas. The accent's hue (324deg) is chosen for the
+// interface, and the brand mark is to be redrawn on it, not the other way
+// round; specs/default-palette.md records why this hue.
 
 // B&W
 $black: oklch(0% 0 0deg);
 $white: oklch(100% 0 0deg);
 
 // Light canvas. The light scheme's page background: white pulled faintly
-// toward the accent's hue (44deg), far short of a tint, so every surface
-// derived from it above and below keeps one temperature. Off the 19-step
-// ladder on purpose: it's a surface color, not a scale step.
+// toward the neutral family's hue (120deg), far short of a tint, so every
+// surface derived from it above and below keeps one temperature, the one
+// the dark canvas takes from the same family, and the accent's hue is
+// left to action and position. Off the 19-step ladder on purpose: it's a
+// surface color, not a scale step.
 // Its lightness is set by the levels around it, not by how white a page
 // can be. The raised level (a card, a field's container) is placed most of
 // the way from the canvas to white, and the recessed level (code, a
@@ -64,117 +69,116 @@ $white: oklch(100% 0 0deg);
 // four levels. See specs/surface-and-edge-model.md for the table.
 // Chroma stays low deliberately: the canvas is the ground and the accent
 // the signal on it, not a wash across everything.
-$canvas-light: oklch(96% 0.006 44deg);
+$canvas-light: oklch(96% 0.006 120deg);
 
-// Neutral: ink, lines, secondary controls and the dark canvas. Cool enough
-// to be the temperature the warm accent is read against; see the
-// derivation note above.
-$neutral-950: oklch(18% 0.022 280deg);
-$neutral-900: oklch(22.3% 0.023 280deg);
-$neutral-850: oklch(26.7% 0.025 280deg);
-$neutral-800: oklch(31% 0.026 280deg);
-$neutral-750: oklch(35.3% 0.027 280deg);
-$neutral-700: oklch(39.7% 0.028 280deg);
-$neutral-650: oklch(44% 0.029 280deg);
-$neutral-600: oklch(48.3% 0.03 280deg);
-$neutral-550: oklch(52.7% 0.031 280deg);
-$neutral-500: oklch(57% 0.032 280deg);
-$neutral-450: oklch(61.3% 0.028 280deg);
-$neutral-400: oklch(65.7% 0.025 280deg);
-$neutral-350: oklch(70% 0.021 280deg);
-$neutral-300: oklch(74.3% 0.018 280deg);
-$neutral-250: oklch(78.7% 0.014 280deg);
-$neutral-200: oklch(83% 0.011 280deg);
-$neutral-150: oklch(87.3% 0.007 280deg);
-$neutral-100: oklch(91.7% 0.004 280deg);
-$neutral-50: oklch(96% 0 280deg);
+// Neutral: ink, lines, secondary controls and the dark canvas. Faintly
+// olive, opposite the accent on both axes; see the derivation note above.
+$neutral-950: oklch(18% 0.022 120deg);
+$neutral-900: oklch(22.3% 0.023 120deg);
+$neutral-850: oklch(26.7% 0.025 120deg);
+$neutral-800: oklch(31% 0.026 120deg);
+$neutral-750: oklch(35.3% 0.027 120deg);
+$neutral-700: oklch(39.7% 0.028 120deg);
+$neutral-650: oklch(44% 0.029 120deg);
+$neutral-600: oklch(48.3% 0.03 120deg);
+$neutral-550: oklch(52.7% 0.031 120deg);
+$neutral-500: oklch(57% 0.032 120deg);
+$neutral-450: oklch(61.3% 0.028 120deg);
+$neutral-400: oklch(65.7% 0.025 120deg);
+$neutral-350: oklch(70% 0.021 120deg);
+$neutral-300: oklch(74.3% 0.018 120deg);
+$neutral-250: oklch(78.7% 0.014 120deg);
+$neutral-200: oklch(83% 0.011 120deg);
+$neutral-150: oklch(87.3% 0.007 120deg);
+$neutral-100: oklch(91.7% 0.004 120deg);
+$neutral-50: oklch(96% 0 120deg);
 
 // Accent: the default --cirth-primary and the steps the increased-contrast
 // pass pins it to.
-$accent-950: oklch(18% 0.037 44deg);
-$accent-900: oklch(22.3% 0.045 44deg);
-$accent-850: oklch(26.7% 0.054 44deg);
-$accent-800: oklch(31% 0.063 44deg);
-$accent-750: oklch(35.3% 0.072 44deg);
-$accent-700: oklch(39.7% 0.081 44deg);
-$accent-650: oklch(44% 0.09 44deg);
-$accent-600: oklch(48.3% 0.098 44deg);
-$accent-550: oklch(52.7% 0.107 44deg);
-$accent-500: oklch(57% 0.116 44deg);
-$accent-450: oklch(61.3% 0.125 44deg);
-$accent-400: oklch(65.7% 0.134 44deg);
-$accent-350: oklch(70% 0.141 44deg);
-$accent-300: oklch(74.3% 0.115 44deg);
-$accent-250: oklch(78.7% 0.092 44deg);
-$accent-200: oklch(83% 0.07 44deg);
-$accent-150: oklch(87.3% 0.051 44deg);
-$accent-100: oklch(91.7% 0.032 44deg);
-$accent-50: oklch(96% 0.015 44deg);
+$accent-950: oklch(18% 0.059 324deg);
+$accent-900: oklch(22.3% 0.073 324deg);
+$accent-850: oklch(26.7% 0.088 324deg);
+$accent-800: oklch(31% 0.102 324deg);
+$accent-750: oklch(35.3% 0.116 324deg);
+$accent-700: oklch(39.7% 0.131 324deg);
+$accent-650: oklch(44% 0.145 324deg);
+$accent-600: oklch(48.3% 0.159 324deg);
+$accent-550: oklch(52.7% 0.173 324deg);
+$accent-500: oklch(57% 0.188 324deg);
+$accent-450: oklch(61.3% 0.202 324deg);
+$accent-400: oklch(65.7% 0.216 324deg);
+$accent-350: oklch(70% 0.2 324deg);
+$accent-300: oklch(74.3% 0.168 324deg);
+$accent-250: oklch(78.7% 0.136 324deg);
+$accent-200: oklch(83% 0.107 324deg);
+$accent-150: oklch(87.3% 0.078 324deg);
+$accent-100: oklch(91.7% 0.05 324deg);
+$accent-50: oklch(96% 0.024 324deg);
 
 // Error (invalid form state, deleted/removed text)
-// 22deg sits 22deg from the accent's hue, and the distance is the point:
+// 26deg sits 62deg from the accent's hue, and the distance is the point:
 // a destructive action and a primary one share a page, and the palette
 // has to keep them apart without either of them raising its voice.
 // scripts/check-accent-distance.js fails the tooling check if an accent,
 // shipped or preset, comes within 20deg of the error input.
-$error-950: oklch(18% 0.062 22deg);
-$error-900: oklch(22.3% 0.076 22deg);
-$error-850: oklch(26.7% 0.091 22deg);
-$error-800: oklch(31% 0.106 22deg);
-$error-750: oklch(35.3% 0.121 22deg);
-$error-700: oklch(39.7% 0.136 22deg);
-$error-650: oklch(44% 0.151 22deg);
-$error-600: oklch(48.3% 0.165 22deg);
-$error-550: oklch(52.7% 0.18 22deg);
-$error-500: oklch(57% 0.195 22deg);
-$error-450: oklch(61.3% 0.21 22deg);
-$error-400: oklch(65.7% 0.195 22deg);
-$error-350: oklch(70% 0.162 22deg);
-$error-300: oklch(74.3% 0.133 22deg);
-$error-250: oklch(78.7% 0.105 22deg);
-$error-200: oklch(83% 0.08 22deg);
-$error-150: oklch(87.3% 0.057 22deg);
-$error-100: oklch(91.7% 0.036 22deg);
-$error-50: oklch(96% 0.017 22deg);
+$error-950: oklch(18% 0.062 26deg);
+$error-900: oklch(22.3% 0.077 26deg);
+$error-850: oklch(26.7% 0.092 26deg);
+$error-800: oklch(31% 0.107 26deg);
+$error-750: oklch(35.3% 0.122 26deg);
+$error-700: oklch(39.7% 0.137 26deg);
+$error-650: oklch(44% 0.152 26deg);
+$error-600: oklch(48.3% 0.167 26deg);
+$error-550: oklch(52.7% 0.182 26deg);
+$error-500: oklch(57% 0.197 26deg);
+$error-450: oklch(61.3% 0.212 26deg);
+$error-400: oklch(65.7% 0.195 26deg);
+$error-350: oklch(70% 0.162 26deg);
+$error-300: oklch(74.3% 0.133 26deg);
+$error-250: oklch(78.7% 0.105 26deg);
+$error-200: oklch(83% 0.08 26deg);
+$error-150: oklch(87.3% 0.058 26deg);
+$error-100: oklch(91.7% 0.036 26deg);
+$error-50: oklch(96% 0.017 26deg);
 
 // Success (valid form state, inserted/added text)
-$success-950: oklch(18% 0.039 153deg);
-$success-900: oklch(22.3% 0.049 153deg);
-$success-850: oklch(26.7% 0.058 153deg);
-$success-800: oklch(31% 0.068 153deg);
-$success-750: oklch(35.3% 0.077 153deg);
-$success-700: oklch(39.7% 0.087 153deg);
-$success-650: oklch(44% 0.096 153deg);
-$success-600: oklch(48.3% 0.106 153deg);
-$success-550: oklch(52.7% 0.115 153deg);
-$success-500: oklch(57% 0.125 153deg);
-$success-450: oklch(61.3% 0.134 153deg);
-$success-400: oklch(65.7% 0.144 153deg);
-$success-350: oklch(70% 0.153 153deg);
-$success-300: oklch(74.3% 0.163 153deg);
-$success-250: oklch(78.7% 0.172 153deg);
-$success-200: oklch(83% 0.182 153deg);
-$success-150: oklch(87.3% 0.191 153deg);
-$success-100: oklch(91.7% 0.12 153deg);
-$success-50: oklch(96% 0.054 153deg);
+$success-950: oklch(18% 0.035 160deg);
+$success-900: oklch(22.3% 0.043 160deg);
+$success-850: oklch(26.7% 0.051 160deg);
+$success-800: oklch(31% 0.06 160deg);
+$success-750: oklch(35.3% 0.068 160deg);
+$success-700: oklch(39.7% 0.076 160deg);
+$success-650: oklch(44% 0.085 160deg);
+$success-600: oklch(48.3% 0.093 160deg);
+$success-550: oklch(52.7% 0.101 160deg);
+$success-500: oklch(57% 0.11 160deg);
+$success-450: oklch(61.3% 0.118 160deg);
+$success-400: oklch(65.7% 0.126 160deg);
+$success-350: oklch(70% 0.135 160deg);
+$success-300: oklch(74.3% 0.143 160deg);
+$success-250: oklch(78.7% 0.151 160deg);
+$success-200: oklch(83% 0.16 160deg);
+$success-150: oklch(87.3% 0.168 160deg);
+$success-100: oklch(91.7% 0.113 160deg);
+$success-50: oklch(96% 0.051 160deg);
 
 // Warning (the middle meter reading and the borderline validation state)
-$warning-950: oklch(18% 0.031 89.5deg);
-$warning-900: oklch(22.3% 0.039 89.5deg);
-$warning-850: oklch(26.7% 0.046 89.5deg);
-$warning-800: oklch(31% 0.054 89.5deg);
-$warning-750: oklch(35.3% 0.061 89.5deg);
-$warning-700: oklch(39.7% 0.069 89.5deg);
-$warning-650: oklch(44% 0.076 89.5deg);
-$warning-600: oklch(48.3% 0.084 89.5deg);
-$warning-550: oklch(52.7% 0.092 89.5deg);
-$warning-500: oklch(57% 0.099 89.5deg);
-$warning-450: oklch(61.3% 0.106 89.5deg);
-$warning-400: oklch(65.7% 0.114 89.5deg);
-$warning-350: oklch(70% 0.122 89.5deg);
-$warning-300: oklch(74.3% 0.129 89.5deg);
-$warning-250: oklch(78.7% 0.137 89.5deg);
-$warning-200: oklch(83% 0.144 89.5deg);
-$warning-150: oklch(87.3% 0.137 89.5deg);
-$warning-100: oklch(91.7% 0.088 89.5deg);
-$warning-50: oklch(96% 0.042 89.5deg);
+$warning-950: oklch(18% 0.032 80deg);
+$warning-900: oklch(22.3% 0.039 80deg);
+$warning-850: oklch(26.7% 0.047 80deg);
+$warning-800: oklch(31% 0.055 80deg);
+$warning-750: oklch(35.3% 0.062 80deg);
+$warning-700: oklch(39.7% 0.07 80deg);
+$warning-650: oklch(44% 0.077 80deg);
+$warning-600: oklch(48.3% 0.085 80deg);
+$warning-550: oklch(52.7% 0.093 80deg);
+$warning-500: oklch(57% 0.1 80deg);
+$warning-450: oklch(61.3% 0.108 80deg);
+$warning-400: oklch(65.7% 0.116 80deg);
+$warning-350: oklch(70% 0.123 80deg);
+$warning-300: oklch(74.3% 0.131 80deg);
+$warning-250: oklch(78.7% 0.139 80deg);
+$warning-200: oklch(83% 0.141 80deg);
+$warning-150: oklch(87.3% 0.103 80deg);
+$warning-100: oklch(91.7% 0.066 80deg);
+$warning-50: oklch(96% 0.031 80deg);

@@ -6,6 +6,7 @@ const {
 	startServer,
 } = require("../scripts/lib/docs-site");
 const { withAndWithoutScrollbar } = require("./helpers/viewport");
+const { listPresetNames, presetsSourceDir } = require("../scripts/lib/presets");
 const versions = require("../docs/src/_data/versions.js");
 
 assertDocsBuilt("docs-stack.spec");
@@ -286,8 +287,8 @@ test("header keeps navigation, search, and automatic versioning distinct", async
 	// wash on the trigger exactly as it does on the field beside it, and
 	// leaves the edge and the size where they are. The text keeps every
 	// property of a placeholder but its ink, which steps up to the secondary
-	// ink: the placeholder ink on the deeper wash measured 4.21:1 in
-	// playroom's dark scheme, under AA.
+	// ink: the placeholder ink on the deeper wash measured 4.21:1 in the
+	// dark scheme of the former playroom preset, under AA.
 	await version.hover();
 	const fieldHover = await box(version);
 	await searchTrigger.hover();
@@ -1652,10 +1653,10 @@ test("the theme demo and the page keep separate themes", async ({ page }) => {
 	// Now the other direction: the site's preset switcher repaints the page
 	// and leaves the demo exactly where it was.
 	const header = page.locator("[data-cirth-preset-select]");
-	await header.selectOption("playroom");
+	await header.selectOption("material");
 	await expect(page.locator("#cirth-preset-stylesheet")).toHaveAttribute(
 		"href",
-		/presets\/playroom\.css$/,
+		/presets\/material\.css$/,
 	);
 	// The href is set synchronously on change; the accent only moves once
 	// the sheet behind it has loaded. Waiting on the attribute alone reads
@@ -2635,9 +2636,21 @@ test("a divider grid keeps one stroke at every column count", async ({
 });
 
 // Shell chrome that is ordinary Cirth UI follows the knob a preset moves.
-// The stage a live example stands on is one: under `playroom` the example
-// re-times and the frame around it used to stay pinned.
+// The stage a live example stands on is one: under a preset that opens the
+// flow the example re-times, and the frame around it used to stay pinned.
+// The preset is whichever shipped one sets --cirth-spacing, read from its
+// source, so the test does not hang on one name.
+const spacingPreset = listPresetNames().find((name) =>
+	/--cirth-spacing\s*:/.test(
+		require("node:fs").readFileSync(
+			require("node:path").join(presetsSourceDir, `${name}.scss`),
+			"utf8",
+		),
+	),
+);
+
 test("the demo stage follows the preset's spacing knob", async ({ page }) => {
+	test.skip(!spacingPreset, "no shipped preset sets --cirth-spacing");
 	const stagePadding = async (/** @type {string} */ preset) => {
 		await page.context().addInitScript((value) => {
 			sessionStorage.setItem("cirth-preset", value);
@@ -2664,7 +2677,7 @@ test("the demo stage follows the preset's spacing knob", async ({ page }) => {
 	};
 
 	const base = await stagePadding("default");
-	const roomier = await stagePadding("playroom");
+	const roomier = await stagePadding(/** @type {string} */ (spacingPreset));
 
 	// The preset really does move the knob…
 	expect(roomier.spacing).not.toBe(base.spacing);

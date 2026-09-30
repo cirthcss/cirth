@@ -63,9 +63,9 @@ as relationships:
 ```
 
 You can set a derived token directly, and sometimes you should: that is
-how you break a relationship on purpose. The `playroom` preset does exactly
-this so its buttons brighten on hover instead of darkening, which no
-proportional darkening could produce. What you should know is that doing so
+how you break a relationship on purpose. The `material` preset does exactly
+this so its buttons take Material's state layer on hover, lighter in light
+and darker in dark, which no proportional darkening could produce. What you should know is that doing so
 opts that token out permanently: it stops following the input, and a later
 change to the accent will leave it behind.
 
@@ -153,7 +153,7 @@ these.
 
 The `plain` preset is those first two plus three role choices, and nothing
 else, see
-[Themes](/themes#presets) for what it looks like. It exists partly to prove the
+[Presets](/presets#plain) for what it looks like. It exists partly to prove the
 point: a coherent, accessible, light-and-dark theme in five declarations.
 
 Here is a custom accent applied live, which is two declarations (the pair
@@ -167,8 +167,9 @@ and a radius) over the build this page is already using:
 
 Colour has its own pages. [Colors](/colors) covers the accent and the roles
 derived from it, the status colours and the surface ladder;
-[Themes](/themes) covers the light and dark schemes, `data-theme`, the
-presets and increased contrast in a theme of your own.
+[Themes](/themes) covers the light and dark schemes, `data-theme` and
+increased contrast in a theme of your own; [Presets](/presets) covers the
+three shipped ones.
 
 ## Typography
 
@@ -180,9 +181,10 @@ presets and increased contrast in a theme of your own.
 ```
 
 `--cirth-font-family` is body text and every control that inherits it.
-`--cirth-font-family-display` is headings: it points at the serif stack by
-default, which is part of Cirth's own identity; setting it to
-`var(--cirth-font-family)` is how both presets make headings match the body.
+`--cirth-font-family-display` is headings: it points at the same system
+stack by default, as a role of its own so that headings can take another
+face; setting it to `var(--cirth-font-family)` is how every shipped preset
+keeps headings in the body face whatever that face is.
 
 Cirth loads no webfonts. If you want one, load it yourself and point the
 token at it afterwards:
@@ -581,6 +583,7 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-contrast-text` | role |
 | `--cirth-contrast-underline` | role |
 | `--cirth-contrast-underline-active` | derived |
+| `--cirth-danger-on-surface` | role |
 | `--cirth-error` | input |
 | `--cirth-error-active` | derived |
 | `--cirth-error-border` | derived |

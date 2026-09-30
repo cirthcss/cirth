@@ -81,8 +81,8 @@ See [About Cirth](docs/src/pages/about.md) for the scope and trade-offs.
 | `dist/cirth.scoped.min.css` | An existing site or app; styles stay inside `.cirth`. |
 | `dist/cirth.classless.scoped.min.css` | Scoped and classless together. |
 
-All four share the same copper theme and light/dark support. Load an optional
-[`plain` or `playroom` preset](docs/src/pages/themes.md) after the main
+All four share the same default theme and light/dark support. Load one of the
+optional [presets](docs/src/pages/themes.md) after the main
 stylesheet to change its look. Print stylesheets are available separately.
 The [installation guide](docs/src/pages/installation/index.md) has examples,
 npm import paths for each build, and guides for Vite, React, Next.js, Vue,

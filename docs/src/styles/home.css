@@ -970,7 +970,7 @@ cirth-theme-preview:not(:defined) {
 }
 
 /* 1.5rem, not 1rem: at 16px a 0.5rem radius is half the box, so the chip
-   comes out a circle under Playroom and reads as a different kind of mark
+   comes out a circle under an 8px control radius and reads as a different kind of mark
    rather than as a corner. At 24px the same radius is unmistakably a
    rounded square. */
 .docs-token-chip {

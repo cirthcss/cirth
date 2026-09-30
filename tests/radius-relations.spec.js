@@ -109,8 +109,11 @@ for (const build of builds) {
 				const control = radii.text;
 				const container = radii.card;
 
-				// The pair: the container is one and a half controls.
-				expect(control).toBeGreaterThan(0);
+				// The pair: the container is one and a half controls. A square
+				// preset (metro) zeroes the knob, and the pair is zero and zero:
+				// theme/_styles.scss derives every radius so that zeroing the
+				// knob zeroes them all, cards included.
+				expect(control).toBeGreaterThanOrEqual(0);
 				expect(container).toBeCloseTo(control * 1.5, 1);
 
 				// Operated: the control radius, search included.

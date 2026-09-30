@@ -3,7 +3,7 @@ const { defineConfig } = require("@playwright/test");
 // Interaction tests exercise behavior that static screenshots cannot cover,
 // including keyboard flows and browser-managed validity states. One
 // desktop/light project per engine is enough here: resilience and parity
-// specs explicitly exercise the default, plain, and playroom themes, while
+// specs explicitly exercise the default theme and every shipped preset, while
 // screenshot coverage across schemes and viewports remains elsewhere.
 
 module.exports = defineConfig({
@@ -38,6 +38,7 @@ module.exports = defineConfig({
 		"popover.spec.js",
 		"prefers-contrast.spec.js",
 		"shell-overlays.spec.js",
+		"signal-separation.spec.js",
 		"print.spec.js",
 		"radius-relations.spec.js",
 		"segmented.spec.js",

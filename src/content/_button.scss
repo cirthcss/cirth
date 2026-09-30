@@ -188,6 +188,11 @@
   // The dark fill is deliberately deeper than the bright error input so a
   // white label keeps AA, and the accent and error fills keep a lightness
   // difference when red/green hue discrimination is reduced.
+  // The label is the one role of its own, --cirth-danger-on-surface, for the
+  // reason --cirth-primary-on-surface is explicit: light or dark ink on a
+  // fill is a decision, not a mix. It used to be the primary's label, so a
+  // theme that darkened that label for a light accent darkened this one too,
+  // on a fill that stayed deep (specs/fill-labels.md).
   #{$parent-selector}
     :is(button, [type="submit"], [type="button"], [role="button"]).danger {
     --cirth-background-color: light-dark(
@@ -195,7 +200,7 @@
       color-mix(in oklch, var(--cirth-error) 55%, black)
     );
     --cirth-border-color: var(--cirth-background-color);
-    --cirth-color: var(--cirth-primary-on-surface);
+    --cirth-color: var(--cirth-danger-on-surface);
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
       --cirth-background-color: light-dark(
@@ -203,7 +208,7 @@
         color-mix(in oklch, var(--cirth-error) 50%, black)
       );
       --cirth-border-color: var(--cirth-background-color);
-      --cirth-color: var(--cirth-primary-on-surface);
+      --cirth-color: var(--cirth-danger-on-surface);
     }
 
     &:focus-visible {

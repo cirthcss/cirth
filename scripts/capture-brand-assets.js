@@ -31,9 +31,10 @@ const lockupCaptures = [
 ];
 
 // The set a brand reviewer needs, rendered from the site rather than mocked
-// up beside it. The two specimen captures are the application screen: copper
-// on small surfaces, graphite dark surfaces, and a primary sitting next to a
-// destructive action: the adjacency the palette was hardest to settle.
+// up beside it. The two specimen captures are the application screen: the
+// 324deg accent on small surfaces, dark surfaces on the 120deg neutrals, and a
+// primary sitting next to a destructive action: the adjacency the palette was
+// hardest to settle.
 /** @type {Array<{file: string, width: number, height: number, theme: "light" | "dark", path?: string}>} */
 const reviewCaptures = [
 	{ file: "home-desktop-light.png", width: 1440, height: 900, theme: "light" },

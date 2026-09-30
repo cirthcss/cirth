@@ -345,7 +345,7 @@
     // the controls inside it at every setting of --cirth-spacing. Derived
     // from the knob instead, the two would cross the moment a preset moved
     // it: `calc(var(--cirth-spacing) * 1.25)` is an exact no-op at the
-    // default and lands on 25px under the playroom preset, off the scale
+    // default and lands on 25px when a preset opens the flow to 20px, off the scale
     // entirely. A card's padding is a container decision, not a density
     // one; override this pair to change it.
     --cirth-block-spacing-vertical: var(--cirth-space-5);
@@ -430,7 +430,13 @@
   }
 
   // Chevron icons
-  // Change the icon color to white for accordion and dropdown buttons
+  // A summary drawn as a filled button paints its chevron in its own label
+  // colour, the on-surface role of whichever fill it has. It used to be
+  // forced to white with a filter, which put a white chevron on the pale
+  // wash of a secondary summary, and on the fill of any theme whose label
+  // is dark (specs/fill-labels.md). The accordion's chevron is already
+  // masked over currentColor; the dropdown's takes the muted ink, which
+  // this replaces.
   details {
     summary {
       $selector: '&[role="button"]';
@@ -440,7 +446,7 @@
       }
       #{$selector} {
         &::after {
-          filter: brightness(0) invert(1);
+          background-color: currentColor;
         }
       }
     }

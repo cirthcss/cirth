@@ -45,6 +45,7 @@ const sidebar = [
 			{ text: "Overview", link: "/customization" },
 			{ text: "Colors", link: "/colors" },
 			{ text: "Themes", link: "/themes" },
+			{ text: "Presets", link: "/presets" },
 		],
 	},
 	{

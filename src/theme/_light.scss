@@ -11,7 +11,7 @@
   // replaced lifted each input's lightness, and on the recessed surface
   // level they fell under the 3:1 a field's edge owes WCAG 1.4.11 (error
   // 2.82:1). The input is the colour the theme chose; on every surface
-  // level it clears 4.1:1 or more.
+  // level it clears 3.4:1 or more.
   --cirth-error-text: color-mix(in oklch, var(--cirth-error) 80.2%, black);
   --cirth-error-border: var(--cirth-error);
   --cirth-error-active: oklch(
@@ -40,9 +40,10 @@
   --cirth-primary-border: var(--cirth-primary-surface);
   --cirth-primary-underline: oklch(from var(--cirth-primary) l c h / 50%);
 
-  // 83.5% and 91.7% of the accent mixed toward black land exactly on
-  // $accent-650 and $accent-600: the ladder is proportional in L and C at
-  // this end, so a single mix reproduces a step.
+  // 83.5% and 91.7% of the accent mixed toward black. The ratios come from
+  // the ladder's own proportions, which are even in L and C at this end: from
+  // a 550 anchor they land exactly on $accent-650 and $accent-600. From the
+  // shipped 500 they land between steps, at L 0.476 and 0.521.
   --cirth-primary-active: color-mix(
     in oklch,
     var(--cirth-primary) 83.5%,
@@ -73,9 +74,9 @@
 
   // Text selection. Derived, not pinned to a scale step: this used to be a
   // literal from the brand family, which meant every preset (a blue Plain
-  // page, a violet Playroom one) highlighted text in the default theme's
+  // page, a violet Material one) highlighted text in the default theme's
   // accent. The ratio lifts the accent to the lightness the wash needs so
-  // the page's ink stays legible through it (8.0:1 with the shipped value).
+  // the page's ink stays legible through it (7.8:1 with the shipped value).
   --cirth-text-selection-color: oklch(
     from var(--cirth-primary) calc(l * 1.247) c h / 25%
   );
@@ -116,7 +117,7 @@
   // neutral family's: cool lines on a warm page were the conflict this
   // replaces, and a preset's canvas now brings its own lines with it.
   // The control edge is set for >= 3:1 against the darkest level it can sit
-  // on, the recessed one (3.23:1), and is stronger everywhere else. The
+  // on, the recessed one (3.19:1), and is stronger everywhere else. The
   // container is a relation, not a third number: a quarter of the way from
   // the separator to the control, so the order holds even when a preset or
   // a consumer moves one end. The mix is in oklab, as every mix here that
@@ -206,9 +207,9 @@
   // Thumb matches button text color rather than a hardcoded white, so a
   // customized --cirth-primary-on-surface stays consistent everywhere it
   // implies "text/icon on top of the primary color". Verified >= 3:1
-  // (WCAG 1.4.11) against both tracks with the shipped values: 3.77:1
-  // unchecked (white on neutral-450), 5.60:1 checked (white on
-  // accent-550): the tightest of the two is the one to re-check if
+  // (WCAG 1.4.11) against both tracks with the shipped values: 3.92:1
+  // unchecked (white on the control edge), 4.95:1 checked (white on
+  // accent-500): the tightest of the two is the one to re-check if
   // --cirth-primary-on-surface or --cirth-switch-background-color changes.
   --cirth-switch-color: var(--cirth-primary-on-surface);
   --cirth-range-thumb-border-color: var(--cirth-background-color);
@@ -247,7 +248,7 @@
   // teaches, but with the hue backed by weight: each step down the scale
   // is also a darker color, so the same signal survives a reader who
   // cannot separate the hues. All three clear 3:1 against the track
-  // (WCAG 1.4.11) with room: 3.97:1, 5.05:1, 6.57:1. A meter whose author
+  // (WCAG 1.4.11): 3.43:1, 4.40:1, 8.10:1. A meter whose author
   // declared no low/high/optimum is entirely optimum, so it prints as one
   // flat green bar, which is what it means.
   --cirth-meter-optimum-color: var(--cirth-success);

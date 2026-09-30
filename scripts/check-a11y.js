@@ -2,6 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { AxeBuilder } = require("@axe-core/playwright");
 const { chromium } = require("playwright");
+const { listPresetNames } = require("./lib/presets");
 const {
 	assertDocsBuilt,
 	createServer,
@@ -30,7 +31,7 @@ const updateBaseline = process.argv.includes("--update-baseline");
 /**
  * @typedef {{
  *   page: string,
- *   theme: "default" | "plain" | "playroom" | "blue",
+ *   theme: string,
  *   mode: "light" | "dark" | "forced-colors",
  *   state: "default" | "dialog-open" | "popover-open" | "search-open" | "button-hover" | "button-focus" | "button-active" | "input-hover" | "input-focus" | "accordion-hover" | "accordion-focus" | "accordion-open",
  *   violation: import("axe-core").Result,
@@ -103,7 +104,7 @@ const openStates = [
 ];
 const viewport = { width: 1440, height: 900 };
 const concurrency = 4;
-const frameworkSpecimens = ["default", "plain", "playroom", "blue"];
+const frameworkSpecimens = ["default", ...listPresetNames(), "blue"];
 
 try {
 	assertDocsBuilt("check-a11y");

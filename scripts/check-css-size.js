@@ -54,7 +54,8 @@ const budgets = {
 	"cirth.print.scoped.min.css": 1_024,
 	"cirth.scoped.min.css": 15_400,
 	"presets/plain.min.css": 400,
-	"presets/playroom.min.css": 700,
+	"presets/material.min.css": 1_000,
+	"presets/metro.min.css": 1_000,
 };
 
 const warnOnly = process.argv.includes("--warn-only");

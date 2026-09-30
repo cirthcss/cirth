@@ -1,13 +1,13 @@
 ---
 layout: docs.njk
-description: Light and dark schemes, the plain and playroom presets, and how to write and verify a theme of your own with --cirth-* custom properties.
+description: Light and dark schemes, the shipped presets, and how to write and verify a theme of your own with --cirth-* custom properties.
 ---
 
 # Themes
 
 A theme in Cirth is a set of `--cirth-*` values, nothing more. The default
-theme ships in every build with a light and a dark scheme; two presets
-restate a handful of tokens on top of it; and your own theme is a stylesheet
+theme ships in every build with a light and a dark scheme; three presets
+restate some of its tokens on top of it; and your own theme is a stylesheet
 that does the same.
 
 ## Light and dark
@@ -79,39 +79,18 @@ mirror the host's choice onto the wrapper:
 
 ## Presets
 
-A preset is a stylesheet that restates some of the default theme's tokens.
-It contains no component styles, reset rules or scheme logic, so it works
-with any of the four builds. Try both live with the **Preset** control in
-this site's header.
+A preset is a stylesheet that restates some of the default theme's tokens,
+and nothing else, so it works with any of the four builds. Cirth ships
+three: `plain`, the conventional application look in five declarations;
+`material`, Material Design 3's colour scheme, shapes and motion; and
+`metro`, the manner of Windows Phone and Windows 8. Try each live with the
+**Preset** control in this site's header.
 
 {% colorSwatches %}
 
-- **`plain`** is the conventional application baseline: a familiar blue
-  accent and a plain white page. It is the token model in five declarations:
-  two colour inputs and three role choices, with the accent states and the
-  whole surface ladder following on their own.
-- **`playroom`** is the expressive end: a soft violet accent, surfaces tinted
-  toward it, large radii, a rounded system face, generous spacing, springy
-  motion and a wide soft shadow. It overrides two *derived* tokens on
-  purpose, so its hover lightens rather than darkens.
-
-Load a preset after the build:
-
-```html
-<link rel="stylesheet" href="dist/cirth.min.css">
-<link rel="stylesheet" href="dist/presets/plain.min.css">
-```
-
-```css
-@import "@cirthcss/cirth";
-@import "@cirthcss/cirth/presets/plain";
-```
-
-A preset shares the build's [cascade layer](/customization#cascade-layers),
-which is why the order between the two matters and why a token you set
-yourself beats both, wherever you load it. Like the default theme, presets
-use font stacks that ship with every major operating system: no webfont, no
-request beyond the stylesheet.
+[Presets](/presets) describes what each one moves and leaves alone, how it
+behaves in both schemes and under increased contrast, how to load it, and
+how to give it its typeface, since a preset loads no font of its own.
 
 ## Your own theme
 
@@ -173,13 +152,13 @@ off for that token. Give it a stronger value where the reader asked for one:
 }
 ```
 
-Both presets do this. [Accessibility and user
+Every shipped preset does this. [Accessibility and user
 preferences](/guides/accessibility#increased-contrast) lists what the pass
 changes.
 
 ## Verifying your theme
 
-Cirth's shipped themes, the default and both presets, are verified: every
+Cirth's shipped themes, the default and every preset, are verified: every
 text pair clears WCAG AA (4.5:1, or 7:1 under `prefers-contrast: more`) and
 every non-text indicator clears 3:1, in light and dark, on every page of this
 site.

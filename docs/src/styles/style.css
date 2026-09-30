@@ -72,7 +72,7 @@
 
      Its two consumers, .docs-switch button and .docs-stage-toggle, look
      inert at the default build, where min(4px, 4px) is the radius they
-     would inherit anyway. Under playroom the core radius is 8px and this
+     would inherit anyway. Under material the core radius is 8px and this
      stays 4. Preset-dependent; keep. */
   --docs-chrome-radius: min(
     var(--cirth-border-radius),
@@ -183,7 +183,8 @@
 
 /* Hover deepens the wash, as a secondary button's does, and the text steps
    up from the placeholder ink to the secondary ink with it: the placeholder
-   ink on the deeper wash measured 4.21:1 in playroom's dark scheme. Focus
+   ink on the deeper wash measured 4.21:1 in the dark scheme of the former
+   playroom preset. Focus
    is the ring every control draws. Nothing here changes the trigger's
    size. */
 .docs-search-trigger:is(:hover, :active) {
@@ -1257,7 +1258,7 @@ pre:not(.docs-demo-preview *) {
    a library concern, and nothing in src/ derives from these.
 
    The comment hue reads inert only because the default palette's muted
-   grey is the colour this text would fall back to anyway. Under playroom
+   grey is the colour this text would fall back to anyway. Under a preset
    it is not, so the token is what keeps a comment muted in the reader's
    theme rather than in this one. */
 .hljs-comment,

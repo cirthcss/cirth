@@ -126,7 +126,7 @@ faq:
         is CSS only, in classless and scoped forms (four builds today:
         default, classless, scoped and scoped classless) with print sheets
         and token presets as separate outputs beside them; the twenty inherited accent themes are one default theme
-        plus <code>plain</code> and <code>playroom</code> as token-override
+        plus a few token-override
         presets; <code>.grid</code> is now an intrinsically wrapping grid
         and the single-row equal-column layout is
         <a href="/layout/row"><code>.row</code></a>; the CSS-only

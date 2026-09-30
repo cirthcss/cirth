@@ -7,6 +7,7 @@ const {
 	listPages,
 	startServer,
 } = require("../scripts/lib/docs-site");
+const { listPresetNames } = require("../scripts/lib/presets");
 
 // The consistency contract the Native Baseline pass settled: one card
 // contract, one button geometry, one active-navigation marker, and no
@@ -402,17 +403,13 @@ test("the card and table borders keep a neutral hue in every theme", async ({
 	// palette anywhere near it. Mixed `in oklab` there is no angle to
 	// rotate. This asserts the outcome, not the mechanism: whatever the
 	// derivation, the result has to stay in the family its inputs are in.
-	for (const [preset, storage] of [
-		["default", "default"],
-		["plain", "plain"],
-		["playroom", "playroom"],
-	]) {
+	for (const preset of ["default", ...listPresetNames()]) {
 		await page.goto(`${origin}/components/card/`, {
 			waitUntil: "domcontentloaded",
 		});
 		await page.evaluate((value) => {
 			sessionStorage.setItem("cirth-preset", value);
-		}, storage);
+		}, preset);
 		await page.reload({ waitUntil: "networkidle" });
 
 		const hues = await page.evaluate(() => {
@@ -531,7 +528,7 @@ test("navigation links reserve the accent for position, while header chrome uses
 	// the hover step, hover below the current entry, and the current entry
 	// at the emphasis ink rather than at whatever the header happens to
 	// inherit. Neither convention paints membership with the action colour.
-	for (const variant of ["default", "plain", "playroom"]) {
+	for (const variant of ["default", ...listPresetNames()]) {
 		await page.goto(`${origin}/specimen/${variant}/`, {
 			waitUntil: "networkidle",
 		});

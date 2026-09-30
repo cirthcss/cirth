@@ -1,0 +1,174 @@
+// Material preset
+// ––––––––––––––––––––
+// Cirth in the dress of Material Design 3: the baseline colour scheme, a
+// Roboto stack, M3's shape, state layer, focus ring, elevation and motion,
+// as far as Cirth's token model can carry them. Values are M3's own, from
+// the baseline and high-contrast schemes Google publishes as tokens
+// (@material/web 2.5.0, design system version 34.0.21), not approximations.
+// specs/material-preset.md records every mapping and what cannot be mapped.
+// It is also the longer half of a worked example. Where
+// src/presets/plain.scss changes five declarations and lets the theme
+// derive the rest, this one overrides broadly, derived tokens included,
+// where M3 derives a state differently from Cirth: the fill of a filled
+// button in dark, the hover state layer, the focus ring, the edges.
+// Import after the main Cirth stylesheet. No @import, no webfont: Roboto
+// shows where it is installed (Android, ChromeOS) or where the page loads
+// it; see the Presets page for how.
+@use "../helpers/cascade";
+@use "../helpers/selectors";
+
+// M3 elevation, levels 2 and 3: a key shadow at 30% and an ambient one at
+// 15%, the pair material-web's elevation component draws.
+$level2:
+  0 1px 2px 0 rgb(0 0 0 / 30%),
+  0 2px 6px 2px rgb(0 0 0 / 15%);
+$level3:
+  0 1px 3px 0 rgb(0 0 0 / 30%),
+  0 4px 8px 3px rgb(0 0 0 / 15%);
+
+// In Cirth's cascade layer, after the build: the theme's declarations and
+// these share their weight, so source order hands these the win, and any
+// rule a consumer writes outside a layer still beats both.
+@include cascade.layer {
+  @include selectors.theme-roots {
+    // Colour: the baseline scheme, light and dark
+    // primary, surface, on-surface, on-surface-variant and error, one role
+    // each. Surface is the canvas; the surface levels derive from it and
+    // land near M3's container tones without being restated.
+    --cirth-primary: light-dark(#6750a4, #d0bcff);
+    --cirth-canvas: light-dark(#fef7ff, #141218);
+    --cirth-ink: light-dark(#1d1b20, #e6e0e9);
+    --cirth-ink-strong: var(--cirth-ink);
+    --cirth-muted-color: light-dark(#49454f, #cac4d0);
+    --cirth-form-element-color: var(--cirth-ink);
+
+    // M3's secondary role carries Cirth's secondary text and, below, the
+    // focus ring; on-secondary-container is its active step and
+    // secondary-container the selected option.
+    --cirth-secondary-text: light-dark(#625b71, #ccc2dc);
+    --cirth-secondary-active: light-dark(#4a4458, #e8def8);
+    --cirth-secondary-underline: light-dark(
+      rgb(98 91 113 / 50%),
+      rgb(204 194 220 / 50%)
+    );
+    --cirth-form-element-selected-background-color: light-dark(
+      #e8def8,
+      #4a4458
+    );
+
+    // Inverse surface for the contrast variant, on-surface for its text.
+    --cirth-contrast-text: var(--cirth-ink);
+    --cirth-contrast-surface: light-dark(#322f35, #e6e0e9);
+
+    // M3 defines error and nothing else; success and warning stay Cirth's.
+    // In light the error is M3's medium-contrast one, not the baseline
+    // #b3261e: that sits at L 0.50, next to the warning's 0.53, so the
+    // meter's two lower readings barely differed in lightness and the
+    // error and warning marks were 0.018 apart under deuteranopia.
+    --cirth-error: light-dark(#8c1d18, #f2b8b5);
+
+    // M3 has no visited role. Cirth's is the accent drained to grey; this
+    // grey is darker than the violet accent in light, so the two stay
+    // apart under tritanopia, where a violet and a grey at one lightness
+    // merge.
+    --cirth-link-visited-color: light-dark(#545454, #919191);
+
+    // Typography
+    // Roboto for every role, as M3's brand and plain typefaces, with the
+    // variable Roboto Flex next and the system stack after them.
+    --cirth-font-family: Roboto, "Roboto Flex", var(--cirth-font-family-sans);
+    --cirth-font-family-display: var(--cirth-font-family);
+
+    // Headline and display at M3's regular weight, titles at medium; the
+    // label weight (medium) is already M3's. Display runs from
+    // display-small to display-large (36 to 57px).
+    --cirth-heading-font-weight: var(--cirth-font-weight-regular);
+    --cirth-title-font-weight: var(--cirth-font-weight-medium);
+    --cirth-display-font-size: clamp(2.25rem, 1.5rem + 3vw, 3.5625rem);
+
+    // Shape
+    // One knob, as everywhere in Cirth: 8px is M3's small corner, the one
+    // M3 names for remapping a button that should not be a pill, and the
+    // container radius it derives lands on M3's medium, 12px, the card's.
+    --cirth-border-radius: var(--cirth-radius-lg);
+
+    // Focus ring: 3px, 2px outside the control, as M3 draws it.
+    --cirth-outline-width: 0.1875rem;
+    --cirth-outline-offset: var(--cirth-border-width-2);
+
+    // Elevation where M3 elevates: menus and popovers at level 2, dialogs
+    // at level 3. Cards stay flat; M3 separates them with tone and an
+    // outline, which the surface levels and the container edge already do.
+    --cirth-box-shadow: #{$level2};
+    --cirth-modal-box-shadow: #{$level3};
+
+    // A scrim, not a blur.
+    --cirth-modal-overlay-backdrop-filter: none;
+
+    // Motion: M3's standard easing at 200ms, the duration M3 gives
+    // selection controls. Expressive's springs have no CSS form.
+    --cirth-transition: var(--cirth-duration-normal) cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  // Derived roles, restated wherever a scheme is applied
+  // Each of these is a token the build derives per scheme. M3 derives them
+  // differently, so they are set here on purpose, and on every
+  // [data-theme] element too, or a forced-scheme subtree would fall back
+  // to the build's formula (helpers/_selectors.scss).
+  @include selectors.scheme-roots {
+    // The filled button is the primary itself in both schemes, with M3's
+    // on-primary as its label: white in light, a deep violet in dark. The
+    // label also marks the checkbox, the radio, the switch thumb and the
+    // selected segment. The danger button keeps its own white label.
+    --cirth-primary-surface: var(--cirth-primary);
+    --cirth-primary-on-surface: light-dark(#fff, #381e72);
+
+    // Hover is M3's state layer: the label colour at 8% over the fill,
+    // which lightens in light and darkens in dark. Pressed adds Cirth's own
+    // wash on top (content/_button.scss).
+    --cirth-primary-surface-active: color-mix(
+      in srgb,
+      var(--cirth-primary-on-surface) 8%,
+      var(--cirth-primary-surface)
+    );
+
+    // M3 draws focus in the secondary colour.
+    --cirth-primary-focus: var(--cirth-secondary-text);
+
+    // Outline for the control edge, outline-variant for the separator; the
+    // container edge sits between them by its own relation.
+    --cirth-form-element-border-color: light-dark(#79747e, #938f99);
+    --cirth-muted-border-color: light-dark(#cac4d0, #49454f);
+
+    // M3's scrim: black at 32%.
+    --cirth-modal-overlay-background-color: rgb(0 0 0 / 32%);
+  }
+
+  // Increased contrast (prefers-contrast: more)
+  // M3 publishes a high-contrast scheme, and this is it, restated for the
+  // same reason as in plain.scss: this file loads after the theme's own
+  // pass and would otherwise hand the base values back. The error keeps
+  // its base value in dark, where the danger fill is a deeper mix of it
+  // and M3's paler high-contrast error would leave white under 7:1.
+  @media (prefers-contrast: more) {
+    @include selectors.theme-roots {
+      --cirth-primary: light-dark(#381e72, #f6edff);
+      --cirth-ink: light-dark(#000, #fff);
+      --cirth-secondary-text: light-dark(#332d41, #f6edff);
+      --cirth-error: light-dark(#601410, #f2b8b5);
+
+      // Visited: M3's on-surface-variant drained to grey, at its own
+      // lightness, rather than the olive grey the theme's pass would hand
+      // back.
+      --cirth-link-visited-color: light-dark(#474747, #c7c7c7);
+    }
+
+    @include selectors.scheme-roots {
+      --cirth-primary-on-surface: light-dark(#fff, #000);
+      --cirth-form-element-border-color: light-dark(#322f37, #f5eefa);
+      --cirth-muted-border-color: light-dark(#49454f, #cac4d0);
+      --cirth-form-element-invalid-border-color: var(--cirth-error);
+      --cirth-switch-background-color: var(--cirth-form-element-border-color);
+    }
+  }
+}

@@ -9,8 +9,9 @@ Cirth's colour is a few inputs and the roles derived from them. Set
 `--cirth-primary` and every link, primary button, focus ring and checked
 control follows; set `--cirth-canvas` and every surface level and every
 edge moves with it. This page lists each role, what it is for, and its
-value in the build this site loads. For light and dark, the `plain` and
-`playroom` presets and writing a theme of your own, see [Themes](/themes).
+value in the build this site loads. For light and dark and writing a theme
+of your own, see [Themes](/themes); for the shipped presets, see
+[Presets](/presets).
 
 The accent is for action and position. Everything else is a surface level,
 an edge, an ink or a state.
@@ -118,7 +119,7 @@ What sits on each:
 
 Every level keeps the canvas's hue and chroma (the raised level in light
 halves the chroma on its way to white), so a preset that tints its canvas
-tints every level with it: `plain` is neutral, `playroom` keeps its own
+tints every level with it: `plain` is neutral, `material` keeps its own
 hue, and no level is a wash of the accent.
 
 `--cirth-surface` is the level the current element sits on: the canvas at
@@ -196,7 +197,12 @@ Three families, each driving the same roles:
 | `--cirth-error-active` | The edge of an outline `.danger` button while hovered or pressed |
 | `--cirth-error-surface` | A tint to sit status content on |
 
-`--cirth-success` and `--cirth-warning` have the same shape.
+`--cirth-success` and `--cirth-warning` have the same shape. The error family
+has one role more, `--cirth-danger-on-surface`: the label on a `.danger`
+button. It is white, and it is its own token rather than the primary's
+label, so a theme that sets a dark `--cirth-primary-on-surface` for a light
+accent keeps a readable label on a deep red fill. Set it only if your error
+colour is light enough to need dark ink.
 
 {% if measured %}
 | State | Hue | Text, lowest on any level | Edge, lowest on any level |
@@ -269,28 +275,31 @@ gamut talking, not an inconsistency between families.
 
 `$neutral-*` is derived differently, because it isn't an accent. Its chroma
 is a bell that peaks mid-ladder and fades to nothing at the pale end: a
-light grey needs more chroma than a dark one to read as cool rather than as
+light grey needs more chroma than a dark one to read as tinted rather than as
 plain grey, and a large pale surface needs none at all, but it doesn't
 return to zero at the dark end. It floors at 70% of the peak, because the
 dark scheme builds its canvas out of the two darkest steps, and a bell that
 closed symmetrically left that canvas achromatic whatever hue the family
 was given.
 
-The neutral's hue does real work: at {{ measured.neutralHue if measured else 280 }}deg it
-sits 124deg from the accent's. That distance is what lets the accent read
-as a signal: the inks and the dark canvas are measured against it rather
-than beside it, and a neutral moved round toward the accent's hue would
-leave lightness as the only thing separating a link from the text around
-it.
+The neutral's hue does real work: at {{ measured.neutralHue if measured else 120 }}deg it
+is a grey with a trace of olive, opposite the accent on both of Oklab's
+colour axes: green where the accent is red, yellow where it is blue. That is
+what lets the accent read as a signal for a reader who loses one of those
+axes. Under protanopia, deuteranopia or tritanopia the neutral at the
+accent's lightness stays clearly apart from it, where a neutral moved round
+toward the accent's hue would leave lightness as the only thing separating
+a link from the text around it. Both canvases take the neutral's hue too,
+so the accent is left to action and position.
 
-`$accent-*`'s hue (44deg) isn't an arbitrary pick; it's lifted directly
-from the brand mark, so the theme's primary accent and the logo are the
-same color by construction rather than by manual matching. `$error-*` sits
-a deliberate 22deg away from it: a destructive action and a primary one
-share a page, and the palette has to keep them apart without either raising
-its voice.
+`$accent-*`'s hue (324deg, a magenta) isn't an arbitrary pick. Of the hues
+that keep the accent apart from the neutrals and from the status colours
+under colour vision deficiency, it sits furthest from the accents of widely
+used systems and CSS tools. `$error-*` sits a deliberate 62deg away from it:
+a destructive action and a primary one share a page, and the palette has to
+keep them apart without either raising its voice.
 
-`plain` and `playroom` (`src/presets/`) declare only the values for the
+The presets (`src/presets/`) declare only the values for the
 inputs and roles they intentionally change. They do not duplicate the theme's
 surface levels, component styles, reset rules, or scheme wiring: each scheme
 difference is stated once as a `light-dark()` pair, which is why `plain` fits
@@ -306,9 +315,10 @@ than converting it to a `hex` / `lab()` fallback.
 
 Cirth previously inherited a set of twenty accent color themes from Pico CSS, then
 briefly maintained three full themes (azure, jade, slate). That has been
-reduced further to a single official theme plus two token override presets,
-`plain` and `playroom`. The official theme's accent was a yellow-orange until
-0.15; it is now the accent described above, with the neutral, surface and
-status families rebuilt around it rather than adapted to it. See
+reduced further to a single official theme plus token override presets,
+first `plain` and `playroom`, now `plain` and `material`. The official theme's accent was a yellow-orange until
+0.15 and a copper through 0.16; it is now the magenta described above, with
+the neutral, surface and status families rebuilt around it rather than
+adapted to it. See
 [About](/about) for the project's history and
 [Contributions](/contributions) before proposing color system changes.

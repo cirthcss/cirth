@@ -71,10 +71,11 @@ takes the interface out of the system.
 ## The mark
 
 Cirth's name comes from a writing system, and the mark is the project's
-own sign rather than a letter borrowed from one. It carries the copper the
-interface uses for action and position, and it is built to hold at the
+own sign rather than a letter borrowed from one. It is built to hold at the
 sizes technical work actually puts it in: a README header, an npm listing,
-a favicon, a tab strip.
+a favicon, a tab strip. It still carries the copper of the palette it was
+drawn with, which is no longer the interface's accent; the redrawn mark
+takes the accent's hue.
 
 The mark is being redrawn. The files in the grid below are the current
 ones and remain the assets to use until they are replaced; the geometry
@@ -234,19 +235,21 @@ A primary button's label on its fill: {{ measured.accent.light.label | ratio }}
 in light, {{ measured.accent.dark.label | ratio }} in dark.
 {% endif %}
 
-The mark and the accent share a hue: {{ measured.accent.hue if measured else 44 }}° in
-OKLCH, the hue the default accent scale is generated from, so the theme's
-accent and the logo match by construction rather than by eye. The mark is
-more saturated than the interface tokens because it is a sign to
-recognise, not a colour that text has to clear 4.5:1 against.
+The mark and the accent do not share a hue yet. The files below are the
+copper mark, at 44° in OKLCH; the default accent scale is generated from
+{{ measured.accent.hue if measured else 324 }}°, and the redrawn mark takes
+that hue, so that the theme's accent and the logo match by construction
+rather than by eye. The mark is more saturated than the interface tokens
+because it is a sign to recognise, not a colour that text has to clear
+4.5:1 against.
 
 | Role | Value |
 | --- | --- |
 | Mark, light backgrounds | `#BD5928` (`oklch(0.58 0.143 44.2)`) |
 | Mark, dark backgrounds | `#E16B31` (`oklch(0.66 0.163 44.2)`) |
 {%- if measured %}
-| Accent, light | `{{ measured.accent.light.primary.hex }}` (`{{ measured.accent.light.primary.oklch }}`), from `$accent-550` |
-| Accent, dark | `{{ measured.accent.dark.primary.hex }}` (`{{ measured.accent.dark.primary.oklch }}`), from `$accent-400` |
+| Accent, light | `{{ measured.accent.light.primary.hex }}` (`{{ measured.accent.light.primary.oklch }}`), from `$accent-500` |
+| Accent, dark | `{{ measured.accent.dark.primary.hex }}` (`{{ measured.accent.dark.primary.oklch }}`), from `$accent-450` |
 | Accent as text, light | `{{ measured.accent.light.text.hex }}` (`{{ measured.accent.light.text.oklch }}`) |
 | Accent as text, dark | `{{ measured.accent.dark.text.hex }}` (`{{ measured.accent.dark.text.oklch }}`) |
 {%- endif %}

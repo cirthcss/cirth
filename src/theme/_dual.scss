@@ -1,4 +1,5 @@
 @use "sass:color";
+@use "../config" as *;
 @use "../helpers/functions";
 @use "../helpers/selectors";
 @use "colors" as *;
@@ -71,9 +72,9 @@
 
   // Muted ink: metadata, placeholders, the quietest text that still has to
   // be read. The step is chosen against the worst surface level in each
-  // scheme, not against the canvas: the recessed level in light (5.27:1)
-  // and the overlay in dark (5.35:1). One step lighter fails there in both
-  // schemes (4.39:1 and 4.33:1).
+  // scheme, not against the canvas: the recessed level in light (5.21:1)
+  // and the overlay in dark (5.37:1). One step weaker fails there in light
+  // (4.30:1) and only just holds in dark (4.56:1).
   --cirth-muted-color: light-dark(#{$neutral-600}, #{$neutral-350});
 
   // Status colours
@@ -83,11 +84,11 @@
   // field takes when it validates, and the surface status content sits on. The
   // status hues are deliberately not fixed constants: a theme whose brand
   // overlaps a conventional status hue is expected to move them (see
-  // gh#84). The default keeps error a full 22deg off the brand hue for
+  // gh#84). The default keeps error a full 62deg off the accent's hue for
   // exactly that reason ; see the note in theme/_colors.scss.
-  --cirth-error: light-dark(#{$error-650}, #{$error-300});
-  --cirth-success: light-dark(#{$success-550}, #{$success-400});
-  --cirth-warning: light-dark(#{$warning-600}, #{$warning-350});
+  --cirth-error: light-dark(#{$error-700}, #{$error-200});
+  --cirth-success: light-dark(#{$success-500}, #{$success-400});
+  --cirth-warning: light-dark(#{$warning-550}, #{$warning-350});
 
   // Primary colors
   // --cirth-primary is the input. Everything below derives from it, so
@@ -95,13 +96,13 @@
   // underline tint and the fill follow without being restated. Override
   // any derived token directly if you want to break the relationship on
   // purpose.
-  // The dark anchor is 400, not the 350 that would mirror the light 550:
-  // this hue's gamut ceiling climbs steeply above L 65%, so the mirror step
-  // lands on the family's chroma peak and saturates into an orange. One
-  // step deeper keeps the accent recognisably the same hue on the dark
-  // canvas and still clears AA on every surface in the scheme (4.97:1 on a
-  // card, the worst of them).
-  --cirth-primary: light-dark(#{$accent-550}, #{$accent-400});
+  // The dark anchor is 450, one step lighter than the light 500. It is
+  // never set as text on its own: the text role lifts it to L 0.72
+  // (theme/_dark.scss), where it reads 5.24:1 on the overlay, the lightest
+  // level, and the fill mixes it toward black, where a white label reads
+  // 7.75:1. Unlifted it would read 4.33:1 on the canvas and 3.42:1 on the
+  // overlay.
+  --cirth-primary: light-dark(#{$accent-500}, #{$accent-450});
 
   // Secondary colors. This is the neutral family, not another input graph:
   // its fixed scale keeps the public runtime relationships concentrated on
@@ -152,15 +153,24 @@
   --cirth-contrast-focus: var(--cirth-contrast-text);
   --cirth-contrast-on-surface: light-dark(#{$white}, #{$black});
 
+  // The label on a .danger button. Its fill is the error input in light and
+  // a deeper mix of it in dark (content/_button.scss), dark enough in both
+  // for white; a theme whose error is light enough to need dark ink says so
+  // here. Not the primary's label: a theme that darkens that one for a
+  // light accent leaves this fill as deep as it was (specs/fill-labels.md).
+  @if $enable-classes {
+    --cirth-danger-on-surface: #{$white};
+  }
+
   // Visited links: the accent drained to neutral, so a followed link reads
   // as spent without leaving the palette. A step darker than
   // --cirth-secondary-text so the two aren't the same colour by accident.
   // Drained means *achromatic*, not "the grey from the neutral scale".
-  // The neutral scale's own steps carry its cool tint, which next to a warm
+  // The neutral scale's own steps carry its olive tint, which next to the
   // accent is a hue change at almost the same lightness: the weakest
   // possible way to say "you have been here". Zero chroma says it with the
   // one channel that is unambiguous. Lightness is unchanged, so is the
-  // contrast: 6.00:1 on the canvas, 6.30:1 on a card (WCAG 1.4.3 AA).
+  // contrast: 5.77:1 on the canvas, 6.37:1 on a card (WCAG 1.4.3 AA).
   --cirth-link-visited-color: light-dark(
     #{color.change($neutral-600, $chroma: 0)},
     #{color.change($neutral-400, $chroma: 0)}

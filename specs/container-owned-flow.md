@@ -26,7 +26,7 @@ layout relied on an element's own margin changes.
 | Rule (grammar) | Value (tuning) |
 | --- | --- |
 | Five named steps, strictly increasing, by distance of meaning | Line 0.5×, element 1×, group 2×, section 3×, chapter 5× the flow knob: 8, 16, 32, 48, 80px at the default |
-| The scale is derived from the one flow knob, `--cirth-spacing` | A preset that opens the flow (playroom's 20px) moves every step in proportion |
+| The scale is derived from the one flow knob, `--cirth-spacing` | A preset that opens the flow (to 20px, say) moves every step in proportion |
 | An element never carries its own outer margin | Nothing to tune |
 | The space between two siblings is the step of their relation, set on the second one as `margin-block-start`, at zero specificity | The relation table below |
 | A heading is closer to what it introduces than to what precedes it | Before `h1` and `h2`: section. Before `h3` to `h6`: group. After any heading: line |

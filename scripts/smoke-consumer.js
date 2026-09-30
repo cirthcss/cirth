@@ -68,7 +68,8 @@ const entryPoints = [
 		mustNot: [".container"],
 	},
 	{ subpath: "./presets/plain", must: ["--cirth-"], mustNot: [] },
-	{ subpath: "./presets/playroom", must: ["--cirth-"], mustNot: [] },
+	{ subpath: "./presets/material", must: ["--cirth-"], mustNot: [] },
+	{ subpath: "./presets/metro", must: ["--cirth-"], mustNot: [] },
 	// The DTCG token export, one file per scheme (gh#93).
 	{
 		subpath: "./tokens/light",

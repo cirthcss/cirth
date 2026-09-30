@@ -33,7 +33,7 @@ Two radii, one knob, assigned by kind:
 
 - **No box is rounder than the container radius.** For every element in the
   first three rows, radius ≤ `--cirth-card-border-radius`, in the default
-  theme, `plain` and `playroom`, in both schemes.
+  theme and every shipped preset, in both schemes.
 - **Search is a field.** `[type="search"]` and `[role="search"]` take the
   control radius. The magnifier icon, which every search field already
   carries, is what identifies it.
