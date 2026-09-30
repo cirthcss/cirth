@@ -50,6 +50,7 @@ It does **not** promise:
 | The regression test detects the old behaviour | `tests/box-shadow.spec.js` "a floating panel lifts off the dark canvas…" fails in all three engines with the factor set back to 1, and passes at 4 | `npx playwright test --config=playwright.behavior.config.js tests/box-shadow.spec.js`, same browsers, 2026-09-27 | Verified |
 | The layer count and geometry are unchanged | The existing "seven layers" and "same geometry, different colour" assertions in `tests/box-shadow.spec.js` pass unchanged | Same run | Verified |
 | The size budgets hold | `npm run build`: `cirth.min.css` 15112 B gzip (budget 15200), `cirth.scoped.min.css` 15295 B (budget 15400, +10 B against the baseline's 15285 B) | This branch, Node 24.18.0, 2026-09-27 | Verified |
+| The contract holds after the near-black canvas of [surface-depth](surface-depth.md), with a black dark shadow and a factor of 10 | Ratios 0.94 (Chromium), 0.90 (Firefox), 0.83 (WebKit) | `tests/box-shadow.spec.js`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, 2026-09-30 | Verified |
 | Graphite needs more shadow ink than paper for the same perceived lift | General design practice for dark interfaces; the measurement above is what this spec relies on, not the rule of thumb | Not reproduced as a general claim | Reported |
 
 ## Decisions

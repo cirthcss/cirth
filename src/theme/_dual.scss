@@ -50,10 +50,7 @@
   // so anything that needs to refer to *the page* (an outline button
   // wanting an opaque background, a hover tint mixing toward it) needs a
   // name the components are not allowed to shadow. That is this one.
-  --cirth-canvas: light-dark(
-    #{$canvas-light},
-    #{color.mix($neutral-950, $neutral-900, $method: oklab)}
-  );
+  --cirth-canvas: light-dark(#{$canvas-light}, #{$canvas-dark});
 
   // The page ink, as an input of its own: the exact twin of --cirth-canvas
   // above, and for the same reason. --cirth-color is the slot a component
@@ -179,11 +176,16 @@
   // Box shadow: the overlay elevation (dialog, popover, dropdown). The
   // light half is the deepest neutral, not a pale grey: a shadow is read as
   // a lightness step against what it falls on, and a pale one on a
-  // near-white page is a step nobody sees.
-  --cirth-box-shadow: #{functions.shadow(
-      $neutral-950,
-      color.mix($black, $neutral-950, $method: oklab)
-    )};
+  // near-white page is a step nobody sees. The dark half is black: on a
+  // near-black page any colour lighter than black leaves the shadow no
+  // room to be seen.
+  --cirth-box-shadow: #{functions.shadow($neutral-950, $black)};
+
+  // Card shadow: the raised elevation, one contact layer. A card is a
+  // sheet on the page, not a floating one; this is the faint depth that
+  // separates a near-white sheet from a near-white page beside its edge.
+  // Its own token, so turning the overlay shadow off leaves it alone.
+  --cirth-card-box-shadow: #{functions.raised-shadow($neutral-950, $black)};
 
   // Typography
   // Four ink steps with named jobs: strong for the heading, title and

@@ -42,6 +42,7 @@ module.exports = defineConfig({
 		"print.spec.js",
 		"radius-relations.spec.js",
 		"segmented.spec.js",
+		"surface-depth.spec.js",
 		"surface-derivation.spec.js",
 		"table-controls.spec.js",
 		"token-override.spec.js",

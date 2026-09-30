@@ -49,7 +49,7 @@ with this spec), `dist/cirth.css` and the presets at `f7fc5d2a`, Chromium
 | Every level derives from `--cirth-canvas` at runtime | Light canvas `oklch(97.8% 0.003 120deg)`, was 96% at chroma 0.006. Dark canvas `oklch(16.5% 0.012 120deg)`, was the oklab mix of neutral 950 and 900 (L 0.202, chroma 0.0225) |
 | Three edge roles, separator < container ≤ control on every level | Separator −0.08 / +0.15; control −0.37 / +0.42; container 25% of the way, unchanged |
 | The same, further apart, under `prefers-contrast: more` | Separator −0.35 / +0.34; control −0.56 / +0.60 |
-| Elevation is a shadow per level, never a border alone | Raised: one contact layer at 6%. Overlay: contact 8% and ambient 14%, plus a 1px top highlight in dark. Dark alpha stays eight times the light one |
+| Elevation is a shadow per level, never a border alone | Raised: one contact layer at 6%. Overlay: contact 8% and ambient 11%, plus a 1px top highlight in dark. The dark shadow is black, at ten times the light alpha, capped at 1 |
 
 ## Models compared
 
@@ -112,16 +112,22 @@ level and a control of 6.5:1.
 
 | Level | Token | Light | Dark |
 | --- | --- | --- | --- |
-| Raised (`<article>`) | `--cirth-card-box-shadow` | `0 1px 2px` at 6% of neutral 950 | same geometry, 48% of the black-mixed neutral |
-| Overlay (dropdown, popover, dialog) | `--cirth-box-shadow` | `0 1px 3px` at 8% and `0 10px 28px -6px` at 14% | 64% and 100%, and an inset `0 1px 0` highlight of white at 5% |
+| Raised (`<article>`) | `--cirth-card-box-shadow` | `0 1px 2px` at 6% of neutral 950 | same geometry, black at 60% |
+| Overlay (dropdown, popover, dialog) | `--cirth-box-shadow` | an inset `0 1px 0` layer, transparent; `0 1px 3px` at 8% and `0 10px 28px -6px` at 11% of neutral 950 | the inset layer white at 5%; black at 80% and 100% |
 
 `--cirth-modal-box-shadow` keeps aliasing `--cirth-box-shadow`, so one
 declaration still removes every overlay shadow, as metro does. A card's
 shadow is its own token and is not removed by it.
 
-A card never casts the overlay shadow: its single contact layer is a sixth
-of the overlay's reach, so a card reads as a sheet on the page and a menu
-as something above it.
+A card never casts the overlay shadow: its single contact layer is a
+fourteenth of the overlay's reach, so a card reads as a sheet on the page
+and a menu as something above it.
+
+The dark shadow colour moves from black mixed with neutral 950 to black,
+and the dark factor from 8 to 10. Two pixels under a panel the ambient
+layer decides the step [dark-elevation-shadow](dark-elevation-shadow.md)
+measures, and on a near-black canvas it has to reach full opacity for the
+dark step to keep three quarters of the light one.
 
 ### Presets
 
@@ -262,9 +268,15 @@ computed. Material sets its own edges under `more` and is unchanged.
 | In B, canvas and overlay are identical in greyscale and fields in a card turn grey | `protoB/default-light-*.png`: canvas and overlay both `#ffffff` | Prototype B, same browser | Verified |
 | The ratios recorded in surface-and-edge-model show the hierarchy is sufficient | They measure distance, not whether the page reads as luminous or deep; the maintainer's review of the same build on 2026-09-30 found it flat | surface-and-edge-model, Measurements | Invalid |
 | The values in this spec's Measurements tables | `protoA2/report.json` | Prototype A2 over `f7fc5d2a`, Chromium 149.0.7827.55 | Verified |
-| The `more` edges in this spec | Computed from the formulas, the canvases and 8-bit rounding in Node, not painted. The prototype could not measure them: an unlayered override also replaces the contrast pass | `scripts/lib/color.js`, Node 24.18.0 | Reported |
-| The same values hold in the implementation, in Chromium, Firefox and WebKit | Not yet measured | Implementation acceptance | Reported |
-| The dark elevation contract (ΔL two pixels under a panel ≥ 0.75 × light) holds with the new shadow | Not yet measured | `tests/box-shadow.spec.js` at implementation | Reported |
+| The `more` edges, as first recorded | Computed from the formulas, the canvases and 8-bit rounding in Node, not painted. The prototype could not measure them: an unlayered override also replaces the contrast pass | `scripts/lib/color.js`, Node 24.18.0 | Reported |
+| The `more` edges, painted | Separator on canvas and on its worst level as computed (3.30 and 2.94 light, 3.30 and 2.53 dark); container 4.09 light and 4.30 dark against the 4.11 and 4.34 computed, the difference being the oklab mix in 8-bit; control worst 7.11 and 7.00 | Surface matrix, `dist/cirth.css` from this change, Chromium 149.0.7827.55, `prefers-contrast: more` | Verified |
+| The implementation paints the prototype's values | Every hex and ratio in the Measurements tables reproduced exactly on the surface matrix | `dist/cirth.css` and `dist/presets/*.css` from this change, Chromium 149.0.7827.55 | Verified |
+| The levels, edge order and control floors hold in three engines | `tests/surface-depth.spec.js`: 37 tests per engine, default, three presets and the probe, both schemes, with and without `more` | Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5 | Verified |
+| The same test detects the baseline | 19 of its 37 tests fail on `dist/` built from `f7fc5d2a`: the canvas ends, the dark overlay step, the light recessed step, the card shadow and the dark `more` edges | `f7fc5d2a` extracted and built outside the tree, Chromium 149.0.7827.55 | Verified |
+| Colour tokens agree across engines | 717 comparisons within ΔOklab 0.002 | `npm run check:tokens`, three engines | Verified |
+| No new accessibility violation | 65 pages × 4 themes × 3 modes, the specimens, and the five surface matrices | `npm run check:a11y`, axe in Chromium 149.0.7827.55 | Verified |
+| The dark elevation contract (ΔL two pixels under a panel ≥ 0.75 × light) holds with the prototype's shadow | Light −0.055 to −0.058, dark −0.030 to −0.044: 0.54 in WebKit, 0.60 in Firefox | `tests/box-shadow.spec.js` on the first implementation (ambient 14%, factor 8), Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5 | Invalid |
+| The dark elevation contract holds with the shipped shadow | Light −0.047 (Chromium), −0.051 (Firefox), −0.048 (WebKit); dark −0.044, −0.046, −0.040: ratios 0.94, 0.90, 0.83 | `tests/box-shadow.spec.js`, same browsers | Verified |
 
 ## Decisions
 
@@ -277,7 +289,9 @@ computed. Material sets its own edges under `more` and is unchanged.
 | Raised at 90% of the way to white, not white | Existing contract | A card must still follow `--cirth-canvas`; at 100% every light canvas would give a white card and a tinted canvas would lose its tint on cards |
 | Dark canvas at 16.5% with chroma 0.012 | Design | Near black with a trace of the neutral hue; at 15% the recessed level has no room left (0.11) and code blocks go black |
 | Rejected: a dark canvas from the neutral ladder | Constraint | The ladder starts at 18%, which is the problem |
-| A contact shadow on cards | Design | The maintainer allowed a faint depth on cards; it is what separates a white sheet from a near-white page besides the edge. One layer, a sixth of the overlay's reach |
+| A contact shadow on cards | Design | The maintainer allowed a faint depth on cards; it is what separates a white sheet from a near-white page besides the edge. One layer, a fourteenth of the overlay's reach |
+| Overlay ambient at 11%, not the prototype's 14% | Existing contract | At 14% the light step under a panel grew to −0.055 and the dark one, already opaque, could not follow: WebKit measured 0.54 of it against the 0.75 the contract asks |
+| Dark shadow black, factor 10 | Existing contract | With the near-black canvas the black-mixed neutral left the dark shadow 0.075 L of room; black and a saturated ambient bring the dark step back to 0.83 to 0.94 of the light one |
 | Rejected: a separate, deeper modal shadow | Existing contract | Metro turns every overlay shadow off with one declaration; the dialog is already set apart by its backdrop |
 | A top highlight on overlays in dark | Design | Light from above is how a lifted panel reads on a near-black page; 5% white on one pixel row, overlays only, so a card never borrows it |
 | Retune the `more` edges | Existing contract | The dark ladder is wider; without it the pass would fall under its own promises (2.10 and 5.84) |
@@ -285,24 +299,28 @@ computed. Material sets its own edges under `more` and is unchanged.
 
 ## Acceptance
 
-- [ ] With every border removed, recessed, canvas and raised differ in
-      greyscale in both schemes, and overlay differs from raised in dark,
-      for default, plain, material, metro and the probe:
-      `tests/surface-derivation.spec.js`, extended with minimum ΔL steps.
-- [ ] Control ≥ 3:1 on every level, separator < container ≤ control on
-      every level, in both schemes, with and without `more`, in Chromium,
-      Firefox and WebKit: `tests/surface-derivation.spec.js`.
-- [ ] Canvas hue within 120° ± 5° in both schemes; `--cirth-primary`
-      unchanged in light, dark and `more`.
-- [ ] A card casts the raised shadow and not the overlay one; metro and
-      material cast none: `tests/box-shadow.spec.js`.
-- [ ] The dark elevation contract passes in three engines:
+- [x] With every border removed, recessed, canvas and raised differ in
+      lightness in both schemes, and overlay differs from raised in dark,
+      for default, plain, material, metro and the probe, with minimum ΔL
+      steps: `tests/surface-depth.spec.js`.
+- [x] Control ≥ 3:1 (≥ 6.9:1 under `more`) on every level, separator <
+      container ≤ control on every level, in both schemes, with and
+      without `more`, in Chromium, Firefox and WebKit:
+      `tests/surface-depth.spec.js`.
+- [x] Canvas hue at 120° in both schemes (the literals); `--cirth-primary`
+      untouched by this change.
+- [x] A card casts one contact layer and not the overlay shadow; metro and
+      material cast none: `tests/box-shadow.spec.js`,
+      `tests/surface-depth.spec.js`.
+- [x] The dark elevation contract passes in three engines:
       `tests/box-shadow.spec.js`.
-- [ ] `npm run check:tokens` green with the export regenerated;
-      `npm run check:size` reported.
-- [ ] `docs/src/pages/colors.md`, `customization.md` and `upgrading.md`
-      updated; [surface-and-edge-model](surface-and-edge-model.md) and
-      [dark-elevation-shadow](dark-elevation-shadow.md) point here.
+- [x] `npm run check:tokens` green; `npm run check:size` within every
+      budget (`cirth.min.css` 14770 B of 15200 B).
+- [x] `docs/src/pages/colors.md`, `components/card.md`, `presets.md` and
+      `upgrading.md` updated; [surface-and-edge-model](surface-and-edge-model.md)
+      and [dark-elevation-shadow](dark-elevation-shadow.md) point here.
+- [ ] Visual baselines regenerated after the documentation redesign that
+      follows this change, with every diff inspected.
 
 ## Migration
 

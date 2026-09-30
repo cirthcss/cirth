@@ -554,7 +554,6 @@ for (const specimen of specimens) {
 			}
 
 			const flatSelectors = [
-				"[data-state-card]",
 				"[data-state-code]",
 				"[data-state-button]",
 				"[data-state-outline]",
@@ -580,6 +579,22 @@ for (const specimen of specimens) {
 					`unexpected shadow: ${style.boxShadow}`,
 				).toBe(true);
 			}
+
+			// A card is a sheet with a contact shadow, not a panel with an
+			// overlay one (specs/surface-depth.md): whatever it casts is the
+			// card token, one layer or none, never inset.
+			const card = page.locator("[data-state-card]");
+			const cardShadow = await card.evaluate((element) => {
+				const probe = document.createElement("div");
+				probe.style.boxShadow = "var(--cirth-card-box-shadow)";
+				element.append(probe);
+				const token = getComputedStyle(probe).boxShadow;
+				probe.remove();
+				return { cast: getComputedStyle(element).boxShadow, token };
+			});
+			expect(cardShadow.cast).toBe(cardShadow.token);
+			expect(cardShadow.cast).not.toMatch(/inset/);
+			expect(cardShadow.cast.split(/,(?![^(]*\))/)).toHaveLength(1);
 
 			const details = page.locator("[data-state-accordion]");
 			const summary = details.locator("summary");

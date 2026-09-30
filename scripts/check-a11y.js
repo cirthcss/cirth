@@ -105,6 +105,7 @@ const openStates = [
 const viewport = { width: 1440, height: 900 };
 const concurrency = 4;
 const frameworkSpecimens = ["default", ...listPresetNames(), "blue"];
+const surfaceSpecimens = ["default", ...listPresetNames(), "probe"];
 
 try {
 	assertDocsBuilt("check-a11y");
@@ -358,6 +359,37 @@ const run = async () => {
 		}
 	}
 
+	// The surface matrix (specs/surface-depth.md): every level, a form in
+	// and out of a card, and a dropdown, a popover and a dialog open at
+	// once, for the default theme, each preset and the probe accent.
+	for (const variant of surfaceSpecimens) {
+		for (const mode of modes) {
+			const context = await browser.newContext({
+				...mode.options,
+				reducedMotion: "reduce",
+				viewport,
+			});
+			const page = await context.newPage();
+			await page.goto(`${origin}/specimen/surfaces/${variant}/`, {
+				waitUntil: "load",
+			});
+			const results = await analyze(
+				page,
+				/** @type {Finding["mode"]} */ (mode.name),
+			);
+			for (const violation of results.violations) {
+				found.push({
+					page: `specimen/surfaces/${variant}/index.html`,
+					theme: variant,
+					mode: /** @type {Finding["mode"]} */ (mode.name),
+					state: "default",
+					violation,
+				});
+			}
+			await context.close();
+		}
+	}
+
 	await browser.close();
 	server.close();
 	return found;
@@ -410,6 +442,7 @@ run()
 					`violation(s) across ${pages.length} pages × ${themeVariants.length} ` +
 					`themes × ${modes.length} modes plus ${openStates.length} open states and ` +
 					`${frameworkSpecimens.length} shell-free specimens and state matrices ` +
+					`and ${surfaceSpecimens.length} surface matrices ` +
 					`per theme/mode. Fix them or, ` +
 					`if accepted deliberately, run ` +
 					`\`node scripts/check-a11y.js --update-baseline\`.`,
@@ -421,7 +454,8 @@ run()
 			`✓ check-a11y: no new WCAG 2.0–2.2 A/AA violations across ` +
 				`${pages.length} pages × ${themeVariants.length} themes × ` +
 				`${modes.length} modes plus ${openStates.length} open states per ` +
-				`theme/mode and ${frameworkSpecimens.length} shell-free specimens/state matrices` +
+				`theme/mode, ${frameworkSpecimens.length} shell-free specimens/state matrices ` +
+				`and ${surfaceSpecimens.length} surface matrices` +
 				(baseline.size > 0 ? ` (${baseline.size} baselined)` : "") +
 				".",
 		);

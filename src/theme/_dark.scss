@@ -94,15 +94,17 @@
   // Surface levels, as in theme/_light.scss, with the direction a dark
   // interface reads elevation in: every level above the canvas is lighter,
   // and the overlay has room to rise past the raised level instead of
-  // sharing it. Hue and chroma are the canvas's own, so plain stays neutral
+  // sharing it. The canvas is near black, so the steps can be wide enough
+  // to read as lifted: a card 0.06 above it, a menu or a dialog 0.11, code
+  // 0.04 below. Hue and chroma are the canvas's own, so plain stays neutral
   // and material keeps its violet without restating a scale.
-  --cirth-surface-recessed: oklch(from var(--cirth-canvas) calc(l - 0.035) c h);
-  --cirth-surface-raised: oklch(from var(--cirth-canvas) calc(l + 0.05) c h);
-  --cirth-surface-overlay: oklch(from var(--cirth-canvas) calc(l + 0.085) c h);
+  --cirth-surface-recessed: oklch(from var(--cirth-canvas) calc(l - 0.04) c h);
+  --cirth-surface-raised: oklch(from var(--cirth-canvas) calc(l + 0.06) c h);
+  --cirth-surface-overlay: oklch(from var(--cirth-canvas) calc(l + 0.11) c h);
   --cirth-code-background-color: var(--cirth-surface-recessed);
   --cirth-card-background-color: var(--cirth-surface-raised);
   --cirth-card-sectioning-background-color: oklch(
-    from var(--cirth-canvas) calc(l + 0.025) c h
+    from var(--cirth-canvas) calc(l + 0.03) c h
   );
   --cirth-dropdown-background-color: var(--cirth-surface-overlay);
   --cirth-popover-background-color: var(--cirth-surface-overlay);
@@ -110,12 +112,13 @@
 
   // Edge roles, as in theme/_light.scss, lightened from the canvas. The
   // control edge clears 3:1 against the overlay, the lightest level here
-  // (3.81:1).
+  // (3.53:1), and reads 4.61:1 on the canvas. The separator is 0.15 above
+  // the canvas so that it still divides on the overlay, 0.04 below it.
   --cirth-muted-border-color: oklch(
-    from var(--cirth-canvas) calc(l + 0.12) c h
+    from var(--cirth-canvas) calc(l + 0.15) c h
   );
   --cirth-form-element-border-color: oklch(
-    from var(--cirth-canvas) calc(l + 0.41) c h
+    from var(--cirth-canvas) calc(l + 0.42) c h
   );
   --cirth-card-border-color: color-mix(
     in oklab,

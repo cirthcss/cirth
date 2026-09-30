@@ -48,7 +48,7 @@ following from the two colour inputs on their own.
 
 | Area | What it sets | Left to the default |
 | --- | --- | --- |
-| Colour | `--cirth-primary`, a blue at 258°; `--cirth-canvas`, a neutral page (an achromatic 97% in light, a cool near-black in dark) | Ink, muted and secondary text, status colours |
+| Colour | `--cirth-primary`, a blue at 258°; `--cirth-canvas`, a neutral page (an achromatic 97.8% in light, a cool near-black in dark) | Ink, muted and secondary text, status colours |
 | Typography | `--cirth-font-family-display` follows the body face | The system stack, weights, sizes |
 | Radius | `--cirth-border-radius` at 2px; cards derive 3px | |
 | Space | | The flow and every padding |

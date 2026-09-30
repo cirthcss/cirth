@@ -28,6 +28,7 @@ const render = (page, theme) =>
 				<summary>Menu</summary>
 				<ul><li><a href="#">Item</a></li></ul>
 			</details>
+			<article>A card</article>
 			<div id="probe" style="box-shadow: var(--cirth-box-shadow)">probe</div>
 			<section data-theme="dark">
 				<div id="forced" style="box-shadow: var(--cirth-box-shadow)">forced</div>
@@ -40,17 +41,60 @@ const layers = (value) =>
 	value === "none" ? [] : value.split(/,(?![^(]*\))/).map((layer) => layer.trim());
 
 for (const theme of /** @type {const} */ (["light", "dark"])) {
-	// Two layers since specs/surface-and-edge-model.md: a contact shadow and
-	// an ambient one. The seven-layer ramp before it came from Pico.
-	test(`the shared shadow resolves to two layers in ${theme}`, async ({ page }) => {
+	// Three layers since specs/surface-depth.md: a one-pixel highlight on
+	// the top edge, transparent in light, then the contact shadow and the
+	// ambient one of specs/surface-and-edge-model.md. The seven-layer ramp
+	// before them came from Pico.
+	test(`the shared shadow resolves to three layers in ${theme}`, async ({ page }) => {
 		await render(page, theme);
 
 		for (const selector of ["details.dropdown > ul", "#probe"]) {
 			const shadow = await page
 				.locator(selector)
 				.evaluate((element) => getComputedStyle(element).boxShadow);
-			expect(layers(shadow), selector).toHaveLength(2);
+			const [highlight, ...cast] = layers(shadow);
+			expect(layers(shadow), selector).toHaveLength(3);
+			expect(highlight, selector).toMatch(/inset/);
+			for (const layer of cast) expect(layer, selector).not.toMatch(/inset/);
+			if (theme === "light") {
+				expect(highlight, `${selector}: no highlight on a light panel`).toMatch(
+					/rgba\(0, 0, 0, 0\)|transparent|oklch\([^)]*\/ 0\)/,
+				);
+			} else {
+				expect(highlight, `${selector}: a highlight on a dark panel`).not.toMatch(
+					/rgba\(0, 0, 0, 0\)|transparent/,
+				);
+			}
 		}
+	});
+
+	// A card is a sheet, not a panel: one contact layer that reaches a
+	// fraction of the overlay's ambient one, and no highlight.
+	test(`a card casts a contact shadow, not the overlay one, in ${theme}`, async ({
+		page,
+	}) => {
+		await render(page, theme);
+		const [card, overlay] = await Promise.all(
+			["article", "details.dropdown > ul"].map((selector) =>
+				page
+					.locator(selector)
+					.evaluate((element) => getComputedStyle(element).boxShadow),
+			),
+		);
+		/** @param {string} layer */
+		const blur = (layer) => {
+			const lengths = layer
+				.replace(/oklch\([^)]*\)|rgba?\([^)]*\)|inset/g, "")
+				.trim()
+				.split(/\s+/)
+				.map((part) => Number.parseFloat(part));
+			return lengths[2] ?? 0;
+		};
+		expect(layers(card)).toHaveLength(1);
+		expect(card).not.toMatch(/inset/);
+		expect(blur(layers(card)[0])).toBeLessThan(
+			Math.max(...layers(overlay).map(blur)) / 4,
+		);
 	});
 }
 
@@ -66,7 +110,7 @@ test("a forced dark subtree draws the dark shadow on a light page", async ({
 				.evaluate((element) => getComputedStyle(element).boxShadow),
 		),
 	);
-	expect(layers(dark)).toHaveLength(2);
+	expect(layers(dark)).toHaveLength(3);
 	// Same geometry, different colour.
 	expect(dark).not.toBe(light);
 	expect(dark.replace(/oklch\([^)]*\)|rgba?\([^)]*\)/g, "")).toBe(

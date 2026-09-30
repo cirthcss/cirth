@@ -72,12 +72,12 @@
 
   // Edges: the same three roles, derived from the canvas the same way,
   // further from it. The separator clears 3:1 on the canvas and on the
-  // raised level, and reads 2.95:1 on the recessed one (up from about
+  // raised level, and reads 2.94:1 on the recessed one (up from about
   // 1.2:1); the control clears 7:1; the container follows its relation
   // between them. The switch track and the progress frame follow the
   // control edge.
   --cirth-muted-border-color: oklch(
-    from var(--cirth-canvas) calc(l - 0.34) c h
+    from var(--cirth-canvas) calc(l - 0.35) c h
   );
   --cirth-form-element-border-color: oklch(
     from var(--cirth-canvas) calc(l - 0.56) c h
@@ -114,10 +114,13 @@
   --cirth-icon-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-250)}' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
 
   // Edges, as in the light mixin: the separator at 2.4:1 or better on
-  // every level, the control at 6.5:1.
-  --cirth-muted-border-color: oklch(from var(--cirth-canvas) calc(l + 0.3) c h);
+  // every level, the control at 6.9:1. The dark levels span 0.15 of
+  // lightness, so both sit further above the canvas than in light.
+  --cirth-muted-border-color: oklch(
+    from var(--cirth-canvas) calc(l + 0.34) c h
+  );
   --cirth-form-element-border-color: oklch(
-    from var(--cirth-canvas) calc(l + 0.55) c h
+    from var(--cirth-canvas) calc(l + 0.6) c h
   );
 
   // The one control that cannot follow the edge all the way: the thumb

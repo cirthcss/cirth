@@ -86,8 +86,10 @@ reads from; `.outline` and `.ghost` keep the group and drop the fill. See
 ## Surface levels
 
 Four levels, each derived from `--cirth-canvas` with relative colour
-syntax, lowest first. In light the levels above the canvas use the
-headroom up to white; in dark every level steps up from the canvas.
+syntax, lowest first. The light canvas is near white, so the level above
+it is a sheet of near-white paper and the level below it has the room;
+the dark canvas is near black, so every level above it has room to read
+as lifted.
 
 {% if measured %}
 | Level | Token | Rule | Light | Dark |
@@ -111,16 +113,19 @@ What sits on each:
 - **Canvas**: the page.
 - **Raised**: an `<article>`. A card's header and footer bands sit halfway
   between the canvas and this level
-  (`--cirth-card-sectioning-background-color`).
+  (`--cirth-card-sectioning-background-color`). In light the step above the
+  canvas is small, and a one-layer contact shadow
+  (`--cirth-card-box-shadow`) completes it.
 - **Overlay**: a dialog, a popover, a dropdown list. In light it is the
-  raised level and its shadow lifts it; in dark it is also a step lighter
-  than the raised level, so a floating sheet is lighter than what it
-  covers as well as shadowed.
+  raised level and its larger shadow lifts it; in dark it is also a clear
+  step lighter than the raised level, so a floating sheet is lighter than
+  what it covers as well as shadowed, and a one-pixel highlight catches its
+  top edge.
 
-Every level keeps the canvas's hue and chroma (the raised level in light
-halves the chroma on its way to white), so a preset that tints its canvas
-tints every level with it: `plain` is neutral, `material` keeps its own
-hue, and no level is a wash of the accent.
+Every level keeps the canvas's hue (the raised level in light keeps a
+quarter of its chroma on its way to white), so a preset that tints its
+canvas tints every level with it: `plain` is neutral, `material` keeps its
+own hue, and no level is a wash of the accent.
 
 `--cirth-surface` is the level the current element sits on: the canvas at
 the root, rebound by every container that paints a level (an `<article>`,
@@ -133,6 +138,17 @@ Component tokens alias a level: `--cirth-card-background-color` is the
 raised level, `--cirth-code-background-color` the recessed one, and the
 dropdown and popover backgrounds the overlay one. Override the level to
 move every component on it, or the component token to move one.
+
+## Elevation
+
+Two shadows, one per level that rises. A card casts a single contact
+layer; a dialog, a popover and a dropdown list cast `--cirth-box-shadow`,
+a contact layer and a wide ambient one. In dark the shadow is black and
+denser, since a near-black page has little room below it, and the overlay
+adds a one-pixel highlight on its top edge. `--cirth-modal-box-shadow`
+follows `--cirth-box-shadow`, so one declaration turns every floating
+shadow off; a card's is its own token. `material` keeps Material's own
+elevation levels and flat cards; `metro` turns every shadow off.
 
 ## Edges
 
@@ -278,9 +294,9 @@ is a bell that peaks mid-ladder and fades to nothing at the pale end: a
 light grey needs more chroma than a dark one to read as tinted rather than as
 plain grey, and a large pale surface needs none at all, but it doesn't
 return to zero at the dark end. It floors at 70% of the peak, because the
-dark scheme builds its canvas out of the two darkest steps, and a bell that
-closed symmetrically left that canvas achromatic whatever hue the family
-was given.
+deepest inks and the shadow of a light page come from the two darkest
+steps, and a bell that closed symmetrically left them achromatic whatever
+hue the family was given.
 
 The neutral's hue does real work: at {{ measured.neutralHue if measured else 120 }}deg it
 is a grey with a trace of olive, opposite the accent on both of Oklab's

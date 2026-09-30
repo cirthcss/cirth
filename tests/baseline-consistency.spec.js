@@ -203,7 +203,18 @@ test("the home page's specimen cards all share one card contract", async ({
 	expect(cards.length).toBeGreaterThan(1);
 	for (const card of rest) expect(card).toEqual(first);
 
-	expect(first.boxShadow, "cards carry no decorative shadow").toBe("none");
+	// A card casts the card token's single contact layer and nothing a
+	// shell added (specs/surface-depth.md).
+	const token = await page.evaluate(() => {
+		const probe = document.createElement("div");
+		probe.style.boxShadow = "var(--cirth-card-box-shadow)";
+		document.body.append(probe);
+		const value = getComputedStyle(probe).boxShadow;
+		probe.remove();
+		return value;
+	});
+	expect(first.boxShadow, "cards carry the card's own shadow").toBe(token);
+	expect(first.boxShadow.split(/,(?![^(]*\))/), "one contact layer").toHaveLength(1);
 });
 
 // --- :visited must not repaint a card ----------------------------------

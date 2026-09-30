@@ -7,6 +7,7 @@
 | Baseline | `806fea7a` on `design/technical-language-system` (token values identical to `94f7c669`) |
 | Breaking | Yes: custom property defaults redefined, two removed, four added |
 | Decisions | 2026-09-27, maintainer: nothing frozen except accent hues; size budget not a constraint |
+| Superseded in part | The tuning column and the Measurements, by [surface-depth](surface-depth.md) (2026-09-30). The grammar stands |
 
 The page is built from four named surface levels (recessed, canvas, raised,
 overlay) and three named edge roles (separator, container, control), each a

@@ -84,26 +84,29 @@
   // Surface levels. --cirth-canvas is the only input; every level keeps
   // its relationship at runtime, so a preset or a consumer canvas moves the
   // whole ladder. Four levels, in order: recessed (code, a specimen well),
-  // canvas, raised (a card), overlay (a modal, a popover, a dropdown). In
-  // light there is no room above white, so the overlay shares the raised
-  // lightness and is lifted by its shadow instead. The raised level takes
-  // most of the distance to white and halves the canvas chroma, so a card
-  // reads as the same page, brighter, rather than as a tint. The band a
-  // card groups its header and footer in sits about halfway.
+  // canvas, raised (a card), overlay (a modal, a popover, a dropdown). The
+  // canvas is near white, so there is little room above it: the raised
+  // level takes 90% of what is left and a quarter of the canvas chroma, a
+  // sheet of paper on the page rather than a tint, and its contact shadow
+  // (--cirth-card-box-shadow) finishes the step. The overlay shares that
+  // lightness and is lifted by the stronger overlay shadow instead. The
+  // recessed level has the room the raised one lacks and takes 0.04. The
+  // band a card groups its header and footer in sits halfway to white.
   // These declarations stay in the scheme mixin so a forced-theme subtree
   // derives from the inherited input in its own color scheme.
   // A field has no level of its own: it paints the surface it sits on
   // (--cirth-surface, theme/_styles.scss), and its edge alone says it is a
-  // control. See specs/surface-and-edge-model.md.
-  --cirth-surface-recessed: oklch(from var(--cirth-canvas) calc(l - 0.03) c h);
+  // control. See specs/surface-and-edge-model.md for the grammar and
+  // specs/surface-depth.md for these distances.
+  --cirth-surface-recessed: oklch(from var(--cirth-canvas) calc(l - 0.04) c h);
   --cirth-surface-raised: oklch(
-    from var(--cirth-canvas) calc(l + (1 - l) * 0.85) calc(c * 0.5) h
+    from var(--cirth-canvas) calc(l + (1 - l) * 0.9) calc(c * 0.25) h
   );
   --cirth-surface-overlay: var(--cirth-surface-raised);
   --cirth-code-background-color: var(--cirth-surface-recessed);
   --cirth-card-background-color: var(--cirth-surface-raised);
   --cirth-card-sectioning-background-color: oklch(
-    from var(--cirth-canvas) calc(l + (1 - l) * 0.45) calc(c * 0.75) h
+    from var(--cirth-canvas) calc(l + (1 - l) * 0.5) calc(c * 0.5) h
   );
   --cirth-dropdown-background-color: var(--cirth-surface-overlay);
   --cirth-popover-background-color: var(--cirth-surface-overlay);
@@ -117,7 +120,8 @@
   // neutral family's: cool lines on a warm page were the conflict this
   // replaces, and a preset's canvas now brings its own lines with it.
   // The control edge is set for >= 3:1 against the darkest level it can sit
-  // on, the recessed one (3.19:1), and is stronger everywhere else. The
+  // on, the recessed one (3.19:1), and is stronger everywhere else (3.58:1
+  // on the canvas). The separator reads 1.27:1 on the canvas. The
   // container is a relation, not a third number: a quarter of the way from
   // the separator to the control, so the order holds even when a preset or
   // a consumer moves one end. The mix is in oklab, as every mix here that
@@ -126,7 +130,7 @@
     from var(--cirth-canvas) calc(l - 0.08) c h
   );
   --cirth-form-element-border-color: oklch(
-    from var(--cirth-canvas) calc(l - 0.36) c h
+    from var(--cirth-canvas) calc(l - 0.37) c h
   );
   --cirth-card-border-color: color-mix(
     in oklab,

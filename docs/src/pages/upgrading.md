@@ -33,7 +33,10 @@ replaced by `material`. Each change has a spec in the repository's `specs/` dire
 | Paint your own container background and put fields in it | Set `--cirth-surface` on it to the same colour |
 | Read `--cirth-table-border-color` as the card's edge | It is the separator now; `--cirth-card-border-color` sits between the separator and the control edge unless you set it |
 | Count on the modal having no shadow | It takes the overlay shadow; set `--cirth-modal-box-shadow: none` |
-| Read `--cirth-box-shadow` as seven layers | It is two |
+| Read `--cirth-box-shadow` as seven layers | It is three: a one-pixel highlight on the top edge, transparent in light, a contact shadow and an ambient one |
+| Rely on cards having no shadow | A card casts one faint contact layer; set `--cirth-card-box-shadow: none` |
+| Set `--cirth-box-shadow: none` to flatten the page | Set `--cirth-card-box-shadow: none` too |
+| Matched your own surfaces to the canvas by value | The light canvas is near white (L 0.978) and the dark one near black (L 0.165); read `--cirth-canvas` or a level token rather than a colour |
 | Read `--cirth-primary-text` as exactly `--cirth-primary` | It is the accent held within the lightness range every surface level can carry: at most 0.52 in light, at least 0.72 in dark |
 
 ### Type

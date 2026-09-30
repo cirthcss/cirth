@@ -176,9 +176,10 @@
 
   // Card (<article>)
   // A card is a sheet on the page, not a floating one: the raised surface
-  // level carries it. The overlays (dialog, popover, dropdown) are what
-  // float, and they share --cirth-box-shadow.
-  --cirth-card-box-shadow: none;
+  // level and a contact shadow carry it (--cirth-card-box-shadow, in
+  // theme/_dual.scss). The overlays (dialog, popover, dropdown) are what
+  // float, and they share --cirth-box-shadow, so one declaration still
+  // turns every overlay shadow off.
   --cirth-modal-box-shadow: var(--cirth-box-shadow);
 
   // Meter (<meter>)

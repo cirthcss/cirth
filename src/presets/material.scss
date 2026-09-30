@@ -101,6 +101,7 @@ $level3:
     // outline, which the surface levels and the container edge already do.
     --cirth-box-shadow: #{$level2};
     --cirth-modal-box-shadow: #{$level3};
+    --cirth-card-box-shadow: none;
 
     // A scrim, not a blur.
     --cirth-modal-overlay-backdrop-filter: none;

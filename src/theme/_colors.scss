@@ -30,9 +30,10 @@
 // end: a light grey needs more chroma than a dark one to read as tinted
 // rather than as plain grey, and a large pale surface needs none at all:
 // but it does not return to zero at the dark end. It floors at 70% of the
-// peak instead, because the dark scheme builds its canvas out of the two
-// darkest steps, and a bell that closed symmetrically left that canvas
-// achromatic no matter which hue the family was given.
+// peak instead, because the dark scheme's deepest ink, the strong ink of a
+// light page and the shadow colour all come from the two darkest steps,
+// and a bell that closed symmetrically left them achromatic no matter
+// which hue the family was given.
 // The hue is the neutral family's other half. At 120deg it is a grey with
 // a trace of olive, 156deg from the accent's hue and opposite it on both
 // axes of Oklab: green where the accent is red, yellow where it is blue.
@@ -45,33 +46,38 @@
 // to be: $error-500 is what most people would call "red", but naming it
 // that way would hide why it's used (invalid form state, deleted/removed
 // text). $accent-* seeds the default of the one accent input,
-// --cirth-primary; $neutral-* carries ink, lines, the secondary controls
-// and the dark canvas. The accent's hue (324deg) is chosen for the
-// interface, and the brand mark is to be redrawn on it, not the other way
-// round; specs/default-palette.md records why this hue.
+// --cirth-primary; $neutral-* carries ink, lines and the secondary
+// controls, and gives both canvases their hue. The accent's hue (324deg)
+// is chosen for the interface, and the brand mark is to be redrawn on it,
+// not the other way round; specs/default-palette.md records why this hue.
 
 // B&W
 $black: oklch(0% 0 0deg);
 $white: oklch(100% 0 0deg);
 
-// Light canvas. The light scheme's page background: white pulled faintly
-// toward the neutral family's hue (120deg), far short of a tint, so every
-// surface derived from it above and below keeps one temperature, the one
-// the dark canvas takes from the same family, and the accent's hue is
-// left to action and position. Off the 19-step ladder on purpose: it's a
-// surface color, not a scale step.
-// Its lightness is set by the levels around it, not by how white a page
-// can be. The raised level (a card, a field's container) is placed most of
-// the way from the canvas to white, and the recessed level (code, a
-// specimen) 0.03 below it; at 97.3% the raised level had 0.027 of
-// lightness to use and read at 1.07:1. At 96% it reads at 1.10:1 and the
-// recessed level at 1.09:1, while every text token keeps >= 4.5:1 on all
-// four levels. See specs/surface-and-edge-model.md for the table.
+// The two canvases. Each scheme's page background: white or black pulled
+// faintly toward the neutral family's hue (120deg), far short of a tint,
+// so every surface derived from it above and below keeps one temperature
+// in both schemes, and the accent's hue is left to action and position.
+// Off the 19-step ladder on purpose: they are surface colors, not scale
+// steps, and the ladder does not reach far enough toward either end.
+// Their lightness is set by what the page should be, and the levels
+// around them follow it. The light canvas is near white, so the page reads
+// as paper rather than as a grey: at 96% it did, whatever its ratios said.
+// That leaves the raised level (a card) 0.019 of lightness above it, which
+// its contact shadow and its edge complete, and the recessed level (code,
+// a specimen well) 0.04 below it. The dark canvas is near black, so the
+// levels above it have room to read as lifted: at L 0.202 the page was a
+// lit room and a card a slightly different grey. Its chroma is about half
+// the ladder's floor, enough to keep the family's hue without the page
+// reading as a dark olive. Every text token keeps >= 4.5:1 on all four
+// levels in both schemes. See specs/surface-depth.md for the tables.
 // Chroma stays low deliberately: the canvas is the ground and the accent
 // the signal on it, not a wash across everything.
-$canvas-light: oklch(96% 0.006 120deg);
+$canvas-light: oklch(97.8% 0.003 120deg);
+$canvas-dark: oklch(16.5% 0.012 120deg);
 
-// Neutral: ink, lines, secondary controls and the dark canvas. Faintly
+// Neutral: ink, lines, secondary controls, and the canvases' hue. Faintly
 // olive, opposite the accent on both axes; see the derivation note above.
 $neutral-950: oklch(18% 0.022 120deg);
 $neutral-900: oklch(22.3% 0.023 120deg);

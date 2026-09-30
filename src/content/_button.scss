@@ -228,7 +228,10 @@
   // Ghost mixes toward transparent rather than toward the canvas so the
   // wash composites over whatever it is actually on (a card, a header, a
   // popover) while outline, already opaque, mixes toward the canvas it
-  // is painting.
+  // is painting. That mix is in oklab: the surface carries the neutral
+  // family's hue and the label an accent's, and a polar space would walk
+  // the hue angle between them, so a magenta wash on an olive page came
+  // out beige.
   // The border stays declared as transparent on ghost rather than removed:
   // a border-width of zero would resize the control, and these two are
   // meant to be swappable with the filled variants without the layout
@@ -257,7 +260,7 @@
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
       --cirth-background-color: color-mix(
-        in oklch,
+        in oklab,
         var(--cirth-primary-text) 12%,
         var(--cirth-form-element-background-color, var(--cirth-surface))
       );
@@ -280,7 +283,7 @@
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
       --cirth-background-color: color-mix(
-        in oklch,
+        in oklab,
         var(--cirth-secondary-text) 12%,
         var(--cirth-form-element-background-color, var(--cirth-surface))
       );
@@ -303,7 +306,7 @@
 
     &:is([aria-current]:not([aria-current="false"]), :hover, :active, :focus) {
       --cirth-background-color: color-mix(
-        in oklch,
+        in oklab,
         var(--cirth-contrast-text) 12%,
         var(--cirth-form-element-background-color, var(--cirth-surface))
       );
