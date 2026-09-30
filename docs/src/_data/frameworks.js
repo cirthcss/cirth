@@ -32,6 +32,22 @@ const aspect = (file) => {
 	return width / height;
 };
 
+/**
+ * @typedef {object} Mark
+ * @property {string} name The project's name, printed beside the mark.
+ * @property {string} file The mark, for the light scheme or for both.
+ * @property {string} [dark] The project's own variant for dark backgrounds.
+ * @property {boolean} [wide] A wordmark rather than a symbol.
+ * @property {number} [aspect] Width over height, read from the file below.
+ * @property {string} owner
+ * @property {string} source Where the file was downloaded from.
+ * @property {string} terms
+ * @property {string} termsUrl
+ * @property {string} [note]
+ * @property {string} [attribution] A statement the terms require.
+ */
+
+/** @type {Record<string, Mark>} */
 const marks = {
 	html: {
 		name: "HTML",
@@ -197,10 +213,11 @@ const guides = [
 ];
 
 for (const mark of Object.values(marks)) {
-	mark.aspect = aspect(mark.file);
-	if (mark.dark && Math.abs(aspect(mark.dark) - mark.aspect) > 0.01) {
+	const ratio = aspect(mark.file);
+	if (mark.dark && Math.abs(aspect(mark.dark) - ratio) > 0.01) {
 		throw new Error(`frameworks.js: ${mark.name}'s two variants differ in shape`);
 	}
+	mark.aspect = ratio;
 }
 
 for (const guide of guides) {
