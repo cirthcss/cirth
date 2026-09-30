@@ -1,5 +1,6 @@
 ---
 layout: docs.njk
+framework: sveltekit
 description: Use Cirth in a SvelteKit app. Import it in the root layout and keep Vite's CSS target at Cirth's browser floor.
 ---
 {% from "install.njk" import packageManagers %}

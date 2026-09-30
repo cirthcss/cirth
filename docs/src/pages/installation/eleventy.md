@@ -1,5 +1,6 @@
 ---
 layout: docs.njk
+framework: eleventy
 description: Use Cirth on an Eleventy site. Copy the stylesheet through to the output and link it from your base layout.
 ---
 {% from "install.njk" import packageManagers %}

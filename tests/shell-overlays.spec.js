@@ -83,8 +83,6 @@ test("Tab reaches every landmark control on the home page", async ({
 	// Landmarks and the controls a reader has to be able to get to, not a
 	// transcript of the page: pinning the full sequence would fail on any
 	// edit to the home page rather than on a keyboard regression.
-	// The page is longer than it was: a story, a framework section and a
-	// closing call to action sit between the hero and the footer now.
 	const reached = await walk(page, 120);
 	/** @param {RegExp} pattern */
 	const found = (pattern) =>
@@ -94,7 +92,8 @@ test("Tab reaches every landmark control on the home page", async ({
 	expect(found(/^Docs$/), "navbar: Docs").toBe(true);
 	expect(found(/^Search documentation/), "navbar: search trigger").toBe(true);
 	expect(found(/^Get started$/), "hero: Get started").toBe(true);
-	expect(found(/^Browse examples$/), "hero: Browse examples").toBe(true);
+	expect(found(/^Examples$/), "hero: Examples").toBe(true);
+	expect(found(/discussions$/), "footer: Discussions").toBe(true);
 	expect(found(/^\/customization$/), "footer: Customization").toBe(true);
 	expect(found(/^\/about$/), "footer: About").toBe(true);
 });
@@ -108,9 +107,9 @@ test("the hero preview is a picture, not four tab stops", async ({ page }) => {
 	// operable: without `inert`, Tab would walk the reader through an email
 	// field, a password field, a checkbox and a Sign in button that belong
 	// to a picture, and a screen reader would announce a working sign-in
-	// form on the Cirth home page. The same holds for the story's rendered
-	// card and the framework section's button.
-	for (const selector of [".docs-hero-render", ".docs-story-render-stage", ".docs-dom-result"]) {
+	// form on the Cirth home page. The same holds for the theme preview,
+	// a themed interface shown, not offered.
+	for (const selector of [".docs-hero-render", "cirth-theme-preview"]) {
 		await expect(page.locator(selector)).toHaveAttribute("inert", "");
 	}
 	const fields = await page.locator(".docs-hero-render").evaluate(
@@ -417,4 +416,83 @@ test("the home page never scrolls sideways", async ({ page }) => {
 			).toHaveAttribute("tabindex", "0");
 		}
 	}
+});
+
+// --- The search field's focus --------------------------------------------
+
+// The field in the search dialog is a bare row: no border, no box. The
+// library's focus ring on it drew a second rectangle inside a panel that
+// already has an edge, round nothing. The row carries the focus instead,
+// as an inset accent line along its bottom edge, and the field's own
+// outline is transparent, which forced colors repaints: the ring comes
+// back exactly where the line cannot follow.
+test("the search field takes focus on its row, not as a second rectangle", async ({
+	page,
+}) => {
+	const { contrastRatio } = require("../scripts/lib/color");
+	for (const scheme of /** @type {const} */ (["light", "dark"])) {
+		await page.emulateMedia({ colorScheme: scheme, forcedColors: "none" });
+		await page.setViewportSize({ width: 1440, height: 900 });
+		await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
+
+		const input = page.locator("[data-docs-search-input]");
+		const row = page.locator(".docs-search-dialog > article > header");
+		await page.keyboard.press("Control+k");
+		await expect(input).toBeFocused();
+		expect(await input.evaluate((element) => element.matches(":focus-visible"))).toBe(true);
+
+		const focused = await page.evaluate(() => {
+			const field = /** @type {HTMLElement} */ (document.querySelector("[data-docs-search-input]"));
+			const header = /** @type {HTMLElement} */ (field.closest("header"));
+			const panel = /** @type {HTMLElement} */ (header.closest("article"));
+			const probe = document.createElement("span");
+			probe.style.color = "var(--cirth-primary-focus)";
+			panel.append(probe);
+			const focusColor = getComputedStyle(probe).color;
+			probe.remove();
+			return {
+				outlineColor: getComputedStyle(field).outlineColor,
+				outlineStyle: getComputedStyle(field).outlineStyle,
+				rowShadow: getComputedStyle(header).boxShadow,
+				panel: getComputedStyle(panel).backgroundColor,
+				focusColor,
+				rowBox: header.getBoundingClientRect().toJSON(),
+			};
+		});
+		// No visible rectangle round the field.
+		expect(
+			focused.outlineStyle === "none" || focused.outlineColor === "rgba(0, 0, 0, 0)",
+			`${scheme}: the field draws no ring of its own`,
+		).toBe(true);
+		// The row says it instead, in the colour every ring on the site takes,
+		// at the contrast a focus indicator needs against the panel.
+		expect(focused.rowShadow, `${scheme}: the row carries the focus`).toMatch(/inset/);
+		expect(focused.rowShadow).toContain("-2px");
+		expect(contrastRatio(focused.focusColor, focused.panel)).toBeGreaterThanOrEqual(3);
+
+		// Moving focus off the field takes the line away and moves nothing.
+		await page.keyboard.press("Tab");
+		const after = await row.evaluate((element) => ({
+			shadow: getComputedStyle(element).boxShadow,
+			box: element.getBoundingClientRect().toJSON(),
+		}));
+		expect(after.shadow).not.toContain("-2px");
+		expect(after.box).toEqual(focused.rowBox);
+	}
+
+	// Forced colors drops the line, and the ring comes back. An engine that
+	// matches the query without forcing colours (WebKit's emulation) keeps
+	// the line instead; either way the focus stays visible.
+	await page.emulateMedia({ forcedColors: "active" });
+	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
+	await page.keyboard.press("Control+k");
+	const forced = await page.locator("[data-docs-search-input]").evaluate((element) => ({
+		outline: getComputedStyle(element).outlineColor,
+		width: Number.parseFloat(getComputedStyle(element).outlineWidth),
+		row: getComputedStyle(/** @type {HTMLElement} */ (element.closest("header"))).boxShadow,
+	}));
+	expect(
+		(forced.outline !== "rgba(0, 0, 0, 0)" && forced.width > 0) || forced.row.includes("-2px"),
+		`forced colors keeps a visible focus: ${JSON.stringify(forced)}`,
+	).toBe(true);
 });

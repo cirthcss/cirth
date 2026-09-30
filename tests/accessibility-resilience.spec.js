@@ -343,16 +343,13 @@ for (const theme of themeVariants) {
 
 				await openPage(page, "index.html", theme);
 				for (const target of [
-					// A control inside one of the home page's live stages, the
-					// tab that chooses which stage that is, and a FAQ trigger:
-					// the shapes of focusable the page has outside the shell
-					// chrome. The stage control is taken from the theme
-					// showcase rather than the example deck, because the deck
-					// shows one example at a time and the one it opens on has
-					// no form control in it.
-					page.locator(".docs-theme-showcase .docs-stage-preview input").first(),
+					// The tab that chooses an example, a disclosure trigger and
+					// a framework link: the shapes of focusable the home page
+					// has outside the shell chrome. The theme preview is inert,
+					// a picture of an interface, so it has none.
 					page.locator("[data-docs-tab]").first(),
-					page.locator(".docs-faq-list summary").first(),
+					page.locator(".docs-count-source summary").first(),
+					page.locator(".docs-logo-list a").first(),
 				]) {
 					await page.keyboard.press("Tab");
 					await target.focus();

@@ -106,30 +106,26 @@ test("a pressed button does not translate", async ({ page }) => {
 
 // --- The card contract -------------------------------------------------
 
-test("the hero demo surface uses the card radius and clips its panels", async ({
+test("the hero's source slab uses the card radius and clips its listing", async ({
 	page,
 }) => {
 	await page.goto(origin, { waitUntil: "networkidle" });
 
-	// One window holds the source pane and the card it renders, and it is
-	// the one that has to clip a code pane running flush to its own edge.
-	const figure = page.locator(".docs-hero-panes");
-	const style = await styleOf(figure, [
+	// The slab holds a code pane running flush to its own edge, and a card
+	// laid over it: it has to clip the one and match the other's corners.
+	const slab = page.locator(".docs-hero-source");
+	const style = await styleOf(slab, [
 		"borderTopLeftRadius",
 		"borderBottomRightRadius",
 		"overflow",
 	]);
-	const cardRadius = await page.evaluate(() =>
-		getComputedStyle(document.documentElement)
-			.getPropertyValue("--cirth-card-border-radius")
-			.trim(),
-	);
+	const card = await styleOf(page.locator(".docs-hero-render > article"), [
+		"borderTopLeftRadius",
+	]);
 
-	// The outer surface was square while the sign-in card it renders inside
-	// itself was rounded.
 	expect(style.borderTopLeftRadius).not.toBe("0px");
 	expect(style.borderTopLeftRadius).toBe(style.borderBottomRightRadius);
-	expect(cardRadius, "the shell reads the card radius token").not.toBe("");
+	expect(style.borderTopLeftRadius).toBe(card.borderTopLeftRadius);
 	expect(["clip", "hidden"]).toContain(style.overflow);
 });
 
@@ -183,25 +179,29 @@ test("the home page's specimen cards all share one card contract", async ({
 			),
 		);
 	}
-	cards.push(
-		await styleOf(
-			page.locator(".docs-theme-showcase .docs-stage-preview article"),
-			properties,
-		),
-	);
-	// The hero's card and the story's rendered card are the same element
-	// under the same stylesheet: the shell closes their outer margin and
-	// nothing else.
-	for (const selector of [
-		".docs-hero-render > article",
-		".docs-story-render-stage > article",
-	]) {
-		cards.push(await styleOf(page.locator(selector), properties));
-	}
+	// The theme preview's card is painted by its own copy of Cirth in a
+	// shadow root, with the theme the reader picked, so it is not the
+	// page's card and is not compared here.
 
 	const [first, ...rest] = cards;
 	expect(cards.length).toBeGreaterThan(1);
 	for (const card of rest) expect(card).toEqual(first);
+
+	// The hero's card is the same element under the same stylesheet, with
+	// one thing the shell adds on purpose: it is laid over the source, so
+	// it casts the overlay's elevation rather than a sheet's. Everything
+	// else about it is the library's card.
+	const hero = await styleOf(page.locator(".docs-hero-render > article"), properties);
+	const overlay = await page.evaluate(() => {
+		const probe = document.createElement("div");
+		probe.style.boxShadow = "var(--cirth-box-shadow)";
+		document.body.append(probe);
+		const value = getComputedStyle(probe).boxShadow;
+		probe.remove();
+		return value;
+	});
+	expect({ ...hero, boxShadow: "" }).toEqual({ ...first, boxShadow: "" });
+	expect(hero.boxShadow).toBe(overlay);
 
 	// A card casts the card token's single contact layer and nothing a
 	// shell added (specs/surface-depth.md).
@@ -264,10 +264,10 @@ test("the visited rule stands aside for a link wrapping a card", () => {
 test("an open disclosure keeps a bottom gutter whatever its last child is", async ({
 	page,
 }) => {
-	for (const url of ["/", "/components/accordion/"]) {
+	for (const url of ["/why-cirth/", "/components/accordion/"]) {
 		await page.goto(`${origin}${url}`, { waitUntil: "networkidle" });
 
-		const scope = url === "/" ? ".docs-faq-list" : ".docs-demo-preview";
+		const scope = url === "/why-cirth/" ? ".docs-content" : ".docs-demo-preview";
 		const details = page.locator(`${scope} details:not(.dropdown)`);
 		const count = await details.count();
 

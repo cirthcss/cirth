@@ -9,21 +9,11 @@ const topNav = [
 	{ text: "Examples", link: "/examples" },
 ];
 
-// The framework guides, once: the sidebar group, the grid on the
-// Installation page and the framework section of the home page all read
-// this list, so a guide cannot be linked from one and missing from
-// another. Names only: no third-party logo is drawn anywhere on the site.
-const frameworks = [
-	{ text: "HTML and CDN", link: "/installation/cdn", summary: "One link element. No install, no build." },
-	{ text: "Vite", link: "/installation/vite", summary: "Import the stylesheet from your entry module." },
-	{ text: "React", link: "/installation/react", summary: "Import it once, where the app mounts." },
-	{ text: "Next.js", link: "/installation/nextjs", summary: "Import it in the root layout." },
-	{ text: "Vue and Nuxt", link: "/installation/vue", summary: "main.js, or the css option in nuxt.config." },
-	{ text: "SvelteKit", link: "/installation/sveltekit", summary: "Import it in the root +layout.svelte." },
-	{ text: "Astro", link: "/installation/astro", summary: "Import it in a shared layout." },
-	{ text: "Angular", link: "/installation/angular", summary: "Add it to the styles array in angular.json." },
-	{ text: "Eleventy", link: "/installation/eleventy", summary: "Copy the file through and link it." },
-];
+// The framework guides, from the one list in frameworks.js: the sidebar
+// group below, the Installation page, the home page and each guide's own
+// header all read it.
+const { guides } = require("./frameworks.js");
+const frameworks = guides.map(({ text, link, summary }) => ({ text, link, summary }));
 
 const sidebar = [
 	{
@@ -174,25 +164,16 @@ const redirects = [
 	},
 ];
 
+// Where a reader goes next, not a second index of the reference: the
+// sidebar is that. Three paths: starting, the project, and the people.
 const footerLinks = [
 	{
 		title: "Start",
 		items: [
+			{ text: "Get started", link: "/installation" },
 			{ text: "Why Cirth", link: "/why-cirth" },
-			{ text: "Installation", link: "/installation" },
-			{ text: "Compatibility", link: "/compatibility" },
-			{ text: "Customization", link: "/customization" },
 			{ text: "Examples", link: "/examples" },
-		],
-	},
-	{
-		title: "Reference",
-		items: [
-			{ text: "Layout", link: "/layout/document" },
-			{ text: "Forms", link: "/forms/" },
-			{ text: "Components", link: "/components/accordion" },
-			{ text: "Accessibility", link: "/guides/accessibility" },
-			{ text: "Upgrading", link: "/upgrading" },
+			{ text: "Customization", link: "/customization" },
 		],
 	},
 	{
@@ -201,8 +182,17 @@ const footerLinks = [
 			{ text: "About", link: "/about" },
 			{ text: "Brand", link: "/brand" },
 			{ text: "Contributions", link: "/contributions" },
+			{ text: "Changelog", link: "https://github.com/cirthcss/cirth/blob/master/CHANGELOG.md" },
+			{ text: "npm", link: "https://www.npmjs.com/package/@cirthcss/cirth" },
+		],
+	},
+	{
+		title: "Community",
+		items: [
 			{ text: "GitHub", link: "https://github.com/cirthcss/cirth" },
+			{ text: "Discussions", link: "https://github.com/orgs/cirthcss/discussions" },
 			{ text: "Issues", link: "https://github.com/cirthcss/cirth/issues" },
+			{ text: "Contributors", link: "https://github.com/cirthcss/cirth/graphs/contributors" },
 		],
 	},
 ];

@@ -3,7 +3,7 @@ layout: docs.njk
 usesClassless: true
 description: Add Cirth from a CDN or npm, choose one of four builds, and import it where your project already loads CSS.
 ---
-{% from "install.njk" import packageManagers, frameworkGrid %}
+{% from "install.njk" import packageManagers, guideList %}
 
 # Installation
 
@@ -11,10 +11,10 @@ Cirth is one stylesheet. Add it to a page and the HTML you already write is
 styled: there is nothing to configure, nothing to initialize, and no
 JavaScript to load.
 
-<ul class="docs-link-grid">
+<ul class="docs-path-list">
 <li><a href="#cdn"><strong>CDN</strong><span>Paste one <code>&lt;link&gt;</code> into your page. Nothing to install.</span></a></li>
 <li><a href="#npm"><strong>npm</strong><span>Install the package and import it where your project loads CSS.</span></a></li>
-<li><a href="#framework-guides"><strong>Framework guides</strong><span>Vite, React, Next.js, Vue, SvelteKit, Astro, Angular, Eleventy.</span></a></li>
+<li><a href="#framework-guides"><strong>Framework guides</strong><span>Vite, React, Next.js, Vue and Nuxt, SvelteKit, Astro, Angular, Eleventy.</span></a></li>
 </ul>
 
 ## CDN
@@ -142,7 +142,12 @@ Cirth has no framework-specific package, because it does not need one. Every
 guide comes down to the same three steps: install the package, import one
 stylesheet where the framework loads global CSS, and write HTML.
 
-{{ frameworkGrid(nav.frameworks) }}
+{{ guideList(frameworks.guides, frameworks.marks) }}
+
+Logos belong to their projects and appear only to say where Cirth has been
+checked; none of these projects is affiliated with Cirth or endorses it.
+[Brand](/brand#framework-logos) lists where each one comes from and the
+terms it is used under.
 
 ## Next steps
 

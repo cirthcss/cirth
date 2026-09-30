@@ -449,3 +449,28 @@ When you do use the mark:
 * don't recolor, outline, rotate, add effects, or redraw the strokes,
   and don't set the wordmark in another typeface; use
   [the lockup](#the-lockup) rather than re-typesetting the name.
+
+## Framework logos
+
+The installation guides and the home page show the logos of the tools
+Cirth has been checked with. They belong to their projects, appear only to
+say where a guide lives, and do not mean that any of these projects is
+affiliated with Cirth or endorses it. Each file was downloaded from the
+project's own site or repository on {{ frameworks.retrieved }}, is served
+from this site rather than hotlinked, and is used unmodified.
+
+<div class="overflow-auto docs-table-scroll" tabindex="0" role="region" aria-label="Framework logo sources">
+<table>
+<thead><tr><th scope="col">Logo</th><th scope="col">Owner</th><th scope="col">Source</th><th scope="col">Terms</th></tr></thead>
+<tbody>
+{%- for id, mark in frameworks.marks %}
+<tr><th scope="row">{{ mark.name }}</th><td>{{ mark.owner }}</td><td><a href="{{ mark.source }}">{{ mark.source | replace("https://", "") | truncate(36, true, "…") }}</a></td><td><a href="{{ mark.termsUrl }}">{{ mark.terms }}</a></td></tr>
+{%- endfor %}
+</tbody>
+</table>
+</div>
+
+{% for id, mark in frameworks.marks %}{% if mark.note %}
+- **{{ mark.name }}.** {{ mark.note }}{% endif %}{% endfor %}
+
+{% for id, mark in frameworks.marks %}{% if mark.attribution %}{{ mark.attribution }} {% endif %}{% endfor %}

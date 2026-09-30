@@ -1,5 +1,6 @@
 ---
 layout: docs.njk
+framework: nextjs
 description: Use Cirth in a Next.js App Router project. Import it in the root layout and give the project a browserslist that matches Cirth's.
 ---
 {% from "install.njk" import packageManagers %}

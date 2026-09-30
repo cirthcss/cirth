@@ -1,5 +1,6 @@
 ---
 layout: docs.njk
+framework: react
 description: Use Cirth in a React app built with Vite. Import it once where the app mounts; React renders the HTML Cirth styles.
 ---
 {% from "install.njk" import packageManagers %}

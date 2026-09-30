@@ -56,7 +56,7 @@ layout: base.njk
 			</nav>
 		</aside>
 		<div class="docs-content" data-docs-kind="{{ page.url | docsKind }}" data-pagefind-body>
-			{{ content | safe }}
+			{{ (content | frameworkGuide(framework) if framework else content) | safe }}
 			{% if pageIndex > -1 %}
 				{% set prevPage = nav.flatPages[pageIndex - 1] if pageIndex > 0 %}
 				{% set nextPage = nav.flatPages[pageIndex + 1] if pageIndex < nav.flatPages.length - 1 %}

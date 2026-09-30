@@ -89,7 +89,7 @@ question, which is always the case for radios and usually for checkboxes.
 
 ## Controls
 
-<ul class="docs-link-grid">
+<ul class="docs-path-list">
 <li><a href="/forms/text-inputs"><strong>Text inputs</strong><span>Text, email, password, URL, phone and number.</span></a></li>
 <li><a href="/forms/select"><strong>Select</strong><span>One or several choices from a list.</span></a></li>
 <li><a href="/forms/textarea"><strong>Textarea</strong><span>Multi-line text.</span></a></li>

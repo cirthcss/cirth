@@ -322,6 +322,21 @@ for (const specimen of frameworkSpecimens) {
 	});
 }
 
+// The surface matrix (specs/surface-depth.md): every level side by side,
+// a form in and out of a card, and a dropdown, a popover and a dialog open
+// at once, for the default theme, each preset and the probe accent.
+for (const variant of ["default", ...listPresetNames(), "probe"]) {
+	test(`surfaces-${variant}`, async ({ page }) => {
+		await page.goto(`${origin}/specimen/surfaces/${variant}/`, {
+			waitUntil: "networkidle",
+		});
+		await page.evaluate(() => document.fonts.ready);
+		await expect(page).toHaveScreenshot(`surfaces-${variant}.png`, {
+			fullPage: true,
+		});
+	});
+}
+
 test("mobile navigation open", async ({ page }, testInfo) => {
 	test.skip(
 		!testInfo.project.name.includes("-mobile"),

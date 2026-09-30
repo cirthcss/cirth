@@ -1,5 +1,6 @@
 ---
 layout: docs.njk
+framework: astro
 description: Use Cirth in an Astro site. Import it in the frontmatter of a shared layout.
 ---
 {% from "install.njk" import packageManagers %}

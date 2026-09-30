@@ -70,10 +70,10 @@
      chrome came out *rounder* than the content it frames. min() follows a
      preset down and caps on the way up.
 
-     Its two consumers, .docs-switch button and .docs-stage-toggle, look
-     inert at the default build, where min(4px, 4px) is the radius they
-     would inherit anyway. Under material the core radius is 8px and this
-     stays 4. Preset-dependent; keep. */
+     Its consumers (the home page's tab strip, and the rows of the path,
+     guide and logo lists) look inert at the default build, where
+     min(4px, 4px) is the radius they would inherit anyway. Under material
+     the core radius is 8px and this stays 4. Preset-dependent; keep. */
   --docs-chrome-radius: min(
     var(--cirth-border-radius),
     var(--cirth-radius-sm)
@@ -249,6 +249,48 @@
   font-size: var(--cirth-font-size-lg);
 }
 
+/* The field has no box, so it cannot carry the ring every control draws:
+   an outline around a bare row is a rectangle drawn round nothing, inside
+   a panel that already has an edge. The row carries the focus instead, as
+   a result row does below it: the accent along the row's bottom edge, the
+   search glyph in the accent. Same colour as every ring on the site, the
+   accent text role, which keeps 4.5:1 on the overlay level, so the mark
+   clears the 3:1 a focus indicator needs; drawn as an inset shadow, so
+   nothing moves.
+
+   The outline is made transparent rather than removed: under forced
+   colors the system repaints it, and the shadow is dropped, so the ring
+   comes back exactly where the shadow cannot follow. */
+.docs-search-dialog > article > header input:focus-visible {
+  outline-color: transparent;
+}
+
+.docs-search-dialog > article > header {
+  box-shadow: inset 0 calc(var(--cirth-border-width) * -1) 0
+    var(--cirth-card-border-color);
+}
+
+.docs-search-dialog > article > header:has(input:focus-visible) {
+  box-shadow: inset 0 -0.125rem 0 var(--cirth-primary-focus);
+}
+
+.docs-search-dialog > article > header > svg {
+  color: var(--cirth-muted-color);
+}
+
+.docs-search-dialog > article > header:has(input:focus-visible) > svg {
+  color: var(--cirth-primary-text);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .docs-search-dialog > article > header,
+  .docs-search-dialog > article > header > svg {
+    transition:
+      box-shadow var(--cirth-transition),
+      color var(--cirth-transition);
+  }
+}
+
 /* The margin only: this header is a grid, so the library's `float: right`
    on a dialog's close control never applies here. */
 .docs-search-dialog > article > header .close {
@@ -307,10 +349,22 @@
     var(--cirth-muted-border-color);
 }
 
-.docs-search-results a:hover,
+/* A result row's states, in the grammar the rest of the panel and the
+   header use: a pointer over it is the secondary wash, a press the deeper
+   one, and keyboard focus adds the accent, here as a bar on the row's
+   start edge. The field above takes the same accent on its bottom edge. */
+.docs-search-results a:hover {
+  background: var(--cirth-secondary-surface);
+}
+
+.docs-search-results a:active {
+  background: var(--cirth-secondary-surface-active);
+}
+
 .docs-search-results a:focus-visible {
+  outline-color: transparent;
   background: var(--cirth-mark-background-color);
-  box-shadow: inset 0.1875rem 0 0 var(--cirth-primary-text);
+  box-shadow: inset 0.1875rem 0 0 var(--cirth-primary-focus);
 }
 
 .docs-search-results strong,
@@ -1089,114 +1143,145 @@
   }
 }
 
-/* Site footer: the card-band surface under a hairline, so the page has
-   an end in both schemes rather than a canvas that simply stops. */
+/* Site footer
+   ––––––––––––––––––––
+   The page ends on the dark scheme in both schemes (site-footer.njk sets
+   data-theme="dark" on it), on the recessed level of that scheme: in light
+   the page closes on a band of the deepest ground, in dark on a step below
+   the page. Either way it reads as the end of the page, not as one more
+   section of it. Nothing here restyles an element: the footer paints a
+   level, lays out three columns, and sets the type roles. */
 .docs-footer {
-  margin-top: calc(var(--cirth-spacing) * 4);
-  border-top: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-  background: var(--cirth-card-sectioning-background-color);
+  --cirth-surface: var(--cirth-surface-recessed);
+
+  margin-block-start: var(--cirth-space-16);
+  border-block-start: var(--cirth-border-width) solid
+    var(--cirth-card-border-color);
+  background: var(--cirth-surface-recessed);
+  color: var(--cirth-ink);
 }
 
 /* The footer's own margin is air for a documentation page, where the prose
    simply stops. The home page's last section already ends on its own
-   padding, and the two stack to 176px of empty canvas. */
+   padding. */
 .docs-home-page .docs-footer {
-  margin-top: 0;
+  margin-block-start: 0;
 }
 
 .docs-footer .container {
-  padding-top: calc(var(--cirth-spacing) * 3);
+  padding-block: clamp(3rem, 6vw, 4.5rem) var(--cirth-space-8);
 }
 
 .docs-footer-top {
   display: grid;
-  gap: calc(var(--cirth-spacing) * 2);
-  padding-bottom: calc(var(--cirth-spacing) * 2);
+  gap: var(--cirth-space-10);
+  padding-block-end: clamp(2.5rem, 5vw, 3.5rem);
 }
 
 @media (width >= 48rem) {
   .docs-footer-top {
     grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
-    gap: calc(var(--cirth-spacing) * 4);
+    gap: var(--cirth-space-16);
   }
 }
 
 /* Layout only: the ink is the library's `.contrast` link variant on the
-   element. `color: var(--cirth-color)` would not do it: on an <a> that
-   slot is the one the link component binds to the accent. */
+   element. */
 .docs-footer-brand {
-  gap: 0.5rem;
+  gap: var(--cirth-space-3);
+  font-size: var(--cirth-font-size-lg);
 }
 
 .docs-footer-brand:hover {
   text-decoration: none;
 }
 
+.docs-footer-tagline {
+  margin-block: var(--cirth-space-4) 0;
+  color: var(--cirth-ink-strong);
+  font-size: var(--cirth-font-size-lg);
+  font-weight: var(--cirth-title-font-weight);
+  line-height: var(--cirth-line-height-snug);
+}
+
 .docs-footer-credit {
+  margin-block: var(--cirth-space-3) 0;
   color: var(--cirth-muted-color);
   font-size: var(--cirth-font-size-sm);
 }
 
-/* Inline margins only: the space above the list is the flow relation's
-   (element step after the credit line), and a `margin: 0` here would
-   outweigh it and leave the two rows of links 3px apart, under the 24px
-   spacing WCAG 2.5.8 asks of targets this small. */
-.docs-footer-social {
-  display: flex;
-  gap: var(--cirth-spacing);
-  margin-inline: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.docs-footer-social li {
-  margin: 0;
-  list-style: none;
-}
-
-.docs-footer-social a {
-  font-size: var(--cirth-font-size-sm);
-}
-
-/* Link columns spread across the remaining width */
+/* Three columns, wrapping intrinsically. */
 .docs-footer-columns {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-  gap: calc(var(--cirth-spacing) * 2);
+  gap: var(--cirth-space-8);
 }
 
-/* A column's name is the meta role, as a sidebar group's is. */
-.docs-footer-column strong {
-  display: block;
-  margin-bottom: var(--cirth-flow-line);
+/* A column's name is the meta role, as a sidebar group's is: a heading
+   for the outline, set as metadata. */
+.docs-footer-column h2 {
+  --cirth-font-size: var(--cirth-meta-font-size);
+  --cirth-font-weight: var(--cirth-font-weight-medium);
+
+  margin: 0 0 var(--cirth-space-3);
+  padding: 0;
+  border: 0;
   color: var(--cirth-muted-color);
-  font-size: var(--cirth-meta-font-size);
-  font-weight: var(--cirth-font-weight-medium);
   letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
 }
 
 .docs-footer-column ul {
+  display: grid;
+  gap: 0;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+/* The columns sit in a <nav>, and the library's navigation spaces a bar:
+   padding on every item and a link pulled out over it. A column is a
+   list read downward, so both are taken back, and the row is the link's
+   own height instead. */
 .docs-footer-column li {
-  margin-bottom: calc(var(--cirth-spacing) * 0.5);
+  margin: 0;
+  padding: 0;
   list-style: none;
 }
 
+/* A 36px row, over the 24px WCAG 2.5.8 asks, by the link's own height
+   rather than by space around it, and flush with the column's heading.
+   The secondary ink at rest, the page ink and an underline on hover: the
+   link states every other quiet list on the site uses. */
 .docs-footer-column a {
-  color: var(--cirth-muted-color);
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2.25rem;
+  margin: 0;
+  padding: 0;
+  color: var(--cirth-secondary-text);
   font-size: var(--cirth-font-size-sm);
+  text-decoration: none;
 }
 
-.docs-footer small {
+.docs-footer-column a:hover {
+  color: var(--cirth-ink-strong);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.docs-footer-legal {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  padding-bottom: var(--cirth-spacing);
+  justify-content: space-between;
+  gap: var(--cirth-space-2) var(--cirth-space-6);
+  padding-block-start: var(--cirth-space-6);
+  border-block-start: var(--cirth-border-width) solid
+    var(--cirth-muted-border-color);
   color: var(--cirth-muted-color);
+}
+
+.docs-footer-legal a {
+  color: inherit;
 }
 
 /* Markdown header anchors (markdown-it-anchor emits .header-anchor links) */
@@ -2411,58 +2496,271 @@ details.docs-toc-top {
    the card background and border, the sectioning band, the muted ink.
    Nothing here restyles an element the framework styles. */
 
-/* A grid of link cards: the installation paths, the framework guides and
-   the form controls. The whole card is the link, so the target is the
-   card; the title is at reading size and the line under it is muted. */
-.docs-link-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr));
-  gap: var(--cirth-space-3);
-  margin: var(--cirth-space-6) 0 var(--cirth-space-8);
+/* Navigation paths as rows, not cards: a path is a link with a line of
+   what is behind it, and a list of them reads as a list. Each row is the
+   whole target; the separator between rows is the only division, and the
+   states are the ones every quiet row on the site takes: the secondary
+   wash under a pointer, the name underlined, the ring on keyboard focus. */
+.docs-path-list {
+  margin-block: var(--cirth-space-6) var(--cirth-space-8);
   padding: 0;
+  border-block-start: var(--cirth-border-width) solid
+    var(--cirth-muted-border-color);
   list-style: none;
 }
 
-.docs-link-grid li {
+.docs-path-list li {
   margin: 0;
+  border-block-end: var(--cirth-border-width) solid
+    var(--cirth-muted-border-color);
   list-style: none;
 }
 
-.docs-link-grid a {
+.docs-path-list a {
   display: grid;
-  align-content: start;
-  gap: var(--cirth-space-1);
-  block-size: 100%;
-  min-block-size: 4.5rem;
-  padding: var(--cirth-space-4);
-  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
-  border-radius: var(--cirth-card-border-radius);
-  background: var(--cirth-card-background-color);
+  gap: var(--cirth-space-1) var(--cirth-space-6);
+  padding: var(--cirth-space-3) var(--cirth-space-2);
+  border-radius: var(--docs-chrome-radius);
   color: var(--cirth-ink);
   text-decoration: none;
 }
 
-.docs-link-grid a:hover {
-  border-color: var(--cirth-primary-border);
-  box-shadow: var(--cirth-box-shadow);
+@media (width >= 48rem) {
+  .docs-path-list a {
+    grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+    align-items: baseline;
+  }
 }
 
-.docs-link-grid strong {
-  color: var(--cirth-contrast-text);
+.docs-path-list strong {
+  color: var(--cirth-ink-strong);
+  font-weight: var(--cirth-font-weight-medium);
 }
 
-.docs-link-grid span {
+.docs-path-list span {
   color: var(--cirth-muted-color);
   font-size: var(--cirth-font-size-sm);
-  line-height: var(--cirth-line-height-snug);
+}
+
+.docs-path-list a:hover {
+  background: var(--cirth-secondary-surface);
+}
+
+.docs-path-list a:hover strong {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.docs-path-list a:active {
+  background: var(--cirth-secondary-surface-active);
+}
+
+/* A project's mark, at the height its container gives it. The dark
+   variant, where a project publishes one, swaps in with the site's own
+   scheme switch (.docs-logo above). */
+.docs-mark {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+}
+
+.docs-mark-image {
+  display: block;
+  inline-size: auto;
+  max-inline-size: none;
+}
+
+/* Restated after the rule above, which would otherwise show both of a
+   mark's variants at once. */
+.docs-mark .docs-logo-dark,
+[data-theme="dark"] .docs-mark .docs-logo-light {
+  display: none;
+}
+
+[data-theme="dark"] .docs-mark .docs-logo-dark {
+  display: block;
+}
+
+/* Framework marks as an open list: the mark over its name, on a rule, and
+   no box. The name is printed, so the mark is decoration and a missing
+   image leaves the list whole. The mark lifts a little under a pointer,
+   the one movement here, and only where motion is welcome. */
+.docs-logo-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 8.5rem), 1fr));
+  gap: 0 var(--cirth-space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-logo-list li {
+  margin: 0;
+  border-block-start: var(--cirth-border-width) solid
+    var(--cirth-muted-border-color);
+  list-style: none;
+}
+
+.docs-logo-list a {
+  display: grid;
+  justify-items: start;
+  align-content: start;
+  gap: var(--cirth-space-3);
+  padding: var(--cirth-space-4) var(--cirth-space-1) var(--cirth-space-5);
+  border-radius: var(--docs-chrome-radius);
+  color: var(--cirth-ink);
+  text-decoration: none;
+}
+
+.docs-logo-list .docs-mark {
+  block-size: 2rem;
+}
+
+.docs-logo-list .docs-mark-image {
+  block-size: 2rem;
+}
+
+.docs-mark-name {
+  font-size: var(--cirth-font-size-sm);
+  font-weight: var(--cirth-font-weight-medium);
+}
+
+.docs-logo-list a:hover .docs-mark-name {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .docs-link-grid a {
-    transition:
-      border-color var(--cirth-transition),
-      box-shadow var(--cirth-transition);
+  .docs-logo-list .docs-mark {
+    transition: translate var(--cirth-duration-normal) var(--cirth-ease-out);
   }
+
+  .docs-logo-list a:hover .docs-mark {
+    translate: 0 -0.125rem;
+  }
+}
+
+/* The framework guides on the Installation page: rows, each with the
+   guide's marks, its name and what the guide has you do. */
+.docs-guide-list {
+  margin-block: var(--cirth-space-6) var(--cirth-space-4);
+  padding: 0;
+  border-block-start: var(--cirth-border-width) solid
+    var(--cirth-muted-border-color);
+  list-style: none;
+}
+
+.docs-guide-list li {
+  margin: 0;
+  border-block-end: var(--cirth-border-width) solid
+    var(--cirth-muted-border-color);
+  list-style: none;
+}
+
+.docs-guide-list a {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--cirth-space-1) var(--cirth-space-4);
+  padding: var(--cirth-space-3) var(--cirth-space-2);
+  border-radius: var(--docs-chrome-radius);
+  color: var(--cirth-ink);
+  text-decoration: none;
+}
+
+@media (width >= 48rem) {
+  .docs-guide-list a {
+    grid-template-columns: 4.5rem minmax(0, 12rem) minmax(0, 1fr);
+  }
+}
+
+.docs-guide-marks {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cirth-space-2);
+}
+
+.docs-guide-list .docs-guide-marks {
+  grid-row: span 2;
+}
+
+@media (width >= 48rem) {
+  .docs-guide-list .docs-guide-marks {
+    grid-row: auto;
+  }
+}
+
+.docs-guide-list .docs-mark-image {
+  block-size: 1.75rem;
+}
+
+.docs-guide-list strong {
+  color: var(--cirth-ink-strong);
+  font-weight: var(--cirth-font-weight-medium);
+}
+
+.docs-guide-list a > span:last-child {
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-font-size-sm);
+}
+
+.docs-guide-list a:hover {
+  background: var(--cirth-secondary-surface);
+}
+
+.docs-guide-list a:hover strong {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.docs-guide-list a:active {
+  background: var(--cirth-secondary-surface-active);
+}
+
+/* A framework guide's own shape (eleventy.config.js, frameworkGuide).
+   The title carries the project's marks before its name; the sentence
+   under the lead says what the guide has you do; and every numbered
+   chapter is a step, its number set in a badge on the start edge. The
+   markdown stays flat, so the column's rhythm rules still apply. */
+.docs-guide-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cirth-space-4);
+}
+
+.docs-guide-title .docs-mark-image {
+  block-size: 2.5rem;
+}
+
+.docs-content > .docs-guide-summary {
+  margin-block: calc(var(--cirth-space-6) * -1) var(--cirth-space-8);
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-font-size-sm);
+  font-weight: var(--cirth-font-weight-medium);
+}
+
+.docs-content > .docs-step-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--cirth-space-3);
+}
+
+.docs-step-number {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-radius-pill);
+  background: var(--cirth-card-background-color);
+  box-shadow: var(--cirth-card-box-shadow);
+  color: var(--cirth-primary-text);
+  font-size: var(--cirth-font-size-sm);
+  font-weight: var(--cirth-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
 }
 
 /* Facts at a glance: a gridded description list divided by its own gap,

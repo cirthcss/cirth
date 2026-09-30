@@ -1,5 +1,6 @@
 ---
 layout: docs.njk
+framework: vue
 description: Use Cirth with Vue on Vite, or with Nuxt. Import it in main.js or list it in nuxt.config, and keep the CSS target at Cirth's browser floor.
 ---
 {% from "install.njk" import packageManagers %}

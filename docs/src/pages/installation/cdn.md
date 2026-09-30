@@ -1,5 +1,6 @@
 ---
 layout: docs.njk
+framework: cdn
 description: Use Cirth from jsDelivr with one link element. Snippets with integrity hashes for all four builds, the print sheet and a preset.
 ---
 

@@ -21,11 +21,29 @@
 </div>
 {%- endmacro -%}
 
-{#- The framework guides as a grid of links, from nav.frameworks. -#}
-{%- macro frameworkGrid(frameworks) -%}
-<ul class="docs-link-grid">
-{%- for framework in frameworks %}
-<li><a href="{{ framework.link }}"><strong>{{ framework.text }}</strong><span>{{ framework.summary }}</span></a></li>
+{#- Framework marks as links to their guides, from frameworks.entries (or
+    one guide's own marks). An open list, not a set of cards: the mark and
+    the name are the target, and the name is always printed, so the image
+    is decorative. A mark with a separate dark variant carries both, and
+    the site's own light/dark switch shows one (style.css, .docs-logo). -#}
+{%- macro logoMark(mark, height = 32) -%}
+<span class="docs-mark"><img class="docs-mark-image{% if mark.dark %} docs-logo docs-logo-light{% endif %}" src="/logos/frameworks/{{ mark.file }}" alt="" width="{{ (mark.aspect * height) | round }}" height="{{ height }}" decoding="async">{% if mark.dark %}<img class="docs-mark-image docs-logo docs-logo-dark" src="/logos/frameworks/{{ mark.dark }}" alt="" width="{{ (mark.aspect * height) | round }}" height="{{ height }}" decoding="async">{% endif %}</span>
+{%- endmacro -%}
+
+{%- macro logoList(entries, variant = "") -%}
+<ul class="docs-logo-list{% if variant %} docs-logo-list-{{ variant }}{% endif %}">
+{%- for entry in entries %}
+<li><a href="{{ entry.link }}">{{ logoMark(entry) }}<span class="docs-mark-name">{{ entry.name }}</span></a></li>
+{%- endfor %}
+</ul>
+{%- endmacro -%}
+
+{#- The framework guides as rows: a mark, the guide's name and what the
+    guide does, for the Installation page. -#}
+{%- macro guideList(guides, marks) -%}
+<ul class="docs-guide-list">
+{%- for guide in guides %}
+<li><a href="{{ guide.link }}"><span class="docs-guide-marks">{% for id in guide.marks %}{{ logoMark(marks[id], 28) }}{% endfor %}</span><strong>{{ guide.text }}</strong><span>{{ guide.summary }}</span></a></li>
 {%- endfor %}
 </ul>
 {%- endmacro -%}

@@ -1,5 +1,6 @@
 ---
 layout: docs.njk
+framework: vite
 description: Use Cirth in a Vite project. Install the package, import it from your entry module, and keep Vite's CSS target at Cirth's browser floor.
 ---
 {% from "install.njk" import packageManagers %}

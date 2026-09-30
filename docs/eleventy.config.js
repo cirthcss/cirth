@@ -10,6 +10,7 @@ const { brotliSize, gzipSize } = require("../scripts/lib/compressed-size");
 const { listPresetNames, presetLabel } = require("../scripts/lib/presets");
 const { docsPathPrefix } = require("../scripts/lib/docs-site");
 const { measuredTheme } = require("../scripts/lib/measured-theme");
+const frameworks = require("./src/_data/frameworks.js");
 
 // Eleventy replacement for the previous Astro setup. Same site shape:
 // docs/src/pages -> docs/dist, one <path>/index.html per page, served at
@@ -625,6 +626,70 @@ ${caption}<div class="docs-demo-preview${classlessClass}">${html}</div>
 			0,
 		),
 	);
+
+	// A framework guide's own shape, laid on the page markdown already
+	// rendered, so the source stays plain markdown and every rhythm rule
+	// that reads the column's direct children keeps reading them. Three
+	// changes, all to what is already there:
+	//
+	//   · the <h1> carries the guide's marks before its text. They are
+	//     decorative (alt=""): the title is the name, and firstHeading
+	//     strips the images, so <title> and the search index read "Vite";
+	//   · a sentence under the lead says what the guide will have you do,
+	//     taken from the step headings themselves, so it cannot drift from
+	//     them;
+	//   · a numbered <h2> ("2. Import it") becomes a step: its number set
+	//     apart in a badge, where the heading's name reads "2 Import it",
+	//     and the id and the anchor untouched, so every link to a step
+	//     still lands.
+	const numberWords = ["", "One step", "Two steps", "Three steps", "Four steps", "Five steps", "Six steps"];
+	/** @param {{ file: string, dark?: string, aspect: number }} mark */
+	const markImages = (mark, height) => {
+		const width = Math.round(mark.aspect * height);
+		const image = (file, variant) =>
+			`<img class="docs-mark-image${variant ? ` docs-logo docs-logo-${variant}` : ""}" src="/logos/frameworks/${file}" alt="" width="${width}" height="${height}" decoding="async">`;
+		return mark.dark
+			? image(mark.file, "light") + image(mark.dark, "dark")
+			: image(mark.file, "");
+	};
+	eleventyConfig.addFilter("frameworkGuide", (content, id) => {
+		const guide = frameworks.guides.find((entry) => entry.id === id);
+		if (!guide) throw new Error(`[frameworkGuide] unknown guide: ${id}`);
+		let html = String(content);
+
+		const stepPattern =
+			/<h2 id="([^"]+)" tabindex="-1">(\d+)\. ([\s\S]*?) (<a class="header-anchor"[\s\S]*?<\/a>)<\/h2>/g;
+		const steps = [...html.matchAll(stepPattern)].map((match) => match[3]);
+		html = html.replace(
+			stepPattern,
+			(_, slug, number, title, anchor) =>
+				`<h2 id="${slug}" tabindex="-1" class="docs-step-heading"><span class="docs-step-number">${number}</span> ${title} ${anchor}</h2>`,
+		);
+
+		const marks = guide.marks
+			.map((mark) => `<span class="docs-mark">${markImages(frameworks.marks[mark], 40)}</span>`)
+			.join("");
+		if (!/<h1>[\s\S]*?<\/h1>/.test(html)) {
+			throw new Error(`[frameworkGuide] ${id}: no <h1> to carry the marks`);
+		}
+		html = html.replace(
+			/<h1>([\s\S]*?)<\/h1>/,
+			(_, title) => `<h1 class="docs-guide-title"><span class="docs-guide-marks">${marks}</span>${title}</h1>`,
+		);
+
+		if (steps.length > 1 && steps.length < numberWords.length) {
+			const named = steps.map((step) => step.charAt(0).toLowerCase() + step.slice(1));
+			const list =
+				named.length === 2
+					? named.join(" and ")
+					: `${named.slice(0, -1).join(", ")} and ${named.at(-1)}`;
+			html = html.replace(
+				/(<\/h1>\s*<p>[\s\S]*?<\/p>)/,
+				`$1\n<p class="docs-guide-summary">${numberWords[steps.length]}: ${list}.</p>`,
+			);
+		}
+		return html;
+	});
 
 	// Page URLs always end in "/" (one <path>/index.html per page) while
 	// nav-config links don't — normalize before comparing for active state.

@@ -1,5 +1,6 @@
 ---
 layout: docs.njk
+framework: angular
 description: Use Cirth in an Angular application. Add the stylesheet to the styles array in angular.json, or import it from styles.css.
 ---
 {% from "install.njk" import packageManagers %}
