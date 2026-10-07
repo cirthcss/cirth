@@ -2,53 +2,19 @@ const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 
-const { compareVersions, parseVersion } = require("./lib/version");
+const { parseVersion } = require("./lib/version");
+const { documentedVersion: documented } = require("./lib/documented-version");
 
 const { version } = require("../package.json");
 
 const projectRoot = path.join(__dirname, "..");
 const cdnOrigin = "https://cdn.jsdelivr.net/npm/@cirthcss/cirth";
 
-// The version the documented snippets pin is not always the version in
-// package.json, and during a prerelease series it must not be.
-//
-// A `<link>` in the README is an instruction to a reader, and the reader
-// asked for the framework, not for a beta of it: the same reason a
-// prerelease never takes the `latest` dist-tag. While package.json is at
-// 0.15.0-beta.1, the snippets keep pointing at the last stable release,
-// so `npm install` and the CDN say the same thing.
-//
-// The stable line is read from .github/releases/, which gains a file per
-// release and is therefore the one list in the repository that cannot fall
-// behind the tags without somebody noticing.
-const releaseNotesDir = path.join(projectRoot, ".github/releases");
-
-/** @returns {string} */
-const lastStableRelease = () => {
-	const released = fs
-		.readdirSync(releaseNotesDir)
-		.flatMap((entry) => {
-			const match = /^v(\d+\.\d+\.\d+)\.md$/.exec(entry);
-			return match ? [parseVersion(match[1])] : [];
-		})
-		.sort(compareVersions);
-
-	if (released.length === 0) {
-		throw new Error(
-			`${version} is a prerelease, so the documented CDN snippets should ` +
-				`stay on the last stable release, but ${path.relative(
-					projectRoot,
-					releaseNotesDir,
-				)} lists none.`,
-		);
-	}
-
-	return released[0].raw;
-};
-
+// Which version the snippets pin, and why it is not always package.json's:
+// see scripts/lib/documented-version.js.
 const releasedVersion = parseVersion(version);
 const isPrerelease = releasedVersion.channel !== null;
-const documentedVersion = isPrerelease ? lastStableRelease() : version;
+const documentedVersion = documented(projectRoot);
 
 // Subresource Integrity for the documented CDN snippets. Every
 // `<link>` that points at jsDelivr carries the sha384 digest of the exact
