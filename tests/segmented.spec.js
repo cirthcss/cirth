@@ -68,6 +68,7 @@ const segments = (page) =>
 				radioDisplay: radioStyle.display,
 				radioOpacity: Number(radioStyle.opacity),
 				radioBorder: Number.parseFloat(radioStyle.borderTopWidth),
+				dot: getComputedStyle(radio, "::before").scale,
 				radioWidth: radio.getBoundingClientRect().width,
 			};
 		}),
@@ -157,8 +158,10 @@ test("the selection is not conveyed by colour alone", async ({ page }) => {
 	const [checked, unchecked] = await segments(page);
 
 	expect(checked.background).not.toBe(unchecked.background);
-	// The checked radio keeps its dot: a much thicker border than an empty one.
-	expect(checked.radioBorder).toBeGreaterThanOrEqual(unchecked.radioBorder * 3);
+	// The checked radio keeps its dot, a shape on the accent; an empty one
+	// has none (specs/choice-marks.md).
+	expect(checked.dot).toBe("1");
+	expect(unchecked.dot).toBe("0");
 });
 
 // Disabled is a neutral state, not a transparency (specs/control-emphasis.md):
@@ -210,7 +213,8 @@ test.describe("forced-colors: active", () => {
 
 		// The fill is gone; the dot is what still tells the options apart.
 		const [checked, unchecked] = await segments(page);
-		expect(checked.radioBorder).toBeGreaterThanOrEqual(unchecked.radioBorder * 3);
+		expect(checked.dot).toBe("1");
+		expect(unchecked.dot).toBe("0");
 	});
 });
 

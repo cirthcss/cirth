@@ -62,6 +62,10 @@ replaced by `material`. Each change has a spec in the repository's `specs/` dire
 | Styled a focus ring through `box-shadow` | Focus is an `outline` with `outline-offset: var(--cirth-outline-offset)` |
 | Styled inline `code` expecting the chip | Set `padding`, `background` and `display: inline-block` on it |
 | Relied on 2px checkbox and radio borders | Set `--cirth-border-width` on `[type="checkbox"], [type="radio"]` |
+| Expected a checkbox or radio drawn edge to edge at 24px | The box is still 24px and is the target; the mark drawn inside it is 20px. Set `width` and `height` to `1.75em` on the input for the old drawn size |
+| Relied on the thick ring of a checked radio | A checked radio is the accent with a dot in `--cirth-primary-on-surface`; nothing to set |
+| Laid out a checkbox or radio label with `display: flex` or `grid` | A label that starts with its checkbox or radio now hangs its wrapped lines under the first word; set `padding-inline-start: 0` and `text-indent: 0` on a flex or grid label |
+| Drew your own edge on a checkbox or radio with `border-color` | The edge is an inset ring of `--cirth-border-color`; the border is a transparent band. Set `--cirth-border-color` instead |
 
 ### Radii
 

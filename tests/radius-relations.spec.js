@@ -69,8 +69,23 @@ const measure = (page) =>
 			"group", "pre", "progress", "kbd", "checkbox",
 			"dialog-article", "popover",
 		];
+		// A checkbox's box is its target and is not drawn: the mark sits
+		// inside a transparent band (specs/choice-marks.md), so the corner a
+		// reader sees is the box's less that band, which CSS clamps at zero.
+		/** @param {string} id */
+		const drawn = (id) =>
+			id === "checkbox"
+				? Math.max(
+						0,
+						radius(id) -
+							Number.parseFloat(
+								getComputedStyle(/** @type {Element} */ (document.getElementById(id)))
+									.borderTopWidth,
+							),
+					)
+				: radius(id);
 		return {
-			radii: Object.fromEntries(ids.map((id) => [id, radius(id)])),
+			radii: Object.fromEntries(ids.map((id) => [id, drawn(id)])),
 			groupedSearch: corners("grouped-search"),
 			groupedText: corners("grouped-text"),
 			radio: getComputedStyle(

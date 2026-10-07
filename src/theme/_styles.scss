@@ -407,9 +407,11 @@
   // at 1px on every surface level, so the 2px these two used to carry was
   // an exception with no reason left behind it.
   // A 1.5em box at the full control radius would read as a circle:
-  // keep checkboxes visibly square-cornered
+  // keep checkboxes visibly square-cornered. The radius is the drawn
+  // mark's, so the box's transparent 0.125em band is added outside it
+  // (forms/_checkbox-radio-switch.scss).
   [type="checkbox"] {
-    --cirth-border-radius: var(--cirth-checkbox-border-radius);
+    --cirth-border-radius: calc(var(--cirth-checkbox-border-radius) + 0.125em);
   }
 
   [type="checkbox"][role="switch"] {

@@ -61,20 +61,43 @@
         border-end-end-radius: var(--cirth-border-radius);
       }
 
+      // The segment centres its radio: no lift for a first line, no hang,
+      // and the gap a segment's padding calls for.
+      text-indent: 0;
+
+      > [type="radio"] {
+        margin-block: 0;
+        margin-inline-end: 0.375em;
+
+        // The segment carries the ring (below); a second one on the radio
+        // inside it would sit on the accent fill.
+        &:focus {
+          outline: none;
+        }
+      }
+
       // Filled with the same pair a primary button uses for its label, so
-      // the contrast is the one the theme already verifies.
+      // the contrast is the one the theme already verifies. The radio on
+      // it is a ring and a dot in that label colour, clear between them:
+      // the chosen segment is marked by a shape on the accent, which a
+      // filled radio could not show (its fill is the accent too).
       &:has(:checked) {
         z-index: 1;
         border-color: var(--cirth-primary-border);
         background-color: var(--cirth-primary-surface);
         color: var(--cirth-primary-on-surface);
+
+        > [type="radio"]:checked {
+          --cirth-background-color: transparent;
+          --cirth-border-color: var(--cirth-primary-on-surface);
+        }
       }
 
       // The radio's own ring would sit on the accent fill of the selected
       // segment, which is where focus lands. An outline around the whole
       // segment stays on the page surface, and forced-colors mode repaints
       // it with a system colour.
-      &:has(:focus-visible) {
+      &:has(:focus-visible, [type="radio"]:focus) {
         z-index: 2;
         outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
         outline-offset: var(--cirth-outline-offset);
