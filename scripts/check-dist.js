@@ -370,6 +370,37 @@ for (const { name } of presets) {
 	});
 }
 
+// --- No empty functional pseudo-class --------------------------------
+
+// `:is()`, `:where()`, `:not()` and `:has()` with nothing inside are what a
+// minifier leaves when every argument was invalid where it was written, as
+// `[aria-current]` was after `::file-selector-button`. Browsers accept the
+// empty list and match nothing, so the rule is silently dead, and stricter
+// pipelines (esbuild, in Phoenix) warn about it on every build. Checked in
+// every file, expanded and minified, since each is what someone ships.
+const emptyFunctional = new Set([":is", ":where", ":not", ":has"]);
+for (const file of allFiles) {
+	const filePath = path.join(distDir, file);
+	if (!fs.existsSync(filePath)) continue;
+	const root = postcss.parse(fs.readFileSync(filePath, "utf8"), { from: file });
+	root.walkRules((rule) => {
+		if (isInsideKeyframes(rule)) return;
+		selectorParser((selectors) => {
+			selectors.walkPseudos((pseudo) => {
+				if (!emptyFunctional.has(pseudo.value.toLowerCase())) return;
+				const empty =
+					pseudo.nodes.length === 0 ||
+					pseudo.nodes.every((selector) =>
+						selector.nodes.every((node) => node.type === "comment"),
+					);
+				if (empty) {
+					fail(file, `empty ${pseudo.value}() in \`${rule.selector.slice(0, 160)}\``);
+				}
+			});
+		}).processSync(rule.selector);
+	});
+}
+
 // --- Report ----------------------------------------------------------
 
 if (failures.length > 0) {
@@ -386,5 +417,6 @@ console.log(
 	`✓ check-dist: ${allFiles.length} files parse and are non-empty; ` +
 		`every rule is in @layer ${layerName}, with no !important; ` +
 		`classless builds only expose .${EXCLUSION_CLASS}, scoped builds stay ` +
-		`inside .${scopeClass}, presets only touch custom properties.`,
+		`inside .${scopeClass}, presets only touch custom properties; no ` +
+		`:is(), :where(), :not() or :has() is empty.`,
 );

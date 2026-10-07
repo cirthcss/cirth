@@ -89,15 +89,8 @@
     color var(--cirth-transition),
     box-shadow var(--cirth-transition);
 
-  &:is([aria-current]:not([aria-current="false"])),
   &:is(:hover, :active, :focus) {
-    --cirth-background-color: var(--cirth-primary-surface-active);
-    --cirth-border-color: var(--cirth-primary-border-active);
-    --cirth-box-shadow: var(
-      --cirth-button-hover-box-shadow,
-      0 0 0 rgb(0 0 0 / 0%)
-    );
-    --cirth-color: var(--cirth-primary-on-surface);
+    @extend %button-active;
   }
 
   // Pressed is one tonal step past hover. Painted as a wash over the
@@ -107,6 +100,32 @@
   &:active {
     background-image: linear-gradient(rgb(0 0 0 / 12%) 0 0);
   }
+}
+
+// The current page or view is a state of the elements, not of the file
+// input's button: a pseudo-element cannot carry an attribute, and written
+// into the list above, `[aria-current]` compiled to
+// `::file-selector-button:is()`, an empty selector esbuild warns about.
+// One declaration block for both states, through the placeholder, so
+// each keeps the specificity it had.
+#{$parent-selector} button,
+#{$parent-selector} [type="submit"],
+#{$parent-selector} [type="reset"],
+#{$parent-selector} [type="button"],
+#{$parent-selector} [role="button"] {
+  &:is([aria-current]:not([aria-current="false"])) {
+    @extend %button-active;
+  }
+}
+
+%button-active {
+  --cirth-background-color: var(--cirth-primary-surface-active);
+  --cirth-border-color: var(--cirth-primary-border-active);
+  --cirth-box-shadow: var(
+    --cirth-button-hover-box-shadow,
+    0 0 0 rgb(0 0 0 / 0%)
+  );
+  --cirth-color: var(--cirth-primary-on-surface);
 }
 
 // Keep ::file-selector-button out of this selector list. Firefox does not
