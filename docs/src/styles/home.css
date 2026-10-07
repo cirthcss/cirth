@@ -43,14 +43,12 @@
    paragraph under it in the secondary ink. */
 .docs-section-head {
   max-inline-size: 44rem;
-  margin-block-end: clamp(2rem, 4vw, 3rem);
 }
 
 .docs-section-head h2 {
   --cirth-font-size: clamp(1.75rem, 1.35rem + 1.6vw, 2.5rem);
 
   margin-block: 0 var(--cirth-flow-element);
-  text-wrap: balance;
 }
 
 .docs-section-head > p {
@@ -59,19 +57,10 @@
   font-size: var(--cirth-font-size-lg);
 }
 
-.docs-section-head > p + p {
-  margin-block-start: var(--cirth-flow-element);
-}
-
 /* The way on from a section, in the flow: a link, not a button. */
 .docs-section-more {
   margin-block: clamp(1.25rem, 2.5vw, 2rem) 0;
   font-weight: var(--cirth-font-weight-medium);
-}
-
-.docs-section-head > .docs-section-more {
-  margin-block-start: clamp(1.25rem, 2.5vw, 2rem);
-  font-size: var(--cirth-font-size-md);
 }
 
 /* A pane label: the file name, in the meta role, on the band of the pane
@@ -81,7 +70,6 @@
   align-items: center;
   gap: var(--cirth-space-3);
   min-block-size: 2.5rem;
-  margin: 0;
   padding: var(--cirth-space-2) var(--cirth-space-4);
   border-block-end: var(--cirth-border-width) solid
     var(--cirth-card-border-color);
@@ -89,11 +77,6 @@
   color: var(--cirth-muted-color);
   font-size: var(--cirth-meta-font-size);
   font-weight: var(--cirth-font-weight-medium);
-}
-
-.docs-pane-label code {
-  color: var(--cirth-ink);
-  font-weight: var(--cirth-font-weight-regular);
 }
 
 
@@ -106,7 +89,6 @@
    decoration added to it. */
 .docs-home > .docs-hero {
   position: relative;
-  isolation: isolate;
   padding-block: clamp(2.5rem, 6vw, 5.5rem) clamp(3rem, 7vw, 6rem);
 }
 
@@ -133,28 +115,19 @@
 .docs-hero h1 {
   --cirth-font-size: var(--cirth-display-font-size);
   --cirth-font-weight: var(--cirth-display-font-weight);
-
-  margin: 0;
-  text-wrap: balance;
 }
 
 .docs-hero-lede {
   margin-block: var(--cirth-space-6) 0;
   color: var(--cirth-secondary-text);
   font-size: clamp(var(--cirth-font-size-lg), 1rem + 0.4vw, var(--cirth-font-size-xl));
-  line-height: var(--cirth-line-height-normal);
-  text-wrap: pretty;
 }
 
+/* The row itself is the shared .docs-hero-actions in style.css, which the
+   examples page uses too; the home page sets only its spacing. */
 .docs-hero-actions {
-  display: flex;
-  flex-wrap: wrap;
   gap: var(--cirth-space-3);
   margin-block: var(--cirth-space-8) 0;
-}
-
-.docs-hero-actions [role="button"] {
-  margin: 0;
 }
 
 /* The install line: a label in the meta role over one command, with the
@@ -183,7 +156,6 @@
 
 .docs-hero-demo {
   position: relative;
-  margin: 0;
   min-inline-size: 0;
 }
 
@@ -232,8 +204,6 @@
 
 .docs-hero-render > article {
   --cirth-card-box-shadow: var(--cirth-box-shadow);
-
-  margin: 0;
 }
 
 /* From 48rem the two surfaces share a grid. The source spans it, up to
@@ -267,8 +237,6 @@
 
 .docs-hero-demo figcaption {
   margin-block-start: var(--cirth-space-6);
-  color: var(--cirth-muted-color);
-  font-size: var(--cirth-meta-font-size);
 }
 
 /* The one orchestrated moment on the page: the source rises, the card
@@ -341,13 +309,11 @@
 .docs-fact-list dt {
   color: var(--cirth-muted-color);
   font-size: var(--cirth-meta-font-size);
-  font-weight: var(--cirth-font-weight-medium);
 }
 
 .docs-fact-list dd {
   display: grid;
   gap: var(--cirth-space-1);
-  margin: 0;
 }
 
 .docs-fact-list strong {
@@ -487,7 +453,6 @@
   --cirth-font-size: clamp(1.75rem, 1.35rem + 1.6vw, 2.5rem);
 
   margin-block: 0 var(--cirth-flow-element);
-  text-wrap: balance;
 }
 
 .docs-story-head > p,
@@ -532,16 +497,10 @@
   margin-block-end: 0;
 }
 
-.docs-story-part > figcaption {
-  color: var(--cirth-muted-color);
-  font-size: var(--cirth-meta-font-size);
-}
-
 /* The listing is the library's own code block. The typed copy over it is
    for the held scene only. */
 .docs-story-source pre {
   display: grid;
-  margin: 0;
   font-size: 0.8125rem;
   line-height: 1.6;
 }
@@ -566,7 +525,6 @@
 /* Cirth's picture is the card itself, on this page's canvas: no frame. */
 .docs-story-result > article {
   inline-size: min(100%, 26rem);
-  margin: 0;
 }
 
 @media (width >= 64rem) {
@@ -607,8 +565,8 @@
 .docs-home[data-stage="held"] .docs-story-scene {
   display: grid;
   position: sticky;
-  inset-block-start: var(--docs-header, 4.5rem);
-  block-size: calc(100svh - var(--docs-header, 4.5rem));
+  inset-block-start: var(--docs-header);
+  block-size: calc(100svh - var(--docs-header));
   align-content: center;
 }
 
@@ -657,7 +615,6 @@
 /* Once a rendering is in front, the listing steps back: still there, the
    same markup, but no longer what is being read. */
 .docs-home[data-stage="held"] .docs-story-source {
-  justify-self: start;
   inline-size: min(100%, 36rem);
   opacity: calc(1 - var(--docs-front, 0) * 0.6);
   scale: calc(1 - var(--docs-front, 0) * 0.04);
@@ -716,10 +673,6 @@
   translate: none;
 }
 
-.docs-home[data-stage="held"] .docs-story-result > article {
-  inline-size: 100%;
-}
-
 
 /* 4. Measured
    ––––––––––––––––––––
@@ -741,7 +694,6 @@
 .docs-measured-list {
   display: grid;
   gap: clamp(2rem, 5vw, 3.5rem);
-  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -750,7 +702,6 @@
   display: grid;
   gap: var(--cirth-space-3) clamp(1.5rem, 4vw, 3rem);
   margin: 0;
-  list-style: none;
 }
 
 @media (width >= 48rem) {
@@ -762,7 +713,6 @@
 
 .docs-measured-figure {
   display: grid;
-  margin: 0;
   line-height: var(--cirth-line-height-tight);
 }
 
@@ -781,7 +731,6 @@
 }
 
 .docs-measured-text > p {
-  margin: 0;
   color: var(--cirth-secondary-text);
   font-size: var(--cirth-font-size-lg);
 }
@@ -824,7 +773,6 @@
   display: flex;
   align-items: center;
   gap: var(--cirth-space-3);
-  margin: 0;
   font-size: var(--cirth-font-size-sm);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -854,8 +802,8 @@
 .docs-home[data-stage="held"] .docs-measured-scene {
   display: grid;
   position: sticky;
-  inset-block-start: var(--docs-header, 4.5rem);
-  block-size: calc(100svh - var(--docs-header, 4.5rem));
+  inset-block-start: var(--docs-header);
+  block-size: calc(100svh - var(--docs-header));
   align-content: center;
 }
 
@@ -890,7 +838,6 @@
 .docs-theme-steps {
   display: grid;
   gap: var(--cirth-space-2);
-  margin: 0;
   padding: 0;
   list-style: none;
   counter-reset: docs-theme;
@@ -903,7 +850,6 @@
   gap: var(--cirth-space-1) var(--cirth-space-3);
   margin: 0;
   color: var(--cirth-secondary-text);
-  list-style: none;
   counter-increment: docs-theme;
 }
 
@@ -950,11 +896,6 @@
   border-radius: var(--cirth-card-border-radius);
 }
 
-.docs-theme-preview > figcaption {
-  color: var(--cirth-muted-color);
-  font-size: var(--cirth-meta-font-size);
-}
-
 @media (width >= 64rem) {
   .docs-theme-grid {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
@@ -985,8 +926,8 @@
 .docs-home[data-stage="held"] .docs-theme-scene {
   display: grid;
   position: sticky;
-  inset-block-start: var(--docs-header, 4.5rem);
-  block-size: calc(100svh - var(--docs-header, 4.5rem));
+  inset-block-start: var(--docs-header);
+  block-size: calc(100svh - var(--docs-header));
   align-content: center;
 }
 
@@ -1034,11 +975,6 @@
 
 .docs-presets-pick[hidden] {
   display: none;
-}
-
-.docs-presets-pick label {
-  margin: 0;
-  font-weight: var(--cirth-font-weight-medium);
 }
 
 .docs-presets-pick select {
@@ -1134,7 +1070,6 @@
   margin: 0;
   padding: 0;
   border: 0;
-  background: transparent;
   opacity: 0;
   cursor: ew-resize;
   touch-action: pan-y;
@@ -1151,8 +1086,6 @@
 
 .docs-compare > figcaption {
   margin-block-start: var(--cirth-space-3);
-  color: var(--cirth-muted-color);
-  font-size: var(--cirth-meta-font-size);
 }
 
 
@@ -1216,7 +1149,6 @@
   position: absolute;
   z-index: 1;
   inset: 0;
-  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -1287,7 +1219,6 @@
   --cirth-font-size: clamp(1.75rem, 1.35rem + 1.6vw, 2.5rem);
 
   margin-block: 0 var(--cirth-flow-element);
-  text-wrap: balance;
 }
 
 .docs-agnostic-copy > p {
@@ -1303,10 +1234,6 @@
 /* 8. The close
    ––––––––––––––––––––
    One heading, one sentence, two actions. */
-.docs-home > .docs-pure .docs-section-head {
-  margin-block-end: 0;
-}
-
 .docs-pure .docs-hero-actions {
   margin-block-start: clamp(1.5rem, 3vw, 2rem);
 }
