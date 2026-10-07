@@ -6,6 +6,7 @@ const markdownItAnchor = require("markdown-it-anchor");
 const GithubSlugger = require("github-slugger").default;
 const hljs = require("highlight.js");
 const { buildPagefindIndex } = require("../scripts/build-pagefind");
+const { removeBuildOutput } = require("../scripts/lib/build-output");
 const { brotliSize, gzipSize } = require("../scripts/lib/compressed-size");
 const { listPresetNames, presetLabel } = require("../scripts/lib/presets");
 const { docsPathPrefix } = require("../scripts/lib/docs-site");
@@ -475,17 +476,26 @@ module.exports = (eleventyConfig) => {
 	eleventyConfig.on("eleventy.before", () => slugger.reset());
 
 	// Eleventy doesn't clean its output directory (Astro did); start each
-	// process fresh so stale pages — or iCloud "name 2.html" duplicates —
-	// can't accumulate in docs/dist. The guard matters in --serve mode:
-	// eleventy.before also runs for incremental rebuilds, where deleting the
-	// active output directory leaves Eleventy with nowhere to write.
-	let outputCleaned = false;
-	eleventyConfig.on("eleventy.before", () => {
-		if (outputCleaned) return;
-		fs.rmSync(path.join(docsRoot, "dist"), { recursive: true, force: true });
-		outputCleaned = true;
+	// process fresh so stale pages, or iCloud "name 2.html" duplicates,
+	// can't accumulate. The directory is the one Eleventy reports for this
+	// build (`directories.output`): docs/dist normally, or whatever
+	// `--output` named, so a build pointed elsewhere never touches the real
+	// site. It is cleaned once per process: in --serve mode eleventy.before
+	// also runs for incremental rebuilds, where deleting the active output
+	// directory leaves Eleventy with nowhere to write.
+	const cleanedOutputs = new Set();
+	/** @param {{ directories: { output: string } }} event */
+	const buildOutput = ({ directories }) => path.resolve(directories.output);
+	eleventyConfig.on("eleventy.before", (/** @type {any} */ event) => {
+		const output = buildOutput(event);
+		if (cleanedOutputs.has(output)) return;
+		removeBuildOutput(output, {
+			sources: [event.directories.input, event.directories.includes, event.directories.data].filter(Boolean),
+		});
+		cleanedOutputs.add(output);
 	});
-	eleventyConfig.on("eleventy.after", buildPagefindIndex);
+	// Search is indexed from, and written into, the same directory.
+	eleventyConfig.on("eleventy.after", (/** @type {any} */ event) => buildPagefindIndex({ outputDir: buildOutput(event) }));
 	markdown.core.ruler.before("normalize", "cirth-reset-slugs", () => {
 		slugger.reset();
 		return true;

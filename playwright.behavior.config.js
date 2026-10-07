@@ -56,9 +56,13 @@ module.exports = defineConfig({
 		contextOptions: { reducedMotion: "reduce" },
 		viewport: { width: 1280, height: 720 },
 	},
+	// The docs build's own regression test builds docs/dist, which empties
+	// it for a moment: it runs first, alone, and every engine's project waits
+	// for it, so no spec ever reads a site that is being rebuilt.
 	projects: [
-		{ name: "behavior-chromium", use: { browserName: "chromium" } },
-		{ name: "behavior-firefox", use: { browserName: "firefox" } },
-		{ name: "behavior-webkit", use: { browserName: "webkit" } },
+		{ name: "docs-build", testMatch: ["docs-build-output.spec.js"], use: { browserName: "chromium" } },
+		{ name: "behavior-chromium", use: { browserName: "chromium" }, dependencies: ["docs-build"] },
+		{ name: "behavior-firefox", use: { browserName: "firefox" }, dependencies: ["docs-build"] },
+		{ name: "behavior-webkit", use: { browserName: "webkit" }, dependencies: ["docs-build"] },
 	],
 });
