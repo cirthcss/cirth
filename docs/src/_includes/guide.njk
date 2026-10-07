@@ -1,0 +1,44 @@
+{#- Parts every integration guide shares, written once so forty pages say
+    the same thing the same way. Each macro returns markdown, not HTML: the
+    page is rendered by Nunjucks first and markdown-it after, so a fence
+    inside a macro is a fence on the page. Nothing here is indented, since
+    indentation inside a macro is indentation in the markdown.
+
+    whyTarget(tool): why a pipeline that lowers CSS needs telling about
+    Cirth's browsers, in one paragraph.
+
+    checkIt(lowers, fix): the last step of every guide. A forced-dark subtree is
+    the one thing a pipeline that rewrites light-dark() breaks, and the one
+    thing a reader can see without a developer tool.
+
+    nextSteps(where): where the reader's own overrides go. -#}
+
+{%- macro whyTarget(tool = "Vite") -%}
+{{ tool }} compiles CSS for older browsers than Cirth supports, and on the
+way rewrites its `light-dark()` colours. The page still follows the system
+between light and dark, but an element with `data-theme` that forces the
+other scheme inside it stops changing colour. Tell {{ tool }} Cirth's
+browser floor:
+{%- endmacro -%}
+
+{%- macro checkIt(lowers = false, fix = "check the CSS target above") -%}
+Put a forced-dark subtree on any page:
+
+```html
+<section data-theme="dark">
+  <article>
+    <p>Dark, whatever the system scheme is.</p>
+  </article>
+</section>
+```
+
+Build for production and open the page. The article is dark on a light
+page and stays dark on a dark one.{% if lowers %} If it follows the page
+instead, the build rewrote Cirth's colours: {{ fix }}.{% endif %}
+{%- endmacro -%}
+
+{%- macro nextSteps(where = "in a stylesheet loaded after Cirth's") -%}
+[Customization](/customization) covers the `--cirth-*` properties; set
+yours {{ where }}. To use another build (classless, scoped, print) see
+[What the package contains](/compatibility#what-the-package-contains).
+{%- endmacro -%}

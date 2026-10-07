@@ -34,6 +34,11 @@
 		{% for sheet in stylesheets %}<link rel="stylesheet" href="/styles/{{ sheet }}" />{% endfor %}
 		{% if usesClassless %}<link rel="stylesheet" href="/styles/generated/cirth-docs-classless.css" />{% endif %}
 		<script>
+			// A page can lay itself out for a script before first paint: the
+			// home page's narrative only takes its scrolling layout where a
+			// script will drive it, and must not change height once painted.
+			document.documentElement.classList.add("docs-script");
+
 			// Set data-theme before first paint to avoid a light-mode flash.
 			(function () {
 				var stored = localStorage.getItem("cirth-theme");

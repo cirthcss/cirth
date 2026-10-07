@@ -2,34 +2,31 @@
  * The home page, and only the home page: loaded after style.css by
  * index.md's `stylesheets`, so no documentation page carries it.
  *
- * Six blocks, each with its own silhouette: a hero whose demo is two
- * surfaces laid one over the other, a ruled band of facts, a stage of real
- * examples, an open list of framework marks on the recessed level, a theme
- * stage, and the close. Every surface is one of Cirth's levels and every
- * edge one of its three roles. The one thing only this page has is a field
- * of colour behind the hero's demo, derived from the accent, with no text
- * on it.
+ * A column of scenes the reader scrolls through, each with its own
+ * silhouette: a hero whose demo is two surfaces laid one over the other, a
+ * ruled band of facts, the story of one element from markup to Cirth, three
+ * measured figures, a theme of the reader's own, the presets in both
+ * schemes, the stacks Cirth works with, and a short close. Behind all of
+ * them, one field of colour drawn from the accent, which travels with the
+ * scroll. Every surface is one of Cirth's levels and every edge one of its
+ * three roles.
  *
- * Mobile first. The base rules are the phone; every width query adds.
+ * Mobile first. The base rules are the phone, and every scene is complete
+ * in them; the held scenes (.docs-home[data-stage="held"]) only exist where
+ * the motion script decides the window can hold one, and the script is the
+ * only thing that moves anything.
  */
 
 .docs-home {
   --docs-home-gutter: clamp(1rem, 4vw, 2rem);
   --docs-home-max: 76rem;
+  /* The sticky header's height: a held scene sticks just under it. */
+  --docs-header: 4.5rem;
 
-  /* The hero's atmosphere: the accent, and the accent turned a third of
-     the way round toward the cool side, both thinned to a glow. From the
-     accent, never from a status colour, so a preset's field is its own. */
-  --docs-aurora-warm: light-dark(
-    oklch(from var(--cirth-primary) 78% calc(c * 0.9) h / 34%),
-    oklch(from var(--cirth-primary) 45% calc(c * 0.9) h / 42%)
-  );
-  --docs-aurora-cool: light-dark(
-    oklch(from var(--cirth-primary) 80% calc(c * 0.6) calc(h - 100) / 30%),
-    oklch(from var(--cirth-primary) 42% calc(c * 0.6) calc(h - 100) / 36%)
-  );
-
-  overflow: clip;
+  /* Sideways only. A wide demo or the logo grid must never give the page
+     a horizontal scroll, and nothing here is meant to paint past the
+     viewport's sides. */
+  overflow-x: clip;
 }
 
 .docs-home > section {
@@ -49,8 +46,7 @@
   margin-block-end: clamp(2rem, 4vw, 3rem);
 }
 
-.docs-section-head h2,
-.docs-cta h2 {
+.docs-section-head h2 {
   --cirth-font-size: clamp(1.75rem, 1.35rem + 1.6vw, 2.5rem);
 
   margin-block: 0 var(--cirth-flow-element);
@@ -74,6 +70,7 @@
 }
 
 .docs-section-head > .docs-section-more {
+  margin-block-start: clamp(1.25rem, 2.5vw, 2rem);
   font-size: var(--cirth-font-size-md);
 }
 
@@ -184,24 +181,10 @@
   color: var(--cirth-muted-color);
 }
 
-/* The demo and the field behind it. The field is the figure's own
-   pseudo-element, under the two surfaces and behind nothing else: the copy
-   column never sits on it. */
 .docs-hero-demo {
   position: relative;
   margin: 0;
   min-inline-size: 0;
-}
-
-.docs-hero-demo::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: -18% -14% -16% -10%;
-  background:
-    radial-gradient(42% 48% at 72% 30%, var(--docs-aurora-warm), transparent 70%),
-    radial-gradient(46% 52% at 26% 78%, var(--docs-aurora-cool), transparent 72%);
-  pointer-events: none;
 }
 
 .docs-hero-stack {
@@ -288,14 +271,10 @@
   font-size: var(--cirth-meta-font-size);
 }
 
-/* The one orchestrated moment on the page: the field settles, the source
-   rises, the card follows it. Once, on load, and only where motion is
-   welcome; without it, and without CSS, everything is simply there. */
+/* The one orchestrated moment on the page: the source rises, the card
+   follows it. Once, on load, and only where motion is welcome; without it,
+   and without CSS, everything is simply there. */
 @media (prefers-reduced-motion: no-preference) {
-  .docs-hero-demo::before {
-    animation: docs-hero-field 1400ms var(--cirth-ease-out) both;
-  }
-
   .docs-hero-source {
     animation: docs-hero-rise 700ms var(--cirth-ease-out) 80ms both;
   }
@@ -309,13 +288,6 @@
   from {
     opacity: 0;
     translate: 0 0.75rem;
-  }
-}
-
-@keyframes docs-hero-field {
-  from {
-    opacity: 0;
-    scale: 0.94;
   }
 }
 
@@ -392,429 +364,1009 @@
 }
 
 
-/* 3. Demonstration
+/* The shared field of colour
    ––––––––––––––––––––
-   The heading and the count side by side from 64rem, the stage under both
-   at full width. */
-@media (width >= 64rem) {
-  .docs-demo-section .docs-home-inner {
-    display: grid;
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    column-gap: clamp(2rem, 5vw, 4.5rem);
-    align-items: center;
-  }
+   One fixed layer behind the whole page, three soft glows: the accent, the
+   accent turned a third of the way round toward the cool side, and a warm
+   gold. The motion script moves, scales, fades and turns them as the
+   scenes go by (one set of custom properties, written once a frame), so
+   the page has one field that travels instead of a gradient per section.
+   Its resting arrangement is the hero's; with no script and under reduced
+   motion the field keeps it. Each glow is a box sized to fade to nothing
+   inside itself, and the layer fades in under the header, so no edge of it
+   ever shows. Opacity, position and scale are the compositor's; the hue
+   moves only between scenes. */
+.docs-aurora {
+  /* Resting arrangement under 80rem, where the demo is under the copy. */
+  --docs-aurora-rest-warm-x: 74;
+  --docs-aurora-rest-warm-y: 64;
+  --docs-aurora-rest-cool-x: 28;
+  --docs-aurora-rest-cool-y: 84;
 
-  .docs-demo-section .docs-home-inner > :not(.docs-section-head, .docs-count) {
-    grid-column: 1 / -1;
-  }
-}
-
-/* The count: two measured rows, drawn to one scale. The bar is decoration
-   under the number, which is the text. */
-.docs-count {
-  margin: 0 0 clamp(2rem, 4vw, 3rem);
-}
-
-.docs-count-rows {
-  display: grid;
-  gap: var(--cirth-space-4);
-  margin: 0;
-}
-
-.docs-count-rows > div {
-  display: grid;
-  gap: var(--cirth-space-1);
-}
-
-.docs-count-rows dt {
-  color: var(--cirth-muted-color);
-  font-size: var(--cirth-meta-font-size);
-  font-weight: var(--cirth-font-weight-medium);
-}
-
-.docs-count-rows dd {
-  display: flex;
-  align-items: center;
-  gap: var(--cirth-space-3);
-  margin: 0;
-  color: var(--cirth-ink-strong);
-  font-weight: var(--cirth-font-weight-medium);
-  font-variant-numeric: tabular-nums;
-}
-
-.docs-count-bar {
-  flex: none;
-  inline-size: max(
-    0.5rem,
-    calc(var(--docs-count) / var(--docs-count-max) * min(18rem, 50vw))
-  );
-  block-size: 0.5rem;
-  border-radius: var(--cirth-radius-pill);
-  background: var(--cirth-form-element-border-color);
-}
-
-/* The row that counts nothing is the accent: the one thing the section is
-   pointing at. */
-.docs-count-rows > div:last-child .docs-count-bar {
-  background: var(--cirth-primary-surface);
-}
-
-.docs-count figcaption {
-  margin-block-start: var(--cirth-space-4);
-  color: var(--cirth-muted-color);
-  font-size: var(--cirth-meta-font-size);
-}
-
-.docs-count-source {
-  margin-block-start: var(--cirth-space-2);
-}
-
-.docs-count-listings {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-  gap: var(--cirth-space-3);
-}
-
-.docs-count-listings pre {
-  margin: 0;
-  font-size: 0.75rem;
-}
-
-
-/* The stage, and one example at a time.
-   ––––––––––––––––––––
-   The strip is served `hidden` and the script turns it on, so a reader
-   without script gets three complete examples stacked under their own
-   headings. Every rule here describes the enhanced state only, and the
-   stage's resting state is the readable one. */
-.docs-switch {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--cirth-space-1);
-  margin-block-end: var(--cirth-space-3);
-  font-size: var(--cirth-font-size-sm);
-}
-
-/* `display: flex` beats the UA's `[hidden] { display: none }`. */
-.docs-switch[hidden] {
-  display: none;
-}
-
-/* A tab is the only thing a reader has to hit before the section works,
-   so it takes a control's height. The selected one carries an underline
-   in the accent that slides between tabs rather than jumping: a state
-   change answering the reader's own action. */
-.docs-switch button {
-  position: relative;
-  min-height: 2.75rem;
-  margin: 0;
-  padding: var(--cirth-space-1) var(--cirth-space-3);
-  border: var(--cirth-border-width) solid transparent;
-  border-radius: var(--docs-chrome-radius);
-  background: none;
-  color: var(--cirth-muted-color);
-  font-size: inherit;
-}
-
-.docs-switch button::after {
-  content: "";
-  position: absolute;
-  inset: auto var(--cirth-space-3) -0.1875rem;
-  block-size: 0.125rem;
-  border-radius: var(--cirth-radius-pill);
-  background: var(--cirth-primary-surface);
-  scale: 0 1;
-}
-
-.docs-switch button:hover {
-  background: var(--cirth-secondary-surface);
-  color: var(--cirth-ink);
-}
-
-.docs-switch button:active {
-  background: var(--cirth-secondary-surface-active);
-}
-
-.docs-switch button[aria-selected="true"] {
-  color: var(--cirth-ink-strong);
-}
-
-.docs-switch button[aria-selected="true"]::after {
-  scale: 1 1;
-}
-
-.docs-switch button:focus-visible {
-  outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
-  outline-offset: var(--cirth-outline-offset);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .docs-switch button {
-    transition:
-      background-color var(--cirth-transition),
-      color var(--cirth-transition);
-  }
-
-  .docs-switch button::after {
-    transition: scale var(--cirth-duration-normal) var(--cirth-ease-out);
-  }
-}
-
-.docs-stage {
-  display: grid;
-  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
-  border-radius: var(--cirth-card-border-radius);
-
-  /* The container's own colour shows through the grid gaps, and that is
-     where every divider in a stage comes from. */
-  background: var(--cirth-card-border-color);
-  gap: var(--cirth-border-width);
+  position: fixed;
+  z-index: -1;
+  inset: 0;
   overflow: clip;
+  mask-image: linear-gradient(to bottom, transparent, #000 16%);
+  pointer-events: none;
 }
 
-.docs-example {
-  display: grid;
-  gap: var(--cirth-border-width);
-  background: var(--cirth-card-border-color);
-}
-
-.docs-example[hidden] {
-  display: none;
-}
-
-/* The panel's own heading names it without script; with the strip on, the
-   tab says it. */
-.docs-home-inner:has(> .docs-switch:not([hidden])) .docs-example-name {
-  display: none;
-}
-
-.docs-example-name {
-  margin: 0;
-  padding: var(--cirth-space-3);
-  background: var(--cirth-card-background-color);
-  color: var(--cirth-muted-color);
-  font-size: var(--cirth-meta-font-size);
-  font-weight: var(--cirth-font-weight-medium);
-}
-
-.docs-example:focus-visible {
-  outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
-  outline-offset: calc(var(--cirth-outline-width) * -1);
-}
-
-/* Source beside result. Intrinsic: side by side while both halves clear
-   22rem, stacked when they cannot. The result takes the larger share. */
-.docs-stage-split {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-  gap: var(--cirth-border-width);
-  background: var(--cirth-card-border-color);
-}
-
-@media (width >= 60rem) {
-  .docs-stage-split {
-    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-  }
-
-  .docs-theme-stage .docs-stage-split {
-    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1fr);
+/* Side by side, the demo is the right half: so is the field. */
+@media (width >= 80rem) {
+  .docs-aurora {
+    --docs-aurora-rest-warm-x: 78;
+    --docs-aurora-rest-warm-y: 38;
+    --docs-aurora-rest-cool-x: 56;
+    --docs-aurora-rest-cool-y: 76;
   }
 }
 
-.docs-stage-code {
-  display: grid;
-  align-content: center;
-  min-width: 0;
-  background: var(--cirth-code-background-color);
+.docs-aurora > span {
+  position: absolute;
+  inset-block-start: calc(var(--docs-y) * 1%);
+  inset-inline-start: calc(var(--docs-x) * 1%);
+  inline-size: 92vw;
+  block-size: 80vh;
+  background: radial-gradient(closest-side, var(--docs-glow), transparent 92%);
+  opacity: var(--docs-o);
+  translate: -50% -50%;
+  scale: var(--docs-s);
 }
 
-.docs-stage-code pre {
-  margin: 0;
-  border: 0;
-  border-radius: 0;
-  background: none;
-  font-size: 0.8125rem;
-  line-height: 1.65;
+.docs-aurora-warm {
+  --docs-x: var(--docs-aurora-warm-x, var(--docs-aurora-rest-warm-x));
+  --docs-y: var(--docs-aurora-warm-y, var(--docs-aurora-rest-warm-y));
+  --docs-s: var(--docs-aurora-warm-s, 1);
+  --docs-o: var(--docs-aurora-warm-o, 1);
+  --docs-glow: light-dark(
+    oklch(from var(--cirth-primary) 78% calc(c * 0.9) calc(h + var(--docs-aurora-warm-h, 0)) / 34%),
+    oklch(from var(--cirth-primary) 45% calc(c * 0.9) calc(h + var(--docs-aurora-warm-h, 0)) / 42%)
+  );
 }
 
-@media (width < 80rem) {
-  .docs-stage-code pre > code {
-    white-space: pre-wrap;
+.docs-aurora-cool {
+  --docs-x: var(--docs-aurora-cool-x, var(--docs-aurora-rest-cool-x));
+  --docs-y: var(--docs-aurora-cool-y, var(--docs-aurora-rest-cool-y));
+  --docs-s: var(--docs-aurora-cool-s, 1);
+  --docs-o: var(--docs-aurora-cool-o, 1);
+  --docs-glow: light-dark(
+    oklch(from var(--cirth-primary) 80% calc(c * 0.6) calc(h + var(--docs-aurora-cool-h, -100)) / 30%),
+    oklch(from var(--cirth-primary) 42% calc(c * 0.6) calc(h + var(--docs-aurora-cool-h, -100)) / 36%)
+  );
+}
+
+/* The gold is the one glow not drawn from the accent, so the band of
+   stacks gets its warm third whatever the preset; it rests hidden. */
+.docs-aurora-gold {
+  --docs-x: var(--docs-aurora-gold-x, 30);
+  --docs-y: var(--docs-aurora-gold-y, 20);
+  --docs-s: var(--docs-aurora-gold-s, 0.6);
+  --docs-o: var(--docs-aurora-gold-o, 0);
+  --docs-glow: light-dark(oklch(90% 0.07 72 / 46%), oklch(38% 0.07 55 / 34%));
+}
+
+/* The field's one timed moment, the hero's: it settles in once, on load,
+   where motion is welcome. */
+@media (prefers-reduced-motion: no-preference) {
+  .docs-aurora {
+    animation: docs-aurora-settle 1400ms var(--cirth-ease-out) both;
   }
 }
 
-/* The preview half is the canvas: what is in here is a component the
-   framework has already finished. */
-.docs-stage-preview {
-  display: grid;
-  align-content: center;
-  min-width: 0;
-  padding: clamp(1rem, 2.5vw, 2rem);
-  background: var(--cirth-background-color);
-}
-
-/* The one thing a container owes its contents: closing their outer
-   margins against its edges. */
-.docs-stage-preview > * > :first-child {
-  margin-block-start: 0;
-}
-
-.docs-stage-preview > * > :last-child {
-  margin-block-end: 0;
-}
-
-.docs-example-note {
-  margin: 0;
-  padding: var(--cirth-space-3);
-  background: var(--cirth-card-background-color);
-  color: var(--cirth-muted-color);
-  font-size: var(--cirth-meta-font-size);
-}
-
-.docs-themes .docs-example-note {
-  margin-block-start: var(--cirth-space-3);
-  padding: 0;
-  background: none;
+@keyframes docs-aurora-settle {
+  from {
+    opacity: 0;
+  }
 }
 
 
-/* 4. Frameworks
+/* 3. The story
    ––––––––––––––––––––
-   The recessed level, so the page changes ground here; the argument on
-   the left and the marks on the right from 64rem. */
-.docs-home > .docs-frameworks {
-  --cirth-surface: var(--cirth-surface-recessed);
-
-  border-block: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-  background: var(--cirth-surface-recessed);
-}
-
-@media (width >= 64rem) {
-  .docs-frameworks-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: clamp(2rem, 5vw, 4.5rem);
-    align-items: start;
-  }
-
-  .docs-frameworks .docs-section-head {
-    margin-block-end: 0;
-  }
-}
-
-
-.docs-frameworks-note {
-  margin-block: var(--cirth-space-6) 0;
-  color: var(--cirth-muted-color);
-  font-size: var(--cirth-meta-font-size);
-}
-
-
-/* 5. Themes
-   ––––––––––––––––––––
-   Two choices over the stage: which theme's declarations the preview
-   carries, and which scheme it is in. The preview gives its padding to the
-   element, which paints its own canvas, so the two grounds meet across the
-   stage's hairline. */
-.docs-theme-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--cirth-space-3) var(--cirth-space-6);
-  margin-block-end: var(--cirth-space-4);
-  font-size: var(--cirth-font-size-sm);
-}
-
-.docs-theme-controls[hidden] {
-  display: none;
-}
-
-.docs-theme-controls > .segmented {
-  --cirth-form-element-spacing-horizontal: var(--cirth-space-3);
-
-  margin: 0;
-}
-
-/* Four themes share one row on a 390px phone: the segment's inline
-   padding goes down to the smallest step, and the segments keep their
-   44px height. Narrower than that, the group wraps as the library lets it. */
-@media (width < 36rem) {
-  .docs-theme-controls > .segmented {
-    --cirth-form-element-spacing-horizontal: var(--cirth-space-1);
-  }
-}
-
-.docs-theme-stage .docs-stage-code {
-  align-content: start;
-}
-
-.docs-theme-stage .docs-stage-preview {
-  align-content: stretch;
-  padding: 0;
-  contain: layout paint;
-}
-
-cirth-theme-preview {
-  min-width: 0;
-}
-
-/* Before the element upgrades, and for a reader with no script: its
-   children are ordinary light-DOM markup, rendered by the page's own
-   Cirth, and they need the padding the pane gave away. */
-cirth-theme-preview:not(:defined) {
+   Three steps, each followed by its picture: on a phone, in a short window,
+   with no script and under reduced motion, text, picture, text, picture,
+   text, picture, all complete. Where a scene can be held in view (the
+   script says so on .docs-home, data-stage="held"), the section becomes a
+   long scroll and the scene stays in the window: the steps on the left,
+   one stage on the right in which the markup is typed, the browser's
+   rendering comes up in front of it, and Cirth's replaces that, each in
+   step with the scroll (custom properties written by the script). */
+.docs-story-grid {
   display: grid;
-  padding: clamp(1rem, 3vw, 2.5rem);
+  grid-template-columns: minmax(0, 1fr);
 }
 
-cirth-theme-preview:not(:defined) details.dropdown {
-  margin-block-end: 5.5rem;
+.docs-story-head {
+  max-inline-size: 44rem;
+  margin-block-end: clamp(2rem, 4vw, 3rem);
 }
 
-.docs-token {
-  display: inline;
+.docs-story-head h2,
+.docs-measured-head h2,
+.docs-theme-head h2,
+.docs-presets-head h2 {
+  --cirth-font-size: clamp(1.75rem, 1.35rem + 1.6vw, 2.5rem);
+
+  margin-block: 0 var(--cirth-flow-element);
+  text-wrap: balance;
 }
 
-
-/* 6. The close
-   –––––––––––––––––––– */
-.docs-cta {
-  text-align: center;
-}
-
-.docs-cta .docs-home-inner > p {
-  max-inline-size: 36rem;
-  margin-inline: auto;
+.docs-story-head > p,
+.docs-measured-head > p,
+.docs-theme-head > p,
+.docs-presets-head > p:not([class]) {
+  margin: 0;
   color: var(--cirth-secondary-text);
   font-size: var(--cirth-font-size-lg);
 }
 
-.docs-cta .docs-install {
+.docs-story-step {
+  margin: 0 0 var(--cirth-space-4);
+}
+
+.docs-story-step h3 {
+  display: flex;
+  align-items: baseline;
+  gap: var(--cirth-space-3);
+  margin: 0 0 var(--cirth-space-2);
+  font-size: var(--cirth-font-size-lg);
+}
+
+.docs-story-number {
+  color: var(--cirth-primary-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.docs-story-step p {
+  margin: 0;
+  color: var(--cirth-secondary-text);
+}
+
+.docs-story-part {
+  display: grid;
+  gap: var(--cirth-space-3);
+  min-inline-size: 0;
+  margin: 0 0 clamp(2.5rem, 6vw, 3.5rem);
+}
+
+.docs-story-part:last-child {
+  margin-block-end: 0;
+}
+
+.docs-story-part > figcaption {
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-meta-font-size);
+}
+
+/* The listing is the library's own code block. The typed copy over it is
+   for the held scene only. */
+.docs-story-source pre {
+  display: grid;
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.docs-story-source pre > code {
+  grid-area: 1 / 1;
+  white-space: pre-wrap;
+}
+
+.docs-story-typed {
+  display: none;
+}
+
+/* The browser's picture is a page of its own, so it has an edge. */
+.docs-story-ua {
+  display: grid;
+  overflow: clip;
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-card-border-radius);
+}
+
+/* Cirth's picture is the card itself, on this page's canvas: no frame. */
+.docs-story-result > article {
+  inline-size: min(100%, 26rem);
+  margin: 0;
+}
+
+@media (width >= 64rem) {
+  .docs-story-grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: clamp(2.5rem, 5vw, 4.5rem);
+    row-gap: clamp(2.5rem, 5vw, 4rem);
+    align-items: center;
+  }
+
+  .docs-story-head {
+    grid-column: 1 / -1;
+  }
+
+  .docs-story-step {
+    grid-column: 1;
+    margin: 0;
+  }
+
+  .docs-story-part {
+    grid-column: 2;
+    margin: 0;
+  }
+}
+
+/* The held scene. The section is the length of the story; the scene inside
+   it sticks under the header for all of it, as tall as the window below
+   the header, and never longer than the section, so it lets go before the
+   next section arrives. The steps stand in a column, the one being told in
+   full ink; the three pictures share the stage on the right: the listing at
+   the back, the two renderings in front of its lower half, as the hero lays
+   its card over its source. */
+.docs-home[data-stage="held"] > .docs-story {
+  block-size: 450svh;
+  padding-block: 0;
+}
+
+.docs-home[data-stage="held"] .docs-story-scene {
+  display: grid;
+  position: sticky;
+  inset-block-start: var(--docs-header, 4.5rem);
+  block-size: calc(100svh - var(--docs-header, 4.5rem));
+  align-content: center;
+}
+
+.docs-home[data-stage="held"] .docs-story-grid {
+  grid-template-rows: auto auto auto auto 1fr;
+  grid-template-areas:
+    "head head"
+    "one stage"
+    "two stage"
+    "three stage"
+    ". stage";
+  row-gap: var(--cirth-space-6);
+  align-items: start;
+}
+
+.docs-home[data-stage="held"] .docs-story-head {
+  grid-area: head;
+  margin: 0;
+}
+
+.docs-home[data-stage="held"] [data-docs-story-step="1"] { grid-area: one; }
+.docs-home[data-stage="held"] [data-docs-story-step="2"] { grid-area: two; }
+.docs-home[data-stage="held"] [data-docs-story-step="3"] { grid-area: three; }
+
+.docs-home[data-stage="held"] .docs-story-step {
+  color: var(--cirth-muted-color);
+  transition: color var(--cirth-transition);
+}
+
+.docs-home[data-stage="held"] .docs-story-step p {
+  color: inherit;
+}
+
+.docs-home[data-stage="held"] .docs-story:not([data-step]) [data-docs-story-step="1"],
+.docs-home[data-stage="held"] .docs-story[data-step="1"] [data-docs-story-step="1"],
+.docs-home[data-stage="held"] .docs-story[data-step="2"] [data-docs-story-step="2"],
+.docs-home[data-stage="held"] .docs-story[data-step="3"] [data-docs-story-step="3"] {
+  color: var(--cirth-ink);
+}
+
+.docs-home[data-stage="held"] .docs-story-part {
+  grid-area: stage;
+  align-self: start;
+}
+
+/* Once a rendering is in front, the listing steps back: still there, the
+   same markup, but no longer what is being read. */
+.docs-home[data-stage="held"] .docs-story-source {
+  justify-self: start;
+  inline-size: min(100%, 36rem);
+  opacity: calc(1 - var(--docs-front, 0) * 0.6);
+  scale: calc(1 - var(--docs-front, 0) * 0.04);
+  transform-origin: 0 0;
+}
+
+/* The listing on screen is the typed copy; the listing in the document is
+   whole and unchanged, there for a screen reader and the copy button, and
+   simply not painted. */
+.docs-home[data-stage="held"] .docs-story-source [data-docs-story-code],
+.docs-home[data-stage="held"] .docs-story-source [data-docs-story-code] * {
+  color: transparent;
+}
+
+.docs-home[data-stage="held"] .docs-story-typed {
+  display: block;
+}
+
+/* Where the typing has got to. Drawn only while it is typing. */
+.docs-home[data-stage="held"] .docs-story-typed::after {
+  content: "";
+  display: inline-block;
+  inline-size: 0.55em;
+  block-size: 1.15em;
+  background: var(--cirth-primary-text);
+  vertical-align: text-bottom;
+  opacity: var(--docs-typing, 0);
+}
+
+.docs-home[data-stage="held"] .docs-story-browser,
+.docs-home[data-stage="held"] .docs-story-cirth {
+  justify-self: end;
+  inline-size: min(100%, 25rem);
+  margin-block-start: clamp(7rem, 22svh, 12rem);
+}
+
+.docs-home[data-stage="held"] .docs-story-browser {
+  opacity: var(--docs-browser, 0);
+  translate: 0 calc((1 - var(--docs-browser, 0)) * 1.5rem);
+}
+
+.docs-home[data-stage="held"] .docs-story-browser .docs-story-ua,
+.docs-home[data-stage="held"] .docs-story-result > article {
+  box-shadow: var(--cirth-box-shadow);
+}
+
+.docs-home[data-stage="held"] .docs-story-cirth {
+  opacity: var(--docs-cirth, 0);
+  translate: 0 calc((1 - var(--docs-cirth, 0)) * 1.5rem);
+}
+
+/* The live card can be reached by the keyboard wherever the story is; a
+   control that has the focus is never left invisible. */
+.docs-home[data-stage="held"] .docs-story-cirth:focus-within {
+  opacity: 1;
+  translate: none;
+}
+
+.docs-home[data-stage="held"] .docs-story-result > article {
+  inline-size: 100%;
+}
+
+
+/* 4. Measured
+   ––––––––––––––––––––
+   Three figures in a column, each a large number with what it counts and
+   what it was counted on, and a small picture of the count: the ticket's
+   elements, the package's files, the builds' sizes. Held in view, the
+   figures come up one after another as the reader scrolls, the one being
+   read in full ink, and each picture composes with it (--docs-fact, 0 to
+   1, from the script). */
+.docs-measured-grid {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3rem);
+}
+
+.docs-measured-head {
   max-inline-size: 30rem;
-  margin-inline: auto;
-  text-align: start;
 }
 
-.docs-cta .docs-install > .segmented {
-  justify-content: center;
+.docs-measured-list {
+  display: grid;
+  gap: clamp(2rem, 5vw, 3.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.docs-cta .docs-hero-actions {
-  justify-content: center;
+.docs-measured-fact {
+  display: grid;
+  gap: var(--cirth-space-3) clamp(1.5rem, 4vw, 3rem);
+  margin: 0;
+  list-style: none;
+}
+
+@media (width >= 48rem) {
+  .docs-measured-fact {
+    grid-template-columns: minmax(0, 17rem) minmax(0, 1fr);
+    align-items: baseline;
+  }
+}
+
+.docs-measured-figure {
+  display: grid;
+  margin: 0;
+  line-height: var(--cirth-line-height-tight);
+}
+
+.docs-measured-figure strong {
+  color: var(--cirth-ink-strong);
+  font-size: clamp(3rem, 2rem + 3.4vw, 4.5rem);
+  white-space: nowrap;
+  font-weight: var(--cirth-display-font-weight);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.docs-measured-figure span {
+  color: var(--cirth-secondary-text);
+  font-size: var(--cirth-font-size-lg);
+}
+
+.docs-measured-text > p {
+  margin: 0;
+  color: var(--cirth-secondary-text);
+  font-size: var(--cirth-font-size-lg);
+}
+
+.docs-measured-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cirth-space-2);
+  margin: var(--cirth-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-measured-tags > li {
+  margin: 0;
+  list-style: none;
+}
+
+.docs-measured-builds {
+  display: grid;
+  gap: var(--cirth-space-2);
+  margin: var(--cirth-space-4) 0 0;
+}
+
+/* Each build's size as a bar against the largest, the number at its end. */
+.docs-measured-builds > div {
+  display: grid;
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--cirth-space-3);
+}
+
+.docs-measured-builds dt {
+  color: var(--cirth-secondary-text);
+  font-size: var(--cirth-font-size-sm);
+  font-weight: var(--cirth-font-weight-regular);
+}
+
+.docs-measured-builds dd {
+  display: flex;
+  align-items: center;
+  gap: var(--cirth-space-3);
+  margin: 0;
+  font-size: var(--cirth-font-size-sm);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.docs-measured-builds dd::before {
+  content: "";
+  flex: none;
+  inline-size: calc(var(--docs-share) * var(--docs-fact, 1) * 60%);
+  block-size: 0.5rem;
+  border-radius: var(--cirth-radius-pill);
+  background: var(--cirth-primary);
+}
+
+@media (width >= 64rem) {
+  .docs-measured-grid {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    align-items: start;
+  }
+}
+
+.docs-home[data-stage="held"] > .docs-measured {
+  block-size: 240svh;
+  padding-block: 0;
+}
+
+.docs-home[data-stage="held"] .docs-measured-scene {
+  display: grid;
+  position: sticky;
+  inset-block-start: var(--docs-header, 4.5rem);
+  block-size: calc(100svh - var(--docs-header, 4.5rem));
+  align-content: center;
+}
+
+.docs-home[data-stage="held"] .docs-measured-fact {
+  opacity: calc(0.28 + var(--docs-fact, 0) * 0.72);
+}
+
+.docs-home[data-stage="held"] .docs-measured-tags > li {
+  opacity: clamp(0, var(--docs-fact, 0) * 20 - var(--docs-index), 1);
+}
+
+.docs-home[data-stage="held"] .docs-measured-builds > div {
+  opacity: clamp(0, var(--docs-fact, 0) * 6 - var(--docs-index), 1);
+}
+
+
+/* 5. Your theme
+   ––––––––––––––––––––
+   The declarations on the left from 64rem, the form on the right. Held in
+   view, the scroll moves the form through four states (the script turns
+   one state's stylesheet on inside the copy) and the listing shows each
+   declaration's value as it is, the one that has just changed marked. */
+.docs-theme-grid {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2rem);
+}
+
+.docs-theme-head {
+  max-inline-size: 36rem;
+}
+
+.docs-theme-steps {
+  display: grid;
+  gap: var(--cirth-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: docs-theme;
+}
+
+.docs-theme-steps > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--cirth-space-1) var(--cirth-space-3);
+  margin: 0;
+  color: var(--cirth-secondary-text);
+  list-style: none;
+  counter-increment: docs-theme;
+}
+
+.docs-theme-steps > li::before {
+  content: counter(docs-theme);
+  color: var(--cirth-primary-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.docs-theme-steps span {
+  font-weight: var(--cirth-font-weight-medium);
+}
+
+.docs-theme-code {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+}
+
+.docs-theme-code > code {
+  white-space: pre-wrap;
+}
+
+.docs-theme-line {
+  display: inline-block;
+  inline-size: 100%;
+}
+
+.docs-theme-line[data-changed] {
+  background: oklch(from var(--cirth-primary) l c h / 14%);
+  box-shadow: inset var(--cirth-border-width-2) 0 0 var(--cirth-primary-text);
+}
+
+.docs-theme-preview {
+  display: grid;
+  gap: var(--cirth-space-3);
+  min-inline-size: 0;
+  margin: 0;
+}
+
+.docs-theme-copy {
+  overflow: clip;
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-card-border-radius);
+}
+
+.docs-theme-preview > figcaption {
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-meta-font-size);
+}
+
+@media (width >= 64rem) {
+  .docs-theme-grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-areas:
+      "head preview"
+      "steps preview"
+      "code preview";
+    grid-template-rows: auto auto 1fr;
+    column-gap: clamp(2.5rem, 5vw, 4.5rem);
+    align-items: start;
+  }
+
+  .docs-theme-head { grid-area: head; }
+  .docs-theme-steps { grid-area: steps; }
+  .docs-theme-code { grid-area: code; }
+
+  .docs-theme-preview {
+    grid-area: preview;
+    align-self: center;
+  }
+}
+
+.docs-home[data-stage="held"] > .docs-theme {
+  block-size: 320svh;
+  padding-block: 0;
+}
+
+.docs-home[data-stage="held"] .docs-theme-scene {
+  display: grid;
+  position: sticky;
+  inset-block-start: var(--docs-header, 4.5rem);
+  block-size: calc(100svh - var(--docs-header, 4.5rem));
+  align-content: center;
+}
+
+.docs-home[data-stage="held"] .docs-theme-steps > li {
+  color: var(--cirth-muted-color);
+}
+
+.docs-home[data-stage="held"] .docs-theme-steps > li[data-done] {
+  color: var(--cirth-secondary-text);
+}
+
+.docs-home[data-stage="held"] .docs-theme-steps > li[data-current] {
+  color: var(--cirth-ink);
+}
+
+
+/* 6. Presets
+   ––––––––––––––––––––
+   The list and the import line on the left from 64rem, the comparator on
+   the right: one frame with the two copies in one cell, the dark one
+   clipped to the right of the divider. */
+.docs-presets-grid {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+}
+
+@media (width >= 64rem) {
+  .docs-presets-grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: center;
+  }
+}
+
+.docs-presets-head {
+  max-inline-size: 36rem;
+}
+
+.docs-presets-pick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cirth-space-2) var(--cirth-space-3);
+  margin-block: clamp(1.25rem, 2.5vw, 2rem) 0;
+}
+
+.docs-presets-pick[hidden] {
+  display: none;
+}
+
+.docs-presets-pick label {
+  margin: 0;
+  font-weight: var(--cirth-font-weight-medium);
+}
+
+.docs-presets-pick select {
+  inline-size: auto;
+  min-inline-size: 12rem;
+  margin: 0;
+}
+
+.docs-presets-import {
+  display: grid;
+  margin-block: var(--cirth-space-4) 0;
+  overflow-wrap: anywhere;
+}
+
+.docs-presets-import > code {
+  grid-area: 1 / 1;
+  justify-self: start;
+}
+
+.docs-presets-import > code:not([data-current]) {
+  visibility: hidden;
+}
+
+@property --docs-split {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 50%;
+}
+
+/* As tall as the tallest preset makes the form (Metro's flow is the
+   longest: 377px at 320px wide, in all three engines), so picking another
+   preset never moves the caption or anything after it. */
+.docs-compare-frame {
+  display: grid;
+  position: relative;
+  min-block-size: 24.5rem;
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-card-border-radius);
+  overflow: clip;
+  touch-action: pan-y;
+}
+
+.docs-compare-layer {
+  grid-area: 1 / 1;
+  min-inline-size: 0;
+}
+
+/* The dark copy, cut along the divider. */
+.docs-compare-dark {
+  clip-path: inset(0 0 0 var(--docs-split));
+}
+
+.docs-compare-divider {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: var(--docs-split);
+  border-inline-start: var(--cirth-border-width-2) solid var(--cirth-primary-text);
+  translate: calc(var(--cirth-border-width-2) / -2) 0;
+  pointer-events: none;
+}
+
+.docs-compare-handle {
+  display: grid;
+  position: absolute;
+  inset-block-start: 50%;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border: var(--cirth-border-width-2) solid var(--cirth-primary-text);
+  border-radius: var(--cirth-radius-pill);
+  background: var(--cirth-card-background-color);
+  box-shadow: var(--cirth-box-shadow);
+  translate: -50% -50%;
+}
+
+/* Two arrows, pointing both ways: the handle moves sideways. */
+.docs-compare-handle::before {
+  content: "";
+  inline-size: 1.125rem;
+  block-size: 0.75rem;
+  background: var(--cirth-primary-text);
+  clip-path: polygon(0 50%, 35% 0, 35% 100%, 0 50%, 100% 50%, 65% 0, 65% 100%, 100% 50%);
+}
+
+/* The range is the whole frame: a press anywhere moves the divider there,
+   a drag carries it, and the keys step it. It is transparent; its focus
+   ring is drawn on the handle, where the reader is looking. */
+.docs-compare-range {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  opacity: 0;
+  cursor: ew-resize;
+  touch-action: pan-y;
+}
+
+.docs-compare-range[hidden] {
+  display: none;
+}
+
+.docs-compare-frame:has(.docs-compare-range:focus-visible) .docs-compare-handle {
+  outline: var(--cirth-outline-width) solid var(--cirth-primary-text);
+  outline-offset: var(--cirth-border-width-2);
+}
+
+.docs-compare > figcaption {
+  margin-block-start: var(--cirth-space-3);
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-meta-font-size);
+}
+
+
+/* 7. Framework agnostic
+   ––––––––––––––––––––
+   On the page's shared field, the marks orbit Cirth's own in two rings, the
+   inner ring larger, and the copy beside them from 64rem. The rings are
+   drawn behind everything in the orbit and take no pointer; each mark sits
+   on a soft disc of the canvas, so no ring line runs through a logo or its
+   link, whatever the logo's transparency or how light it is. */
+.docs-agnostic-grid {
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 4.5rem);
+  align-items: center;
+}
+
+@media (width >= 64rem) {
+  .docs-agnostic-grid {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  }
+}
+
+@property --docs-orbit {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
+/* A square, measured in its own width, so the rings scale with it. A
+   place is an angle round the centre and a ring's radius; each mark is
+   turned to its place and turned back, so it always stands upright. */
+.docs-agnostic-field {
+  display: grid;
+  position: relative;
+  container-type: inline-size;
+  inline-size: min(100%, 36rem);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  isolation: isolate;
+}
+
+.docs-agnostic-field::before,
+.docs-agnostic-field::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 50% auto auto 50%;
+  inline-size: 44cqi;
+  aspect-ratio: 1;
+  border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+  border-radius: 50%;
+  translate: -50% -50%;
+  pointer-events: none;
+}
+
+.docs-agnostic-field::after {
+  inline-size: 80cqi;
+}
+
+.docs-agnostic-orbit {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-agnostic-core {
+  display: grid;
+  position: relative;
+  z-index: 2;
+  place-self: center;
+  pointer-events: none;
+}
+
+.docs-agnostic-core .docs-logo {
+  width: clamp(2.5rem, 12cqi, 4rem);
+}
+
+.docs-agnostic-orbit > li {
+  --docs-ring: 40cqi;
+  --docs-turn: calc(var(--at) + var(--docs-orbit) * -0.6);
+
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  margin: 0;
+  list-style: none;
+  transform:
+    rotate(var(--docs-turn))
+    translateX(var(--docs-ring))
+    rotate(calc(var(--docs-turn) * -1))
+    translate(-50%, -50%);
+}
+
+.docs-agnostic-orbit > li.docs-agnostic-inner {
+  --docs-ring: 22cqi;
+  --docs-turn: calc(var(--at) + var(--docs-orbit));
+}
+
+/* The link is the mark and a margin round it, so the target is larger
+   than the drawing, on a disc of the canvas that fades out at its edge. */
+.docs-agnostic-mark {
+  display: grid;
+  place-items: center;
+  padding: var(--cirth-space-3);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--cirth-background-color) 72%, transparent);
+  text-decoration: none;
+}
+
+.docs-agnostic-mark .docs-mark-image {
+  block-size: clamp(1.25rem, 5cqi, 1.875rem);
+  max-inline-size: 22cqi;
+  object-fit: contain;
+}
+
+.docs-agnostic-inner .docs-agnostic-mark .docs-mark-image {
+  block-size: clamp(1.75rem, 7cqi, 2.5rem);
+}
+
+.docs-agnostic-mark .docs-mark-wide {
+  block-size: clamp(1rem, 4.2cqi, 1.5rem);
+}
+
+.docs-agnostic-inner .docs-agnostic-mark .docs-mark-wide {
+  block-size: clamp(1.25rem, 5.2cqi, 1.875rem);
+}
+
+.docs-agnostic-copy h2 {
+  --cirth-font-size: clamp(1.75rem, 1.35rem + 1.6vw, 2.5rem);
+
+  margin-block: 0 var(--cirth-flow-element);
+  text-wrap: balance;
+}
+
+.docs-agnostic-copy > p {
+  color: var(--cirth-secondary-text);
+  font-size: var(--cirth-font-size-lg);
+}
+
+.docs-agnostic-actions {
+  margin-block: clamp(1.5rem, 3vw, 2rem) 0;
+}
+
+
+/* 8. The close
+   ––––––––––––––––––––
+   One heading, one sentence, two actions. */
+.docs-home > .docs-pure .docs-section-head {
+  margin-block-end: 0;
+}
+
+.docs-pure .docs-hero-actions {
+  margin-block-start: clamp(1.5rem, 3vw, 2rem);
 }
 
 
 @media (forced-colors: active) {
-  /* The selected tab's underline is a background, which forced colors
-     takes away; the system's own highlight pair carries the state. */
-  .docs-switch button[aria-selected="true"] {
-    background: Highlight;
-    color: HighlightText;
+  /* The field is decoration painted with colour, which forced colors
+     replaces; it goes, rather than turning into blocks. A mark's disc is
+     the system canvas. */
+  .docs-aurora {
+    display: none;
   }
 
-  .docs-count-bar {
+  .docs-agnostic-mark {
+    background: Canvas;
+  }
+
+  .docs-compare-divider,
+  .docs-compare-handle {
+    border-color: CanvasText;
+  }
+
+  .docs-compare-handle::before {
     background: CanvasText;
   }
 
-  .docs-hero-demo::before {
+  .docs-compare-frame:has(.docs-compare-range:focus-visible) .docs-compare-handle {
+    outline-color: Highlight;
+  }
+
+  .docs-measured-builds dd::before {
+    background: CanvasText;
+  }
+
+  .docs-theme-line[data-changed] {
+    background: Highlight;
+    color: HighlightText;
+  }
+}
+
+/* A fixed layer would print on every sheet. */
+@media print {
+  .docs-aurora {
     display: none;
+  }
+}
+
+
+/* Arrivals
+   ––––––––––––––––––––
+   Where a scene is a column, its blocks come up as they cross the bottom
+   of the window, by how far in they are (--docs-arrive, 0 to 1, from the
+   script): tied to the scroll, so they reverse with it and never move on
+   their own. Opacity and a short translate only, so arriving never moves
+   the layout. Nothing applies under reduced motion, in print, or with no
+   script, where everything is simply there. */
+@media screen and (prefers-reduced-motion: no-preference) {
+  .docs-home[data-motion="scroll"]:not([data-stage="held"]) [data-reveal],
+  .docs-home[data-motion="scroll"][data-stage="held"] > :not(.docs-story, .docs-measured, .docs-theme) [data-reveal] {
+    opacity: var(--docs-arrive, 1);
+    translate: 0 calc((1 - var(--docs-arrive, 1)) * 0.75rem);
   }
 }

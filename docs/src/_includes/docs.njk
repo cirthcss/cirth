@@ -1,104 +1,159 @@
 ---
 layout: base.njk
 ---
+{% from "docs-nav.njk" import navTree, pageOutline %}
 {% set pageHeaders = content | headings %}
-{% set pageIndex = nav.flatPages | findPageIndex(page.url) %}
+{% set pageOutlineData = pageHeaders | outline %}
+{% set pager = nav.pager[page.url] %}
+{% set trail = nav.sidebar | breadcrumb(page.url) %}
 <main id="main-content" class="container docs-page-shell">
 	<div class="docs-mobile-tools">
 		<details class="docs-mobile-nav">
 			<summary>Documentation</summary>
 			<nav aria-label="Mobile documentation navigation">
-				{% for group in nav.sidebar %}
-					<section>
-						<strong>{{ group.text }}</strong>
-						<ul>
-							{% for item in group.items %}
-								<li><a href="{{ item.link }}"{% if page.url == (item.link | withSlash) %} aria-current="page"{% endif %}>{{ item.text }}</a></li>
-							{% endfor %}
-						</ul>
-					</section>
-				{% endfor %}
+				{{ navTree(nav.sidebar, page.url) }}
 			</nav>
 		</details>
 		{% if pageHeaders.length > 1 %}
 			<details class="docs-toc-top">
 				<summary>On this page</summary>
 				<nav aria-label="On this page">
-					<ul>
-						{% for header in pageHeaders %}
-							<li class="docs-toc-level-{{ header.depth }}">
-								<a href="#{{ header.slug }}">{{ header.text }}</a>
-							</li>
-						{% endfor %}
-					</ul>
+					{{ pageOutline(pageOutlineData) }}
 				</nav>
 			</details>
 		{% endif %}
 	</div>
 	<div class="docs-layout">
-		{#- An open index, not a set of accordions: every group is visible,
-		    named in the meta role, so the reader sees the whole structure
-		    of the documentation and where the current page sits in it. -#}
-		<aside class="docs-sidebar">
+		{#- Every group folds, and the one holding this page arrives open:
+		    the reader sees where they are and the names of everything
+		    else, rather than a column of every page in the reference. The
+		    rail is as tall as the window and scrolls inside itself, so it
+		    never runs past the end of the page into the footer. -#}
+		<aside class="docs-sidebar" data-docs-rail>
 			<nav aria-label="docs navigation">
-				{% for group in nav.sidebar %}
-					<section class="docs-sidebar-group" aria-labelledby="docs-sidebar-{{ loop.index }}">
-						<p class="docs-sidebar-label" id="docs-sidebar-{{ loop.index }}">{{ group.text }}</p>
-						<ul>
-							{% for item in group.items %}
-								<li>
-									<a href="{{ item.link }}"{% if page.url == (item.link | withSlash) %} aria-current="page"{% endif %}>{{ item.text }}</a>
-								</li>
-							{% endfor %}
-						</ul>
-					</section>
-				{% endfor %}
+				{{ navTree(nav.sidebar, page.url) }}
 			</nav>
 		</aside>
 		<div class="docs-content" data-docs-kind="{{ page.url | docsKind }}" data-pagefind-body>
+			{%- if trail.length %}
+			{#- A nested page says what it belongs to, above its title, from
+			    the same tree the sidebar draws. -#}
+			<nav class="docs-breadcrumb" aria-label="breadcrumb">
+				<ol>
+					{%- for crumb in trail %}
+					{%- if loop.last %}
+					<li aria-current="page">{{ crumb.text }}</li>
+					{%- else %}
+					<li><a href="{{ crumb.link | withSlash }}">{{ crumb.text }}</a></li>
+					{%- endif %}
+					{%- endfor %}
+				</ol>
+			</nav>
+			{%- endif %}
 			{{ (content | frameworkGuide(framework) if framework else content) | safe }}
-			{% if pageIndex > -1 %}
-				{% set prevPage = nav.flatPages[pageIndex - 1] if pageIndex > 0 %}
-				{% set nextPage = nav.flatPages[pageIndex + 1] if pageIndex < nav.flatPages.length - 1 %}
-				{% if prevPage or nextPage %}
-					<nav class="docs-prev-next" aria-label="Previous and next page">
-						<ul>
-							{% if prevPage %}
-								<li><a href="{{ prevPage.link }}" rel="prev"><small>← Previous{% if prevPage.group != nav.flatPages[pageIndex].group %} · {{ prevPage.group }}{% endif %}</small><strong>{{ prevPage.text }}</strong></a></li>
-							{% endif %}
-							{% if nextPage %}
-								<li><a href="{{ nextPage.link }}" rel="next"><small>Next{% if nextPage.group != nav.flatPages[pageIndex].group %} · {{ nextPage.group }}{% endif %} →</small><strong>{{ nextPage.text }}</strong></a></li>
-							{% endif %}
-						</ul>
-					</nav>
-				{% endif %}
+			{#- Previous and next in the reading order (nav.js), not in the
+			    sidebar's tree: a guide leads back to Installation and on to
+			    Customization, never to another guide. Each label names the
+			    group it leads into, read off the destination. -#}
+			{% if pager and (pager.prev or pager.next) %}
+				<nav class="docs-prev-next" aria-label="Previous and next page">
+					<ul>
+						{% if pager.prev %}
+							<li><a href="{{ pager.prev.link }}" rel="prev"><small>← Previous · {{ pager.prev.group }}</small><strong>{{ pager.prev.text }}</strong></a></li>
+						{% endif %}
+						{% if pager.next %}
+							<li><a href="{{ pager.next.link }}" rel="next"><small>Next · {{ pager.next.group }} →</small><strong>{{ pager.next.text }}</strong></a></li>
+						{% endif %}
+					</ul>
+				</nav>
 			{% endif %}
 		</div>
 		{% if pageHeaders.length > 1 %}
-			<aside class="docs-toc">
+			<aside class="docs-toc" data-docs-rail>
 				<nav aria-label="On this page" id="docs-toc-nav">
 					<strong>On this page</strong>
-					<ul>
-						{% for header in pageHeaders %}
-							<li class="docs-toc-level-{{ header.depth }}">
-								<a href="#{{ header.slug }}" data-toc-link data-slug="{{ header.slug }}">{{ header.text }}</a>
-							</li>
-						{% endfor %}
-					</ul>
+					{{ pageOutline(pageOutlineData, true) }}
 				</nav>
 			</aside>
 		{% endif %}
 	</div>
 </main>
 <script>
-	// Scroll-spy for the "On this page" aside: highlight whichever heading
-	// was most recently scrolled past. Purely additive: the TOC works
-	// (and its links navigate) without this script.
-	const links = Array.from(document.querySelectorAll("[data-toc-link]"));
-	if (links.length > 0) {
+	(() => {
+		// A rail scrolls inside itself, and on a long index the current entry
+		// can be out of its view. Scroll the rail, never the page: this runs
+		// on arrival, and moving the document would undo the reader's own
+		// scroll position or the fragment they followed.
+		/** @param {Element | null} element */
+		const reveal = (element) => {
+			const rail = element?.closest("[data-docs-rail]");
+			if (!(element instanceof HTMLElement) || !(rail instanceof HTMLElement)) return;
+			if (rail.scrollHeight <= rail.clientHeight) return;
+			const railBox = rail.getBoundingClientRect();
+			const box = element.getBoundingClientRect();
+			const margin = 48;
+			if (box.top < railBox.top + margin) {
+				rail.scrollTop += box.top - railBox.top - margin;
+			} else if (box.bottom > railBox.bottom - margin) {
+				rail.scrollTop += box.bottom - railBox.bottom + margin;
+			}
+		};
+
+		// The groups a reader opened stay open for the rest of the visit, so
+		// moving between pages of a group they expanded does not fold it
+		// back each time. What the page opened itself (its own group) is
+		// already in the markup; this only adds to it.
+		const key = "cirth-nav-open";
+		/** @type {Set<string>} */
+		let opened = new Set();
+		try {
+			opened = new Set(JSON.parse(sessionStorage.getItem(key) || "[]"));
+		} catch {}
+		const groups = document.querySelectorAll("details[data-docs-nav-group]");
+		for (const group of groups) {
+			if (!(group instanceof HTMLDetailsElement)) continue;
+			if (opened.has(group.dataset.docsNavGroup ?? "")) group.open = true;
+			// Only the reader's own toggles count. A disclosure the markup
+			// opens fires `toggle` too, and recording that would keep every
+			// group a page ever opened open on every later page. A summary
+			// operated by mouse or keyboard fires `click` first.
+			let byReader = false;
+			group.querySelector(":scope > summary")?.addEventListener("click", () => {
+				byReader = true;
+			});
+			group.addEventListener("toggle", () => {
+				if (!byReader) return;
+				byReader = false;
+				const name = group.dataset.docsNavGroup ?? "";
+				if (group.open) opened.add(name);
+				else opened.delete(name);
+				try {
+					sessionStorage.setItem(key, JSON.stringify([...opened]));
+				} catch {}
+			});
+		}
+		reveal(document.querySelector(".docs-sidebar [aria-current='page']"));
+
+		// Scroll-spy for the "On this page" rail: mark whichever heading was
+		// most recently scrolled past, open the section it belongs to on a
+		// long page, and keep the entry in the rail's view. Purely additive:
+		// the outline works, and its links navigate, without this script.
+		const links = Array.from(document.querySelectorAll("[data-toc-link]"));
+		if (links.length === 0) return;
 		const headings = Array.from(
 			document.querySelectorAll(".docs-content :is(h2, h3)[id]"),
 		);
+		/** @type {HTMLDetailsElement | null} */
+		let spyOpened = null;
+		let active = "";
+
+		// A section the reader opened or closed is theirs: the spy only ever
+		// folds back the one it opened itself.
+		for (const group of document.querySelectorAll("[data-toc-group]")) {
+			group.querySelector("summary")?.addEventListener("click", () => {
+				if (group === spyOpened) spyOpened = null;
+			});
+		}
 
 		const update = () => {
 			// 96px offset: the heading counts as "reached" slightly before it
@@ -109,19 +164,35 @@ layout: base.njk
 				else break;
 			}
 			const activeSlug = current || (headings[0] ? headings[0].id : "");
+			if (activeSlug === active) return;
+			active = activeSlug;
 			// aria-current only: the framework paints its one registered
 			// edge on the inline-start rail from it, and the stylesheet
 			// deliberately adds no second marker of its own.
+			/** @type {Element | null} */
+			let activeLink = null;
 			for (const link of links) {
 				if (link.dataset.slug === activeSlug) {
 					link.setAttribute("aria-current", "true");
+					activeLink = link;
 				} else {
 					link.removeAttribute("aria-current");
 				}
 			}
+			const branch = activeLink?.closest(".docs-toc-branch");
+			const group = branch?.querySelector(":scope > details[data-toc-group]");
+			if (group instanceof HTMLDetailsElement && group !== spyOpened) {
+				if (spyOpened) spyOpened.open = false;
+				spyOpened = group.open ? null : group;
+				group.open = true;
+			} else if (!group && spyOpened) {
+				spyOpened.open = false;
+				spyOpened = null;
+			}
+			reveal(activeLink);
 		};
 
 		window.addEventListener("scroll", update, { passive: true });
 		update();
-	}
+	})();
 </script>

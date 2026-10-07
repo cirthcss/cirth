@@ -74,12 +74,10 @@ export default function Page() {
 ## Choosing a build
 
 Import `@cirthcss/cirth/classless`, `@cirthcss/cirth/scoped` or
-`@cirthcss/cirth/classless/scoped` instead. See
-[Choose a build](/installation/#choose-a-build).
+`@cirthcss/cirth/classless/scoped` instead; every entry point is listed in
+[What the package contains](/compatibility#what-the-package-contains).
 
 ## Next
 
 [Customization](/customization) shows how to override `--cirth-*`
 properties from your own stylesheet.
-
-<p class="docs-verified">Checked with Next.js 16.3.6 (create-next-app, App Router, JavaScript) on 27 September 2026: production build and <code>next start</code>, then colours compared in Chromium against the untransformed stylesheet in the light scheme, the dark scheme and a forced-dark subtree.</p>

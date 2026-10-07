@@ -1,15 +1,14 @@
 ---
 layout: docs.njk
 framework: react
-description: Use Cirth in a React app built with Vite. Import it once where the app mounts; React renders the HTML Cirth styles.
+description: Use Cirth in a React app built with Vite. Import it where the app mounts and set build.cssTarget so Vite keeps its light-dark() colours.
 ---
 {% from "install.njk" import packageManagers %}
+{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
 # React
 
-Cirth has no React components and does not need any: the elements your
-components render are what it styles. This guide uses Vite's React template;
-for Next.js, see the [Next.js guide](/installation/nextjs).
+A React app built with Vite, as React's own documentation suggests for a new app, imports CSS from JavaScript. Cirth is one import where the app mounts. For Next.js, React Router and the other React frameworks, see their own guides.
 
 ## 1. Install
 
@@ -17,7 +16,7 @@ for Next.js, see the [Next.js guide](/installation/nextjs).
 
 ## 2. Import it
 
-Once, in the module that mounts the app, usually `src/main.jsx`:
+At the top of `src/main.jsx`, before the starter's `index.css`, or in its place:
 
 ```jsx
 import "@cirthcss/cirth";
@@ -32,59 +31,27 @@ createRoot(document.getElementById("root")).render(
 );
 ```
 
-Remove the template's own `index.css` import if you do not want its styles
-competing with Cirth's.
+JSX writes `className` for `class`; nothing else changes. A custom property
+set inline rethemes a subtree: {% raw %}`style={{ "--cirth-primary": "#2563eb" }}`{% endraw %}.
 
 ## 3. Set the CSS target
 
-Vite compiles CSS for older browsers than Cirth supports and rewrites its
-`light-dark()` colours, which stops a `data-theme` subtree from switching
-scheme. Add the target to `vite.config.js`:
+{{ whyTarget("Vite") }} in `vite.config.js`, beside the plugins already
+there:
 
 ```js
-import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 export default defineConfig({
   build: {
     cssTarget: ["chrome123", "edge123", "firefox130", "safari18.2"],
   },
-  plugins: [react()],
+  // the starter's plugins stay as they are
 });
 ```
 
-## 4. Write HTML
+## 4. Check it
 
-JSX is HTML with a few renamed attributes, and Cirth styles the result:
+{{ checkIt(true) }}
 
-```jsx
-export default function App() {
-  return (
-    <main className="container">
-      <article>
-        <header><h1>Hello, React</h1></header>
-        <label>
-          Email
-          <input type="email" required />
-        </label>
-        <footer><button type="submit">Subscribe</button></footer>
-      </article>
-    </main>
-  );
-}
-```
-
-## Choosing a build
-
-Import `@cirthcss/cirth/classless`, `@cirthcss/cirth/scoped` or
-`@cirthcss/cirth/classless/scoped` instead. The scoped build suits a React
-widget mounted inside a page you do not own: wrap its root in
-`className="cirth"`. See [Choose a build](/installation/#choose-a-build).
-
-## Next
-
-[Customization](/customization) covers the `--cirth-*` properties; a
-{% raw %}`style={{ "--cirth-primary": "#2563eb" }}`{% endraw %} on an element rethemes that
-subtree.
-
-<p class="docs-verified">Checked with React 19.3.0 and Vite 8.3.1 (create-vite 9.2.1, react template) on 27 September 2026: production build, then colours compared in Chromium against the untransformed stylesheet in the light scheme, the dark scheme and a forced-dark subtree.</p>
+{{ nextSteps("in a stylesheet imported after Cirth") }}

@@ -4,30 +4,38 @@ const siteTitle = "Cirth";
 const siteDescription =
 	"HTML-native CSS framework. Production-ready UI from semantic HTML: no class vocabulary to learn, 0 JavaScript.";
 
+// "Docs" opens the documentation where it begins, with why; "Get started"
+// (the home page, the footer) skips straight to installing it.
 const topNav = [
-	{ text: "Docs", link: "/installation" },
+	{ text: "Docs", link: "/why-cirth" },
 	{ text: "Examples", link: "/examples" },
 ];
 
-// The framework guides, from the one list in frameworks.js: the sidebar
-// group below, the Installation page, the home page and each guide's own
-// header all read it.
-const { guides } = require("./frameworks.js");
-const frameworks = guides.map(({ text, link, summary }) => ({ text, link, summary }));
+// The integration guides, from the one list in frameworks.js. They are
+// pages of Installation, not a section of their own: the sidebar nests them
+// under it, one disclosure per category, and each guide's breadcrumb names
+// Installation as its parent. They are not in the reading order (below).
+const { groups } = require("./frameworks.js");
+const frameworks = groups.map(({ id, text, guides }) => ({
+	text,
+	id,
+	items: guides.map(({ name, link }) => ({ text: name, link })),
+}));
 
 const sidebar = [
+	// Why to choose it, whether it fits the browsers and the project, how
+	// to install it. Customization, the next group, is how to make it yours.
 	{
-		text: "Introduction",
+		text: "Start",
 		items: [
 			{ text: "Why Cirth", link: "/why-cirth" },
-			{ text: "Installation", link: "/installation" },
 			{ text: "Compatibility", link: "/compatibility" },
-			{ text: "Upgrading", link: "/upgrading" },
+			{
+				text: "Installation",
+				link: "/installation",
+				items: frameworks,
+			},
 		],
-	},
-	{
-		text: "Frameworks",
-		items: frameworks.map(({ text, link }) => ({ text, link })),
 	},
 	{
 		text: "Customization",
@@ -113,6 +121,7 @@ const sidebar = [
 	{
 		text: "Project",
 		items: [
+			{ text: "Upgrading", link: "/upgrading" },
 			{ text: "About", link: "/about" },
 			{ text: "Contributions", link: "/contributions" },
 			{ text: "Brand", link: "/brand" },
@@ -162,6 +171,40 @@ const redirects = [
 		title: "Accessibility and user preferences",
 		anchors: {},
 	},
+	// The CDN guide repeated the Installation page's first section. The
+	// snippet lives there now, and the hashes for the other builds, the
+	// print sheet and a preset moved to Compatibility.
+	{
+		from: "/installation/cdn/",
+		to: "/installation/#cdn",
+		title: "Installation",
+		anchors: {
+			"1-link-it": "/installation/#cdn",
+			"2-write-html": "/installation/#cdn",
+			"choosing-a-build": "/compatibility/#every-build-from-the-cdn",
+			"print-and-presets": "/compatibility/#every-build-from-the-cdn",
+		},
+	},
+	// For a while the JavaScript guides were one page with a section each.
+	// Each tool has its own page again; a link to a section of the old page
+	// lands on that tool's page.
+	{
+		from: "/installation/javascript/",
+		to: "/installation/#guides",
+		title: "Installation",
+		anchors: {
+			vite: "/installation/vite/",
+			react: "/installation/react/",
+			vue: "/installation/vue/",
+			nuxt: "/installation/nuxt/",
+			sveltekit: "/installation/sveltekit/",
+			astro: "/installation/astro/",
+			"1-install": "/installation/vite/#1-install",
+			"2-import-it": "/installation/vite/#2-import-it",
+			"3-set-the-css-target": "/installation/vite/#3-set-the-css-target",
+			"4-write-html": "/installation/vite/",
+		},
+	},
 ];
 
 // Where a reader goes next, not a second index of the reference: the
@@ -202,6 +245,39 @@ const footer = {
 	copyright: "Copyright © 2025-present Riccardo Pastori",
 };
 
+// Page URLs end in "/" and the links above do not.
+/** @param {string} link */
+const withSlash = (link) => (link.endsWith("/") ? link : `${link}/`);
+
+// The order the documentation is read in, which is not the sidebar's tree:
+// every page a group lists, in the sidebar's order, and none of the pages
+// nested under one. A guide is read by whoever uses that stack and by no
+// one else, so a chain of 43 of them between Installation and Customization
+// would be a detour every reader had to walk.
+const readingOrder = sidebar.flatMap((group) =>
+	group.items.map(({ items, ...page }) => ({ ...page, group: group.text })),
+);
+
+// What the pager offers on each page, keyed by URL. A page in the reading
+// order leads to its neighbours there. A nested page (a guide) is a step
+// out of it: it goes back to the page it is nested under, and on to the
+// page that follows that one, so every guide returns to the same place and
+// none leads to another. A category inside Installation has no route and
+// is never a destination.
+/** @type {Record<string, { prev?: (typeof readingOrder)[number], next?: (typeof readingOrder)[number] }>} */
+const pager = {};
+readingOrder.forEach((page, index) => {
+	pager[withSlash(page.link)] = { prev: readingOrder[index - 1], next: readingOrder[index + 1] };
+});
+for (const item of sidebar.flatMap((group) => group.items)) {
+	if (!item.items) continue;
+	const { next } = pager[withSlash(item.link)];
+	const parent = readingOrder.find((page) => page.link === item.link);
+	for (const child of item.items.flatMap((entry) => entry.items ?? [entry])) {
+		pager[withSlash(child.link)] = { prev: parent, next };
+	}
+}
+
 module.exports = {
 	siteTitle,
 	siteDescription,
@@ -212,9 +288,6 @@ module.exports = {
 	footerLinks,
 	footer,
 	github: "https://github.com/cirthcss/cirth",
-	// Flat, ordered list of every doc page: drives prev/next footer links.
-	// Each entry carries its group so the pager can say where it leads.
-	flatPages: sidebar.flatMap((group) =>
-		group.items.map((item) => ({ ...item, group: group.text })),
-	),
+	readingOrder,
+	pager,
 };

@@ -1,14 +1,15 @@
 ---
 layout: docs.njk
 framework: vite
-description: Use Cirth in a Vite project. Install the package, import it from your entry module, and keep Vite's CSS target at Cirth's browser floor.
+description: Use Cirth in a Vite project. Import it once from the entry module and set build.cssTarget so Vite keeps its light-dark() colours.
 ---
 {% from "install.njk" import packageManagers %}
+{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
 # Vite
 
-Vite imports CSS from JavaScript, so Cirth is one import in your entry module
-and one line of configuration.
+Vite imports CSS like any module, so Cirth is one import in the file that
+starts your app. The one thing to set is the browsers Vite compiles CSS for.
 
 ## 1. Install
 
@@ -16,30 +17,23 @@ and one line of configuration.
 
 ## 2. Import it
 
-At the top of your entry module, usually `src/main.js`, before any
-stylesheet of your own:
+At the top of your entry module, `src/main.js` in Vite's own starter, before
+any stylesheet of yours so your rules come after Cirth's:
 
 ```js
 import "@cirthcss/cirth";
+import "./style.css";
 ```
 
-If you prefer to keep CSS in CSS, the same specifier works at the top of a
-stylesheet you import instead:
-
-```css
-@import "@cirthcss/cirth";
-```
+The same specifier works from a stylesheet: `@import "@cirthcss/cirth";`.
+A plain HTML page with a module script is the same set-up; there is no
+separate guide for it.
 
 ## 3. Set the CSS target
 
-Vite compiles CSS for an older set of browsers than Cirth supports, and in
-doing so rewrites Cirth's `light-dark()` colours. The page still switches
-between light and dark, but an element with `data-theme` that forces the
-other scheme inside the page no longer changes colour. Tell Vite to compile
-for Cirth's browser floor:
+{{ whyTarget("Vite") }}
 
 ```js
-// vite.config.js
 import { defineConfig } from "vite";
 
 export default defineConfig({
@@ -49,30 +43,11 @@ export default defineConfig({
 });
 ```
 
-If the file already exists, add the `build` key beside what is there.
+Every Vite-based guide on this site sets the same four browsers: they are
+Cirth's floor, listed on [Compatibility](/compatibility).
 
-## 4. Write HTML
+## 4. Check it
 
-```html
-<main class="container">
-  <article>
-    <h1>Hello, Vite</h1>
-    <p>Styled by Cirth, with no classes on this card.</p>
-    <button type="button">Get started</button>
-  </article>
-</main>
-```
+{{ checkIt(true) }}
 
-## Choosing a build
-
-Import a different entry point to change build:
-`@cirthcss/cirth/classless`, `@cirthcss/cirth/scoped` or
-`@cirthcss/cirth/classless/scoped`. See
-[Choose a build](/installation/#choose-a-build).
-
-## Next
-
-Retheme with custom properties in any stylesheet imported after Cirth: see
-[Customization](/customization).
-
-<p class="docs-verified">Checked with Vite 8.3.1 (create-vite 9.2.1, vanilla template) on 27 September 2026: production build, then colours compared in Chromium against the untransformed stylesheet in the light scheme, the dark scheme and a forced-dark subtree.</p>
+{{ nextSteps("in a stylesheet imported after Cirth") }}

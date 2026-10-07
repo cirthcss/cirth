@@ -156,8 +156,6 @@ test("the home page's specimen cards all share one card contract", async ({
 }) => {
 	await page.goto(origin, { waitUntil: "networkidle" });
 
-	/** @type {Record<string, string>[]} */
-	const cards = [];
 	const properties = [
 		"borderTopWidth",
 		"borderTopLeftRadius",
@@ -166,26 +164,17 @@ test("the home page's specimen cards all share one card contract", async ({
 		"padding",
 	];
 
-	// One example shows at a time, so each one is opened to be measured:
-	// a card in a panel nobody looked at is exactly where a shell
-	// treatment would go unnoticed.
-	for (const id of ["article", "details", "form"]) {
-		await page.locator(`[data-docs-tab="${id}"]`).click();
-		await expect(page.locator(`[data-docs-panel="${id}"]`)).toBeVisible();
-		cards.push(
-			await styleOf(
-				page.locator(`[data-docs-panel="${id}"] .docs-stage-preview article`),
-				properties,
-			),
-		);
-	}
-	// The theme preview's card is painted by its own copy of Cirth in a
-	// shadow root, with the theme the reader picked, so it is not the
-	// page's card and is not compared here.
-
-	const [first, ...rest] = cards;
-	expect(cards.length).toBeGreaterThan(1);
-	for (const card of rest) expect(card).toEqual(first);
+	// The specimens are fragments now (a field, a disclosure group, a
+	// table), so the hero's card is compared with a plain <article> the
+	// page's own Cirth renders beside it: the contract is the library's,
+	// not anything a section of the shell adds.
+	await page.evaluate(() => {
+		const article = document.createElement("article");
+		article.id = "probe-card";
+		article.innerHTML = "<p>Probe</p>";
+		document.querySelector("main")?.append(article);
+	});
+	const first = await styleOf(page.locator("#probe-card"), properties);
 
 	// The hero's card is the same element under the same stylesheet, with
 	// one thing the shell adds on purpose: it is laid over the source, so
@@ -345,10 +334,10 @@ test("the sidebar group headers share the inline gutter of their entries", async
 }) => {
 	await page.goto(`${origin}/about/`, { waitUntil: "networkidle" });
 
-	// The groups are an open index now: each is named by a label rather
-	// than a disclosure summary, and the label keeps the same gutter.
+	// The groups fold: each is named by its disclosure summary, and the
+	// summary keeps the same gutter as the entries it holds.
 	const summary = await styleOf(
-		page.locator(".docs-sidebar .docs-sidebar-label").first(),
+		page.locator(".docs-sidebar .docs-nav-group > summary").first(),
 		["paddingInlineStart"],
 	);
 	const link = await styleOf(page.locator(".docs-sidebar nav li a").first(), [

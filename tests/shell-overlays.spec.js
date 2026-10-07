@@ -107,9 +107,16 @@ test("the hero preview is a picture, not four tab stops", async ({ page }) => {
 	// operable: without `inert`, Tab would walk the reader through an email
 	// field, a password field, a checkbox and a Sign in button that belong
 	// to a picture, and a screen reader would announce a working sign-in
-	// form on the Cirth home page. The same holds for the theme preview,
-	// a themed interface shown, not offered.
-	for (const selector of [".docs-hero-render", "cirth-theme-preview"]) {
+	// form on the Cirth home page. The same holds for the browser's own
+	// rendering in the story, both copies in the presets comparator and the
+	// theme's copy: interfaces shown, not offered.
+	for (const selector of [
+		".docs-hero-render",
+		".docs-story-ua",
+		".docs-compare-light",
+		".docs-compare-dark",
+		".docs-theme-copy",
+	]) {
 		await expect(page.locator(selector)).toHaveAttribute("inert", "");
 	}
 	const fields = await page.locator(".docs-hero-render").evaluate(

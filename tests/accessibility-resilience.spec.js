@@ -342,14 +342,20 @@ for (const theme of themeVariants) {
 				expect(focus.width).toBeGreaterThan(0);
 
 				await openPage(page, "index.html", theme);
+				// Where motion is welcome the story shows one picture at a
+				// time; the live ticket is reachable whatever is shown.
+				await page.locator(".docs-story-result").evaluate((element) => element.scrollIntoView({ block: "center" }));
 				for (const target of [
-					// The tab that chooses an example, a disclosure trigger and
-					// a framework link: the shapes of focusable the home page
-					// has outside the shell chrome. The theme preview is inert,
-					// a picture of an interface, so it has none.
-					page.locator("[data-docs-tab]").first(),
-					page.locator(".docs-count-source summary").first(),
-					page.locator(".docs-logo-list a").first(),
+					// The live disclosure and button in the story, the presets
+					// list and a project's mark in the framework band: the
+					// shapes of focusable the home page has outside the shell
+					// chrome. The comparator's and the theme's copies are inert
+					// pictures; the range is checked below, on the handle that
+					// draws its ring.
+					page.locator(".docs-story-result summary"),
+					page.locator(".docs-story-result button"),
+					page.locator("[data-docs-compare-preset]"),
+					page.locator(".docs-agnostic-orbit a").first(),
 				]) {
 					await page.keyboard.press("Tab");
 					await target.focus();
@@ -369,34 +375,51 @@ for (const theme of themeVariants) {
 					expect(targetFocus.width).toBeGreaterThan(0);
 				}
 
-				// The showcase strip says which example is showing with a
-				// background, and a background is the first thing forced
-				// colors takes away: both states came out Canvas, and the
-				// only cue left was `aria-selected`, which a sighted reader
-				// does not get. Every button's transparent border is forced
-				// to CanvasText as well, so the border cannot carry it
-				// either: the selected tab has to differ in a system colour.
-				const strip = await page
-					.locator("[data-docs-tab]")
-					.evaluateAll((tabs) =>
-						tabs.map((tab) => {
-							const style = getComputedStyle(tab);
+				// The comparator's range is transparent; its ring is the
+				// handle's, in a system colour.
+				const range = page.locator("[data-docs-compare-range]");
+				await range.scrollIntoViewIfNeeded();
+				await page.keyboard.press("Tab");
+				await range.focus();
+				expect(await range.evaluate((element) => element.matches(":focus-visible"))).toBe(true);
+				const handle = await page.locator(".docs-compare-handle").evaluate((element) => ({
+					style: getComputedStyle(element).outlineStyle,
+					width: Number.parseFloat(getComputedStyle(element).outlineWidth),
+				}));
+				expect(handle.style).not.toBe("none");
+				expect(handle.width).toBeGreaterThan(0);
+
+				// The chosen package manager is told by the radio's dot, a
+				// shape, and by its label's edge in the system's highlight:
+				// forced colors takes the accent tint away, so colour alone
+				// could not carry it, and neither could a background.
+				await openPage(page, "installation/index.html", theme);
+				const options = await page
+					.locator("[data-docs-install] fieldset")
+					.first()
+					.locator("label")
+					.evaluateAll((labels) =>
+						labels.map((label) => {
+							const input = /** @type {HTMLInputElement} */ (label.querySelector("input"));
 							return {
-								selected: tab.getAttribute("aria-selected") === "true",
-								paint: `${style.backgroundColor}|${style.color}`,
+								checked: input.checked,
+								edge: getComputedStyle(label).borderTopColor,
+								dot: getComputedStyle(input, "::before").scale,
 							};
 						}),
 					);
-				const chosen = strip.filter((tab) => tab.selected);
-				const rest = strip.filter((tab) => !tab.selected);
-				expect(chosen, "one tab is selected").toHaveLength(1);
+				const chosen = options.filter((option) => option.checked);
+				const rest = options.filter((option) => !option.checked);
+				expect(chosen, "one package manager is chosen").toHaveLength(1);
 				expect(rest.length).toBeGreaterThan(0);
-				for (const tab of rest) {
+				for (const option of rest) {
 					expect(
-						tab.paint,
-						`${theme}: the selected tab is distinguishable in forced colors`,
-					).not.toBe(chosen[0].paint);
+						option.edge,
+						`${theme}: the chosen option's edge differs in forced colors`,
+					).not.toBe(chosen[0].edge);
+					expect(option.dot).toBe("0");
 				}
+				expect(chosen[0].dot).toBe("1");
 
 				await page.goto(`${origin}/specimen/default/`);
 				const markColors = await page.locator("mark").first().evaluate((element) => {

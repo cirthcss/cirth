@@ -16,7 +16,8 @@ linked like any stylesheet. Nothing transforms it on the way.
 
 ## 2. Copy it through
 
-In `eleventy.config.js`:
+In `eleventy.config.js`, written as an ES module, which Eleventy's own
+Get Started sets up with `npm pkg set type="module"`:
 
 ```js
 export default function (eleventyConfig) {
@@ -26,8 +27,11 @@ export default function (eleventyConfig) {
 }
 ```
 
+In a CommonJS project, the same function is `module.exports = function
+(eleventyConfig) { … }`.
+
 If you would rather not install anything, link the
-[CDN build](/installation/cdn) instead and skip this step.
+[CDN link](/installation/#cdn) instead and skip this step.
 
 ## 3. Link it
 
@@ -58,11 +62,10 @@ lists, tables, code blocks and blockquotes need no classes.
 ## Choosing a build
 
 Copy `cirth.classless.min.css` for a site with no classes at all, or one of
-the scoped builds. See [Choose a build](/installation/#choose-a-build).
+the scoped builds; every file is listed in
+[What the package contains](/compatibility#what-the-package-contains).
 
 ## Next
 
 [Customization](/customization) covers the `--cirth-*` properties; link your
 own stylesheet after Cirth's to override them.
-
-<p class="docs-verified">Checked with Eleventy 3.1.6 on 27 September 2026: build, then colours compared in Chromium against the untransformed stylesheet in the light scheme, the dark scheme and a forced-dark subtree. This documentation site is itself built with Eleventy and Cirth.</p>

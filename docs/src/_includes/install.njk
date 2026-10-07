@@ -1,19 +1,23 @@
-{#- Installation widgets, shared by the Installation page and the framework
-    guides.
+{#- Installation widgets, shared by the Installation page and the guides.
 
-    packageManagers(id, verb): one command per package manager, chosen with
-    Cirth's own segmented radio group. The choice is pure CSS
-    (`.docs-install:has(:checked)` in styles/style.css), so every command is
-    in the document and the right one shows with no script at all; without
-    `:has()` all four are simply listed. A small script in base.njk
-    remembers the choice and applies it to every group on the next page.
+    packageManagers(id, verb): one command per package manager, chosen
+    with a row of native radios under a legend. The choice is pure CSS
+    (`.docs-install:has(:checked)` in styles/style.css), so every command
+    is in the document and the right one shows with no script at all;
+    without `:has()` all four are simply listed. A small script in
+    base.njk remembers the choice and applies it to every group on the
+    next page.
+
+    Radios that look like radios: this is a choice of one of four, and the
+    control says so. A segmented bar would make it read as tabs, which
+    are a different widget with a different keyboard model.
 
     Everything is written on single lines on purpose: markdown-it ends an
     HTML block at the first blank line, and whitespace inside <pre> is
     content. -#}
 {%- macro packageManagers(id, args = "@cirthcss/cirth") -%}
 <div class="docs-install" data-docs-install>
-<fieldset class="segmented"><legend class="sr-only">Package manager</legend><label><input type="radio" name="pm-{{ id }}" value="npm" checked> npm</label><label><input type="radio" name="pm-{{ id }}" value="pnpm"> pnpm</label><label><input type="radio" name="pm-{{ id }}" value="yarn"> Yarn</label><label><input type="radio" name="pm-{{ id }}" value="bun"> Bun</label></fieldset>
+<fieldset class="docs-choice"><legend>Package manager</legend><label><input type="radio" name="pm-{{ id }}" value="npm" checked> npm</label><label><input type="radio" name="pm-{{ id }}" value="pnpm"> pnpm</label><label><input type="radio" name="pm-{{ id }}" value="yarn"> Yarn</label><label><input type="radio" name="pm-{{ id }}" value="bun"> Bun</label></fieldset>
 <pre tabindex="0" data-pm="npm"><code class="hljs language-sh">npm install {{ args }}</code></pre>
 <pre tabindex="0" data-pm="pnpm"><code class="hljs language-sh">pnpm add {{ args }}</code></pre>
 <pre tabindex="0" data-pm="yarn"><code class="hljs language-sh">yarn add {{ args }}</code></pre>
@@ -21,29 +25,37 @@
 </div>
 {%- endmacro -%}
 
-{#- Framework marks as links to their guides, from frameworks.entries (or
-    one guide's own marks). An open list, not a set of cards: the mark and
-    the name are the target, and the name is always printed, so the image
-    is decorative. A mark with a separate dark variant carries both, and
-    the site's own light/dark switch shows one (style.css, .docs-logo). -#}
-{%- macro logoMark(mark, height = 32) -%}
-<span class="docs-mark"><img class="docs-mark-image{% if mark.dark %} docs-logo docs-logo-light{% endif %}" src="/logos/frameworks/{{ mark.file }}" alt="" width="{{ (mark.aspect * height) | round }}" height="{{ height }}" decoding="async">{% if mark.dark %}<img class="docs-mark-image docs-logo docs-logo-dark" src="/logos/frameworks/{{ mark.dark }}" alt="" width="{{ (mark.aspect * height) | round }}" height="{{ height }}" decoding="async">{% endif %}</span>
+{#- A project's mark as a link to the project's own site, named as such
+    ("Django website"): the images inside are decorative, the link's name
+    says where it goes. A project whose logo is not shown here (its terms
+    keep it off, or it publishes none: `noMark`) gets no picture at all,
+    not even a stand-in: the same link, in the same place, is the site's
+    address as text ("symfony.com"), which is also its name, free to wrap
+    after each dot on a narrow tile. -#}
+{%- macro siteLink(guide, height = 28, className = "docs-guide-site") -%}
+{%- if guide.markData -%}
+<a class="{{ className }}" href="{{ guide.officialUrl }}" aria-label="{{ guide.name }} website"><span class="docs-mark">{{ guide.markData | markImages(height) | safe }}</span></a>
+{%- else -%}
+<a class="{{ className }}" href="{{ guide.officialUrl }}">{{ guide.officialUrl | siteName | replace(".", ".<wbr>") | safe }}</a>
+{%- endif -%}
 {%- endmacro -%}
 
-{%- macro logoList(entries, variant = "") -%}
-<ul class="docs-logo-list{% if variant %} docs-logo-list-{{ variant }}{% endif %}">
-{%- for entry in entries %}
-<li><a href="{{ entry.link }}">{{ logoMark(entry) }}<span class="docs-mark-name">{{ entry.name }}</span></a></li>
+{#- The guides as a grid of small tiles under a heading per category.
+    Each tile holds two links side by side, never one inside the other:
+    the mark, to the project's site, and the name, to the guide. No
+    script: every guide is in the document, in the order the sidebar
+    lists them. -#}
+{%- macro guideGrid(groups) -%}
+<div class="docs-guide-groups">
+{%- for group in groups %}
+<section aria-labelledby="guides-{{ group.id }}">
+<h3 id="guides-{{ group.id }}" class="docs-guide-group-title">{{ group.text }}</h3>
+<ul class="docs-guide-grid">
+{%- for guide in group.guides %}
+<li>{{ siteLink(guide) }}<a class="docs-guide-name" href="{{ guide.link }}">{{ guide.name }}<span class="docs-guide-arrow" aria-hidden="true">→</span></a></li>
 {%- endfor %}
 </ul>
-{%- endmacro -%}
-
-{#- The framework guides as rows: a mark, the guide's name and what the
-    guide does, for the Installation page. -#}
-{%- macro guideList(guides, marks) -%}
-<ul class="docs-guide-list">
-{%- for guide in guides %}
-<li><a href="{{ guide.link }}"><span class="docs-guide-marks">{% for id in guide.marks %}{{ logoMark(marks[id], 28) }}{% endfor %}</span><strong>{{ guide.text }}</strong><span>{{ guide.summary }}</span></a></li>
+</section>
 {%- endfor %}
-</ul>
+</div>
 {%- endmacro -%}

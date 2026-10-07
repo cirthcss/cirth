@@ -5,16 +5,22 @@ description: Supported browsers, what the package contains, how Cirth sits besid
 
 # Compatibility
 
-What to know before adopting Cirth: where it runs, what the package
-contains, how it sits beside the CSS you already have, and how the file gets
-to a browser.
+Cirth needs a current browser, and it shares the page with the CSS a
+project already has. In short:
 
-<dl class="grid docs-facts">
-<div><dt>Browsers</dt><dd>{{ browsers.sentence }}</dd></div>
-<div><dt>JavaScript</dt><dd>None shipped, none required</dd></div>
-<div><dt>Package</dt><dd>Compiled CSS, four builds, print sheets, presets, design tokens as JSON</dd></div>
-<div><dt>Default build</dt><dd>{{ proof.size.label if proof.size else "about 15 KB" }} gzipped, measured on this build</dd></div>
-</dl>
+- **Browsers:** {{ browsers.sentence }}.
+- **Modern CSS:** colours are written with `light-dark()` and relative
+  colour syntax, forms rely on `:user-invalid`, and every rule sits in a
+  cascade layer. Below the floor, those declarations are dropped.
+- **Your build:** many bundlers rewrite `light-dark()` for older browsers
+  by default, and a scheme forced on part of the page then stops working.
+  [Which tools do, and the one setting that stops it](#if-your-build-transpiles-css).
+- **Scoped builds:** `@cirthcss/cirth/scoped` styles only what is inside a
+  `.cirth` element, for a page or an app shell with styles of its own
+  ([every build](#what-the-package-contains)).
+- **Existing CSS and component libraries:** your own unlayered CSS beats
+  Cirth's at any specificity, and `.no-cirth` keeps Cirth's components off a
+  third-party widget ([beside your own CSS](#beside-your-own-css)).
 
 ## Browser support
 
@@ -42,14 +48,19 @@ one anyway, aimed at an older default set of browsers, and that pass rewrites
 - an element with `data-theme` that forces the **other** scheme inside the
   page, a dark sidebar on a light page for example, no longer changes colour.
 
-Measured on 27 September 2026, with each tool's own starter:
+Measured with each tool's own starter, between
+{{ frameworks.checkedBetween[0] | longDate }} and
+{{ frameworks.checkedBetween[1] | longDate }}; each guide has its versions.
 
 | Tool | Rewrites `light-dark()` by default | What to set |
 | --- | --- | --- |
-| Vite 8, and React, Vue and SvelteKit on it | Yes | `build.cssTarget` ([Vite](/installation/vite)) |
-| Nuxt 4 | Yes | `vite.build.cssTarget` ([Nuxt](/installation/vue)) |
-| Next.js 16 | Yes | `browserslist` in `package.json` ([Next.js](/installation/nextjs)) |
-| Astro 7, Angular 22, Eleventy 3 | No | Nothing |
+{% for guide in frameworks.pipelines.lowers -%}
+| <a href="{{ guide.link }}">{{ guide.name }}</a> | Yes | {{ guide.fix }} |
+{% endfor -%}
+| {% for guide in frameworks.pipelines.keeps %}<a href="{{ guide.link }}">{{ guide.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %} | No | Nothing |
+
+{% for guide in frameworks.pipelines.asIs %}<a href="{{ guide.link }}">{{ guide.name }}</a>{% if loop.revindex == 2 %} and {% elif not loop.last %}, {% endif %}{% endfor %}
+serve or copy the file as it is, so nothing rewrites it.
 
 In each case the fix is the same: tell the tool Cirth's browsers, so it has
 nothing to lower.
@@ -94,7 +105,7 @@ statement; [Cascade layers](/customization#cascade-layers) shows how.
 
 ### Inside an existing page
 
-The [scoped build](/installation/#scoped) styles only what is inside a
+The scoped build (`@cirthcss/cirth/scoped`) styles only what is inside a
 `.cirth` element, so it can be added to a page, a CMS or an application shell
 that already has its own styles. The page around the wrapper is left alone.
 
@@ -127,8 +138,7 @@ needs a real style boundary, mount it in a shadow root.
 
 Cirth styles elements, not components, so it does not matter what produced
 the DOM: a template, a server, or a client framework. The
-[framework guides](/installation/#framework-guides) show where the import goes
-in each. A component library that renders its own styled markup can live on
+[guides](/installation/#guides) show where the import goes in each. A component library that renders its own styled markup can live on
 the same page; give its root `.no-cirth` if the two disagree.
 
 ## Delivering the stylesheet
@@ -167,6 +177,65 @@ The CDN snippet carries a Subresource Integrity hash. The digest covers the
 decoded stylesheet, so compression does not affect it, but it is tied to the
 exact version in the URL: change the version and take that release's hash
 with it.
+
+### Every build from the CDN
+
+The [Installation](/installation/#cdn) snippet links the default build.
+Every other file is linked the same way, and each carries its own hash.
+
+Classless, for a page with no classes at all:
+
+```html
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.classless.min.css"
+  integrity="sha384-GZZdP20mqrkcypnIg17t08a5FoGdAKJ49eU1GBK8aXcaT+BwFnqIn5vK52i0gIQm"
+  crossorigin="anonymous">
+```
+
+Scoped, to style only what is inside a `.cirth` element:
+
+```html
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.scoped.min.css"
+  integrity="sha384-yFHmovn3OOvzinHeO2HC8iG31iDb+lzxgD4N1MlNchcoGDoFtCB07aY2FOyH/pPD"
+  crossorigin="anonymous">
+```
+
+Scoped classless:
+
+```html
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.classless.scoped.min.css"
+  integrity="sha384-pmLwIliHSNEo//m1i4cVpTDvwB8TWoXibgRIsG/pCjCS1CjZWI+xzd9xPL27iDal"
+  crossorigin="anonymous">
+```
+
+The print sheet goes after the build, with `media="print"`. This one pairs
+with the default build; each build has its own ([Print](/utilities/print)):
+
+```html
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.print.min.css"
+  integrity="sha384-YN/sJVAjTOf20mXWrLlQ2XLbgm3EzefQEiFukKfZstkH6fR92hz6dP7eQQTXQE6I"
+  crossorigin="anonymous"
+  media="print">
+```
+
+A preset goes after the build too ([Themes](/themes)):
+
+```html
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/presets/plain.min.css"
+  integrity="sha384-kcc0qmhEMFGjevUPPKQe8HsvALQEf5WLYgSB0GDaiwpnVkdOQ3FdmeCj7K8GgIA2"
+  crossorigin="anonymous">
+```
+
+Every hash here is checked against the pinned files by `npm run check:sri`.
 
 ### Compression
 

@@ -61,12 +61,10 @@ use the default emulated encapsulation for markup Cirth should style.
 ## Choosing a build
 
 Use `dist/cirth.classless.min.css`, `dist/cirth.scoped.min.css` or
-`dist/cirth.classless.scoped.min.css` in the array instead. See
-[Choose a build](/installation/#choose-a-build).
+`dist/cirth.classless.scoped.min.css` in the array instead; every file is
+listed in [What the package contains](/compatibility#what-the-package-contains).
 
 ## Next
 
 [Customization](/customization) covers the `--cirth-*` properties; set them
 in `src/styles.css`, after Cirth.
-
-<p class="docs-verified">Checked with Angular 22.2.0 (<code>ng new</code>, default options, CSS) on 27 September 2026: production build with each of the two set-ups above, then colours compared in Chromium against the untransformed stylesheet in the light scheme, the dark scheme and a forced-dark subtree. A bare package name in the <code>styles</code> array fails the build's schema validation.</p>

@@ -1,13 +1,16 @@
 ---
 layout: docs.njk
 framework: sveltekit
-description: Use Cirth in a SvelteKit app. Import it in the root layout and keep Vite's CSS target at Cirth's browser floor.
+description: Use Cirth in a SvelteKit app. Import it in the root layout and set Vite's CSS target so the build keeps its light-dark() colours.
 ---
 {% from "install.njk" import packageManagers %}
+{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
 # SvelteKit
 
-The root layout wraps every page, so it is where a global stylesheet goes.
+SvelteKit's root layout, `src/routes/+layout.svelte`, wraps every page, so a
+stylesheet imported there reaches the whole app. SvelteKit builds with Vite,
+which takes one line.
 
 ## 1. Install
 
@@ -17,7 +20,7 @@ The root layout wraps every page, so it is where a global stylesheet goes.
 
 In `src/routes/+layout.svelte`:
 
-```html
+```svelte
 <script>
   import "@cirthcss/cirth";
 
@@ -31,10 +34,7 @@ In `src/routes/+layout.svelte`:
 
 ## 3. Set the CSS target
 
-SvelteKit builds with Vite, whose default CSS target is older than Cirth's
-browsers and rewrites its `light-dark()` colours: a `data-theme` element that
-forces the other scheme inside the page stops changing colour. Add the target
-to `vite.config.js`, beside the `sveltekit()` plugin:
+{{ whyTarget("Vite") }} in `vite.config.js`, beside the `sveltekit()` plugin:
 
 ```js
 import { sveltekit } from "@sveltejs/kit/vite";
@@ -48,29 +48,8 @@ export default defineConfig({
 });
 ```
 
-## 4. Write HTML
+## 4. Check it
 
-In any page, for example `src/routes/+page.svelte`:
+{{ checkIt(true) }}
 
-```html
-<article>
-  <header><h1>Hello, SvelteKit</h1></header>
-  <label>
-    <input type="checkbox" role="switch" checked>
-    Email notifications
-  </label>
-</article>
-```
-
-## Choosing a build
-
-Import `@cirthcss/cirth/classless`, `@cirthcss/cirth/scoped` or
-`@cirthcss/cirth/classless/scoped` instead. See
-[Choose a build](/installation/#choose-a-build).
-
-## Next
-
-[Customization](/customization) covers the `--cirth-*` properties you can
-override from any stylesheet.
-
-<p class="docs-verified">Checked with SvelteKit 2.70.3 on Vite 8.3.1 (<code>sv create</code>, minimal template) on 27 September 2026: production build and <code>vite preview</code>, then colours compared in Chromium against the untransformed stylesheet in the light scheme, the dark scheme and a forced-dark subtree.</p>
+{{ nextSteps("in a stylesheet the layout imports after Cirth") }}

@@ -521,7 +521,7 @@ they change which selectors exist at all:
 
 If you need different values for these you are choosing a different
 published build, not overriding a variable. See
-[Choose a build](/installation/#choose-a-build).
+[What the package contains](/compatibility#what-the-package-contains).
 
 ## Tokens outside CSS
 

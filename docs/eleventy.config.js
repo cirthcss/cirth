@@ -11,6 +11,7 @@ const { brotliSize, gzipSize } = require("../scripts/lib/compressed-size");
 const { listPresetNames, presetLabel } = require("../scripts/lib/presets");
 const { docsPathPrefix } = require("../scripts/lib/docs-site");
 const { measuredTheme } = require("../scripts/lib/measured-theme");
+const { documentedVersion } = require("../scripts/lib/documented-version");
 const frameworks = require("./src/_data/frameworks.js");
 
 // Eleventy replacement for the previous Astro setup. Same site shape:
@@ -198,6 +199,26 @@ const themePreview = () => {
 		),
 	}));
 
+	// The home page's comparator: one copy of Cirth in its light scheme
+	// beside the same copy in its dark one, under the theme the reader picks.
+	// Each state's three declarations are listed as an author writes them,
+	// on :root, with the line the preset page uses to say what it is for.
+	const summaries = {
+		default: "Cirth as it ships, with nothing loaded after it.",
+		plain: "A conventional application look, with no decisions to make.",
+		material: "An interface that reads as Material Design 3.",
+		metro: "An interface in the manner of Windows Phone and Windows 8.",
+	};
+	for (const state of rendered) {
+		state.short = state.name === "default" ? "Default" : presetLabel(state.name);
+		state.title = state.name === "default" ? "Default theme" : `${state.short} preset`;
+		state.summary = summaries[state.name] ?? "";
+		state.listing = hljs.highlight(
+			`:root {\n${tokens.map((prop) => `  ${prop}: ${reflow(state.lines[prop].value)};`).join("\n")}\n}`,
+			{ language: "css" },
+		).value;
+	}
+
 	return {
 		selector,
 		tokens,
@@ -248,6 +269,44 @@ const defaultBuildSize = () => {
 	// a host reaches by precompressing the file itself — reported, never
 	// promised. See scripts/lib/compressed-size.js.
 	return { bytes, label: kb(bytes), brotliLabel: kb(brotliSize(source)) };
+};
+
+// What the package holds, read off dist/ rather than written down: the home
+// page says how many stylesheets and token files it ships and that no
+// script is among them, and a script appearing there would change the
+// number it prints. Null on a docs-only run with no build.
+const packageContents = () => {
+	const distDir = path.join(docsRoot, "../dist");
+	if (!fs.existsSync(distDir)) return null;
+	/** @param {string} dir @returns {string[]} */
+	const walk = (dir) =>
+		fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+			entry.isDirectory() ? walk(path.join(dir, entry.name)) : [path.join(dir, entry.name)],
+		);
+	const files = walk(distDir);
+	const count = (/** @type {RegExp} */ pattern) => files.filter((file) => pattern.test(file)).length;
+	// The minified screen builds, gzipped, for the size comparison.
+	const builds = [
+		["Default", "cirth.min.css"],
+		["Classless", "cirth.classless.min.css"],
+		["Scoped", "cirth.scoped.min.css"],
+		["Classless and scoped", "cirth.classless.scoped.min.css"],
+	].flatMap(([name, file]) => {
+		const full = path.join(distDir, file);
+		if (!fs.existsSync(full)) return [];
+		const bytes = gzipSize(fs.readFileSync(full));
+		return [{ name, file, bytes, label: `${(bytes / 1024).toFixed(1)} KB` }];
+	});
+	const largest = Math.max(...builds.map((build) => build.bytes));
+	const scripts = files.filter((file) => /\.(?:m?js|cjs|wasm)$/.test(file));
+	return {
+		files: files.length,
+		stylesheets: count(/\.css$/),
+		tokens: count(/\.tokens\.json$/),
+		scripts: scripts.length,
+		scriptBytes: scripts.reduce((sum, file) => sum + fs.statSync(file).size, 0),
+		builds: builds.map((build) => ({ ...build, share: build.bytes / largest })),
+	};
 };
 
 // The radius pair (a container's corner against the corners of the
@@ -411,10 +470,28 @@ module.exports = (eleventyConfig) => {
 	);
 	eleventyConfig.addGlobalData("themePreview", themePreview());
 	eleventyConfig.addGlobalData("browsers", browserTargets());
+	// The version a guide tells a reader to download, the same one every
+	// CDN snippet is pinned to (scripts/update-sri.js), so a command that
+	// fetches a file cannot fall behind the links beside it.
+	eleventyConfig.addGlobalData("release", { version: documentedVersion() });
 	// Surface levels, edges, inks, the accent, the states and the rhythm,
 	// measured off dist/tokens for the Brand and Colors pages; null on a
 	// docs-only run with no build, where the pages print token names only.
 	eleventyConfig.addGlobalData("measured", measuredTheme(path.join(docsRoot, "..")));
+	eleventyConfig.addGlobalData("packageContents", packageContents());
+
+	// A specimen's markup, counted: its elements in order and how many of
+	// them carry a class. The home page prints both from the very string it
+	// renders, so "no class" is a measurement of the specimen on screen.
+	eleventyConfig.addFilter("markupStats", (/** @type {string} */ markup) => {
+		const tags = [...String(markup).matchAll(/<([a-z][a-z0-9-]*)\b([^>]*)>/gi)];
+		return {
+			elements: tags.length,
+			names: tags.map((tag) => tag[1].toLowerCase()),
+			classes: tags.filter((tag) => /\sclass\s*=/.test(tag[2])).length,
+			attributes: [...new Set(tags.flatMap((tag) => [...tag[2].matchAll(/\s([a-z-]+)(?==|\s|$)/gi)].map((match) => match[1])))],
+		};
+	});
 
 	// --- Markdown pipeline ------------------------------------------------
 	// Fenced code: highlight.js token classes (same .hljs-* classes the docs
@@ -628,44 +705,60 @@ ${caption}<div class="docs-demo-preview${classlessClass}">${html}</div>
 			hljs.highlight(String(code), { language, ignoreIllegals: true }).value,
 	);
 
-	// How many class names a snippet carries, counted rather than claimed:
-	// the home page's story quotes the number beside the markup it counts.
-	eleventyConfig.addFilter("classCount", (html) =>
-		[...String(html).matchAll(/\sclass="([^"]*)"/g)].reduce(
-			(total, [, value]) => total + value.split(/\s+/).filter(Boolean).length,
-			0,
-		),
-	);
-
 	// A framework guide's own shape, laid on the page markdown already
 	// rendered, so the source stays plain markdown and every rhythm rule
-	// that reads the column's direct children keeps reading them. Three
-	// changes, all to what is already there:
+	// that reads the column's direct children keeps reading them. Four
+	// changes, all to what is already there, and all read from
+	// frameworks.js so a guide cannot claim more than its entry does:
 	//
-	//   · the <h1> carries the guide's marks before its text. They are
+	//   · the <h1> carries the guide's mark before its text. It is
 	//     decorative (alt=""): the title is the name, and firstHeading
-	//     strips the images, so <title> and the search index read "Vite";
-	//   · a sentence under the lead says what the guide will have you do,
-	//     taken from the step headings themselves, so it cannot drift from
-	//     them;
+	//     strips the image, so <title> and the search index read "Vite";
+	//   · under the lead, one line: the category, how sure the guide is
+	//     and when it was last checked, and the project's own site as a
+	//     plain link, named by its address;
+	//   · a sentence after it says what the guide will have you do, taken
+	//     from the step headings themselves, so it cannot drift from them;
 	//   · a numbered <h2> ("2. Import it") becomes a step: its number set
 	//     apart in a badge, where the heading's name reads "2 Import it",
 	//     and the id and the anchor untouched, so every link to a step
-	//     still lands.
+	//     still lands. The page ends with what was checked, with which
+	//     versions, and the official pages the guide follows.
 	const numberWords = ["", "One step", "Two steps", "Three steps", "Four steps", "Five steps", "Six steps"];
-	/** @param {{ file: string, dark?: string, aspect: number }} mark */
+	const longDate = (/** @type {string} */ iso) =>
+		new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-GB", {
+			day: "numeric",
+			month: "long",
+			year: "numeric",
+			timeZone: "UTC",
+		});
+	const siteName = (/** @type {string} */ url) => url.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, "");
+	/**
+	 * A mark's <img> elements: one, or the light and dark pair a project
+	 * publishes, each at its own intrinsic ratio. A one-colour mark renders
+	 * black in an <img>, so it is marked `mono` and the stylesheet shows it
+	 * white on the dark scheme, as the project's own site does.
+	 * @param {{ file: string, dark?: string, mono?: boolean, aspect: number, darkAspect?: number }} mark
+	 * @param {number} height
+	 */
 	const markImages = (mark, height) => {
-		const width = Math.round(mark.aspect * height);
-		const image = (file, variant) =>
-			`<img class="docs-mark-image${variant ? ` docs-logo docs-logo-${variant}` : ""}" src="/logos/frameworks/${file}" alt="" width="${width}" height="${height}" decoding="async">`;
+		const image = (/** @type {string} */ file, /** @type {number} */ ratio, /** @type {string} */ variant) =>
+			`<img class="docs-mark-image${variant ? ` docs-logo docs-logo-${variant}` : ""}${mark.mono ? " docs-mark-mono" : ""}${ratio > 2 ? " docs-mark-wide" : ""}" src="/logos/frameworks/${file}" alt="" width="${Math.round(ratio * height)}" height="${height}" decoding="async">`;
 		return mark.dark
-			? image(mark.file, "light") + image(mark.dark, "dark")
-			: image(mark.file, "");
+			? image(mark.file, mark.aspect, "light") +
+					image(mark.dark, mark.darkAspect ?? mark.aspect, "dark")
+			: image(mark.file, mark.aspect, "");
 	};
+	eleventyConfig.addFilter("markImages", (mark, height = 32) => markImages(mark, height));
+	eleventyConfig.addFilter("longDate", longDate);
+	eleventyConfig.addFilter("siteName", siteName);
 	eleventyConfig.addFilter("frameworkGuide", (content, id) => {
-		const guide = frameworks.guides.find((entry) => entry.id === id);
+		const guide = frameworks.byId[id];
 		if (!guide) throw new Error(`[frameworkGuide] unknown guide: ${id}`);
 		let html = String(content);
+		if (/class="docs-verified"/.test(html)) {
+			throw new Error(`[frameworkGuide] ${id}: the verification note comes from frameworks.js, not the page`);
+		}
 
 		const stepPattern =
 			/<h2 id="([^"]+)" tabindex="-1">(\d+)\. ([\s\S]*?) (<a class="header-anchor"[\s\S]*?<\/a>)<\/h2>/g;
@@ -676,28 +769,45 @@ ${caption}<div class="docs-demo-preview${classlessClass}">${html}</div>
 				`<h2 id="${slug}" tabindex="-1" class="docs-step-heading"><span class="docs-step-number">${number}</span> ${title} ${anchor}</h2>`,
 		);
 
-		const marks = guide.marks
-			.map((mark) => `<span class="docs-mark">${markImages(frameworks.marks[mark], 40)}</span>`)
-			.join("");
 		if (!/<h1>[\s\S]*?<\/h1>/.test(html)) {
-			throw new Error(`[frameworkGuide] ${id}: no <h1> to carry the marks`);
+			throw new Error(`[frameworkGuide] ${id}: no <h1> to carry the mark`);
 		}
-		html = html.replace(
-			/<h1>([\s\S]*?)<\/h1>/,
-			(_, title) => `<h1 class="docs-guide-title"><span class="docs-guide-marks">${marks}</span>${title}</h1>`,
-		);
+		const mark = guide.markData
+			? `<span class="docs-guide-marks"><span class="docs-mark">${markImages(guide.markData, 40)}</span></span>`
+			: "";
+		html = html.replace(/<h1>([\s\S]*?)<\/h1>/, (_, title) => `<h1 class="docs-guide-title">${mark}${title}</h1>`);
 
+		const { verified, status } = guide;
+		const meta =
+			`<p class="docs-guide-meta">` +
+			`<span>${guide.categoryText}</span>` +
+			`<span class="docs-guide-status" data-status="${verified.status}">${status.text} <time datetime="${verified.date}">${longDate(verified.date)}</time></span>` +
+			`<a href="${guide.officialUrl}" class="docs-guide-official">${siteName(guide.officialUrl)}</a>` +
+			`</p>`;
+		let lead = meta;
 		if (steps.length > 1 && steps.length < numberWords.length) {
 			const named = steps.map((step) => step.charAt(0).toLowerCase() + step.slice(1));
 			const list =
 				named.length === 2
 					? named.join(" and ")
 					: `${named.slice(0, -1).join(", ")} and ${named.at(-1)}`;
-			html = html.replace(
-				/(<\/h1>\s*<p>[\s\S]*?<\/p>)/,
-				`$1\n<p class="docs-guide-summary">${numberWords[steps.length]}: ${list}.</p>`,
-			);
+			lead += `\n<p class="docs-guide-summary">${numberWords[steps.length]}: ${list}.</p>`;
 		}
+		if (!/(<\/h1>\s*<p>[\s\S]*?<\/p>)/.test(html)) {
+			throw new Error(`[frameworkGuide] ${id}: no lead paragraph under the <h1>`);
+		}
+		html = html.replace(/(<\/h1>\s*<p>[\s\S]*?<\/p>)/, `$1\n${lead}`);
+
+		// Data strings mark code with backticks, as markdown would.
+		const code = (/** @type {string} */ text) =>
+			escapeHtml(text).replace(/`([^`]+)`/g, "<code>$1</code>");
+		const docs = guide.docs.map((doc) => `<a href="${doc.url}">${escapeHtml(doc.text)}</a>`);
+		html +=
+			`\n<aside class="docs-verified" aria-labelledby="verified-${id}">` +
+			`<h2 id="verified-${id}" class="docs-verified-title">${status.text}</h2>` +
+			`<p><strong>${status.text} on <time datetime="${verified.date}">${longDate(verified.date)}</time></strong> (${status.detail}) with ${code(verified.with)}. ${code(verified.result)}</p>` +
+			`<p>Follows ${docs.length === 1 ? docs[0] : `${docs.slice(0, -1).join(", ")} and ${docs.at(-1)}`}.</p>` +
+			`</aside>`;
 		return html;
 	});
 
@@ -723,13 +833,39 @@ ${caption}<div class="docs-demo-preview${classlessClass}">${html}</div>
 	);
 
 	// Nunjucks `set` inside a for-loop doesn't escape the loop scope, so
-	// active-item and prev/next lookups live here instead of the template.
-	eleventyConfig.addFilter("hasActiveItem", (items, pageUrl) =>
-		items.some((item) => withSlash(item.link) === pageUrl),
-	);
-	eleventyConfig.addFilter("findPageIndex", (flatPages, pageUrl) =>
-		flatPages.findIndex((item) => withSlash(item.link) === pageUrl),
-	);
+	// the active-item lookup lives here instead of the template.
+	// Recursive: a group holding Installation holds every guide under it,
+	// so the group and the branch both open on a guide.
+	/** @param {{ link: string, items?: any[] }[]} items @param {string} pageUrl @returns {boolean} */
+	const hasActiveItem = (items, pageUrl) =>
+		items.some(
+			(item) =>
+				(typeof item.link === "string" && withSlash(item.link) === pageUrl) ||
+				(Array.isArray(item.items) && hasActiveItem(item.items, pageUrl)),
+		);
+	eleventyConfig.addFilter("hasActiveItem", hasActiveItem);
+
+	// The trail above a nested page, read from the same tree the sidebar
+	// draws: a guide's parent is Installation because nav.js nests it
+	// there, not because a template says so. Empty for a top-level page,
+	// which has nothing above it but its group's name.
+	eleventyConfig.addFilter("breadcrumb", (/** @type {any[]} */ sidebar, /** @type {string} */ pageUrl) => {
+		// A category between a page and its parent (Build tools, inside
+		// Installation) has no page of its own, so the trail skips it.
+		/** @param {any[]} items @returns {any} */
+		const find = (items) =>
+			items.find((entry) => typeof entry.link === "string" && withSlash(entry.link) === pageUrl) ??
+			items.flatMap((entry) => (entry.link ? [] : entry.items ?? [])).find(
+				(entry) => typeof entry.link === "string" && withSlash(entry.link) === pageUrl,
+			);
+		for (const group of sidebar) {
+			for (const item of group.items) {
+				const child = find(item.items ?? []);
+				if (child) return [{ text: item.text, link: item.link }, { text: child.text }];
+			}
+		}
+		return [];
+	});
 
 	// A page's own title, read off its first <h1>, for <title> and the
 	// Open Graph title when front matter does not name one. Markup inside
@@ -750,6 +886,23 @@ ${caption}<div class="docs-demo-preview${classlessClass}">${html}</div>
 			.replace(/&#39;/g, "'")
 			.replace(/\s+/g, " ")
 			.trim();
+	});
+
+	// The outline as a tree: each h3 under the h2 it belongs to, so the
+	// "On this page" lists say which section a subsection is part of. An h3
+	// before the first h2 stands on its own. `collapsible` is the length at
+	// which the subsections fold under their section: past it, a flat list
+	// of every heading is taller than the rail that holds it.
+	eleventyConfig.addFilter("outline", (/** @type {{ depth: number, slug: string, text: string }[]} */ headings) => {
+		/** @type {{ slug: string, text: string, children: { slug: string, text: string }[] }[]} */
+		const sections = [];
+		for (const heading of headings) {
+			const last = sections.at(-1);
+			if (heading.depth === 3 && last) last.children.push({ slug: heading.slug, text: heading.text });
+			else sections.push({ slug: heading.slug, text: heading.text, children: [] });
+		}
+		const nested = sections.reduce((total, section) => total + section.children.length, 0);
+		return { sections, collapsible: headings.length > 14 && nested > 0 };
 	});
 
 	// "On this page" data: h2/h3 headings of the rendered page content.

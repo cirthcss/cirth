@@ -1,14 +1,16 @@
 ---
 layout: docs.njk
 framework: astro
-description: Use Cirth in an Astro site. Import it in the frontmatter of a shared layout.
+description: Use Cirth in an Astro site. Import it in the frontmatter of a layout every page uses; Astro's build keeps it as it is.
 ---
 {% from "install.njk" import packageManagers %}
+{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
 # Astro
 
-Astro bundles a stylesheet imported in a component's frontmatter, so Cirth
-goes in the layout every page uses. No configuration is needed.
+Astro bundles every stylesheet a component imports. Import Cirth once, in a
+layout every page uses, and nothing needs configuring: Astro's build keeps
+Cirth's `light-dark()` colours.
 
 ## 1. Install
 
@@ -16,7 +18,7 @@ goes in the layout every page uses. No configuration is needed.
 
 ## 2. Import it
 
-In a shared layout such as `src/layouts/Layout.astro`:
+In the frontmatter of the layout, for example `src/layouts/Layout.astro`:
 
 ```astro
 ---
@@ -38,32 +40,11 @@ const { title } = Astro.props;
 </html>
 ```
 
-## 3. Write HTML
+A `<style>` block in a component is scoped by Astro and comes after Cirth, so
+it wins without any specificity of its own.
 
-```astro
----
-import Layout from "../layouts/Layout.astro";
----
-<Layout title="Hello">
-  <article>
-    <h1>Hello, Astro</h1>
-    <button type="button">Save</button>
-  </article>
-</Layout>
-```
+## 3. Check it
 
-Astro's build keeps Cirth's `light-dark()` colours as they are, so there is
-no CSS target to set.
+{{ checkIt() }}
 
-## Choosing a build
-
-Import `@cirthcss/cirth/classless`, `@cirthcss/cirth/scoped` or
-`@cirthcss/cirth/classless/scoped` instead. See
-[Choose a build](/installation/#choose-a-build).
-
-## Next
-
-[Customization](/customization) covers the `--cirth-*` properties; put
-your overrides in a stylesheet imported after Cirth.
-
-<p class="docs-verified">Checked with Astro 7.3.5 (<code>create astro</code>, minimal template) on 27 September 2026: static build, then colours compared in Chromium against the untransformed stylesheet in the light scheme, the dark scheme and a forced-dark subtree.</p>
+{{ nextSteps("in a stylesheet the layout imports after Cirth") }}

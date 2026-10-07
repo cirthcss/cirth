@@ -84,9 +84,13 @@ See [About Cirth](docs/src/pages/about.md) for the scope and trade-offs.
 All four share the same default theme and light/dark support. Load one of the
 optional [presets](docs/src/pages/themes.md) after the main
 stylesheet to change its look. Print stylesheets are available separately.
-The [installation guide](docs/src/pages/installation/index.md) has examples,
-npm import paths for each build, and guides for Vite, React, Next.js, Vue,
-SvelteKit, Astro, Angular and Eleventy.
+The [installation guide](docs/src/pages/installation/index.md) has the CDN
+snippet, the npm import, and a guide for each stack it was checked with:
+build tools, JavaScript and backend frameworks, static site generators
+and Rust, each listed in
+[frameworks.js](docs/src/_data/frameworks.js) with its versions.
+[Compatibility](docs/src/pages/compatibility.md) lists every build's import
+path.
 
 To keep Cirth's content, form, and component declarations off a third-party
 widget, mark its root with `.no-cirth`:

@@ -119,11 +119,12 @@ test("homepage keeps the source and authentic output comparison focused on mobil
 	await expect(source).toContainText('<input type="email" required>');
 	await expect(source).toContainText("<button>Sign in</button>");
 	await expect(source).not.toContainText("…");
+	const hero = page.locator(".docs-hero");
 	await expect(
-		page.getByRole("button", { name: "Get started" }),
+		hero.getByRole("button", { name: "Get started" }),
 	).toHaveAttribute("href", "/installation");
 	await expect(
-		page.getByRole("button", { name: "Examples", exact: true }),
+		hero.getByRole("button", { name: "Examples", exact: true }),
 	).toHaveAttribute("href", "/examples");
 
 	// The result is the page's own Cirth rendering the card, not an image
@@ -725,7 +726,8 @@ test("the navbar states are a contrast ladder, not the accent", async ({
 	// below the current item, current at full contrast, and none of the
 	// three is the accent, which in chrome belongs to actions.
 	await page.setViewportSize({ width: 1280, height: 800 });
-	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
+	// Where "Docs" leads, so it is the current item there.
+	await page.goto(`${origin}/why-cirth/`, { waitUntil: "networkidle" });
 
 	const current = page.locator('.docs-nav-item a[aria-current="page"]');
 	const other = page.locator(".docs-nav-item a:not([aria-current])");
@@ -899,18 +901,28 @@ test("the hero moves once, only where motion is welcome, and its result follows 
 	);
 	expect(stray, "operable controls outside the inert card").toBe(0);
 
-	// One entrance, and it ends: every animation in the hero is finite, and
-	// none of them repeats.
+	// One entrance, and it ends: every animation in the hero that runs on
+	// the clock is finite, and none of them repeats. The field's drift is
+	// tied to the scroll where scroll timelines exist, so it moves only
+	// while the reader does and has no duration of its own.
 	const animations = await page.locator(".docs-hero").evaluate((element) =>
 		element.getAnimations({ subtree: true }).map((animation) => {
 			const timing = animation.effect?.getComputedTiming();
-			return { iterations: timing?.iterations, duration: Number(timing?.duration) };
+			return {
+				scroll: !(animation.timeline instanceof DocumentTimeline),
+				iterations: timing?.iterations,
+				duration: Number(timing?.duration),
+			};
 		}),
 	);
-	expect(animations.length, "the entrance runs where motion is welcome").toBeGreaterThan(0);
-	for (const animation of animations) {
+	const timed = animations.filter((animation) => !animation.scroll);
+	expect(timed.length, "the entrance runs where motion is welcome").toBeGreaterThan(0);
+	for (const animation of timed) {
 		expect(animation.iterations).toBe(1);
 		expect(animation.duration).toBeLessThanOrEqual(2000);
+	}
+	for (const animation of animations.filter((animation) => animation.scroll)) {
+		expect(animation.iterations, "a scroll-linked drift does not repeat").toBe(1);
 	}
 
 	// With the preference set, nothing in the hero moves at all.
@@ -932,93 +944,170 @@ test("the hero moves once, only where motion is welcome, and its result follows 
 	expect(dark).not.toBe(light);
 });
 
-// --- The count -----------------------------------------------------------
-
-// The demonstration opens on a number, and the number is taken from the two
-// listings it compares, both served in a disclosure beside it, rather than
-// asserted.
-test("the count is taken from the two listings it compares", async ({ page }) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	const rows = page.locator(".docs-count-rows > div");
-	await expect(rows).toHaveCount(2);
-	const counts = await rows.locator("dd").evaluateAll((items) =>
-		items.map((item) => Number.parseInt(item.textContent ?? "", 10)),
-	);
-
-	const listings = page.locator(".docs-count-source pre code");
-	await expect(listings).toHaveCount(2);
-	const counted = await listings.evaluateAll((items) =>
-		items.map((item) =>
-			[...(item.textContent ?? "").matchAll(/\sclass="([^"]*)"/g)].reduce(
-				(total, [, value]) => total + value.split(/\s+/).filter(Boolean).length,
-				0,
-			),
-		),
-	);
-	expect(counts).toEqual(counted);
-	expect(counts[0]).toBeGreaterThan(40);
-	expect(counts[1]).toBe(0);
-
-	// The bars are drawn to one scale, and the text is the number.
-	const bars = await rows.locator(".docs-count-bar").evaluateAll((items) =>
-		items.map((item) => ({
-			width: item.getBoundingClientRect().width,
-			hidden: item.getAttribute("aria-hidden"),
-		})),
-	);
-	expect(bars[0].width).toBeGreaterThan(bars[1].width * 4);
-	expect(bars.map((bar) => bar.hidden)).toEqual(["true", "true"]);
-});
-
 // --- Framework agnostic --------------------------------------------------
 
-test("the framework section names each project and leads to its guide", async ({
+test("the framework band shows the ecosystems and leads each mark to its project", async ({
 	page,
 }) => {
 	const frameworks = require("../docs/src/_data/frameworks.js");
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-	const section = page.locator(".docs-frameworks");
-	await expect(section.locator("h2")).toHaveText("Pure CSS. Whatever writes your HTML.");
+	const band = page.locator(".docs-agnostic");
+	await expect(band.locator("h2")).toHaveText("Framework agnostic. Works everywhere.");
+	// The page's own scheme: no scheme forced on the band, so each mark
+	// shows the variant its project publishes for the page's ground.
+	await expect(band).not.toHaveAttribute("data-theme", /.*/);
+	await expect(band.locator("[data-theme]")).toHaveCount(0);
+	// No card under any mark: the orbit is the composition.
+	const tile = await band.locator(".docs-agnostic-mark").first().evaluate((link) => ({
+		border: getComputedStyle(link).borderTopStyle,
+		background: getComputedStyle(link).backgroundColor,
+	}));
+	expect(tile.border).toBe("none");
+	expect(tile.background).toBe("rgba(0, 0, 0, 0)");
 
-	// One list, from the one data file: every mark, in guide order, each
-	// leading to the guide that covers it.
-	const links = await section.locator(".docs-logo-list a").evaluateAll((items) =>
+	// The marks are the data's featured set, each a link to the project's
+	// own site, named as one; the images inside are decorative and carry
+	// their size, so nothing moves while they load.
+	const links = await band.locator(".docs-agnostic-orbit a").evaluateAll((items) =>
 		items.map((item) => ({
-			name: item.textContent?.trim(),
 			href: item.getAttribute("href"),
+			name: item.getAttribute("aria-label"),
 			images: [...item.querySelectorAll("img")].map((image) => ({
 				alt: image.getAttribute("alt"),
 				src: image.getAttribute("src"),
-				width: image.getAttribute("width"),
-				height: image.getAttribute("height"),
+				width: Number(image.getAttribute("width")),
+				height: Number(image.getAttribute("height")),
+				shown: getComputedStyle(image).display !== "none",
 			})),
 		})),
 	);
-	expect(links.map((link) => link.name)).toEqual(
-		frameworks.entries.map((/** @type {{ name: string }} */ entry) => entry.name),
+	expect(links.map((link) => link.href)).toEqual(
+		frameworks.featured.map((/** @type {{ officialUrl: string }} */ guide) => guide.officialUrl),
 	);
-	for (const link of links) {
-		expect(link.href ?? "").toMatch(/^\/installation\//);
-		// The name is printed, so the mark is decorative, and it carries its
-		// size so nothing moves while it loads. Served from this site.
-		expect(link.images.length).toBeGreaterThan(0);
+	links.forEach((link, index) => {
+		expect(link.name).toBe(`${frameworks.featured[index].name} website`);
+		expect(link.images.filter((image) => image.shown), `${link.name}: one variant shows`).toHaveLength(1);
 		for (const image of link.images) {
-			expect(image.alt, `${link.name}'s mark is decorative`).toBe("");
-			expect(image.src ?? "").toMatch(/^\/logos\/frameworks\/[\w-]+\.svg$/);
-			expect(Number(image.width)).toBeGreaterThan(0);
-			expect(Number(image.height)).toBeGreaterThan(0);
+			expect(image.alt).toBe("");
+			expect(image.src).toMatch(/^\/logos\/frameworks\/[\w-]+\.(svg|png)$/);
+			expect(image.width).toBeGreaterThan(0);
+			expect(image.height).toBeGreaterThan(0);
 		}
+	});
+	// Spread over the ecosystems, not one family of tools.
+	const categories = new Set(frameworks.featured.map((/** @type {{ category: string }} */ guide) => guide.category));
+	expect(categories.size).toBeGreaterThanOrEqual(5);
+
+	// One way on, with the list's own count.
+	const action = band.getByRole("button");
+	await expect(action).toHaveText(`Browse all ${frameworks.count} guides`);
+	await expect(action).toHaveAttribute("href", "/installation#guides");
+
+	// The variant follows the page: Django's positive logo on a light page,
+	// its negative one on a dark page.
+	const django = band.locator(`a[href="${frameworks.byId.django.officialUrl}"] img`);
+	const shown = () =>
+		django.evaluateAll((images) => images.filter((image) => getComputedStyle(image).display !== "none").map((image) => image.getAttribute("src")));
+	const scheme = await page.locator("html").getAttribute("data-theme");
+	const first = await shown();
+	await page.locator(".docs-theme-toggle").click();
+	await expect(page.locator("html")).not.toHaveAttribute("data-theme", String(scheme));
+	const second = await shown();
+	const byScheme = scheme === "dark" ? { dark: first, light: second } : { light: first, dark: second };
+	expect(byScheme.light).toEqual([`/logos/frameworks/${frameworks.marks.django.file}`]);
+	expect(byScheme.dark).toEqual([`/logos/frameworks/${frameworks.marks.django.dark}`]);
+});
+
+test("the marks orbit Cirth's behind no line, stay upright, and turn only with the scroll", async ({ page }) => {
+	await page.emulateMedia({ reducedMotion: "no-preference" });
+	await page.setViewportSize({ width: 1440, height: 900 });
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	const band = page.locator(".docs-agnostic");
+	const orbit = page.locator(".docs-agnostic-orbit");
+	/** Each mark's centre, and how far its box is turned. */
+	const read = () =>
+		orbit.locator("li").evaluateAll((items) =>
+			items.map((item) => {
+				const box = item.getBoundingClientRect();
+				const matrix = new DOMMatrix(getComputedStyle(item).transform);
+				return {
+					x: Math.round(box.left + box.width / 2),
+					y: Math.round(box.top + box.height / 2),
+					turn: Math.round((Math.atan2(matrix.b, matrix.a) * 180) / Math.PI),
+				};
+			}),
+		);
+	await band.evaluate((element) => window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY - 200));
+	await page.waitForFunction(() => document.querySelector(".docs-agnostic-orbit")?.getAttribute("style")?.includes("--docs-orbit"));
+	const at = await read();
+	for (const mark of at) expect(Math.abs(mark.turn), "a mark is turned").toBeLessThanOrEqual(0);
+
+	// Two rings round one centre, drawn behind the marks: the rings sit
+	// under the orbit and the core above it, and neither takes the pointer.
+	const field = await page.locator(".docs-agnostic-field").evaluate((element) => {
+		const box = element.getBoundingClientRect();
+		const ring = getComputedStyle(element, "::after");
+		return {
+			x: box.left + box.width / 2,
+			y: box.top + box.height / 2,
+			size: box.width,
+			isolated: getComputedStyle(element).isolation,
+			ringZ: ring.zIndex,
+			ringEvents: ring.pointerEvents,
+			orbitZ: getComputedStyle(/** @type {Element} */ (element.querySelector(".docs-agnostic-orbit"))).zIndex,
+			coreZ: getComputedStyle(/** @type {Element} */ (element.querySelector(".docs-agnostic-core"))).zIndex,
+			coreEvents: getComputedStyle(/** @type {Element} */ (element.querySelector(".docs-agnostic-core"))).pointerEvents,
+		};
+	});
+	expect(field.isolated).toBe("isolate");
+	expect(Number(field.ringZ)).toBeLessThan(Number(field.orbitZ));
+	expect(Number(field.coreZ)).toBeGreaterThan(Number(field.orbitZ));
+	expect(field.ringEvents).toBe("none");
+	expect(field.coreEvents).toBe("none");
+	const radii = at.map((mark) => Math.hypot(mark.x - field.x, mark.y - field.y) / field.size);
+	expect([...new Set(radii.map((radius) => Math.round(radius * 10)))].sort()).toEqual([2, 4]);
+	await expect(page.locator(".docs-agnostic-core img:visible")).toHaveCount(1);
+	// Every mark's link stands on a disc of the canvas, so no ring line runs
+	// through it, and is the element under its own centre (nothing on top).
+	const marks = await orbit.locator("a").evaluateAll((links) =>
+		links.map((link) => {
+			const box = link.getBoundingClientRect();
+			const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+			return { disc: getComputedStyle(link).backgroundImage, own: Boolean(hit && link.contains(hit)) };
+		}),
+	);
+	for (const mark of marks) {
+		expect(mark.disc).toMatch(/radial-gradient/);
+		expect(mark.own, "a mark is covered").toBe(true);
 	}
 
-	// One variant shows per scheme where a project publishes two.
-	const visible = await section.locator(".docs-logo-list img").evaluateAll((images) =>
-		images.filter((image) => getComputedStyle(image).display !== "none").length,
-	);
-	expect(visible).toBe(links.length);
+	// The rings turn with the scroll, never on their own, and hold still
+	// under the pointer.
+	const still = await read();
+	await page.waitForTimeout(600);
+	expect(await read(), "the orbit moved on its own").toEqual(still);
+	await page.mouse.wheel(0, 300);
+	await expect.poll(async () => (await read()).some((mark, index) => mark.x !== still[index].x)).toBe(true);
+	for (const mark of await read()) expect(Math.abs(mark.turn)).toBeLessThanOrEqual(0);
+	const box = await orbit.boundingBox();
+	if (!box) throw new Error("no orbit");
+	await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+	const held = await orbit.getAttribute("style");
+	await page.mouse.wheel(0, 120);
+	await page.waitForTimeout(200);
+	expect(await orbit.getAttribute("style"), "the orbit moved under the pointer").toBe(held);
 
-	await expect(section).toContainText("none of these projects is affiliated with Cirth or endorses it");
-	await expect(section.locator('a[href="/brand#framework-logos"]')).toHaveCount(1);
+	// A phone and reduced motion: still, and no CSS animation anywhere.
+	for (const [width, motion] of /** @type {const} */ ([[390, "no-preference"], [1440, "reduce"]])) {
+		await page.emulateMedia({ reducedMotion: motion });
+		await page.setViewportSize({ width, height: 900 });
+		await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+		await band.evaluate((element) => element.scrollIntoView());
+		await page.mouse.wheel(0, 200);
+		await page.waitForTimeout(200);
+		expect(await orbit.getAttribute("style"), `${width}px ${motion}`).toBeNull();
+		await expect(orbit).toHaveCSS("animation-name", "none");
+	}
 });
 
 // --- Installation widgets -----------------------------------------------
@@ -1039,12 +1128,31 @@ test("the package manager switch shows one command and remembers the choice", as
 	await install.getByLabel("pnpm").check();
 	expect(await visible()).toEqual(["pnpm add @cirthcss/cirth"]);
 
-	// A radio group named by its legend, with every segment a 44px target.
-	await expect(install.getByRole("group", { name: "Package manager" })).toHaveCount(1);
-	const heights = await install
-		.locator("label")
-		.evaluateAll((items) => items.map((item) => Math.round(item.getBoundingClientRect().height)));
-	for (const height of heights) expect(height).toBeGreaterThanOrEqual(44);
+	// A radio group named by its legend: native radios in labels of their
+	// own, apart rather than joined, each label the whole target, as tall as
+	// the header's controls. Not a tab strip: no tab roles, and no class
+	// that draws one.
+	const group = install.getByRole("group", { name: "Package manager" });
+	await expect(group).toHaveCount(1);
+	await expect(group.getByRole("radio")).toHaveCount(4);
+	await expect(install.locator("fieldset.segmented, [role='tab'], [role='tablist']")).toHaveCount(0);
+	const labels = await install.locator("label").evaluateAll((items) =>
+		items.map((item) => item.getBoundingClientRect()),
+	);
+	for (const label of labels) expect(Math.round(label.height)).toBeGreaterThanOrEqual(40);
+	for (let index = 1; index < labels.length; index++) {
+		expect(
+			labels[index].left - labels[index - 1].right,
+			"the options stand apart",
+		).toBeGreaterThanOrEqual(4);
+	}
+
+	// The keyboard walks it the way it walks any radio group.
+	await install.getByLabel("pnpm").focus();
+	await page.keyboard.press("ArrowRight");
+	await expect(install.getByLabel("Yarn")).toBeChecked();
+	expect(await visible()).toEqual(["yarn add @cirthcss/cirth"]);
+	await install.getByLabel("pnpm").check();
 
 	// The choice follows the reader to the next guide.
 	await page.goto(`${origin}/installation/vite/`, { waitUntil: "networkidle" });
@@ -1059,6 +1167,15 @@ test("an old address forwards to the page that replaced it", async ({ page }) =>
 		["/get-started/#excluding-a-third-party-component", "/compatibility/#excluding-a-third-party-component"],
 		["/deploy/#caching", "/compatibility/#caching"],
 		["/utilities/reduce-motion/", "/guides/accessibility/#reduced-motion"],
+		// The CDN guide became the Installation page's first section. For a
+		// while the JavaScript guides were one page with a section each;
+		// each tool has its own page again, and a link to a section lands
+		// on that tool's page.
+		["/installation/cdn/", "/installation/#cdn"],
+		["/installation/cdn/#choosing-a-build", "/compatibility/#every-build-from-the-cdn"],
+		["/installation/javascript/", "/installation/#guides"],
+		["/installation/javascript/#react", "/installation/react/"],
+		["/installation/javascript/#3-set-the-css-target", "/installation/vite/#3-set-the-css-target"],
 	]) {
 		await page.goto(`${origin}${from}`);
 		await page.waitForURL(`${origin}${to}`);
@@ -1070,6 +1187,14 @@ test("an old address forwards to the page that replaced it", async ({ page }) =>
 	expect(html).toMatch(/<link rel="canonical" href="\/compatibility\/"/);
 	expect(html).toMatch(/<meta name="robots" content="noindex"/);
 	expect(html).toMatch(/<a href="\/compatibility\/">Compatibility<\/a>/);
+
+	// The guides that came back are pages again, not forwards.
+	for (const slug of ["vite", "react", "vue", "sveltekit", "astro"]) {
+		const guide = await page.request.get(`${origin}/installation/${slug}/`);
+		const text = await guide.text();
+		expect(text, slug).not.toMatch(/<meta name="robots" content="noindex"/);
+		expect(text, slug).toMatch(/class="docs-guide-title"/);
+	}
 });
 
 test.describe("without JavaScript", () => {
@@ -1096,565 +1221,402 @@ test.describe("without JavaScript", () => {
 		await expect(page.locator(".docs-fact-list > div")).toHaveCount(4);
 	});
 
-	// The count and both of the listings it is taken from need no script.
-	test("the count and its two listings are served", async ({ page }) => {
-		await page.goto(`${origin}/`, { waitUntil: "load" });
-		await expect(page.locator(".docs-count-rows > div")).toHaveCount(2);
-		await expect(page.locator(".docs-count-rows")).toBeVisible();
-		await page.locator(".docs-count-source summary").click();
-		await expect(page.locator(".docs-count-source pre")).toHaveCount(2);
-		await expect(page.locator(".docs-count-source pre").first()).toBeVisible();
-	});
-
-	// The showcase's fallback is the whole reason its tab strip ships
-	// `hidden` rather than inert: with no script there is no tablist, so
-	// all three examples are served rendered, complete, and under their own
-	// headings.
-	test("the showcase degrades to three complete examples", async ({ page }) => {
+	// Every scene is whole without a script: the story's three pictures,
+	// the browser's own rendering from a declarative shadow root, the
+	// measured figures, the finished theme, and the presets comparator at
+	// the middle, without a control that could not move anything.
+	test("every scene of the home page needs no script", async ({ page }) => {
 		await page.goto(`${origin}/`, { waitUntil: "load" });
 
-		const strip = page.locator("[data-docs-switch]");
-		await expect(strip).toHaveCount(1);
-		await expect(strip).toBeHidden();
-		await expect(page.locator('[role="tablist"], [role="tab"]')).toHaveCount(0);
-		await expect(page.locator('[role="tabpanel"]')).toHaveCount(0);
-
-		const panels = page.locator("[data-docs-panel]");
-		await expect(panels).toHaveCount(3);
-		for (let index = 0; index < 3; index++) {
-			await expect(panels.nth(index)).toBeVisible();
-			await expect(
-				panels.nth(index).locator(".docs-example-name"),
-				`example ${index} names itself without the tab`,
-			).toBeVisible();
+		await expect(page.locator(".docs-home")).not.toHaveAttribute("data-stage", /.*/);
+		for (const part of ["1", "2", "3"]) {
+			await expect(page.locator(`[data-docs-story-part="${part}"]`)).toBeVisible();
+			await expect(page.locator(`[data-docs-story-part="${part}"] figcaption`)).not.toBeEmpty();
 		}
+		await expect(page.locator("[data-docs-story-code]")).toContainText("<button type=\"button\">Show ticket</button>");
+		expect(
+			await page
+				.locator(".docs-story-ua")
+				.evaluate((element) => element.shadowRoot?.querySelector("meter") !== null),
+		).toBe(true);
+		await expect(page.locator('[role="tablist"], [role="tab"], [role="tabpanel"]')).toHaveCount(0);
+		await expect(page.locator(".docs-measured-fact")).toHaveCount(3);
+		await expect(page.locator(".docs-measured-figure strong").first()).toHaveText("0");
 
-		// And the theme section is a listing and a finished interface, both
-		// served. The custom element never upgrades, so what renders is its
-		// own children, painted by the page's Cirth, carrying the pane's
-		// padding while it lasts.
-		const listing = page.locator("[data-docs-theme-block]");
-		await expect(listing).toHaveCount(1);
-		await expect(listing).toContainText(".cirth {");
-		await expect(listing).toContainText("--cirth-primary");
+		// The finished theme, with all three of its declarations.
+		const themeOn = await page
+			.locator(".docs-theme-copy")
+			.evaluate((element) => [...(element.shadowRoot?.querySelectorAll("style[data-docs-theme-state]") ?? [])].filter((style) => /** @type {HTMLStyleElement} */ (style).media === "all").map((style) => /** @type {HTMLElement} */ (style).dataset.docsThemeState));
+		expect(themeOn).toEqual(["canvas"]);
+		await expect(page.locator(".docs-theme-code")).toContainText("1.125rem");
 
-		const preview = page.locator("cirth-theme-preview");
-		await expect(preview).toBeVisible();
-		const fallback = await preview.evaluate((element) => ({
-			defined: element.matches(":not(:defined)"),
-			shadow: element.shadowRoot !== null,
-			children: element.children.length,
-			padding: Number.parseFloat(getComputedStyle(element).paddingTop),
-		}));
-		expect(fallback.defined, "the element never upgrades").toBe(true);
-		expect(fallback.shadow).toBe(false);
-		expect(fallback.children).toBe(1);
-		expect(fallback.padding).toBeGreaterThan(8);
-		await expect(
-			preview.locator("article button", { hasText: "Save changes" }),
-		).toBeVisible();
+		await expect(page.locator("[data-docs-compare-range]")).toBeHidden();
+		await expect(page.locator("[data-docs-compare-preset]")).toBeHidden();
+		const halves = await page
+			.locator(".docs-compare-layer")
+			.evaluateAll((layers) => layers.map((layer) => layer.shadowRoot?.querySelectorAll("button").length ?? 0));
+		expect(halves).toEqual([2, 2]);
+		await expect(page.locator(".docs-compare")).toBeVisible();
 
-		// The choices that would change the preview are not offered, because
-		// without script nothing could apply them. The inert preview cannot
-		// trap the page either: its open menu's outside-click catcher is a
-		// fixed layer, and an inert subtree takes no pointer events.
-		await expect(page.locator("[data-docs-theme-controls]")).toBeHidden();
-		await expect(preview).toHaveAttribute("inert", "");
-		await page.locator(".docs-cta").getByRole("button", { name: "Why Cirth" }).click();
-		await expect(page).toHaveURL(/\/why-cirth\/?$/);
+		await page.locator(".docs-pure").getByRole("button", { name: "Get started" }).click();
+		await expect(page).toHaveURL(/\/installation\/?$/);
 	});
 });
 
 
-// --- The home page's showcase sections ---------------------------------
+// --- The home page's story -----------------------------------------------
 
-// Every specimen on this page is declared once in home.njk and used twice:
-// rendered into the page, and highlighted into the pane beside it. The
-// point of doing it that way is that the two cannot drift: the hero has
-// had exactly that bug before, a snippet declaring attributes the rendered
-// output no longer had, so the contract to pin is equality, not the
-// presence of either half.
+// The story's specimen is declared once in home.njk and used three times:
+// listed, rendered with no stylesheet, and rendered by Cirth. The contract
+// worth pinning is that the three are the same markup.
 const normalizeMarkup = (/** @type {string} */ html) =>
 	html
 		.replace(/\s+/g, " ")
 		.replace(/>\s+</g, "><")
-		// `open` and `open=""` are the same attribute. The specimen writes
-		// the bare form, which is what an author writes and what the pane
-		// therefore lists; `outerHTML` always serialises the empty-string
-		// form. Normalising both sides the same way compares the markup
-		// rather than the serialiser.
+		// `open` and `open=""` are the same attribute; `outerHTML` always
+		// writes the second.
 		.replace(/=""/g, "")
 		.trim();
 
-/** The three examples, in the order the strip offers them. */
-const showcaseExamples = ["article", "details", "form"];
-
-/**
- * @param {import("@playwright/test").Page} page
- * @param {string} id
- */
-const openExample = async (page, id) => {
-	await page.locator(`[data-docs-tab="${id}"]`).click();
-	await expect(page.locator(`[data-docs-panel="${id}"]`)).toBeVisible();
-};
-
-test("each source pane is the markup that produced the specimen beside it", async ({
-	page,
-}) => {
+test("the story lists the markup it renders, with and without Cirth", async ({ page }) => {
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	// All three, not just the one that happens to be showing: an example
-	// nobody looks at is exactly where a listing drifts from its specimen.
-	for (const id of showcaseExamples) {
-		await openExample(page, id);
-		const scope = page.locator(`[data-docs-panel="${id}"]`);
-		const listed = await scope.locator(".docs-stage-code pre code").innerText();
-		const rendered = await scope
-			.locator(".docs-stage-preview article")
-			.evaluate((element) => element.outerHTML);
-
-		expect(
-			normalizeMarkup(listed),
-			`${id}: the pane lists what the page rendered`,
-		).toBe(normalizeMarkup(rendered));
-
-		// Highlighted at build time, like every other code block on the site.
-		expect(
-			await scope.locator("pre code span").count(),
-			`${id} is highlighted`,
-		).toBeGreaterThan(10);
-	}
-});
-
-// The strip is the WAI-ARIA tabs pattern or it is three buttons pretending:
-// one tab stop for the whole strip, arrows walking it, one panel showing,
-// and the panel named by the tab that opened it.
-test("the showcase strip is a real tablist", async ({ page }) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	const strip = page.locator("[data-docs-switch]");
-	await expect(strip).toBeVisible();
-	await expect(strip).toHaveAttribute("role", "tablist");
-
-	const tabs = page.getByRole("tab");
-	await expect(tabs).toHaveCount(3);
-
-	/** Exactly one panel is in the document at a time. */
-	const assertOnlyOpen = async (/** @type {string} */ id) => {
-		for (const other of showcaseExamples) {
-			await expect(
-				page.locator(`[data-docs-panel="${other}"]`),
-				`${other} while ${id} is selected`,
-			)[other === id ? "toBeVisible" : "toBeHidden"]();
-		}
-		// Roving tabindex: one stop for the strip, on the selected tab.
-		expect(
-			await tabs.evaluateAll((items) =>
-				items.map((item) => `${item.getAttribute("aria-selected")}/${item.tabIndex}`),
-			),
-		).toEqual(
-			showcaseExamples.map((other) =>
-				other === id ? "true/0" : "false/-1",
-			),
-		);
-	};
-
-	await assertOnlyOpen("article");
-
-	// Each tab controls a panel, and each panel is named by its tab:
-	// which is what lets the heading in the panel be dropped once the
-	// strip is on without the panel losing its name.
-	for (const id of showcaseExamples) {
-		const tab = page.locator(`[data-docs-tab="${id}"]`);
-		const panel = page.locator(`[data-docs-panel="${id}"]`);
-		await expect(tab).toHaveAttribute("aria-controls", `panel-${id}`);
-		await expect(panel).toHaveAttribute("role", "tabpanel");
-		await expect(panel).toHaveAttribute("aria-labelledby", `tab-${id}`);
-		await expect(panel).toHaveAttribute("tabindex", "0");
-	}
-
-	// Arrow keys walk the strip and selection follows focus, because every
-	// panel is already in the document: nothing is fetched by arrowing.
-	await page.locator('[data-docs-tab="article"]').focus();
-	await page.keyboard.press("ArrowRight");
-	await assertOnlyOpen("details");
-	await expect(page.locator('[data-docs-tab="details"]')).toBeFocused();
-	await page.keyboard.press("End");
-	await assertOnlyOpen("form");
-	await page.keyboard.press("ArrowRight");
-	await assertOnlyOpen("article");
-	await page.keyboard.press("Home");
-	await assertOnlyOpen("article");
-
-	// The tab strip is the only control in this section, and it takes a
-	// ring like everything else the page asks a reader to operate.
-	expect(
-		await page
-			.locator('[data-docs-tab="article"]')
-			.evaluate((element) => {
-				const style = getComputedStyle(element);
-				return (
-					(style.outlineStyle !== "none" &&
-						Number.parseFloat(style.outlineWidth) > 0) ||
-					style.boxShadow !== "none"
-				);
-			}),
-		"the focused tab paints a ring",
-	).toBe(true);
-
-	// With the strip on, the panel's own heading is redundant with the tab
-	// above it and is taken out of the page rather than repeated.
-	await expect(page.locator(".docs-example-name").first()).toBeHidden();
-
-	// And the strip is the section's control, not a row of the stage's
-	// band: it sits outside the stage, above it, on the section's own
-	// column. In the band it read as part of the listing's toolbar, beside
-	// the file name and the copy affordance.
-	const stage = page.locator('[aria-labelledby="semantic-title"] .docs-stage');
-	expect(
-		await strip.evaluate((element) => element.closest(".docs-stage") !== null),
-		"the strip is outside the stage",
-	).toBe(false);
-	await expect(stage.locator(".docs-switch")).toHaveCount(0);
-
-	const [stripBox, stageBox] = await Promise.all([
-		strip.boundingBox(),
-		stage.boundingBox(),
-	]);
-	if (!stripBox || !stageBox) throw new Error("Expected the strip and stage");
-	expect(stripBox.y + stripBox.height).toBeLessThanOrEqual(stageBox.y + 1);
-	expect(Math.round(stripBox.x)).toBe(Math.round(stageBox.x));
-	// Close enough to read as attached to what it switches, and not so far
-	// that it reads as loose copy.
-	expect(stageBox.y - (stripBox.y + stripBox.height)).toBeLessThan(24);
-});
-
-// The two sections this one absorbed both claimed the browser does the
-// work. That claim now belongs to two of the three examples, and it has to
-// be true of the elements the page actually renders.
-test("the showcase's examples are the browser's own behaviour", async ({
-	page,
-}) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	// 1 — an exclusive disclosure group. One `name`, so opening the second
-	// closes the first, and it is the browser doing it.
-	await openExample(page, "details");
-	const panel = page.locator('[data-docs-panel="details"]');
-	const rows = panel.locator("details");
-	await expect(rows).toHaveCount(2);
-	const names = await rows.evaluateAll((items) =>
-		items.map((item) => item.getAttribute("name")),
+	const listed = normalizeMarkup((await page.locator("[data-docs-story-code]").textContent()) ?? "");
+	const cirth = normalizeMarkup(await page.locator(".docs-story-result").evaluate((element) => element.innerHTML));
+	const browser = normalizeMarkup(
+		await page.locator(".docs-story-ua").evaluate((element) => element.shadowRoot?.querySelector(".ua")?.innerHTML ?? ""),
 	);
-	expect(new Set(names).size).toBe(1);
-	expect(names[0]).toBeTruthy();
-
-	await expect(rows.nth(0)).toHaveAttribute("open", "");
-	await rows.nth(1).locator("summary").click();
-	await expect(rows.nth(1)).toHaveAttribute("open", "");
-	await expect(rows.nth(0)).not.toHaveAttribute("open", "");
-
-	// 2 — the browser's own validity state, painted by the framework, and
-	// held back until the reader has caused it. `:user-invalid`, not
-	// `:invalid`: a required field is invalid on arrival, and nothing on
-	// this page is painted red before anyone has touched it.
-	await openExample(page, "form");
-	const email = page.locator('[data-docs-panel="form"] input[type="email"]');
-	expect(
-		await email.evaluate((el) => el.matches(":user-invalid")),
-		"nothing is invalid on arrival",
-	).toBe(false);
-	const resting = await email.evaluate(
-		(el) => getComputedStyle(el).borderColor,
-	);
-	await email.fill("not-an-address");
-	await email.blur();
-	expect(await email.evaluate((el) => el.matches(":user-invalid"))).toBe(true);
-	expect(
-		await email.evaluate((el) => getComputedStyle(el).borderColor),
-		"an invalid field is repainted",
-	).not.toBe(resting);
-
-	// And nothing in any of the three samples is wired to anything, which
-	// is the sentence under the heading. The switcher is in the band, not
-	// in a sample, and there is no inline handler anywhere in the section.
-	const section = page.locator('[aria-labelledby="semantic-title"]');
-	expect(
-		await section.locator(".docs-stage-deck :is(script, [onclick], [onchange], [onsubmit])").count(),
-	).toBe(0);
-
-	// No <form> in the samples either, and that is deliberate: a form with
-	// no action submits to this page, so a reader who filled the field in
-	// would be navigated off the home page by a demo whose claim is that
-	// nothing here is wired. Constraint validation does not need a form
-	// owner, which is why the example above still works.
-	expect(await section.locator("form").count()).toBe(0);
+	expect(listed).toContain('<meter value="0.7" low="0.5" high="0.8" optimum="0">70%</meter>');
+	// No class anywhere in it: the elements say what they are.
+	expect(listed).not.toMatch(/\sclass=/);
+	expect(cirth).toBe(listed);
+	expect(browser).toBe(listed);
 });
 
-test("every control in the showcase specimens is reachable and takes a ring", async ({
-	page,
-}) => {
+test("the browser's picture is its defaults and a picture; Cirth's ticket is live and the library's own", async ({ page }) => {
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	const ua = page.locator(".docs-story-ua");
+	await expect(ua).toHaveAttribute("inert", "");
+	const looks = await page.evaluate(() => {
+		const host = /** @type {HTMLElement} */ (document.querySelector(".docs-story-ua"));
+		const plain = /** @type {HTMLElement} */ (host.shadowRoot?.querySelector("button"));
+		const styled = /** @type {HTMLElement} */ (document.querySelector(".docs-story-result button"));
+		return {
+			plainFont: getComputedStyle(/** @type {Element} */ (host.shadowRoot?.querySelector(".ua"))).fontFamily,
+			pageFont: getComputedStyle(document.body).fontFamily,
+			plainHeight: plain.getBoundingClientRect().height,
+			styledHeight: styled.getBoundingClientRect().height,
+			// Nothing in home.css restyles the ticket's own elements: no rule
+			// there names an element inside the result.
+			homeRules: [...document.styleSheets]
+				.filter((sheet) => sheet.href?.endsWith("/styles/home.css"))
+				.flatMap((sheet) => [...sheet.cssRules].flatMap((rule) => ("cssRules" in rule ? [rule, .../** @type {CSSGroupingRule} */ (rule).cssRules] : [rule])))
+				.map((rule) => /** @type {CSSStyleRule} */ (rule).selectorText ?? "")
+				.filter((selector) => /\.docs-story-result\s*>?\s*(?:article\s+)?(?:hgroup|dl|dt|dd|meter|details|summary|button|label|time|h3|p)\b/.test(selector)),
+		};
+	});
+	// No stylesheet reaches the picture: neither the page's face nor
+	// Cirth's control size.
+	expect(looks.plainFont).not.toBe(looks.pageFont);
+	expect(looks.styledHeight).toBeGreaterThan(looks.plainHeight + 8);
+	expect(looks.homeRules).toEqual([]);
 
-	let checked = 0;
-	// Every example, not only the one showing: a control in a panel nobody
-	// opened is still a control a reader can reach.
-	for (const id of [...showcaseExamples, null]) {
-		if (id) await openExample(page, id);
+	// Cirth's copy is the real thing: the disclosure opens and closes, the
+	// gauge has its region, and the button takes the keyboard.
+	const details = page.locator(".docs-story-result details");
+	await expect(details).not.toHaveAttribute("open", "");
+	await details.locator("summary").click();
+	await expect(details).toHaveAttribute("open", "");
+	await details.locator("summary").click();
+	await expect(details).not.toHaveAttribute("open", "");
+	expect(await page.locator(".docs-story-result meter").evaluate((meter) => /** @type {HTMLMeterElement} */ (meter).value)).toBe(0.7);
+	const button = page.locator(".docs-story-result button");
+	await button.focus();
+	await expect(button).toBeFocused();
+});
 
-		// Form controls and summaries only, which is what every engine
-		// reaches with default settings (see the note at the top of this
-		// file). Visible ones, because a hidden panel's controls are out of
-		// the document's tab order by design.
-		const controls = page.locator(
-			".docs-example:not([hidden]) .docs-stage-preview :is(input, select, summary)",
-		);
-		const count = await controls.count();
-		for (let index = 0; index < count; index++) {
-			const control = controls.nth(index);
-			// A Tab first, because opening an example is a click and every
-			// engine's `:focus-visible` heuristic remembers that the last
-			// interaction was a pointer: a programmatic focus after a click
-			// is deliberately not focus-visible. The keypress puts the
-			// browser back in the modality this assertion is about.
-			await page.keyboard.press("Tab");
-			await control.focus();
-			expect(
-				await control.evaluate((element) => element.matches(":focus-visible")),
-				`${id ?? "last"} control ${index} takes focus`,
-			).toBe(true);
-			const ring = await control.evaluate((element) => {
-				const style = getComputedStyle(element);
+// --- The presets comparator -------------------------------------------
+
+test("the import line under the list is the preset the halves wear", async ({ page }) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	const options = await page.locator("[data-docs-compare-preset] option").evaluateAll((items) => items.map((item) => [item.getAttribute("value"), item.textContent?.trim()]));
+	expect(options).toEqual([["default", "Default"], ["material", "Material"], ["metro", "Metro"], ["plain", "Plain"]]);
+	const line = page.locator("[data-docs-compare-import][data-current]");
+	await expect(line).toHaveText('@import "@cirthcss/cirth";');
+	for (const name of ["material", "metro", "plain"]) {
+		await page.locator("[data-docs-compare-preset]").selectOption(name);
+		await expect(line).toHaveText(`@import "@cirthcss/cirth/presets/${name}";`);
+		await expect(line).toBeVisible();
+		await expect(page.locator("[data-docs-compare-import]:not([data-current])").first()).toHaveCSS("visibility", "hidden");
+	}
+	// One short line, not a block competing with the comparator.
+	await expect(page.locator(".docs-presets pre")).toHaveCount(0);
+});
+
+test("one preset in both halves: light on the left, dark on the right, never on the host", async ({ page }) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	const read = () =>
+		page.locator(".docs-compare-layer").evaluateAll((layers) =>
+			layers.map((layer) => {
+				const root = /** @type {ShadowRoot} */ (layer.shadowRoot);
+				const surface = /** @type {Element} */ (root.querySelector("[data-docs-compare-surface]"));
 				return {
-					style: style.outlineStyle,
-					width: Number.parseFloat(style.outlineWidth),
-					shadow: style.boxShadow,
+					host: layer.getAttribute("data-theme"),
+					theme: surface.getAttribute("data-theme"),
+					scheme: getComputedStyle(surface).colorScheme,
+					canvas: getComputedStyle(surface).backgroundColor,
+					radius: getComputedStyle(/** @type {Element} */ (root.querySelector('input[type="email"]'))).borderTopLeftRadius,
+					on: [...root.querySelectorAll("link[data-docs-preset]")].filter((link) => /** @type {HTMLLinkElement} */ (link).media === "all").map((link) => /** @type {HTMLElement} */ (link).dataset.docsPreset),
+				};
+			}),
+		);
+	const pick = page.locator("[data-docs-compare-preset]");
+	await expect(pick).toBeVisible();
+	await expect(pick).toHaveValue("default");
+	/** @type {Record<string, string>} */
+	const radii = {};
+	for (const name of ["default", "material", "metro", "plain"]) {
+		await pick.selectOption(name);
+		const [light, dark] = await read();
+		expect(light.host, "a data-theme on the shadow host").toBeNull();
+		expect(dark.host, "a data-theme on the shadow host").toBeNull();
+		expect([light.theme, dark.theme]).toEqual(["light", "dark"]);
+		expect([light.scheme, dark.scheme]).toEqual(["light", "dark"]);
+		expect(light.canvas).not.toBe(dark.canvas);
+		// The same theme on both sides.
+		expect(light.radius).toBe(dark.radius);
+		expect(light.on).toEqual(name === "default" ? [] : [name]);
+		expect(dark.on).toEqual(light.on);
+		radii[name] = light.radius;
+	}
+	expect(radii.metro).toBe("0px");
+	expect(new Set(Object.values(radii)).size).toBeGreaterThan(2);
+
+	// The page's own scheme and preset reach neither half.
+	const before = await read();
+	await page.locator(".docs-theme-toggle").click();
+	await page.locator("[data-cirth-preset-select]").first().selectOption("material");
+	await page.waitForTimeout(500);
+	expect((await read()).map((half) => [half.scheme, half.canvas, half.radius])).toEqual(before.map((half) => [half.scheme, half.canvas, half.radius]));
+});
+
+test("picking a preset moves nothing on the page", async ({ page }) => {
+	for (const width of [320, 390, 1024, 1440]) {
+		await page.setViewportSize({ width, height: 900 });
+		await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+		const layout = () =>
+			page.evaluate(() =>
+				[".docs-compare-frame", ".docs-compare > figcaption", ".docs-presets .docs-section-more", ".docs-agnostic"].map((selector) => {
+					const box = /** @type {Element} */ (document.querySelector(selector)).getBoundingClientRect();
+					return [Math.round(box.top + window.scrollY), Math.round(box.height)];
+				}),
+			);
+		const first = await layout();
+		for (const name of ["material", "metro", "plain", "default"]) {
+			await page.locator("[data-docs-compare-preset]").selectOption(name);
+			expect(await layout(), `${width}px ${name}`).toEqual(first);
+		}
+	}
+});
+
+test("the divider is a real range: keyboard, pointer, a name and a value", async ({ page }) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	const compare = page.locator("[data-docs-compare]");
+	const range = page.getByRole("slider", { name: "Divider between the light and the dark scheme" });
+	await expect(range).toHaveCount(1);
+	await expect(range).toHaveAttribute("aria-valuetext", "Half light, half dark");
+	const split = () => compare.evaluate((element) => getComputedStyle(element).getPropertyValue("--docs-split").trim());
+
+	await range.focus();
+	await page.keyboard.press("Home");
+	await expect(range).toHaveValue("0");
+	await expect(range).toHaveAttribute("aria-valuetext", "All dark");
+	await page.keyboard.press("End");
+	await expect(range).toHaveAttribute("aria-valuetext", "All light");
+	await page.keyboard.press("Home");
+	for (let index = 0; index < 20; index++) await page.keyboard.press("ArrowRight");
+	await expect(range).toHaveValue("20");
+	expect(await split()).toBe("20%");
+	await expect(range).toHaveAttribute("aria-valuetext", "20% light, 80% dark");
+	// The ring is drawn on the handle, where the reader looks.
+	await expect(page.locator(".docs-compare-handle")).not.toHaveCSS("outline-style", "none");
+
+	// A press anywhere on the frame moves the divider there.
+	const frame = await page.locator(".docs-compare-frame").boundingBox();
+	if (!frame) throw new Error("no frame");
+	await page.mouse.click(frame.x + frame.width * 0.75, frame.y + frame.height / 2);
+	const value = Number(await range.inputValue());
+	expect(value).toBeGreaterThanOrEqual(72);
+	expect(value).toBeLessThanOrEqual(78);
+
+	// The two copies are pictures: the list and the range are the only
+	// controls, and Tab meets each of them once.
+	for (const layer of await page.locator(".docs-compare-layer").all()) {
+		await expect(layer).toHaveAttribute("inert", "");
+	}
+	const focusable = await page.locator(".docs-presets").evaluate((section) =>
+		[...section.querySelectorAll("a, button, input, select, [tabindex]")].filter((element) => {
+			const style = getComputedStyle(element);
+			return !element.closest("[inert]") && style.visibility === "visible" && style.display !== "none" && !element.hasAttribute("hidden");
+		}).map((element) => element.tagName),
+	);
+	expect(focusable.filter((tag) => tag === "SELECT")).toHaveLength(1);
+	expect(focusable.filter((tag) => tag === "INPUT")).toHaveLength(1);
+
+	// No labels drawn as badges over the frame: the schemes are named in
+	// the copies' own ink.
+	await expect(page.locator(".docs-compare-label")).toHaveCount(0);
+	const names = await page.locator(".docs-compare-layer").evaluateAll((layers) => layers.map((layer) => layer.shadowRoot?.querySelector(".scheme")?.textContent));
+	expect(names).toEqual(["Light", "Dark"]);
+});
+
+test("nothing moves the divider but the reader", async ({ page }) => {
+	await page.emulateMedia({ reducedMotion: "no-preference" });
+	await page.setViewportSize({ width: 1440, height: 900 });
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	const range = page.locator("[data-docs-compare-range]");
+	const split = () => page.locator("[data-docs-compare]").evaluate((element) => getComputedStyle(element).getPropertyValue("--docs-split").trim());
+	// Arriving at the comparator plays nothing: no hint, no animation.
+	await page.locator(".docs-compare").evaluate((element) => element.scrollIntoView({ block: "center" }));
+	await page.waitForTimeout(1800);
+	expect(await split()).toBe("50%");
+	expect(await page.locator(".docs-compare").evaluate((element) => element.getAnimations({ subtree: true }).length)).toBe(0);
+	await range.focus();
+	await page.keyboard.press("ArrowLeft");
+	await page.waitForTimeout(1200);
+	expect(await range.inputValue()).toBe("49");
+	expect(await split()).toBe("49%");
+});
+
+// --- Your theme --------------------------------------------------------
+
+test("the demonstration's theme is its own: no value is the default's or a preset's", () => {
+	const fs = require("node:fs");
+	const path = require("node:path");
+	const themeDemo = require("../docs/src/_data/themeDemo.js");
+	/** @param {string} text */
+	const declared = (text) =>
+		Object.fromEntries(
+			[...text.matchAll(/(--cirth-[\w-]+):\s*([^;]+);/g)].map(([, prop, value]) => [
+				prop,
+				value.replace(/\s+/g, " ").replace(/\(\s+/g, "(").replace(/\s+\)/g, ")").replace(/(\d)deg\b/g, "$1").trim(),
+			]),
+		);
+	const postcss = require("postcss");
+	const generated = path.join(__dirname, "../docs/src/styles/generated");
+	// A theme root's own declarations, at the top of the file or of its one
+	// cascade layer, as the docs build reads them for the presets page.
+	/** @param {string} file */
+	const themeRoot = (file) => {
+		/** @type {Record<string, string>} */
+		const found = {};
+		postcss.parse(fs.readFileSync(path.join(generated, file), "utf8")).walkRules((rule) => {
+			const parent = rule.parent;
+			const top = parent?.type === "root" || (parent?.type === "atrule" && /** @type {import("postcss").AtRule} */ (parent).name === "layer" && parent.parent?.type === "root");
+			if (!top || !rule.selector.split(",").every((selector) => /^(:root|:host|\.cirth)$/.test(selector.trim()))) return;
+			Object.assign(found, declared(rule.toString()));
+		});
+		return found;
+	};
+	/** @type {Record<string, Record<string, string>>} */
+	const shipped = { default: themeRoot("cirth-lab-scoped.css") };
+	for (const name of ["material", "metro", "plain"]) shipped[name] = themeRoot(`presets/${name}.css`);
+	for (const [name, values] of Object.entries(shipped)) {
+		expect(values["--cirth-primary"], `${name} declares an accent`).toBeTruthy();
+	}
+	const normal = (/** @type {string} */ value) => value.replace(/\s+/g, " ").replace(/(\d)deg\b/g, "$1").trim();
+	expect(themeDemo.states).toHaveLength(4);
+	for (const state of themeDemo.states) {
+		for (const token of themeDemo.tokens) {
+			const value = normal(state.values[token]);
+			for (const [name, values] of Object.entries(shipped)) {
+				if (values[token]) expect(value, `${state.id} ${token} is ${name}'s`).not.toBe(normal(values[token]));
+			}
+		}
+		// Not the default theme's or any preset's, as a whole either.
+		for (const [name, values] of Object.entries(shipped)) {
+			expect(themeDemo.tokens.every((token) => normal(state.values[token]) === normal(values[token] ?? "")), `${state.id} is ${name}`).toBe(false);
+		}
+	}
+	// One declaration changes at each step, in the order the steps name.
+	expect(themeDemo.states.slice(1).map((state) => state.changes)).toEqual(themeDemo.tokens);
+	for (let index = 1; index < themeDemo.states.length; index += 1) {
+		const changed = themeDemo.tokens.filter((token) => themeDemo.states[index].values[token] !== themeDemo.states[index - 1].values[token]);
+		expect(changed).toEqual([themeDemo.states[index].changes]);
+	}
+});
+
+test("the theme copy wears each state inside its shadow root, and reads at AA in every one", async ({ page }) => {
+	const themeDemo = require("../docs/src/_data/themeDemo.js");
+	for (const scheme of /** @type {const} */ (["light", "dark"])) {
+		await page.emulateMedia({ colorScheme: scheme, reducedMotion: "no-preference" });
+		await page.setViewportSize({ width: 1440, height: 900 });
+		await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+		const host = page.locator(".docs-theme-copy");
+		await expect(host).toHaveAttribute("inert", "");
+		expect(await host.getAttribute("data-theme"), "a data-theme on the shadow host").toBeNull();
+		for (const [index, p] of [0.05, 0.3, 0.52, 0.85].entries()) {
+			await page.locator("[data-docs-theme]").evaluate((section, p) => {
+				window.scrollTo(0, section.getBoundingClientRect().top + window.scrollY + p * (/** @type {HTMLElement} */ (section).offsetHeight - window.innerHeight));
+			}, p);
+			const id = themeDemo.states[index].id;
+			await expect(page.locator("[data-docs-theme]")).toHaveAttribute("data-state", id);
+			// Cirth's own control transitions finish before reading colours.
+			await page.waitForTimeout(400);
+			const read = await host.evaluate((element) => {
+				const root = /** @type {ShadowRoot} */ (element.shadowRoot);
+				const on = [...root.querySelectorAll("style[data-docs-theme-state]")].filter((style) => /** @type {HTMLStyleElement} */ (style).media === "all").map((style) => /** @type {HTMLElement} */ (style).dataset.docsThemeState);
+				const surface = /** @type {HTMLElement} */ (root.querySelector("[data-docs-theme-surface]"));
+				const canvas = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
+				if (!canvas) throw new Error("no canvas");
+				/** @param {string} colour */
+				const rgb = (colour) => {
+					canvas.clearRect(0, 0, 1, 1);
+					canvas.fillStyle = colour;
+					canvas.fillRect(0, 0, 1, 1);
+					return [...canvas.getImageData(0, 0, 1, 1).data];
+				};
+				/** @param {number[]} colour */
+				const luminance = ([r, g, b]) => {
+					const f = (/** @type {number} */ v) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+					return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+				};
+				/** @param {string} a @param {string} b */
+				const ratio = (a, b) => {
+					const [x, y] = [luminance(rgb(a)), luminance(rgb(b))].sort((m, n) => n - m);
+					return (x + 0.05) / (y + 0.05);
+				};
+				/** @param {Element | null} node */
+				const background = (node) => {
+					for (let at = node; at; at = at.parentElement) {
+						const colour = getComputedStyle(at).backgroundColor;
+						if (rgb(colour)[3] > 0) return colour;
+					}
+					return getComputedStyle(surface).backgroundColor;
+				};
+				/** @param {string} selector */
+				const text = (selector) => {
+					const node = /** @type {Element} */ (root.querySelector(selector));
+					return ratio(getComputedStyle(node).color, background(node));
+				};
+				return {
+					on,
+					scheme: getComputedStyle(surface).colorScheme,
+					theme: surface.getAttribute("data-theme"),
+					button: text("button"),
+					summary: text("summary"),
+					term: text("dt"),
+					value: text("dd"),
+					subtitle: text("hgroup p"),
 				};
 			});
-			expect(
-				(ring.style !== "none" && ring.width > 0) || ring.shadow !== "none",
-				`${id ?? "last"} control ${index} paints a focus ring`,
-			).toBe(true);
-			checked += 1;
+			expect(read.on, `${scheme} ${id}`).toEqual([id]);
+			expect(read.theme).toBe(scheme);
+			expect(read.scheme).toBe(scheme);
+			for (const [what, value] of Object.entries(read)) {
+				if (typeof value === "number") expect(value, `${scheme} ${id}: ${what}`).toBeGreaterThanOrEqual(4.5);
+			}
 		}
 	}
-	// The disclosure's two summaries and the form's field and switch: the
-	// theme preview is inert, a picture of an interface, and has none.
-	expect(checked).toBeGreaterThanOrEqual(4);
-});
-
-// --- The theme section --------------------------------------------------
-
-/**
- * The listing beside the preview and the stylesheet the preview is really
- * carrying, normalised the same way: the listing breaks a `light-dark()`
- * value over three lines to fit the pane.
- * @param {string} css
- */
-const normalizeCss = (css) =>
-	css
-		.replace(/\s+/g, " ")
-		.replace(/\(\s+/g, "(")
-		.replace(/\s+\)/g, ")")
-		.trim();
-
-/**
- * What the demo is showing and what it is doing, read together.
- * @param {import("@playwright/test").Page} page
- */
-const themeState = (page) =>
-	page.evaluate(() => {
-		const element = document.querySelector("cirth-theme-preview");
-		const shadow = element?.shadowRoot;
-		const surface = /** @type {HTMLElement | null | undefined} */ (shadow?.querySelector(".cirth"));
-		const style = shadow?.querySelector("style[data-cirth-theme]");
-		const block = document.querySelector("[data-docs-theme-block]");
-		return {
-			applied: style?.textContent ?? "",
-			listed: block?.textContent ?? "",
-			file: document.querySelector("[data-docs-theme-file]")?.textContent?.trim() ?? "",
-			scheme: surface?.dataset.theme ?? "",
-			accent: surface
-				? getComputedStyle(surface).getPropertyValue("--cirth-primary").trim()
-				: "",
-			canvas: surface ? getComputedStyle(surface).backgroundColor : "",
-			pageAccent: getComputedStyle(document.documentElement)
-				.getPropertyValue("--cirth-primary")
-				.trim(),
-		};
-	});
-
-// The demo is a custom element with its own copy of Cirth in a shadow
-// root, and every claim this section makes rests on that: the declarations
-// it applies reach the preview and nothing else, and the listing beside it
-// is the stylesheet the preview carries rather than a picture of one.
-test("the theme preview carries its own Cirth, in a shadow root", async ({
-	page,
-}) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	const element = page.locator("cirth-theme-preview");
-	await expect(element).toHaveCount(1);
-	// A picture of a themed interface, like the hero's card.
-	await expect(element).toHaveAttribute("inert", "");
-
-	const shadow = await element.evaluate((host) => {
-		const root = host.shadowRoot;
-		const sheets = [...(root?.querySelectorAll("link[rel=stylesheet]") ?? [])];
-		return {
-			mode: root ? "open" : "none",
-			stylesheets: sheets.map((sheet) =>
-				String(sheet.getAttribute("href")).replace(/^.*\/styles\//, "styles/"),
-			),
-			themeAfterCirth:
-				[...(root?.children ?? [])].findIndex((child) =>
-					child.matches("style[data-cirth-theme]"),
-				) >
-				[...(root?.children ?? [])].findIndex((child) =>
-					child.matches("link[rel=stylesheet]"),
-				),
-			wrapper: root?.querySelector(".cirth")?.tagName.toLowerCase() ?? null,
-			specimen: root?.querySelector(".cirth > article")?.tagName.toLowerCase() ?? null,
-			// The overlay the section is about: a menu open over the card.
-			menu: root?.querySelector(".cirth details.dropdown[open] > ul") ? "open" : "closed",
-			lightChildren: host.children.length,
-		};
-	});
-	expect(shadow.mode).toBe("open");
-	expect(shadow.stylesheets).toEqual(["styles/generated/cirth-lab-scoped.css"]);
-	expect(shadow.themeAfterCirth).toBe(true);
-	expect(shadow.wrapper).toBe("div");
-	expect(shadow.specimen).toBe("article");
-	expect(shadow.menu).toBe("open");
-	expect(shadow.lightChildren).toBe(0);
-
-	// The listing is the stylesheet: the same text, which is the only
-	// version of this claim that cannot drift.
-	const state = await themeState(page);
-	expect(normalizeCss(state.listed)).toBe(normalizeCss(state.applied));
-	expect(state.applied).toContain(".cirth {");
-	for (const token of ["--cirth-primary", "--cirth-border-radius", "--cirth-canvas"]) {
-		expect(state.applied, `${token} is applied`).toContain(token);
-	}
-
-	// Served in the default theme and the page's own scheme: the section
-	// opens on agreement rather than on a difference nobody asked for.
-	expect(state.accent).toBe(state.pageAccent);
-	expect(state.file).toBe("cirth.scoped.css");
-});
-
-// Every choice applies exactly what it lists, and names the file it comes
-// from. Every value is read out of a compiled file at build time, so "no
-// fake code" is a property of the pipeline; what this checks is that the
-// demo applies what it prints, for every theme.
-test("choosing a theme applies exactly what it lists", async ({ page }) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	const controls = page.locator("[data-docs-theme-controls]");
-	await expect(controls).toBeVisible();
-	const themes = controls.locator('input[name="docs-theme-state"]');
-	const count = await themes.count();
-	expect(count).toBeGreaterThanOrEqual(4);
-
-	const accents = new Set();
-	for (let index = 0; index < count; index++) {
-		await themes.nth(index).check();
-		const state = await themeState(page);
-		expect(normalizeCss(state.listed), `theme ${index}: listed is applied`).toBe(
-			normalizeCss(state.applied),
-		);
-		expect(state.file, `theme ${index} names its file`).toMatch(/\.css$/);
-		accents.add(state.accent);
-	}
-	// Each theme is a different accent, not four names for one.
-	expect(accents.size).toBe(count);
-});
-
-// The isolation, exercised rather than asserted: the demo takes a theme of
-// its own, and the site's preset switcher moves the page and leaves the
-// demo where it was.
-test("the theme demo and the page keep separate themes", async ({ page }) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	const opening = await themeState(page);
-	await page.locator('[data-docs-theme-controls] label', { hasText: "Material" }).click();
-	const moved = await themeState(page);
-	expect(moved.accent).not.toBe(opening.accent);
-	expect(moved.pageAccent, "the page did not move").toBe(opening.pageAccent);
-
-	const header = page.locator("[data-cirth-preset-select]");
-	await header.selectOption("metro");
-	await expect
-		.poll(async () => (await themeState(page)).pageAccent, {
-			message: "the preset repaints the page",
-			timeout: 15000,
-		})
-		.not.toBe(moved.pageAccent);
-	const after = await themeState(page);
-	expect(after.accent, "the demo is not repainted by the page").toBe(moved.accent);
-	expect(after.applied).toBe(moved.applied);
-
-	await header.selectOption("default");
-});
-
-// Nothing in the section moves on its own, with or without the motion
-// preference: auto-updating content beside a form is what WCAG 2.2.2 asks
-// a way to stop, and the simplest way is not to start it. The scheme is a
-// choice too, and it moves the preview's canvas and nothing else.
-test("the theme demo moves only when the reader chooses", async ({ page }) => {
-	await page.emulateMedia({ reducedMotion: "no-preference" });
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-	await page.locator(".docs-themes").scrollIntoViewIfNeeded();
-
-	const opening = await themeState(page);
-	await page.waitForTimeout(2500);
-	expect(await themeState(page), "nothing changes on its own").toEqual(opening);
-
-	const pageScheme = await page.locator("html").getAttribute("data-theme");
-	const other = pageScheme === "dark" ? "Light" : "Dark";
-	await page.locator('[data-docs-theme-controls] label', { hasText: other }).click();
-	const flipped = await themeState(page);
-	expect(flipped.scheme).toBe(other.toLowerCase());
-	await expect.poll(async () => (await themeState(page)).canvas).not.toBe(opening.canvas);
-	expect(await page.locator("html").getAttribute("data-theme")).toBe(pageScheme);
-});
-
-// The two choices are real radio groups: named, one tab stop each, and the
-// arrow keys walk them, which is what the segmented control is.
-test("the theme choices are named radio groups the keyboard can walk", async ({
-	page,
-}) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	const groups = page.locator("[data-docs-theme-controls] fieldset");
-	await expect(groups).toHaveCount(2);
-	await expect(groups.nth(0).locator("legend")).toHaveText("Theme");
-	await expect(groups.nth(1).locator("legend")).toHaveText("Scheme");
-
-	const first = groups.nth(0).locator("input").first();
-	await page.keyboard.press("Tab");
-	await first.focus();
-	const before = await themeState(page);
-	await page.keyboard.press("ArrowRight");
-	await expect(groups.nth(0).locator("input").nth(1)).toBeChecked();
-	const after = await themeState(page);
-	expect(after.applied).not.toBe(before.applied);
-	expect(normalizeCss(after.listed)).toBe(normalizeCss(after.applied));
-});
-
-// The shell injects a copy button on every `pre > code` and copies its
-// text, so the listing hands over exactly the declarations on screen.
-test("copying the theme listing hands over the declarations on screen", async ({
-	page,
-}) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	const block = page.locator("[data-docs-theme-block]");
-	const copied = await block.innerText();
-	const state = await themeState(page);
-	expect(normalizeCss(copied)).toBe(normalizeCss(state.applied));
-	// One value per token, not every state's version of it.
-	expect(copied.match(/--cirth-primary/g)).toHaveLength(1);
 });
 
 test("the home page states its argument in one heading outline", async ({
@@ -1678,129 +1640,56 @@ test("the home page states its argument in one heading outline", async ({
 		).toBeLessThanOrEqual(1);
 	}
 
-	// Six blocks, in order: the claim and its proof, the facts, the
-	// demonstration, where it works, the theme, and the way in. The
-	// questions and the long proofs live on Why Cirth.
+	// Eight scenes, in order: the claim and its proof, the facts, what the
+	// browser does and what Cirth adds, the measured figures, a theme of the
+	// reader's own, the presets, the stacks, and the close.
 	const sections = await page
 		.locator("main > section")
 		.evaluateAll((items) => items.map((item) => item.className.split(" ")[0]));
 	expect(sections).toEqual([
 		"docs-hero",
 		"docs-facts-band",
-		"docs-demo-section",
-		"docs-frameworks",
-		"docs-themes",
-		"docs-cta",
+		"docs-story",
+		"docs-measured",
+		"docs-theme",
+		"docs-presets",
+		"docs-agnostic",
+		"docs-pure",
 	]);
+	expect(
+		await page.locator("main > section h2[id]").evaluateAll((headings) => headings.map((heading) => heading.textContent?.trim())),
+	).toEqual([
+		"At a glance",
+		"Built on HTML, not around it.",
+		"Less markup. Nothing to run.",
+		"Your theme. Same HTML.",
+		"Presets, light and dark.",
+		"Framework agnostic. Works everywhere.",
+		"Pure CSS. Whatever writes your HTML.",
+	]);
+	// The sections it replaced are gone, with everything that drew them.
+	await expect(page.locator(".docs-showcase, .docs-narrative, .docs-themes")).toHaveCount(0);
+	const last = page.locator("main > section").last();
+	await expect(last.locator("h2")).toHaveText("Pure CSS. Whatever writes your HTML.");
+	await expect(page.locator("main h2", { hasText: "Pure CSS. Whatever writes your HTML." })).toHaveCount(1);
+	await expect(last.getByRole("button", { name: "Get started" })).toHaveAttribute("href", "/installation");
 	for (const gone of [
+		"One stylesheet. Whole interfaces.",
+		"Three declarations. A different interface.",
 		"Before you install",
 		"Every claim has a check path.",
 		"Less markup. The same interface.",
+		"Add one stylesheet. Keep your HTML.",
+		"Describe what it is. Cirth draws it.",
 	]) {
 		await expect(
 			page.locator("main h2", { hasText: gone }),
 			`${gone} is not a section of the home page`,
 		).toHaveCount(0);
 	}
-});
-
-test("every stage is one contained frame, and the live half is not a thumbnail", async ({
-	page,
-}) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	for (const [section, inner] of /** @type {const} */ ([
-		["semantic", ".docs-demo-section .docs-home-inner"],
-		["theme", ".docs-themes .docs-home-inner"],
-	])) {
-		const grid = await page
-			.locator(inner)
-			.evaluate((element) => element.getBoundingClientRect().width);
-		const stage = page.locator(`[aria-labelledby="${section}-title"] .docs-stage`);
-		await expect(stage, `${section} has one stage`).toHaveCount(1);
-		const width = await stage.evaluate((element) => element.getBoundingClientRect().width);
-		expect(Math.round(width), `${section} stage width`).toBeGreaterThanOrEqual(
-			Math.round(grid) - 1,
-		);
-	}
-
-	for (const scope of ['[data-docs-panel="article"]', ".docs-theme-stage"]) {
-		const [code, preview] = await Promise.all(
-			[".docs-stage-code", ".docs-stage-preview"].map((selector) =>
-				page
-					.locator(`${scope} ${selector}`)
-					.first()
-					.evaluate((element) => element.getBoundingClientRect().width),
-			),
-		);
-		expect(
-			preview / (code + preview),
-			`${scope}: the preview's share of the split`,
-		).toBeGreaterThanOrEqual(0.5);
-	}
-
-	// Switching examples must not move the page under the reader.
-	const heights = [];
-	for (const id of showcaseExamples) {
-		await openExample(page, id);
-		heights.push(
-			await page
-				.locator('[aria-labelledby="semantic-title"] .docs-stage')
-				.evaluate((element) => Math.round(element.getBoundingClientRect().height)),
-		);
-	}
-	expect(
-		Math.max(...heights) - Math.min(...heights),
-		`stage heights across examples: ${heights.join(", ")}`,
-	).toBeLessThanOrEqual(96);
-});
-
-// The disclosure example's note says the questions on Why Cirth are this
-// same element. A sentence is cheap; the thing worth pinning is that it is
-// still true.
-test("the disclosure example is the element the questions on Why Cirth are made of", async ({
-	page,
-}) => {
-	/** @param {import("@playwright/test").Locator} locator */
-	const shapeOf = (locator) =>
-		locator.first().evaluate((element) => {
-			const summary = element.querySelector("summary");
-			const paragraph = element.querySelector("p");
-			return {
-				tag: element.tagName.toLowerCase(),
-				grouped: element.hasAttribute("name"),
-				classes: [
-					element.className,
-					summary?.className ?? "",
-					paragraph?.className ?? "",
-				].join("").trim(),
-				children: [...element.children].map((child) => child.tagName.toLowerCase()),
-			};
-		});
-
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-	await openExample(page, "details");
-	const specimen = await shapeOf(page.locator('[data-docs-panel="details"] details'));
-	const link = page.locator('[data-docs-panel="details"] .docs-example-note a');
-	await expect(link).toHaveAttribute("href", "/why-cirth#before-you-install");
-	// One group on the home page: the specimen's own.
-	expect(
-		await page
-			.locator("main details[name]")
-			.evaluateAll((items) => [...new Set(items.map((item) => item.getAttribute("name")))]),
-	).toEqual(["delivery"]);
-
-	// The static server this suite runs on does not add a trailing slash
-	// the way a real host does, so the page is opened by its file path.
-	await page.goto(`${origin}/why-cirth/#before-you-install`, { waitUntil: "networkidle" });
-	const question = await shapeOf(page.locator('.docs-content details[name="faq"]'));
-
-	// The same element, the same parts, and no classes on any of them.
-	expect(specimen.tag).toBe("details");
-	expect(specimen).toEqual(question);
-	expect(specimen.classes, "the specimen wears no classes").toBe("");
-	expect(specimen.grouped, "and it is a group, like the questions are").toBe(true);
-	await expect(page.locator('.docs-content details[name="faq"]')).toHaveCount(7);
+	// No radios choose anything on the home page, and nothing poses as tabs.
+	await expect(page.locator("main [type=radio]")).toHaveCount(0);
+	await expect(page.locator('main [role="tab"], main [role="tablist"]')).toHaveCount(0);
 });
 
 // --- The boundary of a live example -------------------------------------
@@ -2123,10 +2012,12 @@ test("every stacked nav in the shell paints inside its own container", async ({
 						Number.parseFloat(style.paddingRight) -
 						Number.parseFloat(style.borderRightWidth),
 				};
-				const boxes = [...document.querySelectorAll(links)].map((link) => {
-					const rect = link.getBoundingClientRect();
-					return { left: rect.left, right: rect.right };
-				});
+				// Links in a folded group are not rendered; what is drawn has
+				// to stay inside.
+				const boxes = [...document.querySelectorAll(links)]
+					.map((link) => link.getBoundingClientRect())
+					.filter((rect) => rect.width > 0)
+					.map((rect) => ({ left: rect.left, right: rect.right }));
 				return { inner, boxes, gutter: style.getPropertyValue("--cirth-nav-element-spacing-horizontal").trim() };
 			},
 			{ container, links },
@@ -2471,28 +2362,28 @@ test("the footer offers paths out, not the reference", async ({ page }) => {
 
 // --- The framework guides -------------------------------------------------
 
-// A guide opens on the project's marks and its name, says what it will
-// have you do, and sets its numbered chapters as steps. The marks are
+// A guide opens on the project's mark and its name, says what it will
+// have you do, and sets its numbered chapters as steps. The mark is
 // decorative, so the title a reader, a search index and <title> get is the
-// name alone.
-test("each framework guide opens on its marks and reads as steps", async ({ page }) => {
+// name alone; a project whose terms keep its logo off the site has none.
+test("each framework guide opens on its mark and reads as steps", async ({ page }) => {
 	const frameworks = require("../docs/src/_data/frameworks.js");
 	for (const guide of frameworks.guides) {
 		await page.goto(`${origin}${guide.link}/`, { waitUntil: "networkidle" });
 		const title = page.locator(".docs-content > h1.docs-guide-title");
 		await expect(title, `${guide.id} title`).toHaveCount(1);
-		await expect(title).toHaveText(guide.text);
-		expect(await page.title()).toBe(`${guide.text} — Cirth`);
+		await expect(title).toHaveText(guide.name);
+		expect(await page.title()).toBe(`${guide.name} — Cirth`);
 
 		const marks = title.locator(".docs-guide-marks img");
-		expect(await marks.count()).toBeGreaterThanOrEqual(guide.marks.length);
 		for (const alt of await marks.evaluateAll((items) => items.map((item) => item.getAttribute("alt")))) {
 			expect(alt, `${guide.id}: a mark beside the name is decorative`).toBe("");
 		}
 		const shown = await marks.evaluateAll(
 			(items) => items.filter((item) => getComputedStyle(item).display !== "none").length,
 		);
-		expect(shown, `${guide.id}: one variant per mark`).toBe(guide.marks.length);
+		expect(shown, `${guide.id}: one variant of its mark, or none`).toBe(guide.mark ? 1 : 0);
+		await expect(title.locator("a")).toHaveCount(0);
 
 		const steps = page.locator(".docs-content > h2.docs-step-heading");
 		const count = await steps.count();

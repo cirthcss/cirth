@@ -56,6 +56,12 @@
                         full surface for the same reason it does at 48rem
 */
 
+/* A fragment, a scroll-spy jump or a focused control lands below the
+   sticky header rather than behind it: the same line the rails stick to. */
+html {
+  scroll-padding-block-start: var(--docs-rail-top);
+}
+
 /* The canvas itself (warm paper in light, near-black in dark) is the
    framework's own --cirth-background-color: nothing to override here. */
 :root {
@@ -87,6 +93,12 @@
   --docs-index-title-size: 0.9375rem;
   --docs-rail-width: 15rem;
   --docs-toc-width: 13rem;
+  /* Where the two rails stick: under the sticky header, with a step of
+     air. Their height is the window's below that line, so a rail is never
+     taller than what it can show and scrolls inside itself instead of
+     running down the page into the footer. */
+  --docs-rail-top: 5.5rem;
+  --docs-rail-height: calc(100dvh - var(--docs-rail-top) - var(--cirth-space-6));
 
   /* The framework's own reading rhythm, captured before the reading column
      below re-times it: both are *inherited*, so every live example inside
@@ -1011,8 +1023,6 @@
 @media (width >= 80rem) {
   .docs-toc {
     display: block;
-    position: sticky;
-    overflow-y: auto;
   }
 }
 
@@ -1032,14 +1042,12 @@
   padding: 0;
 }
 
-/* Level-3 entries indent inside the list; in the aside the indent lives
-   on the link text so the left rail stays continuous */
-.docs-toc-top .docs-toc-level-3 {
+/* A subsection's list sits inside its section's item. In the compact
+   disclosure the indent is the list's; in the rail it lives on the link
+   text, so the one rail down the outline stays continuous and a current
+   subsection marks it at the same place a section does. */
+.docs-toc-top nav ul ul {
   padding-inline-start: var(--cirth-space-4);
-}
-
-.docs-toc .docs-toc-level-3 a {
-  padding-inline-start: calc(var(--cirth-space-3) + var(--cirth-space-4));
 }
 
 /* `text-decoration: none` reads inert only because the audit photographs
@@ -1060,15 +1068,7 @@
 
 /* No active styling here on purpose: the scroll-spy sets aria-current and
    the framework paints the inline-start rail. A second bar drawn as a
-   ::before is one rail too many.
-
-   Sidebar structure only: `aside nav` ships the horizontal-nav resets, so
-   what is left is the shell's: no item padding, because the link is the
-   full-width box, and the rail's type size. */
-.docs-sidebar nav li {
-  padding: 0;
-  font-size: var(--cirth-font-size-sm);
-}
+   ::before is one rail too many. */
 
 /* Prev / next pagination: two cards, each saying which way it goes and
    where it lands, at reading size. Two columns where they fit, stacked on
@@ -1764,11 +1764,27 @@ pre > button.copy.copied::before {
     grid-template-columns: var(--docs-rail-width) minmax(0, 1fr);
   }
 
-  /* No inset: this rail is not positioned, so a `top` here computes to
-	   nothing. */
+  /* Both rails stick under the header and are exactly as tall as the
+     window below it. Whatever does not fit scrolls inside the rail, and
+     a scroll that reaches the rail's end stops there rather than carrying
+     on into the page. A sticky box stays inside its grid area, which is
+     the layout's row, so a rail ends where the content ends and never
+     reaches the footer. `max-height` on its own did none of this: the
+     index kept its full height, painted past the box, and ran down the
+     page under the footer. */
+  .docs-sidebar,
+  .docs-toc {
+    position: sticky;
+    inset-block-start: var(--docs-rail-top);
+    max-block-size: var(--docs-rail-height);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+  }
+
   .docs-sidebar {
-    max-height: calc(100vh - 7rem);
-    padding-inline-end: 1rem;
+    padding-inline-end: var(--cirth-space-3);
     border-inline-end: var(--cirth-border-width) solid
       var(--cirth-muted-border-color);
   }
@@ -1781,10 +1797,6 @@ pre > button.copy.copied::before {
       );
   }
 
-  .docs-toc {
-    top: 5.5rem;
-    max-height: calc(100vh - 7rem);
-  }
 }
 
 .docs-toc-top > summary {
@@ -2031,20 +2043,160 @@ details.docs-demo-source[open] > summary {
   background: transparent;
 }
 
-/* Groups are a group step apart and name themselves in the meta role, on
-   the same inline gutter as the entries under them, so a label never hangs
-   outside the column it introduces. */
-.docs-sidebar-group + .docs-sidebar-group {
-  margin-block-start: var(--cirth-flow-group);
+/* The index tree (docs-nav.njk), in the rail and in the compact menu
+   alike. A group is the library's own disclosure, the chevron and its
+   turn included, set as an index heading: no separator under it, on the
+   same inline gutter as the entries it holds, at the index title size.
+   The summary is a control, so it takes the ink and a wash under a
+   pointer; the entries under it stay in the muted ink until one is
+   current. Every list in the tree is a plain stacked list: the nav bar
+   idiom is released by its one gutter token. */
+.docs-nav-group,
+.docs-nav-group ul,
+.docs-nav-group li {
+  --cirth-nav-element-spacing-horizontal: 0;
+
+  display: block;
+  margin: 0;
+  padding: 0;
 }
 
-.docs-sidebar-label {
-  margin: 0 0 var(--cirth-flow-line);
-  padding-inline: var(--cirth-space-3);
-  color: var(--cirth-muted-color);
+.docs-nav-group {
+  border: 0;
+}
+
+.docs-nav-group[open] {
+  padding-block-end: var(--cirth-space-2);
+}
+
+.docs-nav-group + .docs-nav-group {
+  margin-block-start: var(--cirth-space-1);
+}
+
+.docs-nav-group > summary {
+  min-block-size: 2.25rem;
+  margin: 0;
+  padding: 0.375rem var(--cirth-space-2) 0.375rem var(--cirth-space-3);
+  border-radius: var(--docs-chrome-radius);
+  color: var(--cirth-ink);
   font-size: var(--docs-index-title-size);
   font-weight: var(--cirth-font-weight-medium);
+  line-height: var(--cirth-line-height-snug);
   letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
+}
+
+.docs-nav-group > summary::after {
+  color: var(--cirth-muted-color);
+}
+
+.docs-nav-group[open] > summary {
+  margin-block-end: var(--cirth-space-1);
+}
+
+/* A branch: the page's own link, and a toggle on the end of the same row
+   that folds the pages under it. The toggle is the disclosure's summary,
+   lifted out of the flow onto the link's row; closed, the disclosure has
+   no height of its own, so the row is the link. The same shape in the
+   page outline, where a section folds its subsections. */
+:is(.docs-nav-branch, .docs-toc-branch) {
+  position: relative;
+}
+
+:is(.docs-nav-branch, .docs-toc-branch):has(> details) > a {
+  padding-inline-end: 2.25rem;
+}
+
+:is(.docs-nav-branch, .docs-toc-branch) > details {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+:is(.docs-nav-branch, .docs-toc-branch) > details > summary {
+  display: grid;
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  min-block-size: 0;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--docs-chrome-radius);
+  color: var(--cirth-muted-color);
+}
+
+:is(.docs-nav-branch, .docs-toc-branch) > details > summary::after {
+  float: none;
+  inline-size: 0.875rem;
+  block-size: 0.875rem;
+  margin: 0;
+  mask-position: center;
+  mask-size: 0.875rem auto;
+}
+
+:is(.docs-nav-branch, .docs-toc-branch) > details[open] > summary {
+  margin: 0;
+}
+
+:is(.docs-nav-group > summary, .docs-nav-branch > details > summary, .docs-toc-branch > details > summary):hover {
+  background: var(--cirth-secondary-surface);
+  color: var(--cirth-ink-strong);
+}
+
+/* The pages and subsections under a branch hang off the same rail as the
+   entries above them: no second rail, and the indent on the link text,
+   so a current child marks the one rail like any other entry. */
+:is(.docs-nav-branch, .docs-toc-branch) ul {
+  border: 0;
+}
+
+:is(.docs-nav-branch, .docs-toc-branch) ul a {
+  padding-inline-start: calc(var(--cirth-space-3) + var(--cirth-space-4));
+}
+
+/* A category of a branch's pages (Build tools, under Installation): a
+   disclosure with a visible name, set as a quiet heading on the indent of
+   the pages around it, its own pages one step further in. Open, its name
+   takes the ink, so the reader sees which shelf they are on. */
+.docs-nav-category > details {
+  padding: 0;
+  border: 0;
+}
+
+.docs-nav-category > details > summary {
+  min-block-size: 2.25rem;
+  padding: 0.375rem var(--cirth-space-2) 0.375rem
+    calc(var(--cirth-space-3) + var(--cirth-space-4));
+  border-radius: var(--docs-chrome-radius);
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-font-size-sm);
+  line-height: var(--cirth-line-height-snug);
+}
+
+.docs-nav-category > details > summary::after {
+  color: var(--cirth-muted-color);
+}
+
+.docs-nav-category > details[open] > summary {
+  color: var(--cirth-ink);
+}
+
+.docs-nav-category > details > summary:hover {
+  background: var(--cirth-secondary-surface);
+  color: var(--cirth-ink-strong);
+}
+
+.docs-nav-branch .docs-nav-category ul a {
+  padding-inline-start: calc(var(--cirth-space-3) * 2 + var(--cirth-space-4));
+}
+
+/* Inside a rail that scrolls, a ring drawn outside a row is cut off at
+   the rail's edge. Drawn inside the row it stays whole, on the same
+   geometry. */
+:is(.docs-sidebar, .docs-toc, .docs-mobile-nav, .docs-toc-top) :is(a, summary):focus-visible {
+  outline-offset: calc(var(--cirth-outline-width) * -1);
 }
 
 /* One rail down both columns, and the active marker sits *in* it rather
@@ -2054,7 +2206,7 @@ details.docs-demo-source[open] > summary {
    rail: transparent at rest, the accent when the framework paints
    aria-current.
    One indicator, one continuous line, no pill with a bar stuck to it. */
-.docs-sidebar nav ul,
+.docs-nav-group > ul,
 .docs-toc nav > ul {
   border-inline-start: var(--cirth-border-width-2) solid
     var(--cirth-muted-border-color);
@@ -2072,7 +2224,7 @@ details.docs-demo-source > :not(summary) {
    navigation, and at 12px it was the smallest text on the page. Each row is
    a 36px band, with the whole band the link's box, so the target is the
    row rather than the words in it. */
-.docs-sidebar nav li a,
+.docs-nav-group a,
 .docs-toc a {
   display: flex;
   align-items: center;
@@ -2089,20 +2241,20 @@ details.docs-demo-source > :not(summary) {
 /* Position is carried by contrast and the rail, never by the accent: the
    current entry takes the full-contrast ink and a heavier weight, and the
    framework paints the rail from aria-current. */
-.docs-sidebar nav li a[aria-current="page"],
+.docs-nav-group a[aria-current="page"],
 .docs-toc a[aria-current="true"] {
   color: var(--cirth-contrast-text);
   font-weight: var(--cirth-font-weight-medium);
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .docs-sidebar nav li a,
+  .docs-nav-group a,
   .docs-toc a {
     transition: color var(--cirth-transition);
   }
 }
 
-.docs-sidebar nav li a:hover,
+.docs-nav-group a:hover,
 .docs-toc a:hover {
   color: var(--cirth-contrast-text);
 }
@@ -2141,14 +2293,13 @@ details.docs-toc-top {
   }
 
   /* The third stacked nav here, and the third to say so with the gutter
-     token rather than undoing the bar idiom by hand. */
+     token rather than undoing the bar idiom by hand. The tree inside is
+     the sidebar's, groups and all; only the frame is the menu's. */
   .docs-mobile-nav > nav {
     --cirth-nav-element-spacing-horizontal: 0;
 
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--cirth-space-4);
-    padding: var(--cirth-space-4);
+    display: block;
+    padding: var(--cirth-space-3) var(--cirth-space-4) var(--cirth-space-4);
     border-block-start: var(--cirth-border-width) solid
       var(--cirth-muted-border-color);
   }
@@ -2157,34 +2308,37 @@ details.docs-toc-top {
     margin-bottom: 0;
   }
 
-  .docs-mobile-nav nav section {
-    margin: 0;
-  }
-
-  .docs-mobile-nav nav strong {
-    font-size: var(--docs-index-title-size);
-  }
-
-  .docs-mobile-nav nav ul {
-    display: block;
-    margin-block-start: var(--cirth-space-2);
-  }
-
-  .docs-mobile-nav nav li {
-    display: block;
-  }
-
-  /* The inline gutter goes on the link, not the item: with the bar idiom
-     released the row *is* the link's box, so the fill spans its column
-     instead of floating inside it. */
-  .docs-mobile-nav nav a {
-    display: block;
-    margin-block: 0;
-    display: flex;
-    align-items: center;
+  /* A finger's row, where the rail's is a pointer's. */
+  .docs-mobile-nav .docs-nav-group > summary,
+  .docs-mobile-nav .docs-nav-category > details > summary,
+  .docs-mobile-nav .docs-nav-group a {
     min-block-size: 2.75rem;
-    padding: var(--cirth-space-1) var(--cirth-space-2);
-    font-size: var(--cirth-font-size-sm);
+  }
+
+  /* This nav is not in an <aside>, so the library draws its current page
+     the way a bar does, as an edge under the link. The tree is a rail
+     here as in the sidebar: the edge goes on the inline start, where the
+     sidebar's is, and the one under the link goes. */
+  .docs-mobile-nav .docs-nav-group a {
+    border-block-end-color: transparent;
+    border-inline-start: var(--cirth-border-width-2) solid transparent;
+  }
+
+  .docs-mobile-nav .docs-nav-group a[aria-current="page"] {
+    border-block-end-color: transparent;
+    border-inline-start-color: var(--cirth-primary-text);
+  }
+
+  /* An open disclosure takes the whole row, so the index is read at the
+     width of the page rather than in half of it; the other one moves
+     under it. */
+  .docs-mobile-tools > details[open] {
+    grid-column: 1 / -1;
+  }
+
+  .docs-mobile-nav :is(.docs-nav-branch, .docs-toc-branch) > details > summary {
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
   }
 
   .docs-sidebar {
@@ -2208,10 +2362,6 @@ details.docs-toc-top {
 
   .docs-header nav > ul > li {
     padding: 0;
-  }
-
-  .docs-mobile-nav > nav {
-    grid-template-columns: 1fr;
   }
 
 }
@@ -2577,140 +2727,223 @@ details.docs-toc-top {
   display: block;
 }
 
-/* Framework marks as an open list: the mark over its name, on a rule, and
-   no box. The name is printed, so the mark is decoration and a missing
-   image leaves the list whole. The mark lifts a little under a pointer,
-   the one movement here, and only where motion is welcome. */
-.docs-logo-list {
+/* The framework guides on the Installation page: a grid of small tiles,
+   two to a row on a phone, three on a tablet, four or more on a wide
+   column. A tile is the project's mark, a link to its site, over the
+   guide's name, a link to the guide: two targets, neither inside the
+   other. Under a pointer the tile answers as one, a single wash over both
+   halves and nothing underlined; the keyboard still rings each link on
+   its own, so a reader always knows which of the two is focused. Nothing
+   in it moves. */
+.docs-guide-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 8.5rem), 1fr));
-  gap: 0 var(--cirth-space-6);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.docs-logo-list li {
-  margin: 0;
-  border-block-start: var(--cirth-border-width) solid
-    var(--cirth-muted-border-color);
-  list-style: none;
-}
-
-.docs-logo-list a {
-  display: grid;
-  justify-items: start;
-  align-content: start;
-  gap: var(--cirth-space-3);
-  padding: var(--cirth-space-4) var(--cirth-space-1) var(--cirth-space-5);
-  border-radius: var(--docs-chrome-radius);
-  color: var(--cirth-ink);
-  text-decoration: none;
-}
-
-.docs-logo-list .docs-mark {
-  block-size: 2rem;
-}
-
-.docs-logo-list .docs-mark-image {
-  block-size: 2rem;
-}
-
-.docs-mark-name {
-  font-size: var(--cirth-font-size-sm);
-  font-weight: var(--cirth-font-weight-medium);
-}
-
-.docs-logo-list a:hover .docs-mark-name {
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .docs-logo-list .docs-mark {
-    transition: translate var(--cirth-duration-normal) var(--cirth-ease-out);
-  }
-
-  .docs-logo-list a:hover .docs-mark {
-    translate: 0 -0.125rem;
-  }
-}
-
-/* The framework guides on the Installation page: rows, each with the
-   guide's marks, its name and what the guide has you do. */
-.docs-guide-list {
-  margin-block: var(--cirth-space-6) var(--cirth-space-4);
-  padding: 0;
-  border-block-start: var(--cirth-border-width) solid
-    var(--cirth-muted-border-color);
-  list-style: none;
-}
-
-.docs-guide-list li {
-  margin: 0;
-  border-block-end: var(--cirth-border-width) solid
-    var(--cirth-muted-border-color);
-  list-style: none;
-}
-
-.docs-guide-list a {
-  display: grid;
-  grid-template-columns: 4.5rem minmax(0, 1fr);
-  align-items: center;
-  gap: var(--cirth-space-1) var(--cirth-space-4);
-  padding: var(--cirth-space-3) var(--cirth-space-2);
-  border-radius: var(--docs-chrome-radius);
-  color: var(--cirth-ink);
-  text-decoration: none;
-}
-
-@media (width >= 48rem) {
-  .docs-guide-list a {
-    grid-template-columns: 4.5rem minmax(0, 12rem) minmax(0, 1fr);
-  }
-}
-
-.docs-guide-marks {
-  display: inline-flex;
-  align-items: center;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--cirth-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.docs-guide-list .docs-guide-marks {
-  grid-row: span 2;
-}
-
-@media (width >= 48rem) {
-  .docs-guide-list .docs-guide-marks {
-    grid-row: auto;
+@media (width >= 36rem) {
+  .docs-guide-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-.docs-guide-list .docs-mark-image {
-  block-size: 1.75rem;
+@media (width >= 64rem) {
+  .docs-guide-grid {
+    grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  }
 }
 
-.docs-guide-list strong {
-  color: var(--cirth-ink-strong);
-  font-weight: var(--cirth-font-weight-medium);
+.docs-guide-grid li {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  margin: 0;
+  border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+  border-radius: var(--docs-chrome-radius);
+  list-style: none;
 }
 
-.docs-guide-list a > span:last-child {
-  color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-sm);
-}
-
-.docs-guide-list a:hover {
+.docs-guide-grid li:has(a:hover) {
+  border-color: var(--cirth-form-element-border-color);
   background: var(--cirth-secondary-surface);
 }
 
-.docs-guide-list a:hover strong {
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
+.docs-guide-grid li:has(a:active) {
+  background: var(--cirth-secondary-surface-active);
 }
 
-.docs-guide-list a:active {
-  background: var(--cirth-secondary-surface-active);
+.docs-guide-site {
+  display: grid;
+  place-items: center;
+  block-size: 3.5rem;
+  padding-inline: var(--cirth-space-3);
+  border-start-start-radius: inherit;
+  border-start-end-radius: inherit;
+  text-decoration: none;
+}
+
+.docs-guide-site .docs-mark {
+  max-inline-size: 100%;
+}
+
+.docs-guide-site .docs-mark-image {
+  block-size: 1.75rem;
+  max-inline-size: 100%;
+  object-fit: contain;
+}
+
+/* A wordmark carries its name in the drawing and needs less height to be
+   read at the same weight as a symbol. */
+.docs-guide-site .docs-mark-wide {
+  block-size: 1.375rem;
+}
+
+.docs-mark-none {
+  display: grid;
+  place-items: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+  border-radius: var(--cirth-radius-sm);
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-font-size-sm);
+  font-weight: var(--cirth-font-weight-medium);
+}
+
+.docs-guide-name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cirth-space-2);
+  min-block-size: 2.75rem;
+  padding: var(--cirth-space-2) var(--cirth-space-3);
+  border-block-start: var(--cirth-border-width) solid
+    var(--cirth-muted-border-color);
+  border-end-start-radius: inherit;
+  border-end-end-radius: inherit;
+  color: var(--cirth-ink-strong);
+  font-size: var(--cirth-font-size-sm);
+  font-weight: var(--cirth-font-weight-medium);
+  line-height: var(--cirth-line-height-snug);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.docs-guide-arrow {
+  flex: none;
+  color: var(--cirth-muted-color);
+}
+
+/* The library underlines a link under the pointer; here the tile's wash
+   says it instead, so neither the name nor the arrow takes a line. */
+:is(.docs-guide-site, .docs-guide-name):is(:hover, :focus-visible, :active) {
+  text-decoration: none;
+}
+
+.docs-guide-grid li:has(a:hover) .docs-guide-arrow {
+  color: var(--cirth-primary-text);
+}
+
+/* Both links ring inside the tile, so neither ring is cut by the other. */
+:is(.docs-guide-site, .docs-guide-name):focus-visible {
+  outline-offset: calc(var(--cirth-outline-width) * -1);
+}
+
+@media (forced-colors: active) {
+  .docs-guide-grid li,
+  .docs-guide-name {
+    border-color: CanvasText;
+  }
+}
+
+/* The guides on the Installation page, grouped by the kind of stack they
+   cover. A group's name is the meta role, as an index title is; the rows
+   under it are the guide list. */
+.docs-guide-groups {
+  display: grid;
+  gap: var(--cirth-space-8);
+  margin-block: var(--cirth-space-6) var(--cirth-space-8);
+}
+
+.docs-guide-groups > section {
+  margin: 0;
+}
+
+.docs-content .docs-guide-group-title {
+  margin: 0 0 var(--cirth-space-2);
+  padding: 0;
+  border: 0;
+  color: var(--cirth-muted-color);
+  font-size: var(--docs-index-title-size);
+  font-weight: var(--cirth-font-weight-medium);
+}
+
+/* A mark drawn in currentColor reaches an <img> as black, and black is
+   one of the two colourways its project publishes. The dark scheme takes
+   the other one, white. */
+[data-theme="dark"] .docs-mark-mono {
+  filter: invert(1);
+}
+
+/* Under forced colours the system paints the canvas, light or dark,
+   whatever the page's theme or a band's data-theme asked for. A mark
+   follows the system's canvas then: the variant drawn for it, and a
+   one-colour mark in the colourway that reads on it. */
+@media (forced-colors: active) {
+  :root .docs-mark .docs-logo-dark.docs-mark-image {
+    display: none;
+  }
+
+  :root .docs-mark .docs-logo-light.docs-mark-image {
+    display: block;
+  }
+
+  :root .docs-mark .docs-mark-mono {
+    filter: none;
+  }
+}
+
+@media (forced-colors: active) and (prefers-color-scheme: dark) {
+  :root .docs-mark .docs-logo-light.docs-mark-image {
+    display: none;
+  }
+
+  :root .docs-mark .docs-logo-dark.docs-mark-image {
+    display: block;
+  }
+
+  :root .docs-mark .docs-mark-mono {
+    filter: invert(1);
+  }
+}
+
+/* The trail above a nested page's title: where it belongs, in the meta
+   role, so it reads before the title without competing with it. The
+   library draws the separator. */
+.docs-content > .docs-breadcrumb {
+  margin-block-end: var(--cirth-space-3);
+  font-size: var(--cirth-font-size-sm);
+}
+
+.docs-breadcrumb li {
+  color: var(--cirth-muted-color);
+}
+
+.docs-breadcrumb a {
+  color: var(--cirth-secondary-text);
+  text-decoration: none;
+}
+
+.docs-breadcrumb a:hover {
+  color: var(--cirth-primary-text);
+  text-decoration: underline;
+}
+
+.docs-breadcrumb [aria-current="page"] {
+  color: var(--cirth-ink);
 }
 
 /* A framework guide's own shape (eleventy.config.js, frameworkGuide).
@@ -2727,6 +2960,30 @@ details.docs-toc-top {
 
 .docs-guide-title .docs-mark-image {
   block-size: 2.5rem;
+}
+
+/* Under a guide's lead, one line of facts: the category, how sure the
+   guide is and since when, and the project's own site. */
+.docs-content > .docs-guide-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cirth-space-1) var(--cirth-space-4);
+  margin-block: calc(var(--cirth-space-6) * -1) var(--cirth-space-6);
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-font-size-sm);
+}
+
+.docs-guide-status::before {
+  content: "✓\00a0";
+  color: var(--cirth-success-text, var(--cirth-primary-text));
+}
+
+.docs-guide-status:not([data-status="verified"])::before {
+  content: none;
+}
+
+.docs-content > .docs-guide-meta + .docs-guide-summary {
+  margin-block-start: calc(var(--cirth-space-4) * -1);
 }
 
 .docs-content > .docs-guide-summary {
@@ -2793,21 +3050,87 @@ details.docs-toc-top {
   line-height: var(--cirth-line-height-snug);
 }
 
-/* The package manager switch: Cirth's segmented radio group choosing which
-   of four commands shows. All four are in the document; without :has()
-   they are simply all listed. */
+/* The package manager switch: a group of native radios choosing which of
+   four commands shows. All four are in the document; without :has() they
+   are simply all listed. */
 .docs-install {
   margin-block: var(--cirth-space-4) var(--cirth-space-6);
 }
 
-/* A tighter segment, set through the control's own padding token: four
-   choices then share one row on a 360px phone instead of wrapping one of
-   them onto a row of its own. The segments keep their 44px height. */
-.docs-install > .segmented {
-  --cirth-form-element-spacing-horizontal: var(--cirth-space-2);
+/* A choice of one, said as radios: the library's own radio inside a light
+   label of its own, the labels apart rather than joined, so the row reads
+   as options to pick from and not as a set of tabs. The group is named by
+   a legend in the meta role. A label is the whole target, 40px tall: the
+   height of the header's controls. Under a pointer it takes the secondary
+   wash; chosen, its edge takes the accent's text role and the accent
+   shows faintly through it, while the radio's dot says the same thing in
+   a shape. The weight never changes, so choosing never moves the row. */
+fieldset.docs-choice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cirth-space-2);
+  margin: 0 0 var(--cirth-space-2);
+}
 
-  margin-block-end: var(--cirth-space-2);
+.docs-choice > legend {
+  margin: 0 0 var(--cirth-space-2);
+  padding: 0;
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-meta-font-size);
+  font-weight: var(--cirth-font-weight-medium);
+}
+
+/* The label is a flex row, so the library's hanging indent (a label that
+   wraps hangs under its first word) is handed back here, as its contract
+   asks of a flex label. */
+.docs-choice > label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cirth-space-2);
+  min-block-size: 2.5rem;
+  margin: 0;
+  padding: 0 var(--cirth-space-4) 0 var(--cirth-space-3);
+  border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+  border-radius: var(--cirth-border-radius);
+  color: var(--cirth-secondary-text);
   font-size: var(--cirth-font-size-sm);
+  text-indent: 0;
+}
+
+.docs-choice > label > input {
+  flex: none;
+  margin: 0;
+}
+
+.docs-choice > label:has(:checked) {
+  border-color: var(--cirth-primary-text);
+  background: color-mix(in oklab, var(--cirth-primary-surface) 7%, transparent);
+  color: var(--cirth-ink-strong);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .docs-choice > label:hover:not(:has(:checked)) {
+    background: var(--cirth-secondary-surface);
+    color: var(--cirth-ink-strong);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .docs-choice > label {
+    transition:
+      background-color var(--cirth-transition),
+      border-color var(--cirth-transition),
+      color var(--cirth-transition);
+  }
+}
+
+/* Forced colours take the wash and the tint away; the chosen option keeps
+   an edge in the system's highlight, besides its dot. */
+@media (forced-colors: active) {
+  .docs-choice > label:has(:checked) {
+    border-color: Highlight;
+  }
 }
 
 .docs-install > pre {
@@ -2821,8 +3144,9 @@ details.docs-toc-top {
   display: none;
 }
 
-/* Where a guide says when and how it was checked: a quiet note at the end
-   of the page, not a badge. */
+/* Where a guide says when and how it was checked, and which official
+   pages it follows: a quiet note at the end of the page, not a badge. Its
+   heading is the status word, set as small as the note. */
 .docs-verified {
   margin-block-start: var(--cirth-space-8);
   padding-block-start: var(--cirth-space-3);
@@ -2830,6 +3154,17 @@ details.docs-toc-top {
     var(--cirth-muted-border-color);
   color: var(--cirth-muted-color);
   font-size: var(--cirth-font-size-sm);
+}
+
+.docs-content .docs-verified-title {
+  margin: 0 0 var(--cirth-space-2);
+  color: var(--cirth-ink);
+  font-size: var(--cirth-font-size-sm);
+  font-weight: var(--cirth-font-weight-medium);
+}
+
+.docs-verified > p {
+  margin-block: 0 var(--cirth-space-2);
 }
 
 /* A narrow stage for a screen that is narrow by nature. The stage's own
@@ -2897,7 +3232,6 @@ details.docs-toc-top {
 
 .docs-example-category {
   padding-block-start: var(--cirth-space-10);
-  scroll-margin-block-start: 5rem;
 }
 
 .docs-example-category > header {

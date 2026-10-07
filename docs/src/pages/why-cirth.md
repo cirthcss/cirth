@@ -146,8 +146,8 @@ Because it styles elements rather than shipping components, Cirth has
 nothing to integrate with. It does not provide React, Vue or Svelte
 components and does not need to: a JSX `<button>`, a Vue template's
 `<button>` and a server-rendered `<button>` are the same element by the time
-the browser styles it. The [framework guides](/installation/#framework-guides)
-show where the one import goes in each.
+the browser styles it. The [guides](/installation/#guides) show where the
+one import goes in each, from Laravel and Django to Vite and Yew.
 
 ## Customizable at runtime
 
@@ -182,7 +182,8 @@ what Cirth does and what stays your job.
   a page that already has its own CSS.
 - **Scoped classless** is both.
 
-[Installation](/installation/#choose-a-build) helps you choose.
+[What the package contains](/compatibility#what-the-package-contains) lists
+the import path of each.
 
 ## Where Cirth fits
 
@@ -220,6 +221,8 @@ another.
 
 ## Next steps
 
+- [Compatibility](/compatibility): whether your browsers, your build and the
+  CSS you already have are ready for it.
 - [Installation](/installation/): a CDN link or an npm import.
 - [Examples](/examples): complete interfaces built from plain elements.
 - [About](/about): where Cirth came from, and how the project decides what to

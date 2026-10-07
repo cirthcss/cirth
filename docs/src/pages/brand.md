@@ -453,18 +453,20 @@ When you do use the mark:
 ## Framework logos
 
 The installation guides and the home page show the logos of the tools
-Cirth has been checked with. They belong to their projects, appear only to
-say where a guide lives, and do not mean that any of these projects is
-affiliated with Cirth or endorses it. Each file was downloaded from the
-project's own site or repository on {{ frameworks.retrieved }}, is served
-from this site rather than hotlinked, and is used unmodified.
+Cirth has been checked with, where the project publishes terms that allow
+it. They belong to their projects, appear only to name the tool a guide
+covers, and do not mean that any of these projects is affiliated with Cirth
+or endorses it. Wherever a logo is a link, it leads to the project's own
+site; the guide is a separate link beside it. Each file was downloaded from
+the project's own site or repository on the date beside it, is served from
+this site rather than hotlinked, and is used unmodified.
 
 <div class="overflow-auto docs-table-scroll" tabindex="0" role="region" aria-label="Framework logo sources">
 <table>
-<thead><tr><th scope="col">Logo</th><th scope="col">Owner</th><th scope="col">Source</th><th scope="col">Terms</th></tr></thead>
+<thead><tr><th scope="col">Logo</th><th scope="col">Owner</th><th scope="col">Source</th><th scope="col">Retrieved</th><th scope="col">Terms</th></tr></thead>
 <tbody>
 {%- for id, mark in frameworks.marks %}
-<tr><th scope="row">{{ mark.name }}</th><td>{{ mark.owner }}</td><td><a href="{{ mark.source }}">{{ mark.source | replace("https://", "") | truncate(36, true, "…") }}</a></td><td><a href="{{ mark.termsUrl }}">{{ mark.terms }}</a></td></tr>
+<tr><th scope="row">{{ mark.name }}</th><td>{{ mark.owner }}</td><td><a href="{{ mark.source }}">{{ mark.source | replace("https://", "") | truncate(36, true, "…") }}</a></td><td>{{ mark.retrieved or frameworks.retrieved }}</td><td><a href="{{ mark.termsUrl }}">{{ mark.terms }}</a></td></tr>
 {%- endfor %}
 </tbody>
 </table>
@@ -473,4 +475,11 @@ from this site rather than hotlinked, and is used unmodified.
 {% for id, mark in frameworks.marks %}{% if mark.note %}
 - **{{ mark.name }}.** {{ mark.note }}{% endif %}{% endfor %}
 
-{% for id, mark in frameworks.marks %}{% if mark.attribution %}{{ mark.attribution }} {% endif %}{% endfor %}
+The licence of a project's code does not cover a logo it publishes somewhere
+else. These projects publish no terms for showing theirs, or terms that keep
+it off this site, so their guides name them by text alone, everywhere a logo
+would otherwise be:
+{% for guide in frameworks.guides %}{% if guide.noMark %}
+- **{{ guide.name }}.** {{ guide.noMark }}{% endif %}{% endfor %}
+
+{% for notice in frameworks.notices %}{{ notice }} {% endfor %}
