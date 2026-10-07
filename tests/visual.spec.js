@@ -33,6 +33,7 @@ const visualPages = [
 	"guides/accessibility/index.html",
 	"installation/index.html",
 	"installation/vite/index.html",
+	"installation/laravel/index.html",
 	"themes/index.html",
 	"why-cirth/index.html",
 	"components/accordion/index.html",
@@ -292,6 +293,94 @@ for (const theme of themeVariants) {
 	}
 }
 
+// The home page's held scenes, at fixed points of their scroll. A scene's
+// state is a function of the scroll position alone, so each point is a
+// scrollY computed from the section's geometry: no inertia, no delay, the
+// same frame every run. Motion has to be welcome for a scene to be held,
+// so these captures, unlike the rest, run with it.
+test.describe("home scenes", () => {
+	test.use({ contextOptions: { reducedMotion: "no-preference" } });
+
+	/**
+	 * @param {import("@playwright/test").Page} page
+	 * @param {string} selector
+	 * @param {number} progress
+	 */
+	const goTo = async (page, selector, progress) => {
+		await page.locator(selector).evaluate((section, p) => {
+			const element = /** @type {HTMLElement} */ (section);
+			const top = element.getBoundingClientRect().top + window.scrollY;
+			window.scrollTo(0, top + p * (element.offsetHeight - window.innerHeight));
+		}, progress);
+		await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+	};
+	/** @type {[string, string, number][]} */
+	const points = [
+		["story-typing", "[data-docs-story]", 0.15],
+		["story-markup", "[data-docs-story]", 0.34],
+		["story-browser", "[data-docs-story]", 0.52],
+		["story-cirth", "[data-docs-story]", 0.85],
+		["measured", "[data-docs-measured]", 0.9],
+		["theme-start", "[data-docs-theme]", 0.05],
+		["theme-accent", "[data-docs-theme]", 0.3],
+		["theme-corners", "[data-docs-theme]", 0.52],
+		["theme-canvas", "[data-docs-theme]", 0.85],
+	];
+	for (const [name, selector, progress] of points) {
+		test(`home-${name}`, async ({ page }, testInfo) => {
+			test.skip(!testInfo.project.name.includes("-desktop"), "a scene is held only where the window can hold it");
+			await capture(page, "index.html", defaultTheme);
+			await expect(page.locator(".docs-home")).toHaveAttribute("data-stage", "held");
+			await goTo(page, selector, progress);
+			await expect(page).toHaveScreenshot(`home-${name}.png`, {
+				fullPage: false,
+				mask: [page.locator('[aria-busy="true"]')],
+			});
+		});
+	}
+
+	for (const split of [20, 50, 80]) {
+		test(`home-presets-${split}`, async ({ page }, testInfo) => {
+			test.skip(!testInfo.project.name.includes("-desktop"), "one width shows the divider");
+			await capture(page, "index.html", defaultTheme);
+			const range = page.locator("[data-docs-compare-range]");
+			await range.evaluate((element, value) => {
+				const input = /** @type {HTMLInputElement} */ (element);
+				input.value = String(value);
+				input.dispatchEvent(new Event("input", { bubbles: true }));
+			}, split);
+			await expect(range).toHaveValue(String(split));
+			await expect(page.locator(".docs-compare")).toHaveScreenshot(`home-presets-${split}.png`);
+		});
+	}
+
+	test("home-orbit", async ({ page }, testInfo) => {
+		test.skip(!testInfo.project.name.includes("-desktop"), "the orbit turns only on a wide screen");
+		await capture(page, "index.html", defaultTheme);
+		await page.locator(".docs-agnostic").evaluate((band) => {
+			const element = /** @type {HTMLElement} */ (band);
+			window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY + element.offsetHeight / 2 - window.innerHeight / 2);
+		});
+		await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+		await expect(page).toHaveScreenshot("home-orbit.png", { fullPage: false });
+	});
+});
+
+// The story on a phone: three blocks in order, each complete, still. The
+// story is taller than the window, and an element capture scrolls through
+// it with the sticky header painted over its middle, so this is the whole
+// page, clipped to the story's box: the header stays at the page's top.
+test("home-story-column", async ({ page }, testInfo) => {
+	test.skip(!testInfo.project.name.includes("-mobile"), "the story is a column on a phone");
+	await capture(page, "index.html", defaultTheme);
+	await expect(page.locator(".docs-home")).toHaveAttribute("data-stage", "column");
+	const clip = await page.locator("[data-docs-story]").evaluate((story) => {
+		const box = story.getBoundingClientRect();
+		return { x: box.left + window.scrollX, y: box.top + window.scrollY, width: box.width, height: box.height };
+	});
+	await expect(page).toHaveScreenshot("home-story-column.png", { fullPage: true, clip });
+});
+
 test("documentation chrome", async ({ page }) => {
 	await capture(page, "colors/index.html", defaultTheme);
 	await expect(page).toHaveScreenshot("docs-chrome.png", { fullPage: false });
@@ -359,6 +448,9 @@ test("mobile navigation open", async ({ page }, testInfo) => {
 // Behavior parity remains multi-engine in framework-specimen.spec.js while
 // this representative Chromium board avoids 192 near-duplicate baselines.
 test("framework interactive state matrix", async ({ page }, testInfo) => {
+	// Four controls, four states, every theme, both schemes: well over the
+	// default 30s once the radio row is in.
+	test.setTimeout(180_000);
 	test.skip(
 		testInfo.project.name !== "light-desktop",
 		"one representative Chromium board covers all themes and schemes",
@@ -471,6 +563,33 @@ test("framework interactive state matrix", async ({ page }, testInfo) => {
 			rows.push({
 				component: "Input",
 				images: inputImages.map(
+					(image) => `data:image/png;base64,${image.toString("base64")}`,
+				),
+				label,
+			});
+
+			// A radio as a reader meets it: unchecked, under the pointer
+			// (its label counts), with the keyboard's ring (a group takes
+			// focus on its checked radio), and checked. The label is in the
+			// capture, so the mark's alignment with its text is too.
+			const radioImages = [];
+			await page.goto(url);
+			target = page.locator("[data-state-radio]");
+			const radioClip = await clipForTarget(target, 6);
+			radioImages.push(await captureTarget(target, 6, radioClip));
+			await target.hover();
+			await page.waitForTimeout(transitionDuration);
+			radioImages.push(await captureTarget(target, 6, radioClip));
+			await page.goto(url);
+			target = page.locator("[data-state-radio-checked]");
+			await keyboardFocus(target.locator("input"));
+			await page.waitForTimeout(transitionDuration);
+			radioImages.push(await captureTarget(target, 6));
+			await page.goto(url);
+			radioImages.push(await captureTarget(page.locator("[data-state-radio-checked]"), 6));
+			rows.push({
+				component: "Radio",
+				images: radioImages.map(
 					(image) => `data:image/png;base64,${image.toString("base64")}`,
 				),
 				label,
