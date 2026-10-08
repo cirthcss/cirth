@@ -5,8 +5,6 @@ description: Use Cirth in an Angular application. Add the stylesheet to the styl
 ---
 {% from "install.njk" import packageManagers %}
 
-# Angular
-
 Angular loads global stylesheets from the `styles` array of the build
 configuration. Cirth is one entry there.
 

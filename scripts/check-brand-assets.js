@@ -96,7 +96,7 @@ for (const { file, kind, background } of assets) {
 // where its mark leads wherever the mark is a link.
 const frameworkDir = path.join(__dirname, "../docs/public/logos/frameworks");
 const frameworkData = require("../docs/src/_data/frameworks.js");
-/** @type {Record<string, { file: string, dark?: string }>} */
+/** @type {Record<string, { file?: string, dark?: string }>} */
 const frameworkMarks = frameworkData.marks;
 const named = new Set(
 	Object.values(frameworkMarks).flatMap((mark) => [mark.file, mark.dark].filter(Boolean)),
@@ -139,37 +139,35 @@ for (const guide of frameworkData.guides) {
 	}
 }
 
-// A logo is shown only under its owner's own terms. Every mark a guide
-// shows names where it came from, who owns it, and the terms with their
-// address; a placeholder ("No terms stated") is the absence of terms and
-// fails. A guide without a mark says why, and has nothing a template could
-// draw. Checked here as well as where frameworks.js loads, because this is
-// the check a change to the logos folder is run against.
-const placeholderTerms = /^\s*$|\bno\s+(?:terms|licen[cs]e|policy)\b|not\s+stated|unknown|\btbd\b|\btodo\b/i;
+// A logo is shown only under the rules frameworks.js states. Every record
+// a guide points at names its owner, the policy read and its address; one
+// with a file names where the file came from, and one without says why the
+// project is named by text alone. A record with a file never carries a
+// text-only reason, and no guide draws mark data from a text-only record.
+// Checked here as well as where frameworks.js loads, because this is the
+// check a change to the logos folder is run against.
 /** @type {Set<string>} */
 const shownMarks = new Set();
 for (const guide of frameworkData.guides) {
-	if (guide.mark) {
-		shownMarks.add(guide.mark);
-		const data = /** @type {Record<string, string | undefined>} */ (/** @type {unknown} */ (frameworkMarks[guide.mark] ?? {}));
-		for (const field of ["source", "owner", "terms", "termsUrl"]) {
-			if (typeof data[field] !== "string" || String(data[field]).trim() === "") {
-				markFailures.push(`frameworks.js: the ${guide.mark} mark ${guide.name} shows has no ${field}`);
-			}
+	const data = /** @type {Record<string, string | undefined>} */ (/** @type {unknown} */ (frameworkMarks[guide.mark] ?? {}));
+	shownMarks.add(guide.mark);
+	for (const field of ["owner", "terms", "termsUrl"]) {
+		if (typeof data[field] !== "string" || String(data[field]).trim() === "") {
+			markFailures.push(`frameworks.js: the ${guide.mark} record ${guide.name} uses has no ${field}`);
 		}
-		if (placeholderTerms.test(String(data.terms ?? ""))) {
-			markFailures.push(`frameworks.js: the ${guide.mark} mark is shown with "${data.terms}", which is not a term of use`);
-		}
-		if (guide.noMark) markFailures.push(`frameworks.js: ${guide.id} shows a mark and says it has none`);
+	}
+	if (data.file) {
+		if (typeof data.source !== "string" || !data.source.startsWith("https://")) markFailures.push(`frameworks.js: the ${guide.mark} mark has no source`);
+		if (data.textOnly) markFailures.push(`frameworks.js: the ${guide.mark} mark is drawn and says it is named by text alone`);
 	} else {
-		if (typeof guide.noMark !== "string" || guide.noMark.trim().length < 20) {
-			markFailures.push(`frameworks.js: ${guide.id} has no mark and does not say why`);
+		if (typeof data.textOnly !== "string" || data.textOnly.trim().length < 40) {
+			markFailures.push(`frameworks.js: ${guide.id} is named by text alone and does not say why`);
 		}
-		if (guide.markData) markFailures.push(`frameworks.js: ${guide.id} has no mark but carries mark data a template would draw`);
+		if (guide.markData) markFailures.push(`frameworks.js: ${guide.id} is named by text alone but carries mark data a template would draw`);
 	}
 }
 for (const id of Object.keys(frameworkMarks)) {
-	if (!shownMarks.has(id)) markFailures.push(`frameworks.js: the ${id} mark is shown by no guide; remove it and its files`);
+	if (!shownMarks.has(id)) markFailures.push(`frameworks.js: the ${id} record is used by no guide; remove it and its files`);
 }
 // The number of guides is the number of guide pages, whatever the number
 // of marks.
@@ -196,5 +194,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-	`[@cirthcss/cirth] check:brand-assets: ${assets.length} assets carry the ${mark.length}-path mark from ${SOURCE}; ${named.size} integration mark files (${shownMarks.size} marks) are present, self-contained, listed and shown under their owners' terms; all ${frameworkData.count} guides name their project's site, ${frameworkData.guides.filter((guide) => !guide.mark).length} of them by name alone`,
+	`[@cirthcss/cirth] check:brand-assets: ${assets.length} assets carry the ${mark.length}-path mark from ${SOURCE}; ${named.size} integration mark files (${Object.values(frameworkMarks).filter((record) => record.file).length} marks) are present, self-contained, listed and shown under their owners' terms; all ${frameworkData.count} guides name their project's site, ${frameworkData.guides.filter((guide) => !guide.markData).length} of them by name alone`,
 );

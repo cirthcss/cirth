@@ -6,8 +6,6 @@ description: Use Cirth in a React app built with Vite. Import it where the app m
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# React
-
 A React app built with Vite, as React's own documentation suggests for a new app, imports CSS from JavaScript. Cirth is one import where the app mounts. For Next.js, React Router and the other React frameworks, see their own guides.
 
 ## 1. Install

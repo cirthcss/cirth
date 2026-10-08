@@ -1,16 +1,10 @@
-{#- Parts every integration guide shares, written once so forty pages say
-    the same thing the same way. Each macro returns markdown, not HTML: the
-    page is rendered by Nunjucks first and markdown-it after, so a fence
-    inside a macro is a fence on the page. Nothing here is indented, since
-    indentation inside a macro is indentation in the markdown.
+{#- Parts every integration guide shares. Each macro returns markdown,
+    rendered after Nunjucks, so nothing here is indented.
 
-    whyTarget(tool): why a pipeline that lowers CSS needs telling about
-    Cirth's browsers, in one paragraph.
-
-    checkIt(lowers, fix): the last step of every guide. A forced-dark subtree is
-    the one thing a pipeline that rewrites light-dark() breaks, and the one
-    thing a reader can see without a developer tool.
-
+    whyTarget(tool): why a pipeline that lowers CSS needs Cirth's browser
+    targets.
+    checkIt(lowers, fix): the last step of every guide, a forced-dark
+    subtree, which is what a light-dark() rewrite breaks.
     nextSteps(where): where the reader's own overrides go. -#}
 
 {%- macro whyTarget(tool = "Vite") -%}

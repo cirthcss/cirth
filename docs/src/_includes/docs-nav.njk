@@ -1,25 +1,15 @@
-{#- The documentation's two indexes, written once and drawn twice: in the
-    rails beside the page on a wide screen, and in the two disclosures above
-    it on a narrow one. One markup, so the compact menu cannot list a page
-    the sidebar does not, or fold a section the rail shows open.
+{#- Both indexes (sidebar tree and page outline), drawn in the rails on
+    wide screens and in the compact disclosures on narrow ones. Everything
+    that folds is a native <details>, opened in the markup where the page
+    is, so it works without a script. -#}
 
-    Everything that folds is a native <details>: it opens and closes with
-    no script, the keyboard and a screen reader get a disclosure button for
-    free, and what is open is decided here, in the markup, so the page
-    arrives with the reader's place already showing. -#}
-
-{#- The sidebar tree. A group is a disclosure named by its summary, open
-    when the page is in it. A page with pages under it (Installation) is a
-    branch: its own link, then a disclosure holding the children, whose
-    summary is only the toggle beside that link. The link is never inside
-    the summary, because a link inside a button is two controls in one
-    and neither works reliably. A branch's pages may come in categories
-    (the guides under Installation), each one more disclosure with a
-    visible name and no page of its own. -#}
+{#- A branch (Installation) is its own link plus a disclosure whose summary
+    is only the toggle: a link inside a summary would be two controls in
+    one. A branch's pages may be grouped in named categories. -#}
 {%- macro navTree(sidebar, url) -%}
 {%- for group in sidebar %}
 {%- set groupOpen = group.items | hasActiveItem(url) %}
-<details class="docs-nav-group" data-docs-nav-group="{{ group.text | slugify }}"{% if groupOpen %} open data-docs-nav-current{% endif %}>
+<details class="docs-nav-group" data-docs-nav-group="{{ group.text | slugify }}"{% if groupOpen %} open{% endif %}>
 	<summary>{{ group.text }}</summary>
 	<ul>
 		{%- for item in group.items %}
@@ -27,17 +17,15 @@
 			{%- set branchOpen = [item] | hasActiveItem(url) %}
 			<li class="docs-nav-branch">
 				<a href="{{ item.link }}"{% if url == (item.link | withSlash) %} aria-current="page"{% endif %}>{{ item.text }}</a>
-				<details data-docs-nav-group="{{ item.text | slugify }}"{% if branchOpen %} open data-docs-nav-current{% endif %}>
+				<details data-docs-nav-group="{{ item.text | slugify }}"{% if branchOpen %} open{% endif %}>
 					<summary><span class="sr-only">{{ item.text }} pages</span></summary>
 					<ul>
 						{%- for child in item.items %}
 						{%- if child.items %}
-						{#- A category of the branch's pages (Build tools): a
-						    disclosure of its own, open when it holds the page,
-						    named by its summary, with no page of its own. #}
+						{#- A category: a named disclosure with no page of its own. #}
 						{%- set categoryOpen = child.items | hasActiveItem(url) %}
 						<li class="docs-nav-category">
-							<details data-docs-nav-group="{{ item.text | slugify }}-{{ child.text | slugify }}"{% if categoryOpen %} open data-docs-nav-current{% endif %}>
+							<details data-docs-nav-group="{{ item.text | slugify }}-{{ child.text | slugify }}"{% if categoryOpen %} open{% endif %}>
 								<summary>{{ child.text }}</summary>
 								<ul>
 									{%- for page in child.items %}
@@ -62,11 +50,8 @@
 {%- endfor %}
 {%- endmacro -%}
 
-{#- The page outline. A section lists its subsections under its own link.
-    On a long page the subsections fold, the same way a branch of the
-    sidebar does, and the scroll-spy in docs.njk opens the one being
-    read. `spy` marks the copy the scroll-spy drives (the rail); the
-    compact disclosure is the same list without it. -#}
+{#- On a long page the subsections fold; docs.njk's scroll-spy opens the
+    one being read in the copy marked `spy` (the rail). -#}
 {%- macro pageOutline(outline, spy = false) -%}
 <ul>
 	{%- for section in outline.sections %}

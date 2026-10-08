@@ -6,8 +6,6 @@ description: Use Cirth in an Astro site. Import it in the frontmatter of a layou
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Astro
-
 Astro bundles every stylesheet a component imports. Import Cirth once, in a
 layout every page uses, and nothing needs configuring: Astro's build keeps
 Cirth's `light-dark()` colours.

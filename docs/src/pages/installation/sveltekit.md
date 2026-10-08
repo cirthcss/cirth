@@ -6,8 +6,6 @@ description: Use Cirth in a SvelteKit app. Import it in the root layout and set 
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# SvelteKit
-
 SvelteKit's root layout, `src/routes/+layout.svelte`, wraps every page, so a
 stylesheet imported there reaches the whole app. SvelteKit builds with Vite,
 which takes one line.

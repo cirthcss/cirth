@@ -6,8 +6,6 @@ description: Use Cirth in a Vite project. Import it once from the entry module a
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Vite
-
 Vite imports CSS like any module, so Cirth is one import in the file that
 starts your app. The one thing to set is the browsers Vite compiles CSS for.
 

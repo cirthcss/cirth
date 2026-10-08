@@ -6,8 +6,6 @@ description: Use Cirth in a Solid app built with Vite. Import it in src/index.js
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Solid
-
 Solid's Vite starter imports CSS from `src/index.jsx`. Cirth is one import there. For SolidStart, see its own guide.
 
 ## 1. Install

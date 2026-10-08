@@ -130,6 +130,67 @@ footer action. Nothing in it is specific to Cirth, so it is also the markup a
 screen reader, a search engine, a test and a code-generating model already
 understand.
 
+{% set benchCirth = benchmark.implementations[0] -%}
+{% set benchUtility = benchmark.implementations[1] -%}
+{% set benchClasses = benchmark.metrics[0] -%}
+{% set benchBytes = benchmark.metrics[1] -%}
+
+## Less markup, measured
+
+The home page compares one component written twice: the sign-in card at the
+top of that page, once as semantic HTML for Cirth and once in a utility-first
+style, where each visual decision is a class in the markup. Both meet one
+brief: the same {{ benchCirth.elements }} elements with the same text and
+attributes, a card surface, light and dark schemes that follow the system, a
+focus ring on every control, hover and pressed states on the button, an
+invalid state on a required field left empty, and an accent-coloured
+checkbox.
+
+| | {{ benchCirth.label }} | {{ benchUtility.label }} | Reduction |
+| --- | --: | --: | --: |
+| {{ benchClasses.label }} | {{ benchClasses.values.cirth | grouped }} | {{ benchClasses.values.utility | grouped }} ({{ benchUtility.distinctClasses }} distinct) | {{ benchClasses.reduction }}% |
+| {{ benchBytes.label }} | {{ benchBytes.values.cirth | grouped }} B | {{ benchBytes.values.utility | grouped }} B | {{ benchBytes.reduction }}% |
+| Elements | {{ benchCirth.elements }} | {{ benchUtility.elements }} | none |
+
+- **What is counted.** A class name is a whitespace-separated token of a
+  `class` attribute, and a repeated one counts each time it appears. Bytes
+  are the UTF-8 length of the HTML once every run of whitespace is a single
+  space and the whitespace between two tags is gone; nothing else is
+  removed. The elements are counted to show that the two versions are the
+  same component, not as a result.
+- **How a reduction is worked out.** `(utility-first - Cirth) / utility-first`,
+  as a whole percentage. On the home page each bar is its value over the
+  larger of the two values of the same metric, so a zero is an empty bar.
+- **What is not counted.** Either stylesheet, and any build step. Cirth's
+  default build is {{ proof.size.label if proof.size else "about 15 KB" }}
+  gzipped however little of it a page uses, while a utility build holds only
+  the classes it finds, so for one card it is the smaller of the two. This
+  compares the markup: what a template keeps, a reviewer reads and every
+  page sends.
+- **Who wrote the utility-first version.** The Cirth project, in the common
+  utility-first vocabulary, as a careful author would write it to meet the
+  brief. It is not any framework's official example. A template component
+  can keep a repeated class list in one place in the source; the HTML a
+  browser receives still carries every copy.
+
+Measured on {{ benchmark.measured | longDate }}, against Cirth
+{{ benchmark.cirthVersion }}, by `npm run benchmark` from the two files in
+[`docs/benchmark/`](https://github.com/cirthcss/cirth/tree/master/docs/benchmark).
+`npm run check:benchmark` and the documentation build both fail when either
+file changes and the numbers do not.
+
+### {{ benchCirth.label }}
+
+```html
+{{ benchmark.sources.cirth | safe }}
+```
+
+### {{ benchUtility.label }}
+
+```html
+{{ benchmark.sources.utility | safe }}
+```
+
 ## Pure CSS, nothing to run
 
 The package is compiled CSS. Accordions, dropdowns, modals and popovers are

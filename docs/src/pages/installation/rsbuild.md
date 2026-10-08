@@ -6,8 +6,6 @@ description: Use Cirth in an Rsbuild project. Import it from the entry module an
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Rsbuild
-
 Rsbuild bundles CSS with Lightning CSS, for the browsers in the project's
 browserslist. Its default list predates `light-dark()`, so Cirth needs one
 entry in `package.json`.

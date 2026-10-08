@@ -5,8 +5,6 @@ description: Use Cirth in a Next.js App Router project. Import it in the root la
 ---
 {% from "install.njk" import packageManagers %}
 
-# Next.js
-
 In the App Router, global CSS is imported from the root layout. Cirth is one
 import there, plus a browser list so Next does not rewrite its colours.
 

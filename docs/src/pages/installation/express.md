@@ -6,8 +6,6 @@ description: Use Cirth with Express. Serve the package's dist folder with expres
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Express
-
 Express serves files with `express.static`. Cirth's package is a folder of
 finished CSS, so the server can hand it out directly from `node_modules`.
 

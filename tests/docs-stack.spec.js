@@ -807,16 +807,22 @@ test("the navbar states are a contrast ladder, not the accent", async ({
 // says what kind of claim it is and where to check it. A guarantee and a
 // capability age differently, and a page that presents them identically is
 // promising the weaker one.
-test("the facts band is four checked facts on one ruled band", async ({
+test("at a glance is a section of its own: a heading, its argument and four checked figures", async ({
 	page,
 }) => {
 	await page.setViewportSize({ width: 1280, height: 900 });
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
-	const band = page.locator(".docs-facts-band");
-	const facts = band.locator(".docs-fact-list > div");
-	await expect(facts).toHaveCount(4);
+	// Between the hero and the story, named by a visible heading.
+	const order = await page.locator("main > section").evaluateAll((sections) => sections.map((section) => section.className.split(" ")[0]));
+	expect(order.slice(0, 3)).toEqual(["docs-hero", "docs-glance", "docs-story"]);
+	const glance = page.locator(".docs-glance");
+	await expect(glance).toHaveAttribute("aria-labelledby", "glance-title");
+	await expect(glance.locator("h2#glance-title")).toBeVisible();
+	await expect(glance.locator(".docs-glance-head > p")).toContainText("Cirth is a stylesheet and nothing else");
 
+	const facts = glance.locator("dl.docs-fact-list > div");
+	await expect(facts).toHaveCount(4);
 	// Every fact: a label, a value, and the link that checks it.
 	for (let index = 0; index < 4; index++) {
 		const fact = facts.nth(index);
@@ -829,8 +835,7 @@ test("the facts band is four checked facts on one ruled band", async ({
 	// The size is the build's own measurement, not a figure typed in.
 	await expect(facts.nth(1).locator("strong")).toHaveText(/^\d+(\.\d+)? KB$/);
 
-	// A band, not four boxes: no fact paints a surface or casts a shadow of
-	// its own, and the band is divided by the separator.
+	// A ruled grid, not four boxes: no fact paints a surface or casts a shadow.
 	const paint = await facts.evaluateAll((items) =>
 		items.map((item) => {
 			const style = getComputedStyle(item);
@@ -841,16 +846,12 @@ test("the facts band is four checked facts on one ruled band", async ({
 		expect(fact.background).toBe("rgba(0, 0, 0, 0)");
 		expect(fact.shadow).toBe("none");
 	}
-	const rules = await band.evaluate((element) => {
-		const style = getComputedStyle(element);
-		return [style.borderTopWidth, style.borderBottomWidth];
-	});
-	expect(rules).not.toContain("0px");
 
-	// Four across on a wide screen, one per row on a phone, and nothing
-	// wider than the viewport at either.
+	// Two by two on a wide screen and a tablet, one per row on a phone, and
+	// nothing wider than the viewport at any of them.
 	for (const [width, columns] of /** @type {const} */ ([
-		[1280, 4],
+		[1280, 2],
+		[768, 2],
 		[390, 1],
 	])) {
 		await page.setViewportSize({ width, height: 900 });
@@ -985,7 +986,7 @@ test("the framework band shows the ecosystems and leads each mark to its project
 		frameworks.featured.map((/** @type {{ officialUrl: string }} */ guide) => guide.officialUrl),
 	);
 	links.forEach((link, index) => {
-		expect(link.name).toBe(`${frameworks.featured[index].name} website`);
+		expect(link.name).toBe(`${frameworks.featured[index].name} official website`);
 		expect(link.images.filter((image) => image.shown), `${link.name}: one variant shows`).toHaveLength(1);
 		for (const image of link.images) {
 			expect(image.alt).toBe("");
@@ -1082,7 +1083,9 @@ test("the marks orbit Cirth's behind no line, stay upright, and turn only with t
 	}
 
 	// The rings turn with the scroll, never on their own, and hold still
-	// under the pointer.
+	// under the pointer. The scenes follow the scroll with a short ease, so
+	// "on their own" is once that has landed.
+	await page.waitForFunction(() => !document.querySelector(".docs-home")?.hasAttribute("data-animating"));
 	const still = await read();
 	await page.waitForTimeout(600);
 	expect(await read(), "the orbit moved on its own").toEqual(still);
@@ -1193,7 +1196,7 @@ test("an old address forwards to the page that replaced it", async ({ page }) =>
 		const guide = await page.request.get(`${origin}/installation/${slug}/`);
 		const text = await guide.text();
 		expect(text, slug).not.toMatch(/<meta name="robots" content="noindex"/);
-		expect(text, slug).toMatch(/class="docs-guide-title"/);
+		expect(text, slug).toMatch(/class="docs-project"/);
 	}
 });
 
@@ -1223,8 +1226,9 @@ test.describe("without JavaScript", () => {
 
 	// Every scene is whole without a script: the story's three pictures,
 	// the browser's own rendering from a declarative shadow root, the
-	// measured figures, the finished theme, and the presets comparator at
-	// the middle, without a control that could not move anything.
+	// markup comparison with its bars, the finished theme, the presets
+	// comparator at the middle, without a control that could not move
+	// anything, and the close with its command and its figures.
 	test("every scene of the home page needs no script", async ({ page }) => {
 		await page.goto(`${origin}/`, { waitUntil: "load" });
 
@@ -1240,8 +1244,11 @@ test.describe("without JavaScript", () => {
 				.evaluate((element) => element.shadowRoot?.querySelector("meter") !== null),
 		).toBe(true);
 		await expect(page.locator('[role="tablist"], [role="tab"], [role="tabpanel"]')).toHaveCount(0);
-		await expect(page.locator(".docs-measured-fact")).toHaveCount(3);
-		await expect(page.locator(".docs-measured-figure strong").first()).toHaveText("0");
+		await expect(page.locator("[data-docs-bench-card]")).toHaveCount(2);
+		await expect(page.locator("[data-docs-bench-card] data").first()).toHaveText("0");
+		const bars = await page.locator(".docs-bench-bar").evaluateAll((items) => items.map((bar) => getComputedStyle(bar, "::before").scale));
+		expect(bars.every((scale) => scale === "1")).toBe(true);
+		await expect(page.locator(".docs-close pre code")).toHaveText("npm install @cirthcss/cirth");
 
 		// The finished theme, with all three of its declarations.
 		const themeOn = await page
@@ -1311,7 +1318,7 @@ test("the browser's picture is its defaults and a picture; Cirth's ticket is liv
 				.filter((sheet) => sheet.href?.endsWith("/styles/home.css"))
 				.flatMap((sheet) => [...sheet.cssRules].flatMap((rule) => ("cssRules" in rule ? [rule, .../** @type {CSSGroupingRule} */ (rule).cssRules] : [rule])))
 				.map((rule) => /** @type {CSSStyleRule} */ (rule).selectorText ?? "")
-				.filter((selector) => /\.docs-story-result\s*>?\s*(?:article\s+)?(?:hgroup|dl|dt|dd|meter|details|summary|button|label|time|h3|p)\b/.test(selector)),
+				.filter((selector) => /\.docs-story-result\s*>?\s*(?:article\s+)?(?:hgroup|dl|dt|dd|meter|fieldset|legend|input|button|label|time|h3|p)\b/.test(selector)),
 		};
 	});
 	// No stylesheet reaches the picture: neither the page's face nor
@@ -1320,14 +1327,15 @@ test("the browser's picture is its defaults and a picture; Cirth's ticket is liv
 	expect(looks.styledHeight).toBeGreaterThan(looks.plainHeight + 8);
 	expect(looks.homeRules).toEqual([]);
 
-	// Cirth's copy is the real thing: the disclosure opens and closes, the
-	// gauge has its region, and the button takes the keyboard.
-	const details = page.locator(".docs-story-result details");
-	await expect(details).not.toHaveAttribute("open", "");
-	await details.locator("summary").click();
-	await expect(details).toHaveAttribute("open", "");
-	await details.locator("summary").click();
-	await expect(details).not.toHaveAttribute("open", "");
+	// Cirth's copy is the real thing: the radios keep one choice, the gauge
+	// has its region, and the button takes the keyboard.
+	const radios = page.locator(".docs-story-result [type=radio]");
+	await expect(radios.nth(0)).toBeChecked();
+	await radios.nth(1).click();
+	await expect(radios.nth(1)).toBeChecked();
+	await expect(radios.nth(0)).not.toBeChecked();
+	await page.locator(".docs-story-result label", { hasText: "Email" }).click();
+	await expect(radios.nth(0)).toBeChecked();
 	expect(await page.locator(".docs-story-result meter").evaluate((meter) => /** @type {HTMLMeterElement} */ (meter).value)).toBe(0.7);
 	const button = page.locator(".docs-story-result button");
 	await button.focus();
@@ -1336,19 +1344,20 @@ test("the browser's picture is its defaults and a picture; Cirth's ticket is liv
 
 // --- The presets comparator -------------------------------------------
 
-test("the import line under the list is the preset the halves wear", async ({ page }) => {
+test("the imports under the list load the preset the halves wear", async ({ page }) => {
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 	const options = await page.locator("[data-docs-compare-preset] option").evaluateAll((items) => items.map((item) => [item.getAttribute("value"), item.textContent?.trim()]));
 	expect(options).toEqual([["default", "Default"], ["material", "Material"], ["metro", "Metro"], ["plain", "Plain"]]);
 	const line = page.locator("[data-docs-compare-import][data-current]");
-	await expect(line).toHaveText('@import "@cirthcss/cirth";');
+	await expect(line).toHaveText('@import "@cirthcss/cirth";', { useInnerText: true });
 	for (const name of ["material", "metro", "plain"]) {
 		await page.locator("[data-docs-compare-preset]").selectOption(name);
-		await expect(line).toHaveText(`@import "@cirthcss/cirth/presets/${name}";`);
+		// Cirth, then the preset after it, as the Presets page loads one.
+		await expect(line).toHaveText(`@import "@cirthcss/cirth";\n@import "@cirthcss/cirth/presets/${name}";`, { useInnerText: true });
 		await expect(line).toBeVisible();
 		await expect(page.locator("[data-docs-compare-import]:not([data-current])").first()).toHaveCSS("visibility", "hidden");
 	}
-	// One short line, not a block competing with the comparator.
+	// Two short lines, not a block competing with the comparator.
 	await expect(page.locator(".docs-presets pre")).toHaveCount(0);
 });
 
@@ -1525,16 +1534,16 @@ test("the demonstration's theme is its own: no value is the default's or a prese
 	}
 	const normal = (/** @type {string} */ value) => value.replace(/\s+/g, " ").replace(/(\d)deg\b/g, "$1").trim();
 	expect(themeDemo.states).toHaveLength(4);
-	for (const state of themeDemo.states) {
-		for (const token of themeDemo.tokens) {
-			const value = normal(state.values[token]);
+	// The first state is Cirth as it ships: nothing declared, no stylesheet.
+	expect(themeDemo.states[0].values).toEqual({});
+	expect(themeDemo.states[0].css).toBe("");
+	// Every value a later state declares is the demonstration's own.
+	for (const state of themeDemo.changes) {
+		for (const [token, raw] of Object.entries(state.values)) {
+			const value = normal(String(raw));
 			for (const [name, values] of Object.entries(shipped)) {
 				if (values[token]) expect(value, `${state.id} ${token} is ${name}'s`).not.toBe(normal(values[token]));
 			}
-		}
-		// Not the default theme's or any preset's, as a whole either.
-		for (const [name, values] of Object.entries(shipped)) {
-			expect(themeDemo.tokens.every((token) => normal(state.values[token]) === normal(values[token] ?? "")), `${state.id} is ${name}`).toBe(false);
 		}
 	}
 	// One declaration changes at each step, in the order the steps name.
@@ -1552,7 +1561,8 @@ test("the theme copy wears each state inside its shadow root, and reads at AA in
 		await page.setViewportSize({ width: 1440, height: 900 });
 		await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 		const host = page.locator(".docs-theme-copy");
-		await expect(host).toHaveAttribute("inert", "");
+		// Live, not a picture: its controls are there to be used.
+		await expect(host).not.toHaveAttribute("inert", /.*/);
 		expect(await host.getAttribute("data-theme"), "a data-theme on the shadow host").toBeNull();
 		for (const [index, p] of [0.05, 0.3, 0.52, 0.85].entries()) {
 			await page.locator("[data-docs-theme]").evaluate((section, p) => {
@@ -1580,36 +1590,54 @@ test("the theme copy wears each state inside its shadow root, and reads at AA in
 					const f = (/** @type {number} */ v) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
 					return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
 				};
-				/** @param {string} a @param {string} b */
+				/** @param {number[]} a @param {number[]} b */
 				const ratio = (a, b) => {
-					const [x, y] = [luminance(rgb(a)), luminance(rgb(b))].sort((m, n) => n - m);
+					const [x, y] = [luminance(a), luminance(b)].sort((m, n) => n - m);
 					return (x + 0.05) / (y + 0.05);
 				};
+				// What is behind a node: every background up to the first
+				// opaque one, painted bottom up, so a translucent wash (a
+				// secondary button's) is read over what it washes.
 				/** @param {Element | null} node */
 				const background = (node) => {
+					const layers = [];
 					for (let at = node; at; at = at.parentElement) {
 						const colour = getComputedStyle(at).backgroundColor;
-						if (rgb(colour)[3] > 0) return colour;
+						const alpha = rgb(colour)[3];
+						if (alpha > 0) layers.push(colour);
+						if (alpha === 255) break;
 					}
-					return getComputedStyle(surface).backgroundColor;
+					canvas.clearRect(0, 0, 1, 1);
+					canvas.fillStyle = getComputedStyle(surface).backgroundColor;
+					canvas.fillRect(0, 0, 1, 1);
+					for (const colour of layers.reverse()) {
+						canvas.fillStyle = colour;
+						canvas.fillRect(0, 0, 1, 1);
+					}
+					return [...canvas.getImageData(0, 0, 1, 1).data];
 				};
 				/** @param {string} selector */
 				const text = (selector) => {
 					const node = /** @type {Element} */ (root.querySelector(selector));
-					return ratio(getComputedStyle(node).color, background(node));
+					const behind = background(node);
+					return ratio(rgb(getComputedStyle(node).color), behind);
 				};
 				return {
 					on,
 					scheme: getComputedStyle(surface).colorScheme,
 					theme: surface.getAttribute("data-theme"),
-					button: text("button"),
-					summary: text("summary"),
-					term: text("dt"),
-					value: text("dd"),
+					primary: text("footer button:not(.secondary)"),
+					secondary: text("footer button.secondary"),
+					chosen: text("fieldset > label:has(:checked)"),
+					unchosen: text("fieldset > label:not(:has(:checked))"),
+					legend: text("legend"),
+					checkbox: text("label:has([type=checkbox])"),
+					checklist: text("article > label"),
 					subtitle: text("hgroup p"),
 				};
 			});
-			expect(read.on, `${scheme} ${id}`).toEqual([id]);
+			// The first state is Cirth as it ships, with no stylesheet of its own on.
+			expect(read.on, `${scheme} ${id}`).toEqual(index === 0 ? [] : [id]);
 			expect(read.theme).toBe(scheme);
 			expect(read.scheme).toBe(scheme);
 			for (const [what, value] of Object.entries(read)) {
@@ -1640,17 +1668,18 @@ test("the home page states its argument in one heading outline", async ({
 		).toBeLessThanOrEqual(1);
 	}
 
-	// Eight scenes, in order: the claim and its proof, the facts, what the
-	// browser does and what Cirth adds, the measured figures, a theme of the
-	// reader's own, the presets, the stacks, and the close.
+	// Eight sections, in order: the claim and its proof, the figures that
+	// follow from it, what the browser does and what Cirth adds, the markup measured against a
+	// utility-first version of it, a theme of the reader's own, the
+	// presets, the stacks, and the close.
 	const sections = await page
 		.locator("main > section")
 		.evaluateAll((items) => items.map((item) => item.className.split(" ")[0]));
 	expect(sections).toEqual([
 		"docs-hero",
-		"docs-facts-band",
+		"docs-glance",
 		"docs-story",
-		"docs-measured",
+		"docs-bench",
 		"docs-theme",
 		"docs-presets",
 		"docs-agnostic",
@@ -1659,19 +1688,19 @@ test("the home page states its argument in one heading outline", async ({
 	expect(
 		await page.locator("main > section h2[id]").evaluateAll((headings) => headings.map((heading) => heading.textContent?.trim())),
 	).toEqual([
-		"At a glance",
+		"Measured, not promised.",
 		"Built on HTML, not around it.",
-		"Less markup. Nothing to run.",
+		"Less markup to maintain.",
 		"Your theme. Same HTML.",
-		"Presets, light and dark.",
+		"Pick a preset. Both schemes are ready.",
 		"Framework agnostic. Works everywhere.",
-		"Pure CSS. Whatever writes your HTML.",
+		"Your HTML is already enough.",
 	]);
 	// The sections it replaced are gone, with everything that drew them.
 	await expect(page.locator(".docs-showcase, .docs-narrative, .docs-themes")).toHaveCount(0);
 	const last = page.locator("main > section").last();
-	await expect(last.locator("h2")).toHaveText("Pure CSS. Whatever writes your HTML.");
-	await expect(page.locator("main h2", { hasText: "Pure CSS. Whatever writes your HTML." })).toHaveCount(1);
+	await expect(last.locator("h2")).toHaveText("Your HTML is already enough.");
+	await expect(page.locator("main h2", { hasText: "Your HTML is already enough." })).toHaveCount(1);
 	await expect(last.getByRole("button", { name: "Get started" })).toHaveAttribute("href", "/installation");
 	for (const gone of [
 		"One stylesheet. Whole interfaces.",
@@ -1681,14 +1710,28 @@ test("the home page states its argument in one heading outline", async ({
 		"Less markup. The same interface.",
 		"Add one stylesheet. Keep your HTML.",
 		"Describe what it is. Cirth draws it.",
+		"Less markup. Nothing to run.",
+		"Presets, light and dark.",
+		"Pure CSS. Whatever writes your HTML.",
 	]) {
 		await expect(
 			page.locator("main h2", { hasText: gone }),
 			`${gone} is not a section of the home page`,
 		).toHaveCount(0);
 	}
-	// No radios choose anything on the home page, and nothing poses as tabs.
-	await expect(page.locator("main [type=radio]")).toHaveCount(0);
+	// No radio is a control of the page, and nothing poses as tabs: the
+	// only radios are the ticket's (in both its renderings) and the theme
+	// card's own, parts of the specimens they belong to, which the page
+	// never reads.
+	const radios = await page.locator("main [type=radio]").evaluateAll((items) =>
+		items.map((item) => {
+			const root = item.getRootNode();
+			const host = root instanceof ShadowRoot ? root.host : null;
+			return Boolean(item.closest(".docs-story-result") ?? host?.closest(".docs-story-ua, .docs-theme-copy"));
+		}),
+	);
+	expect(radios.length).toBeGreaterThan(0);
+	expect(radios.every(Boolean)).toBe(true);
 	await expect(page.locator('main [role="tab"], main [role="tablist"]')).toHaveCount(0);
 });
 
@@ -2366,24 +2409,25 @@ test("the footer offers paths out, not the reference", async ({ page }) => {
 // have you do, and sets its numbered chapters as steps. The mark is
 // decorative, so the title a reader, a search index and <title> get is the
 // name alone; a project whose terms keep its logo off the site has none.
-test("each framework guide opens on its mark and reads as steps", async ({ page }) => {
+test("each framework guide opens on its project's card, then its h1, and reads as steps", async ({ page }) => {
 	const frameworks = require("../docs/src/_data/frameworks.js");
 	for (const guide of frameworks.guides) {
 		await page.goto(`${origin}${guide.link}/`, { waitUntil: "networkidle" });
-		const title = page.locator(".docs-content > h1.docs-guide-title");
+		const title = page.locator(".docs-content > h1");
 		await expect(title, `${guide.id} title`).toHaveCount(1);
-		await expect(title).toHaveText(guide.name);
-		expect(await page.title()).toBe(`${guide.name} — Cirth`);
+		await expect(title).toHaveText(`Install Cirth for ${guide.name}`);
+		expect(await page.title()).toBe(`Install Cirth for ${guide.name} — Cirth`);
+		await expect(title.locator("img, a")).toHaveCount(0);
 
-		const marks = title.locator(".docs-guide-marks img");
+		// The mark is in the card, decorative beside the printed name.
+		const marks = page.locator(".docs-project-mark img");
 		for (const alt of await marks.evaluateAll((items) => items.map((item) => item.getAttribute("alt")))) {
 			expect(alt, `${guide.id}: a mark beside the name is decorative`).toBe("");
 		}
 		const shown = await marks.evaluateAll(
 			(items) => items.filter((item) => getComputedStyle(item).display !== "none").length,
 		);
-		expect(shown, `${guide.id}: one variant of its mark, or none`).toBe(guide.mark ? 1 : 0);
-		await expect(title.locator("a")).toHaveCount(0);
+		expect(shown, `${guide.id}: one variant of its mark, or none`).toBe(guide.markData ? 1 : 0);
 
 		const steps = page.locator(".docs-content > h2.docs-step-heading");
 		const count = await steps.count();

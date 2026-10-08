@@ -175,6 +175,23 @@ const capture = async (page, pagePath, theme, prepare) => {
 	await page.goto(`${origin}/${pagePath}`, { waitUntil: "networkidle" });
 	await waitForTheme(page, theme);
 	await page.evaluate(() => document.fonts.ready);
+	// Lazy images, the home page's cover among them in a shadow root, are
+	// loaded before any capture, so a full-page screenshot never races them.
+	await page.evaluate(async () => {
+		const roots = [document, ...[...document.querySelectorAll("*")].flatMap((element) => (element.shadowRoot ? [element.shadowRoot] : []))];
+		const images = roots.flatMap((root) => [...root.querySelectorAll("img")]);
+		for (const image of images) image.loading = "eager";
+		await Promise.all(
+			images.map((image) =>
+				image.complete
+					? null
+					: new Promise((done) => {
+							image.addEventListener("load", done, { once: true });
+							image.addEventListener("error", done, { once: true });
+						}),
+			),
+		);
+	});
 	if (pagePath === "forms/input-date/index.html") {
 		// Empty date segments in WebKit use today's date as their visual
 		// placeholder, making the snapshot drift over time. Fixed values keep
@@ -301,6 +318,14 @@ for (const theme of themeVariants) {
 test.describe("home scenes", () => {
 	test.use({ contextOptions: { reducedMotion: "no-preference" } });
 
+	// The scenes are drawn at an eased scroll position that follows the
+	// window's; `data-animating` is on the page until the two meet.
+	/** @param {import("@playwright/test").Page} page */
+	const settle = async (page) => {
+		await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+		await page.waitForFunction(() => !document.querySelector(".docs-home")?.hasAttribute("data-animating"));
+	};
+
 	/**
 	 * @param {import("@playwright/test").Page} page
 	 * @param {string} selector
@@ -312,7 +337,7 @@ test.describe("home scenes", () => {
 			const top = element.getBoundingClientRect().top + window.scrollY;
 			window.scrollTo(0, top + p * (element.offsetHeight - window.innerHeight));
 		}, progress);
-		await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+		await settle(page);
 	};
 	/** @type {[string, string, number][]} */
 	const points = [
@@ -320,7 +345,8 @@ test.describe("home scenes", () => {
 		["story-markup", "[data-docs-story]", 0.34],
 		["story-browser", "[data-docs-story]", 0.52],
 		["story-cirth", "[data-docs-story]", 0.85],
-		["measured", "[data-docs-measured]", 0.9],
+		["bench-composing", "[data-docs-bench]", 0.35],
+		["bench", "[data-docs-bench]", 1],
 		["theme-start", "[data-docs-theme]", 0.05],
 		["theme-accent", "[data-docs-theme]", 0.3],
 		["theme-corners", "[data-docs-theme]", 0.52],
@@ -354,6 +380,18 @@ test.describe("home scenes", () => {
 		});
 	}
 
+	// The close, a frame under the header, every piece of it arrived.
+	test("home-close", async ({ page }, testInfo) => {
+		test.skip(!testInfo.project.name.includes("-desktop"), "a frame is a window tall only on a wide screen");
+		await capture(page, "index.html", defaultTheme);
+		await page.locator(".docs-pure").evaluate((section) => {
+			const header = document.querySelector(".docs-header")?.getBoundingClientRect().height ?? 0;
+			window.scrollTo(0, section.getBoundingClientRect().top + window.scrollY - header);
+		});
+		await settle(page);
+		await expect(page).toHaveScreenshot("home-close.png", { fullPage: false });
+	});
+
 	test("home-orbit", async ({ page }, testInfo) => {
 		test.skip(!testInfo.project.name.includes("-desktop"), "the orbit turns only on a wide screen");
 		await capture(page, "index.html", defaultTheme);
@@ -361,7 +399,7 @@ test.describe("home scenes", () => {
 			const element = /** @type {HTMLElement} */ (band);
 			window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY + element.offsetHeight / 2 - window.innerHeight / 2);
 		});
-		await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+		await settle(page);
 		await expect(page).toHaveScreenshot("home-orbit.png", { fullPage: false });
 	});
 });

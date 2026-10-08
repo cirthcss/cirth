@@ -16,6 +16,7 @@ module.exports = defineConfig({
 		"cascade-layers.spec.js",
 		"choice-marks.spec.js",
 		"doc-links.spec.js",
+		"docs-boundary.spec.js",
 		"docs-home.spec.js",
 		"docs-integrations.spec.js",
 		"docs-navigation.spec.js",

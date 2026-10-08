@@ -6,8 +6,6 @@ description: Use Cirth in a Vue app built with Vite. Import it in src/main.js an
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Vue
-
 Vue's starter builds with Vite and imports CSS from `src/main.js`. Cirth is one import there. For Nuxt, see its own guide.
 
 ## 1. Install

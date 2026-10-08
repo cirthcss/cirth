@@ -76,70 +76,71 @@ test("every entry is complete, and its category and status are real ones", () =>
 	);
 });
 
-test("every mark is a safe file on this site, and a guide without one says why", () => {
+test("every mark is a safe file on this site, and a project named by text says why", () => {
 	for (const guide of frameworks.guides) {
-		if (!guide.mark) {
-			expect(guide.noMark, `${guide.id}: why there is no mark`).toBeTruthy();
+		const record = frameworks.marks[guide.mark];
+		expect(record, guide.id).toBeTruthy();
+		if (!record.file) {
+			expect(guide.markData, `${guide.id}: nothing to draw`).toBeNull();
+			expect(String(record.textOnly).length, `${guide.id}: why it is named by text`).toBeGreaterThan(40);
 			continue;
 		}
-		const mark = frameworks.marks[guide.mark];
-		for (const file of [mark.file, mark.dark]) {
+		for (const file of [record.file, record.dark]) {
 			if (!file) continue;
 			expect(fs.existsSync(path.join(logoDir, file)), `${guide.id}: ${file}`).toBe(true);
 		}
-		expect(mark.source).toMatch(/^https:\/\//);
-		expect(mark.termsUrl).toMatch(/^https:\/\//);
-		expect(mark.owner.length).toBeGreaterThan(2);
-		expect(mark.aspect).toBeGreaterThan(0);
+		expect(record.source).toMatch(/^https:\/\//);
+		expect(record.termsUrl).toMatch(/^https:\/\//);
+		expect(record.owner.length).toBeGreaterThan(2);
+		expect(record.aspect).toBeGreaterThan(0);
 	}
 });
 
-// A logo is shown under its owner's own published terms or not at all.
-const placeholder = /^\s*$|\bno\s+(?:terms|licen[cs]e|policy)\b|not\s+stated|unknown|\btbd\b|\btodo\b/i;
-
-test("every mark shown names its source, owner and terms, and a guide without one says why", () => {
-	const shown = new Set(frameworks.guides.map((/** @type {{ mark: string | null }} */ guide) => guide.mark).filter(Boolean));
-	// Every mark in the data is one a guide shows, and the other way round.
-	expect(Object.keys(frameworks.marks).sort()).toEqual([...shown].sort());
-	for (const [id, mark] of Object.entries(frameworks.marks)) {
-		const fields = /** @type {Record<string, unknown>} */ (/** @type {unknown} */ (mark));
-		for (const field of ["source", "owner", "terms", "termsUrl"]) {
-			const value = fields[field];
+test("every record names its owner, the policy read and when, and a logo is never shown against one", () => {
+	const used = new Set(frameworks.guides.map((/** @type {{ mark: string }} */ guide) => guide.mark));
+	// Every record in the data is one a guide uses, and the other way round.
+	expect(Object.keys(frameworks.marks).sort()).toEqual([...used].sort());
+	expect(frameworks.checked).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+	for (const [id, record] of Object.entries(frameworks.marks)) {
+		for (const field of ["owner", "terms", "termsUrl"]) {
+			const value = /** @type {Record<string, unknown>} */ (record)[field];
 			expect(typeof value === "string" && value.trim().length > 0, `${id}: ${field}`).toBe(true);
 		}
-		expect(mark.terms, `${id}: "${mark.terms}" is not a term of use`).not.toMatch(placeholder);
-	}
-	for (const guide of frameworks.guides) {
-		if (guide.mark) {
-			expect(guide.noMark, `${guide.id} shows a mark and says it has none`).toBeUndefined();
-			continue;
+		expect(record.termsUrl, id).toMatch(/^https:\/\//);
+		// Nothing is recoloured: no one-colour inversion, and a file drawn
+		// for light backgrounds alone asks for a light ground instead.
+		expect(record, id).not.toHaveProperty("mono");
+		if (record.file) {
+			expect(record.source, id).toMatch(/^https:\/\//);
+			expect(record.textOnly, id).toBeUndefined();
 		}
-		expect(guide.markData, `${guide.id}: no mark data to draw`).toBeNull();
-		expect(String(guide.noMark).length, `${guide.id}: why there is no mark`).toBeGreaterThan(20);
 	}
-	// The projects whose marks are not shown here, and why that is decided
-	// in the data, not in a template.
-	expect(frameworks.guides.filter((/** @type {{ mark: string | null }} */ guide) => !guide.mark).map((/** @type {{ id: string }} */ guide) => guide.id).sort()).toEqual(
-		["dioxus", "eleventy", "livewire", "stimulus", "symfony", "waku"],
+	// The projects named by text alone, decided in the data: Symfony's
+	// policy asks for written authorisation, Vercel's for prior written
+	// permission, 37signals' for permission before promotional use.
+	expect(frameworks.guides.filter((/** @type {{ markData: unknown }} */ guide) => !guide.markData).map((/** @type {{ id: string }} */ guide) => guide.id).sort()).toEqual(
+		["nextjs", "stimulus", "symfony"],
 	);
-	// AdonisJS is shown under its brand guidelines, light and dark official
-	// files, and is never recoloured by a filter.
+	expect(frameworks.marks.symfony.permission).toMatch(/written authorisation/i);
+	// Files drawn for light backgrounds with no official dark variant.
+	expect(Object.entries(frameworks.marks).filter(([, record]) => record.ground).map(([id]) => id).sort()).toEqual(["elysia", "rails"]);
+	// AdonisJS and WordPress are shown with their own files for dark backgrounds.
 	expect(frameworks.marks.adonisjs).toMatchObject({ termsUrl: "https://adonisjs.com/brand", dark: "adonisjs-dark.svg" });
-	expect(frameworks.marks.adonisjs.mono).toBeUndefined();
-	// Nothing in the logos folder that no shown mark names.
-	const files = new Set(Object.values(frameworks.marks).flatMap((/** @type {{ file: string, dark?: string }} */ mark) => [mark.file, mark.dark].filter(Boolean)));
+	expect(frameworks.marks.wordpress).toMatchObject({ dark: "wordpress-dark.png" });
+	// Nothing in the logos folder that no record names.
+	const files = new Set(Object.values(frameworks.marks).flatMap((/** @type {{ file?: string, dark?: string }} */ record) => [record.file, record.dark].filter(Boolean)));
 	expect(fs.readdirSync(logoDir).filter((file) => !files.has(file))).toEqual([]);
-	// The count is the guides', whatever the marks.
+	// The count is the guides', whatever the records.
 	expect(frameworks.count).toBe(fs.readdirSync(pagesDir).filter((file) => file.endsWith(".md") && file !== "index.md").length);
 	expect(frameworks.count).toBeGreaterThan(Object.keys(frameworks.marks).length);
 });
 
 test("a guide named by text has no picture anywhere a mark would be", async ({ page }) => {
-	const textOnly = frameworks.guides.filter((/** @type {{ mark: string | null }} */ guide) => !guide.mark);
+	const textOnly = frameworks.guides.filter((/** @type {{ markData: unknown }} */ guide) => !guide.markData);
 	/** Every framework logo image on a page, by file. */
 	const logos = () =>
 		page.locator('img[src*="/logos/frameworks/"]').evaluateAll((images) => images.map((image) => image.getAttribute("src")));
-	const shownFiles = new Set(Object.values(frameworks.marks).flatMap((/** @type {{ file: string, dark?: string }} */ mark) => [mark.file, mark.dark].filter(Boolean)));
+	const shownFiles = new Set(Object.values(frameworks.marks).flatMap((/** @type {{ file?: string, dark?: string }} */ record) => [record.file, record.dark].filter(Boolean)));
 
 	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
 	for (const guide of textOnly) {
@@ -160,21 +161,25 @@ test("a guide named by text has no picture anywhere a mark would be", async ({ p
 	}
 	for (const guide of textOnly) {
 		await page.goto(`${origin}${guide.link}/`, { waitUntil: "domcontentloaded" });
-		await expect(page.locator(".docs-guide-title img"), guide.id).toHaveCount(0);
-		await expect(page.locator(".docs-guide-title")).toHaveText(guide.name);
+		await expect(page.locator(".docs-project img"), guide.id).toHaveCount(0);
+		await expect(page.locator(".docs-project-name")).toHaveText(guide.name);
 		await expect(page.locator(`.docs-sidebar a[href="${guide.link}"]`)).toHaveText(guide.name);
 	}
 
-	// The Brand page lists each of them, with the reason, and no logo row.
+	// The Brand page lists every project, the decision and the reason.
 	await page.goto(`${origin}/brand/`, { waitUntil: "domcontentloaded" });
-	const rows = await page.locator('[aria-label="Framework logo sources"] tbody th').allTextContents();
+	const table = page.locator('[aria-label="Framework logo sources and decisions"]');
+	const rows = await table.locator("tbody tr").evaluateAll((items) => items.map((item) => [...item.children].map((cell) => cell.textContent?.trim() ?? "")));
 	expect(rows).toHaveLength(Object.keys(frameworks.marks).length);
-	for (const guide of textOnly) {
-		expect(rows, guide.id).not.toContain(guide.name);
-		await expect(page.locator("main li", { hasText: String(guide.noMark).slice(0, 40) })).toHaveCount(1);
+	for (const [id, record] of Object.entries(frameworks.marks)) {
+		const row = rows.find((cells) => cells[0] === record.name);
+		expect(row, id).toBeTruthy();
+		expect(row?.[1], id).toBe(record.file ? (record.wide ? "Wordmark" : "Logo") : "Name only");
+		expect(row?.[2], id).toBe(record.owner);
+		expect(row?.[5], id).toBe(frameworks.checked);
 	}
-	for (const terms of await page.locator('[aria-label="Framework logo sources"] tbody td:last-child').allTextContents()) {
-		expect(terms).not.toMatch(placeholder);
+	for (const guide of textOnly) {
+		await expect(page.locator("main li", { hasText: String(guide.brand.textOnly).slice(0, 40) })).toHaveCount(1);
 	}
 
 	// The home page's orbit holds only marks it may show, none of them empty.
@@ -231,7 +236,7 @@ test("the Installation grid is the list: a mark to the project's site, a name to
 		const [site, name] = tile.links;
 		expect(site.href, `${guide.id}: the mark leads to the project's site`).toBe(guide.officialUrl);
 		// A mark's link is named for the site; a text-only one is its address.
-		expect(site.name).toBe(guide.mark ? `${guide.name} website` : guide.officialUrl.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, ""));
+		expect(site.name).toBe(guide.markData ? `${guide.name} official website` : guide.officialUrl.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, ""));
 		for (const alt of site.alts) expect(alt, `${guide.id}: the image is decorative inside a named link`).toBe("");
 		expect(name.href).toBe(guide.link);
 		expect(name.name).toContain(guide.name);
@@ -243,7 +248,7 @@ test("the Installation grid is the list: a mark to the project's site, a name to
 test("Django's logo, wherever it is a link, leads to djangoproject.com", async ({ page }) => {
 	const django = frameworks.byId.django;
 	expect(django.officialUrl).toBe("https://www.djangoproject.com");
-	for (const url of ["/installation/", "/"]) {
+	for (const url of ["/installation/", "/", "/installation/django/"]) {
 		await page.goto(`${origin}${url}`, { waitUntil: "networkidle" });
 		const linked = page.locator(`a:has(img[src="/logos/frameworks/${frameworks.marks.django.file}"])`);
 		expect(await linked.count(), `${url} shows the Django logo as a link`).toBeGreaterThan(0);
@@ -251,20 +256,41 @@ test("Django's logo, wherever it is a link, leads to djangoproject.com", async (
 			expect(href, `${url}: a Django logo link`).toBe("https://www.djangoproject.com");
 		}
 	}
-	// On its own guide the logo is not a link, and the site is.
+	// On its own guide the logo leads there too, out of the tab order; the
+	// card's Website link is the one the keyboard and a screen reader find.
 	await page.goto(`${origin}/installation/django/`, { waitUntil: "networkidle" });
 	await expect(page.locator("h1 a")).toHaveCount(0);
-	await expect(page.locator(".docs-guide-meta a")).toHaveAttribute("href", "https://www.djangoproject.com");
+	await expect(page.locator(".docs-project-mark")).toHaveAttribute("tabindex", "-1");
+	await expect(page.locator(".docs-project-links a").first()).toHaveAttribute("href", "https://www.djangoproject.com");
 });
 
-test("a guide says how sure it is, from the data, and which pages it follows", async ({ page }) => {
+test("a guide opens on its project's card and one h1, says how sure it is, and which pages it follows", async ({ page }) => {
 	for (const guide of frameworks.guides) {
 		await page.goto(`${origin}${guide.link}/`, { waitUntil: "networkidle" });
+		// The card: the project's name (text, not a heading), what it is, and
+		// its site and repository, each link named for the project.
+		const card = page.locator(".docs-content > aside.docs-project");
+		await expect(card, guide.id).toHaveAttribute("aria-label", `About ${guide.name}`);
+		await expect(card.locator(".docs-project-name")).toHaveText(guide.name);
+		await expect(card.locator(".docs-project-description")).toHaveText(guide.description);
+		await expect(card.locator("h1, h2, h3, h4, h5, h6")).toHaveCount(0);
+		const links = card.locator(".docs-project-links a");
+		await expect(links.first()).toHaveText("Website");
+		await expect(links.first()).toHaveAttribute("href", guide.officialUrl);
+		await expect(links.first()).toHaveAttribute("aria-label", `${guide.name} official website`);
+		if (guide.github) {
+			await expect(links.nth(1)).toHaveText("GitHub");
+			await expect(links.nth(1)).toHaveAttribute("href", guide.github);
+			await expect(links.nth(1)).toHaveAttribute("aria-label", `${guide.name} on GitHub`);
+		}
+		// One h1, right after the card, and the outline below it is h2s and h3s.
+		await expect(page.locator("main h1")).toHaveCount(1);
+		await expect(page.locator(".docs-content > aside.docs-project + h1")).toHaveText(`Install Cirth for ${guide.name}`);
+		// The facts line: how sure, with which release, and when.
 		const meta = page.locator(".docs-content > .docs-guide-meta");
-		await expect(meta, guide.id).toContainText(guide.categoryText);
 		await expect(meta.locator(".docs-guide-status")).toHaveAttribute("data-status", guide.verified.status);
+		await expect(meta).toContainText(`${guide.status.text} with ${guide.version} on`);
 		await expect(meta.locator("time")).toHaveAttribute("datetime", guide.verified.date);
-		await expect(meta.locator("a")).toHaveAttribute("href", guide.officialUrl);
 		const note = page.locator(".docs-content aside.docs-verified");
 		await expect(note).toHaveCount(1);
 		await expect(note).toContainText(guide.status.text);

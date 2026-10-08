@@ -5,8 +5,6 @@ description: Use Cirth in a Laravel application. Import it in resources/css/app.
 ---
 {% from "install.njk" import packageManagers %}
 
-# Laravel
-
 Laravel builds its front end with Vite, and a new application imports
 Tailwind from `resources/css/app.css`. Cirth takes Tailwind's place in that
 file, and Vite gets one line of configuration.

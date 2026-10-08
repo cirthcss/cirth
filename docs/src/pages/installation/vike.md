@@ -6,8 +6,6 @@ description: Use Cirth in a Vike app. Import it in pages/+Layout and set Vite's 
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Vike
-
 Vike wraps every page in `pages/+Layout`, so a stylesheet imported there
 reaches the whole app, with React, Vue or Solid alike. Vike builds with Vite,
 which takes one line.

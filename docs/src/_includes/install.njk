@@ -1,20 +1,11 @@
 {#- Installation widgets, shared by the Installation page and the guides.
 
-    packageManagers(id, verb): one command per package manager, chosen
-    with a row of native radios under a legend. The choice is pure CSS
-    (`.docs-install:has(:checked)` in styles/style.css), so every command
-    is in the document and the right one shows with no script at all;
-    without `:has()` all four are simply listed. A small script in
-    base.njk remembers the choice and applies it to every group on the
-    next page.
+    packageManagers(id, verb): one command per package manager, chosen with
+    native radios (a choice of one, not tabs). The choice is pure CSS
+    (`.docs-install:has(:checked)`); base.njk only remembers it.
 
-    Radios that look like radios: this is a choice of one of four, and the
-    control says so. A segmented bar would make it read as tabs, which
-    are a different widget with a different keyboard model.
-
-    Everything is written on single lines on purpose: markdown-it ends an
-    HTML block at the first blank line, and whitespace inside <pre> is
-    content. -#}
+    Single lines on purpose: markdown-it ends an HTML block at a blank line,
+    and whitespace inside <pre> is content. -#}
 {%- macro packageManagers(id, args = "@cirthcss/cirth") -%}
 <div class="docs-install" data-docs-install>
 <fieldset class="docs-choice"><legend>Package manager</legend><label><input type="radio" name="pm-{{ id }}" value="npm" checked> npm</label><label><input type="radio" name="pm-{{ id }}" value="pnpm"> pnpm</label><label><input type="radio" name="pm-{{ id }}" value="yarn"> Yarn</label><label><input type="radio" name="pm-{{ id }}" value="bun"> Bun</label></fieldset>
@@ -25,26 +16,19 @@
 </div>
 {%- endmacro -%}
 
-{#- A project's mark as a link to the project's own site, named as such
-    ("Django website"): the images inside are decorative, the link's name
-    says where it goes. A project whose logo is not shown here (its terms
-    keep it off, or it publishes none: `noMark`) gets no picture at all,
-    not even a stand-in: the same link, in the same place, is the site's
-    address as text ("symfony.com"), which is also its name, free to wrap
-    after each dot on a narrow tile. -#}
+{#- A link to the project's site, named "<Project> official website"; its
+    images are decorative. A project named by text alone (`textOnly` in
+    frameworks.js) gets its address as the link text instead. -#}
 {%- macro siteLink(guide, height = 28, className = "docs-guide-site") -%}
 {%- if guide.markData -%}
-<a class="{{ className }}" href="{{ guide.officialUrl }}" aria-label="{{ guide.name }} website"><span class="docs-mark">{{ guide.markData | markImages(height) | safe }}</span></a>
+<a class="{{ className }}" href="{{ guide.officialUrl }}" aria-label="{{ guide.name }} official website"><span class="docs-mark">{{ guide.markData | markImages(height) | safe }}</span></a>
 {%- else -%}
 <a class="{{ className }}" href="{{ guide.officialUrl }}">{{ guide.officialUrl | siteName | replace(".", ".<wbr>") | safe }}</a>
 {%- endif -%}
 {%- endmacro -%}
 
-{#- The guides as a grid of small tiles under a heading per category.
-    Each tile holds two links side by side, never one inside the other:
-    the mark, to the project's site, and the name, to the guide. No
-    script: every guide is in the document, in the order the sidebar
-    lists them. -#}
+{#- Guide tiles: two sibling links, the mark to the project's site and the
+    name to the guide, never one inside the other. -#}
 {%- macro guideGrid(groups) -%}
 <div class="docs-guide-groups">
 {%- for group in groups %}

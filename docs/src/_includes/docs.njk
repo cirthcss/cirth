@@ -24,11 +24,7 @@ layout: base.njk
 		{% endif %}
 	</div>
 	<div class="docs-layout">
-		{#- Every group folds, and the one holding this page arrives open:
-		    the reader sees where they are and the names of everything
-		    else, rather than a column of every page in the reference. The
-		    rail is as tall as the window and scrolls inside itself, so it
-		    never runs past the end of the page into the footer. -#}
+		{#- Every group folds; the one holding this page arrives open. -#}
 		<aside class="docs-sidebar" data-docs-rail>
 			<nav aria-label="docs navigation">
 				{{ navTree(nav.sidebar, page.url) }}
@@ -36,8 +32,7 @@ layout: base.njk
 		</aside>
 		<div class="docs-content" data-docs-kind="{{ page.url | docsKind }}" data-pagefind-body>
 			{%- if trail.length %}
-			{#- A nested page says what it belongs to, above its title, from
-			    the same tree the sidebar draws. -#}
+			{#- Breadcrumb, from the same tree the sidebar draws. -#}
 			<nav class="docs-breadcrumb" aria-label="breadcrumb">
 				<ol>
 					{%- for crumb in trail %}
@@ -51,10 +46,8 @@ layout: base.njk
 			</nav>
 			{%- endif %}
 			{{ (content | frameworkGuide(framework) if framework else content) | safe }}
-			{#- Previous and next in the reading order (nav.js), not in the
-			    sidebar's tree: a guide leads back to Installation and on to
-			    Customization, never to another guide. Each label names the
-			    group it leads into, read off the destination. -#}
+			{#- Previous and next in the reading order (nav.js), not the sidebar's
+			    tree: a guide leads back to Installation, never to another guide. -#}
 			{% if pager and (pager.prev or pager.next) %}
 				<nav class="docs-prev-next" aria-label="Previous and next page">
 					<ul>

@@ -6,8 +6,6 @@ description: Use Cirth on a Zola site. Put the file in static/ and link it with 
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Zola
-
 Zola copies `static/` into the site unchanged, and `get_url` can add a hash
 of the file to its URL. Cirth is one file there and one link.
 

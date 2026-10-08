@@ -46,7 +46,7 @@ description: Complete interfaces built only from semantic HTML and Cirth, from a
 							{% for use in item.uses %}<a href="{{ use.link }}">{{ use.text }}</a>{% endfor %}
 						</p>
 					</header>
-					{% demo item.demo, "default", item.frame or "" %}
+					{% demo item.demo, item.frame or "" %}
 				</section>
 			{% endfor %}
 		</section>

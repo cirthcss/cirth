@@ -6,8 +6,6 @@ description: Use Cirth in a Qwik City app. Import it in src/root.tsx; Qwik's bui
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Qwik
-
 A Qwik City app imports its global stylesheet from `src/root.tsx`. Cirth is
 one import there, and Qwik's build, on Vite 7, keeps its `light-dark()`
 colours as they are.

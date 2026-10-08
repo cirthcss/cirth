@@ -6,8 +6,6 @@ description: "Use Cirth in an Electron app. Link it from the renderer's page, an
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Electron
-
 An Electron window is Chromium, well above Cirth's floor, and follows the
 system's light or dark setting. Link Cirth from the renderer's page; the one
 thing to adjust is the Content Security Policy, because Cirth draws its icons

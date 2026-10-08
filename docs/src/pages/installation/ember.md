@@ -6,8 +6,6 @@ description: Use Cirth in an Ember app built with Vite and Embroider. Import it 
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Ember
-
 A new Ember app builds with Vite through Embroider, and imports CSS from
 JavaScript like any Vite project. Embroider compiles for the browsers in
 `config/targets.js`, which name current versions, so Cirth's colours arrive

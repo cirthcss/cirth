@@ -176,10 +176,9 @@ test("the home page's specimen cards all share one card contract", async ({
 	});
 	const first = await styleOf(page.locator("#probe-card"), properties);
 
-	// The hero's card is the same element under the same stylesheet, with
-	// one thing the shell adds on purpose: it is laid over the source, so
-	// it casts the overlay's elevation rather than a sheet's. Everything
-	// else about it is the library's card.
+	// The hero's card is the library's card, shadow included. It is laid
+	// over the source, so the overlay's elevation is cast by the wrapper
+	// around it, never by the article.
 	const hero = await styleOf(page.locator(".docs-hero-render > article"), properties);
 	const overlay = await page.evaluate(() => {
 		const probe = document.createElement("div");
@@ -189,8 +188,8 @@ test("the home page's specimen cards all share one card contract", async ({
 		probe.remove();
 		return value;
 	});
-	expect({ ...hero, boxShadow: "" }).toEqual({ ...first, boxShadow: "" });
-	expect(hero.boxShadow).toBe(overlay);
+	expect(hero).toEqual(first);
+	expect(await page.locator(".docs-hero-render").evaluate((element) => getComputedStyle(element).boxShadow)).toBe(overlay);
 
 	// A card casts the card token's single contact layer and nothing a
 	// shell added (specs/surface-depth.md).

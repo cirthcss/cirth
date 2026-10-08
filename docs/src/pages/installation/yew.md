@@ -4,8 +4,6 @@ framework: yew
 description: Use Cirth in a Yew application built with Trunk. Add the stylesheet to the project and link it from index.html with a Trunk css asset.
 ---
 
-# Yew
-
 Trunk builds a Yew application from its `index.html`, and copies every
 stylesheet that file links. Cirth is one file in the project and one
 `<link>`.

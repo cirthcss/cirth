@@ -6,8 +6,6 @@ description: Use Cirth in Lit components. A document stylesheet does not reach a
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Lit
-
 A Lit component renders into a shadow root, and a stylesheet in the document
 does not reach inside one. Cirth goes into the component's own `styles`,
 imported as text and adopted there.

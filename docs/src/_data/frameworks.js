@@ -13,33 +13,37 @@
 // framework (its CLI, its standalone binary, an atomic engine) are not
 // guides either; `excluded` below names them so a test can keep them out.
 //
-// A mark is a project's own logo, downloaded from the project's official
-// site or repository on the date it carries and committed unmodified under
-// docs/public/logos/frameworks/. Nothing is hotlinked and nothing is
-// redrawn. Where a project publishes a separate variant for dark
-// backgrounds, `dark` names it; a one-colour mark (`mono`) is shown black
-// on light and white on dark, as its own site shows it; otherwise one file
-// serves both schemes. A logo is shown only under terms its owner publishes
-// for that file: a trademark policy, brand guidelines, or the licence of the
-// repository the file itself is shipped in (which covers the file, and is
-// named as such). The licence of a project's code says nothing about a logo
-// published elsewhere, so it is never borrowed for one. A project whose terms
-// do not allow the logo here (Symfony), or that publishes none for it, has no
-// mark, and its guide is named by text alone: `noMark` says why.
+// Every project is named by its name: nominative use, which identifies the
+// tool a guide covers and needs nobody's permission. Its logo is shown
+// beside the name when four things hold: the file comes from the project's
+// own site, press or design kit or repository; it is committed unmodified
+// under docs/public/logos/frameworks/ (nothing hotlinked, nothing redrawn,
+// no colour filter); no official rule asks for permission before this use
+// or forbids it; and the colours, clear space, notices and links its owner
+// asks for are kept. Otherwise, where a policy asks for permission that has
+// not been given, forbids the use, or leaves it genuinely ambiguous, the
+// project is named by text alone and its record says why (`textOnly`).
+// Every record names its owner, the policy read and the day it was read,
+// which is what the Brand page lists.
+//
+// Where a project publishes a separate file for dark backgrounds, `dark`
+// names it. A file drawn only for light backgrounds, with no official
+// variant for dark ones, sits on a neutral light ground in the dark scheme
+// (`ground: "light"`) instead of being inverted.
 //
 // Wherever a mark is a link, it leads to the project's official site
 // (`officialUrl`), named as such, and the guide is a separate link beside
 // it: the Django Software Foundation asks that its logo link to
 // djangoproject.com, and the OpenJS Foundation allows a project logo only
-// as a link to that project's home page. Elsewhere a mark is decorative
-// (alt="") beside the printed name.
+// as a link to that project's home page.
 
 const fs = require("node:fs");
 const path = require("node:path");
 
 // The date the first marks were retrieved. A mark added later carries its
-// own `retrieved`.
+// own `retrieved`. Every record's policy was last read on `checked`.
 const retrieved = "2026-09-30";
+const checked = "2026-10-08";
 const logoDir = path.join(__dirname, "../../public/logos/frameworks");
 
 // Width over height, from the file itself, so every <img> carries its
@@ -68,17 +72,22 @@ const aspect = (file) => {
 /**
  * @typedef {object} Mark
  * @property {string} name The project's name, printed beside the mark.
- * @property {string} file The mark, for the light scheme or for both.
+ * @property {string} [file] The mark, for the light scheme or for both;
+ *   absent where the project is named by text alone.
  * @property {string} [dark] The project's own variant for dark backgrounds.
- * @property {boolean} [mono] One colour: black on light, white on dark.
+ * @property {string} [darkSource] Where the dark variant came from, if not `source`.
+ * @property {"light"} [ground] Drawn for light backgrounds only, with no
+ *   official dark variant: shown on a light ground in the dark scheme.
  * @property {boolean} [wide] A wordmark rather than a symbol.
  * @property {number} [aspect] Width over height, read from the file below.
  * @property {number} [darkAspect] The dark variant's, where its frame differs.
  * @property {string} owner
- * @property {string} source Where the file was downloaded from.
- * @property {string} terms
+ * @property {string} [source] Where the file was downloaded from.
+ * @property {string} terms The policy or licence read.
  * @property {string} termsUrl
- * @property {string} [retrieved] When, if not on the first date above.
+ * @property {string} [retrieved] When the file was downloaded, if not on the first date above.
+ * @property {string} [permission] What the policy asks permission for, where it says.
+ * @property {string} [textOnly] Why the project is named by text alone.
  * @property {string} [note]
  * @property {string} [attribution] A notice the terms require.
  */
@@ -86,6 +95,7 @@ const aspect = (file) => {
 const openJs = {
 	terms: "OpenJS Foundation trademark policy",
 	termsUrl: "https://trademark-policy.openjsf.org/",
+	permission: "Written permission for any use of a project logo other than as a link to the project's home page, which is the only way it is used here.",
 };
 
 /** @type {Record<string, Mark>} */
@@ -137,6 +147,7 @@ const marks = {
 		source:
 			"https://github.com/remix-run/react-router-website/tree/cce55dc06443/public/_brand/react-router-brand-assets/logo",
 		terms: "React Router brand guidelines",
+		permission: "Written consent for merchandise only.",
 		termsUrl: "https://reactrouter.com/brand",
 		retrieved: "2026-10-02",
 		note: "The logo pair from the brand page, light and dark. The guidelines rule out any suggestion of endorsement, and there is none.",
@@ -148,18 +159,18 @@ const marks = {
 		owner: "Shopify Inc.",
 		source: "https://github.com/remix-run/remix-website/tree/25aea9ce95bd/public/_brand",
 		terms: "Remix brand guidelines",
+		permission: "Written consent for merchandise only.",
 		termsUrl: "https://remix.run/brand",
 		retrieved: "2026-10-02",
 		note: "The light-mode and dark-mode logos from the brand page, each on the background it is drawn for.",
 	},
 	nextjs: {
 		name: "Next.js",
-		file: "nextjs.svg",
-		dark: "nextjs-dark.svg",
 		owner: "Vercel, Inc.",
-		source: "https://vercel.com/geist/brands",
 		terms: "Vercel brand guidelines",
 		termsUrl: "https://vercel.com/geist/brands",
+		permission: "Prior written permission for any use of Vercel marks other than describing Vercel's own products or saying one uses them, including uses in connection with software that uses its open source code.",
+		textOnly: "Vercel's guidelines ask for prior written permission before its marks are used in connection with software that uses its open source code, which is what an integration guide is, and none has been given. The guide is named by text alone.",
 		attribution:
 			"Vercel, the Vercel design, Next.js and related marks, designs and logos are trademarks or registered trademarks of Vercel, Inc.",
 	},
@@ -169,6 +180,7 @@ const marks = {
 		owner: "Evan You",
 		source: "https://github.com/vuejs/art/blob/366e8fad63e6/logo.svg",
 		terms: "CC BY-NC-SA 4.0",
+		permission: "Prior written consent to use the logo in a commercial product for anything but illustrating its Vue.js integration; this documentation is not a commercial product.",
 		note: "The terms allow the logo in open-source projects related to Vue.js. Designed by Evan You.",
 		termsUrl: "https://github.com/vuejs/art#readme",
 	},
@@ -256,6 +268,7 @@ const marks = {
 		source:
 			"https://github.com/ember-learn/ember-website/tree/1cb3da94b3e4/public/images/brand/Ember%20Logos/Ember",
 		terms: "Ember logo guidelines",
+		permission: "Not required for the standard art set, with the footer notice below.",
 		termsUrl: "https://emberjs.com/logos/",
 		retrieved: "2026-10-02",
 		note: "The four-colour logo on light and the white one-colour logo on dark, the pairing the guidelines give, each with its registration mark.",
@@ -279,7 +292,8 @@ const marks = {
 		owner: "The Astro project",
 		source: "https://astro.build/press/",
 		terms: "Astro press guidelines",
-		note: "The full logo, unmodified. The logomark alone needs written consent, so it is not used.",
+		permission: "Written consent for the logomark alone, which is why the full logo is the one used.",
+		note: "The full logo, unmodified. The guidelines list linking to Astro's website as a use of the logo.",
 		termsUrl: "https://astro.build/press/",
 	},
 	fresh: {
@@ -309,6 +323,7 @@ const marks = {
 		owner: "Laravel Holdings Inc.",
 		source: "https://github.com/laravel/art/blob/d5f5e725c27f/logo-mark/5%20svg/3%20rgb/1%20Full%20Color/laravel-mark-rgb-red.svg",
 		terms: "Laravel trademark policy",
+		permission: "Permission for commercial uses and for anything that suggests endorsement; neither applies here.",
 		termsUrl: "https://laravel.com/legal/trademark",
 		retrieved: "2026-10-01",
 		note: "The red logomark from the official laravel/art repository. The policy permits referring to Laravel in documentation.",
@@ -316,14 +331,15 @@ const marks = {
 	rails: {
 		name: "Rails",
 		file: "rails.svg",
-		mono: true,
+		ground: "light",
 		wide: true,
 		owner: "David Heinemeier Hansson, under exclusive licence to the Rails Foundation",
 		source: "https://github.com/rails/website/blob/fb413c108b1b/assets/images/logo.svg",
 		terms: "Rails trademark policy",
 		termsUrl: "https://rubyonrails.org/trademarks",
 		retrieved: "2026-10-02",
-		note: "The one-colour file rubyonrails.org itself colours with CSS. The policy allows the logo, without permission, to say that something supports Ruby on Rails.",
+		permission: "Permission for merchandise and book covers; not for using the logo to say something supports Ruby on Rails.",
+		note: "The one-colour file rubyonrails.org itself colours with CSS. The project publishes no variant for dark backgrounds, so in the dark scheme it sits on a light ground.",
 	},
 	adonisjs: {
 		name: "AdonisJS",
@@ -345,6 +361,7 @@ const marks = {
 		owner: "Django Software Foundation",
 		source: "https://www.djangoproject.com/community/logos/",
 		terms: "Django trademark licence",
+		permission: "Approval for merchandise and for the name DjangoCon only.",
 		termsUrl: "https://www.djangoproject.com/trademarks/",
 		retrieved: "2026-10-01",
 		note: "The positive logo on light and the negative logo, white on its own green, on dark: both official files, in the official colours. The DSF asks a site that shows the logo to link it to djangoproject.com, and wherever it is a link here, it leads there.",
@@ -393,22 +410,26 @@ const marks = {
 	elysia: {
 		name: "Elysia",
 		file: "elysia.svg",
+		ground: "light",
 		owner: "Elysia contributors",
 		source: "https://github.com/elysiajs/documentation/blob/f68573703415/docs/public/assets/elysia.svg",
 		terms: "MIT (repository)",
 		termsUrl: "https://github.com/elysiajs/documentation/blob/main/LICENSE",
 		retrieved: "2026-10-02",
+		note: "The documentation's own icon. Elysia publishes no variant for dark backgrounds, so in the dark scheme it sits on a light ground.",
 	},
 	wordpress: {
 		name: "WordPress",
 		file: "wordpress.svg",
-		mono: true,
+		dark: "wordpress-dark.png",
+		darkSource: "https://s.w.org/style/images/about/WordPress-logotype-wmark-white.png",
 		owner: "WordPress Foundation",
 		source: "https://github.com/WordPress/wporg-mu-plugins/blob/31aa3534aa28/mu-plugins/blocks/global-header-footer/images/w-mark.svg",
 		terms: "WordPress trademark policy",
 		termsUrl: "https://wordpressfoundation.org/trademark-policy/",
+		permission: "Permission to use the name or logo as part of a product, project, service, domain or company name; the logo may appear on a page that describes a product or service.",
 		retrieved: "2026-10-01",
-		note: "The W mark from the header of WordPress.org itself. wordpress.org/about/logos publishes it in black and in white, and only those two colourways are shown.",
+		note: "The W mark from the header of WordPress.org on light pages, and the white W mark wordpress.org/about/logos publishes (PNG, White/transparent, downloaded 2026-10-08) on dark ones.",
 	},
 	hugo: {
 		name: "Hugo",
@@ -451,6 +472,67 @@ const marks = {
 		retrieved: "2026-10-01",
 		note: "The logo the Yew website serves, from the dual-licensed yewstack/yew repository; the project states no separate logo terms.",
 	},
+	waku: {
+		name: "Waku",
+		file: "waku.svg",
+		dark: "waku-dark.svg",
+		wide: true,
+		owner: "Daishi Kato and Waku contributors",
+		source: "https://cdn.candycode.com/waku/waku-logo.zip",
+		terms: "No logo policy published (MIT licence covers the code)",
+		termsUrl: "https://github.com/wakujs/waku/blob/main/LICENSE",
+		retrieved: "2026-10-08",
+		note: "The black and the white logo from the logo kit waku.gg itself offers for download from its own logo. Waku publishes no rules for its logo.",
+	},
+	stimulus: {
+		name: "Stimulus",
+		owner: "37signals, LLC",
+		terms: "37signals Terms of Service",
+		termsUrl: "https://37signals.com/policies/terms",
+		permission: "Permission to use the company's logos, or any of its services' logos, for promotional purposes.",
+		textOnly: "37signals, which makes Stimulus, asks to be asked before its logos are used for promotional purposes, and a list of the stacks Cirth works with is close enough to that to leave the use ambiguous. The official symbol (hotwired/stimulus, assets/logo.svg) is not shown until permission is given; the guide is named by text alone.",
+	},
+	livewire: {
+		name: "Livewire",
+		file: "livewire.svg",
+		wide: true,
+		owner: "Caleb Porzio",
+		source: "https://github.com/livewire/livewire/blob/2750bdd142ad/art/logo.svg",
+		terms: "No logo policy published (MIT licence covers the code)",
+		termsUrl: "https://github.com/livewire/livewire/blob/main/LICENSE.md",
+		retrieved: "2026-10-08",
+		note: "The logo Livewire's own README shows. The one file draws its wordmark dark or light by the colour scheme; WebKit takes that from the system rather than the page, so in Safari, on a page switched to the other scheme by hand, the wordmark can lose contrast. The name is printed beside it.",
+	},
+	symfony: {
+		name: "Symfony",
+		owner: "Symfony SAS",
+		terms: "Symfony trademark and logo policy",
+		termsUrl: "https://symfony.com/trademark",
+		permission: "Written authorisation for any use of the logos.",
+		textOnly: "The Symfony trademark and logo policy asks for written authorisation for any use of its logos, and none has been given, so the guide is named by text alone.",
+	},
+	eleventy: {
+		name: "Eleventy",
+		file: "eleventy.svg",
+		owner: "The Eleventy project",
+		source: "https://github.com/11ty/11ty-logo/blob/82352f4ede5a/assets/logo-bg.svg",
+		terms: "No logo policy published (MIT licence covers the code)",
+		termsUrl: "https://github.com/11ty/11ty-logo",
+		retrieved: "2026-10-08",
+		note: "The logo on its own dark square, from the project's 11ty-logo repository; the same file serves both schemes. Neither 11ty.dev nor its repositories publish rules for the logo.",
+	},
+	dioxus: {
+		name: "Dioxus",
+		file: "dioxus.svg",
+		dark: "dioxus-dark.svg",
+		owner: "Dioxus Labs",
+		source: "https://github.com/DioxusLabs/brand/tree/4f5601935824/logos",
+		terms: "Dioxus brand repository",
+		termsUrl: "https://github.com/DioxusLabs/brand#logos",
+		retrieved: "2026-10-08",
+		permission: "None: the logo may be used if it is kept intact and not used commercially. This documentation is free and sells nothing.",
+		note: "The colour logo on light pages and the inverted one on dark pages, both from the logos folder of the brand repository.",
+	},
 };
 
 // Every guide sits in one category, the one a reader would look under
@@ -484,8 +566,9 @@ const cssTarget = '["chrome123", "edge123", "firefox130", "safari18.2"]';
  * @property {string} id
  * @property {string} name The tool, as the sidebar, the grid and the h1 print it.
  * @property {string} category
- * @property {string | null} mark A key of `marks`, or null where none may be shown.
- * @property {string} [noMark] Why a guide has no mark, for the Brand page.
+ * @property {string} mark A key of `marks`: the project's record, with or without a file.
+ * @property {string} description What the project is, in one neutral sentence.
+ * @property {string} [github] The project's official repository.
  * @property {string} officialUrl The project's own site.
  * @property {string} summary What the guide has you do, in one line.
  * @property {{ text: string, url: string }[]} docs The official pages the guide follows.
@@ -506,6 +589,8 @@ const guides = [
 		category: "build",
 		mark: "vite",
 		officialUrl: "https://vite.dev",
+		description: "A frontend build tool with a development server and a production bundler.",
+		github: "https://github.com/vitejs/vite",
 		summary: "Import it in the entry module and set build.cssTarget.",
 		covers: ["HTML and Vite"],
 		docs: [
@@ -528,6 +613,8 @@ const guides = [
 		category: "build",
 		mark: "postcss",
 		officialUrl: "https://postcss.org",
+		description: "A tool that transforms CSS with JavaScript plugins.",
+		github: "https://github.com/postcss/postcss",
 		summary: "Inline it with postcss-import; nothing else to set.",
 		docs: [
 			{ text: "postcss-import", url: "https://github.com/postcss/postcss-import" },
@@ -548,6 +635,8 @@ const guides = [
 		category: "build",
 		mark: "rsbuild",
 		officialUrl: "https://rsbuild.rs",
+		description: "A build tool for web applications, based on Rspack.",
+		github: "https://github.com/web-infra-dev/rsbuild",
 		summary: "Import it in the entry module and give the project Cirth's browsers.",
 		docs: [
 			{ text: "Rsbuild: CSS usage", url: "https://rsbuild.rs/guide/styling/css-usage" },
@@ -570,6 +659,8 @@ const guides = [
 		category: "javascript",
 		mark: "angular",
 		officialUrl: "https://angular.dev",
+		description: "A TypeScript framework from Google for building web applications.",
+		github: "https://github.com/angular/angular",
 		summary: "A path in the styles array of angular.json, or an @import.",
 		docs: [
 			{
@@ -592,6 +683,8 @@ const guides = [
 		category: "javascript",
 		mark: "astro",
 		officialUrl: "https://astro.build",
+		description: "A web framework for content-driven websites that ships HTML by default.",
+		github: "https://github.com/withastro/astro",
 		summary: "Import it in a layout's frontmatter.",
 		docs: [{ text: "Astro: Styles and CSS", url: "https://docs.astro.build/en/guides/styling/" }],
 		toolchain: "Astro's build keeps light-dark() as it is.",
@@ -609,6 +702,8 @@ const guides = [
 		category: "javascript",
 		mark: "ember",
 		officialUrl: "https://emberjs.com",
+		description: "A JavaScript framework for web applications, built around conventions and a CLI.",
+		github: "https://github.com/emberjs/ember.js",
 		summary: "Import it in app/app.js; Embroider builds for your targets.",
 		docs: [
 			{ text: "Ember Guides: Vite", url: "https://guides.emberjs.com/release/build-tools/vite/" },
@@ -632,6 +727,8 @@ const guides = [
 		category: "javascript",
 		mark: "fresh",
 		officialUrl: "https://usefresh.dev",
+		description: "A web framework for Deno that renders on the server and hydrates islands.",
+		github: "https://github.com/freshframework/fresh",
 		summary: "Add the npm package and @import it in assets/styles.css.",
 		docs: [
 			{ text: "Fresh: Vite", url: "https://usefresh.dev/docs/advanced/vite" },
@@ -652,6 +749,8 @@ const guides = [
 		category: "javascript",
 		mark: "lit",
 		officialUrl: "https://lit.dev",
+		description: "A library for building web components.",
+		github: "https://github.com/lit/lit",
 		summary: "Adopt it in each component's shadow root.",
 		docs: [{ text: "Lit: Styles", url: "https://lit.dev/docs/components/styles/" }],
 		toolchain: "A stylesheet in the document does not reach a shadow root; the component adopts Cirth itself.",
@@ -670,6 +769,8 @@ const guides = [
 		category: "javascript",
 		mark: "nextjs",
 		officialUrl: "https://nextjs.org",
+		description: "A React framework for full-stack web applications, made by Vercel.",
+		github: "https://github.com/vercel/next.js",
 		summary: "Import it in the root layout and give the project Cirth's browsers.",
 		docs: [
 			{ text: "Next.js: CSS", url: "https://nextjs.org/docs/app/getting-started/css" },
@@ -691,6 +792,8 @@ const guides = [
 		category: "javascript",
 		mark: "nuxt",
 		officialUrl: "https://nuxt.com",
+		description: "A Vue framework for full-stack web applications.",
+		github: "https://github.com/nuxt/nuxt",
 		summary: "One entry in the css array and Vite's CSS target.",
 		docs: [
 			{ text: "Nuxt: Styling", url: "https://nuxt.com/docs/getting-started/styling" },
@@ -711,6 +814,8 @@ const guides = [
 		category: "javascript",
 		mark: "preact",
 		officialUrl: "https://preactjs.com",
+		description: "A small JavaScript UI library with an API compatible with React's.",
+		github: "https://github.com/preactjs/preact",
 		summary: "Import it in src/main.jsx and set Vite's CSS target.",
 		docs: [{ text: "Preact: Getting started", url: "https://preactjs.com/guide/v10/getting-started" }],
 		toolchain: "Preact's starter builds with Vite 8, which rewrites light-dark() unless told the target.",
@@ -729,6 +834,8 @@ const guides = [
 		category: "javascript",
 		mark: "qwik",
 		officialUrl: "https://qwik.dev",
+		description: "A JavaScript framework that resumes server-rendered pages instead of hydrating them.",
+		github: "https://github.com/QwikDev/qwik",
 		summary: "Import it in src/root.tsx; nothing else to set.",
 		docs: [{ text: "Qwik: Styles", url: "https://qwik.dev/docs/components/styles/" }],
 		toolchain: "Qwik's starter builds with Vite 7, whose CSS minifier keeps light-dark().",
@@ -746,6 +853,8 @@ const guides = [
 		category: "javascript",
 		mark: "react",
 		officialUrl: "https://react.dev",
+		description: "A JavaScript library for building user interfaces from components.",
+		github: "https://github.com/react/react",
 		summary: "Import it where the app mounts and set Vite's CSS target.",
 		covers: ["React and Vite"],
 		docs: [
@@ -768,6 +877,8 @@ const guides = [
 		category: "javascript",
 		mark: "reactRouter",
 		officialUrl: "https://reactrouter.com",
+		description: "A routing library and framework for React applications.",
+		github: "https://github.com/remix-run/react-router",
 		summary: "Replace Tailwind in app/app.css and set Vite's CSS target.",
 		docs: [
 			{ text: "React Router: installation", url: "https://reactrouter.com/start/framework/installation" },
@@ -789,6 +900,8 @@ const guides = [
 		category: "javascript",
 		mark: "remix",
 		officialUrl: "https://remix.run",
+		description: "A full-stack web framework from the team behind React Router.",
+		github: "https://github.com/remix-run/remix",
 		summary: "Serve it from public/ and link it in the document.",
 		docs: [
 			{ text: "Remix: guides", url: "https://remix.run/docs" },
@@ -808,6 +921,8 @@ const guides = [
 		category: "javascript",
 		mark: "solid",
 		officialUrl: "https://www.solidjs.com",
+		description: "A JavaScript library for user interfaces with fine-grained reactivity.",
+		github: "https://github.com/solidjs/solid",
 		summary: "Import it in src/index.jsx and set Vite's CSS target.",
 		docs: [
 			{ text: "Solid: styling your components", url: "https://docs.solidjs.com/guides/styling-your-components" },
@@ -828,6 +943,8 @@ const guides = [
 		category: "javascript",
 		mark: "solidStart",
 		officialUrl: "https://docs.solidjs.com/solid-start",
+		description: "The full-stack framework for Solid.",
+		github: "https://github.com/solidjs/solid-start",
 		summary: "Import it in src/app.jsx and set Vite's CSS target.",
 		docs: [{ text: "SolidStart documentation", url: "https://docs.solidjs.com/solid-start" }],
 		toolchain: "SolidStart 2 builds with Vite 8, which rewrites light-dark() unless told the target.",
@@ -846,6 +963,8 @@ const guides = [
 		category: "javascript",
 		mark: "svelte",
 		officialUrl: "https://svelte.dev",
+		description: "A UI framework that compiles components to JavaScript at build time.",
+		github: "https://github.com/sveltejs/svelte",
 		summary: "Import it in src/main.js and set Vite's CSS target.",
 		docs: [{ text: "Svelte: Getting started", url: "https://svelte.dev/docs/svelte/getting-started" }],
 		toolchain: "Svelte's Vite starter rewrites light-dark() unless Vite is told the target.",
@@ -864,6 +983,8 @@ const guides = [
 		category: "javascript",
 		mark: "svelte",
 		officialUrl: "https://svelte.dev/docs/kit",
+		description: "The application framework for Svelte, with routing and server rendering.",
+		github: "https://github.com/sveltejs/kit",
 		summary: "Import it in the root layout and set Vite's CSS target.",
 		docs: [{ text: "SvelteKit: Routing, +layout", url: "https://svelte.dev/docs/kit/routing" }],
 		toolchain: "SvelteKit builds with Vite 8, which rewrites light-dark() unless told the target.",
@@ -882,6 +1003,8 @@ const guides = [
 		category: "javascript",
 		mark: "vike",
 		officialUrl: "https://vike.dev",
+		description: "A Vite-based framework for server-rendered and pre-rendered applications.",
+		github: "https://github.com/vikejs/vike",
 		summary: "Import it in pages/+Layout and set Vite's CSS target.",
 		docs: [{ text: "Vike: Layout", url: "https://vike.dev/Layout" }],
 		toolchain: "Vike builds with Vite 8, which rewrites light-dark() unless told the target.",
@@ -900,6 +1023,8 @@ const guides = [
 		category: "javascript",
 		mark: "vue",
 		officialUrl: "https://vuejs.org",
+		description: "A JavaScript framework for building user interfaces.",
+		github: "https://github.com/vuejs/core",
 		summary: "Import it in src/main.js and set Vite's CSS target.",
 		docs: [{ text: "Vue: Quick start", url: "https://vuejs.org/guide/quick-start" }],
 		toolchain: "Vue's Vite starter rewrites light-dark() unless Vite is told the target.",
@@ -916,9 +1041,10 @@ const guides = [
 		id: "waku",
 		name: "Waku",
 		category: "javascript",
-		mark: null,
-		noMark: "Waku publishes no logo or trademark terms (its repository's MIT licence covers the code, not the mark), so the guide is named by text alone.",
+		mark: "waku",
 		officialUrl: "https://waku.gg",
+		description: "A minimal React framework built around React Server Components.",
+		github: "https://github.com/wakujs/waku",
 		summary: "Replace Tailwind in src/styles.css and set Vite's CSS target.",
 		docs: [{ text: "Waku: guides", url: "https://waku.gg/guides" }],
 		toolchain: "Waku builds with Vite 8, which rewrites light-dark() unless told the target.",
@@ -938,6 +1064,8 @@ const guides = [
 		category: "html",
 		mark: "htmx",
 		officialUrl: "https://htmx.org",
+		description: "A JavaScript library that adds requests and partial updates through HTML attributes.",
+		github: "https://github.com/bigskysoftware/htmx",
 		summary: "Link it once in the page htmx swaps into.",
 		docs: [{ text: "htmx: documentation", url: "https://htmx.org/docs/" }],
 		toolchain: "htmx swaps HTML into a page that already has the stylesheet; nothing to build.",
@@ -952,9 +1080,10 @@ const guides = [
 		id: "stimulus",
 		name: "Stimulus",
 		category: "html",
-		mark: null,
-		noMark: "Stimulus publishes no logo terms: the repository behind stimulus.hotwired.dev states no licence, and 37signals' brand guidelines are about not imitating its products, not about showing their logos. The guide is named by text alone.",
+		mark: "stimulus",
 		officialUrl: "https://stimulus.hotwired.dev",
+		description: "A JavaScript framework that connects behaviour to HTML through data attributes.",
+		github: "https://github.com/hotwired/stimulus",
 		summary: "Let controllers set the attributes Cirth already styles.",
 		docs: [{ text: "Stimulus Handbook", url: "https://stimulus.hotwired.dev/handbook/introduction" }],
 		toolchain: "Stimulus adds no CSS step; the stylesheet comes from whatever builds the page.",
@@ -972,6 +1101,8 @@ const guides = [
 		category: "backend",
 		mark: "adonisjs",
 		officialUrl: "https://adonisjs.com",
+		description: "A TypeScript framework for web applications and APIs on Node.js.",
+		github: "https://github.com/adonisjs/core",
 		summary: "Import it in resources/css/app.css and set Vite's CSS target.",
 		docs: [{ text: "AdonisJS: Vite", url: "https://docs.adonisjs.com/guides/frontend/vite" }],
 		toolchain: "AdonisJS bundles with Vite 8, which rewrites light-dark() unless told the target.",
@@ -990,6 +1121,8 @@ const guides = [
 		category: "backend",
 		mark: "dotnet",
 		officialUrl: "https://dotnet.microsoft.com/apps/aspnet",
+		description: "Microsoft's framework for building web apps and services with .NET.",
+		github: "https://github.com/dotnet/aspnetcore",
 		summary: "A file in wwwroot, fingerprinted by MapStaticAssets.",
 		docs: [
 			{
@@ -1011,6 +1144,8 @@ const guides = [
 		category: "backend",
 		mark: "dotnet",
 		officialUrl: "https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor",
+		description: "A .NET framework for interactive web UI written in C# and Razor.",
+		github: "https://github.com/dotnet/aspnetcore",
 		summary: "A file in wwwroot, linked through @Assets in App.razor.",
 		docs: [
 			{
@@ -1032,6 +1167,8 @@ const guides = [
 		category: "backend",
 		mark: "django",
 		officialUrl: "https://www.djangoproject.com",
+		description: "A Python web framework with an ORM, templates and an admin site.",
+		github: "https://github.com/django/django",
 		summary: "A static file in your app, linked with the static tag.",
 		docs: [
 			{
@@ -1053,6 +1190,8 @@ const guides = [
 		category: "backend",
 		mark: "flask",
 		officialUrl: "https://flask.palletsprojects.com",
+		description: "A lightweight Python web framework built on Werkzeug and Jinja.",
+		github: "https://github.com/pallets/flask",
 		summary: "A file in static/, linked with url_for.",
 		docs: [{ text: "Flask: static files", url: "https://flask.palletsprojects.com/en/stable/tutorial/static/" }],
 		toolchain: "Flask serves static/ as it is.",
@@ -1069,6 +1208,8 @@ const guides = [
 		category: "backend",
 		mark: "laravel",
 		officialUrl: "https://laravel.com",
+		description: "A PHP web framework with routing, an ORM and Blade templates.",
+		github: "https://github.com/laravel/framework",
 		summary: "Import it in resources/css/app.css, in place of Tailwind, and set Vite's CSS target.",
 		docs: [{ text: "Laravel: Asset bundling (Vite)", url: "https://laravel.com/docs/vite" }],
 		toolchain: "Laravel bundles with Vite 8, which rewrites light-dark() unless told the target.",
@@ -1085,9 +1226,10 @@ const guides = [
 		id: "livewire",
 		name: "Livewire",
 		category: "backend",
-		mark: null,
-		noMark: "Livewire publishes no logo or trademark terms (its repository's MIT licence covers the code, not the mascot or the wordmark), so the guide is named by text alone.",
+		mark: "livewire",
 		officialUrl: "https://livewire.laravel.com",
+		description: "A Laravel library for dynamic interfaces written in PHP and Blade.",
+		github: "https://github.com/livewire/livewire",
 		summary: "Cirth comes from Laravel's Vite build; Livewire's updates keep it.",
 		docs: [{ text: "Livewire: installation", url: "https://livewire.laravel.com/docs/installation" }],
 		toolchain: "Livewire injects its own small styles and morphs the DOM; it does not touch the stylesheet.",
@@ -1104,6 +1246,8 @@ const guides = [
 		category: "backend",
 		mark: "phoenix",
 		officialUrl: "https://www.phoenixframework.org",
+		description: "An Elixir web framework, with LiveView for server-rendered interactive pages.",
+		github: "https://github.com/phoenixframework/phoenix",
 		summary: "Installed into assets/ and bundled by esbuild.",
 		covers: ["Phoenix LiveView"],
 		docs: [{ text: "Phoenix: Asset management", url: "https://hexdocs.pm/phoenix/asset_management.html" }],
@@ -1122,6 +1266,8 @@ const guides = [
 		category: "backend",
 		mark: "rails",
 		officialUrl: "https://rubyonrails.org",
+		description: "A Ruby web framework for database-backed applications.",
+		github: "https://github.com/rails/rails",
 		summary: "A file in vendor/assets, linked before the app's own stylesheets.",
 		docs: [
 			{ text: "Rails Guides: The Asset Pipeline", url: "https://guides.rubyonrails.org/asset_pipeline.html" },
@@ -1138,9 +1284,10 @@ const guides = [
 		id: "symfony",
 		name: "Symfony",
 		category: "backend",
-		mark: null,
-		noMark: "The Symfony trademark and logo policy asks for written permission for any use of the logo, so the guide is named by text alone.",
+		mark: "symfony",
 		officialUrl: "https://symfony.com",
+		description: "A PHP framework and a set of reusable PHP components.",
+		github: "https://github.com/symfony/symfony",
 		summary: "Require it through AssetMapper's importmap and import it in app.js.",
 		docs: [
 			{ text: "Symfony: AssetMapper", url: "https://symfony.com/doc/current/frontend/asset_mapper.html" },
@@ -1159,6 +1306,8 @@ const guides = [
 		category: "backend",
 		mark: "elysia",
 		officialUrl: "https://elysiajs.com",
+		description: "A TypeScript web framework built for the Bun runtime.",
+		github: "https://github.com/elysiajs/elysia",
 		summary: "Serve dist/ with the static plugin and link it.",
 		docs: [{ text: "Elysia: static plugin", url: "https://elysiajs.com/plugins/static" }],
 		toolchain: "The static plugin serves the file as it is, as text/css.",
@@ -1175,6 +1324,8 @@ const guides = [
 		category: "backend",
 		mark: "express",
 		officialUrl: "https://expressjs.com",
+		description: "A minimal web framework for Node.js.",
+		github: "https://github.com/expressjs/express",
 		summary: "Serve dist/ with express.static and link it.",
 		docs: [{ text: "Express: serving static files", url: "https://expressjs.com/en/starter/static-files.html" }],
 		toolchain: "express.static serves the file as it is.",
@@ -1192,6 +1343,8 @@ const guides = [
 		category: "cms",
 		mark: "wordpress",
 		officialUrl: "https://wordpress.org",
+		description: "An open-source content management system written in PHP.",
+		github: "https://github.com/WordPress/wordpress-develop",
 		summary: "Enqueued from your theme's functions.php.",
 		docs: [
 			{
@@ -1212,9 +1365,10 @@ const guides = [
 		id: "eleventy",
 		name: "Eleventy",
 		category: "static",
-		mark: null,
-		noMark: "Eleventy publishes no logo or trademark terms (the 11ty/logo repository states no licence, and the code's MIT licence does not cover the mark), so the guide is named by text alone.",
+		mark: "eleventy",
 		officialUrl: "https://www.11ty.dev",
+		description: "A static site generator that turns templates and data into HTML.",
+		github: "https://github.com/11ty/buildawesome",
 		summary: "Copy the file through and link it.",
 		docs: [{ text: "Eleventy: Passthrough file copy", url: "https://www.11ty.dev/docs/copy/" }],
 		toolchain: "Passthrough copy writes the file unchanged.",
@@ -1231,6 +1385,8 @@ const guides = [
 		category: "static",
 		mark: "hugo",
 		officialUrl: "https://gohugo.io",
+		description: "A static site generator written in Go.",
+		github: "https://github.com/gohugoio/hugo",
 		summary: "A file in assets/, fingerprinted by Hugo Pipes.",
 		docs: [
 			{ text: "Hugo: resources.Fingerprint", url: "https://gohugo.io/functions/resources/fingerprint/" },
@@ -1250,6 +1406,8 @@ const guides = [
 		category: "static",
 		mark: "zola",
 		officialUrl: "https://www.getzola.org",
+		description: "A static site generator written in Rust, shipped as a single binary.",
+		github: "https://github.com/getzola/zola",
 		summary: "A file in static/, linked with get_url and a cache-busting hash.",
 		docs: [{ text: "Zola: templates, get_url", url: "https://www.getzola.org/documentation/templates/overview/" }],
 		toolchain: "Zola copies static/ unchanged.",
@@ -1268,6 +1426,8 @@ const guides = [
 		category: "javascript",
 		mark: "electron",
 		officialUrl: "https://www.electronjs.org",
+		description: "A framework for desktop applications built with JavaScript, HTML and CSS.",
+		github: "https://github.com/electron/electron",
 		summary: "Link it from the renderer's page and allow data: images in the CSP.",
 		docs: [
 			{ text: "Electron: security, Content Security Policy", url: "https://www.electronjs.org/docs/latest/tutorial/security" },
@@ -1285,9 +1445,10 @@ const guides = [
 		id: "dioxus",
 		name: "Dioxus",
 		category: "rust",
-		mark: null,
-		noMark: "The Dioxus brand repository (github.com/DioxusLabs/brand) allows the logo \"for your own projects\", not commercially, and says nothing of a third-party site showing it to name Dioxus, so the guide is named by text alone.",
+		mark: "dioxus",
 		officialUrl: "https://dioxuslabs.com",
+		description: "A Rust framework for user interfaces on the web, desktop and mobile.",
+		github: "https://github.com/DioxusLabs/dioxus",
 		summary: "An asset!() with minification off, linked by document::Stylesheet.",
 		docs: [{ text: "Dioxus: Assets", url: "https://dioxuslabs.com/learn/0.7/essentials/ui/assets" }],
 		toolchain: "Dioxus's asset pipeline minifies CSS for older browsers in release builds and rewrites light-dark().",
@@ -1306,6 +1467,8 @@ const guides = [
 		category: "rust",
 		mark: "yew",
 		officialUrl: "https://yew.rs",
+		description: "A Rust framework for web applications compiled to WebAssembly.",
+		github: "https://github.com/yewstack/yew",
 		summary: "One Trunk link in index.html.",
 		docs: [{ text: "Trunk: assets", url: "https://trunkrs.dev/assets/" }],
 		toolchain: "Trunk copies the file, adds an integrity hash, and with --minify keeps light-dark().",
@@ -1333,6 +1496,7 @@ const excluded = [
 ];
 
 for (const mark of Object.values(marks)) {
+	if (!mark.file) continue;
 	mark.aspect = aspect(mark.file);
 	if (mark.dark) {
 		const dark = aspect(mark.dark);
@@ -1344,33 +1508,39 @@ for (const mark of Object.values(marks)) {
 	}
 }
 
-// A logo is shown only with its provenance and its owner's own terms, all
-// four named. "No terms stated" is not a term: a mark whose owner states
-// none is not shown, and its guide carries `noMark` instead.
-const placeholderTerms = /^\s*$|\bno\s+(?:terms|licen[cs]e|policy)\b|not\s+stated|unknown|\btbd\b|\btodo\b/i;
+// Every record names its owner and the policy read; one with a file names
+// where the file came from, and one without says why. A file is never shown
+// under a policy that asks for permission first.
+const isoDate = /^\d{4}-\d{2}-\d{2}$/;
 for (const [id, mark] of Object.entries(marks)) {
-	for (const field of /** @type {const} */ (["source", "owner", "terms", "termsUrl"])) {
+	for (const field of /** @type {const} */ (["owner", "terms", "termsUrl"])) {
 		if (typeof mark[field] !== "string" || mark[field].trim() === "") {
-			throw new Error(`frameworks.js: mark ${id} has no ${field}`);
+			throw new Error(`frameworks.js: record ${id} has no ${field}`);
 		}
 	}
-	if (placeholderTerms.test(mark.terms)) {
-		throw new Error(`frameworks.js: mark ${id} names no terms ("${mark.terms}"); give the guide noMark instead`);
+	if (!/^https:\/\//.test(mark.termsUrl)) throw new Error(`frameworks.js: record ${id} needs an https policy URL`);
+	if (mark.file) {
+		if (mark.textOnly) throw new Error(`frameworks.js: record ${id} has a file and says it is named by text alone`);
+		if (!/^https:\/\//.test(mark.source ?? "")) throw new Error(`frameworks.js: record ${id} needs an https source`);
+		if (mark.dark && mark.ground) throw new Error(`frameworks.js: record ${id} has a dark variant and asks for a light ground`);
+	} else if (typeof mark.textOnly !== "string" || mark.textOnly.trim().length < 40) {
+		throw new Error(`frameworks.js: record ${id} has no file and does not say why`);
 	}
-	if (!/^https:\/\//.test(mark.source) || !/^https:\/\//.test(mark.termsUrl)) {
-		throw new Error(`frameworks.js: mark ${id} needs an https source and terms URL`);
-	}
+	if (!isoDate.test(mark.retrieved ?? retrieved)) throw new Error(`frameworks.js: record ${id} has a malformed retrieval date`);
 	if (!guides.some((guide) => guide.mark === id)) {
-		throw new Error(`frameworks.js: mark ${id} is not used by any guide`);
+		throw new Error(`frameworks.js: record ${id} is not used by any guide`);
 	}
 }
 
 for (const guide of guides) {
-	if (guide.mark && guide.noMark) {
-		throw new Error(`frameworks.js: ${guide.id} has a mark and says it has none`);
+	if (!marks[guide.mark]) {
+		throw new Error(`frameworks.js: ${guide.id} names unknown record ${guide.mark}`);
 	}
-	if (guide.mark === null && (typeof guide.noMark !== "string" || guide.noMark.trim().length < 20)) {
-		throw new Error(`frameworks.js: ${guide.id} has no mark and does not say why`);
+	if (typeof guide.description !== "string" || !/^[A-Z.].{20,110}\.$/.test(guide.description)) {
+		throw new Error(`frameworks.js: ${guide.id} needs a one-sentence description`);
+	}
+	if (guide.github !== undefined && !/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+$/.test(guide.github)) {
+		throw new Error(`frameworks.js: ${guide.id} has a malformed GitHub URL`);
 	}
 	if (!categories.some((category) => category.id === guide.category)) {
 		throw new Error(`frameworks.js: ${guide.id} has unknown category ${guide.category}`);
@@ -1397,7 +1567,10 @@ const byName = (/** @type {Guide} */ a, /** @type {Guide} */ b) =>
 const entries = guides.map((guide) => ({
 	...guide,
 	link: `/installation/${guide.id}`,
-	markData: guide.mark ? marks[guide.mark] : null,
+	brand: marks[guide.mark],
+	markData: marks[guide.mark].file ? marks[guide.mark] : null,
+	// The release a guide was checked with, as its header prints it.
+	version: /** @type {RegExpExecArray} */ (/^(.+?)(?= \(|,| on | with | and |$)/.exec(guide.verified.with))[1],
 	categoryText: /** @type {(typeof categories)[number]} */ (
 		categories.find((category) => category.id === guide.category)
 	).text,
@@ -1443,6 +1616,7 @@ const ordered = groups.flatMap((group) => group.guides);
 
 module.exports = {
 	retrieved,
+	checked,
 	marks,
 	categories,
 	statuses,

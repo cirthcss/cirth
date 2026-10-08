@@ -128,10 +128,10 @@ test("every guide names Installation above its title", async ({ page }) => {
 		await expect(trail.locator("li a")).toHaveAttribute("href", "/installation/");
 		await expect(trail.locator("li a")).toHaveText("Installation");
 		await expect(trail.locator('li[aria-current="page"]')).toHaveText(guide.name);
-		// Before the title, not after it.
+		// Before the title, not after it: the trail, the project's card, the h1.
 		expect(
-			await trail.evaluate((element) => element.nextElementSibling?.tagName),
-		).toBe("H1");
+			await trail.evaluate((element) => [element.nextElementSibling?.className, element.nextElementSibling?.nextElementSibling?.tagName]),
+		).toEqual(["docs-project", "H1"]);
 	}
 	// A page that is not nested carries none.
 	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });

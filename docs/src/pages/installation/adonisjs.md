@@ -6,8 +6,6 @@ description: Use Cirth in an AdonisJS app. Import it in resources/css/app.css an
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# AdonisJS
-
 An AdonisJS app bundles `resources/css/app.css` with Vite and loads it with
 the `@vite` tag in its Edge layouts. Cirth is one `@import` at the top of
 that file, and Vite takes one line.

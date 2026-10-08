@@ -6,8 +6,6 @@ description: Use Cirth in a Waku app. Replace Tailwind in src/styles.css and set
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Waku
-
 A new Waku app imports `src/styles.css` from its root layout, and that file
 imports Tailwind. Cirth takes Tailwind's place, and Waku's Vite settings
 take one line.

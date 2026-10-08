@@ -1,8 +1,5 @@
-{#- A page's title is its own <h1> unless front matter names one: every
-    documentation page used to be titled "Cirth", which leaves a reader
-    with thirty identical tabs and a screen reader announcing the site
-    name on every navigation (WCAG 2.4.2). The home page keeps the bare
-    site name. -#}
+{#- A page is titled by its own <h1> unless front matter names one, so
+    every tab and every navigation announces the page (WCAG 2.4.2). -#}
 {%- set pageTitle = title or (content | firstHeading if page.url != "/" else "") -%}
 <!doctype html>
 <html lang="en" data-base="{{ '/' | htmlBaseUrl }}">
@@ -29,16 +26,9 @@
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 		<link rel="manifest" href="/site.webmanifest" />
 		<link rel="stylesheet" href="/styles/style.css" />
-		{#- Page-specific composition (the home page, the examples) in its own
-		    file, so the shell every page loads does not carry it. -#}
+		{#- Page-specific stylesheets, loaded after the shared shell. -#}
 		{% for sheet in stylesheets %}<link rel="stylesheet" href="/styles/{{ sheet }}" />{% endfor %}
-		{% if usesClassless %}<link rel="stylesheet" href="/styles/generated/cirth-docs-classless.css" />{% endif %}
 		<script>
-			// A page can lay itself out for a script before first paint: the
-			// home page's narrative only takes its scrolling layout where a
-			// script will drive it, and must not change height once painted.
-			document.documentElement.classList.add("docs-script");
-
 			// Set data-theme before first paint to avoid a light-mode flash.
 			(function () {
 				var stored = localStorage.getItem("cirth-theme");
@@ -48,12 +38,7 @@
 				document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
 			})();
 
-			// Same idea for the preset switcher (gh#80): apply a
-			// session-remembered preset before first paint, so returning to
-			// a page (or following a link) after picking one doesn't flash
-			// the default theme first. sessionStorage, not localStorage:
-			// the issue asks for "the current session", not a permanent
-			// choice that'd survive a closed tab into someone's next visit.
+			// The session's preset, before first paint (gh#80).
 			(function () {
 				var preset = sessionStorage.getItem("cirth-preset");
 				if (!preset || preset === "default") return;
@@ -69,10 +54,8 @@
 	<body{% if bodyClass %} class="{{ bodyClass }}"{% endif %}>
 		<a href="#main-content" class="sr-only sr-only-focusable docs-skip-link">Skip to main content</a>
 		{%- if versions.isNext %}
-			{#- Only ever rendered on the /next/ preview build. Not a
-			    decoration: someone arriving from a search result has no
-			    other way to know that what they are reading has not
-			    shipped. -#}
+			{#- Only on the /next/ preview build: a reader arriving from a
+			    search result has no other sign that it has not shipped. -#}
 			<aside class="docs-next-banner">
 				<p>
 					<strong>Unreleased documentation.</strong> This is the
@@ -88,10 +71,9 @@
 		{% include "search-dialog.njk" %}
 		<div class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-copy-status></div>
 		<script>
-			// Copy-to-clipboard for fenced code blocks: the markdown pipeline
-			// only highlights, it doesn't add a button, so one is injected for
-			// every `pre > code` on the page (prose fences and Demo's
-			// "Show HTML" source alike).
+			// A copy button for every code block the shell owns, announced in
+			// the live region above. It copies what is on screen (innerText),
+			// so a listing with hidden lines hands over only the visible ones.
 			const copyStatus = document.querySelector("[data-copy-status]");
 			const announceCopyStatus = (message) => {
 				if (!copyStatus) return;
@@ -101,11 +83,7 @@
 				});
 			};
 
-			// Every code block the shell owns, and no others: a <pre> inside a
-			// live example is the example. Injecting a control into it would
-			// put a <button> in the reader's specimen that Cirth never ships,
-			// and the caption on every demo says the opposite. The disclosure
-			// under the demo keeps its button: that listing is the shell's.
+			// A <pre> inside a live example is part of the example: no button.
 			for (const pre of document.querySelectorAll("pre")) {
 				if (pre.closest(".docs-demo-preview")) continue;
 				if (pre.querySelector(":scope > button.copy")) continue;
@@ -120,7 +98,7 @@
 
 				button.addEventListener("click", async () => {
 					try {
-						await navigator.clipboard.writeText(code.textContent ?? "");
+						await navigator.clipboard.writeText(code.innerText);
 						button.classList.add("copied");
 						setTimeout(() => button.classList.remove("copied"), 2000);
 						announceCopyStatus("Code copied to clipboard.");
@@ -130,25 +108,8 @@
 				});
 			}
 
-			// The scoped classless build reads data-theme from its own root
-			// element (.cirth-classless demos), so mirror the site theme onto
-			// every such wrapper whenever it changes.
-			const classlessRoots = document.querySelectorAll(".cirth-classless");
-			if (classlessRoots.length > 0) {
-				const sync = () => {
-					const theme = document.documentElement.getAttribute("data-theme");
-					for (const root of classlessRoots) root.setAttribute("data-theme", theme ?? "light");
-				};
-				sync();
-				new MutationObserver(sync).observe(document.documentElement, {
-					attributeFilter: ["data-theme"],
-				});
-			}
-
-			// The package manager switch (install.njk): pure CSS on its own.
-			// This only remembers the choice and applies it to every switch on
-			// the page and on the next one, so a reader who picked pnpm is not
-			// asked again on every guide.
+			// The package manager switch (install.njk) works in CSS alone; this
+			// remembers the choice across switches and pages.
 			if (document.querySelector("[data-docs-install]")) {
 				const applyManager = (value) => {
 					for (const input of document.querySelectorAll(
@@ -172,12 +133,9 @@
 				});
 			}
 
-			// Live preset switcher (gh#80): the <head> script above already
-			// applied a remembered choice before first paint; this wires up
-			// the header <select> for changes after load. Swapping the
-			// stylesheet's href (rather than always keeping one <link> per
-			// preset and toggling disabled) means an unvisited preset is
-			// never fetched at all.
+			// Header preset switcher (gh#80). The <head> script applies a
+			// remembered preset before first paint; one <link> is swapped, so
+			// an unvisited preset is never fetched.
 			const presetSelect = document.querySelector("[data-cirth-preset-select]");
 			if (presetSelect) {
 				const base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
@@ -199,7 +157,6 @@
 					applyPreset(presetSelect.value);
 				});
 			}
-
 		</script>
 	</body>
 </html>

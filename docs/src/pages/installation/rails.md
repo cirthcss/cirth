@@ -6,8 +6,6 @@ description: Use Cirth in a Rails app with Propshaft. Put the file in vendor/ass
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Rails
-
 A new Rails app serves stylesheets with Propshaft, which copies each file
 unchanged under a digest. Cirth is one vendored file and one
 `stylesheet_link_tag`, before the app's own.

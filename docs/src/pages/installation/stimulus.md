@@ -6,8 +6,6 @@ description: Use Cirth with Stimulus. Load the stylesheet from your build, and l
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Stimulus
-
 Stimulus adds behaviour to HTML the server already rendered; it has no CSS
 step of its own. Load Cirth the way your app loads stylesheets, then let
 controllers change state through attributes, which is how Cirth reads it.

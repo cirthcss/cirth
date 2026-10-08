@@ -4,8 +4,6 @@ framework: django
 description: Use Cirth in a Django project. Put the stylesheet in an app's static folder, link it with the static tag, and deploy it with collectstatic.
 ---
 
-# Django
-
 Django serves CSS as a static file, and nothing in its pipeline rewrites it.
 Cirth goes in an app's static folder and is linked from your base template.
 

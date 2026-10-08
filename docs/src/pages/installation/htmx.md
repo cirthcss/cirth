@@ -6,8 +6,6 @@ description: Use Cirth with htmx. Link it once in the page htmx swaps into; ever
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# htmx
-
 htmx asks the server for HTML and swaps it into the page. Cirth styles
 elements, not components, so a fragment needs nothing: link the stylesheet
 once, in the page, and whatever arrives is styled.

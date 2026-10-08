@@ -6,8 +6,6 @@ description: Use Cirth in a PostCSS pipeline. Inline it with postcss-import from
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# PostCSS
-
 PostCSS is a pipeline, not a bundler: it resolves an `@import` only with the
 `postcss-import` plugin, which inlines the file where the rule stands. Cirth
 needs nothing else from it.

@@ -27,21 +27,13 @@
 					hidden
 				>
 					{% icon "search", 16 %}
-					{#- .truncate is the library's own utility, and it is the
-					     right one: the placeholder is the only thing in the bar
-					     free to wrap, and a wrapped placeholder takes the whole
-					     header from one row to two in the narrow band a classic
-					     scrollbar puts a 1024px window into. Cirth's class says
-					     the truncation is a decision rather than an accident,
-					     which is also how the reflow spec reads it. -#}
+					{#- Truncated, so the header never wraps to two rows. -#}
 					<span class="truncate">Search documentation</span>
 					<kbd><span data-docs-search-modifier>Ctrl</span> K</kbd>
 				</button>
 			</div>
-			{#- Search precedes the menu in both DOM and visual order. At the
-			    collapse breakpoint the existing control nodes are moved into
-			    the drawer below: moved, never cloned, so there is only ever
-			    one of each in the document and the tab order stays the
+			{#- Below 64rem the controls are moved (never cloned) into the
+			    drawer, so each exists once and the tab order stays the
 			    reading order. -#}
 			<button
 				type="button"
@@ -58,12 +50,7 @@
 			<li class="docs-header-github">
 				<a href="{{ nav.github }}" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
 			</li>
-			{#- Documentation line switcher. The list is short by design: it
-			    gains an entry only when a release breaks something, so it
-			    answers "does what I am reading apply to the version I have?"
-			    rather than listing every patch. A native <select> for the
-			    same reason as the preset one below: keyboard and screen
-			    reader support for free. -#}
+			{#- One entry per documentation line, not per patch release. -#}
 			<li data-docs-header-control>
 				<span class="docs-control-label" aria-hidden="true">Version</span>
 				<select
@@ -78,9 +65,7 @@
 				</select>
 				<script>
 					(() => {
-					// Navigating between documentation lines is a page load, not
-					// a preference: each line is a separate build with its own
-					// pages, so there is nothing to remember or restore.
+						// Each line is a separate build: choosing one navigates.
 						const versionSelect = document.querySelector("[data-docs-version-select]");
 						versionSelect?.addEventListener("change", () => {
 							if (versionSelect.value) window.location.assign(versionSelect.value);
@@ -88,14 +73,7 @@
 					})();
 				</script>
 			</li>
-			{#- Live preset switcher (gh#80): lets anyone preview the presets
-			    (including their light/dark variants) against the whole real
-			    site without downloading anything. Handled in base.njk: swaps
-			    in the compiled preset stylesheet built by build-docs.js,
-			    remembered for the session via sessionStorage. A native
-			    <select> on purpose, not a custom dropdown: full keyboard and
-			    screen-reader support for free, matching the theme toggle's own
-			    "smallest control that does the job" bar. -#}
+			{#- Preset switcher (gh#80), wired in base.njk. -#}
 			<li data-docs-header-control>
 				<span class="docs-control-label" aria-hidden="true">Preset</span>
 				<select class="docs-preset-select" aria-label="Color preset" data-cirth-preset-select>
@@ -113,22 +91,17 @@
 				</button>
 				<script>
 					(() => {
-					// Which icon is visible is driven entirely by CSS
-					// ([data-theme="dark"] .docs-theme-icon-*, see styles/style.css)
-					// this script is only the click handler.
+						// The icons follow data-theme in CSS; this only toggles it.
 						const themeToggle = document.querySelector(".docs-theme-toggle");
+						const root = document.documentElement;
 						const syncThemeToggle = () => {
-						themeToggle?.setAttribute(
-							"aria-pressed",
-							document.documentElement.getAttribute("data-theme") === "dark" ? "true" : "false",
-						);
+							themeToggle?.setAttribute("aria-pressed", root.dataset.theme === "dark" ? "true" : "false");
 						};
 						syncThemeToggle();
 						themeToggle?.addEventListener("click", () => {
-						const next =
-							document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
-						document.documentElement.setAttribute("data-theme", next);
-						localStorage.setItem("cirth-theme", next);
+							const next = root.dataset.theme === "dark" ? "light" : "dark";
+							root.dataset.theme = next;
+							localStorage.setItem("cirth-theme", next);
 							syncThemeToggle();
 						});
 					})();
@@ -137,24 +110,8 @@
 		</ul>
 	</nav>
 
-	{#- The compact-viewport menu, as an offcanvas drawer.
-
-	    It used to be `details.dropdown`, a 20rem panel hanging off the
-	    hamburger, capped at `100dvh - 5rem`, with the page behind it still
-	    scrollable and still in the tab order, and Escape wired by hand.
-	    That is a menu drawn as a dropdown; what a compact viewport wants is
-	    a surface.
-
-	    <dialog>, because this shell already made that choice once for
-	    search and because everything §11 asks for is what the element does
-	    natively: showModal() traps focus, makes the rest of the document
-	    inert, closes on Escape, and returns focus to the invoker. The
-	    alternative was rebuilding all four in script. The drawer is only
-	    docs shell, and nothing here goes into the library (see the note in
-	    styles/style.css). What it is built out of is not: the nav is a
-	    Cirth <nav><ul>, the close control is the library's own .close, and
-	    the controls that move in keep the <select> and <button> they had in
-	    the bar. -#}
+	{#- The compact menu: a modal <dialog>, so focus trapping, inertness of
+	    the page, Escape and focus return are native. -#}
 	<dialog
 		id="docs-mobile-menu-panel"
 		class="docs-drawer"
@@ -192,11 +149,9 @@
 			const closeButton = drawer?.querySelector("[data-docs-menu-close]");
 			const desktopControls = header?.querySelector(".docs-header-controls-group");
 			const mobileControls = drawer?.querySelector("[data-docs-mobile-controls]");
-			// The one query that decides collapsed vs expanded. It is the same
-			// width the stylesheet uses to show this toggler, hide the in-header
-			// nav items and hide the sidebar: read from one place so the
-			// transfer and the toggler's visibility cannot drift apart.
-			const compact = window.matchMedia("(max-width: 1023px)");
+			// The stylesheet's collapse breakpoint, written the same way so the
+			// two agree at any root font size.
+			const compact = window.matchMedia("(width < 64rem)");
 			const controls = desktopControls
 				? Array.from(desktopControls.querySelectorAll(":scope > [data-docs-header-control]"))
 				: [];
@@ -207,11 +162,8 @@
 			const closeDrawer = () => {
 				if (drawer?.open) drawer.close();
 			};
-			// Moving a node blurs whatever inside it had focus, so only move
-			// what is not already where it belongs, and hand focus back if the
-			// element that had it travelled. Crossing the breakpoint with the
-			// preset select focused should not drop the reader at the top of
-			// the document.
+			// Moving a node blurs it: move only what is misplaced, and give
+			// focus back to a control that travelled while focused.
 			const placeControls = () => {
 				const target = compact.matches ? mobileControls : desktopControls;
 				if (target) {
@@ -235,21 +187,17 @@
 				syncMenuState();
 			});
 			closeButton?.addEventListener("click", closeDrawer);
-			// Clicking the backdrop: the event target is the dialog itself
-			// only when the pointer misses the panel inside it.
+			// The dialog itself is the target only for a click on the backdrop.
 			drawer?.addEventListener("click", (event) => {
 				if (event.target === drawer) closeDrawer();
 			});
-			// Fires for the close button, for the backdrop, and for Escape,
-			// which the element handles on its own. Returning focus to the
-			// trigger explicitly rather than relying on the element's own
-			// restoration keeps this identical to the search dialog next to
-			// it, and correct when the drawer is closed by a resize.
+			// Close button, backdrop, Escape or a resize: focus returns to the
+			// trigger, as it does for the search dialog.
 			drawer?.addEventListener("close", () => {
 				syncMenuState();
 				if (compact.matches) trigger?.focus();
 			});
-			compact.addEventListener?.("change", placeControls);
+			compact.addEventListener("change", placeControls);
 			placeControls();
 		})();
 	</script>

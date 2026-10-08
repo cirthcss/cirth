@@ -6,8 +6,6 @@ description: Use Cirth in a Preact app built with Vite. Import it in src/main.js
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Preact
-
 Preact's Vite starter imports CSS from `src/main.jsx`. Cirth is one import there.
 
 ## 1. Install

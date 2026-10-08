@@ -6,8 +6,6 @@ description: Use Cirth in an ASP.NET Core app with Razor Pages or MVC. Put the f
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# ASP.NET Core
-
 ASP.NET Core serves `wwwroot/` as static web assets. Since .NET 9,
 `MapStaticAssets` also fingerprints and compresses them, and the layout's
 `~/` links resolve to the fingerprinted names. Cirth is one file there and

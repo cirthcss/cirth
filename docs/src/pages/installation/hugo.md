@@ -6,8 +6,6 @@ description: Use Cirth on a Hugo site. Put the file in assets/, fingerprint it w
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Hugo
-
 Hugo Pipes can fingerprint a stylesheet from `assets/` and give its link a
 Subresource Integrity hash. Cirth is one file there and one block in the
 base template.

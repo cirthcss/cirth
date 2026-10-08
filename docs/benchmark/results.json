@@ -1,0 +1,58 @@
+{
+	"measured": "2026-10-07",
+	"cirthVersion": "0.16.0",
+	"implementations": [
+		{
+			"id": "cirth",
+			"label": "Semantic HTML + Cirth",
+			"file": "sign-in.cirth.html",
+			"sha256": "2604d477cda596e5f691ad4728ecdf2d9bb44ff431cdcc252c0c3722c10cb0c3",
+			"elements": 10,
+			"classes": 0,
+			"distinctClasses": 0,
+			"bytes": 239
+		},
+		{
+			"id": "utility",
+			"label": "Utility-first implementation",
+			"file": "sign-in.utility.html",
+			"sha256": "9178b80814b7920c1960ca761fa4a871ce8dbfea820468ead1bc97534783a9d4",
+			"elements": 10,
+			"classes": 77,
+			"distinctClasses": 42,
+			"bytes": 1395
+		}
+	],
+	"metrics": [
+		{
+			"id": "classes",
+			"label": "Class names in the markup",
+			"unit": "",
+			"result": "fewer class names",
+			"values": {
+				"cirth": 0,
+				"utility": 77
+			},
+			"shares": {
+				"cirth": 0,
+				"utility": 1
+			},
+			"reduction": 100
+		},
+		{
+			"id": "bytes",
+			"label": "HTML, minified",
+			"unit": "B",
+			"result": "less HTML",
+			"values": {
+				"cirth": 239,
+				"utility": 1395
+			},
+			"shares": {
+				"cirth": 0.17132616487455196,
+				"utility": 1
+			},
+			"reduction": 83
+		}
+	]
+}

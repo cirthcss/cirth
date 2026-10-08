@@ -6,8 +6,6 @@ description: Use Cirth in a Blazor Web App. Put the file in wwwroot and link it 
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Blazor
-
 A Blazor Web App links its stylesheets in `Components/App.razor`, through
 `@Assets`, which resolves each path to its fingerprinted name. Cirth is one
 file in `wwwroot/` and one `<link>`, in place of the template's Bootstrap.

@@ -6,8 +6,6 @@ description: Use Cirth in a Symfony app with AssetMapper. Require the stylesheet
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Symfony
-
 AssetMapper, Symfony's default for front-end assets, can bring a stylesheet
 from an npm package without Node: `importmap:require` downloads it, and an
 import in `assets/app.js` links it on every page that renders the importmap.

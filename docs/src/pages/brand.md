@@ -452,34 +452,44 @@ When you do use the mark:
 
 ## Framework logos
 
-The installation guides and the home page show the logos of the tools
-Cirth has been checked with, where the project publishes terms that allow
-it. They belong to their projects, appear only to name the tool a guide
+The installation guides, the Installation page and the home page name the
+tools Cirth has been checked with. The name is always printed, and naming a
+project to say what a guide covers needs nobody's permission. Its logo is
+shown beside the name when the file comes from the project's own site, kit
+or repository, is used unmodified, and no official rule asks for permission
+first or forbids the use; the colours, notices and links its owner asks for
+are kept. Otherwise the project is named by text alone, and the note below
+says why.
+
+The logos belong to their projects, appear only to name the tool a guide
 covers, and do not mean that any of these projects is affiliated with Cirth
 or endorses it. Wherever a logo is a link, it leads to the project's own
-site; the guide is a separate link beside it. Each file was downloaded from
-the project's own site or repository on the date beside it, is served from
-this site rather than hotlinked, and is used unmodified.
+site. Every file is served from this site, never hotlinked, and none is
+recoloured: a file drawn only for light backgrounds, with no official
+variant for dark ones, sits on a light ground in the dark scheme.
 
-<div class="overflow-auto docs-table-scroll" tabindex="0" role="region" aria-label="Framework logo sources">
+<div class="overflow-auto docs-table-scroll" tabindex="0" role="region" aria-label="Framework logo sources and decisions">
 <table>
-<thead><tr><th scope="col">Logo</th><th scope="col">Owner</th><th scope="col">Source</th><th scope="col">Retrieved</th><th scope="col">Terms</th></tr></thead>
+<thead><tr><th scope="col">Project</th><th scope="col">Shown as</th><th scope="col">Owner</th><th scope="col">Source</th><th scope="col">Policy read</th><th scope="col">Checked</th></tr></thead>
 <tbody>
 {%- for id, mark in frameworks.marks %}
-<tr><th scope="row">{{ mark.name }}</th><td>{{ mark.owner }}</td><td><a href="{{ mark.source }}">{{ mark.source | replace("https://", "") | truncate(36, true, "…") }}</a></td><td>{{ mark.retrieved or frameworks.retrieved }}</td><td><a href="{{ mark.termsUrl }}">{{ mark.terms }}</a></td></tr>
+<tr><th scope="row">{{ mark.name }}</th><td>{% if mark.file %}{{ "Wordmark" if mark.wide else "Logo" }}{% else %}Name only{% endif %}</td><td>{{ mark.owner }}</td><td>{% if mark.file %}<a href="{{ mark.source }}">{{ mark.source | replace("https://", "") | truncate(36, true, "…") }}</a>{% if mark.darkSource %} and <a href="{{ mark.darkSource }}">its dark variant</a>{% endif %}, retrieved {{ mark.retrieved or frameworks.retrieved }}{% else %}None shown{% endif %}</td><td><a href="{{ mark.termsUrl }}">{{ mark.terms }}</a></td><td>{{ frameworks.checked }}</td></tr>
 {%- endfor %}
 </tbody>
 </table>
 </div>
 
-{% for id, mark in frameworks.marks %}{% if mark.note %}
-- **{{ mark.name }}.** {{ mark.note }}{% endif %}{% endfor %}
-
-The licence of a project's code does not cover a logo it publishes somewhere
-else. These projects publish no terms for showing theirs, or terms that keep
-it off this site, so their guides name them by text alone, everywhere a logo
-would otherwise be:
-{% for guide in frameworks.guides %}{% if guide.noMark %}
-- **{{ guide.name }}.** {{ guide.noMark }}{% endif %}{% endfor %}
+{% for id, mark in frameworks.marks %}{% if mark.textOnly or mark.note or mark.permission or mark.attribution %}
+- **{{ mark.name }}.** {{ mark.textOnly or mark.note }}{% if mark.permission %} Permission the policy asks for: {{ mark.permission }}{% endif %}{% if mark.attribution %} Notice required: {{ mark.attribution }}{% endif %}{% endif %}{% endfor %}
 
 {% for notice in frameworks.notices %}{{ notice }} {% endfor %}
+
+## Images
+
+The home page uses one image, the cover of the card in its theme
+demonstration. It is an original illustration made for this documentation:
+an imaginary relief map, drawn by a script in the repository
+([`docs/src/images/atlas-cover.html`](https://github.com/cirthcss/cirth/blob/master/docs/src/images/atlas-cover.html))
+and served from this site as AVIF and WebP. It is not a photograph or a
+stock image, shows no text, logo or interface, and is licensed under
+Apache-2.0 with the rest of the repository.

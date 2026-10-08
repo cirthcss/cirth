@@ -346,16 +346,18 @@ for (const theme of themeVariants) {
 				// time; the live ticket is reachable whatever is shown.
 				await page.locator(".docs-story-result").evaluate((element) => element.scrollIntoView({ block: "center" }));
 				for (const target of [
-					// The live disclosure and button in the story, the presets
-					// list and a project's mark in the framework band: the
-					// shapes of focusable the home page has outside the shell
-					// chrome. The comparator's and the theme's copies are inert
-					// pictures; the range is checked below, on the handle that
-					// draws its ring.
-					page.locator(".docs-story-result summary"),
+					// The live radio and button in the story, the presets list,
+					// a project's mark in the framework band and the live
+					// controls of the theme's card: the shapes of focusable the
+					// home page has outside the shell chrome. The comparator's
+					// copies are inert pictures; the range is checked below, on
+					// the handle that draws its ring.
+					page.locator(".docs-story-result input[type='radio']:checked"),
 					page.locator(".docs-story-result button"),
 					page.locator("[data-docs-compare-preset]"),
 					page.locator(".docs-agnostic-orbit a").first(),
+					page.locator(".docs-theme-copy input[type='checkbox']"),
+					page.locator(".docs-theme-copy footer button").last(),
 				]) {
 					await page.keyboard.press("Tab");
 					await target.focus();

@@ -6,8 +6,6 @@ description: Use Cirth in a Remix 3 app. Serve the stylesheet from public/ with 
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Remix
-
 Remix 3 serves files two ways: `staticFiles()` hands out `public/` as it is,
 and the asset server compiles what is under `app/`. Cirth is a finished
 file, so it belongs in `public/`. Through the asset server, Remix 3.0.0 loses

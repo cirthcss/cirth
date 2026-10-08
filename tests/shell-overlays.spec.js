@@ -108,17 +108,19 @@ test("the hero preview is a picture, not four tab stops", async ({ page }) => {
 	// field, a password field, a checkbox and a Sign in button that belong
 	// to a picture, and a screen reader would announce a working sign-in
 	// form on the Cirth home page. The same holds for the browser's own
-	// rendering in the story, both copies in the presets comparator and the
-	// theme's copy: interfaces shown, not offered.
+	// rendering in the story and both copies in the presets comparator:
+	// interfaces shown, not offered. The theme's card is the one exception,
+	// and on purpose: its controls are there to be used, so the states they
+	// draw can be seen to follow the theme.
 	for (const selector of [
 		".docs-hero-render",
 		".docs-story-ua",
 		".docs-compare-light",
 		".docs-compare-dark",
-		".docs-theme-copy",
 	]) {
 		await expect(page.locator(selector)).toHaveAttribute("inert", "");
 	}
+	await expect(page.locator(".docs-theme-copy")).not.toHaveAttribute("inert", /.*/);
 	const fields = await page.locator(".docs-hero-render").evaluate(
 		(element) => element.querySelectorAll("input, button").length,
 	);

@@ -6,8 +6,6 @@ description: Use Cirth with Elysia on Bun. Serve the package's dist folder with 
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Elysia
-
 Elysia serves files with its static plugin. Cirth's package is a folder of
 finished CSS, so the server can hand it out directly from `node_modules`.
 

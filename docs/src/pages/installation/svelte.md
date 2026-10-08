@@ -6,8 +6,6 @@ description: Use Cirth in a Svelte app built with Vite. Import it in src/main.js
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Svelte
-
 Svelte's Vite starter imports CSS from `src/main.js`. Cirth is one import there. For SvelteKit, see its own guide.
 
 ## 1. Install

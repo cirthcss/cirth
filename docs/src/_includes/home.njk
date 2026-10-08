@@ -3,46 +3,14 @@ layout: base.njk
 bodyClass: docs-home-page
 ---
 {% from "install.njk" import siteLink %}
-{#- The specimens below are declared once and used more than once: rendered
-    live, and highlighted into the listing beside them. One string, so the
-    markup a reader copies is the markup that produced what they are
-    looking at.
+{#- Each specimen is one string, rendered and highlighted from the same
+    source. Flush left: whitespace in a `set` block ends up in the <pre>. -#}
 
-    They are written flush to the left margin on purpose: whitespace inside a
-    `set` block is captured verbatim, and this is the indentation that ends up
-    in the <pre>. -#}
+{#- Also the Cirth fixture of the markup comparison (docs/benchmark/). -#}
+{%- set heroSpecimen = benchmark.sources.cirth -%}
 
-{#- The hero's specimen: the source slab and the rendered card in front of
-    it are this one string. Written to fit a phone's code pane without a
-    horizontal scrollbar: one attribute set per line, nothing optional. -#}
-{%- set heroSpecimen -%}
-<article>
-  <h2>Sign in</h2>
-  <form>
-    <label>
-      Email
-      <input type="email" required>
-    </label>
-    <label>
-      Password
-      <input type="password" required>
-    </label>
-    <label>
-      <input type="checkbox" checked>
-      Remember me
-    </label>
-    <button>Sign in</button>
-  </form>
-</article>
-{%- endset -%}
-
-
-
-{#- The story's specimen: a train ticket, in elements the browser already
-    knows how to run (dates and times, terms and values, a gauge with its
-    own good and bad ranges, a disclosure, a button) and no class. Used
-    three times, always the same string: listed, rendered with no
-    stylesheet at all, and rendered by Cirth. -#}
+{#- Listed, rendered without any stylesheet, and rendered by Cirth. Nothing
+    in it opens or changes size, so the three renderings share a footprint. -#}
 {%- set storySpecimen -%}
 <article>
   <hgroup>
@@ -59,18 +27,15 @@ bodyClass: docs-home-page
     Coach 5 is 70% full
     <meter value="0.7" low="0.5" high="0.8" optimum="0">70%</meter>
   </label>
-  <details>
-    <summary>Change or cancel</summary>
-    <p>Free changes until 08:09.</p>
-  </details>
+  <fieldset>
+    <legend>Platform alerts</legend>
+    <label><input type="radio" name="alert" checked> Email</label>
+    <label><input type="radio" name="alert"> Text message</label>
+  </fieldset>
   <button type="button">Show ticket</button>
 </article>
 {%- endset %}
-{%- set storyStats = storySpecimen | markupStats %}
 
-{#- The presets comparator's specimen: a field, two switches and two
-    actions, laid across the whole width (presetCopy below), so whichever
-    side of the divider the reader looks at holds the accent and a corner. -#}
 {%- set presetSpecimen -%}
 <article>
   <label>
@@ -95,12 +60,17 @@ bodyClass: docs-home-page
 </article>
 {%- endset -%}
 
-{#- The theme demonstration's specimen: a project's launch card, whose bar
-    and button take the accent, whose corners take the radius and which
-    stands on the canvas, so each of the three declarations has something
-    to change. -#}
+{#- Every control is live and keeps its size in every state. The cover is
+    an original illustration (docs/src/images/atlas-cover.html), sized by its
+    attributes so nothing moves while it loads. -#}
 {%- set themeSpecimen -%}
 <article>
+  <figure>
+    <picture>
+      <source type="image/avif" srcset="/images/home/atlas-480.avif 480w, /images/home/atlas-960.avif 960w" sizes="(width >= 30rem) 23rem, calc(100vw - 5rem)">
+      <img src="/images/home/atlas-480.webp" srcset="/images/home/atlas-480.webp 480w, /images/home/atlas-960.webp 960w" sizes="(width >= 30rem) 23rem, calc(100vw - 5rem)" width="480" height="160" alt="A relief map of an imaginary coast, with a route between two places" loading="lazy" decoding="async">
+    </picture>
+  </figure>
   <hgroup>
     <h3>Atlas 2.0 launch</h3>
     <p>On track for <time datetime="2026-11-12">12 November</time></p>
@@ -109,43 +79,59 @@ bodyClass: docs-home-page
     Launch checklist, 18 of 24
     <progress value="18" max="24"></progress>
   </label>
-  <dl>
-    <dt>Owner</dt>
-    <dd>Ada Lovelace</dd>
-  </dl>
-  <details>
-    <summary>2 blockers</summary>
-    <p>Billing emails in Safari, and the CSV export.</p>
-  </details>
-  <button type="button">Ship it</button>
+  <fieldset>
+    <legend>Release to</legend>
+    <label><input type="radio" name="release" checked> Beta testers</label>
+    <label><input type="radio" name="release"> Everyone</label>
+  </fieldset>
+  <label>
+    <input type="checkbox" checked>
+    Email the subscribers
+  </label>
+  <footer>
+    <button type="button" class="secondary">Preview</button>
+    <button type="button">Ship it</button>
+  </footer>
 </article>
 {%- endset %}
 
-{#- A copy of Cirth that is only this copy's: the scoped build in a
-    declarative shadow root, so the page's preset and theme do not reach
-    it and it renders with no script. Its scheme is set on the `.cirth`
-    root inside the shadow tree, never on the host: a `data-theme` on the
-    host of a shadow root leaves the copy without its tokens. Every preset
-    is loaded and switched off with `media`; the comparator's script turns
-    one on, in both copies at once, so a change of preset fetches nothing
-    and never paints a half without its theme. -#}
+{#- The theme listing: only the declarations applied so far, a comment when
+    there are none. With no script it shows them all. The sizer is the same
+    listing, invisible, so the block is always as tall as its last state. -#}
+{%- macro themeListing(live) -%}
+<span class="hljs-selector-pseudo">:root</span> {
+<span class="docs-theme-line"{% if live %} data-docs-theme-none{% endif %} hidden>  <span class="hljs-comment">/* No overrides: Cirth as it ships. */</span>
+</span>{% for state in themeDemo.changes %}<span class="docs-theme-line"{% if live %} data-docs-theme-from="{{ state.id }}"{% endif %}>  <span class="hljs-attr">{{ state.changes }}</span>: {{ state.values[state.changes] }};
+</span>{% endfor %}}
+{%- endmacro -%}
+
+{#- Isolated copies: the scoped build in a declarative shadow root, so the
+    page's preset and theme cannot reach them and they render without a
+    script. The scheme goes on the inner `.cirth`, never on the host, which
+    would leave the copy without tokens. The inline rules place the copy's
+    content (columns, margins, the footer's alignment) and never set a
+    component's colour, type, border, radius, shadow or padding; the
+    `.scheme` labels are the page's own.
+
+    Preset copies load every preset with media="not all"; the controller
+    enables one in both copies at once. -#}
 {%- macro presetCopy(markup, scheme) -%}
 <template shadowrootmode="open"><link rel="stylesheet" href="/styles/generated/cirth-lab-scoped.css">{% for preset in presets %}<link rel="stylesheet" href="/styles/generated/presets/{{ preset.name }}.css" media="not all" data-docs-preset="{{ preset.name }}">{% endfor %}<style>:host{display:block}.cirth{position:relative;box-sizing:border-box;min-block-size:100%;padding:3rem clamp(1rem,3vw,2rem) clamp(1rem,3vw,2rem);background:var(--cirth-canvas)}.cirth>article{margin:0}.cirth fieldset{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:1rem}.cirth fieldset>legend{grid-column:1/-1}.cirth fieldset>label{margin-block:0}.cirth article>footer{display:flex;justify-content:space-between}@media (width<30rem){.cirth fieldset{grid-template-columns:minmax(0,1fr)}}.scheme{position:absolute;inset-block-start:1rem;margin:0;color:var(--cirth-muted-color);font-size:var(--cirth-meta-font-size);font-weight:var(--cirth-font-weight-medium)}.scheme-light{inset-inline-start:clamp(1rem,3vw,2rem)}.scheme-dark{inset-inline-end:clamp(1rem,3vw,2rem)}</style><div class="cirth" data-theme="{{ scheme }}" data-docs-compare-surface><p class="scheme scheme-{{ scheme }}">{{ "Light" if scheme == "light" else "Dark" }}</p>{{ markup | safe }}</div></template>
 {%- endmacro -%}
 
-{#- The theme demonstration's copy: the scoped build, and each state's
-    three declarations as a stylesheet switched off with `media`, the last
-    one on, so with no script the copy shows the finished theme. The
-    controller turns on the state the scroll has reached. The copy follows
-    the page's scheme from inside its shadow root (see presetCopy). -#}
+{#- The theme copy is the intentional theming demo: one <style> per state
+    that declares something, the last enabled without a script; the first
+    state declares nothing, so with every one off the copy is Cirth as it
+    ships. Its controls are live, in the page's tab order. The canvas and
+    the card's corners ease between states. -#}
 {%- macro themeCopy(markup) -%}
-<template shadowrootmode="open"><link rel="stylesheet" href="/styles/generated/cirth-lab-scoped.css">{% for state in themeDemo.states %}<style media="{{ 'all' if loop.last else 'not all' }}" data-docs-theme-state="{{ state.id }}">{{ state.css }}</style>{% endfor %}<style>:host{display:block}.cirth{box-sizing:border-box;display:grid;place-items:center;min-block-size:100%;padding:clamp(1.25rem,4vw,3rem);background:var(--cirth-canvas)}.cirth>article{inline-size:min(100%,26rem);margin:0}</style><div class="cirth" data-docs-theme-surface>{{ markup | safe }}</div></template>
+<template shadowrootmode="open"><link rel="stylesheet" href="/styles/generated/cirth-lab-scoped.css">{% for state in themeDemo.states %}{% if state.css %}<style media="{{ 'all' if loop.last else 'not all' }}" data-docs-theme-state="{{ state.id }}">{{ state.css }}</style>{% endif %}{% endfor %}<style>:host{display:block}.cirth{box-sizing:border-box;display:grid;place-items:center;min-block-size:100%;padding:clamp(1.25rem,3vw,3rem);background:var(--cirth-canvas)}.cirth>article{inline-size:min(100%,26rem);margin:0}.cirth article>footer{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:var(--cirth-space-3)}.cirth article>footer>button{margin:0}.cirth{transition:background-color var(--docs-motion-medium,0s) var(--docs-ease-out,ease)}.cirth>article{transition:border-radius var(--docs-motion-medium,0s) var(--docs-ease-out,ease)}</style><div class="cirth" data-docs-theme-surface>{{ markup | safe }}</div></template>
 {%- endmacro -%}
 
-{#- The marks' places in the framework band: two rings round one centre,
-    six on the inner, ten on the outer, in the order frameworks.js
-    features them. A place is a ring and an angle; the stylesheet turns
-    it into a position, and the inner ring's marks are the larger. -#}
+{#- The comparator's choices: Cirth as it ships, then each preset. -#}
+{%- set compareChoices = [{ name: "default", label: "Default" }].concat(presets) -%}
+
+{#- Orbit places, in the order frameworks.js features the marks. -#}
 {%- set orbitSlots = [
   { ring: "inner", at: 300 }, { ring: "outer", at: 0 }, { ring: "outer", at: 36 },
   { ring: "inner", at: 0 }, { ring: "outer", at: 72 }, { ring: "outer", at: 108 },
@@ -157,20 +143,9 @@ bodyClass: docs-home-page
 
 
 <main id="main-content" class="docs-home" data-pagefind-body>
-	{#- The field of colour behind the whole page: one fixed layer of three
-	    soft glows from the accent, which the motion script moves, scales,
-	    fades and turns as the scenes go by, so the page has one field that
-	    travels rather than a gradient per section. With no script and under
-	    reduced motion it holds the hero's arrangement. Decoration only. -#}
 	<div class="docs-aurora" aria-hidden="true"><span class="docs-aurora-warm"></span><span class="docs-aurora-cool"></span><span class="docs-aurora-gold"></span></div>
 
-	{#- 1. The hero. Copy first in the document and on every screen; the
-	    demo is a source slab with the card it renders laid over it, offset
-	    so both read at once. The card is rendered by the page's own Cirth,
-	    not a screenshot, and is inert: it is a picture of the output, not a
-	    form on the home page. The field of colour behind it is the page's
-	    shared one (.docs-aurora, above), in its hero arrangement, and no
-	    text sits on its brightest part. -#}
+	{#- The rendered card is inert: it shows the output and is not a form. -#}
 	<section class="docs-hero" aria-labelledby="home-title">
 		<div class="docs-home-inner docs-hero-grid">
 			<div class="docs-hero-copy">
@@ -181,7 +156,7 @@ bodyClass: docs-home-page
 						<a href="{{ action.link }}" role="button"{% if action.theme != "brand" %} class="secondary outline"{% endif %}>{{ action.text }}</a>
 					{% endfor %}
 				</p>
-				<div class="docs-hero-install">
+				<div class="docs-hero-install docs-command">
 					<p id="hero-install-label">Install from npm</p>
 					<pre tabindex="0" aria-labelledby="hero-install-label"><code class="hljs language-sh">npm install @cirthcss/cirth</code></pre>
 				</div>
@@ -199,26 +174,28 @@ bodyClass: docs-home-page
 		</div>
 	</section>
 
-	{#- 2. The facts, as one ruled band rather than four boxes. Each is a
-	    number from this build or a property the project treats a break of
-	    as a bug, and each links to where it can be checked. -#}
-	<section class="docs-facts-band" aria-labelledby="facts-title">
-		<div class="docs-home-inner">
-			<h2 id="facts-title" class="sr-only">At a glance</h2>
+	{#- Each figure links to where it is measured or audited; the size is
+	    read off this build (proof.size in eleventy.config.js). -#}
+	<section class="docs-glance" aria-labelledby="glance-title" data-aurora="glance">
+		<div class="docs-home-inner docs-glance-grid">
+			<header class="docs-glance-head" data-reveal>
+				<h2 id="glance-title">Measured, not promised.</h2>
+				<p>Cirth is a stylesheet and nothing else: no runtime, no build step, no components to mount. Each figure here follows from that, and each one links to how it is checked.</p>
+			</header>
 			<dl class="docs-fact-list">
 				<div data-reveal>
 					<dt>JavaScript runtime</dt>
 					<dd><strong>0 B</strong> <a href="/why-cirth#pure-css-nothing-to-run">Nothing to run</a></dd>
 				</div>
-				<div data-reveal>
+				<div data-reveal data-reveal-delay="0.15">
 					<dt>Default build, gzipped</dt>
 					<dd><strong>{{ proof.size.label if proof.size else "About 15 KB" }}</strong> <a href="/about#size-and-what-it-is-a-budget-for">Measured on every build</a></dd>
 				</div>
-				<div data-reveal>
+				<div data-reveal data-reveal-delay="0.3">
 					<dt>Accessibility baseline</dt>
 					<dd><strong>WCAG 2.2 AA</strong> <a href="/guides/accessibility#the-baseline">How it is audited</a></dd>
 				</div>
-				<div data-reveal>
+				<div data-reveal data-reveal-delay="0.45">
 					<dt>Stacks</dt>
 					<dd><strong>Any</strong> <a href="/installation#guides">{{ frameworks.guides.length }} checked guides</a></dd>
 				</div>
@@ -226,22 +203,12 @@ bodyClass: docs-home-page
 		</div>
 	</section>
 
-	{#- 3. The story: what the reader writes, what the browser already does
-	    with it, and what Cirth adds, told in three steps beside one stage.
-	    In the document the steps and their pictures alternate (text,
-	    picture, text, picture), which is the order a phone, a short window,
-	    a reader with reduced motion and a page with no script get: three
-	    blocks, everything complete. On a wide, tall screen with a script,
-	    the section is a long scroll with the stage held in view: the
-	    markup is typed as the reader scrolls (a picture of it: the listing
-	    itself is always whole in the document), then the browser's own
-	    rendering comes up in front of it, then the same markup with Cirth
-	    replaces it. Everything follows the scroll position, both ways, and
-	    nothing moves while the reader does not. The browser's rendering is
-	    the markup in a shadow root with no stylesheet at all: `all:
-	    initial` resets what the page would hand it by inheritance, and
-	    WebKit keeps the inherited face through it, so the standard face,
-	    serif, is named as well. -#}
+	{#- Steps and renderings alternate in the document, the order a phone, a
+	    short window, reduced motion and no script all get. Held, the
+	    controller types the listing, then brings in the browser's rendering
+	    (a shadow root with no stylesheet; `all: initial` resets inherited
+	    styles and serif is named because WebKit keeps the inherited face),
+	    then Cirth's. -#}
 	<section class="docs-story" aria-labelledby="story-title" data-docs-story data-aurora="story">
 		<div class="docs-story-scene">
 			<div class="docs-home-inner docs-story-grid">
@@ -251,7 +218,7 @@ bodyClass: docs-home-page
 				</header>
 				<div class="docs-story-step" data-docs-story-step="1" data-reveal>
 					<h3><span class="docs-story-number" aria-hidden="true">1</span> Write the element</h3>
-					<p><code>&lt;time&gt;</code>, <code>&lt;dl&gt;</code>, <code>&lt;meter&gt;</code>, <code>&lt;details&gt;</code>, <code>&lt;button&gt;</code>: each one says what it is, so nothing else has to. No class, no wrapper, no script.</p>
+					<p><code>&lt;time&gt;</code>, <code>&lt;dl&gt;</code>, <code>&lt;meter&gt;</code>, <code>&lt;fieldset&gt;</code>, <code>&lt;button&gt;</code>: each one says what it is, so nothing else has to. No class, no wrapper, no script.</p>
 				</div>
 				<figure class="docs-story-part docs-story-source" data-docs-story-part="1" data-reveal>
 					<pre tabindex="0" aria-label="The markup of the ticket"><code class="hljs language-html" data-docs-story-code>{{ storySpecimen | highlight | safe }}</code><code class="hljs language-html docs-story-typed" aria-hidden="true" data-docs-story-typed></code></pre>
@@ -259,7 +226,7 @@ bodyClass: docs-home-page
 				</figure>
 				<div class="docs-story-step" data-docs-story-step="2" data-reveal>
 					<h3><span class="docs-story-number" aria-hidden="true">2</span> The browser brings the behaviour</h3>
-					<p>It reads the times, pairs each term with its value, colours the gauge by its own good and bad ranges, opens and closes the disclosure and moves focus with the keyboard. Unstyled, it already works.</p>
+					<p>It reads the times, pairs each term with its value, colours the gauge by its own good and bad ranges, keeps one alert chosen at a time and moves the choice with the arrow keys. Unstyled, it already works.</p>
 				</div>
 				<figure class="docs-story-part docs-story-browser" data-docs-story-part="2" data-reveal>
 					<div class="docs-story-ua" inert><template shadowrootmode="open"><style>:host{display:block}.ua{all:initial;font-family:serif;display:block;color-scheme:light;background:Canvas;color:CanvasText;padding:1rem;box-sizing:border-box}</style><div class="ua">{{ storySpecimen | safe }}</div></template></div>
@@ -267,7 +234,7 @@ bodyClass: docs-home-page
 				</figure>
 				<div class="docs-story-step" data-docs-story-step="3" data-reveal>
 					<h3><span class="docs-story-number" aria-hidden="true">3</span> Cirth draws it</h3>
-					<p>One stylesheet adds type, spacing, colour, focus and every state, in light and in dark. The markup has not changed. Open the disclosure.</p>
+					<p>One stylesheet adds type, spacing, colour, focus and every state, in light and in dark. The markup has not changed. Pick the other alert.</p>
 				</div>
 				<figure class="docs-story-part docs-story-cirth" data-docs-story-part="3" data-reveal>
 					<div class="docs-story-result">{{ storySpecimen | safe }}</div>
@@ -277,112 +244,87 @@ bodyClass: docs-home-page
 		</div>
 	</section>
 
-	{#- 4. Measured, not promised: three figures, each read off the thing it
-	    is about. The classes are counted in the ticket above, the scripts
-	    in the package's dist/, the size off the default build. Each says
-	    what it was measured on. A wide screen holds the three in view and
-	    brings them up one after another with the scroll; everywhere else
-	    they are simply there. -#}
-	<section class="docs-measured" aria-labelledby="measured-title" data-docs-measured data-aurora="measured">
-		<div class="docs-measured-scene">
-			<div class="docs-home-inner docs-measured-grid">
-				<header class="docs-measured-head" data-reveal>
-					<h2 id="measured-title">Less markup. Nothing to run.</h2>
-					<p>Three figures, each measured on the thing it describes, not estimated against anything else.</p>
+	{#- Numbers come from docs/benchmark/results.json, checked against the
+	    fixtures at build time. Bars are decorative; every value is text. -#}
+	{%- set benchCirth = benchmark.implementations[0] %}
+	<section class="docs-bench" aria-labelledby="bench-title" data-docs-bench data-aurora="bench">
+		<div class="docs-bench-scene">
+			<div class="docs-home-inner docs-bench-grid">
+				<header class="docs-bench-head" data-reveal>
+					<h2 id="bench-title">{{ "Less markup to maintain." if benchmark.lessMarkup else "The same card, measured twice." }}</h2>
+					<p>The sign-in card at the top of this page, written twice to one brief: the same {{ benchCirth.elements }} elements, both colour schemes, a focus ring on every control, hover, pressed and invalid states. Written for Cirth, it carries no class at all.</p>
+					<dl class="docs-bench-method">
+						<div><dt>Counted</dt><dd>Every class name in the markup, and its bytes in UTF-8 with the whitespace collapsed.</dd></div>
+						<div><dt>Not counted</dt><dd>Either stylesheet, and any build step.</dd></div>
+						<div><dt>Measured</dt><dd><time datetime="{{ benchmark.measured }}">{{ benchmark.measured | longDate }}</time>, on Cirth {{ benchmark.cirthVersion }}</dd></div>
+					</dl>
+					<p class="docs-section-more"><a href="/why-cirth#less-markup-measured">Both versions, and how they are measured</a></p>
 				</header>
-				<ol class="docs-measured-list">
-					<li class="docs-measured-fact" data-docs-measured-fact="1" data-reveal>
-						<p class="docs-measured-figure"><strong>{{ storyStats.classes }}</strong> <span>classes</span></p>
-						<div class="docs-measured-text">
-							<p>In the ticket above: {{ storyStats.elements }} elements, and only the attributes that say what they mean.</p>
-							<ul class="docs-measured-tags" aria-label="The elements of the ticket, in order">
-								{%- for name in storyStats.names %}
-								<li style="--docs-index: {{ loop.index0 }}"><code>{{ name }}</code></li>
-								{%- endfor %}
-							</ul>
-						</div>
-					</li>
-					<li class="docs-measured-fact" data-docs-measured-fact="2" data-reveal>
-						<p class="docs-measured-figure"><strong>{{ packageContents.scriptBytes if packageContents else 0 }}&nbsp;B</strong> <span>of JavaScript</span></p>
-						<div class="docs-measured-text">
-							<p>Cirth is compiled CSS. The package's <code>dist/</code> holds {{ packageContents.stylesheets if packageContents else "only" }} stylesheets and {{ packageContents.tokens if packageContents else "its" }} token files{% if packageContents %}, and {{ "no script" if packageContents.scripts == 0 else packageContents.scripts + " scripts" }}{% endif %}: nothing to load, hydrate or update.</p>
-						</div>
-					</li>
-					<li class="docs-measured-fact" data-docs-measured-fact="3" data-reveal>
-						<p class="docs-measured-figure"><strong>{{ proof.size.label if proof.size else "About 15 KB" }}</strong> <span>gzipped</span></p>
-						<div class="docs-measured-text">
-							<p>The default build, measured on every build of this site. The others, the same way:</p>
-							{%- if packageContents and packageContents.builds.length %}
-							<dl class="docs-measured-builds">
-								{%- for build in packageContents.builds %}
-								<div style="--docs-share: {{ build.share }}; --docs-index: {{ loop.index0 }}"><dt>{{ build.name }}</dt><dd>{{ build.label }}</dd></div>
-								{%- endfor %}
-							</dl>
-							{%- endif %}
-						</div>
-					</li>
-				</ol>
+				<div class="docs-bench-cards">
+					{%- for metric in benchmark.metrics %}
+					<article class="docs-bench-card" aria-labelledby="bench-{{ metric.id }}" data-docs-bench-card="{{ metric.id }}" data-reveal>
+						<h3 id="bench-{{ metric.id }}">{{ metric.label }}</h3>
+						<dl class="docs-bench-rows">
+							{%- for implementation in benchmark.implementations %}
+							<div data-implementation="{{ implementation.id }}">
+								<dt>{{ implementation.label }}</dt>
+								<dd><data value="{{ metric.values[implementation.id] }}">{{ metric.values[implementation.id] | grouped }}{% if metric.unit %}&nbsp;{{ metric.unit }}{% endif %}</data><span class="docs-bench-bar" style="--docs-share: {{ metric.shares[implementation.id] }}" aria-hidden="true"></span></dd>
+							</div>
+							{%- endfor %}
+						</dl>
+						<footer class="docs-bench-result"><strong>{{ metric.reduction }}%</strong> <span>{{ metric.result }}</span></footer>
+					</article>
+					{%- endfor %}
+				</div>
 			</div>
 		</div>
 	</section>
 
-	{#- 5. Your theme: the same card, and three of Cirth's custom properties
-	    changed one at a time as the reader scrolls (themeDemo.js). The
-	    values are the demonstration's own, none of them a preset's. The
-	    listing beside the form shows each declaration as it is at that
-	    point and marks the one that just changed. With no script or with
-	    reduced motion the finished theme is shown, with all three. -#}
+	{#- Three --cirth-* declarations change one at a time with the scroll
+	    (themeDemo.js); the scroll alone changes the state. -#}
 	<section class="docs-theme" aria-labelledby="theme-title" data-docs-theme data-aurora="theme">
 		<div class="docs-theme-scene">
 			<div class="docs-home-inner docs-theme-grid">
 				<header class="docs-theme-head" data-reveal>
 					<h2 id="theme-title">Your theme. Same HTML.</h2>
-					<p>Every colour, radius and surface is a <code>--cirth-*</code> custom property. Three of them change below, one at a time, and the markup of the card never does.</p>
+					<p>Every colour, radius and surface is a <code>--cirth-*</code> custom property. The card starts as Cirth ships; three of them then change, one at a time, and its markup never does. Its controls are live: hover, focus and pick, and every state follows the theme.</p>
 				</header>
 				<ol class="docs-theme-steps" data-reveal>
-					{%- for state in themeDemo.states %}{% if state.changes %}
+					{%- for state in themeDemo.changes %}
 					<li data-docs-theme-step="{{ state.id }}"><span>{{ state.label }}</span> <code>{{ state.changes }}</code></li>
-					{%- endif %}{% endfor %}
+					{%- endfor %}
 				</ol>
-				<pre class="docs-theme-code" tabindex="0" aria-label="The three declarations" data-reveal><code class="hljs language-css"><span class="hljs-selector-pseudo">:root</span> {
-{%- for token in themeDemo.tokens %}
-<span class="docs-theme-line" data-docs-theme-token="{{ token }}">  <span class="hljs-attr">{{ token }}</span>: {% for state in themeDemo.states %}{% if loop.first or state.changes == token %}<span class="docs-theme-value" data-docs-theme-value="{{ state.id }}"{% if loop.first %} hidden{% endif %}>{{ state.values[token] }}</span>{% endif %}{% endfor %};</span>
-{%- endfor %}
-}</code></pre>
+				<pre class="docs-theme-code" tabindex="0" aria-label="The declarations applied so far" data-reveal><code class="hljs language-css" data-docs-theme-listing>{{ themeListing(true) }}</code><code class="hljs language-css docs-theme-sizer" aria-hidden="true">{{ themeListing(false) }}</code></pre>
 				<figure class="docs-theme-preview" data-reveal>
-					<div class="docs-theme-copy" inert>{{ themeCopy(themeSpecimen) }}</div>
+					<div class="docs-theme-copy">{{ themeCopy(themeSpecimen) }}</div>
 					<figcaption>The same card throughout, in its own copy of Cirth, so this page's theme and preset do not reach it.</figcaption>
 				</figure>
 			</div>
 		</div>
 	</section>
 
-	{#- 6. Presets: one form in a preset's light and dark scheme, cut by a
-	    divider. The list picks the preset both halves wear, and
-	    the line under it is the import that loads it. The divider is a real
-	    range input over the frame: a pointer, a finger and the arrow keys
-	    all move it, and it has a name and a value. Both copies are inert
-	    pictures. With no script the default theme shows, the divider rests
-	    in the middle, and neither control is shown. -#}
+	{#- Both halves are inert copies. The divider is a real range input, and
+	    with no script the default preset shows split in the middle. -#}
 	<section class="docs-presets" aria-labelledby="presets-title" data-aurora="presets">
 		<div class="docs-home-inner docs-presets-grid">
 			<header class="docs-presets-head" data-reveal>
-				<h2 id="presets-title">Presets, light and dark.</h2>
-				<p>Material, Metro and Plain are short files of tokens loaded after Cirth, and each has both schemes. Pick one, then move the divider.</p>
+				<h2 id="presets-title">Pick a preset. Both schemes are ready.</h2>
+				<p>Start with Default, Material, Metro or Plain. Default is Cirth as it ships, and each of the others is a small token layer loaded after it. Every component reads the same tokens and every preset has coordinated light and dark schemes, so you can set a consistent visual direction quickly and switch modes without changing your HTML.</p>
+				<p class="docs-presets-tagline">Same markup. Same components. Two coordinated schemes.</p>
 				<p class="docs-presets-pick" data-docs-compare-pick hidden>
 					<label for="compare-preset">Preset</label>
 					<select id="compare-preset" data-docs-compare-preset>
-						{%- for state in themePreview.states %}
-						<option value="{{ state.name }}">{{ state.short }}</option>
+						{%- for choice in compareChoices %}
+						<option value="{{ choice.name }}">{{ choice.label }}</option>
 						{%- endfor %}
 					</select>
 				</p>
 				<p class="docs-presets-import" data-docs-compare-imports>
-					{%- for state in themePreview.states %}
-					<code data-docs-compare-import="{{ state.name }}"{% if loop.first %} data-current{% endif %}>@import "@cirthcss/cirth{{ '' if state.name == 'default' else '/presets/' + state.name }}";</code>
+					{%- for choice in compareChoices %}
+					<code data-docs-compare-import="{{ choice.name }}"{% if loop.first %} data-current{% endif %}>@import "@cirthcss/cirth";{% if choice.name != "default" %}<br>@import "@cirthcss/cirth/presets/{{ choice.name }}";{% endif %}</code>
 					{%- endfor %}
 				</p>
-				<p class="docs-section-more"><a href="/presets">What each preset changes</a></p>
+				<p class="docs-section-more"><a href="/presets">Compare every preset</a></p>
 			</header>
 			<figure class="docs-compare" data-docs-compare data-reveal>
 				<div class="docs-compare-frame">
@@ -396,14 +338,8 @@ bodyClass: docs-home-page
 		</div>
 	</section>
 
-	{#- 7. Framework agnostic. On the page's shared field of colour, the
-	    marks orbit Cirth's own in two drawn rings, the rings behind them,
-	    without a card each, at two sizes; they turn only as the reader
-	    scrolls, stay upright, and hold still under the pointer or the
-	    keyboard. On a phone and under reduced motion they stand still. Each
-	    mark is a link to the project's own site, named as such; the way to
-	    the guides is the one action. The marks are a fixed set from
-	    frameworks.js, every one shown under its owner's terms. -#}
+	{#- Each mark links to the project's own site (see frameworks.js for the
+	    terms); the rings turn only with the scroll and hold under a hand. -#}
 	<section class="docs-agnostic" aria-labelledby="agnostic-title" data-docs-agnostic data-aurora="agnostic">
 		<div class="docs-home-inner docs-agnostic-grid">
 			<div class="docs-agnostic-field">
@@ -427,74 +363,120 @@ bodyClass: docs-home-page
 		</div>
 	</section>
 
-	{#- 8. The close. -#}
-	<section class="docs-pure" aria-labelledby="pure-title">
-		<div class="docs-home-inner">
-			<header class="docs-section-head" data-reveal>
-				<h2 id="pure-title">Pure CSS. Whatever writes your HTML.</h2>
-				<p>No runtime, no components, no build step of its own: one stylesheet from a CDN or from npm, and the HTML you already write is finished.</p>
-				<p class="docs-hero-actions">
-					<a href="/installation" role="button">Get started</a>
-					<a href="/why-cirth" role="button" class="secondary outline">Why Cirth</a>
-				</p>
-			</header>
+	{#- Closing CTA. The command uses the shell's code block, so it gets the
+	    same copy control as every listing. -#}
+	<section class="docs-pure" aria-labelledby="pure-title" data-aurora="pure">
+		<div class="docs-home-inner docs-close">
+			<p class="docs-close-eyebrow" data-reveal>Pure CSS</p>
+			<h2 id="pure-title" data-reveal>Your HTML is already enough.</h2>
+			<p class="docs-close-lede" data-reveal>Add Cirth once and keep the elements, behaviour and stack you already use. No component runtime and no client-side bundle to initialize.</p>
+			<div class="docs-close-install docs-command" data-reveal data-reveal-delay="0.15">
+				<p id="close-install-label">Install from npm</p>
+				<pre tabindex="0" aria-labelledby="close-install-label"><code class="hljs language-sh">npm install @cirthcss/cirth</code></pre>
+			</div>
+			<p class="docs-hero-actions docs-close-actions" data-reveal data-reveal-delay="0.3">
+				<a href="/installation" role="button">Get started</a>
+				<a href="/examples" role="button" class="secondary outline">Browse examples</a>
+			</p>
 		</div>
 	</section>
 </main>
 
 <script>
-	// The home page's one motion controller. Everything it does follows the
-	// scroll position: one passive scroll listener, at most one update per
-	// animation frame, and the state of every scene computed from where the
-	// page is now, never from where it has been, so a link to a fragment, a
-	// reload half way down, the back button and scrolling backwards all land
-	// on the right state. Nothing runs while the page is still. An
-	// IntersectionObserver only says which scenes are near the window; no
-	// effect has an observer or a timer of its own.
+	// Homepage motion. A passive scroll listener queues at most one update
+	// per animation frame. Each update eases the drawn scroll position
+	// towards the real one and updates every section from it; the loop stops
+	// when the two meet. Load, resize, fragment links and back/forward land
+	// at once instead of easing.
 	//
-	// With no script the page is whole: every scene is laid out complete.
-	// Under reduced motion the script only wires the two controls (the
-	// preset list and the divider) and the copies' scheme; nothing moves.
+	// Without a script every section is complete in its markup. Under
+	// reduced motion nothing is eased, typed or held; the controls further
+	// down are wired either way.
 	(() => {
 		const home = document.querySelector(".docs-home");
 		if (!(home instanceof HTMLElement)) return;
 		const root = document.documentElement;
-		const motion = window.matchMedia("(prefers-reduced-motion: no-preference)");
-		// The width and height at which a scene is held in view while the
-		// page scrolls through it; below it every scene is a column.
-		const stage = window.matchMedia("screen and (width >= 64rem) and (height >= 38rem)");
-		const clamp = (/** @type {number} */ value) => Math.min(1, Math.max(0, value));
+		const motion = matchMedia("(prefers-reduced-motion: no-preference)");
+		// The same query as the full-window sections in home.css: where a
+		// section can be held.
+		const wide = matchMedia("screen and (width >= 64rem) and (height >= 38rem)");
+
+		const clamp = (value) => Math.min(1, Math.max(0, value));
 		/** 0 before `from`, 1 after `to`, eased in between. */
-		const ramp = (/** @type {number} */ value, /** @type {number} */ from, /** @type {number} */ to) => {
+		const smoothstep = (value, [from, to]) => {
 			const t = clamp((value - from) / (to - from));
 			return t * t * (3 - 2 * t);
 		};
-		/** How far the page has scrolled through a scene held in view, 0 to 1. */
-		const progressOf = (/** @type {HTMLElement} */ section) => {
-			const box = section.getBoundingClientRect();
-			const travel = box.height - window.innerHeight;
-			return travel > 0 ? clamp(-box.top / travel) : box.top <= 0 ? 1 : 0;
+		const middle = ([from, to]) => (from + to) / 2;
+
+		// The drawn position follows the real one with a 90ms time constant,
+		// so wheel steps arrive as one movement at any frame rate.
+		const lag = 0.09;
+		let drawnY = scrollY;
+		let lastTime;
+		let land = true;
+		/** Real scroll minus drawn scroll: added to a measured top. */
+		let behind = 0;
+		const topOf = (element) => element.getBoundingClientRect().top + behind;
+
+		/** Progress through a held section: 0 at its top, 1 at its end. */
+		const getProgress = (section) => {
+			const top = topOf(section);
+			const travel = section.offsetHeight - innerHeight;
+			return travel > 0 ? clamp(-top / travel) : top <= 0 ? 1 : 0;
 		};
 
-		// --- The story: typed markup, the browser's picture, Cirth's ----------
-		const story = home.querySelector("[data-docs-story]");
-		const typed = story?.querySelector("[data-docs-story-typed]");
-		const source = story?.querySelector("[data-docs-story-code]");
-		/** The listing's text pieces, so a prefix of it can be drawn. */
-		const pieces = [];
-		if (typed instanceof HTMLElement && source instanceof HTMLElement) {
-			typed.innerHTML = source.innerHTML;
-			const walker = document.createTreeWalker(typed, NodeFilter.SHOW_TEXT);
-			while (walker.nextNode()) {
-				const node = /** @type {Text} */ (walker.currentNode);
-				pieces.push({ node, text: node.data });
+		// How many ascending thresholds a progress has passed. Leaving the
+		// previous stage takes a sixtieth of the travel past the line, so a
+		// page resting on a line does not flicker; with no previous stage the
+		// lines are exact. The loop is indexed on purpose: WebKit's optimised
+		// `for (… of array.entries())` crashed the page once this ran for
+		// both the story and the theme.
+		const margin = 1 / 60;
+		const getStage = (value, thresholds, previous) => {
+			let stage = 0;
+			for (let index = 0; index < thresholds.length; index += 1) {
+				const at = thresholds[index];
+				const line = previous === undefined ? at : previous > index ? at - margin : at + margin;
+				if (value < line) break;
+				stage = index + 1;
 			}
+			return stage;
+		};
+
+		const setVars = (element, values) => {
+			for (const [name, value] of Object.entries(values)) element.style.setProperty(name, value.toFixed(4));
+		};
+		const clearVars = (element, names) => {
+			for (const name of names) element.style.removeProperty(name);
+		};
+		const setData = (element, name, value) => {
+			if (element.dataset[name] !== value) element.dataset[name] = value;
+		};
+
+		// Story. Shares of its scroll: the listing is typed until 30%; the
+		// browser's rendering comes in at 38-44% and leaves at 62-67%, crossing
+		// Cirth's, which comes in at 64.5-70%. A step is reached when its
+		// rendering is half in.
+		const story = home.querySelector("[data-docs-story]");
+		const storyAt = { typed: 0.3, browser: [0.38, 0.44], browserOut: [0.62, 0.67], cirth: [0.645, 0.7] };
+		const storyLines = [middle(storyAt.browser), middle(storyAt.cirth)];
+		const steps = [...(story?.querySelectorAll("[data-docs-story-step]") ?? [])];
+		const typed = story?.querySelector("[data-docs-story-typed]");
+		const listing = story?.querySelector("[data-docs-story-code]");
+		const pieces = [];
+		if (typed && listing) {
+			typed.innerHTML = listing.innerHTML;
+			const walker = document.createTreeWalker(typed, NodeFilter.SHOW_TEXT);
+			while (walker.nextNode()) pieces.push({ node: walker.currentNode, text: walker.currentNode.data });
 		}
 		const total = pieces.reduce((sum, piece) => sum + piece.text.length, 0);
-		let shown = -1;
-		const type = (/** @type {number} */ count) => {
-			if (count === shown) return;
-			shown = count;
+		let typedCount = -1;
+		let storyStage;
+
+		const type = (count) => {
+			if (count === typedCount) return;
+			typedCount = count;
 			let left = count;
 			for (const piece of pieces) {
 				const take = Math.max(0, Math.min(piece.text.length, left));
@@ -502,273 +484,315 @@ bodyClass: docs-home-page
 				left -= piece.text.length;
 			}
 		};
-		const updateStory = (/** @type {boolean} */ moving) => {
+
+		const markSteps = (count, withCurrent) => {
+			steps.forEach((step, index) => {
+				step.toggleAttribute("data-reached", index < count);
+				const current = withCurrent && index === count - 1;
+				if (current !== step.hasAttribute("aria-current")) {
+					if (current) step.setAttribute("aria-current", "step");
+					else step.removeAttribute("aria-current");
+				}
+			});
+		};
+
+		const updateStory = (held) => {
 			if (!(story instanceof HTMLElement)) return;
-			if (!moving) {
+			if (!held) {
 				type(total);
+				storyStage = undefined;
+				markSteps(steps.length, false);
+				delete story.dataset.step;
 				return;
 			}
-			const p = progressOf(story);
-			// 0 to 30%: the markup is written; to 38%: it stands complete;
-			// 38 to 44%: the browser's picture comes up in front of it and
-			// stays until 62%; 62 to 70%: it goes and Cirth's takes its
-			// place, then holds to the end.
-			type(Math.round(total * clamp(p / 0.3)));
-			// The browser's picture goes before Cirth's comes, so the two are
-			// never on screen half and half.
-			const front = ramp(p, 0.38, 0.44);
-			const cirth = ramp(p, 0.66, 0.7);
-			story.style.setProperty("--docs-front", String(front));
-			story.style.setProperty("--docs-browser", String(front * (1 - ramp(p, 0.62, 0.66))));
-			story.style.setProperty("--docs-cirth", String(cirth));
-			story.style.setProperty("--docs-typing", p < 0.3 ? "1" : "0");
-			story.dataset.step = p < 0.38 ? "1" : p < 0.66 ? "2" : "3";
+			const p = getProgress(story);
+			const front = smoothstep(p, storyAt.browser);
+			type(Math.round(total * clamp(p / storyAt.typed)));
+			setVars(story, {
+				"--docs-front": front,
+				"--docs-browser": front * (1 - smoothstep(p, storyAt.browserOut)),
+				"--docs-cirth": smoothstep(p, storyAt.cirth),
+				"--docs-typing": p < storyAt.typed ? 1 : 0,
+			});
+			storyStage = getStage(p, storyLines, storyStage);
+			markSteps(storyStage + 1, true);
+			setData(story, "step", String(storyStage + 1));
 			story.dataset.progress = p.toFixed(3);
 		};
 
-		// --- Measured: three facts, one after another -------------------------
-		const measured = home.querySelector("[data-docs-measured]");
-		const facts = [...(measured?.querySelectorAll("[data-docs-measured-fact]") ?? [])];
-		const updateMeasured = (/** @type {boolean} */ moving) => {
-			if (!(measured instanceof HTMLElement)) return;
-			const p = moving ? progressOf(measured) : 1;
-			facts.forEach((fact, index) => {
-				if (!(fact instanceof HTMLElement)) return;
-				// Each fact owns a third of the scroll and has composed by the
-				// middle of it.
-				fact.style.setProperty("--docs-fact", moving ? String(ramp(p, index / 3 - 0.05, index / 3 + 0.18)) : "1");
+		// Benchmark. Shares of its scroll, from the section's top at 65% of the
+		// window to the end of its hold: the copy, each card, its bars, then
+		// its result, and the last stretch still.
+		const bench = home.querySelector("[data-docs-bench]");
+		const benchHead = bench?.querySelector(".docs-bench-head");
+		const benchCards = [...(bench?.querySelectorAll("[data-docs-bench-card]") ?? [])];
+		const benchAt = {
+			head: [0, 0.2],
+			cards: [[0.12, 0.48], [0.3, 0.66]],
+			bars: [[0.4, 0.6], [0.56, 0.76]],
+			results: [[0.62, 0.8], [0.7, 0.88]],
+		};
+		const cardVars = ["--docs-card", "--docs-bar", "--docs-result"];
+
+		const updateBench = (held) => {
+			if (!(bench instanceof HTMLElement)) return;
+			if (!held) {
+				clearVars(bench, ["--docs-head"]);
+				for (const card of benchCards) clearVars(card, cardVars);
+				delete bench.dataset.progress;
+				return;
+			}
+			const start = innerHeight * 0.65;
+			const end = innerHeight - bench.offsetHeight;
+			const p = clamp((start - topOf(bench)) / (start - end));
+			setVars(bench, { "--docs-head": smoothstep(p, benchAt.head) });
+			benchCards.forEach((card, index) => {
+				const at = (windows) => windows[Math.min(index, windows.length - 1)];
+				setVars(card, {
+					"--docs-card": smoothstep(p, at(benchAt.cards)),
+					"--docs-bar": smoothstep(p, at(benchAt.bars)),
+					"--docs-result": smoothstep(p, at(benchAt.results)),
+				});
 			});
-			measured.dataset.step = String(Math.min(3, Math.floor(p * 3) + 1));
-			measured.dataset.progress = p.toFixed(3);
+			bench.dataset.progress = p.toFixed(3);
 		};
 
-		// --- Your theme: one declaration at a time ----------------------------
+		// Theme demo. State 0 is Cirth as it ships: every stylesheet in the
+		// copy is off and the listing says there is nothing to declare. State
+		// n enables its own stylesheet, lists the first n declarations and
+		// marks the one that moved.
 		const theme = home.querySelector("[data-docs-theme]");
 		const themeRoot = theme?.querySelector(".docs-theme-copy")?.shadowRoot ?? null;
-		const themeStates = [...(themeRoot?.querySelectorAll("style[data-docs-theme-state]") ?? [])];
-		const stateIds = themeStates.map((style) => /** @type {HTMLElement} */ (style).dataset.docsThemeState ?? "");
-		let themeState = "";
-		const showThemeState = (/** @type {number} */ index) => {
-			const id = stateIds[index] ?? "";
-			if (!(theme instanceof HTMLElement) || id === themeState) return;
-			themeState = id;
-			themeStates.forEach((style, at) => {
-				if (style instanceof HTMLStyleElement) style.media = at === index ? "all" : "not all";
+		const themeStyles = [...(themeRoot?.querySelectorAll("style[data-docs-theme-state]") ?? [])];
+		const themeNone = theme?.querySelector("[data-docs-theme-none]");
+		const themeDeclarations = [...(theme?.querySelectorAll("[data-docs-theme-from]") ?? [])];
+		const themeSteps = [...(theme?.querySelectorAll("[data-docs-theme-step]") ?? [])];
+		const stateIds = ["default", ...themeDeclarations.map((line) => line.dataset.docsThemeFrom ?? "")];
+		const themeLines = [0.18, 0.4, 0.62];
+		let themeStage;
+
+		const showThemeState = (index) => {
+			const id = stateIds[index];
+			if (theme.dataset.state === id) return;
+			for (const style of themeStyles) style.media = style.dataset.docsThemeState === id ? "all" : "not all";
+			if (themeNone) themeNone.hidden = index > 0;
+			themeDeclarations.forEach((line, at) => {
+				line.hidden = at >= index;
+				line.toggleAttribute("data-changed", at === index - 1);
 			});
-			// Each token shows the value it has at this state; the one that
-			// just changed is marked.
-			for (const line of theme.querySelectorAll("[data-docs-theme-token]")) {
-				const values = [...line.querySelectorAll("[data-docs-theme-value]")];
-				const reached = values.filter((value) => stateIds.indexOf(/** @type {HTMLElement} */ (value).dataset.docsThemeValue ?? "") <= index);
-				const current = reached.at(-1) ?? values[0];
-				for (const value of values) /** @type {HTMLElement} */ (value).hidden = value !== current;
-				line.toggleAttribute("data-changed", index > 0 && current === values.at(-1) && /** @type {HTMLElement} */ (current).dataset.docsThemeValue === id);
-			}
-			for (const step of theme.querySelectorAll("[data-docs-theme-step]")) {
-				const at = stateIds.indexOf(/** @type {HTMLElement} */ (step).dataset.docsThemeStep ?? "");
-				step.toggleAttribute("data-current", at === index);
-				step.toggleAttribute("data-done", at <= index);
-			}
+			themeSteps.forEach((step, at) => {
+				step.toggleAttribute("data-current", at === index - 1);
+				step.toggleAttribute("data-done", at < index);
+			});
 			theme.dataset.state = id;
 		};
-		const updateTheme = (/** @type {boolean} */ moving) => {
-			if (!(theme instanceof HTMLElement) || stateIds.length === 0) return;
-			if (!moving) {
+
+		const updateTheme = (held) => {
+			if (!(theme instanceof HTMLElement) || themeDeclarations.length === 0) return;
+			if (!held) {
+				themeStage = undefined;
 				showThemeState(stateIds.length - 1);
 				return;
 			}
-			const p = progressOf(theme);
-			// The starting theme, then each change, with the last one held the
-			// longest so the finished theme can be read.
-			const index = p < 0.18 ? 0 : p < 0.4 ? 1 : p < 0.62 ? 2 : 3;
-			showThemeState(Math.min(index, stateIds.length - 1));
-			theme.dataset.progress = p.toFixed(3);
+			themeStage = getStage(getProgress(theme), themeLines, themeStage);
+			showThemeState(Math.min(themeStage, stateIds.length - 1));
 		};
 
-		// --- The orbit: turns with the scroll, holds still under a hand -------
+		// Orbit: turns from the band entering the window to it leaving, and
+		// holds while it is hovered or holds focus.
 		const agnostic = home.querySelector("[data-docs-agnostic]");
 		const orbit = agnostic?.querySelector(".docs-agnostic-orbit");
-		let held = false;
-		if (orbit instanceof HTMLElement) {
-			const hold = (/** @type {boolean} */ value) => () => {
-				held = value || orbit.matches(":hover") || orbit.matches(":focus-within");
-			};
-			orbit.addEventListener("pointerenter", hold(true));
-			orbit.addEventListener("pointerleave", hold(false));
-			orbit.addEventListener("focusin", hold(true));
-			orbit.addEventListener("focusout", hold(false));
-		}
-		const updateOrbit = (/** @type {boolean} */ moving) => {
+
+		const updateOrbit = (held) => {
 			if (!(orbit instanceof HTMLElement) || !(agnostic instanceof HTMLElement)) return;
-			if (!moving) {
+			if (!held) {
 				orbit.style.removeProperty("--docs-orbit");
 				return;
 			}
-			if (held) return;
-			const box = agnostic.getBoundingClientRect();
-			// From the band's top entering the window to its bottom leaving it.
-			const p = clamp((window.innerHeight - box.top) / (window.innerHeight + box.height));
+			if (orbit.matches(":hover, :focus-within")) return;
+			const p = clamp((innerHeight - topOf(agnostic)) / (innerHeight + agnostic.offsetHeight));
 			orbit.style.setProperty("--docs-orbit", `${(p * 32 - 16).toFixed(2)}deg`);
 		};
 
-		// --- The field of colour: one layer, carried through the scenes -------
-		const aurora = home.querySelector(".docs-aurora");
-		// Where each glow is, how large, how strong and how far its hue is
-		// turned from the accent, for each scene. The hero's arrangement is
-		// the stylesheet's default, so with no script and under reduced
-		// motion the field is the hero's.
-		/** @type {Record<string, number[]>} */
-		const fields = {
-			// warm x, y, scale, opacity, hue; cool x, y, scale, opacity, hue; gold x, y, scale, opacity
-			hero: [78, 38, 1, 1, 0, 56, 76, 1, 1, -100, 30, 20, 0.6, 0],
-			story: [86, 30, 0.8, 0.6, 0, 20, 82, 0.9, 0.7, -100, 50, 50, 0.6, 0],
-			measured: [24, 34, 1.05, 0.7, 20, 80, 70, 0.8, 0.55, -120, 60, 90, 0.7, 0.2],
-			theme: [70, 22, 0.9, 0.65, 60, 30, 80, 0.85, 0.6, -80, 50, 50, 0.6, 0],
-			presets: [18, 70, 0.85, 0.55, -20, 82, 26, 0.9, 0.7, -110, 50, 50, 0.6, 0],
-			agnostic: [16, 30, 1.15, 0.9, -40, 44, 84, 1.1, 0.85, -100, 86, 22, 1, 0.9],
-			pure: [70, 60, 0.8, 0.4, 0, 30, 40, 0.7, 0.35, -100, 50, 50, 0.6, 0],
+		// Aurora: each section with data-aurora names an arrangement of the
+		// three glows, in the properties home.css rests them with. Between two
+		// sections' middles the glows ease from one arrangement to the next.
+		const glows = {
+			warm: home.querySelector(".docs-aurora-warm"),
+			cool: home.querySelector(".docs-aurora-cool"),
+			gold: home.querySelector(".docs-aurora-gold"),
 		};
-		const names = ["warm-x", "warm-y", "warm-s", "warm-o", "warm-h", "cool-x", "cool-y", "cool-s", "cool-o", "cool-h", "gold-x", "gold-y", "gold-s", "gold-o"];
-		const scenes = [...home.querySelectorAll("[data-aurora]")];
-		const updateAurora = (/** @type {boolean} */ moving) => {
-			if (!(aurora instanceof HTMLElement)) return;
+		const goldHidden = { x: 50, y: 50, scale: 0.6, opacity: 0 };
+		const arrangements = {
+			hero: {
+				warm: { x: 78, y: 38, scale: 1, opacity: 1, hue: 0 },
+				cool: { x: 56, y: 76, scale: 1, opacity: 1, hue: -100 },
+				gold: goldHidden,
+			},
+			glance: {
+				warm: { x: 62, y: 74, scale: 0.95, opacity: 0.75, hue: 10 },
+				cool: { x: 26, y: 30, scale: 1, opacity: 0.8, hue: -90 },
+				gold: goldHidden,
+			},
+			story: {
+				warm: { x: 86, y: 30, scale: 0.8, opacity: 0.6, hue: 0 },
+				cool: { x: 20, y: 82, scale: 0.9, opacity: 0.7, hue: -100 },
+				gold: goldHidden,
+			},
+			bench: {
+				warm: { x: 24, y: 34, scale: 1.05, opacity: 0.7, hue: 20 },
+				cool: { x: 80, y: 70, scale: 0.8, opacity: 0.55, hue: -120 },
+				gold: { x: 60, y: 90, scale: 0.7, opacity: 0.2 },
+			},
+			theme: {
+				warm: { x: 70, y: 22, scale: 0.9, opacity: 0.65, hue: 60 },
+				cool: { x: 30, y: 80, scale: 0.85, opacity: 0.6, hue: -80 },
+				gold: goldHidden,
+			},
+			presets: {
+				warm: { x: 18, y: 70, scale: 0.85, opacity: 0.55, hue: -20 },
+				cool: { x: 82, y: 26, scale: 0.9, opacity: 0.7, hue: -110 },
+				gold: goldHidden,
+			},
+			agnostic: {
+				warm: { x: 16, y: 30, scale: 1.15, opacity: 0.9, hue: -40 },
+				cool: { x: 44, y: 84, scale: 1.1, opacity: 0.85, hue: -100 },
+				gold: { x: 86, y: 22, scale: 1, opacity: 0.9 },
+			},
+			pure: {
+				warm: { x: 70, y: 60, scale: 0.8, opacity: 0.4, hue: 0 },
+				cool: { x: 30, y: 40, scale: 0.7, opacity: 0.35, hue: -100 },
+				gold: goldHidden,
+			},
+		};
+		const auroraSections = [...home.querySelectorAll("[data-aurora]")];
+
+		const updateAurora = (moving) => {
 			if (!moving) {
-				for (const name of names) aurora.style.removeProperty(`--docs-aurora-${name}`);
+				for (const glow of Object.values(glows)) glow?.removeAttribute("style");
 				return;
 			}
-			// Anchors: the top of the page for the hero, then the middle of
-			// each scene. The window's middle falls between two of them, and
-			// the field is that far from one arrangement to the next.
-			const middle = window.scrollY + window.innerHeight / 2;
-			const anchors = [{ at: window.innerHeight / 2, field: fields.hero }];
-			for (const scene of scenes) {
-				const box = scene.getBoundingClientRect();
-				anchors.push({ at: box.top + window.scrollY + box.height / 2, field: fields[/** @type {HTMLElement} */ (scene).dataset.aurora ?? ""] ?? fields.hero });
-			}
-			let from = anchors[0];
-			let to = anchors[0];
-			for (let index = 0; index < anchors.length; index += 1) {
-				if (anchors[index].at <= middle) {
-					from = anchors[index];
-					to = anchors[index + 1] ?? anchors[index];
+			const middle = drawnY + innerHeight / 2;
+			let from = { at: innerHeight / 2, arrangement: arrangements.hero };
+			let to = from;
+			for (const section of auroraSections) {
+				const box = section.getBoundingClientRect();
+				const anchor = { at: box.top + scrollY + box.height / 2, arrangement: arrangements[section.dataset.aurora] };
+				if (anchor.at > middle) {
+					to = anchor;
+					break;
 				}
+				from = to = anchor;
 			}
-			const t = to === from ? 0 : ramp(middle, from.at, to.at);
-			names.forEach((name, index) => {
-				const value = from.field[index] + (to.field[index] - from.field[index]) * t;
-				aurora.style.setProperty(`--docs-aurora-${name}`, value.toFixed(3));
-			});
-		};
-
-		// --- Light arrivals, where scenes are columns -------------------------
-		const arrivals = [...home.querySelectorAll("[data-reveal]")];
-		const updateArrivals = (/** @type {boolean} */ moving) => {
-			const band = window.innerHeight * 0.12;
-			for (const element of arrivals) {
-				if (!(element instanceof HTMLElement)) continue;
-				// Inside a scene held in view, the scene draws itself.
-				const staged = stage.matches && element.closest("[data-docs-story], [data-docs-measured], [data-docs-theme]");
-				if (!moving || staged) {
-					element.style.removeProperty("--docs-arrive");
-					continue;
-				}
-				const top = element.getBoundingClientRect().top;
-				element.style.setProperty("--docs-arrive", clamp((window.innerHeight - top) / band).toFixed(3));
+			const t = to === from ? 0 : smoothstep(middle, [from.at, to.at]);
+			for (const [name, glow] of Object.entries(glows)) {
+				const start = from.arrangement[name];
+				const end = to.arrangement[name];
+				const values = Object.keys(start).map((key) => [`--docs-${key}`, start[key] + (end[key] - start[key]) * t]);
+				if (glow instanceof HTMLElement) setVars(glow, Object.fromEntries(values));
 			}
 		};
 
-		// --- One update, at most once a frame ---------------------------------
-		/** @type {Set<Element>} */
-		const near = new Set();
+		// Reveals: outside a held section, a [data-reveal] block arrives across
+		// the bottom eighth of the window; data-reveal-delay waits that much
+		// more of the same distance.
+		const reveals = [...home.querySelectorAll("[data-reveal]")].map((element) => ({
+			element,
+			delay: Number(element.dataset.revealDelay ?? 0),
+			inHeld: element.closest("[data-docs-story], [data-docs-bench], [data-docs-theme]") !== null,
+		}));
+
+		const updateReveals = (moving, held) => {
+			const band = innerHeight * 0.12;
+			for (const { element, delay, inHeld } of reveals) {
+				if (!moving || (held && inHeld)) element.style.removeProperty("--docs-arrive");
+				else element.style.setProperty("--docs-arrive", clamp((innerHeight - topOf(element)) / band - delay).toFixed(3));
+			}
+		};
+
 		let queued = false;
-		const frame = () => {
+		const frame = (now) => {
 			queued = false;
 			const moving = motion.matches;
-			const held = moving && stage.matches;
-			home.dataset.motion = moving ? "scroll" : "still";
-			home.dataset.stage = held ? "held" : "column";
+			const held = moving && wide.matches;
+			const target = scrollY;
+			if (!moving || land || now === undefined) {
+				drawnY = target;
+			} else {
+				const seconds = lastTime === undefined ? 1 / 60 : Math.min(0.1, (now - lastTime) / 1000);
+				drawnY += (target - drawnY) * (1 - Math.exp(-seconds / lag));
+				if (Math.abs(target - drawnY) < 0.5) drawnY = target;
+			}
+			land = false;
+			behind = target - drawnY;
+			const settling = behind !== 0;
+			lastTime = settling ? now : undefined;
+			setData(home, "motion", moving ? "scroll" : "still");
+			setData(home, "stage", held ? "held" : "column");
+			home.toggleAttribute("data-animating", settling);
 			updateAurora(moving);
-			updateArrivals(moving);
-			if (!held || near.has(story)) updateStory(held);
-			if (!held || near.has(measured)) updateMeasured(held);
-			if (!held || near.has(theme)) updateTheme(held);
-			if (near.has(agnostic) || !moving) updateOrbit(held);
+			updateReveals(moving, held);
+			updateStory(held);
+			updateBench(held);
+			updateTheme(held);
+			updateOrbit(held);
+			if (settling) queue();
 		};
 		const queue = () => {
 			if (queued) return;
 			queued = true;
 			requestAnimationFrame(frame);
 		};
-		if ("IntersectionObserver" in window) {
-			const watch = new IntersectionObserver(
-				(entries) => {
-					for (const entry of entries) {
-						if (entry.isIntersecting) near.add(entry.target);
-						else near.delete(entry.target);
-					}
-					queue();
-				},
-				{ rootMargin: "25% 0px" },
-			);
-			for (const scene of [story, measured, theme, agnostic]) if (scene) watch.observe(scene);
-		} else {
-			for (const scene of [story, measured, theme, agnostic]) if (scene) near.add(scene);
-		}
-		window.addEventListener("scroll", queue, { passive: true });
-		window.addEventListener("resize", queue, { passive: true });
-		window.addEventListener("hashchange", queue);
-		window.addEventListener("load", queue, { once: true });
-		// A page restored from the back/forward cache is laid out where it was.
-		window.addEventListener("pageshow", queue);
-		motion.addEventListener("change", queue);
-		stage.addEventListener("change", queue);
+		const landNext = () => {
+			land = true;
+			queue();
+		};
+		addEventListener("scroll", queue, { passive: true });
+		for (const event of ["resize", "hashchange", "pageshow"]) addEventListener(event, landNext, { passive: true });
+		addEventListener("load", landNext, { once: true });
+		motion.addEventListener("change", landNext);
+		wide.addEventListener("change", landNext);
 		frame();
 
-		// --- The copies' scheme follows the page ------------------------------
-		// A shadow root does not inherit data-theme, and must not carry it on
-		// its host; the theme copy's inner root takes the page's scheme.
+		// The theme copy follows the page's scheme from inside its shadow root:
+		// data-theme on the host would leave the copy without tokens.
 		const themeSurface = themeRoot?.querySelector("[data-docs-theme-surface]");
-		const follow = () => {
-			if (themeSurface instanceof HTMLElement) themeSurface.dataset.theme = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
+		const followScheme = () => {
+			if (themeSurface instanceof HTMLElement) themeSurface.dataset.theme = root.dataset.theme === "dark" ? "dark" : "light";
 		};
-		follow();
-		new MutationObserver(follow).observe(root, { attributeFilter: ["data-theme"] });
+		followScheme();
+		new MutationObserver(followScheme).observe(root, { attributeFilter: ["data-theme"] });
 
-		// --- The presets comparator: the divider and the list -----------------
+		// Preset comparison: the divider and the preset list. Both are hidden
+		// until wired here.
 		const compare = home.querySelector("[data-docs-compare]");
 		const range = compare?.querySelector("[data-docs-compare-range]");
 		if (compare instanceof HTMLElement && range instanceof HTMLInputElement) {
-			const describe = (/** @type {number} */ value) =>
+			const describe = (value) =>
 				value === 50 ? "Half light, half dark" : value === 0 ? "All dark" : value === 100 ? "All light" : `${value}% light, ${100 - value}% dark`;
-			const set = () => {
+			const split = () => {
 				const value = Number(range.value);
 				compare.style.setProperty("--docs-split", `${value}%`);
 				range.setAttribute("aria-valuetext", describe(value));
 			};
-			range.addEventListener("input", set);
+			range.addEventListener("input", split);
 			range.hidden = false;
-			set();
+			split();
 		}
 		const preset = home.querySelector("[data-docs-compare-preset]");
 		if (compare instanceof HTMLElement && preset instanceof HTMLSelectElement) {
-			const roots = [...compare.querySelectorAll(".docs-compare-layer")].map((layer) => layer.shadowRoot).filter((shadow) => shadow instanceof ShadowRoot);
+			const copies = [...compare.querySelectorAll(".docs-compare-layer")].map((layer) => layer.shadowRoot).filter(Boolean);
 			const imports = [...home.querySelectorAll("[data-docs-compare-import]")];
-			const apply = () => {
-				const name = preset.value;
-				for (const shadow of roots) {
-					for (const link of shadow.querySelectorAll("link[data-docs-preset]")) {
-						if (link instanceof HTMLLinkElement) link.media = link.dataset.docsPreset === name ? "all" : "not all";
-					}
+			const applyPreset = () => {
+				for (const copy of copies) {
+					for (const link of copy.querySelectorAll("link[data-docs-preset]")) link.media = link.dataset.docsPreset === preset.value ? "all" : "not all";
 				}
-				// Every import line is in the document, one on top of the other,
-				// so the line's height is the longest one's whichever is shown.
-				for (const line of imports) line.toggleAttribute("data-current", /** @type {HTMLElement} */ (line).dataset.docsCompareImport === name);
+				for (const line of imports) line.toggleAttribute("data-current", line.dataset.docsCompareImport === preset.value);
 			};
-			preset.addEventListener("change", apply);
-			const pick = home.querySelector("[data-docs-compare-pick]");
-			if (pick instanceof HTMLElement) pick.hidden = false;
-			// A restored page keeps the list's last value; the copies follow it.
-			apply();
+			preset.addEventListener("change", applyPreset);
+			home.querySelector("[data-docs-compare-pick]")?.removeAttribute("hidden");
+			// A restored page keeps the list's last value.
+			applyPreset();
 		}
 	})();
 </script>

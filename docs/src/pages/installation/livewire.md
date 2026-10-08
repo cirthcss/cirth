@@ -6,8 +6,6 @@ description: Use Cirth with Livewire. Load it through Laravel's Vite build; Live
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Livewire
-
 Livewire renders components on the server and morphs their new HTML into
 the page. The stylesheet is the Laravel app's, loaded once by `@vite`, so
 Cirth comes from the [Laravel guide](/installation/laravel) and Livewire needs

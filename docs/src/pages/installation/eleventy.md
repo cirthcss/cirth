@@ -5,8 +5,6 @@ description: Use Cirth on an Eleventy site. Copy the stylesheet through to the o
 ---
 {% from "install.njk" import packageManagers %}
 
-# Eleventy
-
 Eleventy does not bundle CSS, so Cirth is copied to the output as a file and
 linked like any stylesheet. Nothing transforms it on the way.
 

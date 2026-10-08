@@ -6,8 +6,6 @@ description: Use Cirth in a Flask app. Put the file in static/ and link it from 
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Flask
-
 Flask serves the `static/` folder next to your app as it is. Cirth is one
 file there, linked from the base template.
 

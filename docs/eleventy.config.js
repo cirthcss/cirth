@@ -12,220 +12,14 @@ const { listPresetNames, presetLabel } = require("../scripts/lib/presets");
 const { docsPathPrefix } = require("../scripts/lib/docs-site");
 const { measuredTheme } = require("../scripts/lib/measured-theme");
 const { documentedVersion } = require("../scripts/lib/documented-version");
+const { readResults: markupBenchmark } = require("../scripts/lib/markup-benchmark");
 const frameworks = require("./src/_data/frameworks.js");
 
-// Eleventy replacement for the previous Astro setup. Same site shape:
 // docs/src/pages -> docs/dist, one <path>/index.html per page, served at
 // https://cirthcss.github.io/cirth/ (GITHUB_PAGES=true sets the /cirth/
 // path prefix, rewritten into links by EleventyHtmlBasePlugin).
 const docsRoot = __dirname;
 const demosFolder = path.join(docsRoot, "src/content/demos");
-
-// The theme preview's declarations, read out of the compiled stylesheets
-// rather than written here: the default theme's from the scoped build the
-// preview element actually loads, each preset's from its own compiled
-// file. A theme is literally a handful of custom properties, and this is
-// the honest way to show that — the listing beside the live preview is the
-// declaration the real file makes, and the same string is what the demo
-// applies.
-//
-// What this returns, per state, is one already-highlighted line per token
-// plus the single-line value to apply. The section shows one block and
-// swaps a line at a time, so the declaration that moved can be marked
-// where it stands and the two that did not are visibly the same two lines.
-// One block rather than one per state also means the shell's copy button —
-// which copies `textContent` — can only ever hand over the declarations
-// that are on screen.
-//
-// Whitespace inside a <pre> is content, so the block is assembled here in
-// JS where every newline is deliberate, rather than in a template where
-// tag boundaries would leak into the listing.
-const themePreview = () => {
-	const postcss = require("postcss");
-	// Preference order, intersected with reality below. Every token named
-	// here is one an author would actually write, and one whose effect is
-	// visible in the preview beside it.
-	const preferred = [
-		"--cirth-primary",
-		"--cirth-border-radius",
-		"--cirth-canvas",
-	];
-	const generated = path.join(docsRoot, "src/styles/generated");
-
-	// A theme root, and nothing else. The compiled files declare these same
-	// names in three other places — inside prefers-contrast and
-	// forced-colors blocks, and on components that rebind them locally
-	// (`.cirth [type=search] { --cirth-border-radius: … }`) — and none of
-	// those is what an author writes. Presets compile to `:root, :host`;
-	// the scoped build the preview loads puts the theme on `.cirth`.
-	const themeRootPattern = /^(:root|:host|\.cirth)$/;
-
-	// Top level of the file, or top level of the one `@layer cirth` block
-	// every compiled file now wraps itself in (gh#124). A rule nested any
-	// deeper sits in a media query, which is the case excluded above.
-	/** @param {import("postcss").Rule} rule */
-	const atTopLevel = (rule) => {
-		const parent = rule.parent;
-		if (parent?.type === "root") return true;
-		return (
-			parent?.type === "atrule" &&
-			/** @type {import("postcss").AtRule} */ (parent).name === "layer" &&
-			parent.parent?.type === "root"
-		);
-	};
-
-	/**
-	 * @param {string} file
-	 * @returns {Map<string, string>}
-	 */
-	const read = (file) => {
-		const found = new Map();
-		if (!fs.existsSync(file)) return found;
-		postcss.parse(fs.readFileSync(file, "utf8")).walkRules((rule) => {
-			if (!atTopLevel(rule)) return;
-			if (
-				!rule.selector
-					.split(",")
-					.every((selector) => themeRootPattern.test(selector.trim()))
-			) {
-				return;
-			}
-			for (const declaration of rule.nodes ?? []) {
-				if (declaration.type !== "decl") continue;
-				if (!preferred.includes(declaration.prop)) continue;
-				// One line, and none of the compiled file's own padding: the
-				// default build writes `light-dark( a, b )` with the parens
-				// spaced and the preset files do not, and this value is both
-				// listed and applied — two formattings of one declaration
-				// would show up as the listing and the demo disagreeing.
-				found.set(
-					declaration.prop,
-					declaration.value
-						.replace(/\s+/g, " ")
-						.replace(/\(\s+/g, "(")
-						.replace(/\s+\)/g, ")"),
-				);
-			}
-		});
-		return found;
-	};
-
-	const states = [
-		{
-			name: "default",
-			label: "Default theme",
-			file: "cirth.scoped.css",
-			declarations: read(path.join(generated, "cirth-lab-scoped.css")),
-		},
-		...listPresetNames().map((name) => ({
-			name,
-			label: `${presetLabel(name)} preset`,
-			file: `presets/${name}.css`,
-			declarations: read(path.join(generated, `presets/${name}.css`)),
-		})),
-	];
-
-	// Only the tokens every state really declares. A line that one file does
-	// not set could only be filled with an inherited value or a blank, and
-	// both would be a listing describing something the file does not say —
-	// so the set of lines is the intersection, and it maintains itself: a
-	// preset that stops declaring one drops the line for all of them rather
-	// than inventing it for one.
-	const tokens = preferred.filter((prop) =>
-		states.every((state) => state.declarations.has(prop)),
-	);
-
-	// `light-dark(a, b)` is one long line — 700px of it at the pane's
-	// measure, which scrolls rather than reads. Broken at the comma the way
-	// the source file itself breaks it, so the pane shows the whole
-	// declaration instead of the first two thirds of one. The captures are
-	// lazy and eat their own padding: the compiled default writes
-	// `light-dark( a, b )` with the parens spaced, and a greedy `(.+)`
-	// carried that space into the reflowed line.
-	/** @param {string} value */
-	const reflow = (value) =>
-		value.length > 46 && value.startsWith("light-dark(")
-			? value.replace(
-					/^light-dark\(\s*(.+?)\s*,\s*(.+?)\s*\)$/,
-					"light-dark(\n    $1,\n    $2\n  )",
-				)
-			: value;
-
-	// Highlighted one declaration at a time. Checked against the whole
-	// block: highlight.js emits byte-identical markup for `  --prop: value;`
-	// on its own as it does for the same line inside a rule, so the listing
-	// is the same listing the fenced-code pipeline would produce.
-	/**
-	 * @param {string} prop
-	 * @param {string} value
-	 */
-	const declaration = (prop, value) =>
-		hljs.highlight(`  ${prop}: ${value};`, {
-			language: "css",
-			ignoreIllegals: true,
-		}).value;
-
-	// The selector the demo's own stylesheet really carries. The preview is
-	// a custom element holding the scoped build in a shadow root, so
-	// `.cirth` is the theme root in there — printing `:root` would be
-	// printing a rule the page does not apply anywhere.
-	const selector = ".cirth";
-
-	// The listing as served: one line group per token, so the script can
-	// swap a line where it stands. Assembled here rather than in the
-	// template because every newline between these spans is content of a
-	// <pre> — a tag boundary in a template leaks into the listing, and a
-	// <pre> that carries its line breaks in CSS copies out as one line.
-	/** @param {{ lines: Record<string, { value: string, html: string }> }} state */
-	const block = (state) =>
-		`${hljs.highlight(`${selector} {`, { language: "css" }).value}\n` +
-		`${tokens
-			.map(
-				(prop) =>
-					`<span class="docs-token" data-token="${prop}">` +
-					`${state.lines[prop].html}</span>`,
-			)
-			.join("\n")}\n}`;
-
-	const rendered = states.map((state) => ({
-		name: state.name,
-		label: state.label,
-		file: state.file,
-		lines: Object.fromEntries(
-			tokens.map((prop) => {
-				const value = String(state.declarations.get(prop));
-				return [prop, { value, html: declaration(prop, reflow(value)) }];
-			}),
-		),
-	}));
-
-	// The home page's comparator: one copy of Cirth in its light scheme
-	// beside the same copy in its dark one, under the theme the reader picks.
-	// Each state's three declarations are listed as an author writes them,
-	// on :root, with the line the preset page uses to say what it is for.
-	const summaries = {
-		default: "Cirth as it ships, with nothing loaded after it.",
-		plain: "A conventional application look, with no decisions to make.",
-		material: "An interface that reads as Material Design 3.",
-		metro: "An interface in the manner of Windows Phone and Windows 8.",
-	};
-	for (const state of rendered) {
-		state.short = state.name === "default" ? "Default" : presetLabel(state.name);
-		state.title = state.name === "default" ? "Default theme" : `${state.short} preset`;
-		state.summary = summaries[state.name] ?? "";
-		state.listing = hljs.highlight(
-			`:root {\n${tokens.map((prop) => `  ${prop}: ${reflow(state.lines[prop].value)};`).join("\n")}\n}`,
-			{ language: "css" },
-		).value;
-	}
-
-	return {
-		selector,
-		tokens,
-		states: rendered,
-		block: block(rendered[0]),
-	};
-};
 
 // The shipped build modes, counted off the source entrypoints rather than
 // written down: only top-level `src/cirth*.scss` files compile, and the
@@ -256,8 +50,8 @@ const runtimeTokenCount = () => {
 //
 // dist/ is produced by `npm run build`, which runs before `docs:build`
 // everywhere it matters (CI, the deploy workflow, the release script). If
-// it is missing — a docs-only local run — the cell falls back to the
-// budget rather than printing a zero, and says which it is.
+// it is missing (a docs-only local run), the pages print their fallback
+// rather than a zero.
 const defaultBuildSize = () => {
 	const file = path.join(docsRoot, "../dist/cirth.min.css");
 	if (!fs.existsSync(file)) return null;
@@ -266,57 +60,15 @@ const defaultBuildSize = () => {
 	const kb = (/** @type {number} */ value) => `${(value / 1024).toFixed(1)} KB`;
 	// `label` is the quoted figure: gzip, because that is what the delivery
 	// paths this site documents actually send. `brotliLabel` is the best case
-	// a host reaches by precompressing the file itself — reported, never
+	// a host reaches by precompressing the file itself: reported, never
 	// promised. See scripts/lib/compressed-size.js.
 	return { bytes, label: kb(bytes), brotliLabel: kb(brotliSize(source)) };
 };
 
-// What the package holds, read off dist/ rather than written down: the home
-// page says how many stylesheets and token files it ships and that no
-// script is among them, and a script appearing there would change the
-// number it prints. Null on a docs-only run with no build.
-const packageContents = () => {
-	const distDir = path.join(docsRoot, "../dist");
-	if (!fs.existsSync(distDir)) return null;
-	/** @param {string} dir @returns {string[]} */
-	const walk = (dir) =>
-		fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
-			entry.isDirectory() ? walk(path.join(dir, entry.name)) : [path.join(dir, entry.name)],
-		);
-	const files = walk(distDir);
-	const count = (/** @type {RegExp} */ pattern) => files.filter((file) => pattern.test(file)).length;
-	// The minified screen builds, gzipped, for the size comparison.
-	const builds = [
-		["Default", "cirth.min.css"],
-		["Classless", "cirth.classless.min.css"],
-		["Scoped", "cirth.scoped.min.css"],
-		["Classless and scoped", "cirth.classless.scoped.min.css"],
-	].flatMap(([name, file]) => {
-		const full = path.join(distDir, file);
-		if (!fs.existsSync(full)) return [];
-		const bytes = gzipSize(fs.readFileSync(full));
-		return [{ name, file, bytes, label: `${(bytes / 1024).toFixed(1)} KB` }];
-	});
-	const largest = Math.max(...builds.map((build) => build.bytes));
-	const scripts = files.filter((file) => /\.(?:m?js|cjs|wasm)$/.test(file));
-	return {
-		files: files.length,
-		stylesheets: count(/\.css$/),
-		tokens: count(/\.tokens\.json$/),
-		scripts: scripts.length,
-		scriptBytes: scripts.reduce((sum, file) => sum + fs.statSync(file).size, 0),
-		builds: builds.map((build) => ({ ...build, share: build.bytes / largest })),
-	};
-};
-
 // The radius pair (a container's corner against the corners of the
 // controls inside it), resolved off the compiled stylesheet rather than
-// written down. The Brand page quotes both numbers as the thing that
-// survives a retheme, and it quoted them wrong for three minor versions:
-// the knob moved from `radius-md` to `radius-sm` in "establish a
-// recognizable default surface" and the prose kept saying 9px and 6px
-// while the build shipped 6px and 4px. A number a reader can check
-// against `dist/` has to come out of `dist/`.
+// written down: a number a reader can check against `dist/` has to come
+// out of `dist/`.
 //
 // The resolver is deliberately narrow. It follows the two shapes the
 // radius tokens actually use (`var(--other)` and
@@ -385,7 +137,7 @@ const radiusPair = () => {
 // Browserslist target in package.json, which is what Lightning CSS
 // compiles against and what scripts/check-browserslist.js holds to a
 // single engine floor. Written out as a sentence so the FAQ answer cannot
-// drift from the target the build actually uses — raising the floor
+// drift from the target the build actually uses; raising the floor
 // rewrites the answer.
 const browserTargets = () => {
 	const names = {
@@ -468,7 +220,6 @@ module.exports = (eleventyConfig) => {
 		"presets",
 		listPresetNames().map((name) => ({ label: presetLabel(name), name })),
 	);
-	eleventyConfig.addGlobalData("themePreview", themePreview());
 	eleventyConfig.addGlobalData("browsers", browserTargets());
 	// The version a guide tells a reader to download, the same one every
 	// CDN snippet is pinned to (scripts/update-sri.js), so a command that
@@ -478,25 +229,16 @@ module.exports = (eleventyConfig) => {
 	// measured off dist/tokens for the Brand and Colors pages; null on a
 	// docs-only run with no build, where the pages print token names only.
 	eleventyConfig.addGlobalData("measured", measuredTheme(path.join(docsRoot, "..")));
-	eleventyConfig.addGlobalData("packageContents", packageContents());
+	// The markup comparison the home page draws and Why Cirth explains,
+	// with the two fixtures it was measured on. Read through the check, so
+	// a fixture edited without `npm run benchmark` fails the build rather
+	// than printing a number the fixtures no longer give.
+	eleventyConfig.addGlobalData("benchmark", markupBenchmark());
 
-	// A specimen's markup, counted: its elements in order and how many of
-	// them carry a class. The home page prints both from the very string it
-	// renders, so "no class" is a measurement of the specimen on screen.
-	eleventyConfig.addFilter("markupStats", (/** @type {string} */ markup) => {
-		const tags = [...String(markup).matchAll(/<([a-z][a-z0-9-]*)\b([^>]*)>/gi)];
-		return {
-			elements: tags.length,
-			names: tags.map((tag) => tag[1].toLowerCase()),
-			classes: tags.filter((tag) => /\sclass\s*=/.test(tag[2])).length,
-			attributes: [...new Set(tags.flatMap((tag) => [...tag[2].matchAll(/\s([a-z-]+)(?==|\s|$)/gi)].map((match) => match[1])))],
-		};
-	});
+	// Markdown
 
-	// --- Markdown pipeline ------------------------------------------------
-	// Fenced code: highlight.js token classes (same .hljs-* classes the docs
-	// shell has colored since the VitePress era) + tabindex="0" so
-	// horizontally scrollable blocks stay keyboard-reachable (axe:
+	// Fenced code: highlight.js token classes, and tabindex="0" so a block
+	// that scrolls sideways stays keyboard-reachable (axe:
 	// scrollable-region-focusable).
 	const markdown = markdownIt({
 		html: true,
@@ -513,10 +255,8 @@ module.exports = (eleventyConfig) => {
 		},
 	});
 
-	// Heading ids (GitHub-style slugs, matching the previous Astro output so
-	// existing #fragment links keep resolving) plus a visible-on-hover
-	// permalink anchor — the .header-anchor affordance the VitePress site
-	// had and the Astro port lost (gh#54).
+	// Heading ids are GitHub-style slugs, so existing #fragment links keep
+	// resolving, each with a permalink anchor shown on hover (gh#54).
 	const slugger = new GithubSlugger();
 	markdown.use(markdownItAnchor, {
 		slugify: (title) => slugger.slug(title),
@@ -552,14 +292,12 @@ module.exports = (eleventyConfig) => {
 	// dedupe (foo, foo-1) without pages leaking suffixes into each other.
 	eleventyConfig.on("eleventy.before", () => slugger.reset());
 
-	// Eleventy doesn't clean its output directory (Astro did); start each
-	// process fresh so stale pages, or iCloud "name 2.html" duplicates,
-	// can't accumulate. The directory is the one Eleventy reports for this
-	// build (`directories.output`): docs/dist normally, or whatever
-	// `--output` named, so a build pointed elsewhere never touches the real
-	// site. It is cleaned once per process: in --serve mode eleventy.before
-	// also runs for incremental rebuilds, where deleting the active output
-	// directory leaves Eleventy with nowhere to write.
+	// Eleventy does not clean its output directory, so each process starts
+	// from an empty one and stale pages cannot accumulate. The directory is
+	// the one Eleventy reports for this build (`directories.output`), so a
+	// build pointed elsewhere never touches docs/dist. Cleaned once per
+	// process: in --serve mode eleventy.before also runs for incremental
+	// rebuilds, where deleting the active output leaves nowhere to write.
 	const cleanedOutputs = new Set();
 	/** @param {{ directories: { output: string } }} event */
 	const buildOutput = ({ directories }) => path.resolve(directories.output);
@@ -580,35 +318,21 @@ module.exports = (eleventyConfig) => {
 
 	eleventyConfig.setLibrary("md", markdown);
 
-	// --- Shortcodes -------------------------------------------------------
-	// Live example + "Show HTML" source (the previous Demo.astro): the raw
-	// snippet is read at build time and injected both rendered and as
-	// literal text. Zero client JS — the <details> disclosure is native.
-	//
-	// Two-phase on purpose: the shortcode runs before markdown-it, and a
-	// demo snippet containing a blank line would terminate the surrounding
-	// CommonMark HTML block, re-parsing the rest of the snippet as markdown
-	// (this silently broke the customization demo's <style> overrides). The
-	// shortcode emits a single-line placeholder comment — inert to markdown
-	// — and the transform below swaps in the real HTML after rendering.
-	const buildDemo = (src, variant, frame) => {
+	// Shortcodes
+
+	// A live example and its source, read from content/demos at build time.
+	// Two-phase: the shortcode emits a one-line placeholder, inert to
+	// markdown-it (a blank line in a snippet would end the surrounding HTML
+	// block), and the transform below swaps in the HTML after rendering.
+	const buildDemo = (src, frame) => {
 		const file = path.join(demosFolder, `${src}.html`);
 		if (!fs.existsSync(file)) {
 			throw new Error(`[demo] missing snippet: ${src}.html`);
 		}
 		const html = fs.readFileSync(file, "utf8").trim();
-		const classlessClass = variant === "classless" ? " cirth-classless" : "";
 		const frameClass = frame === "narrow" ? " docs-demo-narrow" : "";
-		// A caption only when it says something the page does not: which
-		// build renders the example, when it is not the default one. The
-		// same two lines of metadata on every demo were read once and then
-		// skipped, on every page.
-		const caption =
-			variant === "classless"
-				? `<figcaption class="docs-demo-caption">Classless build</figcaption>\n`
-				: "";
 		return `<figure class="docs-demo${frameClass}">
-${caption}<div class="docs-demo-preview${classlessClass}">${html}</div>
+<div class="docs-demo-preview">${html}</div>
 <details class="docs-demo-source">
 <summary>HTML</summary>
 <pre tabindex="0"><code class="hljs language-html">${
@@ -618,34 +342,21 @@ ${caption}<div class="docs-demo-preview${classlessClass}">${html}</div>
 </figure>`;
 	};
 
-	// One source per example. Most pages follow a demo with the listing a
-	// reader should copy, written for reading rather than rendered inline;
-	// with the demo's own disclosure beside it the same code appeared twice.
-	// When an HTML listing follows a demo directly it becomes the demo's
-	// source band, open, and the disclosure goes; a demo with no listing
-	// after it keeps the disclosure.
+	// An HTML listing written right after a demo becomes its source band,
+	// replacing the disclosure, so the code is shown once.
 	const adoptListing = (content) =>
 		content.replace(
 			/<details class="docs-demo-source">[\s\S]*?<\/details>\n<\/figure>\s*(<pre[^>]*><code class="hljs language-html">[\s\S]*?<\/code><\/pre>)/g,
 			(_, listing) => `<div class="docs-demo-source">${listing}</div>\n</figure>`,
 		);
 
-	// `frame` is the stage's width, not the example's: "narrow" gives a
-	// screen that is narrow by nature (a sign-in card) a stage its own size
-	// instead of the full column. Nothing inside the preview changes.
-	eleventyConfig.addShortcode(
-		"demo",
-		(src, variant = "default", frame = "") =>
-			`<!--cirth-demo:${src}:${variant}${frame ? `:${frame}` : ""}-->`,
-	);
+	// `frame`: "narrow" sizes the stage, never the example inside it.
+	eleventyConfig.addShortcode("demo", (src, frame = "") => `<!--cirth-demo:${src}${frame ? `:${frame}` : ""}-->`);
 
 	eleventyConfig.addTransform("cirth-demos", (content, outputPath) => {
 		if (!outputPath?.endsWith(".html")) return content;
 		return adoptListing(
-			content.replace(
-				/<!--cirth-demo:([\w-]+):(\w+)(?::(\w+))?-->/g,
-				(_, src, variant, frame) => buildDemo(src, variant, frame),
-			),
+			content.replace(/<!--cirth-demo:([\w-]+)(?::(\w+))?-->/g, (_, src, frame) => buildDemo(src, frame)),
 		);
 	});
 
@@ -657,11 +368,10 @@ ${caption}<div class="docs-demo-preview${classlessClass}">${html}</div>
 	});
 
 	// Light-mode --cirth-primary swatches for the default theme and each
-	// preset (values from src/theme/_dual.scss and src/presets/*.scss).
-	// A data URI cannot read a custom property, and neither can a swatch that
-	// has to sit next to the preset it names while the page is in another
-	// preset — so these are literals, and they have to be re-read from source
-	// when the default accent moves.
+	// preset (values from src/theme/_dual.scss and src/presets/*.scss). A
+	// swatch sits next to the preset it names while the page is in another
+	// preset, so it cannot read a custom property: these are literals, to be
+	// re-read from source when an accent moves.
 	eleventyConfig.addShortcode("colorSwatches", () => {
 		const colors = [
 			{ name: "default", hex: "#aa46b4", note: "default theme" },
@@ -691,34 +401,28 @@ ${caption}<div class="docs-demo-preview${classlessClass}">${html}</div>
 </section>`;
 	});
 
-	// --- Filters ----------------------------------------------------------
-	// Syntax highlighting for source that is not coming through markdown: the
-	// hero's source panel, and the specimens the home page declares once and
-	// renders twice (live, and highlighted into the pane beside it). Same
-	// highlight.js pass and same .hljs-* classes the fenced-code pipeline
-	// above emits, so there is one highlighter in the build and none in the
-	// browser. The language is a parameter because the theme section shows
-	// the stylesheet that moved the tokens, not markup.
-	eleventyConfig.addFilter(
-		"highlight",
-		(code, language = "html") =>
-			hljs.highlight(String(code), { language, ignoreIllegals: true }).value,
-	);
+	// Filters
 
-	// A framework guide's own shape, laid on the page markdown already
-	// rendered, so the source stays plain markdown and every rhythm rule
-	// that reads the column's direct children keeps reading them. Four
-	// changes, all to what is already there, and all read from
-	// frameworks.js so a guide cannot claim more than its entry does:
+	// The home page's specimens, highlighted by the same highlight.js pass
+	// as fenced code, so nothing is highlighted in the browser.
+	eleventyConfig.addFilter("highlight", (code) => hljs.highlight(String(code), { language: "html", ignoreIllegals: true }).value);
+
+	// A framework guide's head and foot, laid on the page markdown already
+	// rendered, so the source stays plain markdown (it has no <h1>) and every
+	// rhythm rule that reads the column's direct children keeps reading them.
+	// All of it comes from frameworks.js, so a guide cannot claim more than
+	// its entry does:
 	//
-	//   · the <h1> carries the guide's mark before its text. It is
-	//     decorative (alt=""): the title is the name, and firstHeading
-	//     strips the image, so <title> and the search index read "Vite";
-	//   · under the lead, one line: the category, how sure the guide is
-	//     and when it was last checked, and the project's own site as a
-	//     plain link, named by its address;
-	//   · a sentence after it says what the guide will have you do, taken
-	//     from the step headings themselves, so it cannot drift from them;
+	//   · a card for the project: its mark, its name (text, not a heading),
+	//     one sentence about it, and links to its site and its repository.
+	//     The mark is decorative beside the printed name, and is also a link
+	//     to the project's site, which is how the OpenJS Foundation and the
+	//     DSF allow their logos; that link is left out of the tab order and
+	//     the accessibility tree, since "Website" goes to the same place;
+	//   · the <h1>, "Install Cirth for {name}", then the lead paragraph;
+	//   · one line: how sure the guide is, with which release, and when;
+	//   · a sentence saying what the guide will have you do, taken from the
+	//     step headings themselves, so it cannot drift from them;
 	//   · a numbered <h2> ("2. Import it") becomes a step: its number set
 	//     apart in a badge, where the heading's name reads "2 Import it",
 	//     and the id and the anchor untouched, so every link to a step
@@ -735,15 +439,15 @@ ${caption}<div class="docs-demo-preview${classlessClass}">${html}</div>
 	const siteName = (/** @type {string} */ url) => url.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, "");
 	/**
 	 * A mark's <img> elements: one, or the light and dark pair a project
-	 * publishes, each at its own intrinsic ratio. A one-colour mark renders
-	 * black in an <img>, so it is marked `mono` and the stylesheet shows it
-	 * white on the dark scheme, as the project's own site does.
-	 * @param {{ file: string, dark?: string, mono?: boolean, aspect: number, darkAspect?: number }} mark
+	 * publishes, each at its own intrinsic ratio. A file drawn for light
+	 * backgrounds only is marked, so the stylesheet can set it on a light
+	 * ground in the dark scheme.
+	 * @param {{ file: string, dark?: string, ground?: "light", aspect: number, darkAspect?: number }} mark
 	 * @param {number} height
 	 */
 	const markImages = (mark, height) => {
 		const image = (/** @type {string} */ file, /** @type {number} */ ratio, /** @type {string} */ variant) =>
-			`<img class="docs-mark-image${variant ? ` docs-logo docs-logo-${variant}` : ""}${mark.mono ? " docs-mark-mono" : ""}${ratio > 2 ? " docs-mark-wide" : ""}" src="/logos/frameworks/${file}" alt="" width="${Math.round(ratio * height)}" height="${height}" decoding="async">`;
+			`<img class="docs-mark-image${variant ? ` docs-logo docs-logo-${variant}` : ""}${mark.ground === "light" ? " docs-mark-on-light" : ""}${ratio > 2 ? " docs-mark-wide" : ""}" src="/logos/frameworks/${file}" alt="" width="${Math.round(ratio * height)}" height="${height}" decoding="async">`;
 		return mark.dark
 			? image(mark.file, mark.aspect, "light") +
 					image(mark.dark, mark.darkAspect ?? mark.aspect, "dark")
@@ -751,6 +455,8 @@ ${caption}<div class="docs-demo-preview${classlessClass}">${html}</div>
 	};
 	eleventyConfig.addFilter("markImages", (mark, height = 32) => markImages(mark, height));
 	eleventyConfig.addFilter("longDate", longDate);
+	// A count with its thousands grouped, as the page's prose writes them.
+	eleventyConfig.addFilter("grouped", (/** @type {number} */ value) => Number(value).toLocaleString("en-GB"));
 	eleventyConfig.addFilter("siteName", siteName);
 	eleventyConfig.addFilter("frameworkGuide", (content, id) => {
 		const guide = frameworks.byId[id];
@@ -769,21 +475,27 @@ ${caption}<div class="docs-demo-preview${classlessClass}">${html}</div>
 				`<h2 id="${slug}" tabindex="-1" class="docs-step-heading"><span class="docs-step-number">${number}</span> ${title} ${anchor}</h2>`,
 		);
 
-		if (!/<h1>[\s\S]*?<\/h1>/.test(html)) {
-			throw new Error(`[frameworkGuide] ${id}: no <h1> to carry the mark`);
+		if (/<h1\b/.test(html)) {
+			throw new Error(`[frameworkGuide] ${id}: the page has its own <h1>; the guide's comes from frameworks.js`);
 		}
-		const mark = guide.markData
-			? `<span class="docs-guide-marks"><span class="docs-mark">${markImages(guide.markData, 40)}</span></span>`
-			: "";
-		html = html.replace(/<h1>([\s\S]*?)<\/h1>/, (_, title) => `<h1 class="docs-guide-title">${mark}${title}</h1>`);
+		const name = escapeHtml(guide.name);
+		const card =
+			`<aside class="docs-project" aria-label="About ${name}">` +
+			(guide.markData
+				? `<a class="docs-project-mark" href="${guide.officialUrl}" tabindex="-1" aria-hidden="true"><span class="docs-mark">${markImages(guide.markData, 40)}</span></a>`
+				: "") +
+			`<p class="docs-project-name">${name}</p>` +
+			`<p class="docs-project-description">${escapeHtml(guide.description)}</p>` +
+			`<p class="docs-project-links">` +
+			`<a href="${guide.officialUrl}" aria-label="${name} official website">Website</a>` +
+			(guide.github ? `<a href="${guide.github}" aria-label="${name} on GitHub">GitHub</a>` : "") +
+			`</p></aside>\n<h1>Install Cirth for ${name}</h1>\n`;
 
 		const { verified, status } = guide;
 		const meta =
 			`<p class="docs-guide-meta">` +
-			`<span>${guide.categoryText}</span>` +
-			`<span class="docs-guide-status" data-status="${verified.status}">${status.text} <time datetime="${verified.date}">${longDate(verified.date)}</time></span>` +
-			`<a href="${guide.officialUrl}" class="docs-guide-official">${siteName(guide.officialUrl)}</a>` +
-			`</p>`;
+			`<span class="docs-guide-status" data-status="${verified.status}">${status.text}</span> with ${escapeHtml(guide.version)} on ` +
+			`<time datetime="${verified.date}">${longDate(verified.date)}</time></p>`;
 		let lead = meta;
 		if (steps.length > 1 && steps.length < numberWords.length) {
 			const named = steps.map((step) => step.charAt(0).toLowerCase() + step.slice(1));
@@ -793,10 +505,10 @@ ${caption}<div class="docs-demo-preview${classlessClass}">${html}</div>
 					: `${named.slice(0, -1).join(", ")} and ${named.at(-1)}`;
 			lead += `\n<p class="docs-guide-summary">${numberWords[steps.length]}: ${list}.</p>`;
 		}
-		if (!/(<\/h1>\s*<p>[\s\S]*?<\/p>)/.test(html)) {
-			throw new Error(`[frameworkGuide] ${id}: no lead paragraph under the <h1>`);
+		if (!/^\s*<p>[\s\S]*?<\/p>/.test(html)) {
+			throw new Error(`[frameworkGuide] ${id}: the page does not open with its lead paragraph`);
 		}
-		html = html.replace(/(<\/h1>\s*<p>[\s\S]*?<\/p>)/, `$1\n${lead}`);
+		html = card + html.trimStart().replace(/^(<p>[\s\S]*?<\/p>)/, `$1\n${lead}`);
 
 		// Data strings mark code with backticks, as markdown would.
 		const code = (/** @type {string} */ text) =>
@@ -812,20 +524,19 @@ ${caption}<div class="docs-demo-preview${classlessClass}">${html}</div>
 	});
 
 	// Page URLs always end in "/" (one <path>/index.html per page) while
-	// nav-config links don't — normalize before comparing for active state.
+	// nav-config links do not: normalized before comparing.
 	const withSlash = (link) => (link.endsWith("/") ? link : `${link}/`);
 	eleventyConfig.addFilter("withSlash", withSlash);
 
-	// What a page is for decides how it is set. A reference page (an
-	// element, a component, a layout primitive, a utility) is consulted:
-	// the grammar leads, with chapter rules and dense tables. Everything
-	// else is a guide, read from the top: the reading rhythm leads.
 	// A contrast ratio as the pages print it: two decimals, so a value just
 	// over a threshold is not rounded onto it.
 	eleventyConfig.addFilter("ratio", (/** @type {number | null | undefined} */ value) =>
 		typeof value === "number" && Number.isFinite(value) ? `${value.toFixed(2)}:1` : "n/a",
 	);
 
+	// A reference page (an element, a component, a layout primitive, a
+	// utility) is consulted and gets chapter rules; everything else is a
+	// guide, read from the top.
 	eleventyConfig.addFilter("docsKind", (url = "") =>
 		/^\/(?:layout|content|forms|components|utilities)\//.test(url)
 			? "reference"
@@ -921,7 +632,8 @@ ${caption}<div class="docs-demo-preview${classlessClass}">${html}</div>
 		return found;
 	});
 
-	// --- Copy & structure -------------------------------------------------
+	// Output
+
 	// Archived documentation lines: whole sites, built once at the breaking
 	// release that ended them and committed as-is. Copied rather than
 	// rebuilt, so an old line never has to keep compiling against today's

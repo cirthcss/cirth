@@ -6,8 +6,6 @@ description: Use Cirth in a Nuxt app. Add it to the css array in nuxt.config.ts 
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Nuxt
-
 Nuxt loads global stylesheets from the `css` array of its configuration, and
 builds with Vite. Cirth is one entry in that array, and Vite takes one more
 line beside it.

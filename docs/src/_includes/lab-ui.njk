@@ -18,23 +18,17 @@
 		</script>
 		<link rel="stylesheet" href="/styles/generated/{{ labStylesheet }}" />
 		{%- if labScoped %}
-		{#- A scoped build styles the .cirth element and nothing outside it,
-		    so in a frame the document around the wrapper is the browser's own:
-		    a white margin under a dark widget. The frame is the host page
-		    here, and a host that embeds a scoped widget full-bleed gives it
-		    the viewport; that is all this does. -#}
+		{#- A scoped build styles only .cirth, so inside a frame the wrapper is
+		    made full-bleed to avoid the browser's white margin around it. -#}
 		<style>
 			body { margin: 0; }
 			.cirth { min-block-size: 100vh; }
 		</style>
 		{%- endif %}
 	</head>
-	{#- inert: these pages exist only to be embedded as a rendering
-	    specimen (layout: false, excluded from collections). Without it the
-	    sample sign-in form joins the host page's tab order: four focus
-	    stops inside a picture, and a screen reader announces a working
-	    sign-in form on the Cirth home page. The iframe's title carries the
-	    accurate description instead. -#}
+	{#- inert: these pages are embedded as pictures (examples page). The
+	    iframe title describes them; the sample form never enters the host's
+	    tab order. -#}
 	<body inert>
 		{% if labScoped %}<div class="cirth">{% endif %}
 		<main{% if not labClassless %} class="container"{% endif %}>

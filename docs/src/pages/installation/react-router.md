@@ -6,8 +6,6 @@ description: Use Cirth in a React Router app in framework mode. Replace Tailwind
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# React Router
-
 A new React Router app in framework mode imports `app/app.css` from
 `app/root.tsx`, and that file imports Tailwind. Cirth takes Tailwind's place,
 and Vite gets one line. The same set-up serves an app upgraded from Remix 2,

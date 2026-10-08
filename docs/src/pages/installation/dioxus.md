@@ -6,8 +6,6 @@ description: Use Cirth in a Dioxus web app. Declare it with asset!() and minific
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Dioxus
-
 Dioxus collects assets with the `asset!()` macro and, in a release bundle,
 minifies CSS for older browsers than Cirth supports, rewriting its
 `light-dark()` colours. Cirth is already minified: turn that step off for it.

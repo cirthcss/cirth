@@ -6,8 +6,6 @@ description: Use Cirth in a SolidStart app. Import it in src/app.jsx and set Vit
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# SolidStart
-
 SolidStart imports its global stylesheet from `src/app.jsx` and builds with
 Vite. Cirth is one import there, and Vite takes one line.
 

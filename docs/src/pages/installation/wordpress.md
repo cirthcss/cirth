@@ -4,8 +4,6 @@ framework: wordpress
 description: Use Cirth in a WordPress theme. Add the stylesheet to the theme and enqueue it from functions.php with wp_enqueue_style.
 ---
 
-# WordPress
-
 A theme loads its stylesheets by enqueueing them, so WordPress can print each
 one once, in order, with a version for caching. Cirth is one file in the
 theme and one call in `functions.php`.

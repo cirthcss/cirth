@@ -6,8 +6,6 @@ description: Use Cirth in a Fresh 2 project on Deno. Add the npm package and @im
 {% from "install.njk" import packageManagers %}
 {% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
-# Fresh
-
 Fresh 2 builds with Vite and imports `assets/styles.css` from `client.ts`.
 Cirth comes in from npm through Deno, and is one `@import` in that
 stylesheet.
