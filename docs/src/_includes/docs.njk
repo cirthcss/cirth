@@ -39,7 +39,7 @@ layout: base.njk
 					{%- if loop.last %}
 					<li aria-current="page">{{ crumb.text }}</li>
 					{%- else %}
-					<li><a href="{{ crumb.link | withSlash }}">{{ crumb.text }}</a></li>
+					<li><a href="{{ crumb.link if '#' in crumb.link else (crumb.link | withSlash) }}">{{ crumb.text }}</a></li>
 					{%- endif %}
 					{%- endfor %}
 				</ol>

@@ -1,16 +1,27 @@
 ---
 layout: docs.njk
 framework: symfony
-description: Use Cirth in a Symfony app with AssetMapper. Require the stylesheet through the importmap and import it from assets/app.js.
+description: Use Cirth in a Symfony app with AssetMapper. Require the stylesheet through the importmap, import it from assets/app.js, and let the Twig layout link it.
 ---
-{% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
 AssetMapper, Symfony's default for front-end assets, can bring a stylesheet
 from an npm package without Node: `importmap:require` downloads it, and an
 import in `assets/app.js` links it on every page that renders the importmap.
 
-## 1. Require it
+## 1. Create the project
+
+A web application from the Symfony skeleton comes with AssetMapper and Twig:
+
+```sh
+symfony new my-app --webapp
+cd my-app
+```
+
+Without the Symfony CLI, `composer create-project symfony/skeleton my-app`
+and then `composer require webapp` give the same project.
+
+## 2. Require it
 
 ```sh
 php bin/console importmap:require @cirthcss/cirth/dist/cirth.min.css
@@ -19,7 +30,7 @@ php bin/console importmap:require @cirthcss/cirth/dist/cirth.min.css
 The file lands in `assets/vendor/`, and `importmap.php` records it with its
 version.
 
-## 2. Import it
+## 3. Import it
 
 At the top of `assets/app.js`, before the app's own stylesheet:
 
@@ -29,10 +40,12 @@ import "./styles/app.css";
 ```
 
 The `importmap('app')` call in `templates/base.html.twig` now writes a
-`<link>` for Cirth before the app's CSS. In production,
-`php bin/console asset-map:compile` copies it unchanged under a digest.
+`<link>` for Cirth before the app's CSS, so `assets/styles/app.css` comes
+after it and can override `--cirth-*` properties. In production,
+`php bin/console asset-map:compile` copies the file unchanged under a
+digest.
 
-## 3. Write Twig
+## 4. Write Twig
 
 Form themes render labels and inputs Cirth styles as they are; the default
 `form_div_layout.html.twig` needs no Bootstrap theme:
@@ -50,7 +63,7 @@ Form themes render labels and inputs Cirth styles as they are; the default
 {% endblock %}{% endraw %}
 ```
 
-## 4. Check it
+## 5. Check it
 
 {{ checkIt() }}
 

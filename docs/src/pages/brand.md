@@ -461,10 +461,40 @@ first or forbids the use; the colours, notices and links its owner asks for
 are kept. Otherwise the project is named by text alone, and the note below
 says why.
 
+Four logos are shown as nominative references, by decision: Next.js's,
+Stimulus's and Blazor's, although their owners' terms ask to be asked
+first, and Jakarta EE's, on the conditions its guidelines set for
+nominative use. Each
+identifies the guide for that project and nothing else; the note under it
+gives the file's source and the day it was taken, says that the use
+implies no affiliation or endorsement, and that the logo comes down if its
+owner asks. None rests on the project's open source licence, which covers
+code and not trademarks.
+
+Jakarta EE and Spring Boot show the difference between a name and a logo.
+The Jakarta EE guidelines allow community members nominative fair use of
+the marks, so the guide for Jakarta Servlet and JSP shows the standard
+Jakarta EE logo, unmodified, never the Compatible or Member logo, with no
+claim of certified compatibility, and with the attribution its owner asks
+for. The Spring trademark guidelines allow the name Spring Boot as a
+nominative reference but reserve the logo for Broadcom, and say that using
+the name does not extend to the symbol; the Spring Boot guide is named by
+text alone, with no leaf, no lookalike icon and no wordmark set in another
+typeface, until Broadcom gives written permission.
+
+Some owners ask for their logo to be a link to their own site: the Django
+Software Foundation, the OpenJS Foundation, the Commonhaus Foundation and
+JetBrains, which names www.jetbrains.com. On a guide's own page the logo
+is that link. On the Installation page every card, its logo included, is
+a single link to the guide, so there the logo is a decorative picture
+inside a link to this site; the maintainers decided that, and the note
+under each of those projects says so.
+
 The logos belong to their projects, appear only to name the tool a guide
 covers, and do not mean that any of these projects is affiliated with Cirth
-or endorses it. Wherever a logo is a link, it leads to the project's own
-site. Every file is served from this site, never hotlinked, and none is
+or endorses it. On a guide's page the logo links to the project's own
+site, or to the address its owner names for it; on the Installation page
+the whole card, logo and name, links to the guide. Every file is served from this site, never hotlinked, and none is
 recoloured: a file drawn only for light backgrounds, with no official
 variant for dark ones, sits on a light ground in the dark scheme.
 
@@ -473,16 +503,14 @@ variant for dark ones, sits on a light ground in the dark scheme.
 <thead><tr><th scope="col">Project</th><th scope="col">Shown as</th><th scope="col">Owner</th><th scope="col">Source</th><th scope="col">Policy read</th><th scope="col">Checked</th></tr></thead>
 <tbody>
 {%- for id, mark in frameworks.marks %}
-<tr><th scope="row">{{ mark.name }}</th><td>{% if mark.file %}{{ "Wordmark" if mark.wide else "Logo" }}{% else %}Name only{% endif %}</td><td>{{ mark.owner }}</td><td>{% if mark.file %}<a href="{{ mark.source }}">{{ mark.source | replace("https://", "") | truncate(36, true, "…") }}</a>{% if mark.darkSource %} and <a href="{{ mark.darkSource }}">its dark variant</a>{% endif %}, retrieved {{ mark.retrieved or frameworks.retrieved }}{% else %}None shown{% endif %}</td><td><a href="{{ mark.termsUrl }}">{{ mark.terms }}</a></td><td>{{ frameworks.checked }}</td></tr>
+<tr><th scope="row">{{ mark.name }}</th><td>{% if mark.file %}{{ "Wordmark" if mark.wide else "Logo" }}{% if mark.nominative %}, nominative use{% endif %}{% else %}Name only{% endif %}</td><td>{{ mark.owner }}</td><td>{% if mark.file %}<a href="{{ mark.source }}">{{ mark.source | replace("https://", "") | truncate(36, true, "…") }}</a>{% if mark.darkSource %} and <a href="{{ mark.darkSource }}">its dark variant</a>{% endif %}, retrieved {{ mark.retrieved or frameworks.retrieved }}{% else %}None shown{% endif %}</td><td><a href="{{ mark.termsUrl }}">{{ mark.terms }}</a></td><td>{{ frameworks.checked }}</td></tr>
 {%- endfor %}
 </tbody>
 </table>
 </div>
 
-{% for id, mark in frameworks.marks %}{% if mark.textOnly or mark.note or mark.permission or mark.attribution %}
-- **{{ mark.name }}.** {{ mark.textOnly or mark.note }}{% if mark.permission %} Permission the policy asks for: {{ mark.permission }}{% endif %}{% if mark.attribution %} Notice required: {{ mark.attribution }}{% endif %}{% endif %}{% endfor %}
-
-{% for notice in frameworks.notices %}{{ notice }} {% endfor %}
+{% for id, mark in frameworks.marks %}{% if mark.textOnly or mark.nominative or mark.note or mark.permission or mark.trademarkNotice %}
+- **{{ mark.name }}.** {{ mark.textOnly or mark.nominative or mark.note }}{% if mark.permission %} Permission the policy asks for: {{ mark.permission }}{% endif %}{% if mark.trademarkNotice %} Notice on the guide's page: {{ mark.trademarkNotice }}{% endif %}{% if mark.alsoRead %} Also read: {% for doc in mark.alsoRead %}<a href="{{ doc.url }}">{{ doc.text }}</a>{{ ", " if not loop.last else "." }}{% endfor %}{% endif %}{% endif %}{% endfor %}
 
 ## Images
 

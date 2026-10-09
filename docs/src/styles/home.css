@@ -30,7 +30,7 @@
   margin-inline: auto;
 }
 
-.docs-glance-head h2,
+.docs-facts-head h2,
 .docs-story-head h2,
 .docs-bench-head h2,
 .docs-theme-head h2,
@@ -41,7 +41,7 @@
   margin-block: 0 var(--cirth-flow-element);
 }
 
-.docs-glance-head > p,
+.docs-facts-head > p,
 .docs-story-head > p,
 .docs-bench-head > p:not([class]),
 .docs-theme-head > p,
@@ -75,7 +75,7 @@
 }
 
 /* Elements that move with the eased scroll get a layer only while it moves. */
-.docs-home[data-animating] :is(.docs-story-source, .docs-story-browser, .docs-story-cirth, .docs-bench-head, .docs-bench-card) {
+.docs-home[data-animating] :is(.docs-facts-file, .docs-fact, .docs-story-source, .docs-story-browser, .docs-story-cirth, .docs-bench-head, .docs-bench-card) {
   will-change: transform, opacity;
 }
 
@@ -229,71 +229,219 @@
 }
 
 
-/* At a glance */
+/* Three facts. The base rules are the finished picture: the file's name as
+   a listing's label band, and under it the three facts as Cirth cards, in
+   a row where three fit and stacked where they do not. The cards are the
+   library's <article>, with its edge, radius and type; their surface is
+   made nearly clear through the card's own tokens, the way the library
+   restyles a card inside a dialog, so the section's glow shows through.
+   Held, the controller writes each card's progress and the vector from its
+   place to the row's centre; the transforms below start from those and end
+   at the row. */
 
-.docs-glance-grid {
+.docs-facts-grid {
   display: grid;
-  gap: clamp(2rem, 5vw, 4rem);
+  gap: clamp(2rem, 4vw, 3rem);
   align-items: center;
 }
 
-.docs-glance-head {
-  max-inline-size: 34rem;
+.docs-facts-head {
+  max-inline-size: 36rem;
 }
 
-/* Each figure draws the rule on its start and top edges; the list is
-   pulled out by one rule and clips the rules of the first row and column. */
-.docs-fact-list {
+@media (width >= 80rem) {
+  .docs-facts-grid {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    column-gap: clamp(2.5rem, 4vw, 4rem);
+  }
+}
+
+.docs-facts-stage {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  position: relative;
+  gap: var(--cirth-space-4);
+  min-inline-size: 0;
+}
+
+/* The file, as the label band of a listing (the hero's .docs-pane-label),
+   as wide as its name. */
+.docs-facts-file {
+  display: flex;
+  position: relative;
+  z-index: 2;
+  justify-self: start;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cirth-space-6);
+  max-inline-size: 100%;
+  min-block-size: 2.5rem;
   margin: 0;
-  overflow: clip;
-}
-
-@media (width >= 30rem) {
-  .docs-fact-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (width >= 64rem) {
-  .docs-glance-grid {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    column-gap: clamp(2.5rem, 5vw, 4.5rem);
-  }
-}
-
-.docs-fact-list > div {
-  display: grid;
-  align-content: start;
-  gap: var(--cirth-space-2);
-  margin: calc(var(--cirth-border-width) * -1) 0 0 calc(var(--cirth-border-width) * -1);
-  padding: clamp(var(--cirth-space-5), 3vw, var(--cirth-space-8));
-  border-block-start: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-  border-inline-start: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-}
-
-.docs-fact-list dt {
+  padding: var(--cirth-space-2) var(--cirth-space-4);
+  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-card-border-radius);
+  background: var(--cirth-card-sectioning-background-color);
   color: var(--cirth-muted-color);
   font-size: var(--cirth-meta-font-size);
+  font-weight: var(--cirth-font-weight-medium);
 }
 
-.docs-fact-list dd {
-  display: grid;
-  gap: var(--cirth-space-2);
-}
-
-.docs-fact-list strong {
+.docs-facts-file code {
+  padding: 0;
+  background: none;
   color: var(--cirth-ink-strong);
-  font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.5rem);
+  font-size: inherit;
+}
+
+/* Three in a row where each keeps 14rem, two and one below that, one per
+   row on a phone. */
+.docs-facts-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--cirth-space-4);
+}
+
+/* Cards in a row share a height, and each one's link sits at its foot. A
+   card's own flow margin would push the second and third down a row. */
+.docs-fact {
+  --cirth-card-background-color: oklch(from var(--cirth-surface-raised) l c h / 22%);
+  --cirth-card-box-shadow: none;
+
+  display: flex;
+  flex-direction: column;
+  container-type: inline-size;
+  margin: 0;
+}
+
+.docs-fact dl {
+  display: grid;
+  flex: 1;
+  grid-template-rows: auto 1fr;
+  margin: 0;
+}
+
+.docs-fact dt {
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-meta-font-size);
+  font-weight: var(--cirth-font-weight-medium);
+}
+
+.docs-fact dd {
+  display: grid;
+  grid-template-rows: auto auto auto 1fr;
+  grid-template-areas: "value" "visual" "note" "link";
+  gap: var(--cirth-space-2);
+  margin: var(--cirth-space-2) 0 0;
+}
+
+/* Sized by the card, so the longest value keeps to one line. */
+.docs-fact-value {
+  grid-area: value;
+  color: var(--cirth-ink-strong);
+  font-size: clamp(1.5rem, 13cqi, 2.375rem);
   font-weight: var(--cirth-heading-font-weight);
   line-height: var(--cirth-line-height-tight);
   font-variant-numeric: tabular-nums;
 }
 
-.docs-fact-list a {
+.docs-fact dd > p {
+  grid-area: note;
+  margin: 0;
+  color: var(--cirth-secondary-text);
+  font-size: var(--cirth-font-size-sm);
+}
+
+.docs-fact dd > a {
+  grid-area: link;
+  align-self: end;
   justify-self: start;
   font-size: var(--cirth-font-size-sm);
+}
+
+/* One picture per card, of Cirth's own elements, which it only places: a
+   struck-out <script>, the gzip bar, the three checks. */
+.docs-fact-visual {
+  display: grid;
+  grid-area: visual;
+  align-content: start;
+  justify-items: start;
+  gap: var(--cirth-space-1);
+  min-inline-size: 0;
+  min-block-size: 2.75rem;
+}
+
+.docs-fact-visual > progress {
+  margin: 0;
+}
+
+.docs-fact-visual small {
+  color: var(--cirth-muted-color);
+}
+
+.docs-fact-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cirth-space-1) var(--cirth-space-3);
+}
+
+/* Held: 273svh of scroll for a sticky frame (the four-card version's 280,
+   less the fourth card's stretch). The thresholds that drive it are
+   factsAt in the controller. */
+.docs-home[data-stage="held"] > .docs-facts-section {
+  block-size: 273svh;
+  padding-block: 0;
+}
+
+.docs-home[data-stage="held"] .docs-facts-scene {
+  display: grid;
+  position: sticky;
+  inset-block-start: var(--docs-header);
+  block-size: calc(100svh - var(--docs-header));
+  align-content: center;
+}
+
+/* The file starts on the row's centre, larger, and settles above it. */
+.docs-home[data-stage="held"] .docs-facts-file {
+  translate: calc(var(--docs-dx, 0px) * (1 - var(--docs-dock, 1))) calc(var(--docs-dy, 0px) * (1 - var(--docs-dock, 1)));
+  scale: calc(1 + (1 - var(--docs-dock, 1)) * 0.5);
+}
+
+/* A card comes out from behind the file almost half way towards its
+   place, fanned, smaller and still blank, then travels the rest,
+   straightens and shows what it says. */
+.docs-home[data-stage="held"] .docs-fact {
+  --docs-way: calc(1 - var(--docs-emerge, 1) * 0.45 - var(--docs-spread, 1) * 0.55);
+
+  translate: calc(var(--docs-dx, 0px) * var(--docs-way)) calc(var(--docs-dy, 0px) * var(--docs-way));
+  rotate: calc(var(--docs-fan) * var(--docs-emerge, 1) * (1 - var(--docs-spread, 1)));
+  scale: calc(0.55 + var(--docs-emerge, 1) * 0.2 + var(--docs-spread, 1) * 0.25);
+  opacity: var(--docs-emerge, 1);
+}
+
+.docs-home[data-stage="held"] .docs-fact > dl {
+  opacity: calc(0.12 + var(--docs-spread, 1) * 0.88);
+}
+
+.docs-home[data-stage="held"] .docs-fact:nth-child(1) { --docs-fan: -6deg; }
+.docs-home[data-stage="held"] .docs-fact:nth-child(2) { --docs-fan: 5deg; }
+.docs-home[data-stage="held"] .docs-fact:nth-child(3) { --docs-fan: -3deg; }
+
+/* The pictures finish last; the size card's bar is moved by the
+   controller, from the minified length to gzip's share. */
+.docs-home[data-stage="held"] .docs-fact-visual > :not(progress) {
+  opacity: var(--docs-detail, 1);
+  translate: 0 calc((1 - var(--docs-detail, 1)) * 0.5rem);
+}
+
+/* A focused link in a card is never left moving or faded. */
+.docs-home[data-stage="held"] .docs-fact:focus-within {
+  translate: none;
+  rotate: none;
+  scale: none;
+  opacity: 1;
+}
+
+.docs-home[data-stage="held"] .docs-fact:focus-within > dl {
+  opacity: 1;
 }
 
 
@@ -1300,8 +1448,8 @@
    at least one window tall below the header, content centred. Last, so
    this padding wins. */
 @media screen and (width >= 64rem) and (height >= 38rem) {
-  .docs-home > :is(.docs-hero, .docs-glance, .docs-presets, .docs-agnostic, .docs-pure),
-  .docs-home:not([data-stage="held"]) > :is(.docs-bench, .docs-theme) {
+  .docs-home > :is(.docs-hero, .docs-presets, .docs-agnostic, .docs-pure),
+  .docs-home:not([data-stage="held"]) > :is(.docs-facts-section, .docs-bench, .docs-theme) {
     display: grid;
     align-content: center;
     min-block-size: calc(100svh - var(--docs-header));
@@ -1313,7 +1461,7 @@
    crossed the bottom of the window (--docs-arrive), reversibly. */
 @media screen and (prefers-reduced-motion: no-preference) {
   .docs-home[data-motion="scroll"]:not([data-stage="held"]) [data-reveal],
-  .docs-home[data-motion="scroll"][data-stage="held"] > :not(.docs-story, .docs-bench, .docs-theme) [data-reveal] {
+  .docs-home[data-motion="scroll"][data-stage="held"] > :not(.docs-facts-section, .docs-story, .docs-bench, .docs-theme) [data-reveal] {
     opacity: var(--docs-arrive, 1);
     translate: 0 calc((1 - var(--docs-arrive, 1)) * 0.75rem);
   }

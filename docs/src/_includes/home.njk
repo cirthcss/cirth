@@ -174,32 +174,68 @@ bodyClass: docs-home-page
 		</div>
 	</section>
 
-	{#- Each figure links to where it is measured or audited; the size is
-	    read off this build (proof.size in eleventy.config.js). -#}
-	<section class="docs-glance" aria-labelledby="glance-title" data-aurora="glance">
-		<div class="docs-home-inner docs-glance-grid">
-			<header class="docs-glance-head" data-reveal>
-				<h2 id="glance-title">Measured, not promised.</h2>
-				<p>Cirth is a stylesheet and nothing else: no runtime, no build step, no components to mount. Each figure here follows from that, and each one links to how it is checked.</p>
-			</header>
-			<dl class="docs-fact-list">
-				<div data-reveal>
-					<dt>JavaScript runtime</dt>
-					<dd><strong>0 B</strong> <a href="/why-cirth#pure-css-nothing-to-run">Nothing to run</a></dd>
+	{#- Three facts of three kinds about one file: what it runs, what it
+	    weighs, and the accessibility floor it is audited against. Each is a
+	    Cirth card in one order: a label, the value, one small picture made of
+	    an element Cirth draws and hidden from assistive technology, a line
+	    of explanation, and the link. Held, the controller brings the cards
+	    out from behind the file one after another and lays them in a row.
+	    The size comes off this build (proof.size). -#}
+	<section class="docs-facts-section" aria-labelledby="facts-title" data-docs-facts data-aurora="facts">
+		<div class="docs-facts-scene">
+			<div class="docs-home-inner docs-facts-grid">
+				<header class="docs-facts-head" data-reveal>
+					<h2 id="facts-title">One stylesheet. Three facts.</h2>
+					<p>Cirth ships compiled CSS with no JavaScript runtime. Its default build is measured in CI, and its accessibility baseline is audited and documented.</p>
+				</header>
+				<div class="docs-facts-stage">
+					<p class="docs-facts-file" aria-hidden="true" data-docs-facts-file data-reveal><code>dist/cirth.min.css</code><span>@cirthcss/cirth</span></p>
+					<div class="docs-facts-list">
+						<article class="docs-fact" data-docs-fact="runtime" data-reveal>
+							<dl>
+								<dt>JavaScript runtime</dt>
+								<dd>
+									<strong class="docs-fact-value">0 B</strong>
+									<div class="docs-fact-visual" aria-hidden="true">
+										<del><code>&lt;script&gt;</code></del>
+									</div>
+									<p>No runtime, initialization or client-side bundle.</p>
+									<a href="/why-cirth#pure-css-nothing-to-run">Nothing to run</a>
+								</dd>
+							</dl>
+						</article>
+						<article class="docs-fact" data-docs-fact="size" data-reveal data-reveal-delay="0.15">
+							<dl>
+								<dt>Default CSS, gzipped</dt>
+								<dd>
+									<strong class="docs-fact-value">{{ proof.size.label if proof.size else "About 15 KB" }}</strong>
+									{%- if proof.size %}
+									<div class="docs-fact-visual" aria-hidden="true">
+										<progress value="{{ proof.size.bytes }}" max="{{ proof.size.minifiedBytes }}" data-docs-fact-progress></progress>
+										<small>{{ proof.size.label }} of {{ proof.size.minified }} minified</small>
+									</div>
+									{%- endif %}
+									<p>Generated and measured on every build.</p>
+									<a href="/about#size-and-what-it-is-a-budget-for">See the size budget</a>
+								</dd>
+							</dl>
+						</article>
+						<article class="docs-fact" data-docs-fact="access" data-reveal data-reveal-delay="0.3">
+							<dl>
+								<dt>Accessibility baseline</dt>
+								<dd>
+									<strong class="docs-fact-value">WCAG 2.2 AA</strong>
+									<div class="docs-fact-visual" aria-hidden="true">
+										<small class="docs-fact-checks"><span>✓ Contrast</span> <span>✓ Focus</span> <span>✓ Targets</span></small>
+									</div>
+									<p>Audited rules, tested states and documented limits.</p>
+									<a href="/guides/accessibility#the-baseline">See the accessibility audit</a>
+								</dd>
+							</dl>
+						</article>
+					</div>
 				</div>
-				<div data-reveal data-reveal-delay="0.15">
-					<dt>Default build, gzipped</dt>
-					<dd><strong>{{ proof.size.label if proof.size else "About 15 KB" }}</strong> <a href="/about#size-and-what-it-is-a-budget-for">Measured on every build</a></dd>
-				</div>
-				<div data-reveal data-reveal-delay="0.3">
-					<dt>Accessibility baseline</dt>
-					<dd><strong>WCAG 2.2 AA</strong> <a href="/guides/accessibility#the-baseline">How it is audited</a></dd>
-				</div>
-				<div data-reveal data-reveal-delay="0.45">
-					<dt>Stacks</dt>
-					<dd><strong>Any</strong> <a href="/installation#guides">{{ frameworks.guides.length }} checked guides</a></dd>
-				</div>
-			</dl>
+			</div>
 		</div>
 	</section>
 
@@ -454,6 +490,78 @@ bodyClass: docs-home-page
 			if (element.dataset[name] !== value) element.dataset[name] = value;
 		};
 
+		// Facts. Shares of its scroll, kept from the four-card version with
+		// the fourth card's stretch taken out: the three cards come out from
+		// behind the file one after another (emerge), fanned round it; the
+		// file then settles above them as they open into a row (spread);
+		// each card's picture finishes last (detail). Every transform starts
+		// from the place the layout gave the part, so the page never reflows.
+		const facts = home.querySelector("[data-docs-facts]");
+		const factsFile = facts?.querySelector("[data-docs-facts-file]");
+		const factsList = facts?.querySelector(".docs-facts-list");
+		const factCards = [...(facts?.querySelectorAll("[data-docs-fact]") ?? [])];
+		const factsProgress = facts?.querySelector("[data-docs-fact-progress]");
+		// Read once: setting the bar's value rewrites its attribute.
+		const factsShare = factsProgress instanceof HTMLProgressElement ? factsProgress.value : 0;
+		const factsAt = { emerge: [0.042, 0.313], spread: [0.333, 0.729], dock: [0.313, 0.646], detail: [0.625, 0.896], stagger: 0.052 };
+		const factVars = ["--docs-emerge", "--docs-spread", "--docs-detail", "--docs-dx", "--docs-dy"];
+		let factsMeasured = false;
+
+		// The vector from each card's centre, and from the file's, to the
+		// row's centre, in layout pixels. offsetLeft and offsetTop ignore
+		// transforms, so measuring mid-animation reads the layout, not the
+		// frame.
+		const measureFacts = () => {
+			if (!(factsList instanceof HTMLElement) || !(factsFile instanceof HTMLElement)) return;
+			const centre = (element) => {
+				let x = element.offsetWidth / 2;
+				let y = element.offsetHeight / 2;
+				for (let node = element; node && node !== facts; node = node.offsetParent) {
+					x += node.offsetLeft;
+					y += node.offsetTop;
+				}
+				return { x, y };
+			};
+			const target = centre(factsList);
+			for (const element of [factsFile, ...factCards]) {
+				const from = centre(element);
+				element.style.setProperty("--docs-dx", `${(target.x - from.x).toFixed(1)}px`);
+				element.style.setProperty("--docs-dy", `${(target.y - from.y).toFixed(1)}px`);
+			}
+			factsMeasured = true;
+		};
+
+		const updateFacts = (held) => {
+			if (!(facts instanceof HTMLElement)) return;
+			if (!held) {
+				for (const element of [factsFile, ...factCards]) if (element instanceof HTMLElement) clearVars(element, [...factVars, "--docs-dock"]);
+				// The bar shows the real share again: gzip's of the minified file.
+				if (factsProgress instanceof HTMLProgressElement) factsProgress.value = factsShare;
+				factsMeasured = false;
+				delete facts.dataset.progress;
+				return;
+			}
+			if (!factsMeasured) measureFacts();
+			const p = getProgress(facts);
+			if (factsFile instanceof HTMLElement) setVars(factsFile, { "--docs-dock": smoothstep(p, factsAt.dock) });
+			factCards.forEach((card, index) => {
+				const shift = index * factsAt.stagger;
+				const at = ([from, to]) => [from + shift, to + shift];
+				const detail = smoothstep(p, at(factsAt.detail));
+				setVars(card, {
+					"--docs-emerge": smoothstep(p, at(factsAt.emerge)),
+					"--docs-spread": smoothstep(p, [factsAt.spread[0] + shift * 0.6, factsAt.spread[1] + shift * 0.6]),
+					"--docs-detail": detail,
+				});
+				// The size card's bar starts at the minified length and gzip
+				// brings it down to its real share, the value in the markup.
+				if (factsProgress instanceof HTMLProgressElement && card.contains(factsProgress)) {
+					factsProgress.value = factsProgress.max - (factsProgress.max - factsShare) * detail;
+				}
+			});
+			facts.dataset.progress = p.toFixed(3);
+		};
+
 		// Story. Shares of its scroll: the listing is typed until 30%; the
 		// browser's rendering comes in at 38-44% and leaves at 62-67%, crossing
 		// Cirth's, which comes in at 64.5-70%. A step is reached when its
@@ -629,11 +737,6 @@ bodyClass: docs-home-page
 				cool: { x: 56, y: 76, scale: 1, opacity: 1, hue: -100 },
 				gold: goldHidden,
 			},
-			glance: {
-				warm: { x: 62, y: 74, scale: 0.95, opacity: 0.75, hue: 10 },
-				cool: { x: 26, y: 30, scale: 1, opacity: 0.8, hue: -90 },
-				gold: goldHidden,
-			},
 			story: {
 				warm: { x: 86, y: 30, scale: 0.8, opacity: 0.6, hue: 0 },
 				cool: { x: 20, y: 82, scale: 0.9, opacity: 0.7, hue: -100 },
@@ -665,6 +768,24 @@ bodyClass: docs-home-page
 				gold: goldHidden,
 			},
 		};
+		// The facts gather the glows behind their cards and file, and keep them
+		// off the heading and its paragraph: to the right of the column beside
+		// them on a wide screen, under the cards on a narrow one. Softer than
+		// the other sections, and still from the same three glows.
+		const factsGlows = {
+			wide: {
+				warm: { x: 76, y: 62, scale: 0.62, opacity: 0.55, hue: 10 },
+				cool: { x: 86, y: 40, scale: 0.55, opacity: 0.5, hue: -90 },
+				gold: goldHidden,
+			},
+			narrow: {
+				warm: { x: 58, y: 78, scale: 0.6, opacity: 0.5, hue: 10 },
+				cool: { x: 36, y: 92, scale: 0.55, opacity: 0.45, hue: -90 },
+				gold: goldHidden,
+			},
+		};
+		const columns = matchMedia("(width >= 80rem)");
+		const arrangementOf = (name) => (name === "facts" ? factsGlows[columns.matches ? "wide" : "narrow"] : arrangements[name]);
 		const auroraSections = [...home.querySelectorAll("[data-aurora]")];
 
 		const updateAurora = (moving) => {
@@ -677,7 +798,7 @@ bodyClass: docs-home-page
 			let to = from;
 			for (const section of auroraSections) {
 				const box = section.getBoundingClientRect();
-				const anchor = { at: box.top + scrollY + box.height / 2, arrangement: arrangements[section.dataset.aurora] };
+				const anchor = { at: box.top + scrollY + box.height / 2, arrangement: arrangementOf(section.dataset.aurora) };
 				if (anchor.at > middle) {
 					to = anchor;
 					break;
@@ -699,7 +820,7 @@ bodyClass: docs-home-page
 		const reveals = [...home.querySelectorAll("[data-reveal]")].map((element) => ({
 			element,
 			delay: Number(element.dataset.revealDelay ?? 0),
-			inHeld: element.closest("[data-docs-story], [data-docs-bench], [data-docs-theme]") !== null,
+			inHeld: element.closest("[data-docs-facts], [data-docs-story], [data-docs-bench], [data-docs-theme]") !== null,
 		}));
 
 		const updateReveals = (moving, held) => {
@@ -732,6 +853,7 @@ bodyClass: docs-home-page
 			home.toggleAttribute("data-animating", settling);
 			updateAurora(moving);
 			updateReveals(moving, held);
+			updateFacts(held);
 			updateStory(held);
 			updateBench(held);
 			updateTheme(held);
@@ -745,6 +867,8 @@ bodyClass: docs-home-page
 		};
 		const landNext = () => {
 			land = true;
+			// A new window size moves the grid; measure it again.
+			factsMeasured = false;
 			queue();
 		};
 		addEventListener("scroll", queue, { passive: true });

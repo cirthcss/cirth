@@ -26,6 +26,15 @@
 // Every record names its owner, the policy read and the day it was read,
 // which is what the Brand page lists.
 //
+// Some records are a decision the maintainers took instead (`nominative`):
+// the logo identifies the guide for that project, as a nominative
+// reference, where the owner's policy asks to be asked first or allows
+// nominative use on conditions the record states. Such a
+// record keeps what the policy asks, where and when the file was taken,
+// and states that the use implies no affiliation and that the logo comes
+// down if its owner asks. It never rests on the project's open source
+// licence, which covers code and not trademarks.
+//
 // Where a project publishes a separate file for dark backgrounds, `dark`
 // names it. A file drawn only for light backgrounds, with no official
 // variant for dark ones, sits on a neutral light ground in the dark scheme
@@ -33,9 +42,11 @@
 //
 // Wherever a mark is a link, it leads to the project's official site
 // (`officialUrl`), named as such, and the guide is a separate link beside
-// it: the Django Software Foundation asks that its logo link to
-// djangoproject.com, and the OpenJS Foundation allows a project logo only
-// as a link to that project's home page.
+// it, or to the address the owner names for its logo (`linkTo`): JetBrains
+// asks that its product logos link to www.jetbrains.com. On the
+// Installation page a mark is a decorative picture inside its card, which
+// is one link to the guide; the guide's own card is where the mark leads to
+// the project.
 
 const fs = require("node:fs");
 const path = require("node:path");
@@ -88,15 +99,30 @@ const aspect = (file) => {
  * @property {string} [retrieved] When the file was downloaded, if not on the first date above.
  * @property {string} [permission] What the policy asks permission for, where it says.
  * @property {string} [textOnly] Why the project is named by text alone.
+ * @property {string} [nominative] Why the logo is shown although the policy
+ *   asks to be asked: the maintainers' decision, as the Brand page states it.
+ * @property {string} [linkTo] Where the logo links, if not the project's site.
+ * @property {{ text: string, url: string }[]} [alsoRead] Other policies the
+ *   decision rests on.
  * @property {string} [note]
- * @property {string} [attribution] A notice the terms require.
+ * @property {string} [trademarkNotice] The notice the owner's terms ask for,
+ *   printed on the guide's page, after its verification note.
  */
 
 const openJs = {
 	terms: "OpenJS Foundation trademark policy",
 	termsUrl: "https://trademark-policy.openjsf.org/",
-	permission: "Written permission for any use of a project logo other than as a link to the project's home page, which is the only way it is used here.",
+	permission: "Written permission for any use of a project logo other than as a link to the project's home page.",
 };
+
+// What a record whose owner asks for its logo to be a link to the project
+// states: where that holds here, and where the maintainers decided it does
+// not.
+const inCard =
+	"On the guide's page the logo is that link; on the Installation page it is a decorative picture inside the card, which links to the guide, by the maintainers' decision.";
+
+// What every nominative record states after its own reason.
+const removal = "Cirth is not affiliated with or endorsed by the owner, and the logo comes down if the owner asks.";
 
 /** @type {Record<string, Mark>} */
 const marks = {
@@ -152,27 +178,21 @@ const marks = {
 		retrieved: "2026-10-02",
 		note: "The logo pair from the brand page, light and dark. The guidelines rule out any suggestion of endorsement, and there is none.",
 	},
-	remix: {
-		name: "Remix",
-		file: "remix.svg",
-		dark: "remix-dark.svg",
-		owner: "Shopify Inc.",
-		source: "https://github.com/remix-run/remix-website/tree/25aea9ce95bd/public/_brand",
-		terms: "Remix brand guidelines",
-		permission: "Written consent for merchandise only.",
-		termsUrl: "https://remix.run/brand",
-		retrieved: "2026-10-02",
-		note: "The light-mode and dark-mode logos from the brand page, each on the background it is drawn for.",
-	},
+
 	nextjs: {
 		name: "Next.js",
+		file: "nextjs.svg",
+		dark: "nextjs-dark.svg",
+		wide: true,
 		owner: "Vercel, Inc.",
+		source: "https://vercel.com/geist/brands",
+		retrieved: "2026-10-08",
 		terms: "Vercel brand guidelines",
 		termsUrl: "https://vercel.com/geist/brands",
 		permission: "Prior written permission for any use of Vercel marks other than describing Vercel's own products or saying one uses them, including uses in connection with software that uses its open source code.",
-		textOnly: "Vercel's guidelines ask for prior written permission before its marks are used in connection with software that uses its open source code, which is what an integration guide is, and none has been given. The guide is named by text alone.",
-		attribution:
-			"Vercel, the Vercel design, Next.js and related marks, designs and logos are trademarks or registered trademarks of Vercel, Inc.",
+		nominative: `The Next.js logotype, black on light pages and white on dark ones, exactly as Vercel's brand page publishes it (nextjs-logotype-black.svg and nextjs-logotype-white.svg). It is shown only to identify the guide for Next.js, as a nominative reference, with Vercel's notice; Next.js's open source licence covers its code, not its marks, and is not what this use rests on. ${removal}`,
+		trademarkNotice:
+			"Vercel, the Vercel design, Next.js and related marks, designs and logos are trademarks or registered trademarks of Vercel, Inc. or its affiliates in the US and other countries.",
 	},
 	vue: {
 		name: "Vue",
@@ -248,7 +268,7 @@ const marks = {
 		source: "https://github.com/lit/lit.dev/blob/697feba856f5/packages/lit-dev-content/site/images/flame.svg",
 		...openJs,
 		retrieved: "2026-10-02",
-		note: "The flame lit.dev serves. Lit is an OpenJS Foundation project, and the foundation's policy allows a project logo as a link to the project's home page, which is the only way it is used here.",
+		note: `The flame lit.dev serves. Lit is an OpenJS Foundation project, and the foundation's policy allows a project logo as a link to the project's home page. ${inCard}`,
 	},
 	angular: {
 		name: "Angular",
@@ -272,7 +292,7 @@ const marks = {
 		termsUrl: "https://emberjs.com/logos/",
 		retrieved: "2026-10-02",
 		note: "The four-colour logo on light and the white one-colour logo on dark, the pairing the guidelines give, each with its registration mark.",
-		attribution:
+		trademarkNotice:
 			"Ember is a trademark of Tilde Inc. This site is unaffiliated with the Ember project.",
 	},
 	vike: {
@@ -364,8 +384,8 @@ const marks = {
 		permission: "Approval for merchandise and for the name DjangoCon only.",
 		termsUrl: "https://www.djangoproject.com/trademarks/",
 		retrieved: "2026-10-01",
-		note: "The positive logo on light and the negative logo, white on its own green, on dark: both official files, in the official colours. The DSF asks a site that shows the logo to link it to djangoproject.com, and wherever it is a link here, it leads there.",
-	},
+		note: `The positive logo on light and the negative logo, white on its own green, on dark: both official files, in the official colours. The DSF asks that the logo act as a hyperlink to djangoproject.com wherever technically possible. ${inCard}`,
+		},
 	flask: {
 		name: "Flask",
 		file: "flask.svg",
@@ -394,7 +414,19 @@ const marks = {
 		terms: ".NET brand repository",
 		termsUrl: "https://github.com/dotnet/brand",
 		retrieved: "2026-10-02",
-		note: "The repository allows the logo to represent .NET in related content. ASP.NET Core and Blazor are part of .NET and have no logo of their own here, so both guides carry it.",
+		note: "The repository allows the logo to represent .NET in related content. ASP.NET Core is part of .NET and has no logo of its own, so its guide carries it.",
+	},
+	blazor: {
+		name: "Blazor",
+		file: "blazor.png",
+		owner: "Microsoft Corporation",
+		source:
+			"https://github.com/dotnet/aspnetcore/blob/a4248d87c324/src/ProjectTemplates/Web.ProjectTemplates/content/ComponentsWebAssembly-CSharp/wwwroot/icon-512.png",
+		retrieved: "2026-10-09",
+		terms: "Microsoft Trademark and Brand Guidelines",
+		termsUrl: "https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks",
+		permission: "An express licence for any use of a Microsoft logo or product icon; the guidelines allow the names, not the logos, to describe a product truthfully.",
+		nominative: `The Blazor logo exactly as Microsoft ships it in its own Blazor WebAssembly project template (icon-512.png, the purple flame round an @, on its own white square), unmodified, in place of the .NET logo. It is shown only to identify the guide for Blazor, as a nominative reference; the template's open source licence covers its code, not the logo. ${removal}`,
 	},
 	express: {
 		name: "Express",
@@ -405,7 +437,7 @@ const marks = {
 		source: "https://github.com/expressjs/expressjs.com/tree/c936b6310349/public/images/logos",
 		...openJs,
 		retrieved: "2026-10-02",
-		note: "The black and white logos from the expressjs.com repository. The OpenJS Foundation's policy allows a project logo as a link to the project's home page, which is the only way it is used here.",
+		note: `The black and white logos from the expressjs.com repository. The OpenJS Foundation's policy allows a project logo as a link to the project's home page. ${inCard}`,
 	},
 	elysia: {
 		name: "Elysia",
@@ -459,8 +491,8 @@ const marks = {
 		source: "https://github.com/electron/website/blob/e29b95b3c844/static/assets/img/logo.svg",
 		...openJs,
 		retrieved: "2026-10-02",
-		note: "The logo electronjs.org serves. The OpenJS Foundation's policy allows a project logo as a link to the project's home page, which is the only way it is used here.",
-		attribution: "Electron® is a registered trademark of the OpenJS Foundation.",
+		note: `The logo electronjs.org serves. The OpenJS Foundation's policy allows a project logo as a link to the project's home page. ${inCard}`,
+		trademarkNotice: "Electron® is a registered trademark of the OpenJS Foundation.",
 	},
 	yew: {
 		name: "Yew",
@@ -486,11 +518,15 @@ const marks = {
 	},
 	stimulus: {
 		name: "Stimulus",
+		file: "stimulus.svg",
+		ground: "light",
 		owner: "37signals, LLC",
+		source: "https://github.com/hotwired/stimulus/blob/4145d2672562/assets/logo.svg",
+		retrieved: "2026-10-08",
 		terms: "37signals Terms of Service",
 		termsUrl: "https://37signals.com/policies/terms",
 		permission: "Permission to use the company's logos, or any of its services' logos, for promotional purposes.",
-		textOnly: "37signals, which makes Stimulus, asks to be asked before its logos are used for promotional purposes, and a list of the stacks Cirth works with is close enough to that to leave the use ambiguous. The official symbol (hotwired/stimulus, assets/logo.svg) is not shown until permission is given; the guide is named by text alone.",
+		nominative: `The symbol from the hotwired/stimulus repository, unmodified. The file names no colour and draws black, and Stimulus publishes no variant for dark backgrounds, so in the dark scheme it sits on a light ground instead of being recoloured. It is shown only to identify the guide for Stimulus, as a nominative reference, and not to promote Cirth. ${removal}`,
 	},
 	livewire: {
 		name: "Livewire",
@@ -510,6 +546,26 @@ const marks = {
 		termsUrl: "https://symfony.com/trademark",
 		permission: "Written authorisation for any use of the logos.",
 		textOnly: "The Symfony trademark and logo policy asks for written authorisation for any use of its logos, and none has been given, so the guide is named by text alone.",
+		trademarkNotice: "Symfony™ is a trademark of Symfony SAS. Cirth is not affiliated with or endorsed by Symfony SAS or the Symfony project.",
+	},
+	fastapi: {
+		name: "FastAPI",
+		file: "fastapi.svg",
+		wide: true,
+		owner: "Sebastián Ramírez",
+		source: "https://github.com/fastapi/fastapi/blob/f5c6e9b4f9ca/docs/en/docs/img/logo-teal-vector.svg",
+		retrieved: "2026-10-09",
+		terms: "No logo policy published (MIT licence covers the code)",
+		termsUrl: "https://github.com/fastapi/fastapi/blob/master/LICENSE",
+		note: "The teal logo from FastAPI's own documentation sources, the version with its lettering drawn as outlines, unmodified; the same file serves both schemes. The project states that the FastAPI trademark is registered and owned by its author, and publishes no rule that limits the logo's use.",
+	},
+	go: {
+		name: "Go",
+		owner: "Google LLC",
+		terms: "Go brand and trademark usage guidelines",
+		termsUrl: "https://go.dev/brand",
+		permission: "Permission for any use of the Go logo; nominative use covers the word mark in plain text only.",
+		textOnly: "The Go trademark guidelines allow the name Go in plain text to identify the language, and ask for permission before the Go logo is used. The guide is named by text alone.",
 	},
 	eleventy: {
 		name: "Eleventy",
@@ -533,15 +589,143 @@ const marks = {
 		permission: "None: the logo may be used if it is kept intact and not used commercially. This documentation is free and sells nothing.",
 		note: "The colour logo on light pages and the inverted one on dark pages, both from the logos folder of the brand repository.",
 	},
+	codeigniter: {
+		name: "CodeIgniter",
+		file: "codeigniter.png",
+		ground: "light",
+		owner: "CodeIgniter Foundation",
+		source: "https://codeigniter.com/data/ci-logo.zip",
+		retrieved: "2026-10-08",
+		terms: "CodeIgniter trademark guidelines (The Fine Print)",
+		termsUrl: "https://codeigniter.com/the-fine-print",
+		permission: "None for the logo files the Foundation supplies, with a legend and a disclaimer on every page that uses the mark.",
+		note: "CIlogo-200x200.png from the logo kit the Foundation supplies for projects to use, unmodified. Its flame is partly transparent and drawn for light backgrounds, so in the dark scheme it sits on a light ground.",
+		trademarkNotice:
+			"CodeIgniter® is a registered trademark of the CodeIgniter Foundation. The CodeIgniter mark is owned and may be registered by the CodeIgniter Foundation. Cirth is an independent CSS framework and has not been authorized, sponsored, or otherwise approved by the CodeIgniter Foundation.",
+	},
+	yii: {
+		name: "Yii",
+		file: "yii.svg",
+		dark: "yii-dark.svg",
+		wide: true,
+		owner: "Yii Software",
+		source: "https://www.yiiframework.com/logo",
+		retrieved: "2026-10-08",
+		terms: "CC BY-ND 3.0",
+		termsUrl: "https://www.yiiframework.com/logo",
+		note: "The Yii 2 logos for light and for dark backgrounds from the project's logo page (yii_logo_light.svg and yii_logo_dark.svg), unmodified, as the no-derivatives licence requires. Yii logo by Yii Software, licensed under CC BY-ND 3.0.",
+	},
+	slim: {
+		name: "Slim",
+		file: "slim.png",
+		dark: "slim-dark.png",
+		owner: "Slim Framework contributors",
+		source: "https://github.com/slimphp/Slim-Website/tree/193ec4f7d0d0/assets/images",
+		retrieved: "2026-10-08",
+		terms: "No logo policy published (MIT licence covers the code)",
+		termsUrl: "https://github.com/slimphp/Slim/blob/4.x/LICENSE.md",
+		note: "The green Slim wordmark from the website's own images, on white for light pages (200x200-Typo-White.png) and on grey for dark ones (200x200-Typo-Grey.png, also the project's GitHub avatar). Slim publishes no rules for its logo.",
+	},
+	quarkus: {
+		name: "Quarkus",
+		file: "quarkus.svg",
+		dark: "quarkus-dark.svg",
+		wide: true,
+		owner: "Commonhaus Foundation",
+		source: "https://github.com/commonhaus/artwork/tree/6c22d7843888/projects/quarkus/logo",
+		retrieved: "2026-10-08",
+		terms: "Commonhaus Foundation trademark policy",
+		termsUrl: "https://www.commonhaus.org/policies/trademark-policy/",
+		permission: "None on a website with its own branding, where the site's name is the more prominent, the logo links to the project's site and the page says it is not affiliated with or endorsed by the Foundation.",
+			note: `The horizontal logo, in its default colours on light pages and its reverse colours on dark ones, from the artwork repository quarkus.io/brand links to; unmodified, and never the logotype alone. ${inCard}`,
+		trademarkNotice: "Quarkus is a Commonhaus Foundation project. Cirth is not affiliated with or endorsed by the Commonhaus Foundation.",
+	},
+	// No file: the guidelines reserve the logo. Written permission from
+	// Broadcom would add `file` and `dark`, with `source` and `retrieved`,
+	// and replace `textOnly` with what was granted; every template that
+	// draws a mark would then draw it.
+	spring: {
+		name: "Spring Boot",
+		owner: "Broadcom Inc.",
+		terms: "Spring trademark guidelines",
+		termsUrl: "https://spring.io/trademarks",
+		permission: "Written authorisation for any use of a Spring logo: the guidelines reserve the logos for Broadcom, and nominative use covers the word marks only.",
+		textOnly: "The Spring trademark guidelines allow the name Spring Boot as a nominative reference, but say in so many words that this does not allow the logo, which is reserved for Broadcom. The guide is named by text alone, with no leaf, no lookalike icon and no wordmark set in another typeface.",
+		trademarkNotice: "Spring and Spring Boot are trademarks of Broadcom Inc. and/or its subsidiaries.",
+	},
+	jakarta: {
+		name: "Jakarta EE",
+		file: "jakarta.svg",
+		dark: "jakarta-dark.svg",
+		wide: true,
+		owner: "Eclipse Foundation AISBL",
+		source: "https://www.eclipse.org/org/artwork/",
+		retrieved: "2026-10-09",
+		terms: "Jakarta EE trademark guidelines",
+		termsUrl: "https://jakarta.ee/legal/trademark_guidelines/",
+		alsoRead: [
+			{ text: "Eclipse Foundation Trademark Usage Policy", url: "https://www.eclipse.org/legal/logo-guidelines/" },
+			{ text: "Eclipse official artwork", url: "https://www.eclipse.org/org/artwork/" },
+		],
+		permission: "None for nominative fair use by the community; the Compatible and Member logos only under their programmes, and none of them is used.",
+		nominative: `The standard Jakarta EE logo from the Eclipse Foundation's artwork pack (jakarta_ee_logo_schooner_color_horizontal_default.svg on light pages, and the reverse file, on its own black field, on dark ones), unmodified. It names the family of specifications the guide for Jakarta Servlet and Jakarta Pages follows, as the guidelines allow by nominative fair use; it is not the Jakarta EE Compatible or Member logo, and claims no certified compatibility. The mark carries its ® at its first prominent use in text. ${removal}`,
+		trademarkNotice: "Jakarta EE is a trademark of Eclipse Foundation AISBL.",
+	},
+	micronaut: {
+		name: "Micronaut",
+		file: "micronaut.svg",
+		dark: "micronaut-dark.svg",
+		wide: true,
+		owner: "Object Computing, Inc., governed by the Commonhaus Foundation",
+		source: "https://micronaut.io/brand-guidelines/micronaut-logos/",
+		retrieved: "2026-10-09",
+		terms: "Micronaut logos and the Commonhaus Foundation trademark policy",
+		termsUrl: "https://micronaut.io/brand-guidelines/micronaut-logos/",
+		alsoRead: [{ text: "Commonhaus Foundation trademark policy", url: "https://www.commonhaus.org/policies/trademark-policy/" }],
+		permission: "None for community users publishing on a medium no commercial user controls, which this free documentation is; a logo on a website links to the project's site, and the page says it is not affiliated.",
+			note: `The horizontal logo, black on light pages and white on dark ones, as the Micronaut logos page offers them, unmodified. ${inCard}`,
+		trademarkNotice: "Micronaut® is a registered trademark of Object Computing, Inc. Cirth is not affiliated with or endorsed by the Micronaut project or the Commonhaus Foundation.",
+	},
+	helidon: {
+		name: "Helidon",
+		owner: "Oracle and/or its affiliates",
+		terms: "Oracle third-party usage guidelines for logos",
+		termsUrl: "https://www.oracle.com/legal/logos.html",
+		permission: "A licence or written authorisation for any use of an Oracle logo or design mark.",
+		alsoRead: [{ text: "Helidon licence (Apache 2.0, which grants no trademark rights)", url: "https://github.com/helidon-io/helidon/blob/main/LICENSE.txt" }],
+		textOnly: "Helidon is an Oracle project and publishes no logo rules of its own; Oracle's guidelines say its logos and design marks are generally not to be used without a licence or written authorisation, and none has been given. The repository's Apache licence covers code, not marks. The guide is named by text alone.",
+	},
+	ktor: {
+		name: "Ktor",
+		file: "ktor.svg",
+		dark: "ktor-dark.svg",
+		wide: true,
+		owner: "JetBrains s.r.o.",
+		source: "https://resources.jetbrains.com/storage/products/company/brand/logos/Ktor.zip",
+		retrieved: "2026-10-09",
+		terms: "JetBrains brand guidelines",
+		termsUrl: "https://www.jetbrains.com/company/brand/",
+		permission: "None to refer to JetBrains products, provided the logo links back to www.jetbrains.com, carries the attribution and does not outweigh the site's own brand.",
+			linkTo: "https://www.jetbrains.com",
+		note: "Ktor.svg and Ktor-white.svg from the Ktor logo package on JetBrains' brand page, unmodified. On the guide's page the logo links to www.jetbrains.com, as the guidelines ask; on the Installation page it is a decorative picture inside the card, which links to the guide, by the maintainers' decision.",
+		trademarkNotice: "Copyright © 2026 JetBrains s.r.o. Ktor and the Ktor logo are trademarks of JetBrains s.r.o.",
+	},
 };
 
 // Every guide sits in one category, the one a reader would look under
-// first. The Installation page and the sidebar group them in this order.
+// first. The Installation page and the sidebar group them in this order,
+// alphabetical inside each.
 const categories = [
 	{ id: "build", text: "Build tools", short: "Build tool" },
 	{ id: "javascript", text: "JavaScript frameworks", short: "JavaScript" },
-	{ id: "html", text: "HTML-first libraries", short: "HTML-first" },
-	{ id: "backend", text: "Backend frameworks", short: "Backend" },
+	{ id: "html", text: "HTML enhancement", short: "HTML enhancement" },
+	{
+		id: "server",
+		text: "Server-rendered apps",
+		short: "Server-rendered",
+		description:
+			"Frameworks and template systems that generate HTML on the server and serve Cirth as a static stylesheet.",
+	},
 	{ id: "cms", text: "Content management", short: "CMS" },
 	{ id: "static", text: "Static site generators", short: "Static sites" },
 	{ id: "rust", text: "WebAssembly and Rust", short: "Rust" },
@@ -879,10 +1063,14 @@ const guides = [
 		officialUrl: "https://reactrouter.com",
 		description: "A routing library and framework for React applications.",
 		github: "https://github.com/remix-run/react-router",
-		summary: "Replace Tailwind in app/app.css and set Vite's CSS target.",
+		summary: "Replace Tailwind in app/app.css and set Vite's CSS target; the same for an app coming from Remix v2.",
+		covers: ["Remix"],
 		docs: [
 			{ text: "React Router: installation", url: "https://reactrouter.com/start/framework/installation" },
 			{ text: "React Router: route module, links", url: "https://reactrouter.com/start/framework/route-module" },
+			{ text: "React Router: picking a mode", url: "https://reactrouter.com/start/modes" },
+			{ text: "React Router: upgrading from Remix", url: "https://reactrouter.com/upgrading/remix" },
+			{ text: "Remix v2 documentation", url: "https://v2.remix.run/docs/" },
 		],
 		toolchain: "Framework mode builds with Vite 8, which rewrites light-dark() unless told the target.",
 		lowers: true,
@@ -892,27 +1080,6 @@ const guides = [
 			date: "2026-10-02",
 			with: "React Router 8.4.0 (`create-react-router`, framework mode) on Vite 8.3.2",
 			result: "The default build lowered all 46 `light-dark()` values; with `build.cssTarget`, all 46 were kept.",
-		},
-	},
-	{
-		id: "remix",
-		name: "Remix",
-		category: "javascript",
-		mark: "remix",
-		officialUrl: "https://remix.run",
-		description: "A full-stack web framework from the team behind React Router.",
-		github: "https://github.com/remix-run/remix",
-		summary: "Serve it from public/ and link it in the document.",
-		docs: [
-			{ text: "Remix: guides", url: "https://remix.run/docs" },
-			{ text: "Remix: assets package", url: "https://github.com/remix-run/remix/tree/main/packages/assets" },
-		],
-		toolchain: "Remix 3's asset server leaves light-dark() alone but loses ten of Cirth's data: icons; served as a static file, Cirth arrives intact.",
-		verified: {
-			status: "verified",
-			date: "2026-10-02",
-			with: "Remix 3.0.0 (`remix new`) on Node 24.18.0",
-			result: "From `public/` through `staticFiles()` the file arrived byte for byte and every icon loaded. Through the asset server, ten repeated `data:` icons became unresolved URLs, which 404 inside a `data-theme=\"dark\"` subtree.",
 		},
 	},
 	{
@@ -1057,7 +1224,7 @@ const guides = [
 			result: "The default build lowered all 46 `light-dark()` values; with `vite.build.cssTarget`, all 46 were kept.",
 		},
 	},
-	// HTML-first libraries
+	// HTML enhancement
 	{
 		id: "htmx",
 		name: "htmx",
@@ -1094,11 +1261,11 @@ const guides = [
 			result: "A controller that set `aria-busy` on a button drew Cirth's busy state.",
 		},
 	},
-	// Backend frameworks: server-rendered ones and HTTP servers alike
+	// Server-rendered apps
 	{
 		id: "adonisjs",
 		name: "AdonisJS",
-		category: "backend",
+		category: "server",
 		mark: "adonisjs",
 		officialUrl: "https://adonisjs.com",
 		description: "A TypeScript framework for web applications and APIs on Node.js.",
@@ -1118,7 +1285,7 @@ const guides = [
 	{
 		id: "aspnet-core",
 		name: "ASP.NET Core",
-		category: "backend",
+		category: "server",
 		mark: "dotnet",
 		officialUrl: "https://dotnet.microsoft.com/apps/aspnet",
 		description: "Microsoft's framework for building web apps and services with .NET.",
@@ -1141,8 +1308,8 @@ const guides = [
 	{
 		id: "blazor",
 		name: "Blazor",
-		category: "backend",
-		mark: "dotnet",
+		category: "server",
+		mark: "blazor",
 		officialUrl: "https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor",
 		description: "A .NET framework for interactive web UI written in C# and Razor.",
 		github: "https://github.com/dotnet/aspnetcore",
@@ -1164,7 +1331,7 @@ const guides = [
 	{
 		id: "django",
 		name: "Django",
-		category: "backend",
+		category: "server",
 		mark: "django",
 		officialUrl: "https://www.djangoproject.com",
 		description: "A Python web framework with an ORM, templates and an admin site.",
@@ -1187,7 +1354,7 @@ const guides = [
 	{
 		id: "flask",
 		name: "Flask",
-		category: "backend",
+		category: "server",
 		mark: "flask",
 		officialUrl: "https://flask.palletsprojects.com",
 		description: "A lightweight Python web framework built on Werkzeug and Jinja.",
@@ -1205,7 +1372,7 @@ const guides = [
 	{
 		id: "laravel",
 		name: "Laravel",
-		category: "backend",
+		category: "server",
 		mark: "laravel",
 		officialUrl: "https://laravel.com",
 		description: "A PHP web framework with routing, an ORM and Blade templates.",
@@ -1225,7 +1392,7 @@ const guides = [
 	{
 		id: "livewire",
 		name: "Livewire",
-		category: "backend",
+		category: "server",
 		mark: "livewire",
 		officialUrl: "https://livewire.laravel.com",
 		description: "A Laravel library for dynamic interfaces written in PHP and Blade.",
@@ -1243,7 +1410,7 @@ const guides = [
 	{
 		id: "phoenix",
 		name: "Phoenix",
-		category: "backend",
+		category: "server",
 		mark: "phoenix",
 		officialUrl: "https://www.phoenixframework.org",
 		description: "An Elixir web framework, with LiveView for server-rendered interactive pages.",
@@ -1263,7 +1430,7 @@ const guides = [
 	{
 		id: "rails",
 		name: "Rails",
-		category: "backend",
+		category: "server",
 		mark: "rails",
 		officialUrl: "https://rubyonrails.org",
 		description: "A Ruby web framework for database-backed applications.",
@@ -1281,29 +1448,9 @@ const guides = [
 		},
 	},
 	{
-		id: "symfony",
-		name: "Symfony",
-		category: "backend",
-		mark: "symfony",
-		officialUrl: "https://symfony.com",
-		description: "A PHP framework and a set of reusable PHP components.",
-		github: "https://github.com/symfony/symfony",
-		summary: "Require it through AssetMapper's importmap and import it in app.js.",
-		docs: [
-			{ text: "Symfony: AssetMapper", url: "https://symfony.com/doc/current/frontend/asset_mapper.html" },
-		],
-		toolchain: "AssetMapper downloads the file from the npm registry's CDN and serves it unchanged under a digest.",
-		verified: {
-			status: "verified",
-			date: "2026-10-02",
-			with: "Symfony 8.1.8 with AssetMapper 8.1.8 on PHP 8.5.8",
-			result: "`importmap:require` fetched the file; `asset-map:compile` wrote a byte-identical digested copy, which the page linked.",
-		},
-	},
-	{
 		id: "elysia",
 		name: "Elysia",
-		category: "backend",
+		category: "server",
 		mark: "elysia",
 		officialUrl: "https://elysiajs.com",
 		description: "A TypeScript web framework built for the Bun runtime.",
@@ -1321,7 +1468,7 @@ const guides = [
 	{
 		id: "express",
 		name: "Express",
-		category: "backend",
+		category: "server",
 		mark: "express",
 		officialUrl: "https://expressjs.com",
 		description: "A minimal web framework for Node.js.",
@@ -1334,6 +1481,271 @@ const guides = [
 			date: "2026-10-02",
 			with: "Express 5.2.1 on Node 24.18.0",
 			result: "The stylesheet was served as text/css and the page rendered with it.",
+		},
+	},
+	{
+		id: "codeigniter",
+		name: "CodeIgniter",
+		category: "server",
+		mark: "codeigniter",
+		officialUrl: "https://codeigniter.com",
+		description: "A PHP framework with a small footprint, built around models, views and controllers.",
+		github: "https://github.com/codeigniter4/CodeIgniter4",
+		summary: "A file in public/css, linked from a view layout with link_tag().",
+		docs: [
+			{ text: "CodeIgniter: application structure", url: "https://codeigniter.com/user_guide/concepts/structure.html" },
+			{ text: "CodeIgniter: HTML helper", url: "https://codeigniter.com/user_guide/helpers/html_helper.html" },
+			{ text: "CodeIgniter: view layouts", url: "https://codeigniter.com/user_guide/outgoing/view_layouts.html" },
+		],
+		toolchain: "CodeIgniter serves public/ as it is; nothing in it processes CSS.",
+		verified: {
+			status: "verified",
+			date: "2026-10-08",
+			with: "CodeIgniter 4.7.4 (`codeigniter4/appstarter`) on PHP 8.5.8",
+			result: "After `composer install --no-dev --optimize-autoloader`, with `CI_ENVIRONMENT = production`, `php spark serve` served the file byte for byte as text/css; `link_tag()` linked it from `app.baseURL`, and a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "yii",
+		name: "Yii",
+		category: "server",
+		mark: "yii",
+		officialUrl: "https://www.yiiframework.com",
+		description: "A PHP framework for web applications, with asset bundles and a code generator.",
+		github: "https://github.com/yiisoft/yii2",
+		summary: "A file in web/css, listed first in AppAsset in place of Bootstrap.",
+		docs: [{ text: "Yii: asset bundles", url: "https://www.yiiframework.com/doc/guide/2.0/en/structure-assets" }],
+		toolchain: "An asset bundle with basePath @webroot links the file where it is; nothing is published or processed.",
+		verified: {
+			status: "verified",
+			date: "2026-10-08",
+			with: "Yii 2.0.55 (`yiisoft/yii2-app-basic`) on PHP 8.5.8",
+			result: "With Bootstrap out of `AppAsset` and a semantic layout, `composer install --no-dev` and `YII_DEBUG` off, the page linked `css/cirth.min.css` and then `css/site.css` and nothing else; the file arrived byte for byte, and a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "slim",
+		name: "Slim",
+		category: "server",
+		mark: "slim",
+		officialUrl: "https://www.slimframework.com",
+		description: "A PHP micro-framework for web applications and APIs, built on PSR-7.",
+		github: "https://github.com/slimphp/Slim",
+		summary: "A file in public/css, linked from a PHP-View layout.",
+		docs: [
+			{ text: "Slim: templates", url: "https://www.slimframework.com/docs/v4/features/templates.html" },
+			{ text: "Slim: PHP-View", url: "https://www.slimframework.com/docs/v4/features/php-view.html" },
+			{ text: "Slim: web servers", url: "https://www.slimframework.com/docs/v4/start/web-servers.html" },
+		],
+		toolchain: "Slim has no asset pipeline; the web server serves public/ as it is.",
+		verified: {
+			status: "verified",
+			date: "2026-10-08",
+			with: "Slim 4.15.3 and PHP-View 3.4.0 (`slim/slim-skeleton`) on PHP 8.5.8",
+			result: "After `composer install --no-dev --optimize-autoloader`, PHP's built-in server with `public/` as its root served the file byte for byte as text/css; the page rendered in standards mode once PHP-DI was on 7, and a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "jakarta-jsp",
+		name: "Jakarta EE + JSP",
+		category: "server",
+		mark: "jakarta",
+		officialUrl: "https://jakarta.ee/specifications/pages/",
+		description: "Jakarta Servlet and Jakarta Server Pages, the Jakarta EE specifications for Java web pages.",
+		github: "https://github.com/jakartaee/pages",
+		summary: "A file in src/main/webapp/assets, linked from a JSP tag file through the context path.",
+		docs: [
+			{
+				text: "Jakarta Server Pages 4.0",
+				url: "https://jakarta.ee/specifications/pages/4.0/jakarta-server-pages-spec-4.0.html",
+			},
+			{ text: "Jakarta Servlet 6.1", url: "https://jakarta.ee/specifications/servlet/6.1/" },
+			{ text: "Apache Tomcat 11: deployment", url: "https://tomcat.apache.org/tomcat-11.0-doc/deployer-howto.html" },
+		],
+		toolchain: "Maven copies src/main/webapp into the WAR as it is, and the container serves it as it is.",
+		verified: {
+			status: "verified",
+			date: "2026-10-08",
+			with: "Apache Tomcat 11.0.26 (Servlet 6.1, Pages 4.0), Maven 3.9.16 and `maven-archetype-webapp` 1.5, on Java 21",
+			result: "`mvn package` built `signup.war` without Node.js or npm; deployed to Tomcat under `/signup`, the JSP linked `/signup/assets/cirth.min.css`, which arrived byte for byte as text/css, and a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "spring-boot",
+		name: "Spring Boot",
+		category: "server",
+		mark: "spring",
+		officialUrl: "https://spring.io/projects/spring-boot",
+		description: "A Java framework for stand-alone, production-grade applications built on Spring.",
+		github: "https://github.com/spring-projects/spring-boot",
+		summary: "A file among the static resources, linked from Thymeleaf in a jar or from JSP in a WAR.",
+		docs: [
+			{ text: "Spring guide: Serving Web Content", url: "https://spring.io/guides/gs/serving-web-content" },
+			{ text: "Spring Boot: servlet web applications", url: "https://docs.spring.io/spring-boot/reference/web/servlet.html" },
+			{
+				text: "Spring Boot: traditional deployment",
+				url: "https://docs.spring.io/spring-boot/how-to/deployment/traditional-deployment.html",
+			},
+		],
+		toolchain: "Spring Boot serves the classpath's static/ folder as it is; Thymeleaf and Jasper render views, not CSS.",
+		verified: {
+			status: "verified",
+			date: "2026-10-08",
+			with: "Spring Boot 4.1.1 (start.spring.io) on Java 21, with Thymeleaf 3.1.5 in an executable jar and with JSP (Jasper 11.0.24) in a WAR",
+			result: "Both ways were built and opened. Thymeleaf: `./mvnw package`, then `java -jar`, served the file byte for byte as text/css from embedded Tomcat 11.0.24. JSP: `./mvnw package` built an executable WAR, which rendered under `java -jar` and deployed to Apache Tomcat 11.0.26 under `/demo`, linking the file through the context path. Each time a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "micronaut",
+		name: "Micronaut",
+		category: "server",
+		mark: "micronaut",
+		officialUrl: "https://micronaut.io",
+		description: "A JVM framework for modular, easily testable services, with compile-time dependency injection.",
+		github: "https://github.com/micronaut-projects/micronaut-core",
+		summary: "A file in the static resources, mapped in application.properties, linked from a Thymeleaf view.",
+		docs: [
+			{
+				text: "Micronaut guide: serving static resources",
+				url: "https://guides.micronaut.io/latest/micronaut-static-resources-maven-java.html",
+			},
+			{ text: "Micronaut Views: Thymeleaf", url: "https://micronaut-projects.github.io/micronaut-views/latest/guide/#thymeleaf" },
+		],
+		toolchain: "Micronaut serves the mapped classpath folder as it is.",
+		verified: {
+			status: "verified",
+			date: "2026-10-09",
+			with: "Micronaut 5.2.2 (Micronaut Launch, Maven, `views-thymeleaf`) with Micronaut Views 6.3.1 on Java 25",
+			result: "`./mvnw package` ran the generated test and built the jar; `java -jar` answered the page as text/html and served the file byte for byte as text/css, and a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "helidon",
+		name: "Helidon",
+		category: "server",
+		mark: "helidon",
+		officialUrl: "https://helidon.io",
+		description: "A set of Java libraries for microservices, with a lightweight web server at its core.",
+		github: "https://github.com/helidon-io/helidon",
+		summary: "Static content from the classpath, and a route that answers HTML.",
+		docs: [
+			{ text: "Helidon SE Quickstart", url: "https://helidon.io/docs/v4/se/guides/quickstart" },
+			{ text: "Helidon WebServer: static content", url: "https://helidon.io/docs/core/v27/modules/webserver" },
+		],
+		toolchain: "Helidon's static content feature serves the classpath folder as it is.",
+		verified: {
+			status: "verified",
+			date: "2026-10-09",
+			with: "Helidon 27.0.0 SE (Helidon CLI quickstart) on Java 27",
+			result: "`mvn package` ran the quickstart's tests and built the jar; `java -jar` answered the route with `Content-Type: text/html` and served the file byte for byte as text/css, and a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "ktor",
+		name: "Ktor",
+		category: "server",
+		mark: "ktor",
+		officialUrl: "https://ktor.io",
+		description: "A Kotlin framework from JetBrains for asynchronous servers and clients.",
+		github: "https://github.com/ktorio/ktor",
+		summary: "staticResources() for the file, and the HTML DSL for the page.",
+		docs: [
+			{ text: "Ktor: templating", url: "https://ktor.io/docs/server-templating.html" },
+			{ text: "Ktor: HTML DSL", url: "https://ktor.io/docs/server-html-dsl.html" },
+			{ text: "Ktor: responses", url: "https://ktor.io/docs/server-responses.html" },
+			{ text: "Ktor: static content", url: "https://ktor.io/docs/server-static-content.html" },
+		],
+		toolchain: "staticResources() serves the resources folder as it is.",
+		verified: {
+			status: "verified",
+			date: "2026-10-09",
+			with: "Ktor 3.6.0 (Ktor project generator, Gradle 9.5.1, HTML DSL and Static Content) with Kotlin 2.4.0 on Java 21",
+			result: "`./gradlew build buildFatJar` ran the generated test and built the fat jar; `java -jar` answered the page as text/html and served the file byte for byte as text/css, and a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "symfony",
+		name: "Symfony",
+		category: "server",
+		mark: "symfony",
+		officialUrl: "https://symfony.com",
+		description: "A PHP framework and a set of reusable PHP components.",
+		github: "https://github.com/symfony/symfony",
+		summary: "Require it through AssetMapper's importmap and import it in app.js.",
+		docs: [
+			{ text: "Symfony: AssetMapper", url: "https://symfony.com/doc/current/frontend/asset_mapper.html" },
+			{ text: "Symfony: creating pages, templates", url: "https://symfony.com/doc/current/templates.html" },
+		],
+		toolchain: "AssetMapper downloads the file from the npm registry's CDN and serves it unchanged under a digest.",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Symfony 8.1.8 with AssetMapper 8.1.8 on PHP 8.5.8",
+			result: "`importmap:require` fetched the file; `asset-map:compile` wrote a byte-identical digested copy, which the page linked.",
+		},
+	},
+	{
+		id: "fastapi",
+		name: "FastAPI + Jinja2",
+		category: "server",
+		mark: "fastapi",
+		officialUrl: "https://fastapi.tiangolo.com",
+		description: "A Python framework for APIs that also renders HTML pages with Jinja2 templates.",
+		github: "https://github.com/fastapi/fastapi",
+		summary: "StaticFiles for the file, Jinja2Templates for the pages, url_for() for the link.",
+		docs: [
+			{ text: "FastAPI: templates", url: "https://fastapi.tiangolo.com/advanced/templates/" },
+			{ text: "FastAPI: static files", url: "https://fastapi.tiangolo.com/tutorial/static-files/" },
+		],
+		toolchain: "StaticFiles serves the folder as it is.",
+		verified: {
+			status: "verified",
+			date: "2026-10-09",
+			with: "FastAPI 0.143.0 with Jinja2 3.1.6, Starlette 1.7.0 and Uvicorn 0.54.0 on Python 3.14.8",
+			result: "After `pip install \"fastapi[standard]\" jinja2`, `fastapi run main.py` answered the page as text/html, `url_for` linked the file, which arrived byte for byte as text/css, and a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "go-templates",
+		name: "Go templates",
+		category: "server",
+		mark: "go",
+		officialUrl: "https://go.dev",
+		description: "The Go standard library's web server and HTML templates, with no framework.",
+		github: "https://github.com/golang/go",
+		summary: "net/http serves the file, html/template links it, and embed puts both in the binary.",
+		docs: [
+			{ text: "Go: package html/template", url: "https://pkg.go.dev/html/template" },
+			{ text: "Go: package net/http", url: "https://pkg.go.dev/net/http" },
+			{ text: "Go: package embed", url: "https://pkg.go.dev/embed" },
+		],
+		toolchain: "http.FileServerFS serves the embedded file as it is.",
+		verified: {
+			status: "verified",
+			date: "2026-10-09",
+			with: "Go 1.27.2 (standard library only)",
+			result: "`go vet` and `go build` passed; the binary, run alone from an empty folder, answered the page as text/html and served the embedded file byte for byte as text/css, and a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "quarkus",
+		name: "Quarkus + Qute",
+		category: "server",
+		mark: "quarkus",
+		officialUrl: "https://quarkus.io",
+		description: "A Java framework for cloud applications, with Qute, its own template engine.",
+		github: "https://github.com/quarkusio/quarkus",
+		summary: "A file in META-INF/resources/css, linked from a Qute template.",
+		docs: [
+			{ text: "Quarkus: HTTP reference", url: "https://quarkus.io/guides/http-reference" },
+			{ text: "Quarkus: Qute templating", url: "https://quarkus.io/guides/qute" },
+		],
+		toolchain: "Quarkus serves META-INF/resources as it is.",
+		verified: {
+			status: "verified",
+			date: "2026-10-08",
+			with: "Quarkus 3.40.1 (code.quarkus.io, REST and Qute) on Java 21",
+			result: "`./mvnw package` built the production JVM app; `java -jar target/quarkus-app/quarkus-run.jar` served the file byte for byte as text/css, and the page a Qute template rendered kept a `data-theme=\"dark\"` section dark on a light page and on a dark one.",
 		},
 	},
 	// Content management
@@ -1493,7 +1905,13 @@ const excluded = [
 	{ name: "npm", reason: "a package manager; every guide offers it" },
 	{ name: "pnpm", reason: "a package manager; every guide offers it" },
 	{ name: "Yarn", reason: "a package manager; every guide offers it" },
+	{
+		name: "Vaadin",
+		reason: "its components draw inside shadow roots, which a page's stylesheet does not reach; a guide would promise more than Cirth can style",
+	},
 ];
+// Next in line for a guide: Javalin, with JTE or Thymeleaf, for one more
+// lightweight Java stack.
 
 for (const mark of Object.values(marks)) {
 	if (!mark.file) continue;
@@ -1509,8 +1927,8 @@ for (const mark of Object.values(marks)) {
 }
 
 // Every record names its owner and the policy read; one with a file names
-// where the file came from, and one without says why. A file is never shown
-// under a policy that asks for permission first.
+// where the file came from, and one without says why. A file shown although
+// the policy asks to be asked says why, in a nominative record.
 const isoDate = /^\d{4}-\d{2}-\d{2}$/;
 for (const [id, mark] of Object.entries(marks)) {
 	for (const field of /** @type {const} */ (["owner", "terms", "termsUrl"])) {
@@ -1525,6 +1943,13 @@ for (const [id, mark] of Object.entries(marks)) {
 		if (mark.dark && mark.ground) throw new Error(`frameworks.js: record ${id} has a dark variant and asks for a light ground`);
 	} else if (typeof mark.textOnly !== "string" || mark.textOnly.trim().length < 40) {
 		throw new Error(`frameworks.js: record ${id} has no file and does not say why`);
+	}
+	if (mark.linkTo !== undefined && !/^https:\/\//.test(mark.linkTo)) {
+		throw new Error(`frameworks.js: record ${id} names an address for its logo that is not https`);
+	}
+	if (mark.nominative !== undefined) {
+		if (!mark.file || !mark.retrieved) throw new Error(`frameworks.js: nominative record ${id} needs its file and the day it was taken`);
+		if (!mark.nominative.endsWith(removal)) throw new Error(`frameworks.js: nominative record ${id} does not say it implies no affiliation and comes down on request`);
 	}
 	if (!isoDate.test(mark.retrieved ?? retrieved)) throw new Error(`frameworks.js: record ${id} has a malformed retrieval date`);
 	if (!guides.some((guide) => guide.mark === id)) {
@@ -1542,7 +1967,8 @@ for (const guide of guides) {
 	if (guide.github !== undefined && !/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+$/.test(guide.github)) {
 		throw new Error(`frameworks.js: ${guide.id} has a malformed GitHub URL`);
 	}
-	if (!categories.some((category) => category.id === guide.category)) {
+	const category = categories.find((entry) => entry.id === guide.category);
+	if (!category) {
 		throw new Error(`frameworks.js: ${guide.id} has unknown category ${guide.category}`);
 	}
 	if (guide.mark !== null && !marks[guide.mark]) {
@@ -1563,22 +1989,20 @@ const byName = (/** @type {Guide} */ a, /** @type {Guide} */ b) =>
 	a.name.localeCompare(b.name, "en", { sensitivity: "base" });
 
 // The guides with everything a page needs to draw one: its route, its
-// mark, its category's names and its status's words.
-const entries = guides.map((guide) => ({
-	...guide,
-	link: `/installation/${guide.id}`,
-	brand: marks[guide.mark],
-	markData: marks[guide.mark].file ? marks[guide.mark] : null,
-	// The release a guide was checked with, as its header prints it.
-	version: /** @type {RegExpExecArray} */ (/^(.+?)(?= \(|,| on | with | and |$)/.exec(guide.verified.with))[1],
-	categoryText: /** @type {(typeof categories)[number]} */ (
-		categories.find((category) => category.id === guide.category)
-	).text,
-	categoryShort: /** @type {(typeof categories)[number]} */ (
-		categories.find((category) => category.id === guide.category)
-	).short,
-	status: statuses[guide.verified.status],
-}));
+// mark, its category's and subgroup's names and its status's words.
+const entries = guides.map((guide) => {
+	const category = /** @type {(typeof categories)[number]} */ (categories.find((entry) => entry.id === guide.category));
+	return {
+		...guide,
+		link: `/installation/${guide.id}`,
+		brand: marks[guide.mark],
+		markData: marks[guide.mark].file ? marks[guide.mark] : null,
+		// The release a guide was checked with, as its header prints it.
+		version: /** @type {RegExpExecArray} */ (/^(.+?)(?= \(|,| on | with | and |$)/.exec(guide.verified.with))[1],
+		categoryText: category.text,
+		status: statuses[guide.verified.status],
+	};
+});
 
 // The guides grouped for the Installation page and the sidebar, in the
 // order of `categories`, alphabetical inside each.
@@ -1589,9 +2013,10 @@ const groups = categories
 	}))
 	.filter((group) => group.guides.length > 0);
 
-// The marks the home page shows, one or two per ecosystem: bundlers and
-// client frameworks, backend frameworks in five languages, a CMS, a static
-// site generator and Rust. None of them needs a notice where it appears.
+// The marks the home page's orbit shows, one or two per ecosystem: bundlers
+// and client frameworks, server-rendered frameworks in five languages, a
+// CMS, a static site generator and Rust. None of them needs a notice where
+// it appears.
 const featured = [
 	"vite",
 	"react",
@@ -1611,7 +2036,7 @@ const featured = [
 	"yew",
 ];
 
-// The pager walks the guides in the order the sidebar lists them.
+// Every list of the guides reads them in the order the sidebar does.
 const ordered = groups.flatMap((group) => group.guides);
 
 module.exports = {
@@ -1636,14 +2061,10 @@ module.exports = {
 		ordered.map((guide) => guide.verified.date).sort()[0],
 		ordered.map((guide) => guide.verified.date).sort().at(-1),
 	],
-	// The notices some projects' terms ask for wherever their logo appears.
-	notices: Object.values(marks)
-		.map((mark) => mark.attribution)
-		.filter(Boolean),
 	byId: Object.fromEntries(ordered.map((guide) => [guide.id, guide])),
 	featured: featured.map((id) => {
 		const guide = ordered.find((entry) => entry.id === id);
-		if (!guide?.markData || guide.markData.attribution) {
+		if (!guide?.markData || guide.markData.trademarkNotice) {
 			throw new Error(`frameworks.js: featured ${id} is not a guide with a mark that needs no notice`);
 		}
 		return guide;

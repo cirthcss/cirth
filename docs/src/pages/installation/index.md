@@ -1,6 +1,6 @@
 ---
 layout: docs.njk
-description: Add Cirth with one link element from a CDN, or install it from npm and import it once. Then a guide for your stack, from build tools and JavaScript frameworks to backend frameworks, static site generators, desktop apps and Rust.
+description: Add Cirth with one link element from a CDN, or install it from npm and import it once. Then a guide for your stack, from build tools and JavaScript frameworks to server-rendered apps in PHP, Java and five other languages, static site generators, desktop apps and Rust.
 ---
 {% from "install.njk" import packageManagers, guideGrid %}
 
@@ -49,9 +49,11 @@ through; the guides below say which, and the one line that stops it.
 
 ## Guides
 
-Where the import goes in each stack, and what to set when a build tool
-would otherwise change the file: {{ frameworks.count }} guides, by
-category. A logo leads to the project's own site, a name to the guide.
+Where the stylesheet goes in each stack, and what to check when a build
+tool or asset pipeline transforms it: {{ frameworks.count }} guides, by
+category. Each card opens its guide, which links to the project's own site
+and repository. Where a project's owner allows no logo, the card shows the
+project's address instead.
 
 {{ guideGrid(frameworks.groups) }}
 
@@ -60,10 +62,6 @@ Every guide says how sure it is, with the versions and the date.
 verified: followed in a new project made with the tool's own starter, built
 for production, and read in Chromium on a light page and in a
 `data-theme="dark"` subtree inside it.
-
-Logos belong to their projects; none of these projects is affiliated with
-Cirth or endorses it ([sources and terms](/brand#framework-logos)).
-{% for notice in frameworks.notices %}{{ notice }} {% endfor %}
 
 ## Advanced builds
 

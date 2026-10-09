@@ -10,7 +10,11 @@
 			</li>
 			{% for item in nav.topNav %}
 				<li class="docs-nav-item">
+					{%- if item.external %}
+					<a href="{{ item.link }}" target="_blank" rel="noreferrer">{{ item.text }}<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+					{%- else %}
 					<a href="{{ item.link }}"{% if page.url == (item.link | withSlash) %} aria-current="page"{% endif %}>{{ item.text }}</a>
+					{%- endif %}
 				</li>
 			{% endfor %}
 		</ul>
@@ -47,9 +51,6 @@
 			</button>
 		</div>
 		<ul class="docs-header-controls-group">
-			<li class="docs-header-github">
-				<a href="{{ nav.github }}" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
-			</li>
 			{#- One entry per documentation line, not per patch release. -#}
 			<li data-docs-header-control>
 				<span class="docs-control-label" aria-hidden="true">Version</span>
@@ -130,9 +131,12 @@
 			<nav aria-label="Site">
 				<ul>
 					{% for item in nav.topNav %}
+						{%- if item.external %}
+						<li><a href="{{ item.link }}" target="_blank" rel="noreferrer">{{ item.text }}<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+						{%- else %}
 						<li><a href="{{ item.link }}"{% if page.url == (item.link | withSlash) %} aria-current="page"{% endif %}>{{ item.text }}</a></li>
+						{%- endif %}
 					{% endfor %}
-					<li><a href="{{ nav.github }}" target="_blank" rel="noreferrer">GitHub ↗<span class="sr-only"> (opens in a new tab)</span></a></li>
 				</ul>
 			</nav>
 			<section class="docs-mobile-controls">

@@ -61,9 +61,17 @@ const defaultBuildSize = () => {
 	// `label` is the quoted figure: gzip, because that is what the delivery
 	// paths this site documents actually send. `brotliLabel` is the best case
 	// a host reaches by precompressing the file itself: reported, never
-	// promised. See scripts/lib/compressed-size.js.
-	return { bytes, label: kb(bytes), brotliLabel: kb(brotliSize(source)) };
+	// promised. See scripts/lib/compressed-size.js. `minified` is the file
+	// before compression, which the home page sets the gzipped size against.
+	return {
+		bytes,
+		label: kb(bytes),
+		brotliLabel: kb(brotliSize(source)),
+		minifiedBytes: source.length,
+		minified: kb(source.length),
+	};
 };
+
 
 // The radius pair (a container's corner against the corners of the
 // controls inside it), resolved off the compiled stylesheet rather than
@@ -427,7 +435,9 @@ module.exports = (eleventyConfig) => {
 	//     apart in a badge, where the heading's name reads "2 Import it",
 	//     and the id and the anchor untouched, so every link to a step
 	//     still lands. The page ends with what was checked, with which
-	//     versions, and the official pages the guide follows.
+	//     versions and the official pages the guide follows, then, in fine
+	//     print, the notice the project's terms ask for, where they ask for
+	//     one (`trademarkNotice`).
 	const numberWords = ["", "One step", "Two steps", "Three steps", "Four steps", "Five steps", "Six steps"];
 	const longDate = (/** @type {string} */ iso) =>
 		new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-GB", {
@@ -436,7 +446,6 @@ module.exports = (eleventyConfig) => {
 			year: "numeric",
 			timeZone: "UTC",
 		});
-	const siteName = (/** @type {string} */ url) => url.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, "");
 	/**
 	 * A mark's <img> elements: one, or the light and dark pair a project
 	 * publishes, each at its own intrinsic ratio. A file drawn for light
@@ -457,7 +466,8 @@ module.exports = (eleventyConfig) => {
 	eleventyConfig.addFilter("longDate", longDate);
 	// A count with its thousands grouped, as the page's prose writes them.
 	eleventyConfig.addFilter("grouped", (/** @type {number} */ value) => Number(value).toLocaleString("en-GB"));
-	eleventyConfig.addFilter("siteName", siteName);
+	// A site's host alone, for a card too small for a path.
+	eleventyConfig.addFilter("siteHost", (/** @type {string} */ url) => new URL(url).hostname.replace(/^www\./, ""));
 	eleventyConfig.addFilter("frameworkGuide", (content, id) => {
 		const guide = frameworks.byId[id];
 		if (!guide) throw new Error(`[frameworkGuide] unknown guide: ${id}`);
@@ -482,7 +492,7 @@ module.exports = (eleventyConfig) => {
 		const card =
 			`<aside class="docs-project" aria-label="About ${name}">` +
 			(guide.markData
-				? `<a class="docs-project-mark" href="${guide.officialUrl}" tabindex="-1" aria-hidden="true"><span class="docs-mark">${markImages(guide.markData, 40)}</span></a>`
+				? `<a class="docs-project-mark" href="${guide.brand.linkTo ?? guide.officialUrl}" tabindex="-1" aria-hidden="true"><span class="docs-mark">${markImages(guide.markData, 40)}</span></a>`
 				: "") +
 			`<p class="docs-project-name">${name}</p>` +
 			`<p class="docs-project-description">${escapeHtml(guide.description)}</p>` +
@@ -519,7 +529,9 @@ module.exports = (eleventyConfig) => {
 			`<h2 id="verified-${id}" class="docs-verified-title">${status.text}</h2>` +
 			`<p><strong>${status.text} on <time datetime="${verified.date}">${longDate(verified.date)}</time></strong> (${status.detail}) with ${code(verified.with)}. ${code(verified.result)}</p>` +
 			`<p>Follows ${docs.length === 1 ? docs[0] : `${docs.slice(0, -1).join(", ")} and ${docs.at(-1)}`}.</p>` +
-			`</aside>`;
+			`</aside>` +
+			// The notice the project's terms ask for, in the site's fine print.
+			(guide.brand.trademarkNotice ? `\n<p class="docs-fine-print">${escapeHtml(guide.brand.trademarkNotice)}</p>` : "");
 		return html;
 	});
 
@@ -561,18 +573,23 @@ module.exports = (eleventyConfig) => {
 	// there, not because a template says so. Empty for a top-level page,
 	// which has nothing above it but its group's name.
 	eleventyConfig.addFilter("breadcrumb", (/** @type {any[]} */ sidebar, /** @type {string} */ pageUrl) => {
-		// A category between a page and its parent (Build tools, inside
-		// Installation) has no page of its own, so the trail skips it.
-		/** @param {any[]} items @returns {any} */
-		const find = (items) =>
-			items.find((entry) => typeof entry.link === "string" && withSlash(entry.link) === pageUrl) ??
-			items.flatMap((entry) => (entry.link ? [] : entry.items ?? [])).find(
-				(entry) => typeof entry.link === "string" && withSlash(entry.link) === pageUrl,
-			);
+		// A category between a page and its parent (Server-rendered apps,
+		// inside Installation) has no page of its own, so its crumb leads to
+		// its heading on the parent's page.
+		/** @param {any[]} items @returns {{ text: string, link?: string }[] | null} */
+		const trail = (items) => {
+			for (const entry of items) {
+				if (typeof entry.link === "string" && withSlash(entry.link) === pageUrl) return [{ text: entry.text }];
+				if (entry.link || !entry.items) continue;
+				const below = trail(entry.items);
+				if (below) return [{ text: entry.text, link: entry.anchor }, ...below];
+			}
+			return null;
+		};
 		for (const group of sidebar) {
 			for (const item of group.items) {
-				const child = find(item.items ?? []);
-				if (child) return [{ text: item.text, link: item.link }, { text: child.text }];
+				const below = trail(item.items ?? []);
+				if (below) return [{ text: item.text, link: item.link }, ...below];
 			}
 		}
 		return [];

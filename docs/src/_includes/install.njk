@@ -16,30 +16,34 @@
 </div>
 {%- endmacro -%}
 
-{#- A link to the project's site, named "<Project> official website"; its
-    images are decorative. A project named by text alone (`textOnly` in
-    frameworks.js) gets its address as the link text instead. -#}
-{%- macro siteLink(guide, height = 28, className = "docs-guide-site") -%}
-{%- if guide.markData -%}
-<a class="{{ className }}" href="{{ guide.officialUrl }}" aria-label="{{ guide.name }} official website"><span class="docs-mark">{{ guide.markData | markImages(height) | safe }}</span></a>
-{%- else -%}
-<a class="{{ className }}" href="{{ guide.officialUrl }}">{{ guide.officialUrl | siteName | replace(".", ".<wbr>") | safe }}</a>
-{%- endif -%}
+{#- A mark as a link to the project's site, named "<Project> official
+    website"; its images are decorative. Where the owner names another
+    address for its logo (`linkTo`), the mark leads there. -#}
+{%- macro siteLink(guide, height, className) -%}
+<a class="{{ className }}" href="{{ guide.brand.linkTo or guide.officialUrl }}" aria-label="{{ guide.name }} official website"><span class="docs-mark">{{ guide.markData | markImages(height) | safe }}</span></a>
 {%- endmacro -%}
 
-{#- Guide tiles: two sibling links, the mark to the project's site and the
-    name to the guide, never one inside the other. -#}
+{#- Guide cards: each one link to its guide, the whole card its target.
+    The link's name is the guide's name; the mark is decorative, the same
+    one the guide's own card draws. A project named by text alone shows its
+    host in text instead, hidden from the link's name like the arrow. Each
+    heading's id is the anchor the breadcrumbs link to. The fine print
+    under the list is the one line the logos need. -#}
 {%- macro guideGrid(groups) -%}
 <div class="docs-guide-groups">
 {%- for group in groups %}
 <section aria-labelledby="guides-{{ group.id }}">
 <h3 id="guides-{{ group.id }}" class="docs-guide-group-title">{{ group.text }}</h3>
+{%- if group.description %}
+<p class="docs-guide-group-description">{{ group.description }}</p>
+{%- endif %}
 <ul class="docs-guide-grid">
 {%- for guide in group.guides %}
-<li>{{ siteLink(guide) }}<a class="docs-guide-name" href="{{ guide.link }}">{{ guide.name }}<span class="docs-guide-arrow" aria-hidden="true">→</span></a></li>
+<li><a href="{{ guide.link }}"><span class="docs-guide-mark">{% if guide.markData %}<span class="docs-mark">{{ guide.markData | markImages(28) | safe }}</span>{% else %}<span class="docs-guide-address" aria-hidden="true">{{ guide.officialUrl | siteHost | replace(".", ".<wbr>") | safe }}</span>{% endif %}</span><span class="docs-guide-name">{{ guide.name }}<span class="docs-guide-arrow" aria-hidden="true">→</span></span></a></li>
 {%- endfor %}
 </ul>
 </section>
 {%- endfor %}
+<p class="docs-fine-print">Logos belong to their projects; none of these projects is affiliated with Cirth or endorses it (<a href="/brand#framework-logos">sources and terms</a>).</p>
 </div>
 {%- endmacro -%}

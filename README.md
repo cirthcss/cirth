@@ -86,8 +86,9 @@ optional [presets](docs/src/pages/themes.md) after the main
 stylesheet to change its look. Print stylesheets are available separately.
 The [installation guide](docs/src/pages/installation/index.md) has the CDN
 snippet, the npm import, and a guide for each stack it was checked with:
-build tools, JavaScript and backend frameworks, static site generators
-and Rust, each listed in
+build tools, JavaScript frameworks, server-rendered apps in PHP, Python,
+Ruby, Elixir, Java, .NET, Node.js and Go, static site generators and Rust,
+each listed in
 [frameworks.js](docs/src/_data/frameworks.js) with its versions.
 [Compatibility](docs/src/pages/compatibility.md) lists every build's import
 path.

@@ -663,7 +663,6 @@ html {
    rest is in the drawer. site-header.njk reads the same query. */
 @media (width < 64rem) {
   .docs-nav-item,
-  .docs-header-github,
   .docs-header-controls-group {
     display: none;
   }
@@ -946,13 +945,13 @@ details.docs-toc-top {
 
 /* Footer */
 
-/* Footer: layout and type roles only. Its dark scheme comes from
-   data-theme="dark" in site-footer.njk. */
+/* Footer: layout and type roles only. Like the header, it follows the
+   page's scheme: the page's own ground, set off by a rule. */
 .docs-footer {
   margin-block-start: var(--cirth-space-16);
   border-block-start: var(--cirth-border-width) solid
-    var(--cirth-card-border-color);
-  background: var(--cirth-surface-recessed);
+    var(--cirth-muted-border-color);
+  background: var(--cirth-background-color);
   color: var(--cirth-ink);
 }
 
@@ -977,6 +976,10 @@ details.docs-toc-top {
 .docs-footer-brand {
   gap: var(--cirth-space-3);
   font-size: var(--cirth-font-size-lg);
+}
+
+.docs-footer-brand .docs-logo {
+  width: 2.25rem;
 }
 
 .docs-footer-brand:hover {
@@ -2049,8 +2052,9 @@ details.docs-demo-source > :not(summary) {
   display: block;
 }
 
-/* Guide tiles: a link to the project's site above a link to the guide.
-   Hover washes the whole tile; focus rings each link. */
+/* Guide cards: each card is one link to its guide. The mark or the
+   project's address sits above the name; hover, press and the focus ring
+   belong to the whole card. */
 .docs-guide-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2073,47 +2077,70 @@ details.docs-demo-source > :not(summary) {
 }
 
 .docs-guide-grid li {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   min-inline-size: 0;
   margin: 0;
-  border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
-  border-radius: var(--docs-chrome-radius);
   list-style: none;
 }
 
-.docs-guide-grid li:has(a:hover) {
+.docs-guide-grid a {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
+  border-radius: var(--docs-chrome-radius);
+  color: var(--cirth-ink-strong);
+  text-decoration: none;
+}
+
+.docs-guide-grid a:is(:hover, :focus-visible, :active) {
+  text-decoration: none;
+}
+
+.docs-guide-grid a:hover {
   border-color: var(--cirth-form-element-border-color);
   background: var(--cirth-secondary-surface);
 }
 
-.docs-guide-grid li:has(a:active) {
+.docs-guide-grid a:active {
   background: var(--cirth-secondary-surface-active);
 }
 
-.docs-guide-site {
+/* The ring is drawn inside the card, so a neighbour never covers it. */
+.docs-guide-grid a:focus-visible {
+  outline-offset: calc(var(--cirth-outline-width) * -1);
+}
+
+.docs-guide-mark {
   display: grid;
   place-items: center;
   block-size: 3.5rem;
   padding-inline: var(--cirth-space-3);
-  border-start-start-radius: inherit;
-  border-start-end-radius: inherit;
-  text-decoration: none;
 }
 
-.docs-guide-site .docs-mark {
+.docs-guide-mark .docs-mark {
   max-inline-size: 100%;
 }
 
-.docs-guide-site .docs-mark-image {
+.docs-guide-mark .docs-mark-image {
   block-size: 1.75rem;
   max-inline-size: 100%;
   object-fit: contain;
 }
 
 /* A wordmark needs less height than a symbol. */
-.docs-guide-site .docs-mark-wide {
+.docs-guide-mark .docs-mark-wide {
   block-size: 1.375rem;
+}
+
+/* Where no logo is drawn: the project's address, set as text. */
+.docs-guide-address {
+  color: var(--cirth-muted-color);
+  font-family: var(--cirth-font-family-mono);
+  font-size: var(--cirth-meta-font-size);
+  line-height: var(--cirth-line-height-snug);
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 
 .docs-guide-name {
@@ -2122,16 +2149,13 @@ details.docs-demo-source > :not(summary) {
   justify-content: space-between;
   gap: var(--cirth-space-2);
   min-block-size: 2.75rem;
+  margin-block-start: auto;
   padding: var(--cirth-space-2) var(--cirth-space-3);
   border-block-start: var(--cirth-border-width) solid
     var(--cirth-muted-border-color);
-  border-end-start-radius: inherit;
-  border-end-end-radius: inherit;
-  color: var(--cirth-ink-strong);
   font-size: var(--cirth-font-size-sm);
   font-weight: var(--cirth-font-weight-medium);
   line-height: var(--cirth-line-height-snug);
-  text-decoration: none;
   overflow-wrap: anywhere;
 }
 
@@ -2140,22 +2164,12 @@ details.docs-demo-source > :not(summary) {
   color: var(--cirth-muted-color);
 }
 
-/* The tile wash replaces the hover underline. */
-:is(.docs-guide-site, .docs-guide-name):is(:hover, :focus-visible, :active) {
-  text-decoration: none;
-}
-
-.docs-guide-grid li:has(a:hover) .docs-guide-arrow {
+.docs-guide-grid a:hover .docs-guide-arrow {
   color: var(--cirth-primary-text);
 }
 
-/* Rings drawn inside the tile, so neither is cut by the other. */
-:is(.docs-guide-site, .docs-guide-name):focus-visible {
-  outline-offset: calc(var(--cirth-outline-width) * -1);
-}
-
 @media (forced-colors: active) {
-  .docs-guide-grid li,
+  .docs-guide-grid a,
   .docs-guide-name {
     border-color: CanvasText;
   }
@@ -2176,6 +2190,13 @@ details.docs-demo-source > :not(summary) {
   color: var(--cirth-muted-color);
   font-size: var(--docs-index-title-size);
   font-weight: var(--cirth-font-weight-medium);
+}
+
+.docs-content .docs-guide-group-description {
+  max-inline-size: 40rem;
+  margin: 0 0 var(--cirth-space-4);
+  color: var(--cirth-secondary-text);
+  font-size: var(--cirth-font-size-sm);
 }
 
 /* A file drawn for light backgrounds only, with no official variant for
@@ -2483,6 +2504,15 @@ fieldset.docs-choice {
 
 .docs-verified > p {
   margin-block: 0 var(--cirth-space-2);
+}
+
+/* Fine print: the logos' line under the Installation grid and a project's
+   trademark notice under its guide's verification note. Muted ink, which
+   meets AA on every surface; links keep the library's look and focus. */
+.docs-fine-print {
+  margin-block: var(--cirth-space-4) 0;
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-meta-font-size);
 }
 
 

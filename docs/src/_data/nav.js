@@ -5,20 +5,25 @@ const siteDescription =
 	"HTML-native CSS framework. Production-ready UI from semantic HTML: no class vocabulary to learn, 0 JavaScript.";
 
 // "Docs" opens the documentation where it begins, with why; "Get started"
-// (the home page, the footer) skips straight to installing it.
+// (the home page, the footer) skips straight to installing it. "Source" is
+// the repository, the one link here that leaves the site.
 const topNav = [
 	{ text: "Docs", link: "/why-cirth" },
 	{ text: "Examples", link: "/examples" },
+	{ text: "Source", link: "https://github.com/cirthcss/cirth", external: true },
 ];
 
 // The integration guides, from the one list in frameworks.js. They are
 // pages of Installation, not a section of their own: the sidebar nests them
 // under it, one disclosure per category, and each guide's breadcrumb names
-// Installation as its parent. They are not in the reading order (below).
+// Installation and its category. A category has no page; its `anchor` is
+// its heading on the Installation page. Guides are not in the reading
+// order (below).
 const { groups } = require("./frameworks.js");
 const frameworks = groups.map(({ id, text, guides }) => ({
 	text,
 	id,
+	anchor: `/installation/#guides-${id}`,
 	items: guides.map(({ name, link }) => ({ text: name, link })),
 }));
 
@@ -188,6 +193,27 @@ const redirects = [
 	// For a while the JavaScript guides were one page with a section each.
 	// Each tool has its own page again; a link to a section of the old page
 	// lands on that tool's page.
+	// Remix v2 continues as React Router v7, whose guide covers it.
+	{
+		from: "/installation/remix/",
+		to: "/installation/react-router/",
+		title: "Install Cirth for React Router",
+		anchors: {},
+	},
+	// Spring Boot had one guide for Thymeleaf and one for JSP; both are now
+	// sections of a single guide.
+	{
+		from: "/installation/spring-boot-thymeleaf/",
+		to: "/installation/spring-boot/#thymeleaf",
+		title: "Install Cirth for Spring Boot",
+		anchors: {},
+	},
+	{
+		from: "/installation/spring-boot-jsp/",
+		to: "/installation/spring-boot/#jsp",
+		title: "Install Cirth for Spring Boot",
+		anchors: {},
+	},
 	{
 		from: "/installation/javascript/",
 		to: "/installation/#guides",
@@ -252,8 +278,8 @@ const withSlash = (link) => (link.endsWith("/") ? link : `${link}/`);
 // The order the documentation is read in, which is not the sidebar's tree:
 // every page a group lists, in the sidebar's order, and none of the pages
 // nested under one. A guide is read by whoever uses that stack and by no
-// one else, so a chain of 43 of them between Installation and Customization
-// would be a detour every reader had to walk.
+// one else, so a chain of every guide between Installation and
+// Customization would be a detour every reader had to walk.
 const readingOrder = sidebar.flatMap((group) =>
 	group.items.map(({ items, ...page }) => ({ ...page, group: group.text })),
 );
@@ -287,7 +313,6 @@ module.exports = {
 	redirects,
 	footerLinks,
 	footer,
-	github: "https://github.com/cirthcss/cirth",
 	readingOrder,
 	pager,
 };
