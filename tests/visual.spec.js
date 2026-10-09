@@ -252,9 +252,10 @@ const expectDocsScreenshot = async (page, name, splitLongPage = false) => {
 	}
 
 	// Firefox cannot capture an image taller than 32,767 pixels. The
-	// customization guide crosses that limit on a mobile viewport, so keep
-	// complete coverage as four deterministic document-space slices instead
-	// of dropping the tail of the page or excluding the guide again (gh#99).
+	// customization guide and the Brand page, with its record of every
+	// framework logo, cross that limit on a mobile viewport, so keep complete
+	// coverage as four deterministic document-space slices instead of
+	// dropping the tail of the page or excluding it again (gh#99).
 	const parts = 4;
 	for (let part = 0; part < parts; part += 1) {
 		const y = region.y + Math.floor((region.height * part) / parts);
@@ -267,6 +268,9 @@ const expectDocsScreenshot = async (page, name, splitLongPage = false) => {
 		});
 	}
 };
+
+// Pages taller than Firefox can capture in one image on a phone.
+const longPages = new Set(["customization/index.html", "brand/index.html"]);
 
 const defaultTheme = themeVariants.find((theme) => theme.name === "default");
 if (!defaultTheme) throw new Error("visual.spec: default theme is missing");
@@ -282,7 +286,7 @@ for (const pagePath of visualPages) {
 		await expectDocsScreenshot(
 			page,
 			name,
-			pagePath === "customization/index.html",
+			longPages.has(pagePath),
 		);
 	});
 }

@@ -484,7 +484,7 @@ test("every scene is a frame of about one window at desktop and laptop sizes, an
 		const frame = height - header;
 		// The scenes that are not held: at least a window below the header,
 		// and no more than that where what they hold fits one.
-		for (const selector of [".docs-glance", ".docs-presets", ".docs-agnostic", ".docs-pure"]) {
+		for (const selector of [".docs-presets", ".docs-agnostic", ".docs-pure"]) {
 			const section = await page.locator(selector).evaluate((element) => element.getBoundingClientRect().height);
 			expect(section, `${selector} at ${width}x${height}`).toBeGreaterThanOrEqual(frame - 2);
 			expect(section, `${selector} at ${width}x${height}`).toBeLessThanOrEqual(frame + 2);
@@ -496,7 +496,7 @@ test("every scene is a frame of about one window at desktop and laptop sizes, an
 		const bench = await page.locator(".docs-bench").evaluate((element) => element.getBoundingClientRect().height);
 		expect(bench / height, `the comparison at ${width}x${height}`).toBeGreaterThanOrEqual(1.25);
 		expect(bench / height, `the comparison at ${width}x${height}`).toBeLessThanOrEqual(1.5);
-		for (const [selector, points] of /** @type {[string, number[]][]} */ ([["[data-docs-story]", [0, 0.2, 0.5, 0.85]], ["[data-docs-bench]", [0.5, 1]], ["[data-docs-theme]", [0.05, 0.85]]])) {
+		for (const [selector, points] of /** @type {[string, number[]][]} */ ([["[data-docs-facts]", [0, 0.3, 0.6, 1]], ["[data-docs-story]", [0, 0.2, 0.5, 0.85]], ["[data-docs-bench]", [0.5, 1]], ["[data-docs-theme]", [0.05, 0.85]]])) {
 			for (const p of points) {
 				await goTo(page, selector, p);
 				const extent = await page.locator(selector).evaluate((section) => {
@@ -522,7 +522,7 @@ test("every scene is a frame of about one window at desktop and laptop sizes, an
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 	expect(await page.locator(".docs-footer").evaluate((element) => element.getBoundingClientRect().height)).toBeLessThan(800);
 	await page.setViewportSize({ width: 390, height: 844 });
-	expect(["auto", "0px"]).toContain(await page.locator(".docs-glance").evaluate((element) => getComputedStyle(element).minHeight));
+	expect(["auto", "0px"]).toContain(await page.locator(".docs-facts-section").evaluate((element) => getComputedStyle(element).minHeight));
 });
 
 test("the markup comparison composes as the reader scrolls in, holds still, and comes apart backwards", async ({ page }) => {
@@ -589,6 +589,62 @@ test("the markup comparison composes as the reader scrolls in, holds still, and 
 	const early = await boxes();
 	await at(-0.45);
 	expect(await boxes()).toEqual(early);
+});
+
+test("the three facts come out from behind the file with the scroll, settle in a row, and go back", async ({ page }) => {
+	await held(page);
+	const facts = page.locator("[data-docs-facts]");
+	const read = () =>
+		facts.evaluate((section) => {
+			const box = (/** @type {Element} */ element) => element.getBoundingClientRect();
+			const row = box(/** @type {Element} */ (section.querySelector(".docs-facts-list")));
+			const file = box(/** @type {Element} */ (section.querySelector("[data-docs-facts-file]")));
+			const cards = [...section.querySelectorAll(".docs-fact")];
+			const progress = /** @type {HTMLProgressElement} */ (section.querySelector("progress"));
+			return {
+				rowMiddle: { x: row.left + row.width / 2, y: row.top + row.height / 2 },
+				fileMiddle: { x: file.left + file.width / 2, y: file.top + file.height / 2 },
+				fileBottom: file.bottom,
+				rowTop: row.top,
+				opacities: cards.map((card) => Number(getComputedStyle(card).opacity)),
+				tops: cards.map((card) => Math.round(box(card).top)),
+				lefts: cards.map((card) => Math.round(box(card).left)),
+				transforms: cards.map((card) => [getComputedStyle(card).translate, getComputedStyle(card).rotate, getComputedStyle(card).scale].join(" ")),
+				progress: progress.value / progress.max,
+			};
+		});
+	/** The frame at a share of the section's scroll. */
+	const at = async (/** @type {number} */ p) => {
+		await goTo(page, "[data-docs-facts]", p);
+		return read();
+	};
+
+	// 1. The file alone, on the row's centre.
+	const start = await at(0);
+	expect(Math.abs(start.fileMiddle.x - start.rowMiddle.x)).toBeLessThan(4);
+	expect(Math.abs(start.fileMiddle.y - start.rowMiddle.y)).toBeLessThan(4);
+	for (const opacity of start.opacities) expect(opacity).toBeLessThan(0.02);
+
+	// 2 to 4. The cards come out one after another, never two at once.
+	const entering = await at(0.12);
+	expect(entering.opacities[0]).toBeGreaterThan(entering.opacities[1]);
+	expect(entering.opacities[1]).toBeGreaterThan(entering.opacities[2]);
+
+	// 5. In a row, untransformed, under the file, and the gzip bar down to
+	// its real share. No stretch of the scroll is left without change: the
+	// last card is still settling just before the end.
+	const end = await at(1);
+	expect(new Set(end.tops).size, "one row").toBe(1);
+	expect(end.lefts).toEqual([...end.lefts].sort((a, b) => a - b));
+	for (const opacity of end.opacities) expect(opacity).toBe(1);
+	for (const transform of end.transforms) expect(transform).toMatch(/^(none|0px( 0px)?) (none|0deg) (none|1)$/);
+	expect(end.fileBottom).toBeLessThanOrEqual(end.rowTop);
+	expect(end.progress).toBeLessThan(0.2);
+	const late = await at(0.94);
+	expect(late.progress).toBeGreaterThan(end.progress);
+
+	// Back to the start, the same frame as before.
+	expect((await at(0)).opacities).toEqual(start.opacities);
 });
 
 test("the close is one message: the real command and the way to get started", async ({ page }) => {

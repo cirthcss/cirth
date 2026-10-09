@@ -95,7 +95,14 @@ test("the guides are pages of Installation, not a section of their own", async (
 		.evaluateAll((items) =>
 			items.filter((item) => /** @type {HTMLDetailsElement} */ (item).open).map((item) => item.querySelector("summary")?.textContent?.trim()),
 		);
-	expect(openCategories).toEqual(["Backend frameworks"]);
+	expect(openCategories).toEqual(["Server-rendered apps"]);
+	// The category lists its guides directly: no language headings, no
+	// level between the category and its pages.
+	const server = page.locator(".docs-sidebar .docs-nav-category > details[open]");
+	const serverGroup = /** @type {{ guides: unknown[] }} */ (frameworks.groups.find((/** @type {{ id: string }} */ group) => group.id === "server"));
+	await expect(server.locator(":scope > ul > li")).toHaveCount(serverGroup.guides.length);
+	await expect(server.locator(":scope > ul > li > a")).toHaveCount(await server.locator(":scope > ul > li").count());
+	await expect(server.locator("ul ul, span")).toHaveCount(0);
 
 	// The toggle is a real disclosure the keyboard operates.
 	const toggle = page.locator(".docs-sidebar .docs-nav-branch > details > summary");
@@ -119,14 +126,20 @@ test("the compact menu is the sidebar's tree", async ({ page }) => {
 	await expect(page.locator('.docs-mobile-nav a[aria-current="page"]')).toBeVisible();
 });
 
-test("every guide names Installation above its title", async ({ page }) => {
+test("every guide names Installation and its category above its title", async ({ page }) => {
+	// Every guide, one page load each.
+	test.setTimeout(120_000);
 	for (const guide of frameworks.guides) {
 		await page.goto(`${origin}${guide.link}/`, { waitUntil: "networkidle" });
 		const trail = page.locator('.docs-content > nav[aria-label="breadcrumb"]');
 		await expect(trail, guide.id).toHaveCount(1);
-		await expect(trail.locator("ol > li")).toHaveCount(2);
-		await expect(trail.locator("li a")).toHaveAttribute("href", "/installation/");
-		await expect(trail.locator("li a")).toHaveText("Installation");
+		await expect(trail.locator("ol > li")).toHaveCount(3);
+		// The category has no page: its crumb is its heading on Installation.
+		await expect(trail.locator("li a")).toHaveText(["Installation", guide.categoryText]);
+		expect(await trail.locator("li a").evaluateAll((links) => links.map((link) => link.getAttribute("href")))).toEqual([
+			"/installation/",
+			`/installation/#guides-${guide.category}`,
+		]);
 		await expect(trail.locator('li[aria-current="page"]')).toHaveText(guide.name);
 		// Before the title, not after it: the trail, the project's card, the h1.
 		expect(
@@ -247,8 +260,8 @@ test("every guide steps back to Installation and on to Customization", async ({ 
 			{ rel: "prev", href: "/installation", label: "← Previous · Start", title: "Installation" },
 			{ rel: "next", href: "/customization", label: "Next · Customization →", title: "Overview" },
 		]);
-		// The breadcrumb is unchanged: Installation / the guide.
-		await expect(page.locator(".docs-breadcrumb li")).toHaveText(["Installation", name]);
+		// The breadcrumb: Installation, the guide's category, the guide.
+		await expect(page.locator(".docs-breadcrumb li")).toHaveText(["Installation", /\S/, name]);
 	}
 });
 
@@ -497,6 +510,24 @@ test("Installation is short, and the CDN is said once", async ({ page }) => {
 	// Every guide, grouped, the count printed from the same data.
 	await expect(content.locator(".docs-guide-grid > li")).toHaveCount(frameworks.count);
 	await expect(content).toContainText(`${frameworks.count} guides, by category`);
+	// Grouped by category only: one heading and one grid per category, and
+	// no heading for a language inside one.
+	await expect(content.locator(".docs-guide-group-title")).toHaveCount(frameworks.groups.length);
+	await expect(content.locator(".docs-guide-grid")).toHaveCount(frameworks.groups.length);
+	await expect(content.locator(".docs-guide-groups h4")).toHaveCount(0);
+	for (const gone of ["PHP", "Python", "Ruby", "Elixir", "Java & JVM", ".NET", "Node.js"]) {
+		await expect(content.locator(".docs-guide-groups :is(h3, h4, h5)", { hasText: new RegExp(`^${gone.replace(".", "\\.")}$`) })).toHaveCount(0);
+	}
+
+	// The guides that moved forward to where they are now.
+	for (const [from, to] of [
+		["/installation/spring-boot-thymeleaf/", "/installation/spring-boot/#thymeleaf"],
+		["/installation/spring-boot-jsp/", "/installation/spring-boot/#jsp"],
+		["/installation/remix/", "/installation/react-router/"],
+	]) {
+		const moved = await (await page.request.get(`${origin}${from}`)).text();
+		expect(moved, from).toMatch(new RegExp(`<link rel="canonical" href="${to.replace(/[/#.]/g, (c) => `\\${c}`)}"`));
+	}
 
 	// The retired CDN guide forwards rather than repeating the snippet.
 	const response = await page.request.get(`${origin}/installation/cdn/`);

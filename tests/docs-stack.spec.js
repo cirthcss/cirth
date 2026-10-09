@@ -8,6 +8,7 @@ const {
 const { withAndWithoutScrollbar } = require("./helpers/viewport");
 const { listPresetNames, presetsSourceDir } = require("../scripts/lib/presets");
 const versions = require("../docs/src/_data/versions.js");
+const frameworks = require("../docs/src/_data/frameworks.js");
 
 assertDocsBuilt("docs-stack.spec");
 
@@ -696,7 +697,7 @@ test("the collapsed menu is complete, ordered, and returns focus", async ({
 	for (const name of ["Docs", "Examples"]) {
 		await expect(panel.getByRole("link", { name, exact: true })).toBeVisible();
 	}
-	await expect(panel.getByRole("link", { name: /GitHub/ })).toBeVisible();
+	await expect(panel.getByRole("link", { name: /^Source/ })).toBeVisible();
 	await expect(controls.locator("[data-docs-version-select]")).toBeVisible();
 	await expect(controls.locator("[data-cirth-preset-select]")).toBeVisible();
 	await expect(controls.locator(".docs-theme-toggle")).toBeVisible();
@@ -801,65 +802,80 @@ test("the navbar states are a contrast ladder, not the accent", async ({
 	expect(scoped.edgeColor).toBe(accent);
 });
 
-// --- The proof band -----------------------------------------------------
+// --- The three facts ---------------------------------------------------
 
-// Six claims, one card each, and what is worth pinning is that every card
-// says what kind of claim it is and where to check it. A guarantee and a
-// capability age differently, and a page that presents them identically is
-// promising the weaker one.
-test("at a glance is a section of its own: a heading, its argument and four checked figures", async ({
-	page,
-}) => {
+// Three facts of three kinds about one file. What is worth pinning is that
+// each is a Cirth card that says what kind of fact it is and where to
+// check it: values in text, pictures hidden from assistive technology.
+test("the three facts are a section of their own: a heading, its argument and three cards", async ({ page }) => {
 	await page.setViewportSize({ width: 1280, height: 900 });
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
 	// Between the hero and the story, named by a visible heading.
 	const order = await page.locator("main > section").evaluateAll((sections) => sections.map((section) => section.className.split(" ")[0]));
-	expect(order.slice(0, 3)).toEqual(["docs-hero", "docs-glance", "docs-story"]);
-	const glance = page.locator(".docs-glance");
-	await expect(glance).toHaveAttribute("aria-labelledby", "glance-title");
-	await expect(glance.locator("h2#glance-title")).toBeVisible();
-	await expect(glance.locator(".docs-glance-head > p")).toContainText("Cirth is a stylesheet and nothing else");
-
-	const facts = glance.locator("dl.docs-fact-list > div");
-	await expect(facts).toHaveCount(4);
-	// Every fact: a label, a value, and the link that checks it.
-	for (let index = 0; index < 4; index++) {
-		const fact = facts.nth(index);
-		await expect(fact.locator("dt")).toHaveCount(1);
-		await expect(fact.locator("dd strong")).toHaveCount(1);
-		const link = fact.locator("dd a");
-		await expect(link, `fact ${index} has a check path`).toHaveCount(1);
-		expect((await link.getAttribute("href")) || "").not.toBe("");
-	}
-	// The size is the build's own measurement, not a figure typed in.
-	await expect(facts.nth(1).locator("strong")).toHaveText(/^\d+(\.\d+)? KB$/);
-
-	// A ruled grid, not four boxes: no fact paints a surface or casts a shadow.
-	const paint = await facts.evaluateAll((items) =>
-		items.map((item) => {
-			const style = getComputedStyle(item);
-			return { background: style.backgroundColor, shadow: style.boxShadow };
-		}),
+	expect(order.slice(0, 3)).toEqual(["docs-hero", "docs-facts-section", "docs-story"]);
+	const section = page.locator(".docs-facts-section");
+	await expect(section).toHaveAttribute("aria-labelledby", "facts-title");
+	await expect(section.locator("h2#facts-title")).toHaveText("One stylesheet. Three facts.");
+	await expect(section.locator(".docs-facts-head > p")).toHaveText(
+		"Cirth ships compiled CSS with no JavaScript runtime. Its default build is measured in CI, and its accessibility baseline is audited and documented.",
 	);
-	for (const fact of paint) {
-		expect(fact.background).toBe("rgba(0, 0, 0, 0)");
-		expect(fact.shadow).toBe("none");
+	await expect(section).not.toContainText(/promised|guide/i);
+
+	// Three of the library's own cards, in the order they are read.
+	const facts = section.locator(".docs-facts-list > article.docs-fact");
+	await expect(facts).toHaveCount(3);
+	await expect(section.locator(".docs-facts-list > *")).toHaveCount(3);
+	await expect(facts.locator("dt")).toHaveText(["JavaScript runtime", "Default CSS, gzipped", "Accessibility baseline"]);
+	// The size is read off the build, not written down.
+	await expect(facts.locator(".docs-fact-value")).toHaveText(["0 B", /^\d+\.\d KB$/, "WCAG 2.2 AA"]);
+	await expect(facts.locator("dd > a")).toHaveText(["Nothing to run", "See the size budget", "See the accessibility audit"]);
+	for (const href of await facts.locator("dd > a").evaluateAll((links) => links.map((link) => link.getAttribute("href")))) {
+		expect(href).toMatch(/^\/[a-z-]+(\/[a-z-]+)?#[a-z-]+$/);
+	}
+	// Every picture is hidden from assistive technology and made of what
+	// Cirth draws; the button in it cannot take focus.
+	await expect(section.locator(".docs-fact-visual:not([aria-hidden='true'])")).toHaveCount(0);
+	// One picture each, and nothing in them a reader could take for a control.
+	await expect(section.locator(".docs-fact-visual")).toHaveCount(3);
+	await expect(section.locator(".docs-fact-visual progress")).toHaveCount(1);
+	await expect(section.locator(".docs-fact-visual :is(button, a, input, select, img)")).toHaveCount(0);
+
+	// The card is the library's: its edge, radius and spacing are an
+	// <article>'s anywhere else; only its surface is cleared, through the
+	// card's own token, so the glow behind shows through.
+	const paint = await page.evaluate(() => {
+		const read = (/** @type {Element} */ element) => {
+			const style = getComputedStyle(element);
+			return [style.borderTopColor, style.borderTopWidth, style.borderTopLeftRadius, style.paddingTop].join(" | ");
+		};
+		const bare = document.createElement("article");
+		document.querySelector("main")?.append(bare);
+		const reference = read(bare);
+		bare.remove();
+		return { reference, cards: [...document.querySelectorAll(".docs-fact")].map(read) };
+	});
+	for (const card of paint.cards) expect(card).toBe(paint.reference);
+	for (const alpha of await section.locator(".docs-fact").evaluateAll((cards) => cards.map((card) => {
+		const match = /\/\s*([\d.]+)\)$|rgba\([^)]*,\s*([\d.]+)\)$/.exec(getComputedStyle(card).backgroundColor);
+		return match ? Number(match[1] ?? match[2]) : 1;
+	}))) {
+		expect(alpha).toBeLessThan(0.5);
 	}
 
-	// Two by two on a wide screen and a tablet, one per row on a phone, and
-	// nothing wider than the viewport at any of them.
+	// In a row on a wide screen, in a row or two and one on a tablet, one
+	// per row on a phone, and nothing wider than the viewport at any of them.
 	for (const [width, columns] of /** @type {const} */ ([
-		[1280, 2],
-		[768, 2],
-		[390, 1],
+		[1280, [3]],
+		[768, [2, 3]],
+		[390, [1]],
 	])) {
 		await page.setViewportSize({ width, height: 900 });
-		const layout = await page.locator(".docs-fact-list").evaluate((element) => ({
+		const layout = await page.locator(".docs-facts-list").evaluate((element) => ({
 			columns: getComputedStyle(element).gridTemplateColumns.split(" ").length,
 			overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
 		}));
-		expect(layout.columns, `columns at ${width}px`).toBe(columns);
+		expect(columns, `columns at ${width}px`).toContain(layout.columns);
 		expect(layout.overflow, `horizontal overflow at ${width}px`).toBeLessThanOrEqual(0);
 	}
 });
@@ -950,7 +966,6 @@ test("the hero moves once, only where motion is welcome, and its result follows 
 test("the framework band shows the ecosystems and leads each mark to its project", async ({
 	page,
 }) => {
-	const frameworks = require("../docs/src/_data/frameworks.js");
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 	const band = page.locator(".docs-agnostic");
 	await expect(band.locator("h2")).toHaveText("Framework agnostic. Works everywhere.");
@@ -1221,7 +1236,7 @@ test.describe("without JavaScript", () => {
 		).toHaveCount(1);
 		await expect(page.locator(".docs-hero-render article")).toBeVisible();
 		// The facts are readable without a line of script.
-		await expect(page.locator(".docs-fact-list > div")).toHaveCount(4);
+		await expect(page.locator(".docs-facts-list > article")).toHaveCount(3);
 	});
 
 	// Every scene is whole without a script: the story's three pictures,
@@ -1677,7 +1692,7 @@ test("the home page states its argument in one heading outline", async ({
 		.evaluateAll((items) => items.map((item) => item.className.split(" ")[0]));
 	expect(sections).toEqual([
 		"docs-hero",
-		"docs-glance",
+		"docs-facts-section",
 		"docs-story",
 		"docs-bench",
 		"docs-theme",
@@ -1688,7 +1703,7 @@ test("the home page states its argument in one heading outline", async ({
 	expect(
 		await page.locator("main > section h2[id]").evaluateAll((headings) => headings.map((heading) => heading.textContent?.trim())),
 	).toEqual([
-		"Measured, not promised.",
+		"One stylesheet. Three facts.",
 		"Built on HTML, not around it.",
 		"Less markup to maintain.",
 		"Your theme. Same HTML.",
@@ -1713,6 +1728,8 @@ test("the home page states its argument in one heading outline", async ({
 		"Less markup. Nothing to run.",
 		"Presets, light and dark.",
 		"Pure CSS. Whatever writes your HTML.",
+		"Measured, not promised.",
+		"One stylesheet. Four facts.",
 	]) {
 		await expect(
 			page.locator("main h2", { hasText: gone }),
@@ -2370,13 +2387,12 @@ test("the demo stage follows the preset's spacing knob", async ({ page }) => {
 // --- The footer -----------------------------------------------------------
 
 // Paths out of the page, not a second index of the reference: the sidebar
-// and search are that. It closes every page on the dark scheme, a forced
-// subtree of Cirth's own, so it ends the page in both schemes.
+// and search are that. Like the header, it follows the page's scheme.
 test("the footer offers paths out, not the reference", async ({ page }) => {
 	for (const url of ["/", "/installation/"]) {
 		await page.goto(`${origin}${url}`, { waitUntil: "networkidle" });
 		const footer = page.locator(".docs-footer");
-		await expect(footer).toHaveAttribute("data-theme", "dark");
+		await expect(footer).not.toHaveAttribute("data-theme", /.*/);
 		await expect(footer.locator("nav[aria-label='Footer'] h2")).toHaveText([
 			"Start",
 			"Project",
@@ -2410,6 +2426,8 @@ test("the footer offers paths out, not the reference", async ({ page }) => {
 // decorative, so the title a reader, a search index and <title> get is the
 // name alone; a project whose terms keep its logo off the site has none.
 test("each framework guide opens on its project's card, then its h1, and reads as steps", async ({ page }) => {
+	// Every guide, one page load each.
+	test.setTimeout(120_000);
 	const frameworks = require("../docs/src/_data/frameworks.js");
 	for (const guide of frameworks.guides) {
 		await page.goto(`${origin}${guide.link}/`, { waitUntil: "networkidle" });
@@ -2435,7 +2453,7 @@ test("each framework guide opens on its project's card, then its h1, and reads a
 		// The number is in the heading's name.
 		await expect(steps.first()).toHaveAccessibleName(/^1 \S/);
 		await expect(page.locator(".docs-content > .docs-guide-summary")).toHaveText(
-			new RegExp(`^(Two|Three|Four|Five) steps: `),
+			new RegExp(`^(Two|Three|Four|Five|Six) steps: `),
 		);
 	}
 });
