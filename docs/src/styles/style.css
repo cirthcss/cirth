@@ -411,20 +411,42 @@ html {
   display: none;
 }
 
-/* Wordmark lockup, centred on the nav link band (--cirth-space-10). The
-   negative margin mirrors the padding, so the row does not grow. */
+/* The lockup file, 34px high, centred in a link as tall as the nav link
+   band (--cirth-space-10): the target keeps the nav's 40px and the header
+   row does not grow. Its width follows from the file's own proportion.
+   Block-level and without the nav link's padding, so no line box is built
+   around the picture. */
 .docs-brand {
-  --docs-brand-height: 1.75rem;
+  --docs-lockup-height: 2.125rem;
 
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 0.6rem;
-  margin-block: calc((var(--docs-brand-height) - var(--cirth-space-10)) / 2);
-  padding-block: calc((var(--cirth-space-10) - var(--docs-brand-height)) / 2);
-  font-family: var(--cirth-font-family-mono);
+  min-block-size: var(--cirth-space-10);
+  margin-block: 0;
+  padding-block: 0;
+}
 
-  /* Tracking frozen with the mark. */
-  letter-spacing: -0.03em;
+.docs-brand img {
+  width: auto;
+  height: var(--docs-lockup-height);
+}
+
+/* In the header the name, not the lockup's box, is centred on the text
+   beside it. The box is centred on the nav link band, the line the links'
+   capitals are centred on; the picture moves up by the distance between
+   its box's centre and the middle of the name's capitals
+   (--docs-lockup-name-centre, a share of the lockup's height from the
+   lockup generator), and the mark moves with the name it is aligned to. */
+.docs-header-start-group .docs-brand img {
+  translate: 0
+    calc((0.5 - var(--docs-lockup-name-centre, 0.5)) * var(--docs-lockup-height));
+}
+
+/* The lockup stands apart from the links as a group, not as one more link:
+   32px from the first of them, twice the 16px between two links. The
+   items' own padding gives 16px; the margin gives the rest. */
+.docs-header-start-group > li:has(> .docs-brand) {
+  margin-inline-end: var(--cirth-space-4);
 }
 
 /* The same colour in every state. */
@@ -432,11 +454,6 @@ html {
 .docs-brand:is(:hover, :focus, :active) {
   color: var(--cirth-contrast-text);
   text-decoration: none;
-}
-
-/* Width only: the size attributes and Cirth's img rule keep height auto. */
-.docs-logo {
-  width: var(--docs-brand-height);
 }
 
 .docs-logo-dark,
@@ -973,15 +990,6 @@ details.docs-toc-top {
 }
 
 /* Layout only: the ink is the library's .contrast link variant. */
-.docs-footer-brand {
-  gap: var(--cirth-space-3);
-  font-size: var(--cirth-font-size-lg);
-}
-
-.docs-footer-brand .docs-logo {
-  width: 2.25rem;
-}
-
 .docs-footer-brand:hover {
   text-decoration: none;
 }
@@ -1273,6 +1281,38 @@ pre > button.copy.copied::before {
 
 /* Brand page logo tiles. Fixed columns turn three light and three dark
    variants into two rows; the gap shows the border colour as dividers. */
+/* Brand page opening: the lockup at the size it is meant to be seen at,
+   the line that says what it is, and the files most people come for. */
+.docs-brand-hero {
+  display: grid;
+  justify-items: start;
+  gap: var(--cirth-flow-group);
+  margin-block: var(--cirth-flow-section) 0;
+}
+
+.docs-brand-hero > img {
+  width: min(100%, 26rem);
+  height: auto;
+}
+
+.docs-brand-hero-line {
+  max-width: 32ch;
+  margin: 0;
+  color: var(--cirth-ink-strong);
+  font-size: var(--cirth-font-size-2xl);
+  font-weight: var(--cirth-title-font-weight);
+  line-height: var(--cirth-line-height-snug);
+}
+
+.docs-brand-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cirth-space-3) var(--cirth-space-4);
+  margin: 0;
+}
+
+/* Each variant on the scheme it is drawn for, divided by the grid's gap. */
 .docs-brand-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1284,9 +1324,9 @@ pre > button.copy.copied::before {
   overflow: clip;
 }
 
-@media (width >= 36rem) {
+@media (width >= 48rem) {
   .docs-brand-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
@@ -1295,27 +1335,36 @@ pre > button.copy.copied::before {
   flex-direction: column;
   align-items: center;
   gap: var(--cirth-spacing);
+  margin: 0;
   padding: calc(var(--cirth-spacing) * 1.5) var(--cirth-spacing);
   background-color: var(--cirth-background-color);
+  text-align: center;
 }
 
 .docs-brand-tile figcaption {
-  font-size: var(--cirth-font-size-sm);
+  display: grid;
+  gap: var(--cirth-flow-line);
 }
 
 .docs-brand-downloads {
   display: flex;
   gap: calc(var(--cirth-spacing) * 0.5);
+  margin: auto 0 0;
 }
 
-/* The wide lockup takes two tracks. */
+/* The wide lockup takes a track of its own on a narrow screen. */
 .docs-lockup-grid {
   grid-template-columns: minmax(0, 1fr);
 }
 
-@media (width >= 36rem) {
+.docs-lockup-grid img {
+  width: min(100%, 15rem);
+  height: auto;
+}
+
+@media (width >= 48rem) {
   .docs-lockup-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
