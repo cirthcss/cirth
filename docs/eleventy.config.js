@@ -11,6 +11,15 @@ const { brotliSize, gzipSize } = require("../scripts/lib/compressed-size");
 const { listPresetNames, presetLabel } = require("../scripts/lib/presets");
 const { docsPathPrefix } = require("../scripts/lib/docs-site");
 const { measuredTheme } = require("../scripts/lib/measured-theme");
+// The brand data comes from the generators themselves. Eleventy reloads
+// this file when it changes but Node keeps the modules it requires, so a
+// running dev server would go on reading a generator's old exports; they
+// are dropped from the cache first.
+for (const id of ["../scripts/build-brand-lockup", "../scripts/build-brand-marks", "../scripts/lib/brand-mark"]) {
+	delete require.cache[require.resolve(id)];
+}
+const { palette: brandPalette } = require("../scripts/build-brand-marks");
+const brandLockup = require("../scripts/build-brand-lockup");
 const { documentedVersion } = require("../scripts/lib/documented-version");
 const { readResults: markupBenchmark } = require("../scripts/lib/markup-benchmark");
 const frameworks = require("./src/_data/frameworks.js");
@@ -237,6 +246,16 @@ module.exports = (eleventyConfig) => {
 	// measured off dist/tokens for the Brand and Colors pages; null on a
 	// docs-only run with no build, where the pages print token names only.
 	eleventyConfig.addGlobalData("measured", measuredTheme(path.join(docsRoot, "..")));
+	// The mark's pigments, from the scale steps the brand files are painted
+	// with (scripts/build-brand-marks.js), for the Brand page.
+	eleventyConfig.addGlobalData("brandMark", brandPalette());
+	// The lockup's box, so every <img> of it reserves the right space, and
+	// where its name's capitals are centred, for the header.
+	eleventyConfig.addGlobalData("brandLockup", {
+		width: brandLockup.width,
+		height: brandLockup.HEIGHT,
+		nameCentre: brandLockup.nameCentre,
+	});
 	// The markup comparison the home page draws and Why Cirth explains,
 	// with the two fixtures it was measured on. Read through the check, so
 	// a fixture edited without `npm run benchmark` fails the build rather

@@ -1,12 +1,10 @@
-<p align="center">
+<h1 align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/logo_brand_dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/logo_brand.svg">
-    <img alt="" src="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/logo_brand.svg" width="72" height="72">
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/wordmark_dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/wordmark.svg">
+    <img alt="Cirth" src="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/wordmark.svg" width="281" height="96">
   </picture>
-</p>
-
-<h1 align="center">Cirth</h1>
+</h1>
 
 <p align="center"><strong>CSS for the HTML you already write.</strong></p>
 

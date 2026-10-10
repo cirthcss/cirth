@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 90 2548 950" role="img" aria-labelledby="title desc" style="color:#1A1D11">
+  <title id="title">Cirth</title>
+  <desc id="desc">Cirth wordmark outlined from Martian Grotesk Condensed Bold.</desc>
+  <metadata>
+    Wordmark set in Martian Grotesk Condensed Bold 700 with -0.012em tracking,
+    converted to vector outlines. Martian Grotesk is distributed under the
+    SIL Open Font License 1.1: https://github.com/evilmartians/grotesk
+  </metadata>
+  <g fill="currentColor">
+    <g transform="translate(0 1000)">
+      <path d="M357 19C255 19 176.5-17.332 121.5-90 66.5-162.668 39-266 39-400s28-237.332 84-310c56-72.668 135.668-109 239-109 92 0 164.332 28.668 217 86 52.668 57.332 81.668 138.668 87 244H516c-20-122-71.332-183-154-183-107.332 0-161 90.668-161 272s52 272 156 272c76.668 0 125-57 145-171h150c-6.668 101.332-35.332 179.668-86 235-50.668 55.332-120.332 83-209 83Z"/>
+    </g>
+    <g transform="translate(680 1000)">
+      <path d="M66-613h156V0H66Zm78-64c-28 0-50.168-9.5-66.5-28.5S53-750.332 53-783c0-33.332 8.168-59.5 24.5-78.5S116-890 144-890s50.168 9.5 66.5 28.5S235-816.332 235-783c0 32.668-8.168 58.5-24.5 77.5S172-677 144-677Z"/>
+    </g>
+    <g transform="translate(957 1000)">
+      <path d="M66 0v-613h156v54h18c10-23.332 25-41.332 45-54s42.668-19 68-19c90 0 135 71 135 213v63H329v-45c0-28.668-3.668-49.5-11-62.5S299.332-483 284-483c-21.332 0-37 13.332-47 40-10 26.668-15 68.332-15 125V0Z"/>
+    </g>
+    <g transform="translate(1438 1000)">
+      <path d="M309 19c-125.332 0-188-76.332-188-229v-267H21v-136h100v-159h156v159h211v136H277v267c0 61.332 14.668 92 44 92 16 0 28.832-9.332 38.5-28s17.5-48.668 23.5-90h136C511.668-66 441.668 19 309 19Z"/>
+    </g>
+    <g transform="translate(1966 1000)">
+      <path d="M385-360c0-42-6.668-72.832-20-92.5S331.332-482 304-482c-28 0-48.668 9.832-62 29.5S222-402 222-360V0H66v-848h156v288h18c12.668-22.668 30.332-40.332 53-53s48.332-19 77-19c34 0 63.832 9 89.5 27s45.668 43 60 75 21.5 69.332 21.5 112V0H385Z"/>
+    </g>
+  </g>
+</svg>

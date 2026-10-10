@@ -1,150 +1,120 @@
 const fs = require("node:fs");
 const path = require("node:path");
-const { parseColor } = require("./lib/color");
-const { boundingBox, markPaths, publicDir, read } = require("./lib/brand-mark");
+const { boundingBox, markPaths, namePaths, pigment, publicDir } = require("./lib/brand-mark");
+const { roles } = require("./build-brand-marks");
 
 // Generates the horizontal lockup (the mark with "Cirth" beside it) from
-// the assets and tokens that already define both halves. Nothing here is a
-// second copy of the identity:
+// the sources that already define both halves. Nothing here is a second
+// copy of the identity:
 //
-//   geometry   docs/public/logo_brand.svg      (the mark paths, verbatim)
-//   pigment    docs/public/logo_brand*.svg     (each variant's own fill)
-//   ink        src/theme/_colors.scss          ($neutral-900 / $neutral-100)
-//   type       the system sans the framework ships, as live SVG text
+//   mark       docs/public/logo_brand.svg      (the path data, verbatim)
+//   name       docs/brand/cirth-wordmark-martian-condensed.svg
+//                                              (the word outlined from
+//                                              Martian Grotesk Condensed
+//                                              Bold, SIL OFL 1.1)
+//   pigment    src/theme/_colors.scss          (the mark's roles, as
+//                                              build-brand-marks.js assigns
+//                                              them; the name's ink from
+//                                              $neutral-900 / $neutral-100)
 //
-// The text is live rather than outlined on purpose, and it is the reason
-// this file exists instead of four hand-drawn SVGs. Cirth's wordmark is
-// "the same system stacks the framework ships" (docs/src/pages/brand.md);
-// outlining it would both freeze one platform's rendering and embed glyph
-// outlines from fonts (SF Pro, Segoe UI) that are not ours to
-// redistribute. Live text costs one thing in exchange: the advance width
-// moves between faces, so the box reserves the widest one measured.
+// The name is outlines, not text, so the lockup renders the same on every
+// platform and needs no font installed.
 
-const projectRoot = path.join(__dirname, "..");
-
-// Geometry. The mark's ink occupies a box inside its 512 viewBox, and the
-// paths are not centred in it, so a lockup built on the viewBox would sit
-// visibly off its own baseline. The box is measured from the path data
-// (scripts/lib/brand-mark.js) rather than written down here: it used to be
-// a literal, and a literal is a measurement of one drawing that no longer
-// holds the moment the drawing changes.
+// Both halves are measured from their path data. The name's reference is
+// the ink of its first glyph, the round C: cap height plus its overshoot.
 const MARK_BOX = boundingBox(markPaths());
+const NAME = namePaths();
+const NAME_BOX = boundingBox(NAME);
+const CAP_BOX = boundingBox([NAME[0]]);
 
-// Type. Measured in Chromium at 700 weight, 100px, over the faces
-// `--cirth-font-family-sans` can actually resolve to:
-//
-//   cap height   71.68 (SF Pro) · 72.8 (Arial) · 73.34 (Helvetica)
-//   advance      227.64 (SF Pro) · 233.3 (Helvetica, Arial) · 245.86 (Tahoma)
-//
-// CAP_HEIGHT is the ratio the mark is sized against, and is what "mark at
-// the cap height" in brand.md means numerically. TEXT_RESERVE is the width
-// the box holds open for the word: above every face in the stack, so a
-// narrower one leaves a little air on the right rather than being clipped.
-const FONT_SIZE = 100;
-const CAP_HEIGHT = 0.72 * FONT_SIZE;
-const TEXT_RESERVE = 2.45 * FONT_SIZE;
-const ASCENDER = 0.78 * FONT_SIZE;
+// The mark is drawn taller than the name's capitals. Provisional, like the
+// drawing: the published ratio waits for the definitive mark.
+const MARK_RATIO = 1.5;
 
-// The gap between mark and word, as a fraction of the cap height. The two
-// places Cirth already sets its own name beside the mark (the site header
-// and the share card) sit either side of this value.
-const GAP = 0.25 * CAP_HEIGHT;
+// How the two halves are aligned: optically, not by their boxes. The
+// feather adds height to the mark without adding mass, so centring the
+// mark on the capitals leaves the figure sunk below them. The mark and the
+// name are aligned at the foot instead, and the name is raised by a quarter
+// of the difference in their heights. For this drawing that is also what
+// centring the figure without its feather (hat to lute) on the capitals
+// gives: 0.254.
+const RAISE = 0.25;
 
-// Tracking, in user units rather than `em`: `letter-spacing` with a
-// relative unit is CSS/SVG 2, and standalone SVG rasterisers still in use
-// (librsvg, resvg) ignore it silently. At this font size the two are the
-// same -2% the site header sets on the same word.
-const TRACKING = -0.02 * FONT_SIZE;
+// The gap between mark and name, as a fraction of the cap height.
+const GAP_RATIO = 0.3;
 
-const FONT_STACK =
-	"system-ui, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, Helvetica, Arial, 'Helvetica Neue', sans-serif";
+// The lockup's own height, in user units: the size its SVG declares.
+const HEIGHT = 108;
 
-// The fill a given mark variant paints with, read back out of that variant.
-/** @param {string} file */
-const markFill = (file) => {
-	const fill = read(file).match(/<path\s+d="[^"]+"\s+fill="([^"]+)"/);
-	if (!fill) throw new Error(`build-brand-lockup: no fill found in ${file}`);
-	return fill[1];
-};
+/** @param {number} value */
+const round = (value) => Math.round(value * 1000) / 1000;
 
-// The page ink, from the scale the schemes build --cirth-contrast-text out of.
-/** @param {string} name */
-const neutral = (name) => {
-	const colors = fs.readFileSync(
-		path.join(projectRoot, "src/theme/_colors.scss"),
-		"utf8",
-	);
-	const match = colors.match(new RegExp(`\\$${name}:\\s*(oklch\\([^)]*\\))`));
-	if (!match) throw new Error(`build-brand-lockup: $${name} not found`);
-	const { r, g, b } = parseColor(match[1]);
-	/** @param {number} value */
-	const channel = (value) =>
-		Math.round(Math.max(0, Math.min(1, value)) * 255)
-			.toString(16)
-			.padStart(2, "0")
-			.toUpperCase();
-	return `#${channel(r)}${channel(g)}${channel(b)}`;
-};
-
-const scale = CAP_HEIGHT / MARK_BOX.height;
-const markWidth = MARK_BOX.width * scale;
-const textX = markWidth + GAP;
-const width = Math.round((textX + TEXT_RESERVE) * 100) / 100;
-const height = ASCENDER;
-// Baseline sits at the bottom of the box: "Cirth" has no descender, so the
-// box does not reserve room for one.
-const baseline = ASCENDER;
-const markY = baseline - CAP_HEIGHT;
+// Lay both halves out in the name's units, then scale the whole to HEIGHT.
+const capBottom = CAP_BOX.y + CAP_BOX.height;
+const markHeight = MARK_RATIO * CAP_BOX.height;
+const markTop = capBottom + RAISE * (markHeight - CAP_BOX.height) - markHeight;
+const top = Math.min(markTop, NAME_BOX.y);
+const bottom = Math.max(markTop + markHeight, NAME_BOX.y + NAME_BOX.height);
+const unit = HEIGHT / (bottom - top);
+const markScale = (markHeight * unit) / MARK_BOX.height;
+const markWidth = MARK_BOX.width * markScale;
+const nameX = markWidth + GAP_RATIO * CAP_BOX.height * unit;
+const width = nameX + NAME_BOX.width * unit;
+// Where the middle of the name's capitals falls, as a share of the
+// lockup's height: what a page needs to centre the name, rather than the
+// lockup's box, on the text beside it.
+const nameCentre = (CAP_BOX.y + CAP_BOX.height / 2 - top) / (bottom - top);
 
 /**
  * @param {object} variant
- * @param {string} variant.file
  * @param {string} variant.markFill
- * @param {string} variant.textFill
+ * @param {string} variant.nameFill
  * @param {string} variant.title
  */
-const lockup = ({ file, markFill: fill, textFill, title }) => {
-	const transform = `translate(0 ${round(markY)}) scale(${round(scale)}) translate(${round(-MARK_BOX.x)} ${round(-MARK_BOX.y)})`;
-	const paths = markPaths()
-		.map((d) => `    <path d="${d}" fill="${fill}" />`)
+const lockup = ({ markFill, nameFill, title }) => {
+	const markTransform = `translate(0 ${round((markTop - top) * unit)}) scale(${round(markScale)}) translate(${round(-MARK_BOX.x)} ${round(-MARK_BOX.y)})`;
+	const nameTransform = `translate(${round(nameX)} 0) scale(${round(unit)}) translate(${round(-NAME_BOX.x)} ${round(-top)})`;
+	const mark = markPaths()
+		.map((d) => `    <path d="${d}"/>`)
 		.join("\n");
-	const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${round(width)}" height="${round(height)}" viewBox="0 0 ${round(width)} ${round(height)}" fill="none" role="img" aria-label="Cirth">
+	const name = NAME.map((d) => `    <path d="${d}"/>`).join("\n");
+	return `<svg xmlns="http://www.w3.org/2000/svg" width="${round(width)}" height="${HEIGHT}" viewBox="0 0 ${round(width)} ${HEIGHT}" fill="none" role="img" aria-label="Cirth">
   <title>${title}</title>
-  <g transform="${transform}">
-${paths}
+  <g transform="${markTransform}" fill="${markFill}">
+${mark}
   </g>
-  <text x="${round(textX)}" y="${round(baseline)}" fill="${textFill}" font-family="${FONT_STACK}" font-size="${FONT_SIZE}" font-weight="700" letter-spacing="${round(TRACKING)}">Cirth</text>
+  <g transform="${nameTransform}" fill="${nameFill}">
+${name}
+  </g>
 </svg>
 `;
-	fs.writeFileSync(path.join(publicDir, file), svg);
-	return file;
 };
 
-/** @param {number} value */
-function round(value) {
-	return Math.round(value * 1000) / 1000;
-}
-
-const variants = [
-	{
-		file: "wordmark.svg",
-		markFill: markFill("logo_brand.svg"),
-		textFill: neutral("neutral-900"),
+/** @returns {Record<string, string>} Every lockup, by file name, as it should read on disk. */
+const variants = () => ({
+	"wordmark.svg": lockup({
+		markFill: pigment(roles.markLight),
+		nameFill: pigment("neutral-900"),
 		title: "Cirth — horizontal lockup, light backgrounds",
-	},
-	{
-		file: "wordmark_dark.svg",
-		markFill: markFill("logo_brand_dark.svg"),
-		textFill: neutral("neutral-100"),
+	}),
+	"wordmark_dark.svg": lockup({
+		markFill: pigment(roles.markDark),
+		nameFill: pigment("neutral-100"),
 		title: "Cirth — horizontal lockup, dark backgrounds",
-	},
-	{
-		file: "wordmark_mono.svg",
+	}),
+	"wordmark_mono.svg": lockup({
 		markFill: "currentColor",
-		textFill: "currentColor",
+		nameFill: "currentColor",
 		title: "Cirth — horizontal lockup, one colour",
-	},
-];
+	}),
+});
 
-const written = variants.map(lockup);
-console.log(`[cirth] brand lockup generated: ${written.join(", ")}`);
+module.exports = { HEIGHT, nameCentre: round(nameCentre), variants, width: round(width) };
+
+if (require.main === module) {
+	const files = variants();
+	for (const [file, content] of Object.entries(files)) {
+		fs.writeFileSync(path.join(publicDir, file), content);
+	}
+	console.log(`[cirth] brand lockup generated: ${Object.keys(files).join(", ")}`);
+}

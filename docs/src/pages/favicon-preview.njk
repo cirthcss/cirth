@@ -3,5 +3,8 @@ layout: false
 permalink: /favicon-preview/index.html
 eleventyExcludeFromCollections: true
 ---
+{#- The touch icon is opaque: iOS fills a transparent one with black, and
+    rounds the corners itself. The favicon is drawn on the paper canvas,
+    with room around it. -#}
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Cirth touch icon source</title><style>*{box-sizing:border-box}html,body{width:180px;height:180px;margin:0;overflow:hidden}img{display:block;width:180px;height:180px}</style></head><body><img src="../favicon.svg" alt="Cirth" /></body></html>
+<html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Cirth touch icon source</title><style>*{box-sizing:border-box}html,body{width:180px;height:180px;margin:0;overflow:hidden;background:{{ brandMark.paper.hex }}}img{display:block;width:140px;height:140px;margin:20px}</style></head><body><img src="../favicon.svg" alt="Cirth" /></body></html>

@@ -136,9 +136,9 @@ preset.
 
 ### What this does not promise
 
-- **That the brand mark shares the accent's hue.** The mark keeps its copper
-  at 44° until it is redrawn separately; until then the accent and the mark
-  differ, and `docs/src/pages/brand.md` says so.
+- **That the brand mark shares the accent's hue.** Not promised by this
+  change, which left the mark in copper at 44°. Since closed outside the
+  published artifact: see open question 1.
 - **A redesign of the presets.** Plain and playroom change only through what
   they inherit. Their redesign is separate work.
 - **That every pair of signals clears 0.06 under colour vision deficiency.**
@@ -372,8 +372,12 @@ of other systems; this change records its conclusions as reported.
 
 ## Open questions
 
-1. **The mark.** It does not have the new hue yet. `docs/src/pages/brand.md`
-   now says so instead of claiming a shared hue.
+1. **The mark.** Closed. The redrawn mark (2026-10-09) is painted from
+   this scale by `scripts/build-brand-marks.js`: `$accent-500` on light
+   grounds and `$accent-400` on dark ones. `npm run check:brand-assets`
+   fails when a brand file no longer matches the scale, so the mark
+   follows any later move of the accent.
+   The brand files are documentation assets, not part of the npm package.
 2. **The presets.** Plain and playroom are to be redesigned; their meter
    order in dark and defects 2 and 3 belong to that work. Partly closed:
    playroom is replaced by material (`specs/material-preset.md`), which

@@ -48,8 +48,10 @@
 // text). $accent-* seeds the default of the one accent input,
 // --cirth-primary; $neutral-* carries ink, lines and the secondary
 // controls, and gives both canvases their hue. The accent's hue (324deg)
-// is chosen for the interface, and the brand mark is to be redrawn on it,
-// not the other way round; specs/default-palette.md records why this hue.
+// is chosen for the interface, and the brand mark is painted from it by
+// scripts/build-brand-marks.js, not the other way round; renaming or
+// removing a step that script reads fails `npm run check:brand-assets`.
+// specs/default-palette.md records why this hue.
 
 // B&W
 $black: oklch(0% 0 0deg);

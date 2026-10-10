@@ -1,25 +1,55 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-// One reading of the brand mark, for every script that needs its geometry.
+// One reading of the brand mark, for every script that needs its geometry
+// or its colour.
 //
-// Before this module the mark's measurements were written down twice, by
-// hand, and disagreed: build-brand-lockup.js carried
-// `MARK_BOX = { x: 76, y: 66, width: 340.476, height: 380 }` while the
-// favicons cropped the same drawing at `88 48 346 416`. Both were correct
-// for the drawing someone measured, and neither would survive a redraw,
-// because nothing recomputes them and nothing notices when they are wrong.
-//
-// The box is derived from the path data instead. For the current mark that
-// reproduces the hand-measured constant exactly.
+// The mark's measurements are derived from its path data, never written
+// down: a box measured by hand is right about one drawing and silently
+// wrong about the next. Its pigments are read from the theme's scales, so
+// the mark and the accent share a hue by construction.
+
+const { parseColor } = require("./color");
 
 const publicDir = path.join(__dirname, "../../docs/public");
+const colorsFile = path.join(__dirname, "../../src/theme/_colors.scss");
 
 /** The file the mark's geometry is read from. Every other asset follows it. */
 const SOURCE = "logo_brand.svg";
 
 /** @param {string} file */
 const read = (file) => fs.readFileSync(path.join(publicDir, file), "utf8");
+
+/**
+ * A step of the theme's scales (`accent-500`, `canvas-light`) as written in
+ * src/theme/_colors.scss.
+ *
+ * @param {string} name
+ * @returns {string}
+ */
+const scaleStep = (name) => {
+	const colors = fs.readFileSync(colorsFile, "utf8");
+	const match = colors.match(new RegExp(`\\$${name}:\\s*(oklch\\([^)]*\\))`));
+	if (!match) throw new Error(`brand-mark: $${name} not found in src/theme/_colors.scss`);
+	return match[1];
+};
+
+/**
+ * The same step as the uppercase hex an SVG fill carries.
+ *
+ * @param {string} name
+ * @returns {string}
+ */
+const pigment = (name) => {
+	const { r, g, b } = parseColor(scaleStep(name));
+	/** @param {number} value */
+	const channel = (value) =>
+		Math.round(Math.max(0, Math.min(1, value)) * 255)
+			.toString(16)
+			.padStart(2, "0")
+			.toUpperCase();
+	return `#${channel(r)}${channel(g)}${channel(b)}`;
+};
 
 /**
  * The `d` command of every path in an SVG, in document order.
@@ -248,4 +278,107 @@ const boundingBox = (paths) => {
 	};
 };
 
-module.exports = { SOURCE, boundingBox, markPaths, pathData, publicDir, read };
+/** The name's outlines: the word as drawn for the lockup, not set in type. */
+const NAME_SOURCE = path.join(__dirname, "../../docs/brand/cirth-wordmark-martian-condensed.svg");
+
+/**
+ * A path rewritten in absolute M, L, C, Q and Z commands, moved by
+ * (dx, dy). Smooth curves are expanded and H and V become lines, so the
+ * result is a path any consumer of this module can bound or transform.
+ * Elliptical arcs are refused for the reason boundingBox() gives.
+ *
+ * @param {string} d
+ * @param {number} [dx]
+ * @param {number} [dy]
+ * @returns {string}
+ */
+const absolutePath = (d, dx = 0, dy = 0) => {
+	const tokens = d.match(/[A-Za-z]|-?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?/g) ?? [];
+	/** @param {number} value */
+	const fmt = (value) => String(Math.round(value * 1000) / 1000);
+	/** @param {number} x @param {number} y */
+	const at = (x, y) => `${fmt(x + dx)} ${fmt(y + dy)}`;
+	let cursor = 0;
+	let command = "";
+	let x = 0;
+	let y = 0;
+	let startX = 0;
+	let startY = 0;
+	let reflectX = 0;
+	let reflectY = 0;
+	let previous = "";
+	/** @type {string[]} */
+	const out = [];
+	const next = () => Number(tokens[cursor++]);
+	while (cursor < tokens.length) {
+		if (/[A-Za-z]/.test(tokens[cursor])) command = tokens[cursor++];
+		const base = command.toUpperCase();
+		const relative = command !== base;
+		const ox = relative ? x : 0;
+		const oy = relative ? y : 0;
+		if (base === "Z") {
+			out.push("Z");
+			x = startX;
+			y = startY;
+			previous = "Z";
+			continue;
+		}
+		if (base === "M" || base === "L") {
+			x = ox + next();
+			y = oy + next();
+			out.push(`${base}${at(x, y)}`);
+			if (base === "M") {
+				startX = x;
+				startY = y;
+				command = relative ? "l" : "L";
+			}
+		} else if (base === "H" || base === "V") {
+			if (base === "H") x = ox + next();
+			else y = oy + next();
+			out.push(`L${at(x, y)}`);
+		} else if (base === "C" || base === "S") {
+			const smooth = base === "S";
+			const c1x = smooth ? (previous === "C" ? 2 * x - reflectX : x) : ox + next();
+			const c1y = smooth ? (previous === "C" ? 2 * y - reflectY : y) : oy + next();
+			const c2x = ox + next();
+			const c2y = oy + next();
+			x = ox + next();
+			y = oy + next();
+			out.push(`C${at(c1x, c1y)} ${at(c2x, c2y)} ${at(x, y)}`);
+			reflectX = c2x;
+			reflectY = c2y;
+			previous = "C";
+			continue;
+		} else if (base === "Q" || base === "T") {
+			const smooth = base === "T";
+			const cx = smooth ? (previous === "Q" ? 2 * x - reflectX : x) : ox + next();
+			const cy = smooth ? (previous === "Q" ? 2 * y - reflectY : y) : oy + next();
+			x = ox + next();
+			y = oy + next();
+			out.push(`Q${at(cx, cy)} ${at(x, y)}`);
+			reflectX = cx;
+			reflectY = cy;
+			previous = "Q";
+			continue;
+		} else {
+			throw new Error(`brand-mark: cannot rewrite the "${command}" command`);
+		}
+		previous = base;
+	}
+	return out.join("");
+};
+
+/**
+ * The name's glyphs, one absolute path each, in the source's units with
+ * every glyph's own translation applied: the baseline sits at y = 1000.
+ *
+ * @returns {string[]}
+ */
+const namePaths = () => {
+	const svg = fs.readFileSync(NAME_SOURCE, "utf8");
+	const glyphs = [...svg.matchAll(/<g transform="translate\(([-\d.]+)[ ,]+([-\d.]+)\)">\s*<path d="([^"]+)"/g)];
+	if (glyphs.length === 0) throw new Error(`brand-mark: no glyph found in ${path.relative(process.cwd(), NAME_SOURCE)}`);
+	return glyphs.map(([, tx, ty, d]) => absolutePath(d, Number(tx), Number(ty)));
+};
+
+module.exports = { NAME_SOURCE, SOURCE, absolutePath, boundingBox, markPaths, namePaths, pathData, pigment, publicDir, read, scaleStep };

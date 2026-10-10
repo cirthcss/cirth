@@ -30,6 +30,11 @@ const lockupCaptures = [
 	{ source: "wordmark_dark.svg", file: "wordmark_dark.png" },
 ];
 
+// The mark's rasters, at 1024px, rendered from the generated SVGs for the
+// same reason as the lockups: a PNG exported by hand falls behind its SVG
+// without anything noticing.
+const logoCaptures = ["logo_brand", "logo_brand_dark", "logo_mono", "logo_mono_dark"];
+
 // The set a brand reviewer needs, rendered from the site rather than mocked
 // up beside it. The two specimen captures are the application screen: the
 // 324deg accent on small surfaces, dark surfaces on the 120deg neutrals, and a
@@ -92,6 +97,22 @@ const reviewCaptures = [
 			await page.screenshot({
 				animations: "disabled",
 				path: path.join(projectRoot, "docs/public", capture.file),
+				omitBackground: true,
+			});
+			await page.close();
+		}
+
+		for (const name of logoCaptures) {
+			const page = await browser.newPage({
+				viewport: { width: 512, height: 512 },
+				deviceScaleFactor: 2,
+			});
+			await page.goto(pathToFileURL(path.join(projectRoot, "docs/public", `${name}.svg`)).href, {
+				waitUntil: "load",
+			});
+			await page.screenshot({
+				animations: "disabled",
+				path: path.join(projectRoot, "docs/public", `${name}.png`),
 				omitBackground: true,
 			});
 			await page.close();
