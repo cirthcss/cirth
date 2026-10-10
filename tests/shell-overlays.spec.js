@@ -35,6 +35,20 @@ test.afterAll(() => {
 });
 
 /**
+ * Press the search shortcut the trigger declares for this platform:
+ * Command+K on Apple platforms, Ctrl+K elsewhere. Read from the page rather than
+ * written here, so the suite runs the same on macOS and on Linux.
+ * @param {import("@playwright/test").Page} page
+ */
+const pressSearchShortcut = async (page) => {
+	const declared = await page
+		.locator("[data-docs-search-trigger]")
+		.getAttribute("aria-keyshortcuts");
+	const [shortcut] = String(declared).split(" ");
+	await page.keyboard.press(shortcut.replace(/K$/, "k"));
+};
+
+/**
  * Tab `steps` times, returning a description of the active element after
  * each press.
  * @param {import("@playwright/test").Page} page
@@ -181,6 +195,48 @@ test("search opens to the field, returns results, and gives focus back", async (
 	await expect(dialog).not.toHaveAttribute("open", "");
 	await expect(trigger).toHaveAttribute("aria-expanded", "false");
 	await expect(trigger).toBeFocused();
+});
+
+// The shortcut is the one the trigger shows and announces, and only that
+// one: each platform's other modifier keeps its own meaning (Ctrl+K in a
+// Mac text field deletes to the end of the line).
+test("search opens on the shortcut its trigger declares, and on no other", async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 1440, height: 900 });
+	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
+
+	const trigger = page.locator("[data-docs-search-trigger]");
+	const dialog = page.locator("[data-docs-search-dialog]");
+	const input = page.locator("[data-docs-search-input]");
+	const apple = await page.evaluate(() =>
+		/mac|iphone|ipad/i.test(navigator.platform),
+	);
+
+	await expect(trigger).toHaveAttribute(
+		"aria-keyshortcuts",
+		apple ? "Meta+K /" : "Control+K /",
+	);
+	await expect(trigger.locator("[data-docs-search-modifier]")).toHaveText(
+		apple ? "⌘" : "Ctrl",
+	);
+
+	await page.keyboard.press(apple ? "Control+k" : "Meta+k");
+	await page.keyboard.press("Alt+k");
+	await expect(dialog).not.toHaveAttribute("open", "");
+
+	await pressSearchShortcut(page);
+	await expect(dialog).toHaveAttribute("open", "");
+	await expect(input).toBeFocused();
+
+	// Focus goes back to the trigger in the dialog's close event, a moment
+	// after it closes; "/" typed while the field still has focus is text.
+	await page.keyboard.press("Escape");
+	await expect(dialog).not.toHaveAttribute("open", "");
+	await expect(trigger).toBeFocused();
+	await page.keyboard.press("/");
+	await expect(dialog).toHaveAttribute("open", "");
+	await expect(input).toBeFocused();
 });
 
 test("search is a full surface on a phone, not a shrunken panel", async ({
@@ -446,7 +502,7 @@ test("the search field takes focus on its row, not as a second rectangle", async
 
 		const input = page.locator("[data-docs-search-input]");
 		const row = page.locator(".docs-search-dialog > article > header");
-		await page.keyboard.press("Control+k");
+		await pressSearchShortcut(page);
 		await expect(input).toBeFocused();
 		expect(await input.evaluate((element) => element.matches(":focus-visible"))).toBe(true);
 
@@ -494,7 +550,7 @@ test("the search field takes focus on its row, not as a second rectangle", async
 	// the line instead; either way the focus stays visible.
 	await page.emulateMedia({ forcedColors: "active" });
 	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
-	await page.keyboard.press("Control+k");
+	await pressSearchShortcut(page);
 	const forced = await page.locator("[data-docs-search-input]").evaluate((element) => ({
 		outline: getComputedStyle(element).outlineColor,
 		width: Number.parseFloat(getComputedStyle(element).outlineWidth),
