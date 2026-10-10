@@ -14,9 +14,26 @@ if (
   results instanceof HTMLOListElement &&
   typeof dialog.showModal === "function"
 ) {
+  // The shortcut is Command+K on Apple platforms and Ctrl+K elsewhere, and
+  // the trigger says so: in its hint, and to assistive technology through
+  // aria-keyshortcuts. "/" opens search too, outside a field.
   const modifier = document.querySelector("[data-docs-search-modifier]");
-  const applePlatform = /Mac|iPhone|iPad/.test(navigator.platform);
+  const platform = navigator.userAgentData?.platform || navigator.platform || "";
+  const applePlatform = /mac|iphone|ipad/i.test(platform);
   if (modifier) modifier.textContent = applePlatform ? "⌘" : "Ctrl";
+  trigger.setAttribute("aria-keyshortcuts", applePlatform ? "Meta+K /" : "Control+K /");
+
+  // Matched on the physical key as well as on the character, so a layout
+  // that moves K still opens search with the key labelled K. Each
+  // platform's other modifier is left alone, and so is AltGr (Ctrl+Alt) on
+  // Windows: Ctrl+K in a Mac text field deletes to the end of the line.
+  const isShortcut = (event) =>
+    (event.code === "KeyK" || event.key.toLowerCase() === "k") &&
+    !event.shiftKey &&
+    !event.altKey &&
+    (applePlatform
+      ? event.metaKey && !event.ctrlKey
+      : event.ctrlKey && !event.metaKey);
 
   const baseUrl = (document.documentElement.dataset.base || "/").replace(
     /\/?$/,
@@ -150,11 +167,13 @@ if (
       target instanceof HTMLTextAreaElement ||
       target instanceof HTMLSelectElement ||
       (target instanceof HTMLElement && target.isContentEditable);
-    const command =
-      (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
     const slash =
-      event.key === "/" && !editing && !event.metaKey && !event.ctrlKey;
-    if (!command && !slash) return;
+      event.key === "/" &&
+      !editing &&
+      !event.metaKey &&
+      !event.ctrlKey &&
+      !event.altKey;
+    if (!isShortcut(event) && !slash) return;
     event.preventDefault();
     openSearch();
   });
