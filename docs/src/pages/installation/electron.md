@@ -4,12 +4,12 @@ framework: electron
 description: "Use Cirth in an Electron app. Link it from the renderer's page, and allow data: images in the Content Security Policy so Cirth's icons load."
 ---
 {% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
-An Electron window is Chromium, well above Cirth's floor, and follows the
-system's light or dark setting. Link Cirth from the renderer's page; the one
-thing to adjust is the Content Security Policy, because Cirth draws its icons
-as `data:` images.
+An Electron app's renderer is the Chromium page shown inside a window. Link
+Cirth in that page's `<head>`, where it applies to the whole rendered
+document. The Content Security Policy also needs to allow `data:` images,
+because Cirth uses them for its icons.
 
 ## 1. Install
 

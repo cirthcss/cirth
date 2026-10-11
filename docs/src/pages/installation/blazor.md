@@ -3,12 +3,12 @@ layout: docs.njk
 framework: blazor
 description: Use Cirth in a Blazor Web App. Put the file in wwwroot and link it through @Assets in App.razor, in place of Bootstrap.
 ---
-{% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
-A Blazor Web App links its stylesheets in `Components/App.razor`, through
-`@Assets`, which resolves each path to its fingerprinted name. Cirth is one
-file in `wwwroot/` and one `<link>`, in place of the template's Bootstrap.
+`Components/App.razor` writes the document shell shared by every route in a
+Blazor Web App. It links files from the public `wwwroot/` directory through
+`@Assets`, which resolves each path to its fingerprinted name. Cirth replaces
+the template's Bootstrap link there.
 
 ## 1. Add the file
 

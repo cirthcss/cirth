@@ -52,14 +52,4 @@ export default defineConfig({
 
 {{ checkIt(true) }}
 
-## Coming from Remix v2
-
-The latest version of Remix is React Router v7: an app on Remix v2 upgrades
-to React Router's framework mode, with the codemod
-`npx codemod remix/2/react-router/upgrade` and the rest of the official
-[upgrade guide](https://reactrouter.com/upgrading/remix). Its Vite plugin
-changes from `remix()` to `reactRouter()`, and `app/root.tsx` keeps its
-`<Links />`. After the upgrade, Cirth goes in as the steps above show: the
-same import, the same `build.cssTarget` beside `reactRouter()`.
-
 {{ nextSteps("after the @import in app/app.css") }}

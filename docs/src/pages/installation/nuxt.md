@@ -16,7 +16,9 @@ line beside it.
 
 ## 2. Add it, and set the CSS target
 
-{{ whyTarget("Vite") }} under `vite` in `nuxt.config.ts`:
+{{ whyTarget("Vite") }}
+
+Add `build.cssTarget` under `vite` in `nuxt.config.ts`:
 
 ```ts
 export default defineNuxtConfig({

@@ -3,9 +3,11 @@ layout: docs.njk
 framework: yii
 description: Use Cirth in a Yii 2 app. Put the file in web/css and list it in AppAsset in place of Bootstrap, before the app's own stylesheet.
 ---
+{% from "guide.njk" import nextSteps %}
 
 A new Yii 2 app links its stylesheets through `AppAsset`, an asset bundle,
-and is built on Bootstrap 5. Cirth takes Bootstrap's place in that bundle,
+and is built on Bootstrap 5. An asset bundle tells the shared layout which
+files to place in the document head. Cirth takes Bootstrap's place there,
 ahead of the app's own stylesheet.
 
 ## 1. Create the project
@@ -141,4 +143,4 @@ mode. The page source links `css/cirth.min.css`, then `css/site.css`, and
 no Bootstrap; the page follows the system, and the section with
 `data-theme="dark"` stays dark both times.
 
-{% from "guide.njk" import nextSteps %}{{ nextSteps("in web/css/site.css") }}
+{{ nextSteps("in web/css/site.css") }}

@@ -3,12 +3,12 @@ layout: docs.njk
 framework: rails
 description: Use Cirth in a Rails app with Propshaft. Put the file in vendor/assets/stylesheets and link it before the app's own stylesheets.
 ---
-{% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
 A new Rails app serves stylesheets with Propshaft, which copies each file
-unchanged under a digest. Cirth is one vendored file and one
-`stylesheet_link_tag`, before the app's own.
+unchanged under a digest. The application layout supplies the document head
+for every view, so one `stylesheet_link_tag` there loads the vendored Cirth
+file globally, before the app's own stylesheets.
 
 ## 1. Add the file
 

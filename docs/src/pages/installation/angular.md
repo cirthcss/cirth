@@ -4,6 +4,7 @@ framework: angular
 description: Use Cirth in an Angular application. Add the stylesheet to the styles array in angular.json, or import it from styles.css.
 ---
 {% from "install.njk" import packageManagers %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
 Angular loads global stylesheets from the `styles` array of the build
 configuration. Cirth is one entry there.
@@ -56,13 +57,8 @@ Cirth styles the global document. A component whose styles are encapsulated
 in a shadow root (`ViewEncapsulation.ShadowDom`) does not receive global CSS;
 use the default emulated encapsulation for markup Cirth should style.
 
-## Choosing a build
+## 4. Check it
 
-Use `dist/cirth.classless.min.css`, `dist/cirth.scoped.min.css` or
-`dist/cirth.classless.scoped.min.css` in the array instead; every file is
-listed in [What the package contains](/compatibility#what-the-package-contains).
+{{ checkIt() }}
 
-## Next
-
-[Customization](/customization) covers the `--cirth-*` properties; set them
-in `src/styles.css`, after Cirth.
+{{ nextSteps("in src/styles.css, after Cirth") }}

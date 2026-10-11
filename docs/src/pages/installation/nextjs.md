@@ -4,6 +4,7 @@ framework: nextjs
 description: Use Cirth in a Next.js App Router project. Import it in the root layout and give the project a browserslist that matches Cirth's.
 ---
 {% from "install.njk" import packageManagers %}
+{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
 In the App Router, global CSS is imported from the root layout. Cirth is one
 import there, plus a browser list so Next does not rewrite its colours.
@@ -33,10 +34,9 @@ own rules.
 
 ## 3. Declare Cirth's browsers
 
-Next compiles CSS for older browsers than Cirth supports, and rewrites its
-`light-dark()` colours on the way. The page still switches between light and
-dark, but a `data-theme` element that forces the other scheme inside it stops
-changing colour. Next reads a `browserslist` from `package.json`:
+{{ whyTarget("Next.js") }}
+
+Next.js reads this `browserslist` from `package.json`:
 
 ```json
 {
@@ -69,13 +69,8 @@ export default function Page() {
 }
 ```
 
-## Choosing a build
+## 5. Check it
 
-Import `@cirthcss/cirth/classless`, `@cirthcss/cirth/scoped` or
-`@cirthcss/cirth/classless/scoped` instead; every entry point is listed in
-[What the package contains](/compatibility#what-the-package-contains).
+{{ checkIt(true, "check the browserslist above") }}
 
-## Next
-
-[Customization](/customization) shows how to override `--cirth-*`
-properties from your own stylesheet.
+{{ nextSteps("in a global stylesheet imported after Cirth") }}

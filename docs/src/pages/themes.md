@@ -5,16 +5,26 @@ description: Light and dark schemes, the shipped presets, and how to write and v
 
 # Themes
 
-A theme in Cirth is a set of `--cirth-*` values, nothing more. The default
-theme ships in every build with a light and a dark scheme; three presets
-restate some of its tokens on top of it; and your own theme is a stylesheet
-that does the same.
+A theme in Cirth is a set of `--cirth-*` custom-property values. Start with
+one input and let its derived roles follow:
+
+```css
+:root {
+  --cirth-primary: light-dark(#2563eb, #93c5fd);
+}
+```
+
+The default theme includes light and dark schemes. A preset restates a
+maintained group of tokens. A custom theme is an application stylesheet that
+sets only the values it needs to own.
 
 ## Light and dark
 
-Cirth ships both schemes. The scheme follows the operating system, and
-`data-theme="light"` or `data-theme="dark"` on any element forces one for
-that subtree.
+Cirth declares both schemes and follows the operating system's colour-scheme
+preference by default. The browser uses the active `color-scheme` for
+built-in controls as well as for `light-dark()`. Cirth's
+`data-theme="light"` and `data-theme="dark"` convention forces the
+corresponding scheme for an element and its subtree.
 
 ```html
 <html data-theme="dark">
@@ -63,34 +73,28 @@ and it cannot fall out of step with itself.
 
 ### `data-theme` in scoped builds
 
-The builds differ in *where* they look for the attribute.
-
-- **Unscoped builds** respond to `data-theme` on any ancestor.
-- **Scoped builds** only look at the `.cirth` element itself, or elements
-  inside it. `<html data-theme="dark">` around a `.cirth` widget has no
-  effect, because every generated selector is anchored to the wrapper.
-
-If you embed a scoped widget in a host page that manages its own dark mode,
-mirror the host's choice onto the wrapper:
+Unscoped builds respond to a themed ancestor. Scoped builds look for the
+attribute on `.cirth` or inside its subtree, because their generated
+selectors cannot rely on the surrounding page. Mirror the host's choice onto
+the wrapper:
 
 ```html
 <div class="cirth" data-theme="dark">…</div>
 ```
 
+[Using Cirth with existing CSS](/guides/existing-css) owns the full scoped
+boundary and token-inheritance rules.
+
 ## Presets
 
-A preset is a stylesheet that restates some of the default theme's tokens,
-and nothing else, so it works with any of the four builds. Cirth ships
-three: `plain`, the conventional application look in five declarations;
-`material`, Material Design 3's colour scheme, shapes and motion; and
-`metro`, the manner of Windows Phone and Windows 8. Try each live with the
-**Preset** control in this site's header.
+Cirth ships three optional, token-only preset stylesheets: `plain`,
+`material` and `metro`. Try them with the **Preset** control in this site's
+header.
 
 {% colorSwatches %}
 
-[Presets](/presets) describes what each one moves and leaves alone, how it
-behaves in both schemes and under increased contrast, how to load it, and
-how to give it its typeface, since a preset loads no font of its own.
+[Presets](/presets) owns their purpose, loading order, changed tokens,
+colour-scheme behavior and font setup.
 
 ## Your own theme
 

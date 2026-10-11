@@ -1,73 +1,91 @@
 ---
 layout: docs.njk
+description: Create native links for navigation, understand their interaction states, and use Cirth's optional color modifiers.
 ---
-
 
 # Link
 
-Links are styled by tag: `a` (excluding `[role="button"]`) and any element
-with `role="link"`, plus two class modifiers for the secondary and contrast
-color groups.
+Use an `<a>` element with an `href` when activating the text should navigate
+to another page, file, or location. The `href` is the destination. Use a
+native `<button>` instead when the control performs an action on the current
+page.
 
 {% demo "links" %}
 
 ```html
-<a href="#">Primary link</a>
-<a href="#" class="secondary">Secondary link</a>
-<a href="#" class="contrast">Contrast link</a>
+<p><a href="/installation/">Install Cirth</a></p>
+<p><a href="/compatibility" class="secondary">Check compatibility</a></p>
 ```
 
-The second paragraph of that example is the `:visited` state, and it is the
-one state on this page that cannot be mocked up: a browser paints it only
-for a link you have really followed, and reports the unvisited colour to
-`getComputedStyle` so a page cannot read it back. So the example does the
-only honest thing: it asks you to follow the link and return, and prints
-the token's own colour beside it, which is always visible.
+## Native browser behavior
 
-If the followed link still looks unvisited when you come back, the browser
-is suppressing the state rather than Cirth failing to style it. Safari does
-this unconditionally. Chromium partitions visited state from 136 onward: a
-link is painted as visited only when *this* page is where you followed it
-from, so arriving at a page whose links you have opened from somewhere else
-shows none of them as visited. Firefox still applies it globally.
+An `<a href>` participates in keyboard navigation, opens through the browser's
+link commands, exposes its destination, and can be copied or opened in another
+tab. A bare `<a>` without `href` does not provide the same link behavior.
 
-## Behavior
+Browsers track visited links under privacy restrictions. They permit only a
+limited set of color changes and conceal the painted visited value from page
+scripts. As a result, a visited link can keep its original underline color
+while its text color changes.
 
-* Color and underline come from `--cirth-primary-text` /
-  `--cirth-primary-underline` by default.
-* `:hover`, `:active`, `:focus`, and `[aria-current]` (excluding
-  `aria-current="false"`) switch to the `-active` roles and force an
-  underline.
-* `:focus-visible` adds a focus ring in `--cirth-primary-focus`.
-* `:visited` drops the accent for `--cirth-link-visited-color`, an
-  achromatic grey at the same lightness as the accent, so a followed link in
-  a long page shows as spent. Zero chroma on purpose: a grey carrying the
-  neutral scale's hue (120deg) is, against the accent, a hue change at nearly
-  the same lightness: the weakest available way to say "you have been here". It applies to content links only: entries inside `nav` or a
-  dropdown menu keep their color, since a menu that grays out one item at a
-  time as the reader browses looks broken rather than oriented. `.secondary`
-  and `.contrast` links stay in their own color group too, as do the states
-  above.
-* `a[role="button"]` opts out of link styling and receives
-  [Button](/content/button) styling for backward compatibility. Do not use
-  it for navigation: changing the role hides the link semantics, while the
-  anchor still lacks a button's Space-key behavior. Prefer an ordinary link
-  for a destination and a native `<button>` for an action.
+## What Cirth adds
 
-Likewise, `role="link"` changes only semantics and styling. A non-anchor
-custom link still needs `tabindex="0"`, keyboard activation, and navigation
-logic supplied by the application. Native `<a href>` remains the reliable
-default.
+- Ordinary links use the primary text and underline color roles.
+- `:hover`, `:active`, `:focus`, and a true `[aria-current]` use the active
+  roles and show an underline.
+- `:focus-visible` draws the standard focus outline.
+- Visited links in running content use `--cirth-link-visited-color`.
+  Navigation links, current links, color modifiers, and links wrapping cards
+  keep the color required by their current context.
+- An anchor with `role="button"` receives button styling. This does not make
+  it a correct replacement for `<button>`.
 
-The underline keeps its unvisited tint on a visited link, and that is not an
-oversight: browsers let `:visited` change `color` (plus background, border,
-and outline colors) and ignore every other property, including
-`text-decoration-color`, so that a page can't work out where you have been.
-For the same reason the visited color is invisible to scripts:
-`getComputedStyle` reports the unvisited one.
+`aria-current` identifies the link for the page or step currently being
+shown. For example:
+
+```html
+<nav aria-label="Documentation">
+  <a href="/installation/" aria-current="page">Installation</a>
+  <a href="/compatibility">Compatibility</a>
+</nav>
+```
+
+The browser exposes `aria-current="page"` to assistive technology. Cirth adds
+the visual active treatment. Set it only on the current item.
 
 ## Modifiers
 
-`.secondary` and `.contrast` swap the color group the same way they do for
-[buttons](/content/button). They are available only in the default build with
-classes enabled.
+The class-enabled build provides `.secondary` and `.contrast` when a link
+needs the corresponding color role:
+
+```html
+<a href="/settings" class="secondary">Account settings</a>
+<a href="/release-archive" class="contrast">Release archive</a>
+```
+
+Use the default treatment for most links. Color should support the interface
+hierarchy, not encode a meaning that the text fails to express.
+
+## Custom links
+
+`role="link"` supplies link semantics and receives Cirth's link styling, but
+it does not add a destination or native activation behavior. A custom element
+still needs focusability, Enter-key activation, and navigation logic from the
+application. Prefer `<a href>` whenever it can represent the destination.
+
+## Common mistakes
+
+- Do not use `href="#"` as a placeholder action. It changes the URL and can
+  move focus to the top of the page.
+- Do not add `role="button"` to a link merely to change its appearance. Link
+  and button interaction differ, including Space-key behavior.
+- Do not open a new tab without a clear reason and appropriate context for the
+  user.
+- Do not remove the focus outline unless an equally visible replacement is
+  present.
+
+## Related pages
+
+- [Button](/content/button)
+- [Navigation](/components/nav)
+- [Accessibility guide](/guides/accessibility)

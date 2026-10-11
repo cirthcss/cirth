@@ -1,32 +1,36 @@
 ---
 layout: docs.njk
+description: Build collapsible disclosures and exclusive accordions with native details and summary elements.
 ---
-
 
 # Accordion
 
-The native `<details>`/`<summary>` pair is styled as a collapsible accordion
-item, with no JavaScript and no ARIA widget required.
+Use the native `details` and `summary` elements when a person should reveal or
+hide a section of content. `summary` is the visible control; the remaining
+children are the panel it controls.
 
 {% demo "accordion" %}
 
 ```html
 <details>
-  <summary>Accordion item 1</summary>
-  <p>Content for the first item.</p>
+  <summary>Standard delivery</summary>
+  <p>Three to five working days, with tracking.</p>
 </details>
+
 <details open>
-  <summary>Accordion item 2 (open by default)</summary>
-  <p>Content for the second item.</p>
+  <summary>Express delivery</summary>
+  <p>Next working day if ordered before 14:00.</p>
 </details>
 ```
 
+The `open` Boolean attribute provides the initial open state. The browser adds
+or removes it when the summary is activated. JavaScript and an ARIA
+`expanded` state are not required for this native pattern.
+
 ## One at a time
 
-Give a group of `details` the same `name` and the browser makes them
-mutually exclusive: opening one closes the others. No JavaScript, no
-`aria-expanded` bookkeeping: the state lives in the elements, and the
-accessibility tree follows it for free.
+Give related `details` elements the same `name` to make an exclusive group.
+Opening one member closes the other open member.
 
 {% demo "accordion-exclusive" %}
 
@@ -39,28 +43,62 @@ accessibility tree follows it for free.
   <summary>Express delivery</summary>
   <p>Next working day if ordered before 14:00.</p>
 </details>
+<details name="shipping">
+  <summary>Collect in store</summary>
+  <p>Ready within two hours.</p>
+</details>
 ```
 
-Two things worth knowing before reaching for it: if several members of a
-group carry `open`, only the first stays open, and an exclusive accordion
-means a reader cannot compare two answers side by side. Use it when the
-options are alternatives, not when they are a checklist.
+If the source marks several members of one named group as open, the browser
+keeps only one open. Use exclusivity for alternative views or space management.
+Avoid it when people need to compare several answers at once.
+
+## Browser behavior
+
+The browser makes `summary` keyboard-operable, manages the `open` state and
+exposes the disclosure relationship to assistive technology. Keep `summary` as
+the first child of `details` and put a concise description of the hidden
+content inside it.
 
 ## Behavior
 
-* The default disclosure triangle/marker is removed and replaced with a
-  chevron icon (`--cirth-icon-chevron`) that rotates 180° when open.
-* `summary` color: `--cirth-accordion-close-summary-color` when closed,
-  `--cirth-accordion-open-summary-color` when open (and not focused),
-  `--cirth-accordion-active-summary-color` on hover/focus.
-* The single divider belongs to the `details` item, not to `summary`: when
-  open it follows the revealed content instead of separating that content
-  from its trigger.
-* `summary[role="button"]` (a `details` used as an accordion triggered by a
-  button) becomes full width, aligned left, with its own marker sizing.
-* Grouping with `name` needs nothing from Cirth: the styling is per item,
-  so exclusivity is the browser's business and works with everything on
-  this page.
+Cirth removes the platform marker and adds a theme-aware chevron. It rotates
+when the disclosure opens. Each regular disclosure has a divider, a 44px
+summary target, an outset focus ring and spacing below its revealed content.
 
-`details.dropdown` is a related but distinct pattern; see
-[Dropdown](/components/dropdown).
+Where `::details-content` and animatable intrinsic sizes are supported, Cirth
+adds a sliding transition. Opening and closing remain functional without that
+enhancement. Reduced-motion preferences remove the transition.
+
+`details.dropdown` is excluded from the accordion surface rules because its
+panel is positioned as a menu. See [Dropdown](/components/dropdown).
+
+## Accessibility
+
+- Write a summary that still makes sense when the panel is closed.
+- Do not place another interactive control inside `summary`.
+- Do not add `role="button"` or duplicate `aria-expanded` state to an ordinary
+  native summary.
+- Keep essential warnings visible if a reader might never open the disclosure.
+
+## Tokens
+
+| Token | What it sets |
+| --- | --- |
+| `--cirth-icon-chevron` | Disclosure marker |
+| `--cirth-accordion-close-summary-color` | Closed summary text |
+| `--cirth-accordion-open-summary-color` | Open summary text |
+| `--cirth-accordion-active-summary-color` | Hovered or focused summary text |
+| `--cirth-muted-border-color` | Divider |
+
+## Common mistakes
+
+- Putting the label outside `summary`, which leaves an unclear trigger.
+- Adding click handlers that duplicate the native toggle.
+- Using an exclusive group where several panels must remain open for
+  comparison.
+
+## Related
+
+- [Dropdown](/components/dropdown)
+- [Reduced motion](/guides/accessibility#reduced-motion)

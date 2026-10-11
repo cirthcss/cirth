@@ -1,22 +1,24 @@
-{#- Parts every integration guide shares. Each macro returns markdown,
+{#- Parts every integration guide shares. Each macro returns Markdown,
     rendered after Nunjucks, so nothing here is indented.
 
-    whyTarget(tool): why a pipeline that lowers CSS needs Cirth's browser
-    targets.
-    checkIt(lowers, fix): the last step of every guide, a forced-dark
-    subtree, which is what a light-dark() rewrite breaks.
-    nextSteps(where): where the reader's own overrides go. -#}
+    whyTarget(tool): why a pipeline that transforms modern CSS needs
+    Cirth's browser targets.
+    checkIt(lowers, fix): the last step of every guide, using a forced-dark
+    subtree to prove that Cirth loaded and that light-dark() survived.
+    nextSteps(where): where overrides go and where the shared references
+    live. -#}
 
 {%- macro whyTarget(tool = "Vite") -%}
-{{ tool }} compiles CSS for older browsers than Cirth supports, and on the
-way rewrites its `light-dark()` colours. The page still follows the system
-between light and dark, but an element with `data-theme` that forces the
-other scheme inside it stops changing colour. Tell {{ tool }} Cirth's
-browser floor:
+{{ tool }} compiles CSS for browsers older than Cirth supports. That process
+rewrites `light-dark()` colours. The page can still follow the system theme,
+but a `data-theme` region may fail to force the other colour scheme. Set
+{{ tool }} to Cirth's browser floor below. [Compatibility](/compatibility)
+explains the transformation and its limits.
 {%- endmacro -%}
 
 {%- macro checkIt(lowers = false, fix = "check the CSS target above") -%}
-Put a forced-dark subtree on any page:
+Put this forced-dark region in a page or component that uses the global
+stylesheet:
 
 ```html
 <section data-theme="dark">
@@ -26,13 +28,16 @@ Put a forced-dark subtree on any page:
 </section>
 ```
 
-Build for production and open the page. The article is dark on a light
-page and stays dark on a dark one.{% if lowers %} If it follows the page
-instead, the build rewrote Cirth's colours: {{ fix }}.{% endif %}
+{% if lowers %}Build for production, then {% else %}Run the app, then {% endif %}open
+the page while the system uses a light theme. A dark article proves that
+Cirth loaded and that `data-theme="dark"` is working. It remains dark when
+the system switches to a dark theme.{% if lowers %} If the article follows
+the surrounding page instead, the build rewrote Cirth's colours: {{ fix }}.{% endif %}
 {%- endmacro -%}
 
 {%- macro nextSteps(where = "in a stylesheet loaded after Cirth's") -%}
 [Customization](/customization) covers the `--cirth-*` properties; set
-yours {{ where }}. To use another build (classless, scoped, print) see
-[What the package contains](/compatibility#what-the-package-contains).
+yours {{ where }}. [Package and builds](/package) lists the classless,
+scoped and print entry points. Return to [Framework guides](/framework-guides)
+for another stack.
 {%- endmacro -%}

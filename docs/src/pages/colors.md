@@ -16,6 +16,20 @@ of your own, see [Themes](/themes); for the shipped presets, see
 The accent is for action and position. Everything else is a surface level,
 an edge, an ink or a state.
 
+```css
+:root {
+  --cirth-primary: #2563eb;
+}
+```
+
+This is the safest first colour change. Derived hover, border, underline and
+focus values continue to follow the input. A hex value is valid; you do not
+need to write Cirth's internal colour notation.
+
+Where this page prints OKLCH, `L` is perceived lightness, `C` is chroma
+and `H` is hue. Cirth uses that colour space to derive related roles while
+keeping their visual relationships more predictable.
+
 {% if not measured %}
 The measured values on this page are read from `dist/tokens/` when the
 site is built, and this build ran without it, so only the token names are
@@ -321,20 +335,15 @@ surface levels, component styles, reset rules, or scheme wiring: each scheme
 difference is stated once as a `light-dark()` pair, which is why `plain` fits
 in five declarations.
 
-Cirth targets browsers with native `oklch()` support (see the `browserslist`
-field in `package.json`), so the compiled CSS ships `oklch()` directly rather
-than converting it to a `hex` / `lab()` fallback.
+Cirth targets browsers with native `oklch()` support (see the
+[browser floor](/compatibility#browser-support)), so the compiled CSS ships
+`oklch()` directly rather than converting it to a hex or Lab fallback.
 
 </details>
 
-## Theme history
+## Related pages
 
-Cirth previously inherited a set of twenty accent color themes from Pico CSS, then
-briefly maintained three full themes (azure, jade, slate). That has been
-reduced further to a single official theme plus token override presets,
-first `plain` and `playroom`, now `plain` and `material`. The official theme's accent was a yellow-orange until
-0.15 and a copper through 0.16; it is now the magenta described above, with
-the neutral, surface and status families rebuilt around it rather than
-adapted to it. See
-[About](/about) for the project's history and
-[Contributions](/contributions) before proposing color system changes.
+- [Themes](/themes) for light, dark and increased-contrast values.
+- [Presets](/presets) for maintained token override sets.
+- [Token reference](/tokens) for every public colour property.
+- [Customization](/customization) for placement and cascade rules.

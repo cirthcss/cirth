@@ -3,11 +3,13 @@ layout: docs.njk
 framework: helidon
 description: Use Cirth in a Helidon SE app. Serve the file with Helidon's static content feature and answer HTML from a route. No Node.js.
 ---
+{% from "guide.njk" import nextSteps %}
 
 Helidon SE is a set of libraries around a web server, not a template
 engine: a route writes whatever HTML the app renders, and the static
-content feature serves files from the classpath as they are. Cirth is one
-of those files. Nothing here needs Node.js.
+content feature exposes files stored in the application's classpath. Cirth
+is one of those files, linked in the document head returned by the route.
+Nothing here needs Node.js.
 
 ## 1. Create the project
 
@@ -120,4 +122,4 @@ mode. The page arrives as `text/html`, the stylesheet as `text/css`, the
 page follows the system, and the section with `data-theme="dark"` stays
 dark both times.
 
-{% from "guide.njk" import nextSteps %}{{ nextSteps("in a stylesheet in the same static folder, linked after Cirth") }}
+{{ nextSteps("in a stylesheet in the same static folder, linked after Cirth") }}

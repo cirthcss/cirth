@@ -4,11 +4,12 @@ framework: astro
 description: Use Cirth in an Astro site. Import it in the frontmatter of a layout every page uses; Astro's build keeps it as it is.
 ---
 {% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
 Astro bundles every stylesheet a component imports. Import Cirth once, in a
-layout every page uses, and nothing needs configuring: Astro's build keeps
-Cirth's `light-dark()` colours.
+layout every page uses, and it becomes global CSS for the document. The
+frontmatter is the code between `---` markers at the top of an `.astro`
+file. Astro's build keeps Cirth's `light-dark()` colours.
 
 ## 1. Install
 

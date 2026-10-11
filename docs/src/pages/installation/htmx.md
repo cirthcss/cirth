@@ -3,12 +3,12 @@ layout: docs.njk
 framework: htmx
 description: Use Cirth with htmx. Link it once in the page htmx swaps into; every fragment the server returns is styled on arrival.
 ---
-{% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
 htmx asks the server for HTML and swaps it into the page. Cirth styles
-elements, not components, so a fragment needs nothing: link the stylesheet
-once, in the page, and whatever arrives is styled.
+elements, not components. Link the stylesheet once in the `<head>` of the
+initial full document. Fragments returned later reuse that global CSS and
+need no stylesheet link of their own.
 
 ## 1. Link it
 

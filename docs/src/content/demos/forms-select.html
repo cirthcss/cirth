@@ -11,21 +11,21 @@
   Time zone
   <select name="timezone">
     <optgroup label="Europe">
-      <option>Rome</option>
-      <option selected>London</option>
+      <option value="Europe/Rome">Rome</option>
+      <option value="Europe/London" selected>London</option>
     </optgroup>
     <optgroup label="Americas">
-      <option>New York</option>
-      <option>São Paulo</option>
+      <option value="America/New_York">New York</option>
+      <option value="America/Sao_Paulo">São Paulo</option>
     </optgroup>
   </select>
 </label>
 <label>
   Notify me about
   <select name="topics" multiple size="4">
-    <option selected>Releases</option>
-    <option>Security advisories</option>
-    <option selected>Breaking changes</option>
-    <option>Community events</option>
+    <option value="releases" selected>Releases</option>
+    <option value="security">Security advisories</option>
+    <option value="breaking" selected>Breaking changes</option>
+    <option value="community">Community events</option>
   </select>
 </label>

@@ -1,17 +1,23 @@
 <hgroup>
-  <h1>Heading level 1</h1>
-  <p>A short subheading grouped with hgroup.</p>
+  <h1>Deploying a web service</h1>
+  <p>A short checklist for a safe first release.</p>
 </hgroup>
 <p>
-  Body text with <strong>bold</strong>, <em>italic</em>, <mark>highlighted</mark>,
-  <ins>inserted</ins>, <del>deleted</del>, and an <abbr title="Abbreviation">abbr</abbr>.
+  Review every <strong>required check</strong>, <em>especially</em> the items
+  marked as <mark>release blockers</mark>.
 </p>
-<blockquote>
-  "Standard HTML elements should carry most of the structure, meaning, and
-  styling burden before a class is needed."
-  <footer>— <cite>Cirth philosophy</cite></footer>
-</blockquote>
+<h2>Before deployment</h2>
 <ul>
-  <li>Unordered item one</li>
-  <li>Unordered item two</li>
+  <li>Run the automated tests.</li>
+  <li>Back up the production database.</li>
 </ul>
+<h2>Deployment order</h2>
+<ol>
+  <li>Apply database migrations.</li>
+  <li>Deploy the application.</li>
+  <li>Verify the health endpoint.</li>
+</ol>
+<blockquote>
+  <p>Make each change small enough to understand and reverse.</p>
+  <footer><cite>Operations handbook</cite></footer>
+</blockquote>

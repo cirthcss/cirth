@@ -1,8 +1,8 @@
-// Site navigation config, ported 1:1 from the previous src/lib/nav.ts.
+// Site navigation config.
 
 const siteTitle = "Cirth";
 const siteDescription =
-	"HTML-native CSS framework. Production-ready UI from semantic HTML: no class vocabulary to learn, 0 JavaScript.";
+	"Semantic-first CSS framework for usable interfaces, with optional layout classes and no shipped JavaScript runtime.";
 
 // "Docs" opens the documentation where it begins, with why; "Get started"
 // (the home page, the footer) skips straight to installing it. "Source" is
@@ -13,17 +13,15 @@ const topNav = [
 	{ text: "Source", link: "https://github.com/cirthcss/cirth", external: true },
 ];
 
-// The integration guides, from the one list in frameworks.js. They are
-// pages of Installation, not a section of their own: the sidebar nests them
-// under it, one disclosure per category, and each guide's breadcrumb names
-// Installation and its category. A category has no page; its `anchor` is
-// its heading on the Installation page. Guides are not in the reading
-// order (below).
+// The integration guides, from the one list in frameworks.js. Their index is
+// separate from the installation quickstart, so choosing a stack never
+// interrupts the basic path. A category has no page; its `anchor` is its
+// heading on the Framework guides page. Guides are not in the reading order.
 const { groups } = require("./frameworks.js");
 const frameworks = groups.map(({ id, text, guides }) => ({
 	text,
 	id,
-	anchor: `/installation/#guides-${id}`,
+	anchor: `/framework-guides/#guides-${id}`,
 	items: guides.map(({ name, link }) => ({ text: name, link })),
 }));
 
@@ -35,17 +33,16 @@ const sidebar = [
 		items: [
 			{ text: "Why Cirth", link: "/why-cirth" },
 			{ text: "Compatibility", link: "/compatibility" },
-			{
-				text: "Installation",
-				link: "/installation",
-				items: frameworks,
-			},
+			{ text: "Installation", link: "/installation" },
+			{ text: "Package and builds", link: "/package" },
+			{ text: "Framework guides", link: "/framework-guides", items: frameworks },
 		],
 	},
 	{
 		text: "Customization",
 		items: [
 			{ text: "Overview", link: "/customization" },
+			{ text: "Token reference", link: "/tokens" },
 			{ text: "Colors", link: "/colors" },
 			{ text: "Themes", link: "/themes" },
 			{ text: "Presets", link: "/presets" },
@@ -112,6 +109,8 @@ const sidebar = [
 		text: "Guides",
 		items: [
 			{ text: "Accessibility and user preferences", link: "/guides/accessibility" },
+			{ text: "Using Cirth with existing CSS", link: "/guides/existing-css" },
+			{ text: "Delivery and deployment", link: "/delivery" },
 		],
 	},
 	{
@@ -130,6 +129,8 @@ const sidebar = [
 			{ text: "About", link: "/about" },
 			{ text: "Contributions", link: "/contributions" },
 			{ text: "Brand", link: "/brand" },
+			{ text: "Attributions", link: "/attributions" },
+			{ text: "Markup comparison", link: "/markup-comparison" },
 		],
 	},
 ];
@@ -147,15 +148,15 @@ const redirects = [
 		title: "Installation",
 		anchors: {
 			"excluding-a-third-party-component":
-				"/compatibility/#excluding-a-third-party-component",
+				"/guides/existing-css/#excluding-a-third-party-component",
 		},
 	},
 	{
 		from: "/deploy/",
-		to: "/compatibility/",
-		title: "Compatibility",
+		to: "/delivery/",
+		title: "Delivery and deployment",
 		anchors: {
-			"what-a-smaller-stylesheet-actually-buys": "/about/#why-small-matters-here",
+			"what-a-smaller-stylesheet-actually-buys": "/delivery/#compression",
 		},
 	},
 	{
@@ -177,17 +178,17 @@ const redirects = [
 		anchors: {},
 	},
 	// The CDN guide repeated the Installation page's first section. The
-	// snippet lives there now, and the hashes for the other builds, the
-	// print sheet and a preset moved to Compatibility.
+	// quickstart lives there now, while advanced delivery and build selection
+	// have their own authoritative pages.
 	{
 		from: "/installation/cdn/",
 		to: "/installation/#cdn",
 		title: "Installation",
 		anchors: {
 			"1-link-it": "/installation/#cdn",
-			"2-write-html": "/installation/#cdn",
-			"choosing-a-build": "/compatibility/#every-build-from-the-cdn",
-			"print-and-presets": "/compatibility/#every-build-from-the-cdn",
+			"2-write-html": "/installation/#minimal-page",
+			"choosing-a-build": "/package/#screen-builds",
+			"print-and-presets": "/package/#companion-files",
 		},
 	},
 	// For a while the JavaScript guides were one page with a section each.
@@ -216,8 +217,8 @@ const redirects = [
 	},
 	{
 		from: "/installation/javascript/",
-		to: "/installation/#guides",
-		title: "Installation",
+		to: "/framework-guides/",
+		title: "Framework guides",
 		anchors: {
 			vite: "/installation/vite/",
 			react: "/installation/react/",

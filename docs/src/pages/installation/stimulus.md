@@ -4,11 +4,12 @@ framework: stimulus
 description: Use Cirth with Stimulus. Load the stylesheet from your build, and let controllers set the attributes Cirth already styles.
 ---
 {% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
 Stimulus adds behaviour to HTML the server already rendered; it has no CSS
-step of its own. Load Cirth the way your app loads stylesheets, then let
-controllers change state through attributes, which is how Cirth reads it.
+step of its own. With Vite, the entry module is the JavaScript file loaded
+once to start the app; importing Cirth there makes it global CSS. Controllers
+can then change state through the HTML attributes Cirth reads.
 
 ## 1. Install
 

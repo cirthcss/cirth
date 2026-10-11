@@ -1,111 +1,167 @@
 ---
 layout: docs.njk
+description: Build a current, accessible modal with the native dialog element, Cirth styling and progressive enhancement.
 ---
-
 
 # Modal
 
-The native `<dialog>` element is styled as a centered modal with a
-backdrop. Opening it, closing it, locking the page behind it and animating
-it in are all the platform's work: Cirth supplies the appearance and
-nothing else, and no longer asks your script for anything.
+Use a modal dialog when a short interaction must be resolved before the person
+continues with the page. The native `dialog` element supplies modal semantics,
+focus behavior, keyboard dismissal and the browser's top layer. Cirth supplies
+the backdrop and card presentation.
 
 {% demo "modal" %}
 
 ```html
-<dialog id="confirm" aria-labelledby="confirm-title">
-  <article>
-    <header>
-      <button type="button" aria-label="Close" rel="prev"></button>
-      <strong id="confirm-title">Delete this item?</strong>
-    </header>
-    <p>It is removed for everyone on the project, and it cannot be restored.</p>
-    <footer>
-      <button type="button" class="secondary">Cancel</button>
-      <button type="button" class="danger">Delete</button>
-    </footer>
-  </article>
-</dialog>
-```
-
-The dialog is the overlay surface level, lifted by the overlay shadow, over
-a backdrop that dims and blurs the page: the example above holds it inside
-a box of its own so the elevation is visible without covering this page.
-
-## Opening and closing
-
-Two attributes, no script:
-
-```html
-<button type="button" commandfor="confirm" command="show-modal">
+<button id="open-confirm-delete" type="button"
+        commandfor="confirm-delete" command="show-modal">
   Delete item
 </button>
 
-<dialog id="confirm" aria-labelledby="confirm-title">
+<dialog id="confirm-delete" aria-labelledby="confirm-delete-title">
   <article>
-    <h2 id="confirm-title">Confirm action</h2>
-    <p>Are you sure?</p>
+    <header>
+      <button type="button" rel="prev" aria-label="Close"
+              commandfor="confirm-delete" command="request-close"></button>
+      <h2 id="confirm-delete-title">Delete this item?</h2>
+    </header>
+    <p>It will be removed for everyone and cannot be restored.</p>
     <footer>
-      <button type="button" commandfor="confirm" command="request-close">
+      <button id="cancel-confirm-delete" type="button" class="secondary"
+              commandfor="confirm-delete" command="request-close">
         Cancel
       </button>
-      <form method="dialog"><button type="submit">Confirm</button></form>
+      <form method="dialog">
+        <button type="submit" class="danger" value="confirm">
+          Delete
+        </button>
+      </form>
     </footer>
   </article>
 </dialog>
 ```
 
-`command="show-modal"` opens it, `close` and `request-close` close it: the
-second firing a cancel event first, so a form can object. A
-`<form method="dialog">` closes the dialog on submit and reports which
-button did it through `dialog.returnValue`.
+`aria-labelledby` points to the heading's `id` and gives the dialog an
+accessible name. The `article` is the visible card. The outer `dialog` fills
+the viewport and paints the backdrop.
 
-**Invoker commands are newer than Cirth's
-[browser floor](https://github.com/cirthcss/cirth#browser-support)**
-(Chrome 135, Firefox 144, Safari 26.2). Below that the attributes are
-ignored and the button does nothing, so treat them as an enhancement and
-keep the DOM API wherever the interaction is essential:
+## Opening and closing
+
+`commandfor` connects a button to the `id` of the element it controls.
+`command` names the action:
+
+- `show-modal` calls the dialog's modal opening behavior.
+- `close` closes it directly.
+- `request-close` first dispatches the cancelable `cancel` event, then closes
+  unless application code prevents that event.
+
+A form with `method="dialog"` closes its containing dialog instead of sending
+a network request. The activated submit button's `value` becomes
+`dialog.returnValue`, which application code can inspect in the `close` event.
+That value reports the choice; it does not delete data or confirm an operation
+by itself.
+
+Button commands are supported in
+[Chrome 135](https://developer.chrome.com/release-notes/135),
+[Firefox 144](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/144)
+and [Safari 26.2](https://webkit.org/blog/17640/webkit-features-for-safari-26-2/).
+Those versions are newer than Cirth's browser floor. When opening the modal is
+essential, use the widely supported DOM methods as the compatibility path:
 
 ```js
-const dialog = document.getElementById("confirm");
-dialog.showModal(); // open
-dialog.close(); // close
+const dialog = document.querySelector("#confirm-delete");
+const openButton = document.querySelector("#open-confirm-delete");
+const cancelButton = document.querySelector("#cancel-confirm-delete");
+
+openButton.addEventListener("click", () => dialog.showModal());
+cancelButton.addEventListener("click", () => dialog.close("cancel"));
 ```
 
-That is a compatibility path and application logic (confirming a
-deletion, sending a request), not something Cirth needs in order to
-present the component.
+In that version, give the corresponding buttons the shown IDs and omit command
+attributes if you do not want two activation paths. `showModal()` is important:
+setting `open` or calling `show()` does not create a modal interaction.
+
+## Native browser behavior
+
+Opening with `showModal()` places the dialog in the top layer. The top layer is
+a browser-managed plane above ordinary document stacking, so the dialog is not
+clipped by ancestor overflow or competing `z-index` values. The rest of the
+document becomes inert while the modal is open, and focus is moved into the
+dialog according to the browser's dialog focusing rules.
+
+Escape requests dismissal through the `cancel` event. Application code may
+prevent that event when dismissal would be unsafe, but should provide another
+clear way to close the dialog.
 
 ## Behavior
 
-* `dialog` fills the viewport (`position: fixed`, full width/height) and
-  centers its content; the backdrop uses
-  `--cirth-modal-overlay-background-color` and
-  `--cirth-modal-overlay-backdrop-filter` (a blur by default).
-* The `> article` is the actual modal card. Its width is
-  `min(100% - 2 * --cirth-spacing, --cirth-modal-max-width)` (the cap
-  defaults to `43.75rem`/700px), so it follows the available space
-  continuously with no viewport breakpoint. It is scrollable if content is
-  taller than the viewport.
-* A close control, `.close` or `:is(a, button)[rel="prev"]` in the header,
-  is styled as a small floated icon button (`--cirth-icon-close`).
-* **The page stops scrolling on its own.** `html:has(dialog[open])` sets
-  `overflow: hidden`, and the scrollbar's gutter is held open permanently
-  (`scrollbar-gutter: stable` on the document, see
-  [Document](/layout/document)) so hiding the overflow moves nothing. This
-  replaces the old `.modal-is-open` class and the
-  `--cirth-scrollbar-width` measurement it needed from your script. Scoped
-  builds do not do this: they are anchored inside a wrapper and have no
-  business reaching the document root, so a scoped widget has to ask its
-  host to lock the page.
-* **It animates itself in.** `@starting-style` gives the dialog the "before"
-  frame an element entering the top layer otherwise cannot have: the
-  backdrop fades and the card slides down. This replaces
-  `.modal-is-opening`.
-* **The close is instant outside Chromium.** Animating an element *out* of
-  the top layer needs the `overlay` property, which only Chromium ships, so
-  `display` and `overlay` transition with `allow-discrete` where they can
-  and the dialog simply disappears where they cannot. Nothing is lost by
-  that: closing means the dialog goes away.
-* All of the motion collapses under
-  [reduced motion](/guides/accessibility#reduced-motion).
+Cirth makes the outer dialog a fixed, full-viewport overlay and centres its
+direct `article`. The card width is limited by `--cirth-modal-max-width`, which
+defaults to 43.75rem, and its height remains within the dynamic viewport. Long
+content scrolls inside the card.
+
+A direct header control with `rel="prev"` becomes a close icon. Class-based
+builds also recognise `.close`. The icon still needs an accessible label and a
+real close action.
+
+Unscoped builds lock document scrolling with
+`html:has(dialog:modal)`. The `:modal` state limits the lock to a genuinely
+modal dialog. Scoped builds cannot modify the document root, so their host
+application must lock page scrolling when appropriate.
+
+The backdrop fades in and the card settles into place with `@starting-style`.
+Exit animation support differs by engine because retaining an element in the
+top layer during a discrete close transition is not uniform. Closing still
+works immediately when that visual enhancement is unavailable. Reduced-motion
+preferences remove the transition.
+
+## Presentation and application logic
+
+Cirth presents the dialog. The browser opens, closes and manages the modal
+state. Your application owns the decision represented by the dialog, including
+authorisation, network requests, errors and irreversible work.
+
+For a destructive confirmation, do not perform the action merely because the
+dialog closed. Check `returnValue` or the activated control, then run the
+operation and report its result.
+
+## Accessibility
+
+- Give every dialog a concise accessible name with `aria-labelledby` or
+  `aria-label`.
+- Keep at least one obvious close or cancel control.
+- Put initial focus on a useful control or explanatory element when the
+  browser's default is not suitable. Test the resulting order with a keyboard
+  and screen reader.
+- Use a modal only when interaction with the background must pause.
+- Keep confirmation text specific. State the object and consequence rather
+  than asking a vague "Are you sure?".
+
+## Tokens
+
+| Token | What it sets |
+| --- | --- |
+| `--cirth-modal-background-color` | Dialog card surface |
+| `--cirth-modal-box-shadow` | Dialog elevation |
+| `--cirth-modal-max-width` | Card width cap |
+| `--cirth-modal-overlay-background-color` | Viewport backdrop |
+| `--cirth-modal-overlay-backdrop-filter` | Backdrop filter |
+| `--cirth-icon-close` | Close icon |
+
+## Common mistakes
+
+- Adding the `open` attribute in application markup and expecting modal
+  behavior.
+- Styling a `div` with `role="dialog"` and expecting the browser to provide
+  top-layer, inertness and focus behavior.
+- Using invoker commands without a fallback for Cirth's supported older
+  browsers.
+- Treating `method="dialog"` as the application operation itself.
+- Forgetting that a scoped build leaves document scroll locking to its host.
+
+## Related
+
+- [Popover](/components/popover), for non-modal transient content.
+- [Card](/components/card), for the inner surface.
+- [Compatibility](/compatibility)
+- [Reduced motion](/guides/accessibility#reduced-motion)

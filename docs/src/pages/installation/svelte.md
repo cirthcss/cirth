@@ -30,8 +30,9 @@ A component's `<style>` is scoped by Svelte and comes after Cirth.
 
 ## 3. Set the CSS target
 
-{{ whyTarget("Vite") }} in `vite.config.js`, beside the plugins already
-there:
+{{ whyTarget("Vite") }}
+
+Add `build.cssTarget` in `vite.config.js`, beside the plugins already there:
 
 ```js
 import { defineConfig } from "vite";

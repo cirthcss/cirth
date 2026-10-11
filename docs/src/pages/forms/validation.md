@@ -1,112 +1,132 @@
 ---
 layout: docs.njk
-description: Valid, invalid, disabled, read-only and placeholder states for every Cirth form control, set by you or by the browser's own validation.
+description: Present native and application validation, invalid messages, disabled controls and read-only values consistently in Cirth.
 ---
 
 # Validation and states
 
-Every control has the same set of states, and every one of them comes from
-HTML: an attribute you set, or a pseudo-class the browser sets. There are no
-state classes.
+HTML can check simple constraints such as a missing required value or a malformed
+email address. Your application must still validate every submitted value and
+explain errors that HTML cannot decide.
 
 {% demo "forms-validation" %}
 
 ```html
 <label>
-  Valid email
-  <input type="email" value="ada@example.com" aria-invalid="false">
-  <small>Looks good.</small>
+  Email
+  <input id="email" name="email" type="email" value="not-an-email"
+         aria-invalid="true" aria-describedby="email-error">
+  <small id="email-error">Enter a valid email address.</small>
 </label>
 
 <label>
-  Invalid email
-  <input type="email" value="not-an-email" aria-invalid="true">
-  <small>Enter a valid email address.</small>
+  Reference
+  <input name="reference" type="text" value="INV-1042" readonly>
 </label>
 
 <label>
-  Disabled field
-  <input type="text" value="Read only" disabled>
-</label>
-
-<label>
-  Readonly quantity
-  <input type="number" value="3" readonly>
+  Archived account
+  <input name="archived" type="text" value="Unavailable" disabled>
 </label>
 ```
 
+`aria-invalid="true"` tells assistive technology that the value is invalid.
+`aria-describedby` points to the message that explains why. Neither attribute
+performs validation or prevents submission; application code must keep the
+state and message accurate.
+
 ## Valid and invalid, set by you
 
-- `aria-invalid="true"` marks a field invalid: the edge turns to
-  `--cirth-form-element-invalid-border-color`, an alert icon appears, and the
-  help text after it turns to `--cirth-del-color`.
-- `aria-invalid="false"` marks it valid: a success edge, a check icon, and
-  help text in `--cirth-ins-color`.
+- `aria-invalid="true"` uses the invalid edge, focus ring and icon. An
+  immediately following `small` uses the error text colour.
+- `aria-invalid="false"` uses the valid edge, focus ring and icon. Use it only
+  when explicitly confirming success helps the task.
+- An explicit `aria-invalid` value takes precedence over native validity
+  styling.
 
-Use these when your application decides validity, after checking a value on
-the server for example. An explicit `aria-invalid` always wins over the
-browser's own verdict.
+Set `aria-invalid` when the error is shown, not before the person has had an
+opportunity to enter a value. Remove it when the error is resolved. If a
+server rejects a submission, return focus to a useful summary or the first
+invalid field according to the needs of the form.
 
 ## Invalid, found by the browser
 
-Fields with native constraints (`required`, `type="email"`, `pattern`,
-`min`, `maxlength` and the rest) get the invalid treatment on their own,
-through `:user-invalid`. It waits until the reader has interacted with the
-field, so nothing is red on arrival:
+Native constraints include `required`, input types such as `email`, and
+attributes such as `pattern`, `min`, `max` and `maxlength`.
 
 {% demo "forms-validation-native" %}
 
-A field that satisfies its constraints stays neutral: passing the browser's
-checks does not mean the data is right, so Cirth does not paint it green.
-Range inputs are left out of automatic validity styling, and a `select`
-stays neutral while it has focus.
+Cirth styles `:user-invalid`, which browsers apply after the person has
+interacted with a constrained field. This avoids showing an untouched form as
+a page of errors. A value that passes native constraints stays visually
+neutral because syntactic validity does not prove that application data is
+correct.
+
+Range inputs are excluded from automatic validity styling because browsers
+normalise their value into the permitted range. A required select also remains
+neutral while it has focus.
 
 ## Disabled and read-only
 
-- `disabled` on a control, or on a `fieldset` around it, gives it the
-  disabled state every control shares: a faint wash of the ink
-  (`--cirth-disabled-surface`), the separator for an edge, and its text at
-  half the ink (`--cirth-disabled-color`). Nothing fades by opacity, so a
-  checked box does not turn its accent into a paler colour. It also ignores
-  the pointer. `aria-disabled="true"` on a `label` gives the label the same
-  ink.
-- `readonly` keeps the value selectable and submitted, with a dashed edge so
-  it does not look editable; its fill is the surface's, like any field's. A
-  read-only `number`
-  hides its stepper buttons.
+`disabled` prevents interaction and excludes a control from ordinary form
+submission. A disabled `fieldset` applies that behavior to its descendant form
+controls. Cirth paints disabled controls with the shared disabled surface,
+edge and text colours.
+
+`readonly` applies to supported text controls. It keeps the value focusable,
+selectable and submittable, but prevents editing. Cirth uses a dashed edge to
+distinguish it from both editable and disabled fields. A read-only number field
+also hides its step buttons.
 
 ## Focus
 
-A focused field rises to the page surface, takes the accent on its edge and
-gains a ring in `--cirth-form-element-focus-color`. In the valid or invalid
-state the edge and ring take that state's colour instead.
+An editable focused field keeps its normal surface and edge, then draws an
+outset ring in `--cirth-form-element-focus-color`. A valid or invalid field
+rebinds that ring to the corresponding state colour.
+
+## Browser behavior and application responsibility
+
+The browser can stop a native form submission that violates its HTML
+constraints and may show a platform message. It cannot check whether an email
+exists, a username is available or a value is authorised. Always repeat
+validation on the server or other trusted application boundary.
+
+Cirth only presents states already present in HTML or ARIA. It does not choose
+when to validate, create messages or announce asynchronous errors.
 
 ## Accessibility
 
-- Say what is wrong in words, in the help text, and link it to the field
-  with `aria-describedby`. The icon and colour are cues, not the message.
-- Keep `aria-invalid` in step with the message: set it when you show an
-  error, and remove it when the error is fixed.
-- Prefer `readonly` over `disabled` for a value the reader should still be
-  able to read, copy and submit.
+- State the error in words. Colour and the Cirth icon are supporting cues.
+- Connect the message with `aria-describedby`, and keep `aria-invalid` in step
+  with it.
+- Do not use `aria-invalid="false"` as a default on every untouched control.
+- Prefer `readonly` when a value should remain readable, copyable and
+  submittable. Use `disabled` when the control is unavailable.
 
 ## Tokens
 
 | Token | What it sets |
 | --- | --- |
 | `--cirth-form-element-invalid-border-color` | Invalid edge |
-| `--cirth-form-element-invalid-focus-color` | Invalid focus ring: the edge's colour by default |
+| `--cirth-form-element-invalid-focus-color` | Invalid focus ring |
 | `--cirth-form-element-valid-border-color` | Valid edge |
-| `--cirth-form-element-valid-focus-color` | Valid focus ring: the edge's colour by default |
-| `--cirth-del-color`, `--cirth-ins-color` | Help text in each state |
-| `--cirth-icon-invalid`, `--cirth-icon-valid` | The state icons |
-| `--cirth-disabled-surface`, `--cirth-disabled-color` | The disabled wash and ink |
+| `--cirth-form-element-valid-focus-color` | Valid focus ring |
+| `--cirth-del-color`, `--cirth-ins-color` | Adjacent help text in each explicit state |
+| `--cirth-icon-invalid`, `--cirth-icon-valid` | State icons |
+| `--cirth-disabled-surface`, `--cirth-disabled-color` | Disabled surface and text |
 
-The border tokens derive from the status inputs `--cirth-error` and
-`--cirth-success`; see [Colors](/colors#states).
+The state colours derive from `--cirth-error` and `--cirth-success`; see
+[Colors](/colors#states).
+
+## Common mistakes
+
+- Using `aria-invalid` without an understandable error message.
+- Assuming ARIA changes validation behavior.
+- Disabling a field whose value must be submitted.
+- Relying only on client-side checks for trusted data.
 
 ## Related
 
-- [Forms](/forms/), for help text and fieldsets.
+- [Forms](/forms/)
 - [Text inputs](/forms/text-inputs), [Select](/forms/select) and
-  [Textarea](/forms/textarea).
+  [Textarea](/forms/textarea)

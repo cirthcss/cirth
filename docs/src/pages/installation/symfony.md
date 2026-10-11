@@ -39,7 +39,7 @@ import "@cirthcss/cirth/dist/cirth.min.css";
 import "./styles/app.css";
 ```
 
-The `importmap('app')` call in `templates/base.html.twig` now writes a
+The `importmap('app')` call in `templates/base.html.twig` then writes a
 `<link>` for Cirth before the app's CSS, so `assets/styles/app.css` comes
 after it and can override `--cirth-*` properties. In production,
 `php bin/console asset-map:compile` copies the file unchanged under a

@@ -4,7 +4,7 @@ framework: postcss
 description: Use Cirth in a PostCSS pipeline. Inline it with postcss-import from your own stylesheet; Autoprefixer leaves it as it is.
 ---
 {% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
 PostCSS is a pipeline, not a bundler: it resolves an `@import` only with the
 `postcss-import` plugin, which inlines the file where the rule stands. Cirth
@@ -43,6 +43,10 @@ nothing else. Then build:
 ```sh
 npx postcss src/app.css -o dist/app.css
 ```
+
+`dist/app.css` is the global stylesheet produced by the pipeline. Link that
+file from the shared document head, or pass it to the asset step that writes
+your application's final `<link>`.
 
 ## 4. Check it
 

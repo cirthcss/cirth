@@ -3,6 +3,7 @@ layout: docs.njk
 framework: yew
 description: Use Cirth in a Yew application built with Trunk. Add the stylesheet to the project and link it from index.html with a Trunk css asset.
 ---
+{% from "guide.njk" import checkIt, nextSteps %}
 
 Trunk builds a Yew application from its `index.html`, and copies every
 stylesheet that file links. Cirth is one file in the project and one
@@ -67,3 +68,9 @@ fn main() {
     yew::Renderer::<App>::new().render();
 }
 ```
+
+## 4. Check it
+
+{{ checkIt() }}
+
+{{ nextSteps("in another Trunk CSS asset linked after Cirth") }}

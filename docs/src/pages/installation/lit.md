@@ -4,11 +4,12 @@ framework: lit
 description: Use Cirth in Lit components. A document stylesheet does not reach a shadow root, so each component adopts Cirth in its static styles.
 ---
 {% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import whyTarget, nextSteps %}
 
 A Lit component renders into a shadow root, and a stylesheet in the document
-does not reach inside one. Cirth goes into the component's own `styles`,
-imported as text and adopted there.
+does not reach inside one. A shadow root is an isolated document subtree.
+Cirth therefore goes into each component's own `styles`, imported as text
+and adopted there rather than loaded as global document CSS.
 
 ## 1. Install
 

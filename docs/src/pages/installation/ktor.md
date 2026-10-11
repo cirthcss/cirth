@@ -3,11 +3,13 @@ layout: docs.njk
 framework: ktor
 description: Use Cirth in a Ktor server. Serve the file with staticResources() and write the page with the HTML DSL. No Node.js.
 ---
+{% from "guide.njk" import nextSteps %}
 
 Ktor writes HTML with its HTML DSL, Kotlin code that builds the document,
-and serves files from the resources with `staticResources()`. Cirth is one
-of those files, linked from the document's head. No template engine and
-nothing from npm is needed.
+and exposes classpath resources at public URLs with `staticResources()`.
+Cirth is one of those files. The HTML DSL places its link in the document
+head, where it applies across the page. No template engine or npm step is
+needed.
 
 ## 1. Create the project
 
@@ -95,4 +97,4 @@ Open `http://localhost:8080` with the system in light mode, then in dark
 mode. The page follows the system, and the section with
 `data-theme="dark"` stays dark both times.
 
-{% from "guide.njk" import nextSteps %}{{ nextSteps("in a stylesheet in static/css, linked after Cirth") }}
+{{ nextSteps("in a stylesheet in static/css, linked after Cirth") }}

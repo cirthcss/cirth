@@ -4,10 +4,12 @@ framework: express
 description: Use Cirth with Express. Serve the package's dist folder with express.static and link it from your pages.
 ---
 {% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
-Express serves files with `express.static`. Cirth's package is a folder of
-finished CSS, so the server can hand it out directly from `node_modules`.
+Express maps a directory to public URLs with `express.static`. Cirth's
+package is finished CSS, so the server can expose it directly from
+`node_modules`. Put its `<link>` in the shared layout or template head so
+every rendered page loads it.
 
 ## 1. Install
 

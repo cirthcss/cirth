@@ -1,5 +1,6 @@
 ---
 layout: docs.njk
+description: Associate terms, names, or keys with one or more descriptions using the native description-list elements.
 ---
 
 
@@ -20,7 +21,21 @@ class, no wrapper required.
 </dl>
 ```
 
+## Native structure
+
+`<dl>` contains a series of terms and descriptions. `<dt>` is the term, name,
+or key. One or more following `<dd>` elements provide its description or
+value. HTML also allows several terms to share one description.
+
+The relationship comes from the element order, so keep every description next
+to the term or terms it belongs to. A description list is appropriate for
+key-value information and glossaries. It is not a substitute for every list
+whose items happen to contain two pieces of text.
+
 ## Behavior
+
+Cirth leaves the browser's description-list semantics intact and changes only
+the presentation:
 
 * `<dt>` is set at the label weight (`--cirth-font-weight-medium`), so the
   term reads as the term rather than as another line of the description.
@@ -35,8 +50,8 @@ class, no wrapper required.
 
 ## Laying pairs out in columns
 
-HTML allows a `<div>` around each term/description pair, for exactly one
-reason: to give you a box to lay out. Combine it with
+HTML allows a `<div>` around each term/description group, which gives the
+group a box that can participate in a layout. Combine it with
 [`.grid`](/layout/grid) and the pairs become cells.
 
 {% demo "description-list-grid" %}
@@ -64,3 +79,21 @@ For the same reason `<dl>` ships no grid of its own. A metrics panel is a
 composition (`.grid` or [`.row`](/layout/row) plus a `<dl>`), not a
 component, and the hairlines and column counts a particular panel wants are
 that page's design, not the framework's.
+
+## Common mistakes
+
+- Do not put a heading in `<dt>` merely to make it bold. The element must name
+  the description that follows.
+- Do not separate a term from its descriptions with unrelated content.
+- Do not use a two-column table when the information is a simple list of
+  names and values. Use a table only when row and column relationships both
+  matter.
+- Do not add margins to every pair wrapper before using `.grid`; the grid gap
+  already owns the space between cells.
+
+## Related pages
+
+- [Typography](/content/typography)
+- [Grid](/layout/grid)
+- [Row](/layout/row)
+- [Table](/content/table)

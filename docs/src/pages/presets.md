@@ -148,75 +148,43 @@ strengthen and stay grey.
 
 ## Fonts
 
-Presets load no fonts, so a preset's typeface shows only where it is
-already installed: Roboto on Android and ChromeOS, Segoe UI on Windows.
-Everywhere else the stack falls through to the system face, which keeps the
-layout and loses some of the look. To have the full look everywhere, load
-the face yourself, before the preset.
+A preset sets a font-family stack but downloads no font. The browser uses the
+first installed family in that stack and falls back to a system face.
 
-This site does not load any of these fonts; the examples below are for your
-page.
+The material preset prefers Roboto and Roboto Flex. The metro preset prefers
+Segoe UI, then Selawik and Open Sans. Layout and controls still work when those
+families are absent; the visual resemblance is simply less exact.
 
-### Roboto, for material
-
-Roboto and Roboto Flex are under the SIL Open Font License, and served by
-[Bunny Fonts](https://fonts.bunny.net/), a drop-in replacement for the
-Google Fonts CSS API run by an EU company that states it keeps no logs of
-your visitors:
+To use a webfont consistently, host licensed font files with the application
+or use a provider allowed by the project's privacy and security policy. Load
+the font before the preset is rendered:
 
 ```html
-<link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
-<link rel="stylesheet" href="https://fonts.bunny.net/css?family=roboto:400,500,700">
-<link rel="stylesheet" href="dist/cirth.min.css">
-<link rel="stylesheet" href="dist/presets/material.min.css">
+<link rel="stylesheet" href="/fonts/application-fonts.css">
+<link rel="stylesheet" href="/assets/cirth.min.css">
+<link rel="stylesheet" href="/assets/material.min.css">
 ```
 
-or, in CSS, before any other rule:
-
-```css
-@import url("https://fonts.bunny.net/css?family=roboto:400,500,700");
-@import "@cirthcss/cirth";
-@import "@cirthcss/cirth/presets/material";
-```
-
-Any font service sees your visitors' addresses when their browsers ask it
-for a file. If that matters to you, download the files and serve them from
-your own origin with `@font-face`; the preset only needs the family to be
-called `Roboto`.
-
-### Segoe, for metro
-
-Segoe UI ships with Windows and cannot be redistributed, so on other
-systems metro falls back to Selawik, Microsoft's open replacement for it,
-if the page provides it. Selawik is under the SIL Open Font License, comes
-in light, semilight, regular, semibold and bold from
-[its repository](https://github.com/microsoft/Selawik/releases), and is not
-on Bunny Fonts, so serve it yourself:
+A self-hosted font stylesheet can define the family with `@font-face`:
 
 ```css
 @font-face {
-  font-family: Selawik;
-  src: url("/fonts/selawksl.woff2") format("woff2");
-  font-weight: 350;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: Selawik;
-  src: url("/fonts/selawk.woff2") format("woff2");
+  font-family: "Roboto";
+  src: url("/fonts/roboto-regular.woff2") format("woff2");
   font-weight: 400;
+  font-style: normal;
   font-display: swap;
 }
 ```
 
-Add `selawkl` at 300 for display text and `selawksb` at 600 for titles, the
-same way. Open Sans, the next face in the stack, is on Bunny Fonts and is a
-closer approximation than the system face if you would rather not host
-files:
+Provide every weight the preset uses. Material uses regular and medium
+weights for its main roles. Metro can use light, semilight, regular and
+semibold weights. A browser synthesizes a missing weight, but the result may
+not match the intended design.
 
-```html
-<link rel="stylesheet" href="https://fonts.bunny.net/css?family=open-sans:300,400,600">
-```
+Roboto and Selawik are available under the SIL Open Font License from their
+respective projects. Segoe UI is supplied with Windows and is not a font file
+Cirth redistributes. Review a font's license before self-hosting it.
 
 ## Writing your own
 

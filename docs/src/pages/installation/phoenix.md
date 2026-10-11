@@ -3,6 +3,7 @@ layout: docs.njk
 framework: phoenix
 description: Use Cirth in a Phoenix application. Install it into assets with npm, import it from app.js so esbuild bundles it, and link the result from the root layout.
 ---
+{% from "guide.njk" import checkIt, nextSteps %}
 
 A new Phoenix application builds its CSS with Tailwind and daisyUI, and its
 JavaScript with esbuild. Without Tailwind, esbuild bundles CSS too, so Cirth
@@ -69,3 +70,9 @@ HEEx templates render ordinary elements:
   </article>
 </main>
 ```
+
+## 6. Check it
+
+{{ checkIt() }}
+
+{{ nextSteps("in a stylesheet imported after Cirth") }}

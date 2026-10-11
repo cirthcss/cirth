@@ -26,7 +26,9 @@ import "./Layout.css";
 
 ## 3. Set the CSS target
 
-{{ whyTarget("Vite") }} in `vite.config.ts`, beside the plugins already there:
+{{ whyTarget("Vite") }}
+
+Add `build.cssTarget` in `vite.config.ts`, beside the plugins already there:
 
 ```ts
 import vike from "vike/plugin";

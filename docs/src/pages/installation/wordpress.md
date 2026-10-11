@@ -3,6 +3,7 @@ layout: docs.njk
 framework: wordpress
 description: Use Cirth in a WordPress theme. Add the stylesheet to the theme and enqueue it from functions.php with wp_enqueue_style.
 ---
+{% from "guide.njk" import checkIt, nextSteps %}
 
 A theme loads its stylesheets by enqueueing them, so WordPress can print each
 one once, in order, with a version for caching. Cirth is one file in the
@@ -75,3 +76,9 @@ enqueued stylesheet is printed, and render ordinary elements:
 
 Post content is headings, paragraphs, lists, images and tables, which Cirth
 styles without classes.
+
+## 4. Check it
+
+{{ checkIt() }}
+
+{{ nextSteps("in the theme stylesheet enqueued after Cirth") }}

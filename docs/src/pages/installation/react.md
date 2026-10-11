@@ -34,8 +34,9 @@ set inline rethemes a subtree: {% raw %}`style={{ "--cirth-primary": "#2563eb" }
 
 ## 3. Set the CSS target
 
-{{ whyTarget("Vite") }} in `vite.config.js`, beside the plugins already
-there:
+{{ whyTarget("Vite") }}
+
+Add `build.cssTarget` in `vite.config.js`, beside the plugins already there:
 
 ```js
 import { defineConfig } from "vite";

@@ -294,7 +294,7 @@ bodyClass: docs-home-page
 						<div><dt>Not counted</dt><dd>Either stylesheet, and any build step.</dd></div>
 						<div><dt>Measured</dt><dd><time datetime="{{ benchmark.measured }}">{{ benchmark.measured | longDate }}</time>, on Cirth {{ benchmark.cirthVersion }}</dd></div>
 					</dl>
-					<p class="docs-section-more"><a href="/why-cirth#less-markup-measured">Both versions, and how they are measured</a></p>
+					<p class="docs-section-more"><a href="/markup-comparison">Both versions, method and limitations</a></p>
 				</header>
 				<div class="docs-bench-cards">
 					{%- for metric in benchmark.metrics %}
@@ -394,7 +394,7 @@ bodyClass: docs-home-page
 				<h2 id="agnostic-title">Framework agnostic. Works everywhere.</h2>
 				<p>Cirth styles HTML, so it does not mind what wrote it: a JavaScript framework, a server template, a CMS, a static site generator or a desktop app.</p>
 				<p>Each guide shows where the one import goes in that stack, and the one setting that keeps a build from rewriting Cirth's colours.</p>
-				<p class="docs-agnostic-actions"><a href="/installation#guides" role="button">Browse all {{ frameworks.count }} guides</a></p>
+				<p class="docs-agnostic-actions"><a href="/framework-guides" role="button">Browse all {{ frameworks.count }} guides</a></p>
 			</div>
 		</div>
 	</section>

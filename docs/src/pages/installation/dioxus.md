@@ -3,12 +3,14 @@ layout: docs.njk
 framework: dioxus
 description: Use Cirth in a Dioxus web app. Declare it with asset!() and minification off, and link it with document::Stylesheet.
 ---
-{% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
-Dioxus collects assets with the `asset!()` macro and, in a release bundle,
-minifies CSS for older browsers than Cirth supports, rewriting its
-`light-dark()` colours. Cirth is already minified: turn that step off for it.
+Dioxus collects files declared with the `asset!()` macro and gives them a URL
+in the finished application. `document::Stylesheet` places that URL in the
+document head, so the CSS applies to the whole page. In a release bundle,
+Dioxus would also rewrite Cirth's `light-dark()` colours, so disable
+minification for this already minified file. [Compatibility](/compatibility)
+explains why transforming the compiled stylesheet can change theme regions.
 
 ## 1. Add the file
 

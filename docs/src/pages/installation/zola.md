@@ -3,11 +3,12 @@ layout: docs.njk
 framework: zola
 description: Use Cirth on a Zola site. Put the file in static/ and link it with get_url and a cache-busting hash.
 ---
-{% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
-Zola copies `static/` into the site unchanged, and `get_url` can add a hash
-of the file to its URL. Cirth is one file there and one link.
+Zola copies `static/` into the published site unchanged. Its base template
+supplies the document head shared by generated pages, so one Cirth link
+loads the stylesheet globally. `get_url` can add a cache-busting hash to the
+file's URL.
 
 ## 1. Add the file
 

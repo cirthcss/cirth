@@ -3,11 +3,11 @@ layout: docs.njk
 framework: flask
 description: Use Cirth in a Flask app. Put the file in static/ and link it from the base template with url_for.
 ---
-{% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
-Flask serves the `static/` folder next to your app as it is. Cirth is one
-file there, linked from the base template.
+Flask serves the `static/` folder next to your app at public URLs. The base
+template supplies the document head for every template that extends it, so
+one Cirth link there applies across the site.
 
 ## 1. Add the file
 

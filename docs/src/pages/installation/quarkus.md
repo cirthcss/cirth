@@ -3,10 +3,12 @@ layout: docs.njk
 framework: quarkus
 description: Use Cirth in a Quarkus app with Qute templates. Put the file in META-INF/resources, link it from a template, and run the production build.
 ---
+{% from "guide.njk" import nextSteps %}
 
 Quarkus serves the files in `src/main/resources/META-INF/resources` as
-they are, and Qute renders the templates in `src/main/resources/templates`.
-Cirth is one static file, linked from a template.
+public files, and Qute renders the templates in
+`src/main/resources/templates`. Cirth is one public file, linked in the
+document head of the rendered template.
 
 ## 1. Create the project
 
@@ -111,4 +113,4 @@ Open `http://localhost:8080` with the system in light mode, then in dark
 mode. The page follows the system, and the section with
 `data-theme="dark"` stays dark both times.
 
-{% from "guide.njk" import nextSteps %}{{ nextSteps("in a stylesheet in META-INF/resources, linked after Cirth") }}
+{{ nextSteps("in a stylesheet in META-INF/resources, linked after Cirth") }}

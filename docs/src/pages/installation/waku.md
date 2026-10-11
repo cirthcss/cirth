@@ -32,7 +32,9 @@ Replace the contents of `src/styles.css`:
 
 ## 3. Configure Vite
 
-{{ whyTarget("Vite") }} under `vite` in `waku.config.ts`, with the
+{{ whyTarget("Vite") }}
+
+Add `build.cssTarget` under `vite` in `waku.config.ts`, with the
 `tailwindcss()` plugin removed:
 
 ```ts

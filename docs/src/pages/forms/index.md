@@ -1,15 +1,13 @@
 ---
 layout: docs.njk
-description: How a form is put together in Cirth. The form, its fields, labels and help text, fieldsets and legends, and the submit button.
+description: Build understandable, accessible HTML forms with Cirth labels, help text, fieldsets, legends and native controls.
 ---
 
 # Forms
 
-A form in Cirth is made of the standard elements: `form`, `fieldset` and
-`legend`, a `label` for every control, a `small` for help text, and a
-submit button. Each is styled as it is, and they space themselves when
-stacked. This page covers how they fit together; each kind of control has
-its own page.
+Cirth styles standard form elements. Start with the HTML that describes the
+data you need, then let the browser provide input, keyboard and submission
+behavior.
 
 {% demo "forms-structure" %}
 
@@ -28,64 +26,103 @@ its own page.
       <small id="email-help">Receipts go here. We never share it.</small>
     </label>
   </fieldset>
+
   <fieldset>
     <legend>Plan</legend>
-    <label><input type="radio" name="plan" value="free" checked> Free</label>
-    <label><input type="radio" name="plan" value="team"> Team, billed monthly</label>
+    <label>
+      <input type="radio" name="plan" value="free" checked>
+      Free
+    </label>
+    <label>
+      <input type="radio" name="plan" value="team">
+      Team, billed monthly
+    </label>
   </fieldset>
+
   <button type="submit">Create account</button>
 </form>
 ```
 
+This form asks for two account values and one plan. The browser collects
+controls that have a `name`. For example, the checked plan produces either
+`plan=free` or `plan=team`. Your application still has to receive, validate
+and store that data.
+
 ## Label, control, help text
 
-Put the control inside its `label`, right after the text. The label becomes
-a block with medium-weight text, and the control a full-width field just
-under it. A `for` attribute pointing at the control's `id` works the same
-way when the two cannot be nested.
+A `label` gives a control its accessible name and makes the label text
+clickable. The example nests each control inside its label. If the two
+elements cannot be nested, give the control an `id` and use the same value in
+the label's `for` attribute:
 
-A `small` immediately after a control is its help text: a muted line tucked
-under the field. Give it an `id` and point the control's `aria-describedby`
-at it, so a screen reader reads it with the field. When the field is marked
-valid or invalid, the help text takes the matching colour; see
-[Validation and states](/forms/validation).
+```html
+<label for="company">Company</label>
+<input id="company" name="company" type="text">
+```
+
+The attributes have different jobs:
+
+- `id` identifies one element in the page. Labels and ARIA references use it.
+- `name` identifies the value when the browser submits the form.
+- `value` is the submitted value. For text fields it also provides an initial
+  value; for radios and checkboxes it identifies the selected choice.
+- `autocomplete` tells the browser what kind of saved information may fill the
+  field. Use a standard token such as `name`, `email` or `postal-code`.
+- `required` adds a native constraint. A supporting browser will not submit
+  the form while the control has no acceptable value.
+
+A `small` immediately after a control is styled as help text. Its `id` lets
+`aria-describedby` connect the explanation to the control, so assistive
+technology can announce it after the label. `aria-describedby` adds a
+description; it does not replace the label.
 
 ## Grouping with fieldset and legend
 
-A `fieldset` groups related controls under a `legend`. Cirth draws no box
-around it: it is full width, with no border or padding, and the legend is
-styled like a label. Use one whenever a set of controls answers one
-question, which is always the case for radios and usually for checkboxes.
+A `fieldset` groups controls that answer one question. Its first `legend`
+names that group. This relationship is especially important for radio buttons,
+because a label such as "Team" only makes sense after the group question
+"Plan" is known.
 
-`<fieldset disabled>` disables every control inside it at once.
+The browser exposes the group and its name to assistive technology. Setting
+`disabled` on the `fieldset` disables its form controls together. Cirth removes
+the browser's fieldset frame and styles the legend as the group's heading.
+
+## Native behavior and Cirth styling
+
+The browser owns editing, selection, keyboard input, autocomplete, constraint
+validation and form submission. Cirth adds a consistent control height,
+surface, edge, spacing, typography and visible states. It does not send form
+data, validate business rules or write error messages.
+
+Text fields, `select` and `textarea` fill their container by default. Buttons
+size to their text. One-line controls and buttons share a 44px minimum height,
+so they align when placed together.
 
 ## Layout
 
-- Text inputs, `select` and `textarea` are full width. Stacked fields are an
-  element step apart and fieldsets a group step apart, so a form reads as
-  groups of fields; a label's text sits a line above its field.
-- Buttons and one-line controls share one height formula and are at least
-  44px tall, so a field and a button beside it line up without offsets.
-- To place fields side by side, wrap them in a [`.grid`](/layout/grid),
-  which wraps to one column when there is no room.
-- An input with a `size` attribute keeps its natural width instead of
-  filling the row.
-- A submit `button` sizes to its label, like any button. A form that wants
-  a full-width one says so with `width: 100%`. To attach a button to a
-  field instead, use a [group](/components/group).
+- Stack labels in source order for the clearest reading and keyboard order.
+- Use [Grid](/layout/grid) when related fields need to share a row. It wraps
+  when the available width becomes too small.
+- An input with a `size` attribute keeps its native content-based width instead
+  of filling the row.
+- Use [Group](/components/group) when a field and button must form one joined
+  control.
+
+Do not use visual position to change the meaning or order of fields. The DOM
+order remains the order used by keyboards and assistive technology.
 
 ## Accessibility
 
-- Every control needs a visible label. A placeholder is not one: it
-  disappears as soon as the reader types.
-- Use the `type` and `autocomplete` that describe the data. They bring the
-  right keyboard on a phone, and let browsers and password managers fill
-  the field.
-- Put instructions in help text linked with `aria-describedby`, not only in
-  a placeholder or a tooltip.
-- Report errors on the field (`aria-invalid`) and in words next to it.
-  Cirth pairs the error colour with an icon, so the state never depends on
-  colour alone.
+- Give every control a visible label. A placeholder is an example or hint; it
+  disappears during editing and is not a label.
+- Choose an input `type` that matches the data. Browsers can then provide a
+  suitable mobile keyboard and native constraints.
+- Put persistent instructions in help text connected with
+  `aria-describedby`.
+- Describe errors in words and associate them with the field. Cirth supplies
+  state styling, not the error message or application validation.
+- Keep the native element whenever it already represents the interaction.
+  Styling a `div` to look like an input does not give it input behavior.
 
 ## Controls
 
@@ -104,17 +141,30 @@ question, which is always the case for radios and usually for checkboxes.
 
 ## Tokens
 
-Every control reads the same family, so one override reaches all of them:
-
 | Token | What it sets |
 | --- | --- |
-| `--cirth-form-element-background-color` | A fill of its own. Unset by default: a field paints `--cirth-surface`, the surface it sits on |
-| `--cirth-form-element-border-color` | The field's edge |
-| `--cirth-form-element-color` | The text inside a field |
+| `--cirth-form-element-background-color` | Optional field fill; otherwise the field uses its current surface |
+| `--cirth-form-element-border-color` | Field edge |
+| `--cirth-form-element-color` | Entered text |
 | `--cirth-form-element-placeholder-color` | Placeholder text |
-| `--cirth-form-element-focus-color` | The focus ring |
-| `--cirth-form-element-spacing-vertical`, `-horizontal` | The field's padding |
-| `--cirth-form-label-font-weight` | Labels and legends |
+| `--cirth-form-element-focus-color` | Focus ring |
+| `--cirth-form-element-spacing-vertical`, `--cirth-form-element-spacing-horizontal` | Field padding |
+| `--cirth-form-label-font-weight` | Label weight |
 
-[Customization](/customization) explains how these derive from the
-accent and the canvas.
+[Customization](/customization) explains where to set token overrides and how
+they participate in the cascade.
+
+## Common mistakes
+
+- Omitting `name`, which leaves a control out of ordinary form submission.
+- Reusing an `id`, which makes `for`, `aria-describedby` and other references
+  ambiguous.
+- Using a placeholder as the only label.
+- Treating browser validation as server validation. Data must still be checked
+  by the application.
+
+## Related
+
+- [Validation and states](/forms/validation)
+- [Buttons](/content/button)
+- [Accessibility and user preferences](/guides/accessibility)

@@ -4,12 +4,12 @@ framework: ember
 description: Use Cirth in an Ember app built with Vite and Embroider. Import it from app/app.js; Embroider builds CSS for the browsers in config/targets.js.
 ---
 {% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
-A new Ember app builds with Vite through Embroider, and imports CSS from
-JavaScript like any Vite project. Embroider compiles for the browsers in
-`config/targets.js`, which name current versions, so Cirth's colours arrive
-as they are.
+`app/app.js` is the browser entry module for an Ember application. A CSS
+import there is loaded once for the whole document. Ember builds it with
+Vite through Embroider, using the browsers in `config/targets.js`; the
+default current targets preserve Cirth's colours.
 
 ## 1. Install
 
@@ -32,6 +32,7 @@ Your own `app/styles/app.css` still loads after it.
 version of each browser, keeps `light-dark()`. If you widen it to browsers
 older than Cirth's floor (Chrome and Edge 123, Firefox 130, Safari 18.2),
 the build rewrites those colours and a `data-theme` subtree stops changing.
+[Compatibility](/compatibility) explains this limit for CSS pipelines.
 
 ```js
 const browsers = [

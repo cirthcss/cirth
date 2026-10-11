@@ -3,12 +3,11 @@ layout: docs.njk
 framework: fresh
 description: Use Cirth in a Fresh 2 project on Deno. Add the npm package and @import it in assets/styles.css; Fresh's Vite build keeps it as it is.
 ---
-{% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
-Fresh 2 builds with Vite and imports `assets/styles.css` from `client.ts`.
-Cirth comes in from npm through Deno, and is one `@import` in that
-stylesheet.
+Fresh 2's `client.ts` is the browser entry point. It loads
+`assets/styles.css` as the app's global stylesheet. Cirth comes in from npm
+through Deno, as one `@import` at the top of that file.
 
 ## 1. Install
 

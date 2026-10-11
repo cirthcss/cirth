@@ -1,26 +1,26 @@
 <form>
   <label>
     Valid email
-    <input type="email" value="ada@example.com" aria-invalid="false">
-    <small>Looks good.</small>
+    <input type="email" name="valid-email" value="ada@example.com" aria-invalid="false" aria-describedby="valid-email-help">
+    <small id="valid-email-help">Looks good.</small>
   </label>
   <label>
     Invalid email
-    <input type="email" value="not-an-email" aria-invalid="true">
-    <small>Enter a valid email address.</small>
+    <input type="email" name="invalid-email" value="not-an-email" aria-invalid="true" aria-describedby="invalid-email-help">
+    <small id="invalid-email-help">Enter a valid email address.</small>
   </label>
   <label>
-    Disabled field
-    <input type="text" value="Read only" disabled>
+    Archived account
+    <input type="text" name="archived" value="Unavailable" disabled>
   </label>
   <div class="grid" data-readonly-number-example>
     <label>
       Editable quantity
-      <input type="number" value="3" min="0" max="10">
+      <input type="number" name="editable-quantity" value="3" min="0" max="10">
     </label>
     <label>
       Readonly quantity
-      <input type="number" value="3" min="0" max="10" readonly>
+      <input type="number" name="readonly-quantity" value="3" min="0" max="10" readonly>
     </label>
   </div>
 </form>

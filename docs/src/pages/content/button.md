@@ -1,13 +1,14 @@
 ---
 layout: docs.njk
+description: Use native buttons for actions, choose an explicit button type, and apply Cirth's color, quiet, focus, disabled, and loading states.
 ---
 
 
 # Button
 
-`button`, `[type="submit"]`, `[type="reset"]`, `[type="button"]`,
-`[role="button"]`, and a file input's `::file-selector-button` all share the
-same button styling, with no `.btn` class required.
+Use a native `<button>` for an action, such as saving a form, opening a menu,
+or dismissing a message. Use a link when activating the text navigates to a
+destination. Cirth styles buttons directly, so no `.btn` class is required.
 
 {% demo "buttons" %}
 
@@ -28,6 +29,27 @@ same button styling, with no `.btn` class required.
 Buttons in a row share a line and carry no margin of their own: a row of
 actions is a paragraph, a card footer or a `.grid`, and the space around it
 is that block's.
+
+## Anatomy and button types
+
+The visible text is the button's accessible name, so write a specific action
+such as “Save changes” instead of a vague label such as “OK”. An icon-only
+button needs another accessible name, usually `aria-label`.
+
+The `type` attribute controls native form behavior:
+
+| Type | Browser behavior |
+| --- | --- |
+| `button` | Performs no built-in form action. Use it for application controls |
+| `submit` | Submits the form and runs native constraint validation first |
+| `reset` | Restores the form controls to their initial values |
+
+A `<button>` inside a form defaults to `submit` when `type` is omitted. Add
+`type="button"` to buttons that must not submit. Application code still owns
+the action performed by a general-purpose button.
+
+Cirth applies the same visual foundation to `button`, the three typed button
+selectors, `[role="button"]`, and a file input's native selector button.
 
 ## Color modifiers
 
@@ -120,3 +142,20 @@ For navigation, keep an anchor's link semantics. Do not add `role="button"`
 to an `<a href>` merely to change its appearance: a link announces and
 behaves differently from a button, and CSS cannot repair that semantic
 mismatch.
+
+## Common mistakes
+
+- Do not omit `type="button"` from a non-submit button inside a form.
+- Do not use a disabled button as the only explanation for why an action is
+  unavailable. Provide nearby text when the reason is not obvious.
+- Do not place an interactive element, such as a link, inside a button.
+- Do not use color alone to identify a destructive action. Keep an explicit
+  label such as “Delete project”.
+- Do not add `role="button"` to a generic element unless the application also
+  implements focus, Enter and Space activation, and disabled-state behavior.
+
+## Related pages
+
+- [Link](/content/link)
+- [Forms](/forms/)
+- [Loading](/components/loading)

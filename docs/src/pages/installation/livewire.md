@@ -3,13 +3,12 @@ layout: docs.njk
 framework: livewire
 description: Use Cirth with Livewire. Load it through Laravel's Vite build; Livewire's updates morph markup into a page that already has it.
 ---
-{% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
 Livewire renders components on the server and morphs their new HTML into
-the page. The stylesheet is the Laravel app's, loaded once by `@vite`, so
-Cirth comes from the [Laravel guide](/installation/laravel) and Livewire needs
-nothing more.
+the existing page. The shared Laravel layout loads the app's global
+stylesheet once through `@vite`, so Cirth comes from the
+[Laravel guide](/installation/laravel) and Livewire needs nothing more.
 
 ## 1. Set up Laravel
 

@@ -3,6 +3,7 @@ layout: docs.njk
 framework: django
 description: Use Cirth in a Django project. Put the stylesheet in an app's static folder, link it with the static tag, and deploy it with collectstatic.
 ---
+{% from "guide.njk" import checkIt, nextSteps %}
 
 Django serves CSS as a static file, and nothing in its pipeline rewrites it.
 Cirth goes in an app's static folder and is linked from your base template.
@@ -78,3 +79,9 @@ everything else. With `ManifestStaticFilesStorage`, the copy gets a hashed
 name that the `static` tag resolves, and its content stays as it was:
 Cirth's icons are `data:` URLs, which the storage leaves alone. See Django's
 [static files deployment guide](https://docs.djangoproject.com/en/stable/howto/static-files/deployment/).
+
+## 4. Check it
+
+{{ checkIt() }}
+
+{{ nextSteps("in a stylesheet linked after Cirth") }}

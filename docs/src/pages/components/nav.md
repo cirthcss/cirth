@@ -1,179 +1,168 @@
 ---
 layout: docs.njk
+description: Mark up horizontal, breadcrumb, site-header and sidebar navigation with native nav and list elements.
 ---
-
 
 # Nav
 
-`<nav>` lays out its `ul`/`ol` lists as a horizontal bar by default, and
-supports breadcrumbs and vertical (sidebar) navigation through markup, not
-extra classes.
+Use `nav` for a major set of links that helps people move through a site or
+application. Put the links in a list so their number and relationship remain
+clear without the visual layout.
 
 {% demo "nav" %}
 
 ```html
-<nav>
-  <ul><li><strong>Product</strong></li></ul>
+<nav aria-label="Primary">
   <ul>
-    <li><a href="#">Features</a></li>
-    <li><a href="#" aria-current="page">Pricing</a></li>
-    <li><a href="#">Sign up</a></li>
+    <li><strong>Product</strong></li>
+  </ul>
+  <ul>
+    <li><a href="/features">Features</a></li>
+    <li><a href="/pricing" aria-current="page">Pricing</a></li>
+    <li><a href="/signup">Sign up</a></li>
   </ul>
 </nav>
 ```
 
+The browser exposes `nav` as a navigation landmark. Use `aria-label` when a
+page has several navigation landmarks and their purposes are not already named
+by headings. `aria-current="page"` identifies the link for the current page;
+Cirth gives it a visible position marker.
+
 ## Breadcrumb
 
-`nav[aria-label="breadcrumb"]` adds a divider (`--cirth-nav-breadcrumb-divider`,
-`>` by default, a bidi-mirrored glyph, so `[dir="rtl"]` flips it to `<`
-natively) between items and disables pointer events on the current page:
+A breadcrumb records the ordered path to the current page. Use an `ol` because
+the sequence has meaning, and name the navigation landmark.
 
 {% demo "nav-breadcrumb" %}
 
 ```html
-<nav aria-label="breadcrumb">
-  <ul>
-    <li><a href="#">Docs</a></li>
-    <li><a href="#">Components</a></li>
-    <li><a href="#" aria-current="page">Nav</a></li>
-  </ul>
+<nav aria-label="Breadcrumb">
+  <ol>
+    <li><a href="/docs">Docs</a></li>
+    <li><a href="/components">Components</a></li>
+    <li><a href="/components/nav" aria-current="page">Nav</a></li>
+  </ol>
 </nav>
 ```
 
-Write it with `<ol>` if you prefer: a trail is an ordered sequence, and the
-two render identically. Every rule in this component, the divider included,
-matches `:is(ol, ul)`.
+Cirth inserts `--cirth-nav-breadcrumb-divider` between items and removes pointer
+interaction from the current-page link. The default divider mirrors in a
+right-to-left document. `ul` receives the same visual treatment, but `ol`
+communicates the path order more precisely.
 
 ## Navbar
 
-A `nav` that is a direct child of the page's banner `header` is a navbar:
-application chrome rather than an in-page position map. Its links run a
-four-step contrast ladder instead of the accent edge: muted ink at rest,
-an intermediate step on hover and focus, full contrast plus the label
-role's weight (500) for `aria-current`/`aria-selected`, and a
-further-attenuated step for
-`aria-disabled="true"`, which also stops responding to the pointer. None
-of the four is the accent colour: in chrome the accent belongs to actions,
-and position is carried by contrast. The current entry gets weight as well
-as ink, so the state is not distinguished by colour alone.
-
-The rule applies to the banner only: a `header` whose nearest sectioning
-ancestor is `body`. A `nav` inside a card's, an article's, or a section's
-own `header` is that section's navigation, so it keeps the ordinary
-treatment with its active edge.
+A `nav` that is a direct child of the page's banner `header` is styled as site
+or application chrome.
 
 ```html
 <header>
-  <nav>
-    <ul><li><strong>Product</strong></li></ul>
+  <nav aria-label="Primary">
+    <ul><li><a href="/"><strong>Product</strong></a></li></ul>
     <ul>
-      <li><a href="#" aria-current="page">Overview</a></li>
-      <li><a href="#">Activity</a></li>
-      <li><a href="#" aria-disabled="true">Billing</a></li>
+      <li><a href="/overview" aria-current="page">Overview</a></li>
+      <li><a href="/activity">Activity</a></li>
+      <li><a href="/settings">Settings</a></li>
     </ul>
   </nav>
 </header>
 ```
 
-A navbar also wraps rather than overflowing, and centres its items on the
-same 40px band its links occupy, so a brand lockup, a search field, and a
-`details` disclosure used as a toggler all line up on one row. The toggler
-is unfilled: a sober border and its own focus ring, so it reads as chrome
-and not as a form control that wandered into the header.
+The navbar wraps and aligns compact controls to a 40px band. Its links use a
+neutral contrast ladder instead of the accent edge used by in-page navigation.
+The current item also gains weight, so state is not conveyed by colour alone.
+
+A nav inside an article or section header remains ordinary section navigation.
+It is not treated as page chrome.
 
 ## Vertical nav
 
-A `<nav>` inside an `<aside>` is the vertical nav. This is the pattern:
-there is no class and no modifier, and the markup is the same markup as the
-bar above it:
+A nav inside `aside` becomes a vertical navigation rail.
 
 {% demo "nav-vertical" %}
 
 ```html
 <aside>
-  <nav>
+  <nav aria-label="Documentation">
     <ul>
-      <li><a href="#" aria-current="page">Overview</a></li>
-      <li><a href="#">Get Started</a></li>
+      <li><a href="/docs" aria-current="page">Overview</a></li>
+      <li><a href="/docs/get-started">Get started</a></li>
+      <li><a href="/docs/customization">Customization</a></li>
     </ul>
   </nav>
 </aside>
 ```
 
-Stacked, the entries become full-width rows and the current-page marker moves
-from the bottom edge to the inline-start one, where it reads as a rail. The
-rail is painted on the link's own box, so it is contained by the `<aside>` on
-both inline edges: a sidebar that scrolls (`position: sticky` plus
-`overflow-y: auto`, which is what most of them do) will not clip it away.
-
-Two things follow from the trigger being `<aside>` rather than a class:
-
-* Outside an `<aside>`, a `<nav>` is a **bar**. If a stacked menu is coming
-  out as a row, the nav is not inside a complementary region; that is the
-  thing to check first.
-* A plain `<ul>` of links inside an `<aside>` is still a plain list, with its
-  markers. Only the `<nav>` becomes navigation.
+The list and items stack. The current-page marker moves from the bottom edge to
+the inline-start edge, which keeps it visible in left-to-right and
+right-to-left layouts. A plain list in the aside remains a plain list; only the
+nav receives this layout.
 
 ### A stacked nav that is not in an `<aside>`
 
-A drawer, an offcanvas menu, a disclosure, a footer column: a navigation
-that is a column but is not in a complementary region. Those are yours to
-lay out: a drawer is a block, a menu sheet may be a grid, and the framework
-has no way to guess which. What it does hand you is the one thing you would
-otherwise have to undo:
+For a drawer, disclosure or footer column, set the nav layout yourself and
+remove the horizontal gutter that a bar uses:
 
 ```css
 .drawer nav {
   --cirth-nav-element-spacing-horizontal: 0;
 
-  display: block; /* or grid, or whatever the panel wants */
+  display: block;
+}
+
+.drawer nav :is(ol, ul, li) {
+  display: block;
 }
 ```
 
-`--cirth-nav-element-spacing-horizontal` is the inline gutter, and a bar
-spends it three times: the list pulls out by one, the item pushes in by one,
-and the link pulls out by one, so the row sits flush with its container.
-Stacked, those three insets stop cancelling and the painted box (the hover
-fill, and the `border-inline-start` that carries `aria-current`) runs one
-gutter outside the container on *both* edges. In a panel with
-`overflow: hidden`, which most drawers have, that clips the current-page
-marker away entirely.
-
-Naming the gutter zero collapses all three at once, because all three read
-that one token. It is not a mode and not a class: a stacked nav is a nav
-with no inline gutter, and this says so. Everything else about the nav
-(its ink, its states, its `aria-current` treatment) is unchanged.
-
-There is no `.stack` or `.vertical` class, and no ARIA hook:
-`aria-orientation` is not a supported property on `role="navigation"`, and a
-styling hook is not a reason to write invalid ARIA.
+The zero gutter keeps hover surfaces and current-page edges inside a clipped or
+scrolling panel. Do not add `aria-orientation` to a navigation landmark as a
+styling hook; it is not a supported property for that role.
 
 ## Behavior
 
-* Two lists inside one `nav` are pushed to opposite ends
-  (`justify-content: space-between`), the common "brand left, links right"
-  header pattern.
-* A `nav` directly inside the banner `header` adopts the navbar contrast
-  ladder described above; ordinary horizontal navs retain the active bottom
-  edge and sidebars move that edge to their inline-start rail. A `nav` in a
-  component's own `header` counts as an ordinary nav.
-* `li` padding is `--cirth-nav-element-spacing-vertical`/`-horizontal`; a
-  link inside gets its own smaller `--cirth-nav-link-spacing-*` padding so
-  the clickable/hover area is slightly larger than the visible text.
-* In a bar, those two cancel: the list pulls out by one gutter, the item
-  pushes in, and the link pulls out again, so the row sits flush with its
-  container. All three insets are
-  `--cirth-nav-element-spacing-horizontal`, including the link's negative
-  margin, which cancels the item's padding rather than mirroring its own.
-  Stacked in an `<aside>` there is no row to cancel against, so the aside
-  names that gutter zero and the painted box stays inside the container.
-  Anywhere else, you name it zero yourself (above).
-* Buttons, `[role="button"]`, and form controls placed inside a nav `li`
-  adapt their padding to match the nav's link rhythm instead of their usual
-  button/form spacing.
-* A [group](/components/group) (`.group`/`[role="search"]`; `[role="group"]`
-  alone in the classless build) inside a nav item sizes to its content and
-  takes no flow spacing, sitting on the nav's rhythm like any other item.
-* A [dropdown](/components/dropdown) nested in a nav item collapses its own
-  vertical margin so it lines up with sibling links; see that page's
-  "Inside a nav" example.
+Cirth lays out `nav`, `ol` and `ul` with flexbox by default. Two lists move to
+opposite ends, which supports a brand group and a link group. Links receive
+compact padding, a minimum inline target size and visible hover, focus and
+current states.
+
+Buttons and form controls inside nav items use the navigation rhythm and a
+40px minimum block size. A [Group](/components/group) or search form sizes to
+its contents, and a [Dropdown](/components/dropdown) aligns with sibling links.
+
+HTML supplies the landmark and link navigation. Cirth supplies layout and
+states. It does not create routes, control responsive disclosure or make an
+`aria-disabled` link inert for keyboard activation.
+
+## Accessibility
+
+- Use `nav` for meaningful navigation groups, not every cluster of links.
+- Name multiple navigation landmarks so they can be distinguished.
+- Put `aria-current="page"` only on the current destination.
+- If a link is unavailable, prefer removing its `href` or implement complete
+  disabled behavior. `aria-disabled="true"` communicates state but does not
+  cancel navigation by itself.
+- Keep the DOM order logical when visual groups move to opposite ends.
+
+## Tokens
+
+| Token | What it sets |
+| --- | --- |
+| `--cirth-nav-element-spacing-vertical`, `--cirth-nav-element-spacing-horizontal` | Item rhythm and bar gutter |
+| `--cirth-nav-link-spacing-vertical`, `--cirth-nav-link-spacing-horizontal` | Link padding |
+| `--cirth-nav-breadcrumb-divider` | Breadcrumb separator content |
+| `--cirth-primary-text` | Current-item edge in ordinary navs |
+
+## Common mistakes
+
+- Using `nav` for links that are incidental to the surrounding content.
+- Omitting a name when several navigation landmarks are present.
+- Adding `aria-current` to more than one page link in the same navigation.
+- Expecting a stacked layout outside `aside` without applying layout CSS.
+
+## Related
+
+- [Dropdown](/components/dropdown)
+- [Group](/components/group)
+- [Links](/content/link)

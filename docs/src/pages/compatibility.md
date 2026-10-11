@@ -1,290 +1,164 @@
 ---
 layout: docs.njk
-description: Supported browsers, what the package contains, how Cirth sits beside your own CSS and third-party widgets, and how the stylesheet reaches a browser.
+description: Check Cirth's browser floor, required CSS features, build-pipeline risks and boundaries with existing styles.
 ---
 
 # Compatibility
 
-Cirth needs a current browser, and it shares the page with the CSS a
-project already has. In short:
-
-- **Browsers:** {{ browsers.sentence }}.
-- **Modern CSS:** colours are written with `light-dark()` and relative
-  colour syntax, forms rely on `:user-invalid`, and every rule sits in a
-  cascade layer. Below the floor, those declarations are dropped.
-- **Your build:** many bundlers rewrite `light-dark()` for older browsers
-  by default, and a scheme forced on part of the page then stops working.
-  [Which tools do, and the one setting that stops it](#if-your-build-transpiles-css).
-- **Scoped builds:** `@cirthcss/cirth/scoped` styles only what is inside a
-  `.cirth` element, for a page or an app shell with styles of its own
-  ([every build](#what-the-package-contains)).
-- **Existing CSS and component libraries:** your own unlayered CSS beats
-  Cirth's at any specificity, and `.no-cirth` keeps Cirth's components off a
-  third-party widget ([beside your own CSS](#beside-your-own-css)).
+Use this page to decide whether Cirth can run unchanged in your browsers and
+CSS pipeline. Loading instructions belong to [Installation](/installation/);
+package entry points belong to [Package and builds](/package).
 
 ## Browser support
 
 {{ browsers.sentence }}.
 
-That list is the Browserslist target in `package.json`: the engines the
-stylesheet is compiled for and tested in. It is held to one engine floor
-across every family, so a browser that shares an engine with a supported one
-is supported from the same version.
+This list is the `browserslist` target in `package.json`. Lightning CSS
+uses it when compiling the distributed stylesheets. A repository check keeps
+desktop and mobile engines aligned, including the Chromium versions used by
+Opera and Samsung Internet.
 
-Below the floor, Cirth is not tested and parts of it do not work. Its colours
-are declared with `light-dark()` and relative colour syntax, its forms rely
-on `:user-invalid`, and its rules sit in a cascade layer: an engine that
-understands none of these drops those declarations. No version of Internet
-Explorer is supported.
+The browser floor is a compilation contract, not a claim that every listed
+floor release is launched in CI. Automated behavior tests run in the current
+Playwright builds of Chromium, Firefox and WebKit. The built documentation is
+also checked with axe in its supported themes and tested states.
 
-### If your build transpiles CSS
+### Below the floor
 
-Cirth arrives already compiled for the floor above and needs no PostCSS or
-Lightning CSS pass of its own. Many build tools run every stylesheet through
-one anyway, aimed at an older default set of browsers, and that pass rewrites
-`light-dark()` into an emulation that does not keep Cirth's behaviour:
+Older browsers are unsupported. There is no legacy bundle.
 
-- the page still follows the system scheme and a `data-theme` on the root;
-- an element with `data-theme` that forces the **other** scheme inside the
-  page, a dark sidebar on a light page for example, no longer changes colour.
+CSS fails declaration by declaration or rule by rule. A browser may apply
+parts it understands and ignore other parts, so the result is not a
+predictable reduced version of Cirth. It may have incorrect colours, missing
+states or incomplete layout. Test the real browser if your audience requires
+an older version.
 
-Measured with each tool's own starter, between
+## Modern CSS requirements
+
+Cirth uses modern platform features as part of its normal output:
+
+| Feature | Where Cirth uses it | What is at risk without it |
+| --- | --- | --- |
+| Cascade layers | Every shipped rule is inside `@layer cirth` | The stylesheet's cascade contract |
+| `light-dark()`, relative OKLCh and `color-mix()` | Theme colours and derived states | Theme colours and contrast relationships |
+| `:has()` | Relational component and state selectors | Some layout and state rules |
+| `:user-invalid` | Form validation after user interaction | The timed invalid-state styling |
+| Top-layer selectors | Modal dialogs and popovers | Overlay presentation and related styling |
+| `@starting-style` and discrete transitions | Entry and exit motion | Animation; the underlying control can still work |
+| `lh` and dynamic viewport units | Sizing and viewport-bound surfaces | Exact sizing and overflow behavior |
+
+Some features are enhancements rather than prerequisites for the underlying
+HTML control. For example, a browser can open a supported `dialog` even if
+it cannot perform Cirth's exit transition. Component pages document those
+specific limits.
+
+## If your build transpiles CSS
+
+Cirth is already compiled for the browser floor above. It should normally
+pass through your pipeline without being lowered again.
+
+Some tools target older browsers by default and rewrite `light-dark()`.
+The page can still follow the system scheme after that rewrite, but a
+`data-theme` attribute on a nested element may fail to force the
+opposite scheme. A dark panel inside a light page is a common case.
+
+The integration fixtures were checked between
 {{ frameworks.checkedBetween[0] | longDate }} and
-{{ frameworks.checkedBetween[1] | longDate }}; each guide has its versions.
+{{ frameworks.checkedBetween[1] | longDate }}. This matrix records the
+observed category; each linked guide owns the exact setting and tested
+versions.
 
-| Tool | Rewrites `light-dark()` by default | What to set |
-| --- | --- | --- |
-{% for guide in frameworks.pipelines.lowers -%}
-| <a href="{{ guide.link }}">{{ guide.name }}</a> | Yes | {{ guide.fix }} |
-{% endfor -%}
-| {% for guide in frameworks.pipelines.keeps %}<a href="{{ guide.link }}">{{ guide.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %} | No | Nothing |
+| Observed pipeline behavior | Tools |
+| --- | --- |
+| Lowers modern colour syntax unless configured for Cirth's browser floor | {% for guide in frameworks.pipelines.lowers %}<a href="{{ guide.link }}">{{ guide.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %} |
+| Keeps the required syntax in the verified starter | {% for guide in frameworks.pipelines.keeps %}<a href="{{ guide.link }}">{{ guide.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %} |
+| Serves or copies the distributed file without a CSS transform | {% for guide in frameworks.pipelines.asIs %}<a href="{{ guide.link }}">{{ guide.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %} |
 
-{% for guide in frameworks.pipelines.asIs %}<a href="{{ guide.link }}">{{ guide.name }}</a>{% if loop.revindex == 2 %} and {% elif not loop.last %}, {% endif %}{% endfor %}
-serve or copy the file as it is, so nothing rewrites it.
+If a tool is not listed, inspect the production CSS rather than assuming its
+development behavior is the same. Search for `light-dark(` in the emitted
+file and verify a nested `data-theme` region in the opposite scheme.
 
-In each case the fix is the same: tell the tool Cirth's browsers, so it has
-nothing to lower.
+## Bundlers and CSS pipelines
 
-## What the package contains
+Any tool that accepts a global CSS import can consume the package. Cirth does
+not require Sass, PostCSS or a JavaScript plugin.
 
-Compiled CSS and nothing else that runs. Every entry point has a short
-`exports` path:
+The important distinction is whether the tool:
 
-| Import | File | What it is |
-| --- | --- | --- |
-| `@cirthcss/cirth` | `dist/cirth.min.css` | The default build |
-| `@cirthcss/cirth/classless` | `dist/cirth.classless.min.css` | No classes; landmarks are the layout |
-| `@cirthcss/cirth/scoped` | `dist/cirth.scoped.min.css` | Styles only inside `.cirth` |
-| `@cirthcss/cirth/classless/scoped` | `dist/cirth.classless.scoped.min.css` | Both |
-| `@cirthcss/cirth/print` | `dist/cirth.print.min.css` | Print sheet for the default build, one per build |
-| `@cirthcss/cirth/presets/plain` | `dist/presets/plain.min.css` | Token preset, loaded after a build |
-| `@cirthcss/cirth/tokens/light` | `dist/tokens/light.tokens.json` | The token surface as W3C Design Tokens, one file per scheme |
+1. resolves the package's CSS export;
+2. preserves Cirth's supported-browser target;
+3. loads the result once as global CSS;
+4. keeps the import order you intended for presets and overrides.
 
-The `dist/*` paths keep resolving for anyone importing a file directly.
-[Contributions](/contributions#package-exports) has the complete map.
-
-The SCSS in the repository is how these files are produced. It is not a
-published Sass API, and nothing in the package asks you to compile it.
-
-### Versions
-
-Cirth is before 1.0, and a minor release can change something you rely on.
-Those changes are listed, with what to do about each, on
-[Upgrading](/upgrading). Patch releases fix bugs without changing the public
-surface.
+Use the [framework guides](/framework-guides) for verified configuration.
+If your stack is not listed, follow its documented global-CSS mechanism and
+then perform the checks above.
 
 ## Beside your own CSS
 
-### Cascade layer
+The normal build styles matching elements across the document. The scoped
+build places those component and content selectors inside a `.cirth`
+subtree. Both builds keep their rules in the `cirth` cascade layer, so
+unlayered application CSS normally takes priority.
 
-Every stylesheet Cirth ships keeps all of its rules in one cascade layer,
-`cirth`. CSS you write outside a layer beats it at any specificity and in any
-loading order, so an override is a plain rule rather than a selector built to
-outweigh Cirth's. If you use layers yourself, name `cirth` in your order
-statement; [Cascade layers](/customization#cascade-layers) shows how.
+<span id="excluding-a-third-party-component"></span>
+<span id="normal-and-scoped-builds"></span>
 
-### Inside an existing page
+The `.no-cirth` marker provides a partial component opt-out. It is not a full
+style boundary. The scoped build also cannot apply the normal build's
+document-root scroll lock while a modal dialog is open.
 
-The scoped build (`@cirthcss/cirth/scoped`) styles only what is inside a
-`.cirth` element, so it can be added to a page, a CMS or an application shell
-that already has its own styles. The page around the wrapper is left alone.
+Read [Using Cirth with existing CSS](/guides/existing-css) for the scoped
+wrapper, cascade-layer ordering, the exact exclusion boundary, third-party
+widgets and stronger isolation with Shadow DOM. The
+[package page](/package#screen-builds) owns the build names and import paths.
 
-### Excluding a third-party component
+## Feature-specific limits
 
-When a datatable, map, rich-text editor or other widget brings its own CSS,
-mark its root with `.no-cirth`:
+- Dialog exit animation uses the `overlay` transition where the browser
+  implements it. The dialog still closes when that transition is absent.
+- `::details-content` enhances accordion animation where supported. The
+  native `details` disclosure remains the interaction.
+- Declarative `command` and `commandfor` controls have a newer browser
+  support floor than Cirth itself. The [Modal](/components/modal) page
+  provides progressive-enhancement guidance.
+- Non-dialog popover styling targets the standard auto and hint modes.
+  Manual popovers need deliberate application styling.
 
-```html
-<div class="no-cirth">
-  <!-- third-party widget markup -->
-</div>
-```
+These limits are local to the feature. Follow the linked component page
+instead of treating them as requirements for every Cirth page.
 
-**Cirth's component declarations do not target that element or its
-descendants.** This applies to all four screen builds, including an element
-that carries both `.cirth` and `.no-cirth` in a scoped build. Nested
-`.no-cirth` boundaries stay excluded; there is no re-entry class and nothing
-to initialize.
+## What the package contains
 
-The name is shorter than the contract. It does **not** turn all of Cirth off
-or restore browser defaults. The global reset, theme custom properties,
-inherited fonts and colours, layout classes, accessibility and reduced-motion
-rules, and the separate print stylesheet still apply. A Cirth selector whose
-subject is outside the boundary can also still react to an excluded
-descendant through `:has()`, or to an excluded earlier sibling. When a widget
-needs a real style boundary, mount it in a shadow root.
-
-### Frameworks and component libraries
-
-Cirth styles elements, not components, so it does not matter what produced
-the DOM: a template, a server, or a client framework. The
-[guides](/installation/#guides) show where the import goes in each. A component library that renders its own styled markup can live on
-the same page; give its root `.no-cirth` if the two disagree.
+[Package and builds](/package) is the authoritative inventory of exports,
+physical files, presets, token JSON and print companions.
 
 ## Delivering the stylesheet
 
-None of this is required: the [CDN snippet](/installation/#cdn) works as it
-stands. It matters once you care how many milliseconds the stylesheet costs.
-
-### A CDN or your own origin
-
-A CDN needs nothing built or hosted, and the file may already be cached near
-your visitor. It costs a second connection: a new hostname to resolve and a
-new TLS handshake before the first byte of CSS arrives, while a stylesheet in
-the `<head>` blocks rendering.
-
-Serving the file from the same origin as your HTML skips that setup, because
-the connection is already open. It also puts compression and caching under
-your control.
-
-### Caching
-
-A version-pinned URL names bytes that never change, so it can be cached for
-as long as you like:
-
-```http
-Cache-Control: public, max-age=31536000, immutable
-```
-
-That holds for a CDN URL with an exact version in it and for a self-hosted
-copy under a versioned or content-hashed path. It does **not** hold for a URL
-that tracks a moving target, such as a version range or a file you overwrite
-on each deploy.
-
-### Integrity
-
-The CDN snippet carries a Subresource Integrity hash. The digest covers the
-decoded stylesheet, so compression does not affect it, but it is tied to the
-exact version in the URL: change the version and take that release's hash
-with it.
+[Delivery and deployment](/delivery) covers version-pinned CDN URLs,
+Subresource Integrity, self-hosting, caching and compression.
 
 ### Every build from the CDN
 
-The [Installation](/installation/#cdn) snippet links the default build.
-Every other file is linked the same way, and each carries its own hash.
-
-Classless, for a page with no classes at all:
-
-```html
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.classless.min.css"
-  integrity="sha384-GZZdP20mqrkcypnIg17t08a5FoGdAKJ49eU1GBK8aXcaT+BwFnqIn5vK52i0gIQm"
-  crossorigin="anonymous">
-```
-
-Scoped, to style only what is inside a `.cirth` element:
-
-```html
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.scoped.min.css"
-  integrity="sha384-yFHmovn3OOvzinHeO2HC8iG31iDb+lzxgD4N1MlNchcoGDoFtCB07aY2FOyH/pPD"
-  crossorigin="anonymous">
-```
-
-Scoped classless:
-
-```html
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.classless.scoped.min.css"
-  integrity="sha384-pmLwIliHSNEo//m1i4cVpTDvwB8TWoXibgRIsG/pCjCS1CjZWI+xzd9xPL27iDal"
-  crossorigin="anonymous">
-```
-
-The print sheet goes after the build, with `media="print"`. This one pairs
-with the default build; each build has its own ([Print](/utilities/print)):
-
-```html
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.print.min.css"
-  integrity="sha384-YN/sJVAjTOf20mXWrLlQ2XLbgm3EzefQEiFukKfZstkH6fR92hz6dP7eQQTXQE6I"
-  crossorigin="anonymous"
-  media="print">
-```
-
-A preset goes after the build too ([Themes](/themes)):
-
-```html
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/presets/plain.min.css"
-  integrity="sha384-kcc0qmhEMFGjevUPPKQe8HsvALQEf5WLYgSB0GDaiwpnVkdOQ3FdmeCj7K8GgIA2"
-  crossorigin="anonymous">
-```
-
-Every hash here is checked against the pinned files by `npm run check:sri`.
+Use the maintained snippets on [Delivery and deployment](/delivery#cdn-files).
+Do not combine a URL from one version with an integrity hash from another.
 
 ### Compression
 
-The sizes quoted on this site are gzip, because that is what ordinary hosting
-sends without being asked: the default build is
-**{{ proof.size.label if proof.size else "about 15 KB" }}**. Check what your
-own host puts on the wire:
-
-```sh
-curl -s -o /dev/null -D - -H 'Accept-Encoding: br, gzip' \
-  https://example.com/cirth.min.css \
-  | grep -i 'content-encoding\|content-length'
-```
-
-Some hosts never negotiate Brotli; others compress it on the fly at a low
-quality setting, where it can come out larger than gzip. If you serve the file
-yourself, compress it once at deploy time instead, which brings the default
-build to **{{ proof.size.brotliLabel if proof.size else "about 13 KB" }}**.
-
-<details>
-<summary>Precompressing with Brotli</summary>
-
-```sh
-brotli -k -q 11 cirth.min.css     # writes cirth.min.css.br
-```
-
-Servers with static-precompression support find the neighbouring file and set
-the headers for you: nginx with `brotli_static on;` (the ngx_brotli module)
-and `gzip_static on;`, or Caddy with `precompressed br gzip` inside
-`file_server`. Elsewhere, rewrite the request onto the `.br` file and set all
-three headers yourself:
-
-```http
-Content-Encoding: br
-Content-Type: text/css
-Vary: Accept-Encoding
-```
-
-Keep the `.css` URL in your markup. A `.br` file linked directly arrives
-without a `Content-Encoding` header, and the page loads unstyled. `Vary` is
-the one that is easy to forget: without it a shared cache can hand compressed
-bytes to a client that never asked for them.
-
-If you bundle Cirth with your own CSS, precompress the bundle's output rather
-than `cirth.min.css`, which no longer describes anything you serve.
-
-</details>
+Compression is a server concern, not a different Cirth build. See
+[Compression](/delivery#compression) for verification commands and
+deployment guidance.
 
 ### Print
 
-Print styling is a separate file that no screen request needs.
-[Print](/utilities/print) covers which sheet goes with which build.
+Browser support for the separate print stylesheets is documented with their
+behavior on the [Print](/utilities/print) page.
+
+## Before adopting Cirth
+
+- Confirm that your supported browsers meet the floor.
+- Build production CSS and verify that required syntax remains intact.
+- Choose normal or scoped ownership for the page.
+- Test any third-party widget at its actual integration boundary.
+- Exercise dialogs, popovers and form validation in the browsers your users
+  rely on.

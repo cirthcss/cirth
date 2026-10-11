@@ -4,6 +4,7 @@ framework: eleventy
 description: Use Cirth on an Eleventy site. Copy the stylesheet through to the output and link it from your base layout.
 ---
 {% from "install.njk" import packageManagers %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
 Eleventy does not bundle CSS, so Cirth is copied to the output as a file and
 linked like any stylesheet. Nothing transforms it on the way.
@@ -57,13 +58,8 @@ In your base layout, for example `_includes/base.njk`:
 Markdown becomes semantic HTML, which is exactly what Cirth styles: headings,
 lists, tables, code blocks and blockquotes need no classes.
 
-## Choosing a build
+## 5. Check it
 
-Copy `cirth.classless.min.css` for a site with no classes at all, or one of
-the scoped builds; every file is listed in
-[What the package contains](/compatibility#what-the-package-contains).
+{{ checkIt() }}
 
-## Next
-
-[Customization](/customization) covers the `--cirth-*` properties; link your
-own stylesheet after Cirth's to override them.
+{{ nextSteps("in a stylesheet linked after Cirth") }}

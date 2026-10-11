@@ -28,8 +28,9 @@ Solid's JSX writes `class`, as HTML does.
 
 ## 3. Set the CSS target
 
-{{ whyTarget("Vite") }} in `vite.config.js`, beside the plugins already
-there:
+{{ whyTarget("Vite") }}
+
+Add `build.cssTarget` in `vite.config.js`, beside the plugins already there:
 
 ```js
 import { defineConfig } from "vite";

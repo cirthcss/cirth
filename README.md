@@ -28,7 +28,7 @@ Add the stylesheet from a CDN:
 <link
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.min.css"
-  integrity="sha384-lI8cp0vEMgtcAMV0HDytp7C+rad0hVfW/yXmsl87XmnuvTiMsx7O7ADf2lg5IQZq"
+  integrity="sha384-53LU4r3+obTw7a8xZbgzbJxpTHvqBizlnFrXEzhKxAdyyCzI4VcUZxfEFDpiLL8q"
   crossorigin="anonymous">
 ```
 
@@ -72,24 +72,15 @@ See [About Cirth](docs/src/pages/about.md) for the scope and trade-offs.
 
 ## Choose a build
 
-| Stylesheet | Use it for |
-| --- | --- |
-| `dist/cirth.min.css` | The default semantic build. |
-| `dist/cirth.classless.min.css` | Pages with almost no classes. |
-| `dist/cirth.scoped.min.css` | An existing site or app; styles stay inside `.cirth`. |
-| `dist/cirth.classless.scoped.min.css` | Scoped and classless together. |
+The default build is the right starting point for most projects. Classless
+and scoped variants are available when you need a stricter selector boundary.
+[Package and builds](docs/src/pages/package.md) is the authoritative list of
+entry points, generated files, presets, token JSON and print companions.
 
-All four share the same default theme and light/dark support. Load one of the
-optional [presets](docs/src/pages/themes.md) after the main
-stylesheet to change its look. Print stylesheets are available separately.
-The [installation guide](docs/src/pages/installation/index.md) has the CDN
-snippet, the npm import, and a guide for each stack it was checked with:
-build tools, JavaScript frameworks, server-rendered apps in PHP, Python,
-Ruby, Elixir, Java, .NET, Node.js and Go, static site generators and Rust,
-each listed in
-[frameworks.js](docs/src/_data/frameworks.js) with its versions.
-[Compatibility](docs/src/pages/compatibility.md) lists every build's import
-path.
+Use the [installation quickstart](docs/src/pages/installation/index.md) for
+the basic setup. Then choose one of the 53 verified
+[framework guides](docs/src/pages/framework-guides.md) if a build tool or
+application framework owns your global stylesheet.
 
 To keep Cirth's content, form, and component declarations off a third-party
 widget, mark its root with `.no-cirth`:
@@ -100,7 +91,7 @@ widget, mark its root with `.no-cirth`:
 
 This is a component opt-out, not complete isolation: reset, theme, inherited,
 layout, accessibility, motion, and print rules still apply. See
-[Compatibility](docs/src/pages/compatibility.md#excluding-a-third-party-component)
+[Using Cirth with existing CSS](docs/src/pages/guides/existing-css.md#excluding-a-third-party-component)
 for the boundary's `:has()` and sibling-selector limits.
 
 ## Customize
@@ -124,10 +115,9 @@ system and contrast guidance.
 
 ## Browser support
 
-Cirth targets Chrome and Edge 123+, Firefox 130+, and Safari and iOS 18.2+.
-The full [Browserslist target](package.json) also covers mobile Chromium,
-Opera, and Samsung Internet. Older browsers, including Internet Explorer,
-are not supported.
+Cirth targets modern browser engines and does not support Internet Explorer.
+[Compatibility](docs/src/pages/compatibility.md) owns the exact browser
+floor, required CSS features and build-pipeline limits.
 
 ## Documentation and contributing
 

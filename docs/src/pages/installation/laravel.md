@@ -4,6 +4,7 @@ framework: laravel
 description: Use Cirth in a Laravel application. Import it in resources/css/app.css in place of Tailwind, keep Vite's CSS target at Cirth's browser floor, and load it with the @vite directive.
 ---
 {% from "install.njk" import packageManagers %}
+{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
 
 Laravel builds its front end with Vite, and a new application imports
 Tailwind from `resources/css/app.css`. Cirth takes Tailwind's place in that
@@ -33,11 +34,10 @@ Rules of your own go after this line.
 
 ## 3. Configure Vite
 
-In `vite.config.js`, remove the `tailwindcss()` plugin and its import, and
-add `build.cssTarget`. Without it, Vite compiles CSS for older browsers than
-Cirth supports and rewrites its `light-dark()` colours: the page still
-switches between light and dark, but an element with `data-theme` that
-forces the other scheme inside the page stops changing colour.
+Remove the `tailwindcss()` plugin and its import from `vite.config.js`.
+{{ whyTarget("Vite") }}
+
+Add `build.cssTarget` beside the Laravel plugin:
 
 ```js
 import { defineConfig } from 'vite';
@@ -113,5 +113,8 @@ Blade renders ordinary elements, and Cirth styles them:
 @endsection{% endraw %}
 ```
 
-Override `--cirth-*` properties after the `@import` in `app.css`; see
-[Customization](/customization).
+## 6. Check it
+
+{{ checkIt(true) }}
+
+{{ nextSteps("after the @import in resources/css/app.css") }}

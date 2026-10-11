@@ -32,7 +32,9 @@ In `src/routes/+layout.svelte`:
 
 ## 3. Set the CSS target
 
-{{ whyTarget("Vite") }} in `vite.config.js`, beside the `sveltekit()` plugin:
+{{ whyTarget("Vite") }}
+
+Add `build.cssTarget` in `vite.config.js`, beside the `sveltekit()` plugin:
 
 ```js
 import { sveltekit } from "@sveltejs/kit/vite";

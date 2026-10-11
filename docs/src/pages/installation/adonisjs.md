@@ -27,7 +27,9 @@ with `@vite(['resources/css/app.css', 'resources/js/app.js'])`.
 
 ## 3. Set the CSS target
 
-{{ whyTarget("Vite") }} in `vite.config.ts`, beside the `adonisjs()` plugin:
+{{ whyTarget("Vite") }}
+
+Add `build.cssTarget` in `vite.config.ts`, beside the `adonisjs()` plugin:
 
 ```ts
 import { defineConfig } from "vite";

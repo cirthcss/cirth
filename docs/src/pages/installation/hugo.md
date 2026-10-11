@@ -3,12 +3,12 @@ layout: docs.njk
 framework: hugo
 description: Use Cirth on a Hugo site. Put the file in assets/, fingerprint it with Hugo Pipes and link it with its integrity hash.
 ---
-{% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
-Hugo Pipes can fingerprint a stylesheet from `assets/` and give its link a
-Subresource Integrity hash. Cirth is one file there and one block in the
-base template.
+Files in Hugo's `assets/` directory become public only when a pipeline reads
+them. The base template wraps every generated page, so its Cirth link makes
+the stylesheet global. Hugo Pipes fingerprints that file and provides its
+Subresource Integrity hash.
 
 ## 1. Add the file
 

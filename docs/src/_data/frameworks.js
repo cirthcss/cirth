@@ -1,5 +1,5 @@
 // The integration guides and the marks that name them, once. The sidebar
-// and the pager (nav.js), the Installation page, the home page, each
+// and the pager (nav.js), the Framework Guides page, the home page, each
 // guide's breadcrumb, header and verification note, and the Brand page all
 // read this file, so a guide cannot be linked from one place and missing
 // from another, a count cannot drift from the list it counts, and a logo
@@ -44,7 +44,7 @@
 // (`officialUrl`), named as such, and the guide is a separate link beside
 // it, or to the address the owner names for its logo (`linkTo`): JetBrains
 // asks that its product logos link to www.jetbrains.com. On the
-// Installation page a mark is a decorative picture inside its card, which
+// Framework Guides page a mark is a decorative picture inside its card, which
 // is one link to the guide; the guide's own card is where the mark leads to
 // the project.
 
@@ -119,7 +119,7 @@ const openJs = {
 // states: where that holds here, and where the maintainers decided it does
 // not.
 const inCard =
-	"On the guide's page the logo is that link; on the Installation page it is a decorative picture inside the card, which links to the guide, by the maintainers' decision.";
+	"On the guide's page the logo is that link; on the Framework Guides page it is a decorative picture inside the card, which links to the guide, by the maintainers' decision.";
 
 // What every nominative record states after its own reason.
 const removal = "Cirth is not affiliated with or endorsed by the owner, and the logo comes down if the owner asks.";
@@ -707,13 +707,13 @@ const marks = {
 		termsUrl: "https://www.jetbrains.com/company/brand/",
 		permission: "None to refer to JetBrains products, provided the logo links back to www.jetbrains.com, carries the attribution and does not outweigh the site's own brand.",
 			linkTo: "https://www.jetbrains.com",
-		note: "Ktor.svg and Ktor-white.svg from the Ktor logo package on JetBrains' brand page, unmodified. On the guide's page the logo links to www.jetbrains.com, as the guidelines ask; on the Installation page it is a decorative picture inside the card, which links to the guide, by the maintainers' decision.",
+		note: "Ktor.svg and Ktor-white.svg from the Ktor logo package on JetBrains' brand page, unmodified. On the guide's page the logo links to www.jetbrains.com, as the guidelines ask; on the Framework Guides page it is a decorative picture inside the card, which links to the guide, by the maintainers' decision.",
 		trademarkNotice: "Copyright © 2026 JetBrains s.r.o. Ktor and the Ktor logo are trademarks of JetBrains s.r.o.",
 	},
 };
 
 // Every guide sits in one category, the one a reader would look under
-// first. The Installation page and the sidebar group them in this order,
+// first. The Framework Guides page and the sidebar group them in this order,
 // alphabetical inside each.
 const categories = [
 	{ id: "build", text: "Build tools", short: "Build tool" },
@@ -2004,7 +2004,7 @@ const entries = guides.map((guide) => {
 	};
 });
 
-// The guides grouped for the Installation page and the sidebar, in the
+// The guides grouped for the Framework Guides page and the sidebar, in the
 // order of `categories`, alphabetical inside each.
 const groups = categories
 	.map((category) => ({

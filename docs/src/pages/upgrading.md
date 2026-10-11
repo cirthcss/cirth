@@ -1,5 +1,6 @@
 ---
 layout: docs.njk
+description: Migrate existing Cirth projects across breaking selector, token, layout and component changes.
 ---
 
 # Upgrading
@@ -15,12 +16,15 @@ working the way it already does.
 ## Next release, from v0.16.x
 
 Not released yet: this section describes the development line. The class
-list stays the same; the defaults underneath it change in five places.
+and selector changes are listed below, together with the defaults that move.
 Surfaces and edges come from four named levels and three named edges, type
 comes from roles, the primary is always the heaviest action, every corner
 takes one of two radii by what it is, and space between elements comes from
-their relation rather than from margins they carry. The `playroom` preset is
-replaced by `material`. Each change has a spec in the repository's `specs/` directory.
+their relation rather than from margins they carry. Containers size
+continuously, `.grid` wraps intrinsically, `.row` owns the fixed-row pattern,
+and visual groups opt in with `.group`. The `playroom` preset is replaced by
+`material`. Each observable change has a spec in the repository's `specs/`
+directory.
 
 ### Surfaces and edges
 
@@ -84,6 +88,69 @@ replaced by `material`. Each change has a spec in the repository's `specs/` dire
 | Set `--cirth-typography-spacing-top` on a heading | Removed. Set `margin-block-start` on the heading, or change `--cirth-flow-section` or `--cirth-flow-group` |
 | Relied on 4px between list items | Items are a line apart (`--cirth-flow-line`, 8px at the default) |
 | Set `--cirth-spacing` | Nothing: every step of the flow follows it |
+
+### Layout and grouping selectors
+
+#### Container width
+
+`.container` uses one continuously resizing content track capped by
+`--cirth-container-max-width`, which defaults to `60rem`. It does not step
+through fixed maximum widths at viewport breakpoints. `.container-fluid` uses
+the same three-track structure without the content cap.
+
+If a layout depended on one of the fixed widths from v0.16.x, set the new
+maximum explicitly on that container:
+
+```css
+.docs-shell {
+  --cirth-container-max-width: 76rem;
+}
+```
+
+The gutter has its own `--cirth-container-gutter` token. See
+[Container](/layout/container) for the current layout contract.
+
+#### Grid and row
+
+`.grid` is an intrinsic wrapping layout in this line. It creates as many
+columns as fit at `--cirth-grid-min-column` and moves extra items to another
+row. The equal-width layout that stacks below `768px` and stays on one row
+above it is named `.row`.
+
+Rename existing fixed-row uses:
+
+```html
+<!-- v0.16.x -->
+<div class="grid">...</div>
+
+<!-- current development line -->
+<div class="row">...</div>
+```
+
+Keep `.grid` where wrapping is intended, then tune
+`--cirth-grid-min-column` if the default `12rem` minimum does not fit the
+content. The [Grid](/layout/grid) and [Row](/layout/row) pages compare the two
+current contracts.
+
+#### Visual groups
+
+In a class-enabled build, `[role="group"]` no longer triggers the joined
+control layout by itself. Add `.group` for the visual component and retain the
+role only when it correctly describes the relationship between the controls:
+
+```html
+<!-- v0.16.x -->
+<div role="group">...</div>
+
+<!-- current development line -->
+<div class="group" role="group">...</div>
+```
+
+This separates an ARIA semantic from a presentation choice. In the classless
+build, a non-`fieldset` element with `role="group"` remains the visual trigger
+because no component class is available. A `fieldset` uses its native
+`legend` pattern and does not opt into the joined layout. See
+[Group](/components/group) for current markup.
 
 ### Presets
 

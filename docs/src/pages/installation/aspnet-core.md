@@ -3,13 +3,12 @@ layout: docs.njk
 framework: aspnet-core
 description: Use Cirth in an ASP.NET Core app with Razor Pages or MVC. Put the file in wwwroot and link it from the layout; MapStaticAssets fingerprints it.
 ---
-{% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
-ASP.NET Core serves `wwwroot/` as static web assets. Since .NET 9,
-`MapStaticAssets` also fingerprints and compresses them, and the layout's
-`~/` links resolve to the fingerprinted names. Cirth is one file there and
-one `<link>`.
+`wwwroot/` is ASP.NET Core's public directory: files there can be requested
+by the browser. A shared Razor layout supplies the `<head>` for every page,
+so one `<link>` there makes Cirth global. Since .NET 9, `MapStaticAssets`
+also fingerprints and compresses the file.
 
 ## 1. Add the file
 

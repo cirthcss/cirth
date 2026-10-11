@@ -3,11 +3,12 @@ layout: docs.njk
 framework: jakarta-jsp
 description: Use Cirth in a Java web app built on Jakarta Servlet and JSP. Put the file in the webapp folder, link it through the context path, and deploy the WAR to Tomcat. No Node.js.
 ---
+{% from "guide.njk" import nextSteps %}
 
 Jakarta Servlet and Jakarta Pages (JSP) are two of the Jakarta® EE
 specifications, implemented by servlet containers such as Tomcat. A web app
-packaged as a WAR serves everything in `src/main/webapp` that is not under
-`WEB-INF` as it is. Cirth is one file there, linked from a JSP layout
+packaged as a WAR exposes everything in `src/main/webapp` that is not under
+`WEB-INF` as public files. Cirth is one file there, linked from a JSP layout
 through the app's context path, so the link holds wherever the WAR is
 deployed. Nothing here needs Node.js or npm.
 
@@ -172,4 +173,4 @@ Open `http://localhost:8080/signup/` with the system in light mode, then
 in dark mode. The page links `/signup/assets/cirth.min.css`, follows the
 system, and keeps the section with `data-theme="dark"` dark both times.
 
-{% from "guide.njk" import nextSteps %}{{ nextSteps("in a stylesheet linked after Cirth, in the same tag file") }}
+{{ nextSteps("in a stylesheet linked after Cirth, in the same tag file") }}

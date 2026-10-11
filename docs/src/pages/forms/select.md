@@ -1,13 +1,13 @@
 ---
 layout: docs.njk
-description: The native select in Cirth. A chevron, a placeholder option, option groups, and multiple selection, all from the standard element.
+description: Use native select controls in Cirth for one or several choices, including prompts and option groups.
 ---
 
 # Select
 
-A `select` looks like the text fields beside it, with a chevron at the end.
-It stays the browser's own control, so the list that opens is the
-platform's, with its keyboard and touch behaviour.
+Use `select` when a form value must come from a known list. The browser opens
+the list and provides its keyboard, touch and platform-specific picker
+behavior. Cirth makes the closed control match adjacent fields.
 
 {% demo "forms-select" %}
 
@@ -18,6 +18,7 @@ platform's, with its keyboard and touch behaviour.
     <option value="" selected disabled>Choose a country…</option>
     <option value="it">Italy</option>
     <option value="fr">France</option>
+    <option value="de">Germany</option>
   </select>
 </label>
 
@@ -25,8 +26,8 @@ platform's, with its keyboard and touch behaviour.
   Time zone
   <select name="timezone">
     <optgroup label="Europe">
-      <option>Rome</option>
-      <option selected>London</option>
+      <option value="Europe/Rome">Rome</option>
+      <option value="Europe/London" selected>London</option>
     </optgroup>
   </select>
 </label>
@@ -34,53 +35,80 @@ platform's, with its keyboard and touch behaviour.
 <label>
   Notify me about
   <select name="topics" multiple size="4">
-    <option selected>Releases</option>
-    <option>Security advisories</option>
+    <option value="releases" selected>Releases</option>
+    <option value="security">Security advisories</option>
   </select>
 </label>
 ```
 
+Each `option` has a visible label and a submitted `value`. If `value` is
+omitted, the option text is submitted. `optgroup` gives a labelled visual group
+inside a long list; it is not itself selectable.
+
 ## A placeholder option
 
-An empty, `disabled`, `selected` first option on a `required` select reads
-as a prompt: while it is chosen, the select is invalid, and Cirth paints its
-text in the placeholder colour. It does not turn red while it has focus: a
-select that is still being chosen from is not an error yet.
+HTML has no dedicated placeholder attribute for `select`. A common prompt is
+an empty first option that is initially `selected` and cannot be chosen again
+because it is `disabled`. When the `select` is `required`, the empty value does
+not satisfy the constraint.
+
+Cirth colours `select:invalid` text with the placeholder token. Native invalid
+styling waits for user interaction, and an open required select remains neutral
+while it has focus.
 
 ## Multiple selection and size
 
-With `multiple` or a `size` above one, the select shows its options as a
-list instead of a menu. The chevron goes, and chosen options take
+`multiple` lets the person select more than one option. `size` requests how
+many rows remain visible. Either attribute changes the control from a compact
+menu into a list, so Cirth removes the chevron. Selected options use
 `--cirth-form-element-selected-background-color`.
+
+Multiple selection gestures differ by platform. For a small set of independent
+choices, checkboxes are usually easier to discover and operate.
 
 ## States
 
-A select has the same focus, disabled and validation states as a
-[text input](/forms/text-inputs#states). It grows with its longest option
-and never drops below 44px, whatever its font size.
+A select shares the focus, disabled and validation states described in
+[Validation and states](/forms/validation). It fills its container, may grow to
+fit long option text and never drops below the shared 44px control height.
+
+## Native behavior and Cirth styling
+
+The browser owns the popup or picker, option navigation and value selection.
+Cirth styles the closed field, adds its chevron to a single-row select and
+styles selected rows in a list. The open platform menu is not a Cirth surface
+and may look different across operating systems.
 
 ## Accessibility
 
-- Label every select, and use `optgroup` labels to structure long lists.
-- For two or three options, radios are faster to scan and need no opening:
-  see [Checkbox, radio and switch](/forms/checkbox-radio-switch), including
-  the segmented control.
-- A multiple select is hard to use with a pointer alone; a list of
-  checkboxes is often the better control.
+- Label every select.
+- Use concise option labels. Put categories in labelled `optgroup` elements
+  when they help scanning.
+- Use radios when two or three choices should remain visible for comparison.
+- Explain a multiple select if the required selection gesture may not be
+  obvious, or choose checkboxes instead.
 
 ## Tokens
 
 | Token | What it sets |
 | --- | --- |
-| `--cirth-icon-chevron` | The chevron, one per colour scheme |
-| `--cirth-form-element-selected-background-color` | A chosen option in a list |
-| `--cirth-form-element-placeholder-color` | The prompt option |
+| `--cirth-icon-chevron` | Chevron on a single-row select |
+| `--cirth-form-element-selected-background-color` | Selected option in a visible list |
+| `--cirth-form-element-placeholder-color` | Empty prompt text |
 
-The surface, edge and focus tokens are shared with
-[text inputs](/forms/text-inputs#tokens).
+The surface, edge and focus tokens are owned by
+[Text inputs](/forms/text-inputs#tokens).
+
+## Common mistakes
+
+- Using a dropdown component in place of a form select. A disclosure menu does
+  not submit a selected value or provide select keyboard behavior.
+- Omitting explicit option values when display labels may change.
+- Marking the prompt `selected` without `required`, then assuming the browser
+  will reject it.
 
 ## Related
 
-- [Dropdown](/components/dropdown), for a menu of actions or links rather
-  than a form value.
-- [Validation and states](/forms/validation).
+- [Checkbox, radio and switch](/forms/checkbox-radio-switch)
+- [Dropdown](/components/dropdown), for links and actions rather than a value.
+- [Validation and states](/forms/validation)

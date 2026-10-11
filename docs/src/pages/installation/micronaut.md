@@ -3,11 +3,12 @@ layout: docs.njk
 framework: micronaut
 description: Use Cirth in a Micronaut app with Thymeleaf views. Put the file in the static resources, map them in application.properties, and link it from a view. No Node.js.
 ---
+{% from "guide.njk" import nextSteps %}
 
-Micronaut serves static resources from the classpath once a mapping says
-which paths to look up, and Micronaut Views renders Thymeleaf templates.
-Cirth is one file in the resources, linked from a view. Nothing here needs
-Node.js.
+Micronaut can expose classpath resources at public URLs once a mapping says
+which paths to look up. Micronaut Views renders Thymeleaf templates. Cirth
+is one resource, linked in the document head of the rendered view. Nothing
+here needs Node.js.
 
 ## 1. Create the project
 
@@ -119,4 +120,4 @@ Open `http://localhost:8080` with the system in light mode, then in dark
 mode. The page follows the system, and the section with
 `data-theme="dark"` stays dark both times.
 
-{% from "guide.njk" import nextSteps %}{{ nextSteps("in a stylesheet in static/css, linked after Cirth") }}
+{{ nextSteps("in a stylesheet in static/css, linked after Cirth") }}

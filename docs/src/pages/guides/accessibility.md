@@ -11,6 +11,10 @@ checked baseline for contrast, focus and target size, and follows the
 preferences a reader sets in their system, with no class, attribute or
 script from you.
 
+WCAG means Web Content Accessibility Guidelines. Its success criteria give
+teams testable requirements for contrast, focus and target size, but meeting
+them does not by itself make a complete interface accessible.
+
 <dl class="grid docs-facts">
 <div><dt>Contrast</dt><dd>WCAG 2.2 AA in both schemes and every shipped preset</dd></div>
 <div><dt>Focus</dt><dd>Always visible, including under forced colors</dd></div>

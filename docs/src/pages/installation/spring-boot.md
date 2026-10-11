@@ -3,11 +3,13 @@ layout: docs.njk
 framework: spring-boot
 description: Use Cirth in a Spring Boot app. Put the file in the static resources and link it from Thymeleaf in an executable jar, or from JSP in a WAR.
 ---
+{% from "guide.njk" import nextSteps %}
 
 Spring Boot® serves anything in `src/main/resources/static` as it is,
-whichever view technology renders the pages. Cirth is one file there.
-Thymeleaf, in an executable jar, is the way to start; JSP needs a WAR, and
-suits an existing app or a deployment to a servlet container.
+whichever view technology renders the pages. That directory is the
+application's public classpath location. Cirth is one file there, linked in
+the document head. Thymeleaf, in an executable jar, is the way to start; JSP
+needs a WAR, and suits an existing app or a servlet-container deployment.
 
 ## 1. Create the project
 
@@ -258,4 +260,4 @@ cp target/demo-0.0.1-SNAPSHOT.war "$CATALINA_HOME/webapps/demo.war"
 Spring Boot 4 deploys to any container that implements Servlet 6.1 or
 later, Tomcat 11 among them.
 
-{% from "guide.njk" import nextSteps %}{{ nextSteps("in a stylesheet in static/css, linked after Cirth") }}
+{{ nextSteps("in a stylesheet in static/css, linked after Cirth") }}

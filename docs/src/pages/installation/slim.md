@@ -3,11 +3,12 @@ layout: docs.njk
 framework: slim
 description: Use Cirth in a Slim 4 app. Put the file in public/css and link it from a PHP-View layout; Slim has no asset pipeline to configure.
 ---
+{% from "guide.njk" import nextSteps %}
 
 Slim has no view layer and no asset pipeline of its own: a route returns a
-response, and the web server serves `public/` as it is. Cirth is one file
-there, linked from a template rendered with PHP-View, the template
-renderer Slim documents alongside Twig-View.
+response, and the web server exposes `public/` as its web root. Cirth is one
+public file there. A PHP-View layout supplies the document head around every
+rendered template, so one link loads it globally.
 
 ## 1. Create the project
 
@@ -107,4 +108,4 @@ Open `http://localhost:8080` with the system in light mode, then in dark
 mode. The page follows the system, and the section with
 `data-theme="dark"` stays dark both times.
 
-{% from "guide.njk" import nextSteps %}{{ nextSteps("in a stylesheet linked after Cirth") }}
+{{ nextSteps("in a stylesheet linked after Cirth") }}

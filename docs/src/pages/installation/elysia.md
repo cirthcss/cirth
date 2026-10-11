@@ -3,11 +3,11 @@ layout: docs.njk
 framework: elysia
 description: Use Cirth with Elysia on Bun. Serve the package's dist folder with the static plugin and link it from your pages.
 ---
-{% from "install.njk" import packageManagers %}
-{% from "guide.njk" import whyTarget, checkIt, nextSteps %}
+{% from "guide.njk" import checkIt, nextSteps %}
 
 Elysia serves files with its static plugin. Cirth's package is a folder of
-finished CSS, so the server can hand it out directly from `node_modules`.
+finished CSS, so the server can expose that folder from `node_modules` at a
+public URL. A `<link>` in the returned document loads it for the whole page.
 
 ## 1. Install
 

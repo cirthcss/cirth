@@ -1,14 +1,13 @@
 ---
 layout: docs.njk
+description: Arrange a known set of peers as equal-width columns above 768px and stack them on narrower screens.
 ---
-
 
 # Row
 
-`.row` is a single-row layout: stacked below `768px`, equal-width columns
-on one row from that viewport width up. Column count follows child count, not
-available space; for a grid that wraps into multiple rows instead, see
-[Grid](/layout/grid).
+Use `.row` for a small, known set of peers that should stack on narrow screens
+and share one equal-width row on wider screens. Common examples are form
+fields, stat tiles, and short action groups.
 
 {% demo "row" %}
 
@@ -20,37 +19,50 @@ available space; for a grid that wraps into multiple rows instead, see
 </div>
 ```
 
-## When to use `.row`
-
-`.row` is for content that reads as one row of peers and should stay one
-row on wide screens, however many items there are: a group of form
-controls, a row of stat tiles, a toolbar. If you have an unknown or large
-number of items that should wrap onto new rows instead of squeezing into
-one, use [`.grid`](/layout/grid) instead.
+The wrapper controls presentation. The direct children retain their own HTML
+meaning.
 
 ## Behavior
 
-* Below `768px`, `.row` is a single column (`grid-template-columns: 1fr`).
-* At `768px` and above, columns become `repeat(auto-fit, minmax(0%, 1fr))`.
-  Every direct child becomes an equal-width column, however many there are;
-  columns never wrap onto a second row.
-* Gaps are controlled by `--cirth-grid-column-gap` and
-  `--cirth-grid-row-gap` (both default to `--cirth-spacing`).
-* Children get `min-width: 0` so long content (text, tables) doesn't force
-  the column wider than its share of the row.
-* The row owns the space between its columns: its children take no flow
-  spacing from each other, and a trailing `<small>` after one of those
-  controls gets the same full-width helper-text treatment it gets after a
-  bare `input`/`select`/`textarea`/`fieldset`.
+Below `768px`, the row has one column. At `768px` and above, CSS Grid gives
+every direct child an equal share of one row. The items do not wrap onto a
+second row, even when the row has many children.
 
-`.row` only exists in the default build with classes enabled; there's no
-classless equivalent since it requires a class to opt in.
+Spacing comes from `--cirth-grid-column-gap` and
+`--cirth-grid-row-gap`. Direct children receive `min-width: 0`, allowing long
+text or an inner scroll container to shrink within the assigned column.
 
-## Why it keeps one breakpoint
+`.row` is available only in class-enabled builds.
 
-`.row` is the intentional exception to Cirth's intrinsic-first layout
-rules. Its contract is not “fit as many columns as this box can hold”
-(that is [`.grid`](/layout/grid)), but “these peers become one indivisible
-row on a wide page”. The `768px` viewport decision expresses that contract
-directly. Replacing it with `auto-fit` or flex wrapping would make `.row`
-another spelling of `.grid` and remove the behavior it exists to provide.
+## Row or grid
+
+Use [`.grid`](/layout/grid) when items should wrap based on available space or
+when their number can grow. A grid protects a minimum column width and moves
+extra items to another line. A row always keeps its wide-screen items on one
+line.
+
+## Customizing the gaps
+
+```css
+.profile-fields {
+  --cirth-grid-column-gap: var(--cirth-space-4);
+  --cirth-grid-row-gap: var(--cirth-space-3);
+}
+```
+
+The breakpoint and the equal-column behavior are part of `.row`'s contract.
+Use a local layout instead when those decisions do not fit the content.
+
+## Common mistakes
+
+- Do not use `.row` for an unknown number of cards. They can become too narrow
+  on a wide-screen row.
+- Do not set widths on every child just to make them equal. The grid tracks
+  already do that.
+- Do not combine `.row` with another grid-owning class on the same element.
+
+## Related pages
+
+- [Grid](/layout/grid)
+- [Container](/layout/container)
+- [Forms](/forms/)

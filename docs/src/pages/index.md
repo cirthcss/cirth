@@ -5,9 +5,9 @@ stylesheets:
 
 hero:
   tagline: >-
-    One stylesheet for the HTML you already write. No class names to learn
-    and no JavaScript to ship: standard elements become an accessible,
-    themeable interface, whatever renders them.
+    One stylesheet for the HTML you already write. Standard elements gain a
+    tested, themeable visual baseline without a distributed JavaScript
+    runtime, whatever renders them.
   actions:
     - theme: brand
       text: Get started

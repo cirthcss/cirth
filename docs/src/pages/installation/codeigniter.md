@@ -3,9 +3,11 @@ layout: docs.njk
 framework: codeigniter
 description: Use Cirth in a CodeIgniter 4 app. Put the file in public/css, link it from a view layout with link_tag(), and serve it as a static file.
 ---
+{% from "guide.njk" import nextSteps %}
 
-CodeIgniter® serves `public/`, its web root, as it is. Cirth is one file
-there, linked from a layout that every view extends.
+CodeIgniter® serves `public/`, its web root, as it is. A web root is the
+directory a browser can request files from. Cirth is one file there, linked
+from a layout that every view extends.
 
 ## 1. Create the project
 
@@ -126,4 +128,4 @@ mode. The page follows the system, and the section with
 all, `app.baseURL` points somewhere else: the link in the page source says
 where.
 
-{% from "guide.njk" import nextSteps %}{{ nextSteps("in a stylesheet linked after Cirth") }}
+{{ nextSteps("in a stylesheet linked after Cirth") }}

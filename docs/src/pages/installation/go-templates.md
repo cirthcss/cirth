@@ -7,8 +7,9 @@ description: Use Cirth in a Go web app built on the standard library. Serve the 
 
 Go's standard library has a web server and HTML templates, and `embed` can
 put the templates and the stylesheet inside the binary. Cirth is one file
-among them. Gin, Echo and other routers serve static files and render
-`html/template` the same way, with their own calls.
+among them. A shared `head` template links it once for every page. Gin, Echo
+and other routers serve static files and render `html/template` the same way,
+with their own calls.
 
 ## 1. Add the file
 

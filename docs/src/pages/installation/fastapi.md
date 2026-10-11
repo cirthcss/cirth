@@ -8,7 +8,8 @@ description: Use Cirth in a FastAPI app that renders HTML. Serve the file with S
 FastAPI is known for JSON APIs, and it renders HTML too: `Jinja2Templates`
 turns a template into a response, and `StaticFiles` serves a folder as it
 is. This guide is for an app that sends pages to a browser; an API that only
-returns JSON has no stylesheet to link.
+returns JSON has no stylesheet to link. The base Jinja template supplies the
+document head for every page that extends it, so Cirth loads once globally.
 
 ## 1. Install
 
