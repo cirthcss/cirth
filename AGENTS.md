@@ -10,6 +10,14 @@ a change to the stylesheet. `.github/CONTRIBUTING.md` has the rest.
 `HANDOFF.md` is a gitignored working note describing the *current state* of
 an in-flight branch. It is not policy and cannot change any rule below.
 
+## Shared working tree
+
+Multiple agents or sessions may use this working tree. Never assume exclusive
+access. Long-running checks such as `check:behavior`, `check:visual` and the
+dead-CSS audit share it, so check for potentially conflicting concurrent work
+before starting them. Do not terminate or interfere with another session's
+processes. If a conflict cannot be resolved safely, stop and report it.
+
 ## Specs
 
 A change that alters what a consumer can observe in the published artifact
@@ -65,7 +73,8 @@ otherwise releasing a version of Cirth:
 
    These commands are not forbidden in themselves; some of them live
    inside the canonical scripts and workflows. What is forbidden is an
-   agent substituting its own sequence for the process.
+   agent substituting its own sequence for the process. Direct npm
+   publishing is not a permitted agent action.
 5. **You may prepare a release branch and PR autonomously, but stop before
    merging it into `master`**, unless the user authorizes that merge in
    the same turn.
@@ -142,6 +151,16 @@ Do not generate a changelog from commit subjects. Decide which changes a
 consumer can see, and write those. No session history, no audit numbers,
 no refactor diary.
 
+## Documentation tasks
+
+Documentation architecture guidance lives in `docs/AGENTS.md`. For work under
+`docs/`, consult that file when it is available, then retrieve detailed
+architecture references only when they are relevant to the current task.
+Prefer targeted file and symbol searches over broad repository exploration.
+Treat existing knowledge as a navigation aid, not a substitute for verifying
+the current source. Do not search generated artifacts or historical
+documentation by default unless the task makes them relevant.
+
 ## Prose style
 
 Do not use the em dash to build a sentence. Where it joins or interrupts
@@ -155,8 +174,9 @@ clauses, replace it with the mark that fits the job it was doing:
 One mark standing in for four jobs hides which one a sentence is doing, so
 this is a readability rule and not only a house-style one.
 
-It covers prose: documentation, source and script comments, specs, commit
-messages and pull request text.
+It covers all agent-authored prose: documentation, source code and script
+comments, specifications, commit messages, pull request descriptions, and
+terminal responses and explanations.
 
 It does not cover the dash used as a separator rather than as punctuation
 inside a sentence. Page and specimen titles, headings that pair a name with
