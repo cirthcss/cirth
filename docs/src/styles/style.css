@@ -2005,7 +2005,7 @@ details.docs-demo-source > :not(summary) {
 }
 
 /* An empty swatch: the flex basis alone sizes it in every engine. */
-.docs-theme-lab dd i {
+.docs-theme-role-swatch {
   flex: 0 0 1rem;
   height: 1rem;
   border: var(--cirth-border-width) solid var(--cirth-muted-border-color);

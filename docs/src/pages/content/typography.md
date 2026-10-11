@@ -157,6 +157,28 @@ than creating a blockquote.
 alternate voice or convention. Their typical bold and italic appearance does
 not make them interchangeable with `<strong>` and `<em>`.
 
+### The `<i>` element is text, not an icon
+
+```html
+<p>The phrase <i lang="la">in situ</i> means “in its original place.”</p>
+```
+
+Here `<i>` marks a span of text set apart from the surrounding prose by a
+different voice or convention. A technical term, a taxonomic name, or a phrase
+from another language can have that role. The `lang="la"` attribute identifies
+the example as Latin. Browsers and assistive tools can use that language
+information when they process the phrase. Browsers normally render `<i>` in
+italics; Cirth does not add a separate treatment.
+
+The `i` in the tag name does not mean “icon.” The element does not load a
+graphic, explain an icon to assistive technology, or label a control. Some icon
+libraries use `<i>` only as a CSS class hook, but that convention does not
+change the element's HTML meaning. Use an inline SVG, or a neutral `<span>`
+when application CSS supplies the artwork. Hide a decorative icon from
+assistive technology. An icon-only control still needs a text label that
+assistive technology can announce. See [Embedded content](/content/embedded)
+and [Screen-reader only](/utilities/sr-only) for the relevant patterns.
+
 The text inside `title` on `<abbr>` is supplementary. Expand an unfamiliar
 abbreviation in visible prose on its first use when every reader needs the
 definition.
