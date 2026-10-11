@@ -56,6 +56,28 @@ if (
   const resultLinks = () =>
     Array.from(results.querySelectorAll("[data-docs-search-result]"));
 
+  // Pagefind indexes the name inside an HTML tag, while a query that keeps
+  // the angle brackets returns no matches. Quote a query made of one complete
+  // tag so short elements such as <i> stay exact. In longer queries, keep tag
+  // names as ordinary terms and discard unmatched brackets while the reader
+  // is still typing.
+  const normalizePagefindQuery = (query) => {
+    const completeTag = query.match(
+      /^\s*<\s*\/?\s*([a-z][a-z0-9:-]*)(?:\s[^<>]*?)?\s*\/?>\s*$/i,
+    );
+    if (completeTag) return `"${completeTag[1]}"`;
+
+    return query
+      .replace(
+        /<\s*\/?\s*([a-z][a-z0-9:-]*)(?:\s[^<>]*?)?\s*\/?>/gi,
+        " $1 ",
+      )
+      .replace(/<\s*\/?/g, " ")
+      .replace(/>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  };
+
   const openSearch = () => {
     if (!dialog.open) dialog.showModal();
     trigger.setAttribute("aria-expanded", "true");
@@ -95,8 +117,9 @@ if (
 
   const search = async () => {
     const query = input.value.trim();
+    const pagefindQuery = normalizePagefindQuery(query);
     currentQuery = query;
-    if (query.length < 2) {
+    if (pagefindQuery.length < 2) {
       results.replaceChildren();
       status.textContent = "Type at least two characters to search.";
       return;
@@ -105,7 +128,7 @@ if (
     status.textContent = "Searching documentation…";
     try {
       const pagefind = await loadPagefind();
-      const response = await pagefind.debouncedSearch(query, {}, 180);
+      const response = await pagefind.debouncedSearch(pagefindQuery, {}, 180);
       if (!response || currentQuery !== query) return;
       const items = await Promise.all(
         response.results.slice(0, 8).map((result) => result.data()),

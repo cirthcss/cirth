@@ -197,6 +197,45 @@ test("search opens to the field, returns results, and gives focus back", async (
 	await expect(trigger).toBeFocused();
 });
 
+test("search accepts HTML tags with their angle brackets", async ({ page }) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+
+	const dialog = page.locator("[data-docs-search-dialog]");
+	const input = dialog.locator("[data-docs-search-input]");
+	const status = dialog.locator("[data-docs-search-status]");
+	/** @param {string} path */
+	const result = (path) =>
+		dialog.locator(`[data-docs-search-result][href$="${path}"]`);
+	const expectSearchComplete = () =>
+		expect(status).toHaveText(/^\d+ results?\./);
+
+	await page.locator("[data-docs-search-trigger]").click();
+	await input.fill("<dialog>");
+	await expectSearchComplete();
+	await expect(result("/components/modal/")).toBeVisible();
+	await expect(input).toHaveValue("<dialog>");
+
+	await input.fill("</dialog>");
+	await expectSearchComplete();
+	await expect(result("/components/modal/")).toBeVisible();
+
+	await input.fill("<dialog></dialog>");
+	await expectSearchComplete();
+	await expect(result("/components/modal/")).toBeVisible();
+
+	await input.fill("</i");
+	await expect(dialog.locator("[data-docs-search-result]")).toHaveCount(0);
+	await expect(status).toHaveText(
+		"Type at least two characters to search.",
+	);
+
+	// Quoting a complete tag keeps one-letter element names exact instead of
+	// treating the letter as a match on almost every page.
+	await input.fill("<i>");
+	await expectSearchComplete();
+	await expect(result("/content/typography/")).toBeVisible();
+});
+
 // The shortcut is the one the trigger shows and announces, and only that
 // one: each platform's other modifier keeps its own meaning (Ctrl+K in a
 // Mac text field deletes to the end of the line).
