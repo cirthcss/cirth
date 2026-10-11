@@ -11,7 +11,7 @@ const {
 const frameworks = require("../docs/src/_data/frameworks.js");
 const nav = require("../docs/src/_data/nav.js");
 
-// The documentation's indexes: the sidebar tree with Installation as a
+// The documentation's indexes: the sidebar tree with Framework guides as a
 // branch holding its guides, the breadcrumb above a guide, the pager that
 // follows the reading order rather than the tree, the two rails that stay
 // beside the page and never reach the footer, and the outline that folds a
@@ -41,7 +41,7 @@ const sidebarGroups = (/** @type {import("@playwright/test").Page} */ page) =>
 		})),
 	);
 
-test("the guides are pages of Installation, not a section of their own", async ({
+test("the guides are pages of Framework guides, not Installation", async ({
 	page,
 }) => {
 	await page.setViewportSize({ width: 1440, height: 1000 });
@@ -54,11 +54,11 @@ test("the guides are pages of Installation, not a section of their own", async (
 	expect(groups.map((group) => group.name)).not.toContain("Frameworks");
 	expect(groups.filter((group) => group.open).map((group) => group.name)).toEqual(["Content"]);
 
-	// Installation is a branch: its own link, and a toggle beside it that
+	// Framework guides is a branch: its own link, and a toggle beside it that
 	// folds its guides. The link is never inside the summary.
 	const branch = page.locator(".docs-sidebar .docs-nav-branch");
 	await expect(branch).toHaveCount(1);
-	await expect(branch.locator(":scope > a")).toHaveAttribute("href", "/installation");
+	await expect(branch.locator(":scope > a")).toHaveAttribute("href", "/framework-guides");
 	await expect(branch.locator("summary a")).toHaveCount(0);
 	const guides = await branch
 		.locator(":scope > details li a")
@@ -106,7 +106,7 @@ test("the guides are pages of Installation, not a section of their own", async (
 
 	// The toggle is a real disclosure the keyboard operates.
 	const toggle = page.locator(".docs-sidebar .docs-nav-branch > details > summary");
-	await expect(toggle).toHaveAccessibleName("Installation pages");
+	await expect(toggle).toHaveAccessibleName("Framework guides pages");
 	await toggle.focus();
 	await page.keyboard.press("Enter");
 	await expect(page.locator(".docs-sidebar .docs-nav-branch > details")).not.toHaveAttribute("open", "");
@@ -126,7 +126,7 @@ test("the compact menu is the sidebar's tree", async ({ page }) => {
 	await expect(page.locator('.docs-mobile-nav a[aria-current="page"]')).toBeVisible();
 });
 
-test("every guide names Installation and its category above its title", async ({ page }) => {
+test("every guide names Framework guides and its category above its title", async ({ page }) => {
 	// Every guide, one page load each.
 	test.setTimeout(120_000);
 	for (const guide of frameworks.guides) {
@@ -134,11 +134,11 @@ test("every guide names Installation and its category above its title", async ({
 		const trail = page.locator('.docs-content > nav[aria-label="breadcrumb"]');
 		await expect(trail, guide.id).toHaveCount(1);
 		await expect(trail.locator("ol > li")).toHaveCount(3);
-		// The category has no page: its crumb is its heading on Installation.
-		await expect(trail.locator("li a")).toHaveText(["Installation", guide.categoryText]);
+		// The category has no page: its crumb is its heading on Framework guides.
+		await expect(trail.locator("li a")).toHaveText(["Framework guides", guide.categoryText]);
 		expect(await trail.locator("li a").evaluateAll((links) => links.map((link) => link.getAttribute("href")))).toEqual([
-			"/installation/",
-			`/installation/#guides-${guide.category}`,
+			"/framework-guides/",
+			`/framework-guides/#guides-${guide.category}`,
 		]);
 		await expect(trail.locator('li[aria-current="page"]')).toHaveText(guide.name);
 		// Before the title, not after it: the trail, the project's card, the h1.
@@ -166,7 +166,7 @@ const groupPages = (page, name) =>
 		.locator(":scope > ul > li > a")
 		.evaluateAll((links) => links.map((link) => [link.textContent?.trim(), link.getAttribute("href")]));
 
-test("Start says why, then whether it fits, then how to install it", async ({ page }) => {
+test("Start separates adoption, compatibility, installation, package and guides", async ({ page }) => {
 	await page.goto(`${origin}/why-cirth/`, { waitUntil: "networkidle" });
 	const groups = await sidebarGroups(page);
 	expect(groups[0].name).toBe("Start");
@@ -175,6 +175,8 @@ test("Start says why, then whether it fits, then how to install it", async ({ pa
 		["Why Cirth", "/why-cirth"],
 		["Compatibility", "/compatibility"],
 		["Installation", "/installation"],
+		["Package and builds", "/package"],
+		["Framework guides", "/framework-guides"],
 	]);
 	expect(groups[1].name).toBe("Customization");
 	// Upgrading is about the project's releases, not about starting: it
@@ -184,6 +186,8 @@ test("Start says why, then whether it fits, then how to install it", async ({ pa
 		["About", "/about"],
 		["Contributions", "/contributions"],
 		["Brand", "/brand"],
+		["Attributions", "/attributions"],
+		["Markup comparison", "/markup-comparison"],
 	]);
 	const upgrading = await page.request.get(`${origin}/upgrading/`);
 	expect(upgrading.status()).toBe(200);
@@ -235,11 +239,19 @@ test("the pager follows the reading order, and names where it leads", async ({ p
 		],
 		"/installation/": [
 			{ rel: "prev", href: "/compatibility", label: "← Previous · Start", title: "Compatibility" },
+			{ rel: "next", href: "/package", label: "Next · Start →", title: "Package and builds" },
+		],
+		"/package/": [
+			{ rel: "prev", href: "/installation", label: "← Previous · Start", title: "Installation" },
+			{ rel: "next", href: "/framework-guides", label: "Next · Start →", title: "Framework guides" },
+		],
+		"/framework-guides/": [
+			{ rel: "prev", href: "/package", label: "← Previous · Start", title: "Package and builds" },
 			{ rel: "next", href: "/customization", label: "Next · Customization →", title: "Overview" },
 		],
 		"/customization/": [
-			{ rel: "prev", href: "/installation", label: "← Previous · Start", title: "Installation" },
-			{ rel: "next", href: "/colors", label: "Next · Customization →", title: "Colors" },
+			{ rel: "prev", href: "/framework-guides", label: "← Previous · Start", title: "Framework guides" },
+			{ rel: "next", href: "/tokens", label: "Next · Customization →", title: "Token reference" },
 		],
 		"/upgrading/": [
 			{ rel: "prev", href: "/utilities/print", label: "← Previous · Utilities", title: "Print" },
@@ -252,16 +264,16 @@ test("the pager follows the reading order, and names where it leads", async ({ p
 	}
 });
 
-test("every guide steps back to Installation and on to Customization", async ({ page }) => {
+test("every guide steps back to Framework guides and on to Customization", async ({ page }) => {
 	expect(frameworks.guides).toHaveLength(frameworks.count);
 	for (const { link, name } of frameworks.guides) {
 		await page.goto(`${origin}${link}/`, { waitUntil: "domcontentloaded" });
 		expect(await pagerOf(page), name).toEqual([
-			{ rel: "prev", href: "/installation", label: "← Previous · Start", title: "Installation" },
+			{ rel: "prev", href: "/framework-guides", label: "← Previous · Start", title: "Framework guides" },
 			{ rel: "next", href: "/customization", label: "Next · Customization →", title: "Overview" },
 		]);
-		// The breadcrumb: Installation, the guide's category, the guide.
-		await expect(page.locator(".docs-breadcrumb li")).toHaveText(["Installation", /\S/, name]);
+		// The breadcrumb: Framework guides, the guide's category, the guide.
+		await expect(page.locator(".docs-breadcrumb li")).toHaveText(["Framework guides", /\S/, name]);
 	}
 });
 
@@ -346,12 +358,14 @@ test("under /next/, the pager and Docs stay inside the preview", async ({ browse
 			);
 		expect(pager("why-cirth")).toEqual(["next /cirth/next/compatibility"]);
 		expect(pager("compatibility")).toEqual(["prev /cirth/next/why-cirth", "next /cirth/next/installation"]);
-		expect(pager("installation")).toEqual(["prev /cirth/next/compatibility", "next /cirth/next/customization"]);
+		expect(pager("installation")).toEqual(["prev /cirth/next/compatibility", "next /cirth/next/package"]);
+		expect(pager("package")).toEqual(["prev /cirth/next/installation", "next /cirth/next/framework-guides"]);
+		expect(pager("framework-guides")).toEqual(["prev /cirth/next/package", "next /cirth/next/customization"]);
 		for (const index of [0, Math.floor(frameworks.guides.length / 2), frameworks.guides.length - 1]) {
 			const guide = frameworks.guides[index];
 			const slug = guide.link.replace(/^\//, "");
-			expect(pager(slug), guide.name).toEqual(["prev /cirth/next/installation", "next /cirth/next/customization"]);
-			expect(read(slug), guide.name).toMatch(/class="docs-breadcrumb"[\s\S]*?href="\/cirth\/next\/installation\/"/);
+			expect(pager(slug), guide.name).toEqual(["prev /cirth/next/framework-guides", "next /cirth/next/customization"]);
+			expect(read(slug), guide.name).toMatch(/class="docs-breadcrumb"[\s\S]*?href="\/cirth\/next\/framework-guides\/"/);
 		}
 		expect(read("installation")).toMatch(/<a href="\/cirth\/next\/why-cirth"[^>]*>Docs<\/a>/);
 		// The copies on the home page load their stylesheets from inside the
@@ -492,32 +506,35 @@ test("a fragment lands under the sticky header, not behind it", async ({ page })
 	expect(geometry.heading).toBeGreaterThanOrEqual(geometry.header);
 });
 
-test("Installation is short, and the CDN is said once", async ({ page }) => {
+test("Installation is a linear quickstart, with guides kept separate", async ({ page }) => {
 	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
 	const content = page.locator(".docs-content");
 	await expect(content.locator(":scope > h2")).toHaveText([
+		/Prerequisites/,
+		/Choose a loading method/,
 		/CDN/,
-		/npm/,
-		/Guides/,
+		/Package manager/,
+		/Minimal page/,
+		/Expected result/,
+		/Verify that Cirth is active/,
 		/Advanced builds/,
+		/Guides/,
+		/Common problems/,
 		/Next steps/,
 	]);
-	// No live classless or scoped demo and no full-page tutorial.
-	await expect(content.locator(".docs-demo")).toHaveCount(0);
-	await expect(content.locator("pre", { hasText: "<!doctype html>" })).toHaveCount(0);
+	// One rendered result and one complete page source.
+	await expect(content.locator(".docs-demo")).toHaveCount(1);
+	await expect(content.locator("pre", { hasText: "<!doctype html>" })).toHaveCount(1);
 	// One CDN snippet on the page.
 	await expect(content.locator("pre", { hasText: "cdn.jsdelivr.net" })).toHaveCount(1);
-	// Every guide, grouped, the count printed from the same data.
-	await expect(content.locator(".docs-guide-grid > li")).toHaveCount(frameworks.count);
-	await expect(content).toContainText(`${frameworks.count} guides, by category`);
-	// Grouped by category only: one heading and one grid per category, and
-	// no heading for a language inside one.
-	await expect(content.locator(".docs-guide-group-title")).toHaveCount(frameworks.groups.length);
-	await expect(content.locator(".docs-guide-grid")).toHaveCount(frameworks.groups.length);
-	await expect(content.locator(".docs-guide-groups h4")).toHaveCount(0);
-	for (const gone of ["PHP", "Python", "Ruby", "Elixir", "Java & JVM", ".NET", "Node.js"]) {
-		await expect(content.locator(".docs-guide-groups :is(h3, h4, h5)", { hasText: new RegExp(`^${gone.replace(".", "\\.")}$`) })).toHaveCount(0);
-	}
+	// The catalogue is a separate page, linked with its data-driven count.
+	await expect(content.locator(".docs-guide-grid")).toHaveCount(0);
+	await expect(content.locator('a[href="/framework-guides"]')).toHaveCount(2);
+	await expect(content).toContainText(`${frameworks.count} build tools`);
+	// Terms required by a beginner are introduced in the quickstart.
+	await expect(content).toContainText("A package manager");
+	await expect(content).toContainText("The head is the part of an HTML document");
+	await expect(content).toContainText("Pinning a version");
 
 	// The guides that moved forward to where they are now.
 	for (const [from, to] of [
@@ -536,33 +553,22 @@ test("Installation is short, and the CDN is said once", async ({ page }) => {
 	expect(html).not.toMatch(/cdn\.jsdelivr\.net/);
 });
 
-test("Compatibility opens on the browsers, not on a grid of figures", async ({ page }) => {
+test("Compatibility owns environment limits without repeating package delivery", async ({ page }) => {
 	await page.goto(`${origin}/compatibility/`, { waitUntil: "networkidle" });
 	const content = page.locator(".docs-content");
 	await expect(content.locator(".docs-facts")).toHaveCount(0);
-	// Before the first section: the title, one sentence and a short list of
-	// answers, each a line, no table and no card.
+	// Before the first section: the title and its responsibility statement.
 	const opening = await content.evaluate((element) => {
 		const children = [...element.children];
 		const first = children.findIndex((child) => child.tagName === "H2");
-		return children.slice(0, first).map((child) => ({
-			tag: child.tagName,
-			items: child.tagName === "UL" ? [...child.children].map((item) => item.querySelector("strong")?.textContent) : [],
-		}));
+		return children.slice(0, first).map((child) => child.tagName);
 	});
-	expect(opening.map((child) => child.tag)).toEqual(["H1", "P", "UL"]);
-	expect(opening[2].items).toEqual([
-		"Browsers:",
-		"Modern CSS:",
-		"Your build:",
-		"Scoped builds:",
-		"Existing CSS and component libraries:",
-	]);
-	const summary = content.locator(":scope > ul").first();
-	await expect(summary).toContainText("Chrome, Chrome for Android and Edge 123+");
-	await expect(summary).toContainText("light-dark()");
-	for (const href of await summary.locator("a").evaluateAll((links) => links.map((link) => link.getAttribute("href")))) {
-		expect(href).toMatch(/^#/);
-	}
+	expect(opening).toEqual(["H1", "P"]);
 	await expect(content.locator(":scope > h2").first()).toHaveText(/Browser support/);
+	await expect(content).toContainText("Chrome, Chrome for Android and Edge 123+");
+	await expect(content).toContainText("light-dark()");
+	await expect(content.locator("table", { hasText: "Package import" })).toHaveCount(0);
+	await expect(content.locator("pre", { hasText: "cdn.jsdelivr.net" })).toHaveCount(0);
+	await expect(content.locator('a[href="/package"]')).toHaveCount(2);
+	await expect(content.locator('a[href="/delivery"]')).toHaveCount(1);
 });

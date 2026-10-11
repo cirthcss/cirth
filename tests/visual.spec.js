@@ -24,17 +24,25 @@ assertDocsBuilt("visual.spec");
 const visualPages = [
 	"index.html",
 	"about/index.html",
+	"attributions/index.html",
 	"brand/index.html",
 	"colors/index.html",
 	"compatibility/index.html",
 	"contributions/index.html",
 	"customization/index.html",
+	"delivery/index.html",
 	"examples/index.html",
+	"framework-guides/index.html",
 	"guides/accessibility/index.html",
+	"guides/existing-css/index.html",
 	"installation/index.html",
 	"installation/vite/index.html",
 	"installation/laravel/index.html",
+	"markup-comparison/index.html",
+	"package/index.html",
+	"presets/index.html",
 	"themes/index.html",
+	"tokens/index.html",
 	"why-cirth/index.html",
 	"components/accordion/index.html",
 	"components/card/index.html",
@@ -67,6 +75,7 @@ const visualPages = [
 	"forms/textarea/index.html",
 	"forms/validation/index.html",
 	"layout/container/index.html",
+	"layout/document/index.html",
 	"layout/grid/index.html",
 	"layout/landmarks/index.html",
 	"layout/overflow-auto/index.html",
@@ -74,6 +83,7 @@ const visualPages = [
 	"layout/section/index.html",
 	"utilities/breakout/index.html",
 	"utilities/sr-only/index.html",
+	"utilities/print/index.html",
 	"utilities/truncate/index.html",
 	"upgrading/index.html",
 ];
@@ -252,8 +262,8 @@ const expectDocsScreenshot = async (page, name, splitLongPage = false) => {
 	}
 
 	// Firefox cannot capture an image taller than 32,767 pixels. The
-	// customization guide and the Brand page, with its record of every
-	// framework logo, cross that limit on a mobile viewport, so keep complete
+	// Long references and indexes can cross that limit on a mobile viewport,
+	// so keep complete
 	// coverage as four deterministic document-space slices instead of
 	// dropping the tail of the page or excluding it again (gh#99).
 	const parts = 4;
@@ -270,7 +280,13 @@ const expectDocsScreenshot = async (page, name, splitLongPage = false) => {
 };
 
 // Pages taller than Firefox can capture in one image on a phone.
-const longPages = new Set(["customization/index.html", "brand/index.html"]);
+const longPages = new Set([
+	"attributions/index.html",
+	"brand/index.html",
+	"customization/index.html",
+	"framework-guides/index.html",
+	"tokens/index.html",
+]);
 
 const defaultTheme = themeVariants.find((theme) => theme.name === "default");
 if (!defaultTheme) throw new Error("visual.spec: default theme is missing");
@@ -380,7 +396,14 @@ test.describe("home scenes", () => {
 				input.dispatchEvent(new Event("input", { bubbles: true }));
 			}, split);
 			await expect(range).toHaveValue(String(split));
-			await expect(page.locator(".docs-compare")).toHaveScreenshot(`home-presets-${split}.png`);
+			const comparison = page.locator(".docs-compare");
+			// Element screenshots scroll their subject into view, but the home
+			// controller paints this block from the resulting scroll position on
+			// the next frame. Land there explicitly so WebKit never captures the
+			// reveal at opacity zero.
+			await comparison.scrollIntoViewIfNeeded();
+			await settle(page);
+			await expect(comparison).toHaveScreenshot(`home-presets-${split}.png`);
 		});
 	}
 
@@ -404,7 +427,13 @@ test.describe("home scenes", () => {
 			window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY + element.offsetHeight / 2 - window.innerHeight / 2);
 		});
 		await settle(page);
-		await expect(page).toHaveScreenshot("home-orbit.png", { fullPage: false });
+		await expect(page).toHaveScreenshot("home-orbit.png", {
+			fullPage: false,
+			// WebKit can rasterize a few edge pixels of one transformed SVG
+			// differently at the same settled angle. Keep the allowance below
+			// one tenth of a small mark, so any position or layout change fails.
+			maxDiffPixels: 64,
+		});
 	});
 });
 

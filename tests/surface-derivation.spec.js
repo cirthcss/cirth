@@ -229,8 +229,8 @@ test("the public token reference is exact", () => {
 			),
 		),
 	].sort();
-	const reference = read("docs/src/pages/customization.md").split(
-		"## Token reference",
+	const reference = read("docs/src/pages/tokens.md").split(
+		"## Complete property inventory",
 	)[1];
 	if (!reference) throw new Error("token reference is missing");
 	const documentedTokens = [

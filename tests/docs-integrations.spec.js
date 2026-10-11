@@ -158,7 +158,7 @@ test("a guide named by text has no picture anywhere a mark would be", async ({ p
 		page.locator('img[src*="/logos/frameworks/"]').evaluateAll((images) => images.map((image) => image.getAttribute("src")));
 	const shownFiles = new Set(Object.values(frameworks.marks).flatMap((/** @type {{ file?: string, dark?: string }} */ record) => [record.file, record.dark].filter(Boolean)));
 
-	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
+	await page.goto(`${origin}/framework-guides/`, { waitUntil: "networkidle" });
 	for (const guide of textOnly) {
 		const tile = page.locator(".docs-guide-grid > li").filter({ has: page.locator(`a[href="${guide.link}"]`) });
 		await expect(tile.locator("img"), guide.id).toHaveCount(0);
@@ -170,7 +170,7 @@ test("a guide named by text has no picture anywhere a mark would be", async ({ p
 		await expect(tile.locator("svg, .docs-mark")).toHaveCount(0);
 	}
 
-	for (const url of ["/", "/installation/", "/brand/", ...frameworks.guides.map((/** @type {{ link: string }} */ guide) => `${guide.link}/`)]) {
+	for (const url of ["/", "/framework-guides/", "/attributions/", ...frameworks.guides.map((/** @type {{ link: string }} */ guide) => `${guide.link}/`)]) {
 		await page.goto(`${origin}${url}`, { waitUntil: "domcontentloaded" });
 		for (const src of await logos()) {
 			expect(shownFiles.has(String(src).split("/").pop()), `${url}: ${src} is not a shown mark`).toBe(true);
@@ -183,8 +183,8 @@ test("a guide named by text has no picture anywhere a mark would be", async ({ p
 		await expect(page.locator(`.docs-sidebar a[href="${guide.link}"]`)).toHaveText(guide.name);
 	}
 
-	// The Brand page lists every project, the decision and the reason.
-	await page.goto(`${origin}/brand/`, { waitUntil: "domcontentloaded" });
+	// Attributions lists every project, the decision and the reason.
+	await page.goto(`${origin}/attributions/`, { waitUntil: "domcontentloaded" });
 	const table = page.locator('[aria-label="Framework logo sources and decisions"]');
 	const rows = await table.locator("tbody tr").evaluateAll((items) => items.map((item) => [...item.children].map((cell) => cell.textContent?.trim() ?? "")));
 	expect(rows).toHaveLength(Object.keys(frameworks.marks).length);
@@ -233,8 +233,8 @@ test("nothing the list keeps out is in it, and nothing is in it twice", () => {
 	expect(frameworks.guides.filter((/** @type {{ mark: string }} */ guide) => guide.mark === "spring").map((/** @type {{ id: string }} */ guide) => guide.id)).toEqual(["spring-boot"]);
 });
 
-test("the Installation grid is the list: each card one link to its guide, and no link out", async ({ page, browserName }) => {
-	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
+test("the Framework guides grid is the list: each card one link to its guide, and no link out", async ({ page, browserName }) => {
+	await page.goto(`${origin}/framework-guides/`, { waitUntil: "networkidle" });
 	const tiles = page.locator(".docs-guide-grid > li");
 	await expect(tiles).toHaveCount(frameworks.count);
 
@@ -294,7 +294,7 @@ test("the Installation grid is the list: each card one link to its guide, and no
 	const fine = page.locator(".docs-content .docs-fine-print");
 	await expect(fine).toHaveCount(1);
 	await expect(fine).toHaveText("Logos belong to their projects; none of these projects is affiliated with Cirth or endorses it (sources and terms).");
-	await expect(fine.locator("a")).toHaveAttribute("href", "/brand#framework-logos");
+	await expect(fine.locator("a")).toHaveAttribute("href", "/attributions/#framework-logos");
 	expect(await fine.evaluate((element) => element.previousElementSibling?.matches("section"))).toBe(true);
 	for (const record of Object.values(frameworks.marks)) {
 		if (record.trademarkNotice) await expect(page.locator(".docs-content", { hasText: record.trademarkNotice })).toHaveCount(0);
@@ -318,9 +318,9 @@ test("the Installation grid is the list: each card one link to its guide, and no
 test("Django's logo, wherever it is a link to the project, leads to djangoproject.com", async ({ page }) => {
 	const django = frameworks.byId.django;
 	expect(django.officialUrl).toBe("https://www.djangoproject.com");
-	// On Installation the logo is a picture inside the card that opens the
+	// On Framework guides the logo is a picture inside the card that opens the
 	// guide, and links nowhere else.
-	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
+	await page.goto(`${origin}/framework-guides/`, { waitUntil: "networkidle" });
 	for (const href of await page.locator(`a:has(img[src="/logos/frameworks/${frameworks.marks.django.file}"])`).evaluateAll((links) => links.map((link) => link.getAttribute("href")))) {
 		expect(href).toBe("/installation/django");
 	}
@@ -397,17 +397,17 @@ test("every count of the guides on the site is the list's", async ({ page }) => 
 	for (const record of Object.values(frameworks.marks)) {
 		if (record.trademarkNotice) await expect(page.locator("main", { hasText: record.trademarkNotice })).toHaveCount(0);
 	}
-	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
-	await expect(page.locator(".docs-content")).toContainText(`${frameworks.count} guides, by category`);
+	await page.goto(`${origin}/framework-guides/`, { waitUntil: "networkidle" });
+	await expect(page.locator(".docs-content")).toContainText(`All ${frameworks.count} guides are currently marked`);
 	const verified = frameworks.guides.filter((/** @type {{ verified: { status: string } }} */ guide) => guide.verified.status === "verified").length;
 	await expect(page.locator(".docs-content")).toContainText(
-		verified === frameworks.count ? `All ${frameworks.count} are verified` : `${verified} of ${frameworks.count} are`,
+		verified === frameworks.count ? `All ${frameworks.count} guides are currently marked Verified` : `${verified} of ${frameworks.count} guides are currently marked Verified`,
 	);
 });
 
 test("Compatibility lists each stack's pipeline from the same data", async ({ page }) => {
 	await page.goto(`${origin}/compatibility/`, { waitUntil: "networkidle" });
-	const table = page.locator("table", { hasText: "Rewrites" });
+	const table = page.locator("table", { hasText: "Observed pipeline behavior" });
 	for (const guide of frameworks.pipelines.lowers) {
 		await expect(table.locator(`a[href="${guide.link}"]`), guide.id).toHaveCount(1);
 	}

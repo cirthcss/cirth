@@ -326,10 +326,10 @@ test("the markup comparison prints what its fixtures measure, with bars to scale
 	await expect(page.locator(".docs-bench-method time")).toHaveAttribute("datetime", results.measured);
 	// The link is written as the page's other links are (no trailing slash,
 	// which the host resolves); this test's server needs the slash.
-	await expect(page.locator(".docs-bench a[href='/why-cirth#less-markup-measured']")).toHaveCount(1);
-	await page.goto(`${origin}/why-cirth/#less-markup-measured`, { waitUntil: "networkidle" });
-	await expect(page.locator("#less-markup-measured")).toBeVisible();
-	await expect(page.locator("main")).toContainText("(utility-first - Cirth) / utility-first");
+	await expect(page.locator(".docs-bench a[href='/markup-comparison']")).toHaveCount(1);
+	await page.goto(`${origin}/markup-comparison/`, { waitUntil: "networkidle" });
+	await expect(page.getByRole("heading", { level: 1, name: "Markup comparison" })).toBeVisible();
+	await expect(page.locator("main")).toContainText("(utility-style value - Cirth value) / utility-style value");
 	for (const source of Object.values(results.sources)) {
 		const listings = await page.locator("main pre").allTextContents();
 		expect(listings.some((listing) => listing.trim() === String(source).trim())).toBe(true);

@@ -496,12 +496,15 @@ test("the questions before installing expose consistent interactive states", asy
 	expect(stateAfter.background).toBe(stateBefore.background);
 	expect(stateAfter.color).not.toBe(stateBefore.color);
 
-	// The answers that quote the build carry the build's numbers, not the
-	// marker they were written with.
+	// The FAQ stays a short decision aid. Package facts point to the package
+	// reference instead of reproducing its inventory here.
 	await expect(page.locator(".docs-content")).not.toContainText("<!--");
-	await expect(
-		page.locator('.docs-content details[name="faq"]', { hasText: "How big" }),
-	).toContainText(/\d+(\.\d+)? KB gzipped/);
+	await expect(page.locator('.docs-content details[name="faq"]')).toHaveCount(6);
+	const packageAnswer = page.locator('.docs-content details[name="faq"]', {
+		hasText: "What does the package contain?",
+	});
+	await expect(packageAnswer.locator('a[href="/package"]')).toHaveCount(1);
+	await expect(packageAnswer.locator("table, pre, ul, ol")).toHaveCount(0);
 });
 
 test("documentation active navigation uses the public registered state", async ({
@@ -1017,7 +1020,7 @@ test("the framework band shows the ecosystems and leads each mark to its project
 	// One way on, with the list's own count.
 	const action = band.getByRole("button");
 	await expect(action).toHaveText(`Browse all ${frameworks.count} guides`);
-	await expect(action).toHaveAttribute("href", "/installation#guides");
+	await expect(action).toHaveAttribute("href", "/framework-guides");
 
 	// The variant follows the page: Django's positive logo on a light page,
 	// its negative one on a dark page.
@@ -1182,16 +1185,16 @@ test("the package manager switch shows one command and remembers the choice", as
 test("an old address forwards to the page that replaced it", async ({ page }) => {
 	for (const [from, to] of [
 		["/get-started/#cdn", "/installation/#cdn"],
-		["/get-started/#excluding-a-third-party-component", "/compatibility/#excluding-a-third-party-component"],
-		["/deploy/#caching", "/compatibility/#caching"],
+		["/get-started/#excluding-a-third-party-component", "/guides/existing-css/#excluding-a-third-party-component"],
+		["/deploy/#caching", "/delivery/#caching"],
 		["/utilities/reduce-motion/", "/guides/accessibility/#reduced-motion"],
 		// The CDN guide became the Installation page's first section. For a
 		// while the JavaScript guides were one page with a section each;
 		// each tool has its own page again, and a link to a section lands
 		// on that tool's page.
 		["/installation/cdn/", "/installation/#cdn"],
-		["/installation/cdn/#choosing-a-build", "/compatibility/#every-build-from-the-cdn"],
-		["/installation/javascript/", "/installation/#guides"],
+		["/installation/cdn/#choosing-a-build", "/package/#screen-builds"],
+		["/installation/javascript/", "/framework-guides/"],
 		["/installation/javascript/#react", "/installation/react/"],
 		["/installation/javascript/#3-set-the-css-target", "/installation/vite/#3-set-the-css-target"],
 	]) {
@@ -1202,9 +1205,9 @@ test("an old address forwards to the page that replaced it", async ({ page }) =>
 	// And says so without script, with a canonical link and a way to go on.
 	const response = await page.request.get(`${origin}/deploy/`);
 	const html = await response.text();
-	expect(html).toMatch(/<link rel="canonical" href="\/compatibility\/"/);
+	expect(html).toMatch(/<link rel="canonical" href="\/delivery\/"/);
 	expect(html).toMatch(/<meta name="robots" content="noindex"/);
-	expect(html).toMatch(/<a href="\/compatibility\/">Compatibility<\/a>/);
+	expect(html).toMatch(/<a href="\/delivery\/">Delivery and deployment<\/a>/);
 
 	// The guides that came back are pages again, not forwards.
 	for (const slug of ["vite", "react", "vue", "sveltekit", "astro"]) {
@@ -2214,10 +2217,9 @@ test("the shell's flush panels are cards with their knobs moved", async ({
 	expect(search.headerInset).toBeCloseTo(1, 1);
 });
 
-// A metrics panel is `.grid` plus a <dl>, which is what the framework tells
-// everyone else to do, and the panel's cells are divided by the grid gap
-// with the container's colour showing through, which holds at any column
-// count without a :nth-child ladder to restate in a media query.
+// A facts panel is `.grid` plus a <dl>, which is what the framework tells
+// readers to do. Its cells are divided by the grid gap with the container's
+// colour showing through, which holds at any column count.
 test("the metrics panels are gridded description lists divided by their gap", async ({
 	page,
 }) => {
@@ -2269,8 +2271,7 @@ test("the metrics panels are gridded description lists divided by their gap", as
 
 	for (const [url, selector] of [
 		["/why-cirth/", ".docs-facts"],
-		["/brand/", ".docs-brand-measures"],
-		["/about/", ".docs-proof-strip dl"],
+		["/guides/accessibility/", ".docs-facts"],
 	]) {
 		const panel = await readPanel(url, selector);
 		expect(panel.tag, selector).toBe("DL");
@@ -2304,18 +2305,15 @@ test("a divider grid keeps one stroke at every column count", async ({
 }) => {
 	for (const width of [1440, 900, 640, 390]) {
 		await page.setViewportSize({ width, height: 900 });
-		await page.goto(`${origin}/about/`);
+		await page.goto(`${origin}/why-cirth/`);
 		const reading = await page.evaluate(() => {
 			const panel = /** @type {HTMLElement} */ (
-				document.querySelector(".docs-proof-strip dl")
-			);
-			const plate = /** @type {HTMLElement} */ (
-				document.querySelector(".docs-proof-strip")
+				document.querySelector(".docs-facts")
 			);
 			return {
 				columns: getComputedStyle(panel).gridTemplateColumns.split(" ").length,
 				divider: getComputedStyle(panel).backgroundColor,
-				frame: getComputedStyle(plate).borderTopColor,
+				frame: getComputedStyle(panel).borderTopColor,
 				cellBorders: [...panel.children].map((cell) =>
 					[
 						getComputedStyle(cell).borderTopWidth,
