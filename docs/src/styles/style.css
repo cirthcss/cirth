@@ -874,6 +874,45 @@ details.docs-toc-top {
   font-weight: var(--cirth-font-weight-medium);
 }
 
+.docs-toc nav {
+  --docs-toc-marker-color: var(--cirth-primary-text);
+  --docs-toc-marker-height: 1.125rem;
+  --docs-toc-marker-y: 0px;
+  --docs-toc-marker-duration: var(--cirth-duration-normal);
+  --docs-toc-marker-ease: cubic-bezier(0, 1, 0.5, 1);
+
+  position: relative;
+}
+
+/* The rail remains the no-script indicator. Once the controller has real
+   geometry, this decorative marker takes over without changing layout. */
+.docs-toc-marker {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  z-index: 1;
+  inline-size: var(--cirth-border-width-2);
+  block-size: var(--docs-toc-marker-height);
+  border-radius: var(--cirth-radius-xs);
+  background: var(--docs-toc-marker-color);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(var(--docs-toc-marker-y));
+  transition:
+    transform var(--docs-toc-marker-duration) var(--docs-toc-marker-ease),
+    opacity var(--cirth-duration-fast) var(--cirth-ease-out);
+}
+
+.docs-toc nav[data-toc-marker-ready] .docs-toc-marker {
+  opacity: 1;
+}
+
+/* aria-current remains the source of truth. Its static edge stays as the
+   no-script fallback and becomes transparent only after the marker is ready. */
+.docs-toc nav[data-toc-marker-ready] a[aria-current="true"] {
+  border-inline-start-color: transparent;
+}
+
 /* `aside nav` already releases the inline insets; only the item padding is the shell's. */
 .docs-toc li {
   padding: 0;
@@ -1690,17 +1729,49 @@ details.docs-demo-source > :not(summary) {
   line-height: var(--cirth-line-height-snug);
 }
 
-/* Current entry: full-contrast ink and weight. The library paints the rail. */
-.docs-nav-group a[aria-current="page"],
-.docs-toc a[aria-current="true"] {
+/* Current entries keep semantic state in aria-current. The sidebar gets a
+   quiet primary wash; the page outline delegates position to its marker. */
+.docs-nav-group a[aria-current="page"] {
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+  border-start-end-radius: var(--docs-chrome-radius);
+  border-end-end-radius: var(--docs-chrome-radius);
+  background: color-mix(
+    in oklab,
+    var(--cirth-primary-text) 8%,
+    transparent
+  );
   color: var(--cirth-contrast-text);
+  font-weight: var(--cirth-font-weight-medium);
+}
+
+.docs-toc a[aria-current="true"] {
+  color: var(--cirth-primary-text);
   font-weight: var(--cirth-font-weight-medium);
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .docs-nav-group a,
   .docs-toc a {
-    transition: color var(--cirth-transition);
+    transition:
+      background-color var(--cirth-transition),
+      color var(--cirth-transition);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-toc-marker {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .docs-nav-group a[aria-current="page"] {
+    background: Canvas;
+  }
+
+  .docs-toc-marker {
+    background: Highlight;
   }
 }
 

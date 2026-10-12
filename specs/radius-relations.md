@@ -26,8 +26,8 @@ Two radii, one knob, assigned by kind:
 
 | Kind | Radius | Elements |
 | --- | --- | --- |
-| Control | `--cirth-border-radius` | fields (search included), select, buttons, the dropdown summary and its list, segmented and group ends, code blocks, nav link highlights, progress, meter, the range track |
-| Container | `--cirth-card-border-radius` = control × 1.5 | `article` and its bands, the dialog's article, popovers |
+| Control | `--cirth-border-radius` | fields (search included), select, buttons, the dropdown summary and its list, segmented and group ends, nav link highlights, progress, meter, the range track |
+| Container | `--cirth-card-border-radius` = control × 1.5 | `article` and its bands, the dialog's article, popovers, block code |
 | Small mark | `min(control, --cirth-radius-sm)` | checkbox, `kbd` |
 | Shape | its own | radio (circle), switch track and thumb (pill), range thumb (circle) |
 
@@ -70,6 +70,7 @@ Not promised:
 | Rejected: pill everywhere (every field and button) | Design | A look, not a relation, and it would make containers pills through the derivation; a theme can still choose it |
 | Rejected: pill on the standalone field only | Existing contract | Two search profiles by context is the current state, and it already needed a group exception to hold together |
 | Popovers take the container radius | Design | A popover holds content on the overlay level, as the dialog's article does |
+| Block code takes the container radius | `specs/elena-informed-theme-refresh.md` | A listing is a recessed content panel, not an operated control; inline code remains unboxed and `kbd` remains a small mark |
 | The dropdown list keeps the control radius | Design, constraint | It belongs to its summary and matches its width. A larger radius would show the first and last items' hover fill past the curve (3px at `playroom`'s 12px against a 4px inset), and the list cannot clip because a nested dropdown opens inside it |
 | Rejected: concentric radii (inner = outer − inset) | Design | Needs the padding in the relation for every container, and a card's padding is fluid; "never rounder" is the promise that holds at any padding |
 
@@ -90,6 +91,7 @@ Not promised:
 | --- | --- | --- |
 | A pill search field | The control radius | `[type="search"], [role="search"] { --cirth-border-radius: var(--cirth-radius-pill); }` and, for a search field inside a generic group, `.group [type="search"] { --cirth-border-radius: inherit; }` |
 | A popover at the control radius | The container radius | `[popover] { border-radius: var(--cirth-border-radius); }` |
+| A block listing at the control radius | The container radius | `pre { border-radius: var(--cirth-border-radius); }` |
 
 ## Open questions
 

@@ -529,13 +529,23 @@ test("documentation active navigation uses the public registered state", async (
 		const accent = getComputedStyle(probe).color;
 		probe.style.color = "var(--cirth-contrast-text)";
 		const contrast = getComputedStyle(probe).color;
+		probe.style.background =
+			"color-mix(in oklab, var(--cirth-primary-text) 8%, transparent)";
+		const wash = getComputedStyle(probe).backgroundColor;
+		probe.style.borderRadius = "var(--docs-chrome-radius)";
+		const chromeRadius = getComputedStyle(probe).borderStartEndRadius;
 		probe.remove();
 		return {
 			accent,
 			contrast,
+			chromeRadius,
+			wash,
 			backgroundColor: style.backgroundColor,
 			backgroundImage: style.backgroundImage,
-			borderRadius: style.borderRadius,
+			borderEndEndRadius: style.borderEndEndRadius,
+			borderEndStartRadius: style.borderEndStartRadius,
+			borderStartEndRadius: style.borderStartEndRadius,
+			borderStartStartRadius: style.borderStartStartRadius,
 			color: style.color,
 			fontWeight: style.fontWeight,
 			leadingEdge: Number.parseFloat(style.borderInlineStartWidth),
@@ -546,12 +556,15 @@ test("documentation active navigation uses the public registered state", async (
 	});
 
 	// One accent marker and no more: the registered edge. Position is also
-	// carried by contrast, the convention the header's current entry follows:
-	// full-contrast ink and a heavier weight, never the accent, and no tint,
-	// pill, or generic link underline.
+	// carried by contrast, the convention the header's current entry follows.
+	// The quiet wash belongs to the sidebar alone and stays square against the
+	// rail, so it reads as a current row rather than a detached pill.
 	expect(geometry.backgroundImage).toBe("none");
-	expect(geometry.backgroundColor).toBe("rgba(0, 0, 0, 0)");
-	expect(geometry.borderRadius).toBe("0px");
+	expect(geometry.backgroundColor).toBe(geometry.wash);
+	expect(geometry.borderStartStartRadius).toBe("0px");
+	expect(geometry.borderEndStartRadius).toBe("0px");
+	expect(geometry.borderStartEndRadius).toBe(geometry.chromeRadius);
+	expect(geometry.borderEndEndRadius).toBe(geometry.chromeRadius);
 	expect(geometry.leadingEdge).toBe(2);
 	expect(geometry.leadingEdgeColor).toBe(geometry.accent);
 	expect(geometry.color).toBe(geometry.contrast);

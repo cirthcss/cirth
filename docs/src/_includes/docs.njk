@@ -65,6 +65,7 @@ layout: base.njk
 			<aside class="docs-toc" data-docs-rail>
 				<nav aria-label="On this page" id="docs-toc-nav">
 					<strong>On this page</strong>
+					<span class="docs-toc-marker" aria-hidden="true"></span>
 					{{ pageOutline(pageOutlineData, true) }}
 				</nav>
 			</aside>
@@ -84,7 +85,9 @@ layout: base.njk
 			if (rail.scrollHeight <= rail.clientHeight) return;
 			const railBox = rail.getBoundingClientRect();
 			const box = element.getBoundingClientRect();
-			const margin = 48;
+			// One row of context keeps the destination legible without coupling
+			// the rail to a fixed pixel offset.
+			const margin = box.height;
 			if (box.top < railBox.top + margin) {
 				rail.scrollTop += box.top - railBox.top - margin;
 			} else if (box.bottom > railBox.bottom - margin) {
@@ -127,18 +130,23 @@ layout: base.njk
 		}
 		reveal(document.querySelector(".docs-sidebar [aria-current='page']"));
 
-		// Scroll-spy for the "On this page" rail: mark whichever heading was
-		// most recently scrolled past, open the section it belongs to on a
-		// long page, and keep the entry in the rail's view. Purely additive:
-		// the outline works, and its links navigate, without this script.
+		// Scroll-spy for the "On this page" rail. aria-current is the state;
+		// the marker only follows its geometry. Purely additive: the static
+		// rail and its first current link remain useful without this script.
 		const links = Array.from(document.querySelectorAll("[data-toc-link]"));
 		if (links.length === 0) return;
 		const headings = Array.from(
 			document.querySelectorAll(".docs-content :is(h2, h3)[id]"),
 		);
+		const toc = document.querySelector("#docs-toc-nav");
+		const marker = toc?.querySelector(".docs-toc-marker");
 		/** @type {HTMLDetailsElement | null} */
 		let spyOpened = null;
 		let active = "";
+		let frame = 0;
+		let geometryDirty = true;
+		/** @type {Array<{ id: string, top: number }>} */
+		let headingPositions = [];
 
 		// A section the reader opened or closed is theirs: the spy only ever
 		// folds back the one it opened itself.
@@ -148,20 +156,62 @@ layout: base.njk
 			});
 		}
 
-		const update = () => {
-			// 96px offset: the heading counts as "reached" slightly before it
-			// touches the top edge, matching where the eye lands after a jump.
-			let current = "";
-			for (const heading of headings) {
-				if (heading.getBoundingClientRect().top <= 96) current = heading.id;
-				else break;
+		const measure = () => {
+			headingPositions = headings.map((heading) => ({
+				id: heading.id,
+				top: heading.getBoundingClientRect().top + window.scrollY,
+			}));
+		};
+
+		const scrollPadding = () => {
+			const value = getComputedStyle(document.documentElement)
+				.getPropertyValue("scroll-padding-block-start");
+			return Number.parseFloat(value) || 0;
+		};
+
+		/** @param {Element | null} activeLink */
+		const placeMarker = (activeLink) => {
+			if (!(toc instanceof HTMLElement) || !(marker instanceof HTMLElement)) return;
+			if (!(activeLink instanceof HTMLElement)) {
+				toc.removeAttribute("data-toc-marker-ready");
+				return;
 			}
-			const activeSlug = current || (headings[0] ? headings[0].id : "");
-			if (activeSlug === active) return;
+			const tocBox = toc.getBoundingClientRect();
+			const linkBox = activeLink.getBoundingClientRect();
+			// Read the used height, not parseFloat(customProperty): the custom
+			// property is authored in rem and parseFloat would mistake 1.125rem
+			// for 1.125px.
+			const markerHeight = marker.getBoundingClientRect().height || linkBox.height;
+			const y = linkBox.top - tocBox.top + (linkBox.height - markerHeight) / 2;
+			toc.style.setProperty("--docs-toc-marker-y", `${y}px`);
+			toc.setAttribute("data-toc-marker-ready", "");
+		};
+
+		const update = () => {
+			if (geometryDirty || headingPositions.length !== headings.length) measure();
+			geometryDirty = false;
+
+			const scrolling = document.scrollingElement;
+			const scrollTop = scrolling?.scrollTop ?? window.scrollY;
+			const atEnd = scrolling
+				? scrollTop + scrolling.clientHeight >= scrolling.scrollHeight
+				: false;
+			let activeSlug = headingPositions[0]?.id ?? "";
+			if (atEnd) {
+				activeSlug = headingPositions.at(-1)?.id ?? activeSlug;
+			} else {
+				// Scrolling is quantised to device pixels while layout positions can
+				// remain fractional. One device pixel closes that rounding gap; it is
+				// not a visual offset from the sticky header.
+				const reached = scrollTop + scrollPadding() + 1 / (window.devicePixelRatio || 1);
+				for (const heading of headingPositions) {
+					if (heading.top <= reached) activeSlug = heading.id;
+					else break;
+				}
+			}
+
+			const changed = activeSlug !== active;
 			active = activeSlug;
-			// aria-current only: the framework paints its one registered
-			// edge on the inline-start rail from it, and the stylesheet
-			// deliberately adds no second marker of its own.
 			/** @type {Element | null} */
 			let activeLink = null;
 			for (const link of links) {
@@ -182,10 +232,34 @@ layout: base.njk
 				spyOpened.open = false;
 				spyOpened = null;
 			}
-			reveal(activeLink);
+			placeMarker(activeLink);
+			if (changed) reveal(activeLink);
 		};
 
-		window.addEventListener("scroll", update, { passive: true });
-		update();
+		/** @param {boolean} [remeasure] */
+		const schedule = (remeasure = false) => {
+			geometryDirty ||= remeasure;
+			if (frame) return;
+			frame = requestAnimationFrame(() => {
+				frame = 0;
+				update();
+			});
+		};
+
+		window.addEventListener("scroll", () => schedule(), { passive: true });
+		window.addEventListener("resize", () => schedule(true), { passive: true });
+		window.addEventListener("hashchange", () => schedule(true));
+		window.addEventListener("pageshow", () => schedule(true));
+		window.addEventListener("load", () => schedule(true), { once: true });
+
+		if ("ResizeObserver" in window) {
+			const observer = new ResizeObserver(() => schedule(true));
+			const content = document.querySelector(".docs-content");
+			if (content) observer.observe(content);
+			if (toc) observer.observe(toc);
+		}
+
+		document.fonts?.ready.then(() => schedule(true));
+		schedule(true);
 	})();
 </script>

@@ -256,6 +256,7 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | Token | Kind |
 | --- | --- |
 | `--cirth-box-shadow` | slot |
+| `--cirth-control-press-offset` | role |
 | `--cirth-duration-fast` | scale |
 | `--cirth-duration-instant` | scale |
 | `--cirth-duration-normal` | scale |

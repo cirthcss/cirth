@@ -91,6 +91,7 @@ $popover-selector: '[popover=""], [popover="auto"], [popover="hint"]';
     background-color: var(--cirth-popover-background-color);
     box-shadow: var(--cirth-popover-box-shadow);
     color: var(--cirth-popover-color);
+    transform: translateY(0) scale(1);
 
     // Discrete transitions and @starting-style are what let an element
     // fade in and back out of display: none without a script toggling
@@ -98,16 +99,19 @@ $popover-selector: '[popover=""], [popover="auto"], [popover="hint"]';
     // handled globally in utilities/_reduce-motion.scss.
     transition:
       opacity var(--cirth-transition),
+      transform var(--cirth-transition),
       display var(--cirth-transition) allow-discrete,
       overlay var(--cirth-transition) allow-discrete;
 
     @starting-style {
       opacity: 0;
+      transform: translateY(calc(var(--cirth-space-1) * -1)) scale(0.99);
     }
   }
 
   &:not(:popover-open) {
     opacity: 0;
+    transform: translateY(calc(var(--cirth-space-1) * -1)) scale(0.99);
   }
 }
 

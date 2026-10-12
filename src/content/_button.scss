@@ -87,7 +87,8 @@
     background-color var(--cirth-transition),
     border-color var(--cirth-transition),
     color var(--cirth-transition),
-    box-shadow var(--cirth-transition);
+    box-shadow var(--cirth-transition),
+    transform var(--cirth-transition);
 
   &:is(:hover, :active, :focus) {
     @extend %button-active;
@@ -99,6 +100,21 @@
   // without either growing a fill it does not have.
   &:active {
     background-image: linear-gradient(rgb(0 0 0 / 12%) 0 0);
+  }
+}
+
+// Movement is supporting feedback, never the state itself. The tonal active
+// paint above remains under reduced motion, while the one-edge settle is only
+// introduced when the reader has not asked for motion to be removed.
+@media (prefers-reduced-motion: no-preference) {
+  #{$parent-selector} button:not([disabled]),
+  #{$parent-selector} [type="submit"]:not([disabled]),
+  #{$parent-selector} [type="reset"]:not([disabled]),
+  #{$parent-selector} [type="button"]:not([disabled]),
+  #{$parent-selector} [role="button"]:not([disabled], [aria-disabled="true"]) {
+    &:active {
+      transform: translateY(var(--cirth-control-press-offset));
+    }
   }
 }
 
@@ -497,6 +513,7 @@
   background-image: none;
   color: var(--cirth-disabled-color);
   pointer-events: none;
+  transform: none;
 }
 
 // Submit control of a form the reader has made invalid

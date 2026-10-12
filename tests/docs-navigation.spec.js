@@ -492,6 +492,159 @@ test("a long outline folds its subsections, and the spy opens the one being read
 	expect(await hrefs(".docs-toc-top nav")).toEqual(await hrefs(".docs-toc nav"));
 });
 
+test("the server-rendered outline keeps a static current rail without JavaScript", async ({
+	browser,
+}) => {
+	const context = await browser.newContext({
+		javaScriptEnabled: false,
+		viewport: { width: 1440, height: 1000 },
+	});
+	const page = await context.newPage();
+	await page.goto(`${origin}/customization/`, { waitUntil: "domcontentloaded" });
+
+	const toc = page.locator("#docs-toc-nav");
+	await expect(toc).not.toHaveAttribute("data-toc-marker-ready", "");
+	await expect(toc.locator('.docs-toc-marker[aria-hidden="true"]')).toHaveCount(1);
+	await expect(toc.locator('[data-toc-link][aria-current="true"]')).toHaveCount(1);
+	const fallback = await toc
+		.locator('[data-toc-link][aria-current="true"]')
+		.evaluate((element) => {
+			const style = getComputedStyle(element);
+			return {
+				color: style.borderInlineStartColor,
+				style: style.borderInlineStartStyle,
+				width: Number.parseFloat(style.borderInlineStartWidth),
+			};
+		});
+	expect(fallback.style).toBe("solid");
+	expect(fallback.width).toBeGreaterThan(0);
+	expect(fallback.color).not.toBe("rgba(0, 0, 0, 0)");
+
+	await context.close();
+});
+
+test("the outline marker follows aria-current from start through hash, resize, and page end", async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 1440, height: 1000 });
+	await page.goto(`${origin}/customization/`, { waitUntil: "networkidle" });
+
+	const toc = page.locator("#docs-toc-nav");
+	const marker = toc.locator(".docs-toc-marker");
+	await expect(toc).toHaveAttribute("data-toc-marker-ready", "");
+	await expect(marker).toHaveAttribute("aria-hidden", "true");
+
+	const markerState = () =>
+		page.evaluate(() => {
+			const nav = document.querySelector("#docs-toc-nav");
+			const indicator = nav?.querySelector(".docs-toc-marker");
+			const active = nav?.querySelector('[data-toc-link][aria-current="true"]');
+			if (!(nav instanceof HTMLElement) || !(indicator instanceof HTMLElement) || !(active instanceof HTMLElement)) {
+				throw new Error("missing active outline marker");
+			}
+			const markerBox = indicator.getBoundingClientRect();
+			const linkBox = active.getBoundingClientRect();
+			const navStyle = getComputedStyle(nav);
+			return {
+				active: active.dataset.slug,
+				alignment: markerBox.top + markerBox.height / 2 - (linkBox.top + linkBox.height / 2),
+				color: navStyle.getPropertyValue("--docs-toc-marker-color").trim(),
+				height: navStyle.getPropertyValue("--docs-toc-marker-height").trim(),
+				position: navStyle.getPropertyValue("--docs-toc-marker-y").trim(),
+				primary: navStyle.getPropertyValue("--cirth-primary-text").trim(),
+				transitionDurations: getComputedStyle(indicator).transitionDuration
+					.split(",")
+					.map((value) => value.trim()),
+				width: markerBox.width,
+			};
+		});
+
+	const first = await markerState();
+	expect(first.active).toBe(await toc.locator("[data-toc-link]").first().getAttribute("data-slug"));
+	expect(Math.abs(first.alignment)).toBeLessThanOrEqual(0.5);
+	expect(first.color).toBe(first.primary);
+	expect(first.height).toBe("1.125rem");
+	expect(first.position).toMatch(/px$/);
+	expect(first.width).toBe(2);
+	expect(first.transitionDurations.every((duration) => duration === "0s")).toBe(true);
+
+	const links = toc.locator("[data-toc-link]");
+	const hashTarget = links.nth(Math.floor((await links.count()) / 2));
+	const hashSlug = await hashTarget.getAttribute("data-slug");
+	await page.evaluate((slug) => {
+		location.hash = /** @type {string} */ (slug);
+	}, hashSlug);
+	await expect(hashTarget).toHaveAttribute("aria-current", "true");
+	const afterHash = await markerState();
+	expect(afterHash.active).toBe(hashSlug);
+	expect(Math.abs(afterHash.alignment)).toBeLessThanOrEqual(0.5);
+
+	const settledScroll = await page.evaluate(() => window.scrollY);
+	await page.waitForTimeout(250);
+	const scrollAfterSettle = await page.evaluate(() => window.scrollY);
+	const devicePixel = await page.evaluate(() => 1 / window.devicePixelRatio);
+	// Engines may finish fragment alignment on the adjacent device pixel.
+	// Anything beyond that would be a visible page jump caused by the spy.
+	expect(Math.abs(scrollAfterSettle - settledScroll)).toBeLessThanOrEqual(
+		devicePixel,
+	);
+
+	await page.setViewportSize({ width: 1360, height: 840 });
+	// Reflow may place a neighbouring heading at the reading threshold. The
+	// semantic current link, rather than the old hash, remains authoritative.
+	const afterResizeCurrent = toc.locator('[data-toc-link][aria-current="true"]');
+	await expect(afterResizeCurrent).toHaveCount(1);
+	// ResizeObserver and scroll callbacks settle on animation frames. Wait for
+	// the decorative geometry to catch up with the semantic state before taking
+	// a single sample, instead of comparing reads that may straddle two frames.
+	await expect
+		.poll(async () => Math.abs((await markerState()).alignment))
+		.toBeLessThanOrEqual(0.5);
+	const afterResize = await markerState();
+	await expect(
+		toc.locator(
+			`[data-toc-link][data-slug="${afterResize.active}"][aria-current="true"]`,
+		),
+	).toHaveCount(1);
+	expect(Math.abs(afterResize.alignment)).toBeLessThanOrEqual(0.5);
+
+	await page.evaluate(() => window.scrollTo(0, document.scrollingElement?.scrollHeight ?? 0));
+	const last = links.last();
+	await expect(last).toHaveAttribute("aria-current", "true");
+	const atEnd = await markerState();
+	expect(atEnd.active).toBe(await last.getAttribute("data-slug"));
+	expect(Math.abs(atEnd.alignment)).toBeLessThanOrEqual(0.5);
+});
+
+test("the outline marker animates transform only when motion is allowed", async ({
+	page,
+}) => {
+	await page.emulateMedia({ reducedMotion: "no-preference" });
+	await page.setViewportSize({ width: 1440, height: 1000 });
+	await page.goto(`${origin}/customization/`, { waitUntil: "networkidle" });
+	const toc = page.locator("#docs-toc-nav");
+	await expect(toc).toHaveAttribute("data-toc-marker-ready", "");
+	await page.waitForTimeout(300);
+
+	const target = toc.locator("[data-toc-link]").nth(3);
+	const slug = await target.getAttribute("data-slug");
+	const transitions = await page.evaluate(async (targetSlug) => {
+		const heading = document.getElementById(/** @type {string} */ (targetSlug));
+		const marker = document.querySelector(".docs-toc-marker");
+		if (!heading || !(marker instanceof HTMLElement)) throw new Error("missing outline target");
+		heading.scrollIntoView({ block: "start" });
+		await new Promise((resolve) => requestAnimationFrame(resolve));
+		await new Promise((resolve) => requestAnimationFrame(resolve));
+		return marker
+			.getAnimations()
+			.filter((animation) => animation instanceof CSSTransition)
+			.map((animation) => /** @type {CSSTransition} */ (animation).transitionProperty);
+	}, slug);
+
+	expect(transitions).toContain("transform");
+	await expect(target).toHaveAttribute("aria-current", "true");
+});
+
 test("a fragment lands under the sticky header, not behind it", async ({ page }) => {
 	await page.setViewportSize({ width: 1440, height: 1000 });
 	await page.goto(`${origin}/compatibility/`, { waitUntil: "networkidle" });

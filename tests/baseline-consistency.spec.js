@@ -92,16 +92,52 @@ test("every button variant carries the same border on all four sides", async ({
 	}
 });
 
-test("a pressed button does not translate", async ({ page }) => {
+test("a pressed button keeps its tonal state without moving under reduced motion", async ({
+	page,
+}) => {
 	await page.goto(`${origin}/content/button/`, { waitUntil: "networkidle" });
 
 	const button = page.locator(".docs-demo-preview button").first();
 	await button.hover();
 	await page.mouse.down();
-	const pressed = await styleOf(button, ["transform"]);
+	const pressed = await styleOf(button, ["backgroundImage", "transform"]);
 	await page.mouse.up();
 
 	expect(pressed.transform).toBe("none");
+	expect(pressed.backgroundImage).not.toBe("none");
+});
+
+test("an enabled button settles by one edge when motion is allowed", async ({
+	page,
+}) => {
+	await page.emulateMedia({ reducedMotion: "no-preference" });
+	await page.goto(`${origin}/content/button/`, { waitUntil: "networkidle" });
+
+	const button = page.locator(".docs-demo-preview button").first();
+	await button.hover();
+	await page.mouse.down();
+	await expect
+		.poll(() =>
+			button.evaluate((element) => {
+				const style = getComputedStyle(element);
+				return {
+					border: style.getPropertyValue("--cirth-border-width").trim(),
+					offset: style.getPropertyValue("--cirth-control-press-offset").trim(),
+					y: new DOMMatrixReadOnly(style.transform).m42,
+				};
+			}),
+		)
+		.toEqual({ border: "0.0625rem", offset: "0.0625rem", y: 1 });
+
+	await button.evaluate((element) => element.setAttribute("disabled", ""));
+	await expect
+		.poll(() =>
+			button.evaluate((element) =>
+				new DOMMatrixReadOnly(getComputedStyle(element).transform).m42,
+			),
+		)
+		.toBe(0);
+	await page.mouse.up();
 });
 
 // --- The card contract -------------------------------------------------
@@ -310,12 +346,15 @@ test("the active navigation item squares off on the rail side", async ({
 	expect(style.borderInlineStartWidth).not.toBe("0px");
 });
 
-test("the outline highlights an entry with exactly one indicator", async ({
+test("the outline uses one decorative marker and no generated duplicate", async ({
 	page,
 }) => {
 	await page.goto(`${origin}/about/`, { waitUntil: "networkidle" });
+	const toc = page.locator("#docs-toc-nav");
+	await expect(toc.locator('.docs-toc-marker[aria-hidden="true"]')).toHaveCount(1);
+	await expect(toc).toHaveAttribute("data-toc-marker-ready", "");
 
-	const marker = await page
+	const generated = await page
 		.locator(".docs-toc a")
 		.first()
 		.evaluate((element) => {
@@ -323,9 +362,9 @@ test("the outline highlights an entry with exactly one indicator", async ({
 			return { content: before.content, width: before.width };
 		});
 
-	// The outline used to draw its own accent-coloured bar as a ::before on top of the
-	// rail the framework already paints for aria-current.
-	expect(["none", "normal", ""]).toContain(marker.content);
+	// A generated bar would sit on top of the explicit marker and the static
+	// fallback rail, producing the doubled state this contract prevents.
+	expect(["none", "normal", ""]).toContain(generated.content);
 });
 
 test("the sidebar group headers share the inline gutter of their entries", async ({

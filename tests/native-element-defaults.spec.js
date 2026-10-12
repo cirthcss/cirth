@@ -1200,3 +1200,63 @@ test("default: a preset retimes prose through --cirth-spacing alone", async ({
 	expect(measured.paragraph).toBe("20px");
 	expect(measured.columnGap).toBe("20px");
 });
+
+// --- Compact default theme typography ---------------------------------
+
+const themeBuilds = [
+	{ name: "default", css: defaultBuild, scope: "" },
+	{ name: "classless", css: read("dist/cirth.classless.css"), scope: "" },
+	{ name: "scoped", css: read("dist/cirth.scoped.css"), scope: "cirth" },
+	{
+		name: "classless scoped",
+		css: read("dist/cirth.classless.scoped.css"),
+		scope: "cirth",
+	},
+];
+
+for (const build of themeBuilds) {
+	for (const width of [390, 1440]) {
+		test(`${build.name}: content headings stay 28/24/20 and system-ui at ${width}px`, async ({
+			page,
+		}) => {
+			await page.setViewportSize({ width, height: 900 });
+			const content = `<p id="body">Body copy</p>
+				<div id="display" style="font-family: var(--cirth-font-family-display)">Display</div>
+				<h1 id="h1">Heading one</h1>
+				<h2 id="h2">Heading two</h2>
+				<h3 id="h3">Heading three</h3>`;
+			await setContent(
+				page,
+				`<style>${build.css}</style>${
+					build.scope ? `<main class="${build.scope}">${content}</main>` : `<main>${content}</main>`
+				}`,
+			);
+
+			const measured = await page.evaluate(() => {
+				/** @param {string} id */
+				const style = (id) =>
+					getComputedStyle(/** @type {Element} */ (document.getElementById(id)));
+				return {
+					bodyFamily: style("body").fontFamily,
+					bodySize: style("body").fontSize,
+					bodyLineHeight: style("body").lineHeight,
+					displayFamily: style("display").fontFamily,
+					headings: ["h1", "h2", "h3"].map((id) => ({
+						size: style(id).fontSize,
+						weight: style(id).fontWeight,
+					})),
+				};
+			});
+
+			expect(measured.bodyFamily).toContain("system-ui");
+			expect(measured.displayFamily).toBe(measured.bodyFamily);
+			expect(measured.bodySize).toBe("16px");
+			expect(measured.bodyLineHeight).toBe("24px");
+			expect(measured.headings).toEqual([
+				{ size: "28px", weight: "600" },
+				{ size: "24px", weight: "600" },
+				{ size: "20px", weight: "600" },
+			]);
+		});
+	}
+}

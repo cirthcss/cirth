@@ -47,12 +47,16 @@ const distDir = path.join(projectRoot, "dist");
 const budgets = {
 	"cirth.classless.min.css": 13_300,
 	"cirth.classless.scoped.min.css": 13_400,
-	"cirth.min.css": 15_200,
+	// The Elena-informed refresh adds one public press role and transform
+	// states for buttons and overlays. Keep useful headroom after that
+	// deliberate interaction contract instead of turning the budget into a
+	// byte-by-byte design constraint.
+	"cirth.min.css": 15_400,
 	"cirth.print.classless.min.css": 1_024,
 	"cirth.print.classless.scoped.min.css": 1_024,
 	"cirth.print.min.css": 1_024,
 	"cirth.print.scoped.min.css": 1_024,
-	"cirth.scoped.min.css": 15_400,
+	"cirth.scoped.min.css": 15_600,
 	"presets/plain.min.css": 400,
 	"presets/material.min.css": 1_000,
 	"presets/metro.min.css": 1_000,

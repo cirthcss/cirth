@@ -196,9 +196,11 @@
     color: var(--cirth-dropdown-color);
     white-space: nowrap;
     opacity: 0;
+    transform: translateY(calc(var(--cirth-space-1) * -1)) scale(0.99);
+    transform-origin: top center;
     transition:
       opacity var(--cirth-transition),
-      transform var(--cirth-duration-instant) var(--cirth-ease-in-out) 1s;
+      transform var(--cirth-transition);
 
     li {
       width: 100%;
@@ -263,14 +265,16 @@
   // 1. Inside container type accordion
   #{$parent-selector} details.dropdown[open] > summary {
     + ul {
-      transform: scaleY(1);
+      transform: translateY(0) scale(1);
       opacity: 1;
       transition:
         opacity var(--cirth-transition),
-        transform
-          var(--cirth-duration-instant)
-          var(--cirth-ease-in-out)
-          var(--cirth-duration-instant);
+        transform var(--cirth-transition);
+
+      @starting-style {
+        opacity: 0;
+        transform: translateY(calc(var(--cirth-space-1) * -1)) scale(0.99);
+      }
     }
   }
 

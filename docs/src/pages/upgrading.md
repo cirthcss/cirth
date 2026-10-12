@@ -48,6 +48,8 @@ directory.
 | If you | Then |
 | --- | --- |
 | Set `--cirth-letter-spacing-tight` or `-snug` | Removed. Set `--cirth-tracking-optical` (0 turns the correction off), or `--cirth-letter-spacing` on one heading |
+| Relied on `h1`, `h2` or `h3` growing with the viewport | Content headings are now 28px, 24px and 20px. Set `--cirth-font-size` on the heading that needs another size; for a hero, set it to `var(--cirth-display-font-size)` |
+| Relied on the 650 default heading weight | Set `--cirth-heading-font-weight: 650`; the new default is 600 |
 | Relied on headings at 700 | Set `--cirth-heading-font-weight` and `--cirth-title-font-weight` |
 | Relied on buttons, summaries or terms at 600 | Set `--cirth-font-weight` on them |
 | Styled column heads as body text | They are metadata now (13px, medium, muted); set `font-size` and `color` on `thead th` |
@@ -65,6 +67,7 @@ directory.
 | Set `--cirth-group-box-shadow-focus-with-button` or `-with-input` | Removed: a group draws one outline ring around the row |
 | Styled a focus ring through `box-shadow` | Focus is an `outline` with `outline-offset: var(--cirth-outline-offset)` |
 | Styled inline `code` expecting the chip | Set `padding`, `background` and `display: inline-block` on it |
+| Expected an enabled button to stay still while pressed | Set `--cirth-control-press-offset: 0px`; the tonal active state remains |
 | Relied on 2px checkbox and radio borders | Set `--cirth-border-width` on `[type="checkbox"], [type="radio"]` |
 | Expected a checkbox or radio drawn edge to edge at 24px | The box is still 24px and is the target; the mark drawn inside it is 20px. Set `width` and `height` to `1.75em` on the input for the old drawn size |
 | Relied on the thick ring of a checked radio | A checked radio is the accent with a dot in `--cirth-primary-on-surface`; nothing to set |
@@ -75,8 +78,10 @@ directory.
 
 | If you | Then |
 | --- | --- |
+| Relied on the 4px control and 6px container defaults | Set `--cirth-border-radius: var(--cirth-radius-sm)`; the derived container radius returns to 6px |
 | Relied on the pill search field or search group | Search takes the control radius. To keep the pill: `[type="search"], [role="search"] { --cirth-border-radius: var(--cirth-radius-pill); }`, plus `.group [type="search"] { --cirth-border-radius: inherit; }` for a search field inside a generic group |
 | Relied on popovers at the control radius | They take the container radius, as a dialog does; set `border-radius: var(--cirth-border-radius)` on `[popover]` |
+| Relied on block code at the control radius | It takes the container radius; set `pre { border-radius: var(--cirth-border-radius); }` |
 
 ### Space between elements
 

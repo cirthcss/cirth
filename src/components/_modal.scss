@@ -58,7 +58,7 @@
       // already carry, and the longer the throw the more the dialog reads
       // as an effect rather than as something that is now in front.
       @starting-style {
-        transform: translateY(-0.5rem);
+        transform: translateY(calc(var(--cirth-space-1) * -1));
         opacity: 0;
       }
     }
@@ -213,6 +213,11 @@
   &:not([open]),
   &[open="false"] {
     display: none;
+
+    > article {
+      opacity: 0;
+      transform: translateY(calc(var(--cirth-space-1) * -1));
+    }
   }
 }
 

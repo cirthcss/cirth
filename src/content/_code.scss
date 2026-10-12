@@ -79,7 +79,7 @@
 #{$parent-selector} pre {
   display: block;
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
-  border-radius: var(--cirth-border-radius);
+  border-radius: var(--cirth-card-border-radius);
   background: var(--cirth-code-background-color);
   line-height: initial;
   overflow-x: auto;

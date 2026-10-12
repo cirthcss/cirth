@@ -409,7 +409,11 @@ test("your theme's card is live: every control answers the pointer and the keybo
 			const box = element.getBoundingClientRect();
 			const own = getComputedStyle(element);
 			return {
-				box: [box.x, box.y, box.width, box.height].map((value) => Math.round(value * 10) / 10).join(","),
+				box: Object.fromEntries(
+					Object.entries({ x: box.x, y: box.y, width: box.width, height: box.height }).map(
+						([key, value]) => [key, Math.round(value * 10) / 10],
+					),
+				),
 				paint: [own.backgroundColor, own.backgroundImage, own.boxShadow, own.borderTopColor].join(" | "),
 				checked: element instanceof HTMLInputElement ? element.checked : null,
 			};
@@ -440,8 +444,21 @@ test("your theme's card is live: every control answers the pointer and the keybo
 		const after = await look(control);
 		if (button) expect(active.paint, `${name}: pressed shows`).not.toBe(hover.paint);
 		else expect(after.checked, `${name}: a click changes its state`).toBe(!rest.checked);
-		// No state moves or resizes the control.
-		expect([hover.box, active.box, after.box], name).toEqual([rest.box, rest.box, rest.box]);
+		// No state resizes the control. Buttons may settle by the public 1px
+		// press offset, while choices and every resting state stay in place.
+		for (const current of [hover.box, active.box, after.box]) {
+			expect(current.width, `${name}: width`).toBe(rest.box.width);
+			expect(current.height, `${name}: height`).toBe(rest.box.height);
+			expect(current.x, `${name}: inline position`).toBe(rest.box.x);
+		}
+		expect(hover.box.y, `${name}: hover position`).toBe(rest.box.y);
+		expect(after.box.y, `${name}: resting position`).toBe(rest.box.y);
+		if (button) {
+			expect(active.box.y - rest.box.y, `${name}: press offset`).toBeGreaterThanOrEqual(0);
+			expect(active.box.y - rest.box.y, `${name}: press offset`).toBeLessThanOrEqual(1);
+		} else {
+			expect(active.box.y, `${name}: active position`).toBe(rest.box.y);
+		}
 		await page.mouse.move(0, 0);
 	}
 	// The keyboard walks into the card in the page's order, and every stop

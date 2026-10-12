@@ -132,13 +132,13 @@ for (const build of builds) {
 				expect(container).toBeCloseTo(control * 1.5, 1);
 
 				// Operated: the control radius, search included.
-				for (const id of ["search", "select", "button", "search-group", "group", "pre", "progress"]) {
+				for (const id of ["search", "select", "button", "search-group", "group", "progress"]) {
 					expect(radii[id], `${id} takes the control radius`).toBe(control);
 				}
 				expect(groupedSearch).toEqual(groupedText);
 
 				// Holding content: the container radius, floating or not.
-				for (const id of ["dialog-article", "popover"]) {
+				for (const id of ["dialog-article", "popover", "pre"]) {
 					expect(radii[id], `${id} takes the container radius`).toBe(container);
 				}
 
