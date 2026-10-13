@@ -78,7 +78,8 @@ It is not treated as page chrome.
 
 ## Vertical nav
 
-A nav inside `aside` becomes a vertical navigation rail.
+A nav inside `aside` or inside a `details` disclosure becomes a stacked
+navigation list.
 
 {% demo "nav-vertical" %}
 
@@ -94,15 +95,32 @@ A nav inside `aside` becomes a vertical navigation rail.
 </aside>
 ```
 
-The list and items stack. The current-page marker moves from the bottom edge to
-the inline-start edge, which keeps it visible in left-to-right and
-right-to-left layouts. A plain list in the aside remains a plain list; only the
-nav receives this layout.
+The list and items stack, and the horizontal gutter a bar uses drops to zero,
+so hover surfaces and the current-page edge stay inside a clipped or
+scrolling panel. The current-page marker moves from the bottom edge to the
+inline-start edge, which keeps it visible in left-to-right and right-to-left
+layouts. Links and summaries draw their focus ring inside their own box, so a
+scrolling rail cannot clip it. A plain list in the aside or disclosure remains
+a plain list; only the nav receives this layout.
 
-### A stacked nav that is not in an `<aside>`
+The same applies to a collapsible menu:
 
-For a drawer, disclosure or footer column, set the nav layout yourself and
-remove the horizontal gutter that a bar uses:
+```html
+<details>
+  <summary>Documentation</summary>
+  <nav aria-label="Documentation">
+    <ul>
+      <li><a href="/docs" aria-current="page">Overview</a></li>
+      <li><a href="/docs/get-started">Get started</a></li>
+    </ul>
+  </nav>
+</details>
+```
+
+### A stacked nav in another container
+
+For a drawer in a `dialog` or a footer column, set the nav layout yourself
+and remove the horizontal gutter that a bar uses:
 
 ```css
 .drawer nav {
@@ -116,8 +134,8 @@ remove the horizontal gutter that a bar uses:
 }
 ```
 
-The zero gutter keeps hover surfaces and current-page edges inside a clipped or
-scrolling panel. Do not add `aria-orientation` to a navigation landmark as a
+A `dialog` is left out of the automatic layout because it can hold a
+horizontal bar. Do not add `aria-orientation` to a navigation landmark as a
 styling hook; it is not a supported property for that role.
 
 ## Behavior
@@ -159,7 +177,8 @@ states. It does not create routes, control responsive disclosure or make an
 - Using `nav` for links that are incidental to the surrounding content.
 - Omitting a name when several navigation landmarks are present.
 - Adding `aria-current` to more than one page link in the same navigation.
-- Expecting a stacked layout outside `aside` without applying layout CSS.
+- Expecting a stacked layout outside `aside` and `details` without applying
+  layout CSS.
 
 ## Related
 

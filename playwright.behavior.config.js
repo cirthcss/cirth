@@ -37,6 +37,7 @@ module.exports = defineConfig({
 		"modal.spec.js",
 		"native-element-defaults.spec.js",
 		"nav-dropdown.spec.js",
+		"nav-stacked.spec.js",
 		"nav-target-size.spec.js",
 		"number-readonly.spec.js",
 		"overflow-containment.spec.js",

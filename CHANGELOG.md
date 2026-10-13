@@ -7,6 +7,18 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Changed
+
+- **A nav inside a `details` disclosure stacks.** `:is(aside, details) nav`
+  now renders as a stacked list: block rows, no horizontal gutter, and the
+  current entry marked on the inline-start edge. Collapsible menus no longer
+  need hand-written layout CSS. A nav in any other container is unchanged.
+
+- **Focus rings in a stacked nav are drawn inside the row.** A focused link
+  or summary in an `aside` or `details` nav takes
+  `outline-offset: calc(var(--cirth-outline-width) * -1)`, so a scrolling rail
+  cannot clip the ring and it never overlaps the next row.
+
 ### Fixed
 
 - **Dropdowns and popovers have visible elevation in the dark scheme.** The
