@@ -59,7 +59,7 @@
   --cirth-primary-on-surface: #{$white};
 
   // Text selection: the accent lifted to a wash the page's ink stays legible
-  // through (7.8:1 with the shipped value), so presets highlight in their
+  // through (8.2:1 with the shipped value), so presets highlight in their
   // own accent.
   --cirth-text-selection-color: oklch(
     from var(--cirth-primary) calc(l * 1.247) c h / 25%
@@ -171,7 +171,7 @@
   --cirth-switch-checked-background-color: var(--cirth-primary-surface);
 
   // The thumb is the label colour of an accent fill. With the shipped values
-  // it clears 3:1 (WCAG 1.4.11) on both tracks: 3.92:1 unchecked, 4.95:1
+  // it clears 3:1 (WCAG 1.4.11) on both tracks: 3.81:1 unchecked, 5.06:1
   // checked; re-check if either token changes.
   --cirth-switch-color: var(--cirth-primary-on-surface);
   --cirth-range-thumb-border-color: var(--cirth-background-color);

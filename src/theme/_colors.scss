@@ -6,15 +6,16 @@
 
 // Chroma is derived: each chromatic family is pinned to one hue and held at
 // a fixed fraction of that hue's maximum in-gamut sRGB chroma at each step.
-// Status families sit at 85%, to be recognised in a small mark; the accent
-// at 70%, because it covers whole surfaces on every screen. The gamut's
+// Every family sits at 85%: a status colour has to be recognised in a small
+// mark, and the accent only ever fills controls, never a page. The gamut's
 // shape differs per hue, so families peak at different steps.
 
 // The neutral family's chroma is a bell that peaks mid-ladder, fades to
 // nothing at the pale end and floors at 70% of its peak at the dark end, so
 // the deepest inks and the shadow colour keep the family's hue. Its hue,
-// 120deg, sits opposite the accent on both Oklab axes, which keeps accent
-// and neutrals apart under each colour-vision deficiency.
+// 132deg, sits opposite the accent on both Oklab axes, which keeps accent
+// and neutrals apart under each colour-vision deficiency, and as far from
+// the warning hue as it can before the grey turns sage.
 
 // Families are named for their role, not their hue. The accent's hue
 // (324deg) seeds --cirth-primary; scripts/build-brand-marks.js paints the
@@ -31,51 +32,51 @@ $white: oklch(100% 0 0deg);
 // surfaces, and the ladder does not reach far enough toward either end.
 // Every text token keeps >= 4.5:1 on all four surface levels in both
 // schemes (specs/surface-depth.md).
-$canvas-light: oklch(97.8% 0.003 120deg);
-$canvas-dark: oklch(16.5% 0.012 120deg);
+$canvas-light: oklch(97.8% 0.003 132deg);
+$canvas-dark: oklch(16.5% 0.012 132deg);
 
 // Neutral: ink, lines, secondary controls, and the canvases' hue.
-$neutral-950: oklch(18% 0.022 120deg);
-$neutral-900: oklch(22.3% 0.023 120deg);
-$neutral-850: oklch(26.7% 0.025 120deg);
-$neutral-800: oklch(31% 0.026 120deg);
-$neutral-750: oklch(35.3% 0.027 120deg);
-$neutral-700: oklch(39.7% 0.028 120deg);
-$neutral-650: oklch(44% 0.029 120deg);
-$neutral-600: oklch(48.3% 0.03 120deg);
-$neutral-550: oklch(52.7% 0.031 120deg);
-$neutral-500: oklch(57% 0.032 120deg);
-$neutral-450: oklch(61.3% 0.028 120deg);
-$neutral-400: oklch(65.7% 0.025 120deg);
-$neutral-350: oklch(70% 0.021 120deg);
-$neutral-300: oklch(74.3% 0.018 120deg);
-$neutral-250: oklch(78.7% 0.014 120deg);
-$neutral-200: oklch(83% 0.011 120deg);
-$neutral-150: oklch(87.3% 0.007 120deg);
-$neutral-100: oklch(91.7% 0.004 120deg);
-$neutral-50: oklch(96% 0 120deg);
+$neutral-950: oklch(18% 0.022 132deg);
+$neutral-900: oklch(22.3% 0.023 132deg);
+$neutral-850: oklch(26.7% 0.025 132deg);
+$neutral-800: oklch(31% 0.026 132deg);
+$neutral-750: oklch(35.3% 0.027 132deg);
+$neutral-700: oklch(39.7% 0.028 132deg);
+$neutral-650: oklch(44% 0.029 132deg);
+$neutral-600: oklch(48.3% 0.03 132deg);
+$neutral-550: oklch(52.7% 0.031 132deg);
+$neutral-500: oklch(57% 0.032 132deg);
+$neutral-450: oklch(61.3% 0.028 132deg);
+$neutral-400: oklch(65.7% 0.025 132deg);
+$neutral-350: oklch(70% 0.021 132deg);
+$neutral-300: oklch(74.3% 0.018 132deg);
+$neutral-250: oklch(78.7% 0.014 132deg);
+$neutral-200: oklch(83% 0.011 132deg);
+$neutral-150: oklch(87.3% 0.007 132deg);
+$neutral-100: oklch(91.7% 0.004 132deg);
+$neutral-50: oklch(96% 0 132deg);
 
 // Accent: the default --cirth-primary and the steps the increased-contrast
 // pass pins it to.
-$accent-950: oklch(18% 0.059 324deg);
-$accent-900: oklch(22.3% 0.073 324deg);
-$accent-850: oklch(26.7% 0.088 324deg);
-$accent-800: oklch(31% 0.102 324deg);
-$accent-750: oklch(35.3% 0.116 324deg);
-$accent-700: oklch(39.7% 0.131 324deg);
-$accent-650: oklch(44% 0.145 324deg);
-$accent-600: oklch(48.3% 0.159 324deg);
-$accent-550: oklch(52.7% 0.173 324deg);
-$accent-500: oklch(57% 0.188 324deg);
-$accent-450: oklch(61.3% 0.202 324deg);
-$accent-400: oklch(65.7% 0.216 324deg);
-$accent-350: oklch(70% 0.2 324deg);
-$accent-300: oklch(74.3% 0.168 324deg);
-$accent-250: oklch(78.7% 0.136 324deg);
-$accent-200: oklch(83% 0.107 324deg);
-$accent-150: oklch(87.3% 0.078 324deg);
-$accent-100: oklch(91.7% 0.05 324deg);
-$accent-50: oklch(96% 0.024 324deg);
+$accent-950: oklch(18% 0.072 324deg);
+$accent-900: oklch(22.3% 0.089 324deg);
+$accent-850: oklch(26.7% 0.107 324deg);
+$accent-800: oklch(31% 0.124 324deg);
+$accent-750: oklch(35.3% 0.141 324deg);
+$accent-700: oklch(39.7% 0.159 324deg);
+$accent-650: oklch(44% 0.176 324deg);
+$accent-600: oklch(48.3% 0.193 324deg);
+$accent-550: oklch(52.7% 0.211 324deg);
+$accent-500: oklch(57% 0.228 324deg);
+$accent-450: oklch(61.3% 0.245 324deg);
+$accent-400: oklch(65.7% 0.262 324deg);
+$accent-350: oklch(70% 0.243 324deg);
+$accent-300: oklch(74.3% 0.204 324deg);
+$accent-250: oklch(78.7% 0.166 324deg);
+$accent-200: oklch(83% 0.13 324deg);
+$accent-150: oklch(87.3% 0.095 324deg);
+$accent-100: oklch(91.7% 0.061 324deg);
+$accent-50: oklch(96% 0.029 324deg);
 
 // Error (invalid form state, deleted/removed text)
 // 62deg from the accent's hue, so a destructive and a primary action stay

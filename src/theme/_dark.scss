@@ -92,7 +92,7 @@
 
   // Edge roles, as in theme/_light.scss, lightened from the canvas. The
   // control edge clears 3:1 on the overlay, the lightest level (3.53:1), and
-  // reads 4.61:1 on the canvas. The separator is 0.15 above the canvas so it
+  // reads 4.60:1 on the canvas. The separator is 0.15 above the canvas so it
   // still divides on the overlay.
   --cirth-muted-border-color: oklch(
     from var(--cirth-canvas) calc(l + 0.15) c h
@@ -161,8 +161,8 @@
   --cirth-switch-thumb-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
   --cirth-switch-checked-background-color: var(--cirth-primary-surface);
 
-  // The thumb clears 3:1 (WCAG 1.4.11) on both tracks: 3.73:1 unchecked,
-  // 7.75:1 checked.
+  // The thumb clears 3:1 (WCAG 1.4.11) on both tracks: 4.19:1 unchecked,
+  // 7.86:1 checked.
   --cirth-switch-color: var(--cirth-primary-on-surface);
   --cirth-range-thumb-border-color: var(--cirth-background-color);
   --cirth-range-thumb-color: var(--cirth-secondary-text);
@@ -190,7 +190,7 @@
     )};
 
   // Meter (<meter>): on a dark track the weight comes from lightness, so
-  // each step down the scale is lighter. 6.44:1, 7.09:1 and 11.05:1 against
+  // each step down the scale is lighter. 6.78:1, 7.47:1 and 11.63:1 against
   // the track (WCAG 1.4.11).
   --cirth-meter-optimum-color: var(--cirth-success);
   --cirth-meter-suboptimum-color: var(--cirth-warning);

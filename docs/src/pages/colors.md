@@ -292,11 +292,10 @@ than chosen by hand.
 
 Each chromatic scale is pinned to one hue and held at a constant fraction
 of that hue's own maximum sRGB chroma within the gamut at every step. The
-fraction is the family's voice. `$error-*`, `$success-*` and `$warning-*`
-sit at 85%: a status color has to be recognisable at a glance in a small,
-rare mark. `$accent-*` sits at 70%, because the accent is the opposite
-case: it fills a primary button on every screen, so the fraction that makes
-a status mark legible would make the accent the loudest thing on the page.
+fraction is the same for every family: 85%. A status color has to be
+recognisable at a glance in a small, rare mark, and the accent only ever
+fills controls (a button, a checkbox, a switch, a progress bar), never a
+page, so it can speak at the same strength without crowding the screen.
 The families don't peak at the same step because sRGB's gamut boundary
 shape differs per hue. For example, red's ceiling sits at a darker
 lightness than green's, but every step of every scale sits at the same
@@ -312,8 +311,8 @@ deepest inks and the shadow of a light page come from the two darkest
 steps, and a bell that closed symmetrically left them achromatic whatever
 hue the family was given.
 
-The neutral's hue does real work: at {{ measured.neutralHue if measured else 120 }}deg it
-is a grey with a trace of olive, opposite the accent on both of Oklab's
+The neutral's hue does real work: at {{ measured.neutralHue if measured else 132 }}deg it
+is a grey with a trace of green, opposite the accent on both of Oklab's
 colour axes: green where the accent is red, yellow where it is blue. That is
 what lets the accent read as a signal for a reader who loses one of those
 axes. Under protanopia, deuteranopia or tritanopia the neutral at the
