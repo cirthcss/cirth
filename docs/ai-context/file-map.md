@@ -26,7 +26,7 @@ Use this to choose first files. Verify identifiers against current source.
 ## Sidebar and documentation navigation
 
 - Primary: `docs/src/_includes/docs.njk`
-- Related: `docs/src/_includes/docs-nav.njk`, `docs/src/_data/nav.js`, `docs/eleventy.config.js`, `docs/src/styles/style.css`
+- Related: `docs/src/_includes/docs-nav.njk`, `docs/src/_data/nav.js`, `docs/eleventy.config.js`, `docs/src/styles/style.css`, `src/components/_nav.scss` (stacked nav)
 - Locate and preserve: `.docs-sidebar`, `.docs-mobile-nav`, `navTree`, `hasActiveItem`, `breadcrumb`, `cirth-nav-open`; desktop and mobile share one tree.
 - Verify: `tests/docs-navigation.spec.js`, `tests/docs-stack.spec.js`
 
@@ -61,7 +61,7 @@ Use this to choose first files. Verify identifiers against current source.
 ## Preset switching
 
 - Primary: `docs/src/_includes/base.njk`
-- Related: `docs/src/_includes/site-header.njk`, `scripts/build-docs.js`, `scripts/lib/presets.js`
+- Related: `docs/src/_includes/site-header.njk`, `scripts/build-docs.js`, `scripts/lib/presets.js`, `docs/src/_includes/theme-swatches.njk` (Themes page accents, `themeAccents`)
 - Locate and preserve: `cirth-preset`, `data-cirth-preset-select`, `#cirth-preset-stylesheet`; names come from `src/presets/`.
 - Verify: `tests/docs-stack.spec.js`, `tests/docs-home.spec.js`
 

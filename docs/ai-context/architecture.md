@@ -66,8 +66,14 @@ or `styles/` according to their role; `public/` is under `docs/`.
 - `style.css` first imports generated `cirth-docs.css`, the real default
   Cirth build plus print. Later rules own only docs chrome and layout.
 - The shell consumes public `--cirth-*` tokens. Root `--docs-*` tokens are
-  limited to shell and reading widths, rail dimensions, chrome radius, index
-  title size and the saved Cirth line height.
+  limited to shell and reading widths, header height, rail dimensions,
+  chrome radius, index title size and the saved Cirth line height;
+  `home.css` reads the header height from them.
+- Generic behaviour belongs to the library, not the shell. A `nav` inside
+  `aside` or `details` is stacked by Cirth (rows, inline-start current
+  marker, inset focus ring); the drawer and the pager lay out their own
+  navs. Transitions are built from `--cirth-transition`, which Cirth zeroes
+  under reduced motion, so they need no media query of their own.
 - Navigate the file by its stable section comments: Header, Search dialog,
   Header controls, Drawer, Layout, Page outline, Pagination, Footer, Prose
   and code, Brand and color pages, Content column, Live examples, Index tree,
@@ -119,7 +125,9 @@ no JavaScript; these scripts belong to docs chrome or maintained specimens.
 
 - `npm run docs:assets` runs `scripts/build-docs.js`, producing
   `cirth-docs.css`, four lab builds and presets under ignored
-  `docs/src/styles/generated/`.
+  `docs/src/styles/generated/`, and pruning generated files whose source is
+  gone. The Themes page reads each accent from these files
+  (`themeAccents`, rendered by `theme-swatches.njk`).
 - `npm run docs:build` builds assets, runs Eleventy and checks links.
   `docs/public/`, authored styles, generated styles and frozen versions are
   passthrough inputs. Root `npm run build` supplies `dist/` measurements.
