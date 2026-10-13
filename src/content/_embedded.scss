@@ -31,10 +31,8 @@
 #{$parent-selector} img {
   max-width: 100%;
 
-  // Except when an explicit height attribute is the only dimension given:
-  // that stays in effect (upstream #513). With both attributes present,
-  // height: auto is what preserves the attr-derived aspect-ratio on
-  // responsive downscale.
+  // A height attribute given alone stays in effect (upstream #513); with
+  // both attributes, height: auto keeps their aspect ratio on downscale.
   &:where(:not([height]), [width][height]) {
     height: auto;
   }

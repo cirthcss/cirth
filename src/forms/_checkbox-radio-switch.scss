@@ -6,11 +6,9 @@
    * Checkboxes, Radios and Switches
    */
 
-// Labels
-
 // A label wrapping its own control shrinks to the control and its text, so
-// the pointer cursor covers exactly what is clickable and no further. Its
-// text is an option, not a field's name: the body role, not the label one.
+// the pointer cursor covers exactly what is clickable. Its text is an
+// option, so it takes the body weight.
 
 #{$parent-selector} label {
   &:has([type="checkbox"], [type="radio"]) {
@@ -23,12 +21,10 @@
 }
 
 // A label that opens with its checkbox or radio hangs: the mark sits in the
-// indent and a second line starts under the first word, not under the mark.
-// The indent is the box, its margin and the space after it (about a
-// quarter em in every engine's system face), so the two lines meet within
-// half a pixel. Zero weight, so any rule on a label's padding wins: a
-// segment's own, or a label an author lays out as flex or grid. A switch
-// is wider and keeps its label as it is. See specs/choice-marks.md.
+// indent and a second line starts under the first word. The indent is the
+// box, its margin and the space after it. Zero weight, so a label an author
+// lays out as flex or grid overrides it (reset text-indent there too). A
+// switch keeps its label as it is (specs/choice-marks.md).
 
 #{$parent-selector}
   label:where(
@@ -48,17 +44,10 @@
 #{$parent-selector} [type="radio"] {
   appearance: none;
 
-  // 1.5em = 24px at the default root font size: the WCAG 2.5.8 (AA)
-  // minimum target size, without relying on the adjacent label.
-
-  // The box is the target; the mark is drawn smaller inside it. Drawn edge
-  // to edge, a 24px circle beside 16px text was the largest thing in the
-  // row. The outer 0.125em is a transparent band, part of the target and
-  // not painted, and the edge is an inset ring of the same width and
-  // colour the border had, so every state that rebinds the edge reaches
-  // it. The margin-top centres the mark on the first line's capital
-  // height rather than on its box (measured within 0.1px in three
-  // engines). The switch below draws its own track over all of this.
+  // 1.5em is 24px at the default scale, the WCAG 2.5.8 target without the
+  // label. The mark is drawn smaller inside it: the outer 0.125em is a
+  // transparent band, and the edge is an inset ring the state slots reach.
+  // The negative margin centres the mark on the first line's capitals.
   display: inline-grid;
   grid-template: 100% / 100%;
   place-items: center;
@@ -72,8 +61,7 @@
   vertical-align: middle;
   cursor: pointer;
 
-  // The ring is a shadow, and forced colours removes shadows: the box's
-  // own border carries the edge there, in the system's colours.
+  // Forced colours removes the ring (a shadow); the border carries the edge.
   @media (forced-colors: active) {
     border-color: CanvasText;
   }
@@ -97,17 +85,9 @@
 }
 
 // Checkboxes
-
-// The mark is the icon applied as a mask over --cirth-primary-on-surface, not
-// an SVG with a baked stroke: a data URI cannot read a custom property, so
-// a baked white mark stays white on a light custom accent and disappears.
-// The on-surface token is the one the theme already computes for text on the
-// accent, so the mark follows any retheme.
-
-// Scoped away from [role="switch"]: a switch paints its own thumb through
-// ::before (see below), and a mask set here would cut that thumb to the
-// shape of the mark. Radios are excluded by construction: they draw their
-// dot with a thick border, and this block never reaches them.
+// The mark is masked over --cirth-primary-on-surface, so it follows any
+// retheme (a data URI cannot read a custom property). Switches paint their
+// thumb through ::before, so they are excluded.
 
 #{$parent-selector} [type="checkbox"]:not([role="switch"]) {
   &:checked::before,
@@ -121,8 +101,7 @@
     mask-size: 0.9em auto;
     mask-repeat: no-repeat;
 
-    // Forced colors strips author backgrounds, which would blank the
-    // masked mark; a system color stays visible.
+    // Forced colours strips author backgrounds, which would blank the mark.
     @media (forced-colors: active) {
       background-color: CanvasText;
     }
@@ -142,13 +121,8 @@
   }
 }
 
-// Radios
-
-// Checked is the accent with a dot in the label colour, the family a
-// checked checkbox and an on switch belong to. The dot is the
-// selection's shape, so it does not rest on colour alone, and it is what
-// forced colours keeps. It used to be a ring 0.42em thick around a light
-// centre, which read as a donut.
+// Radios: checked is the accent with a dot in the label colour, so the
+// selection has a shape as well as a colour, which forced colours keeps.
 
 #{$parent-selector} [type="radio"] {
   border-radius: 50%;
@@ -175,11 +149,9 @@
   }
 }
 
-// Hover. Fields answer a pointer and these did not: the edge moves toward
-// the ink by the step a field's edge takes, and the wash a secondary
-// control takes comes up; a checked mark takes the accent's own hover
-// step. A label under the pointer counts as its control. Fine pointers
-// only, as for fields.
+// Hover, for fine pointers: the edge moves toward the ink as a field's does
+// and the secondary wash comes up; a checked mark takes the accent's hover
+// step. A label under the pointer counts as its control.
 
 @media (hover: hover) and (pointer: fine) {
   #{$parent-selector}
@@ -210,15 +182,13 @@
   --cirth-background-color: var(--cirth-switch-background-color);
   --cirth-color: var(--cirth-switch-color);
 
-  // Config
-  // 1.5em tall = 24px at the default root font size (WCAG 2.5.8 minimum
-  // target size); width keeps the original 1.8:1 track proportion
+  // 1.5em tall, the WCAG 2.5.8 target at the default scale, at the original
+  // 1.8:1 track proportion.
   $switch-height: 1.5em;
   $switch-width: 2.7em;
   $switch-transition: var(--cirth-duration-fast) var(--cirth-ease-in-out);
 
-  // Styles. A track, not a mark: no band, no ring, and the thumb laid out
-  // in flow rather than centred.
+  // A track, not a mark: no band, no ring, the thumb laid out in flow.
   display: inline-block;
   width: $switch-width;
   height: $switch-height;
@@ -259,33 +229,23 @@
     }
   }
 
-  // The track takes the disabled wash (forms/_basics.scss); the thumb
-  // takes the disabled ink, since a white thumb on a faint wash is gone.
+  // The track takes the disabled wash (forms/_basics.scss) and the thumb
+  // the disabled ink, since a white thumb would vanish on it.
   &[disabled]::before {
     background-color: var(--cirth-disabled-color);
   }
 }
 
-// Disabled marks. The field rule paints a disabled box with the neutral
-// wash, and a mark or a dot drawn in the on-surface ink (white) would
-// vanish into it: the mark and the ring take the disabled ink instead.
+// Disabled marks take the disabled ink: drawn in the on-surface white, they
+// would vanish into the disabled wash.
 #{$parent-selector} [type="checkbox"]:not([role="switch"]):disabled::before {
   background-color: var(--cirth-disabled-color);
 }
 
-// The focus ring every control draws, 2px from what is drawn: here the
-// band already holds it off the mark. As specific as the field rule it
-// follows, which sets the offset for every input.
-
-// A radio takes the ring on :focus, not only on :focus-visible. WebKit does
-// not match :focus-visible on a radio its arrow keys moved to, so a
-// keyboard user walking a group in Safari lost the ring after the first
-// key; :focus is the one state every engine sets there, and no CSS state
-// tells that focus apart from a pointer's. Keyboard focus wins: in
-// Chromium and Firefox a clicked radio shows the ring too, until focus
-// moves on (WebKit does not focus a radio on click). A checkbox is not
-// walked with arrows, so :focus-visible serves it in every engine.
-// See specs/choice-marks.md.
+// The focus ring every control draws; the band already holds it off the
+// mark. A radio takes it on :focus too: WebKit does not match
+// :focus-visible on a radio its arrow keys moved to, and :focus is the one
+// state every engine sets there (specs/choice-marks.md).
 #{$parent-selector}
   input:is(
     [type="checkbox"]:not([role="switch"]),
@@ -297,8 +257,8 @@
   outline-offset: 0;
 }
 
-// The disabled state paints a separator edge as a border; a mark's edge is
-// its ring, so the ring takes the separator and the band stays clear.
+// A mark's edge is its ring, so the disabled separator edge goes there and
+// the band stays clear.
 #{$parent-selector}
   input:is([type="checkbox"], [type="radio"]):not([role="switch"]):disabled {
   --cirth-border-color: var(--cirth-muted-border-color);
@@ -324,25 +284,6 @@
     &:checked:active,
     &:checked:focus {
       --cirth-background-color: var(--cirth-form-element-valid-border-color);
-    }
-  }
-
-  &:checked,
-  &:checked:active,
-  &:checked:focus {
-    &[aria-invalid="true"] {
-      --cirth-background-color: var(--cirth-form-element-invalid-border-color);
-    }
-  }
-}
-
-#{$parent-selector} [type="checkbox"],
-#{$parent-selector} [type="radio"],
-#{$parent-selector} [type="checkbox"][role="switch"] {
-  &[aria-invalid="false"] {
-    &:checked,
-    &:checked:active,
-    &:checked:focus {
       --cirth-border-color: var(--cirth-form-element-valid-border-color);
     }
   }
@@ -351,6 +292,7 @@
   &:checked:active,
   &:checked:focus {
     &[aria-invalid="true"] {
+      --cirth-background-color: var(--cirth-form-element-invalid-border-color);
       --cirth-border-color: var(--cirth-form-element-invalid-border-color);
     }
   }

@@ -32,9 +32,8 @@
   height: var(--cirth-space-2);
   overflow: hidden;
 
-  // The track is too close to the page background to meet WCAG 1.4.11 on
-  // its own, so a >= 3:1 border marks the component's extent instead
-  // (also replaces the Firefox/Opera default border).
+  // The track alone does not meet WCAG 1.4.11, so a >= 3:1 border marks
+  // the component's extent (and replaces Firefox's default border).
   border: var(--cirth-border-width-1) solid var(--cirth-progress-border-color);
   border-radius: var(--cirth-border-radius);
   background-color: var(--cirth-progress-background-color);

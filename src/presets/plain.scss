@@ -1,18 +1,12 @@
 // Plain preset
 // ––––––––––––––––––––
-// For the project that wants a conventional application look and no
-// decisions: a familiar blue accent, a plain white page, and headings in
-// the same face as the body text. It is deliberately the quietest treatment
-// Cirth ships: neutral surfaces, slightly squarer controls, and fast motion.
-// It is also the shorter half of a worked example. The root block is five
-// declarations: two public colour inputs and three role-level choices. The
-// accent states and the entire surface hierarchy are absent because they
-// derive from --cirth-primary and --cirth-canvas at runtime.
-// See src/presets/material.scss for the other half: a preset that
-// overrides broadly, including derived tokens where it wants to break a
-// relationship on purpose.
-// Import after the main Cirth stylesheet. No @import, no webfont: like the
-// default theme, presets make zero network requests.
+// A conventional application look with no decisions to make: a familiar
+// blue accent, a neutral page, headings in the body face, squarer controls
+// and fast motion. Five declarations: two colour inputs and three roles;
+// the accent states and the surface hierarchy derive from them at runtime.
+// src/presets/material.scss is the opposite case, overriding derived tokens
+// where it wants to break a relationship.
+// Import after the main Cirth stylesheet. No @import and no webfont.
 @use "../helpers/cascade";
 @use "../helpers/selectors";
 
@@ -26,12 +20,9 @@
     // scheme too: no second block, no scheme wiring.
     --cirth-primary: light-dark(oklch(52% 0.17 258deg), oklch(72% 0.13 258deg));
 
-    // A neutral page rather than a tinted one. Cards, fields, code,
-    // dropdowns and popovers keep their surface levels and lose the cast
-    // automatically; no surface role is repeated here. The default theme's
-    // ends at no hue in light and a trace of blue in dark: near white, so
-    // the page reads as paper and the cards as sheets on it, and near
-    // black, so the levels above it read as lifted.
+    // A neutral canvas, near white and near black with a trace of blue in
+    // dark. Every surface level derives from it and loses the default's
+    // tint with it.
     --cirth-canvas: light-dark(oklch(97.8% 0 0deg), oklch(16.5% 0.006 264deg));
 
     // Keep headings in the body face even when the consumer has replaced the
@@ -42,16 +33,14 @@
     // it, so Plain stays square without enumerating containers.
     --cirth-border-radius: var(--cirth-radius-xs);
 
-    // The fifth declaration keeps interaction brisk without changing the
-    // component state model.
+    // Brisk interaction, with the same state model.
     --cirth-transition: var(--cirth-duration-fast) var(--cirth-ease-out);
   }
 
   // Increased contrast (prefers-contrast: more)
-  // The theme's own pass strengthens --cirth-primary, and a preset loaded
-  // afterwards would otherwise win over it unconditionally and hand the
-  // base accent back. Restating the accent here keeps the preference
-  // working: text ink reaches AAA against the surface it sits on.
+  // Loaded after the theme's own pass, the preset would hand the base accent
+  // back, so the strengthened accent is restated: text reaches AAA on the
+  // surface it sits on.
   @media (prefers-contrast: more) {
     @include selectors.theme-roots {
       --cirth-primary: light-dark(
@@ -59,9 +48,8 @@
         oklch(86% 0.09 258deg)
       );
 
-      // Same reason as the theme's own pass: the accent lightens for text,
-      // so the button fill has to be pinned or the white label on it gets
-      // worse instead of better.
+      // The accent lightens for text, so the fill is pinned to keep the
+      // white label above 7:1, as in the theme's own pass.
       --cirth-primary-surface: light-dark(
         oklch(41% 0.17 258deg),
         oklch(42% 0.14 258deg)

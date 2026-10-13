@@ -1,86 +1,40 @@
 // Color scales
 // ––––––––––––––––––––
-// Every oklch() literal consumed by the theme's light/dark schemes (and by
-// _styles.scss for its inline icons), consolidated in one place instead of
-// being redeclared separately wherever they're used.
-// All five scales below (neutral + the four chromatic families) share one
-// 19-step lightness ladder: 950 (darkest) down to 50 (lightest), evenly
-// spaced from 18% to 96%, so picking a step is the same exercise
-// regardless of which family you're in, and there are no gaps: every
+// Every oklch() literal the theme consumes. All five scales share one
+// 19-step lightness ladder, 950 (18%) to 50 (96%), evenly spaced, and every
 // family defines every step.
-// Chroma is derived, not hand-picked. Each chromatic family is pinned to
-// one hue and held at a constant fraction of that hue's own maximum
-// in-gamut sRGB chroma at every lightness step; the fraction follows
-// from the family's role:
-//   - $error-*, $success-*, $warning-* sit at 85%. A status color has to
-//     be recognised at a glance in a small mark: a validation border, a
-//     meter segment, a word of inserted text, and it appears rarely.
-//   - $accent-* sits at 70%. The accent is the opposite case: it covers
-//     whole surfaces (a filled button, a focus ring, a checked control)
-//     and shows up on every screen, so the same 85% that makes a status
-//     mark legible would make the accent the loudest thing on every page.
-//     At 70% a filled button is still the one action on its row without
-//     the hue saturating to the edge of the gamut.
-// Because the sRGB gamut boundary shape differs per hue (e.g. red's
-// ceiling peaks earlier, at a darker lightness, than green's does), the
-// families don't hit peak saturation at the same step: that's the gamut
-// speaking, not an inconsistency. What stays consistent is the method.
-// $neutral-* is derived differently, because it is not an accent. Its
-// chroma is a bell that peaks mid-ladder and fades to nothing at the pale
-// end: a light grey needs more chroma than a dark one to read as tinted
-// rather than as plain grey, and a large pale surface needs none at all:
-// but it does not return to zero at the dark end. It floors at 70% of the
-// peak instead, because the dark scheme's deepest ink, the strong ink of a
-// light page and the shadow colour all come from the two darkest steps,
-// and a bell that closed symmetrically left them achromatic no matter
-// which hue the family was given.
-// The hue is the neutral family's other half. At 120deg it is a grey with
-// a trace of olive, 156deg from the accent's hue and opposite it on both
-// axes of Oklab: green where the accent is red, yellow where it is blue.
-// That is what keeps the accent apart from the neutrals for a reader who
-// loses either axis. At the same lightness the neutral stays 0.121 away
-// from the light accent in Oklab (6 JND) in normal vision and under
-// protanopia, deuteranopia and tritanopia; an achromatic family would
-// stay 0.101 away, and one on the accent's own hue 0.084.
-// Every family is named for the role it plays, not for the hue it happens
-// to be: $error-500 is what most people would call "red", but naming it
-// that way would hide why it's used (invalid form state, deleted/removed
-// text). $accent-* seeds the default of the one accent input,
-// --cirth-primary; $neutral-* carries ink, lines and the secondary
-// controls, and gives both canvases their hue. The accent's hue (324deg)
-// is chosen for the interface, and the brand mark is painted from it by
-// scripts/build-brand-marks.js, not the other way round; renaming or
-// removing a step that script reads fails `npm run check:brand-assets`.
-// specs/default-palette.md records why this hue.
+
+// Chroma is derived: each chromatic family is pinned to one hue and held at
+// a fixed fraction of that hue's maximum in-gamut sRGB chroma at each step.
+// Status families sit at 85%, to be recognised in a small mark; the accent
+// at 70%, because it covers whole surfaces on every screen. The gamut's
+// shape differs per hue, so families peak at different steps.
+
+// The neutral family's chroma is a bell that peaks mid-ladder, fades to
+// nothing at the pale end and floors at 70% of its peak at the dark end, so
+// the deepest inks and the shadow colour keep the family's hue. Its hue,
+// 120deg, sits opposite the accent on both Oklab axes, which keeps accent
+// and neutrals apart under each colour-vision deficiency.
+
+// Families are named for their role, not their hue. The accent's hue
+// (324deg) seeds --cirth-primary; scripts/build-brand-marks.js paints the
+// brand mark from it, and `npm run check:brand-assets` fails if a step it
+// reads is renamed. specs/default-palette.md records why this hue.
 
 // B&W
 $black: oklch(0% 0 0deg);
 $white: oklch(100% 0 0deg);
 
-// The two canvases. Each scheme's page background: white or black pulled
-// faintly toward the neutral family's hue (120deg), far short of a tint,
-// so every surface derived from it above and below keeps one temperature
-// in both schemes, and the accent's hue is left to action and position.
-// Off the 19-step ladder on purpose: they are surface colors, not scale
-// steps, and the ladder does not reach far enough toward either end.
-// Their lightness is set by what the page should be, and the levels
-// around them follow it. The light canvas is near white, so the page reads
-// as paper rather than as a grey: at 96% it did, whatever its ratios said.
-// That leaves the raised level (a card) 0.019 of lightness above it, which
-// its contact shadow and its edge complete, and the recessed level (code,
-// a specimen well) 0.04 below it. The dark canvas is near black, so the
-// levels above it have room to read as lifted: at L 0.202 the page was a
-// lit room and a card a slightly different grey. Its chroma is about half
-// the ladder's floor, enough to keep the family's hue without the page
-// reading as a dark olive. Every text token keeps >= 4.5:1 on all four
-// levels in both schemes. See specs/surface-depth.md for the tables.
-// Chroma stays low deliberately: the canvas is the ground and the accent
-// the signal on it, not a wash across everything.
+// The two canvases: white and black pulled faintly toward the neutral hue,
+// so every surface derived from them keeps one temperature and the accent's
+// hue is left to action and position. Off the ladder on purpose: they are
+// surfaces, and the ladder does not reach far enough toward either end.
+// Every text token keeps >= 4.5:1 on all four surface levels in both
+// schemes (specs/surface-depth.md).
 $canvas-light: oklch(97.8% 0.003 120deg);
 $canvas-dark: oklch(16.5% 0.012 120deg);
 
-// Neutral: ink, lines, secondary controls, and the canvases' hue. Faintly
-// olive, opposite the accent on both axes; see the derivation note above.
+// Neutral: ink, lines, secondary controls, and the canvases' hue.
 $neutral-950: oklch(18% 0.022 120deg);
 $neutral-900: oklch(22.3% 0.023 120deg);
 $neutral-850: oklch(26.7% 0.025 120deg);
@@ -124,11 +78,9 @@ $accent-100: oklch(91.7% 0.05 324deg);
 $accent-50: oklch(96% 0.024 324deg);
 
 // Error (invalid form state, deleted/removed text)
-// 26deg sits 62deg from the accent's hue, and the distance is the point:
-// a destructive action and a primary one share a page, and the palette
-// has to keep them apart without either of them raising its voice.
-// scripts/check-accent-distance.js fails the tooling check if an accent,
-// shipped or preset, comes within 20deg of the error input.
+// 62deg from the accent's hue, so a destructive and a primary action stay
+// apart on one page. scripts/check-accent-distance.js fails if an accent,
+// shipped or preset, comes within 20deg of it.
 $error-950: oklch(18% 0.062 26deg);
 $error-900: oklch(22.3% 0.077 26deg);
 $error-850: oklch(26.7% 0.092 26deg);

@@ -43,11 +43,9 @@
 
 /* cirth-component:start */
 
-// Emphasis is one step, semibold, and never lighter than the text it
-// sits in. `bolder` jumped 400 to 700 in a paragraph and 650 to 900 in a
-// heading; the role slot (--cirth-font-weight) is what the surrounding text
-// is set in, so the larger of the two keeps a <strong> in a heading at the
-// heading's weight.
+// Emphasis is one step, semibold, and never lighter than the text around
+// it: the role slot carries that text's weight, so a <strong> in a heading
+// keeps the heading's weight.
 
 #{$parent-selector} :is(b, strong) {
   font-weight: max(
@@ -57,8 +55,8 @@
 }
 
 // No flow element carries a margin of its own: the space between two of
-// them is their relation's (content/_flow.scss). The reset weighs nothing,
-// so those relations, later in the sheet, set the space.
+// them is their relation's (content/_flow.scss). Zero weight, so those
+// relations, later in the sheet, win.
 
 #{$parent-selector}
   :where(
@@ -143,10 +141,7 @@
   --cirth-color: var(--cirth-h6-color);
 }
 
-// Heading group
-
-// A heading group is one unit: its title and subtitle sit together, with
-// none of the line a heading keeps under it elsewhere.
+// Heading group: title and subtitle sit together as one unit.
 
 #{$parent-selector} hgroup {
   > * {
@@ -161,17 +156,14 @@
   }
 }
 
-// Margin-top for nested lists
+// Nested lists
 
 // 1. Remove the margin on nested lists in Chrome, Edge, IE, and Safari
 
-// A nested list belongs to the item it sits in: a line above it, and
-// nothing below, so the next parent item is as close as a sibling (gh#76).
-// :is(), not :where(): it has to outrank the zero-weight flow relations,
-// which would otherwise give a nested list after a paragraph in its item
-// the element step. Components that style their own nested lists (nav,
-// dropdown) still win: they either match this specificity later in the
-// sheet or exceed it.
+// A nested list belongs to its item: a line above it and nothing below
+// (gh#76). :is(), not :where(), to outrank the zero-weight flow relations;
+// navs and dropdowns style their own nested lists at equal or higher
+// weight.
 
 #{$parent-selector} :is(dl, ol, ul) :is(dl, ol, ul) {
   margin: 0; // 1
@@ -182,19 +174,8 @@
   list-style: square;
 }
 
-// Description lists
-
-// The last content element still arriving with the user agent's own idea
-// of itself. <dd> kept a 40px indent that is a browser default rather than
-// a typographic decision; <dt> read at exactly the weight of the <dd>
-// under it, so the pairing was invisible; and consecutive pairs ran
-// together with no rhythm between them. Against cirth.css alone a <dl> was
-// the one thing on the page that still looked like unstyled HTML, in a
-// framework whose claim is that native elements arrive finished. Order
-// metadata, product specs, a detail panel, a glossary: every application
-// has one.
-
-// A term names what follows it: the label role's weight at body size.
+// Description lists: a term takes the label weight, a description loses
+// the browser's 40px indent.
 
 #{$parent-selector} dt {
   font-weight: var(--cirth-font-weight-medium);
@@ -204,18 +185,10 @@
   margin-inline-start: 0;
 }
 
-// Rhythm between pairs, not inside them.
-
-// Only the flat dt/dd sequence, which is the shape a <dl> has in running
-// prose. HTML also lets a <div> wrap each pair, and that wrapper exists
-// precisely so the author can lay the pairs out, in practice by making
-// the <dl> a grid, which is also what this framework recommends (.grid
-// plus a <dl>, rather than a column component nobody asked for). A
-// framework margin on that box would land on grid items and pull every
-// cell after the first out of alignment with the first, so it would have
-// to be undone before the wrapper could be used for the one thing it is
-// for. The elements inside it are styled either way; the box is the
-// author's.
+// Rhythm between pairs, not inside them, and only in the flat dt/dd
+// sequence: a <div> around each pair exists so the author can lay the pairs
+// out (a `.grid` <dl>), and a margin there would misalign every cell after
+// the first.
 
 #{$parent-selector} dl > dd + dt {
   margin-top: var(--cirth-flow-line);

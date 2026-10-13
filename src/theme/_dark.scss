@@ -35,24 +35,12 @@
   --cirth-warning-surface: oklch(from var(--cirth-warning) 35.3% 0.063 h);
 
   // Primary colors
-  // --cirth-primary is the input. Everything below derives from it, so
-  // setting that one token rethemes the whole accent: hover, focus, the
-  // underline tint and the fill follow without being restated. Both fill
-  // ratios are bounded by the same constraint: they have to keep white
-  // legible on the fill when --cirth-primary is replaced by the shipped
-  // Plain value or by the documented custom blue, which are lighter than
-  // the default accent and so darken less for the same ratio. Raising the
-  // resting one to land on a ladder step drops Plain's on-surface ink to
-  // 4.36:1, under AA: that is why it is not a round number. Override any
-  // derived token directly if you want to break the relationship.
-
-  // The input is not also a component role. Keeping the alias explicit lets
-  // consumers retune the accent once while components say what they need.
-  // The text role holds the accent's lightness at 0.72 or above, which is
-  // what keeps 4.5:1 on the overlay, the lightest level in this scheme, for
-  // any accent. The shipped accent (L 0.613) reads 3.42:1 there unlifted;
-  // lifting the text rather than darkening the overlay keeps the levels
-  // from being tuned to it.
+  // Both fill ratios keep white legible on the fill when --cirth-primary is
+  // the Plain preset's or the documented custom blue, which are lighter
+  // than the default and darken less for the same ratio; a round ratio
+  // drops Plain's label to 4.36:1. The text role holds the accent's
+  // lightness at 0.72 or above, which keeps 4.5:1 on the overlay, the
+  // lightest level here, for any accent.
   --cirth-primary-text: oklch(from var(--cirth-primary) max(l, 0.72) c h);
   --cirth-primary-surface: color-mix(
     in oklch,
@@ -65,10 +53,8 @@
     from var(--cirth-primary) calc(l * 1.124) calc(c * 1.132) h
   );
 
-  // Keep the filled control's white on-surface ink above AA when the primary is
-  // replaced by the shipped Plain value or by the documented custom blue.
-  // Darkening on hover also matches the light scheme's direction instead of
-  // making the interactive state the lowest-contrast member of the family.
+  // Hover darkens, as in the light scheme, and keeps the white label above
+  // AA for the same lighter accents.
   --cirth-primary-surface-active: color-mix(
     in oklch,
     var(--cirth-primary) 72%,
@@ -80,24 +66,18 @@
   // Opaque, from the text role; see theme/_light.scss.
   --cirth-primary-focus: var(--cirth-primary-text);
 
-  // Text selection ; see theme/_light.scss for why this is derived rather
-  // than pinned. The accent already sits high on the ladder in this scheme,
-  // so the lift is small and the alpha carries the rest.
+  // The accent already sits high on the ladder here, so the lift is small
+  // and the alpha carries the rest.
   --cirth-text-selection-color: oklch(
     from var(--cirth-primary) calc(l * 1.065) c h / 18.75%
   );
 
-  // Explicit for the same contrast reason recorded in theme/_light.scss:
-  // the current browser floor cannot derive a reliable light-or-dark choice.
+  // Explicit, as in theme/_light.scss.
   --cirth-primary-on-surface: #{$white};
 
-  // Surface levels, as in theme/_light.scss, with the direction a dark
-  // interface reads elevation in: every level above the canvas is lighter,
-  // and the overlay has room to rise past the raised level instead of
-  // sharing it. The canvas is near black, so the steps can be wide enough
-  // to read as lifted: a card 0.06 above it, a menu or a dialog 0.11, code
-  // 0.04 below. Hue and chroma are the canvas's own, so plain stays neutral
-  // and material keeps its violet without restating a scale.
+  // Surface levels, as in theme/_light.scss, lighter with each step up: a
+  // card 0.06 above the canvas, a menu or a dialog 0.11, code 0.04 below.
+  // Hue and chroma are the canvas's own, so a preset keeps its tint.
   --cirth-surface-recessed: oklch(from var(--cirth-canvas) calc(l - 0.04) c h);
   --cirth-surface-raised: oklch(from var(--cirth-canvas) calc(l + 0.06) c h);
   --cirth-surface-overlay: oklch(from var(--cirth-canvas) calc(l + 0.11) c h);
@@ -111,9 +91,9 @@
   --cirth-modal-background-color: var(--cirth-surface-overlay);
 
   // Edge roles, as in theme/_light.scss, lightened from the canvas. The
-  // control edge clears 3:1 against the overlay, the lightest level here
-  // (3.53:1), and reads 4.61:1 on the canvas. The separator is 0.15 above
-  // the canvas so that it still divides on the overlay, 0.04 below it.
+  // control edge clears 3:1 on the overlay, the lightest level (3.53:1), and
+  // reads 4.61:1 on the canvas. The separator is 0.15 above the canvas so it
+  // still divides on the overlay.
   --cirth-muted-border-color: oklch(
     from var(--cirth-canvas) calc(l + 0.15) c h
   );
@@ -138,8 +118,8 @@
   --cirth-contrast-border-active: var(--cirth-contrast-surface-active);
   --cirth-contrast-underline-active: var(--cirth-contrast-active);
 
-  // Highlighted text (<mark>): same semantic relationship as light, with
-  // enough accent in the mix to remain visible on the dark canvas.
+  // Highlighted text (<mark>): enough accent in the mix to stay visible on
+  // the dark canvas.
   --cirth-mark-background-color: color-mix(
     in oklab,
     var(--cirth-primary) 24%,
@@ -154,14 +134,9 @@
   --cirth-blockquote-border-color: var(--cirth-muted-border-color);
   --cirth-blockquote-footer-color: var(--cirth-muted-color);
 
-  // Button
-  // To disable box-shadow, remove the var or set to '0 0 0 rgba(0, 0, 0, 0)'
+  // Button shadows: set a zero shadow, not `none`, to disable them.
   --cirth-button-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
   --cirth-button-hover-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
-
-  // Button
-  // To disable box-shadow, remove the var or set to '0 0 0 rgba(0, 0, 0, 0)'
-  // Don't use, 'none, 'false, 'null', '0', etc.
 
   // A table's rules divide rows, which is the separator's job.
   --cirth-table-border-color: var(--cirth-muted-border-color);
@@ -173,11 +148,7 @@
   --cirth-code-kbd-color: var(--cirth-background-color);
   --cirth-form-element-placeholder-color: var(--cirth-muted-color);
 
-  // A field's focus ring is the same opaque ring a button draws, held off
-  // the edge by --cirth-outline-offset: the gap, not a translucency, is
-  // what keeps a ring distinct from the edge it surrounds. A validation
-  // state rebinds this slot on the field (forms/_basics.scss), so its
-  // ring is always the colour of its edge.
+  // A field's focus ring, as in theme/_light.scss.
   --cirth-form-element-focus-color: var(--cirth-primary-focus);
   --cirth-form-element-invalid-border-color: var(--cirth-error-border);
   --cirth-form-element-invalid-focus-color: var(
@@ -190,10 +161,8 @@
   --cirth-switch-thumb-box-shadow: 0 0 0 rgb(0 0 0 / 0%);
   --cirth-switch-checked-background-color: var(--cirth-primary-surface);
 
-  // Thumb matches button text color rather than a hardcoded white ; see
-  // the matching comment in _light.scss. Verified >= 3:1 (WCAG 1.4.11):
-  // 3.73:1 unchecked (white on the control edge), 7.75:1 checked (white
-  // on the derived primary fill).
+  // The thumb clears 3:1 (WCAG 1.4.11) on both tracks: 3.73:1 unchecked,
+  // 7.75:1 checked.
   --cirth-switch-color: var(--cirth-primary-on-surface);
   --cirth-range-thumb-border-color: var(--cirth-background-color);
   --cirth-range-thumb-color: var(--cirth-secondary-text);
@@ -214,36 +183,23 @@
     );
   }
 
-  // Loading ([aria-busy=true])
-
   // Modal (<dialog>)
   --cirth-modal-overlay-background-color: #{functions.with-var-alpha(
       color.mix($black, $neutral-950, $method: oklab),
       var(--cirth-opacity-overlay)
     )};
 
-  // Meter (<meter>)
-  // Same three readings, and the same trick inverted: on a dark track the
-  // weight has to come from lightness, so each step down the scale is a
-  // *lighter* color. 6.44:1, 7.09:1, 11.05:1 against the track
-  // (WCAG 1.4.11).
+  // Meter (<meter>): on a dark track the weight comes from lightness, so
+  // each step down the scale is lighter. 6.44:1, 7.09:1 and 11.05:1 against
+  // the track (WCAG 1.4.11).
   --cirth-meter-optimum-color: var(--cirth-success);
   --cirth-meter-suboptimum-color: var(--cirth-warning);
   --cirth-meter-even-less-good-color: var(--cirth-error);
 
-  // Progress is part of the active-control language, not a brand specimen.
-  // Following the public primary keeps Plain, Material and custom themes
-  // recognisable as the same framework without leaking the default accent.
+  // Progress follows the accent's text role, as an active control does.
   --cirth-progress-color: var(--cirth-primary-text);
 
-  // Icons painted as background-image on replaced form controls. They
-  // live in the scheme rather than at the root because a data URI cannot
-  // read a custom property: the only way their colour can follow the
-  // theme is to bake one per scheme. The value tracks --cirth-muted-color
-  // above, so they match the masked chevrons in the accordion and the
-  // dropdown, which take that token directly. A consumer who rethemes
-  // past the shipped schemes has to re-emit these four: that is what the
-  // theme generator (gh#90) is for.
+  // Icons baked per scheme, as in theme/_light.scss.
   --cirth-icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-400)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   --cirth-icon-date: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-400)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
   --cirth-icon-time: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-400)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpolyline points='12 6 12 12 16 14'%3E%3C/polyline%3E%3C/svg%3E");
@@ -253,8 +209,7 @@
   --cirth-icon-valid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($success-250)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
   --cirth-icon-invalid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($error-250)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cline x1='12' y1='8' x2='12' y2='12'%3E%3C/line%3E%3Cline x1='12' y1='16' x2='12.01' y2='16'%3E%3C/line%3E%3C/svg%3E");
 
-  // Loading icon (animated)
-  // Change the icon color to black for .contrast buttons
+  // The spinner on a .contrast button is drawn black.
   @if $enable-classes {
     [aria-busy="true"]:not(input, select, textarea) {
       &.contrast:is(

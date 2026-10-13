@@ -9,103 +9,65 @@
    */
 
 // Every token whose light and dark values are both plain colours, stated
-// once as a light-dark() pair instead of twice. These are the inputs: the
-// accent, the status anchors, the canvas and the ink, plus the neutrals
-// the rest of the palette leans on. The scheme difference for one token is
-// now one line, with both values side by side, rather than the same name
-// in two files kept in step by hand.
-// It also settles what a consumer override means. A rule like
+// once as a light-dark() pair: the inputs (accent, status anchors, canvas,
+// ink) and the neutrals the rest of the palette leans on.
+
+// A consumer override such as
 //   :root { --cirth-primary: rebeccapurple; }
-// replaces the pair outright, so it holds in both schemes and reaches into
-// any subtree that forces one. Until 2026-08-25 the scheme blocks
-// redeclared these on the [data-theme] element, and a declaration made on
-// an element beats one inherited from an ancestor at any specificity, so
-// the same override stopped at the edge of a forced-scheme subtree, and
-// the docs had to tell people to repeat it. To vary a token by scheme, a
-// consumer now writes the pair:
+// replaces the pair, so it holds in both schemes and reaches into subtrees
+// that force one. To vary a token by scheme, write the pair:
 //   :root { --cirth-primary: light-dark(#2563eb, #93c5fd); }
-// Why this is safe where hoisting a var() alias is not: a custom property
-// whose value is a var() reference is substituted at computed-value time
-// on the element that declares it, so an alias moved to the root freezes
-// to the root's scheme. A custom property holding light-dark() carries an
-// unresolved token stream, resolved wherever the token is *used*, against
-// that element's color-scheme. Verified in Chromium, Firefox and WebKit,
-// including a light subtree nested inside a dark one.
-// This only works if light-dark() survives the build. Lightning CSS
-// compiles it away for targets below its floor, and its emulation does not
-// reproduce the semantics: scripts/process-css.js fails the build if that
-// ever happens, and scripts/check-browserslist.js forbids the family that
-// used to cause it.
-// What stays in the scheme files, and why:
-//   - derived tokens, because their formula differs by scheme, not just
-//     their value, and they still follow an override, since they read
-//     var(--cirth-primary) resolved on the element they land on;
-//   - aliases, because of the substitution rule above;
-//   - icons, because a data URI cannot derive;
-//   - color-scheme itself, which is what makes every pair below resolve.
+// A custom property holding light-dark() carries an unresolved token
+// stream, resolved where it is used against that element's color-scheme;
+// a var() alias, by contrast, is substituted where it is declared.
+
+// light-dark() must survive the build: scripts/process-css.js fails if it
+// is compiled away, and scripts/check-browserslist.js guards the targets.
+
+// The scheme files keep what cannot live here: derived tokens whose formula
+// differs by scheme, aliases (which must re-resolve per scheme), icons (a
+// data URI cannot derive) and color-scheme itself.
 
 @include selectors.root {
-  // The page surface, as an input of its own. --cirth-background-color is
-  // the slot components rebind (a button paints its own fill through it),
-  // so anything that needs to refer to *the page* (an outline button
-  // wanting an opaque background, a hover tint mixing toward it) needs a
-  // name the components are not allowed to shadow. That is this one.
+  // The page surface, under a name no component rebinds. Use it wherever
+  // something has to mean the page (--cirth-background-color is a slot a
+  // button paints its own fill through).
   --cirth-canvas: light-dark(#{$canvas-light}, #{$canvas-dark});
 
-  // The page ink, as an input of its own: the exact twin of --cirth-canvas
-  // above, and for the same reason. --cirth-color is the slot a component
-  // rebinds: a <button> sets it to the on-surface ink its filled surface
-  // needs, a link sets it to the accent, an <input> to the field ink. Every
-  // one of those shadows the page role for the whole subtree, so anything
-  // that needs to mean *the page's ink*: a custom control built on
-  // <button>, a badge inside a link, a masked glyph that cannot use
-  // currentColor, needs a name components are not allowed to rebind.
-  // That is this one. --cirth-contrast-text is not it: that is maximum-contrast
-  // ink, the .contrast variant's role, not body ink.
+  // The page ink, under a name no component rebinds: --cirth-color is a slot
+  // a button, a link or a field shadows for its whole subtree. Not
+  // --cirth-contrast-text, which is maximum-contrast ink.
   --cirth-ink: light-dark(#{$neutral-750}, #{$neutral-200});
 
   // Text color
   --cirth-color: var(--cirth-ink);
 
   // Muted ink: metadata, placeholders, the quietest text that still has to
-  // be read. The step is chosen against the worst surface level in each
-  // scheme, not against the canvas: the recessed level in light (5.21:1)
-  // and the overlay in dark (5.37:1). One step weaker fails there in light
-  // (4.30:1) and only just holds in dark (4.56:1).
+  // be read. Chosen against the worst surface level in each scheme: 5.21:1
+  // on the recessed level in light, 5.37:1 on the overlay in dark.
   --cirth-muted-color: light-dark(#{$neutral-600}, #{$neutral-350});
 
-  // Status colours
-  // Three inputs (error, success and warning) each driving four roles.
-  // Setting one input rethemes every status treatment that reads from it:
-  // the solid fill a meter paints, the ink <del>/<ins> use, the border a
-  // field takes when it validates, and the surface status content sits on. The
-  // status hues are deliberately not fixed constants: a theme whose brand
-  // overlaps a conventional status hue is expected to move them (see
-  // gh#84). The default keeps error a full 62deg off the accent's hue for
-  // exactly that reason ; see the note in theme/_colors.scss.
+  // Status colours: three inputs, each driving the fill, ink, edge and
+  // surface of its treatments. A theme whose brand overlaps a status hue is
+  // expected to move them (gh#84); the default keeps error 62deg from the
+  // accent (theme/_colors.scss).
   --cirth-error: light-dark(#{$error-700}, #{$error-200});
   --cirth-success: light-dark(#{$success-500}, #{$success-400});
   --cirth-warning: light-dark(#{$warning-550}, #{$warning-350});
 
   // Primary colors
-  // --cirth-primary is the input. Everything below derives from it, so
-  // setting that one token rethemes the whole accent: hover, focus, the
-  // underline tint and the fill follow without being restated. Override
-  // any derived token directly if you want to break the relationship on
-  // purpose.
-  // The dark anchor is 450, one step lighter than the light 500. It is
-  // never set as text on its own: the text role lifts it to L 0.72
-  // (theme/_dark.scss), where it reads 5.24:1 on the overlay, the lightest
-  // level, and the fill mixes it toward black, where a white label reads
-  // 7.75:1. Unlifted it would read 4.33:1 on the canvas and 3.42:1 on the
-  // overlay.
+  // --cirth-primary is the input; every accent role derives from it, so one
+  // token rethemes hover, focus, the underline and the fill. Override a
+  // derived token directly to break the relationship on purpose.
+  // The dark anchor is one step lighter than the light one. It is never set
+  // as text on its own: the text role lifts it to L 0.72 (theme/_dark.scss)
+  // and the fill mixes it toward black.
   --cirth-primary: light-dark(#{$accent-500}, #{$accent-450});
 
-  // Secondary colors. This is the neutral family, not another input graph:
-  // its fixed scale keeps the public runtime relationships concentrated on
-  // primary, status, and surfaces. The text sits one step stronger than the
-  // muted ink, so a secondary action never reads as metadata, and the
-  // active step one further again.
+  // Secondary colors: the neutral family on a fixed scale, so the runtime
+  // relationships stay concentrated on primary, status and surfaces. The
+  // text sits one step stronger than the muted ink, so a secondary action
+  // never reads as metadata.
   --cirth-secondary-text: light-dark(#{$neutral-650}, #{$neutral-300});
   --cirth-secondary-underline: light-dark(
     #{color.change($neutral-650, $alpha: 0.5)},
@@ -113,28 +75,21 @@
   );
   --cirth-secondary-active: light-dark(#{$neutral-750}, #{$neutral-200});
 
-  // The secondary button is tonal: a wash of the page ink over whatever
-  // surface it sits on, with the ink as its label. The filled neutral it
-  // replaces outweighed the primary on the light canvas (5.99:1 against
-  // 5.18:1); a wash reads as a control at about 1.2:1 and never competes
-  // with the fill. Translucent on purpose, so it composites over a card,
-  // a band or a dialog without being told which. The same formula holds in
-  // both schemes, so it is stated once here. See specs/control-emphasis.md.
+  // The secondary button is tonal: a wash of the page ink over whatever it
+  // sits on, translucent so it composites over a card, a band or a dialog,
+  // and never competes with the primary fill (specs/control-emphasis.md).
   --cirth-secondary-surface: oklch(from var(--cirth-ink) l c h / 9%);
   --cirth-secondary-surface-active: oklch(from var(--cirth-ink) l c h / 14%);
   --cirth-secondary-on-surface: var(--cirth-ink);
   --cirth-secondary-border: transparent;
   --cirth-secondary-border-active: transparent;
 
-  // Focus colours are the family's text, opaque. A translucent ring's
-  // contrast depends on what it lands on; a text role already keeps 4.5:1
-  // on every surface level, so the ring keeps 3:1 wherever it is drawn.
+  // Focus colours are the family's opaque text role, which keeps 4.5:1 on
+  // every surface level, so the ring keeps 3:1 wherever it is drawn.
   --cirth-secondary-focus: var(--cirth-secondary-text);
 
   // Disabled is a state, not a transparency: a faint wash of the ink and a
-  // label at half of it, the same whatever the variant was. Nothing is
-  // composited at an opacity, so no accent turns into a paler colour of
-  // its own; there is no accent left to change.
+  // label at half of it, whatever the variant was.
   --cirth-disabled-surface: oklch(from var(--cirth-ink) l c h / 6%);
   --cirth-disabled-color: oklch(from var(--cirth-ink) l c h / 50%);
 
@@ -150,52 +105,35 @@
   --cirth-contrast-focus: var(--cirth-contrast-text);
   --cirth-contrast-on-surface: light-dark(#{$white}, #{$black});
 
-  // The label on a .danger button. Its fill is the error input in light and
-  // a deeper mix of it in dark (content/_button.scss), dark enough in both
-  // for white; a theme whose error is light enough to need dark ink says so
-  // here. Not the primary's label: a theme that darkens that one for a
-  // light accent leaves this fill as deep as it was (specs/fill-labels.md).
+  // The label on a .danger button. Its fill is dark enough for white in both
+  // schemes (content/_button.scss); a theme whose error needs dark ink says
+  // so here (specs/fill-labels.md).
   @if $enable-classes {
     --cirth-danger-on-surface: #{$white};
   }
 
-  // Visited links: the accent drained to neutral, so a followed link reads
-  // as spent without leaving the palette. A step darker than
-  // --cirth-secondary-text so the two aren't the same colour by accident.
-  // Drained means *achromatic*, not "the grey from the neutral scale".
-  // The neutral scale's own steps carry its olive tint, which next to the
-  // accent is a hue change at almost the same lightness: the weakest
-  // possible way to say "you have been here". Zero chroma says it with the
-  // one channel that is unambiguous. Lightness is unchanged, so is the
-  // contrast: 5.77:1 on the canvas, 6.37:1 on a card (WCAG 1.4.3 AA).
+  // Visited links: the accent drained to zero chroma, so a followed link
+  // reads as spent through the one unambiguous channel. A step darker than
+  // --cirth-secondary-text; 5.77:1 on the canvas, 6.37:1 on a card.
   --cirth-link-visited-color: light-dark(
     #{color.change($neutral-600, $chroma: 0)},
     #{color.change($neutral-400, $chroma: 0)}
   );
 
-  // Box shadow: the overlay elevation (dialog, popover, dropdown). The
-  // light half is the deepest neutral, not a pale grey: a shadow is read as
-  // a lightness step against what it falls on, and a pale one on a
-  // near-white page is a step nobody sees. The dark half is black: on a
-  // near-black page any colour lighter than black leaves the shadow no
-  // room to be seen.
+  // Box shadow: the overlay elevation (dialog, popover, dropdown). A shadow
+  // reads as a lightness step, so the light half is the deepest neutral and
+  // the dark half black.
   --cirth-box-shadow: #{functions.shadow($neutral-950, $black)};
 
-  // Card shadow: the raised elevation, one contact layer. A card is a
-  // sheet on the page, not a floating one; this is the faint depth that
-  // separates a near-white sheet from a near-white page beside its edge.
-  // Its own token, so turning the overlay shadow off leaves it alone.
+  // Card shadow: the raised elevation, one contact layer. Its own token, so
+  // turning the overlay shadow off leaves it alone.
   --cirth-card-box-shadow: #{functions.raised-shadow($neutral-950, $black)};
 
-  // Typography
-  // Four ink steps with named jobs: strong for the heading, title and
-  // group roles, the body ink for text and code, the secondary text for
-  // secondary actions, the muted ink for metadata. Strong is the deepest
-  // step short of black: a page of prose is not a poster. The heading
-  // tokens alias a role rather than fading over six steps: h1 to h4 are
-  // headings and titles, h5 and h6 sit at body size, where the strong ink
-  // is too little to tell them from bold text and the body ink reads as
-  // what they are.
+  // Typography: four ink steps. Strong for headings, titles and group
+  // labels; the body ink for text and code; the secondary text for
+  // secondary actions; the muted ink for metadata. h5 and h6 sit at body
+  // size, where the strong ink would not tell them from bold text, so they
+  // take the body ink.
   --cirth-ink-strong: light-dark(#{$neutral-900}, #{$neutral-50});
   --cirth-h1-color: var(--cirth-ink-strong);
   --cirth-h2-color: var(--cirth-ink-strong);
@@ -205,10 +143,8 @@
   --cirth-h6-color: var(--cirth-ink);
   --cirth-mark-color: light-dark(#{$neutral-950}, #{$white});
 
-  // Code ink: the body ink. Code in a document is content, and the muted
-  // ink it used to take told the reader it mattered less than the sentence
-  // around it; the code face alone says what it is. Its surface is the
-  // recessed level, derived in the scheme mixins.
+  // Code is content, so it takes the body ink; the code face says what it
+  // is. Its surface, the recessed level, is derived in the scheme mixins.
   --cirth-code-color: var(--cirth-ink);
 
   // Form elements
@@ -217,7 +153,7 @@
     #{$neutral-800}
   );
 
-  // The field's ink. Its edge is one of the three edge roles derived from
-  // the canvas in the scheme mixins, alongside the surface levels.
+  // The field's ink. Its edge is derived from the canvas in the scheme
+  // mixins.
   --cirth-form-element-color: light-dark(#{$neutral-850}, #{$neutral-100});
 }

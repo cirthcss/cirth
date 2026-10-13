@@ -17,14 +17,11 @@
       minmax(min(100%, var(--cirth-grid-min-column)), 1fr)
     );
 
+    // Cells shrink below their content instead of overflowing, and the
+    // container owns the space between them: a flow relation would offset
+    // every cell after the first (upstream #738).
     & > * {
-      min-width: 0; // HACK for children in overflow
-    }
-
-    // The grid owns the space between its cells: the gap, on both axes.
-    // A flow relation between two cells would add to it and offset every
-    // cell after the first (upstream #738).
-    & > * {
+      min-width: 0;
       margin-block: 0;
     }
   }

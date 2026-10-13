@@ -18,13 +18,11 @@
       grid-template-columns: repeat(auto-fit, minmax(0%, 1fr));
     }
 
+    // Cells shrink below their content instead of overflowing, and the
+    // container owns the space between them: a flow relation would offset
+    // every cell after the first (upstream #738).
     & > * {
-      min-width: 0; // HACK for children in overflow
-    }
-
-    // The row owns the space between its columns: a flow relation between
-    // two of them would offset every column after the first (upstream #738).
-    & > * {
+      min-width: 0;
       margin-block: 0;
     }
   }

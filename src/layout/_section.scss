@@ -5,9 +5,6 @@
    */
 
 // A section carries no margin of its own. The space before one is its
-// relation's (content/_flow.scss): the section step after any block, the
-// chapter step between the top-level sections of <main>. Those rules weigh
-// nothing, so a composition of full-bleed bands that wants no gap opts out
-// in one declaration at any specificity (`.landing :where(section)
-// { margin: 0 }`), which is what this project's own front page does. See
-// docs/src/pages/layout/section.md.
+// relation's (content/_flow.scss); those rules weigh nothing, so a page of
+// full-bleed bands opts out with `.landing :where(section) { margin: 0 }`
+// at any specificity.

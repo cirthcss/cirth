@@ -20,10 +20,8 @@
 #{$parent-selector} code,
 #{$parent-selector} kbd,
 #{$parent-selector} samp {
-  // The code face is set a step smaller than the text around it, so that
-  // its larger x-height does not outweigh the sentence, but never under
-  // the 12px reading floor: in a 13px meta line (a caption, a column
-  // head) 0.875em alone came out at 11.4px.
+  // A step smaller than the text around it, so the code face's larger
+  // x-height does not outweigh the sentence, but never under 12px.
   font-size: max(0.875em, var(--cirth-font-size-xs)); // 2
   font-family: var(--cirth-font-family); // 1
 }
@@ -54,11 +52,8 @@
   font-weight: var(--cirth-font-weight);
 }
 
-// Code in a sentence is text in the code face: no box, no padding, the
-// body's ink and the body's line. The chip it used to sit in broke the
-// rhythm of every line that held one, and its lighter ink said the code
-// mattered less than the sentence around it. A long URL, token or hash
-// still breaks inside the line instead of widening the document.
+// Code in a sentence is text in the code face: no box, the body's ink and
+// line. A long URL, token or hash breaks inside the line.
 #{$parent-selector} code,
 #{$parent-selector} samp {
   overflow-wrap: anywhere;
@@ -74,8 +69,8 @@
   overflow-wrap: anywhere;
 }
 
-// The block listing: the recessed surface level, framed by the
-// container edge.
+// The block listing: the recessed surface level, framed by the container
+// edge.
 #{$parent-selector} pre {
   display: block;
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
@@ -84,10 +79,8 @@
   line-height: initial;
   overflow-x: auto;
 
-  // The block above is the deliberately scrollable one, which makes it a
-  // scroll container an author must expose to the keyboard. Same reason
-  // as .overflow-auto in layout/_overflow-auto.scss: ship the ring with
-  // the container instead of leaving every page to add it back.
+  // A scrolling listing needs `tabindex="0"` to be keyboard operable, so it
+  // ships with the framework's focus ring, like .overflow-auto.
   &:focus-visible {
     outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
   }
@@ -109,8 +102,8 @@
   vertical-align: baseline;
 }
 
-// var: a variable within running text: monospace and italic like code,
-// but without the chip background (upstream #696)
+// A variable in running text: the code face in italic, without a box
+// (upstream #696).
 
 #{$parent-selector} var {
   color: var(--cirth-code-color);

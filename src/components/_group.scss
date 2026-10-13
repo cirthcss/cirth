@@ -4,13 +4,13 @@
 
 $visible-group-item: ':not([hidden], input[type="hidden"])';
 
-// Hidden metadata remains in the DOM child order, so group boundaries use
-// :nth-child(... of ...) to find the first and last rendered participants.
-
 /**
    * Group (.group in the classes build, [role="group"]:not(fieldset) in
-   * the classless build ; see $group-selector in config; [role="search"])
+   * the classless build, see $group-selector in config; [role="search"])
    */
+
+// Hidden metadata stays in the child order, so the group's ends are found
+// with :nth-child(... of ...) among the rendered members.
 
 #{$parent-selector} [role="search"],
 #{$parent-selector} #{$group-selector} {
@@ -23,9 +23,8 @@ $visible-group-item: ':not([hidden], input[type="hidden"])';
   vertical-align: middle;
   transition: box-shadow var(--cirth-transition);
 
-  // Helper text inside the group drops below the row as a full-width line
-  // instead of joining it as a squeezed flex column (upstream #700, #540);
-  // order pins it under the controls wherever it sits in the markup
+  // Helper text drops below the row as a full-width line, wherever it sits
+  // in the markup (upstream #700, #540).
   > small {
     flex: 0 0 100%;
     order: 1;
@@ -39,11 +38,10 @@ $visible-group-item: ':not([hidden], input[type="hidden"])';
     flex: 1 1 auto;
     margin-block: 0;
 
-    // Fields are width: 100% globally, which as flex-basis: auto would
-    // claim a whole wrapped line for themselves now that the group wraps.
-    // Basis 0 lets them sit beside content-sized buttons, and the dominant
-    // grow factor hands them virtually all the free space, while groups
-    // made of buttons alone still share the row evenly (grow 1 each).
+    // Fields are width: 100%, which as a basis would claim a whole wrapped
+    // line. Basis 0 and a dominant grow factor give them the free space
+    // beside content-sized buttons; a group of buttons alone still shares
+    // the row evenly.
     &:is(input, select, textarea) {
       flex: 99 1 0%;
     }
@@ -91,10 +89,8 @@ $visible-group-item: ':not([hidden], input[type="hidden"])';
     width: auto;
   }
 
-  // Focus: one ring around the whole row, in the colour of whatever inside
-  // it has focus. A ring offset from one segment would overlap the
-  // segments beside it, so the group draws the ring and its members draw
-  // none. The geometry is every other control's (content/_button.scss).
+  // Focus: one ring around the whole row, in the colour of the focused
+  // member; a member's own ring would overlap its neighbours.
   &:has(:focus-visible) {
     outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
     outline-offset: var(--cirth-outline-offset);

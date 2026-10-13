@@ -52,21 +52,14 @@
   --cirth-color: var(--cirth-primary-on-surface);
   --cirth-box-shadow: var(--cirth-button-box-shadow, 0 0 0 rgb(0 0 0 / 0%));
 
-  // A control sizes to its label, but never past the space it was given:
-  // without a cap, a long unbroken string (a URL, a token, a hash) grows
-  // the button to its intrinsic width and pushes it out of its container,
-  // where the document's overflow-wrap never gets a constrained line to
-  // break (gh#75). Short labels are unaffected.
+  // A control sizes to its label but never past its container, so a long
+  // unbroken label wraps instead of overflowing (gh#75).
   max-width: 100%;
 
-  // The 44px target size (WCAG 2.5.5), as a floor rather than as an
-  // outcome. The padding and line-height below add up to it at the default
-  // type scale and stop doing so the moment anyone changes the font-size:
-  // a button at 0.875rem came out at 40.75px. Measured from
-  // --cirth-font-size-md rather than from the element's own font-size, so the
-  // floor stays put when the type does not, and matched by the same floor
-  // on select and textarea in forms/_basics.scss. Navs opt down to the
-  // AA minimum instead; see components/_nav.scss.
+  // The 44px target size (WCAG 2.5.5) as a floor, measured from the root
+  // type scale so it holds when the button's own font-size changes. Select
+  // and textarea share it (forms/_basics.scss); navs opt down to 40px
+  // (components/_nav.scss).
   min-block-size: metrics.$control-block-size;
   padding: var(--cirth-form-element-spacing-vertical)
     var(--cirth-form-element-spacing-horizontal);
@@ -94,18 +87,16 @@
     @extend %button-active;
   }
 
-  // Pressed is one tonal step past hover. Painted as a wash over the
-  // variant's own background rather than as a separate colour per variant,
-  // so outline and ghost darken by the same amount a filled button does
-  // without either growing a fill it does not have.
+  // Pressed is one tonal step past hover, painted as a wash over the
+  // variant's own background, so outline and ghost darken by the same
+  // amount without growing a fill.
   &:active {
     background-image: linear-gradient(rgb(0 0 0 / 12%) 0 0);
   }
 }
 
-// Movement is supporting feedback, never the state itself. The tonal active
-// paint above remains under reduced motion, while the one-edge settle is only
-// introduced when the reader has not asked for motion to be removed.
+// Movement is supporting feedback, never the state itself: the one-edge
+// settle only applies when the reader has not asked for reduced motion.
 @media (prefers-reduced-motion: no-preference) {
   #{$parent-selector} button:not([disabled]),
   #{$parent-selector} [type="submit"]:not([disabled]),
@@ -118,12 +109,8 @@
   }
 }
 
-// The current page or view is a state of the elements, not of the file
-// input's button: a pseudo-element cannot carry an attribute, and written
-// into the list above, `[aria-current]` compiled to
-// `::file-selector-button:is()`, an empty selector esbuild warns about.
-// One declaration block for both states, through the placeholder, so
-// each keeps the specificity it had.
+// The current page or view, on the elements only: a pseudo-element cannot
+// carry an attribute, so ::file-selector-button stays out of this list.
 #{$parent-selector} button,
 #{$parent-selector} [type="submit"],
 #{$parent-selector} [type="reset"],
@@ -144,16 +131,12 @@
   --cirth-color: var(--cirth-primary-on-surface);
 }
 
-// Keep ::file-selector-button out of this selector list. Firefox does not
-// support :focus-visible on that pseudo-element and therefore discards the
-// whole comma-separated rule, including the focus ring for ordinary buttons.
-// The file control receives its ring through the focused host input in
-// forms/_input-file.scss instead.
-// Focus is one opaque ring, held off the fill by a gap as wide as itself,
-// so it never merges with a fill of the same colour. An outline rather than
-// a box-shadow: it follows the radius, takes no transition, and
-// forced-colors mode repaints it in a system colour. Variants below change
-// its colour, never its geometry. See specs/control-emphasis.md.
+// Focus is one opaque outline held off the fill by a gap as wide as itself:
+// it follows the radius, takes no transition, and forced-colors repaints
+// it. Variants change its colour, never its geometry
+// (specs/control-emphasis.md). ::file-selector-button stays out: Firefox
+// does not support :focus-visible on it and would drop the whole rule; the
+// file control gets its ring from the host input (forms/_input-file.scss).
 #{$parent-selector} button,
 #{$parent-selector} [type="submit"],
 #{$parent-selector} [type="reset"],
@@ -215,19 +198,11 @@
     }
   }
 
-  // Danger
-  // HTML has no destructive button type, but destructive and primary
-  // actions routinely share a decision surface. Reusing the primary fill
-  // makes their meaning depend on wording alone; this modifier connects the
-  // action to the existing error input without adding a parallel color API.
-  // The dark fill is deliberately deeper than the bright error input so a
-  // white label keeps AA, and the accent and error fills keep a lightness
-  // difference when red/green hue discrimination is reduced.
-  // The label is the one role of its own, --cirth-danger-on-surface, for the
-  // reason --cirth-primary-on-surface is explicit: light or dark ink on a
-  // fill is a decision, not a mix. It used to be the primary's label, so a
-  // theme that darkened that label for a light accent darkened this one too,
-  // on a fill that stayed deep (specs/fill-labels.md).
+  // Danger: a destructive action beside a primary one, on the error input.
+  // The dark fill is deeper than the error input so a white label keeps AA
+  // and the two fills differ in lightness for readers who cannot separate
+  // red and green. The label is its own role, --cirth-danger-on-surface
+  // (specs/fill-labels.md).
   #{$parent-selector}
     :is(button, [type="submit"], [type="button"], [role="button"]).danger {
     --cirth-background-color: light-dark(
@@ -251,26 +226,12 @@
     }
   }
 
-  // Outline and ghost
-  // Two quiet variants that differ in one thing: whether the control owns
-  // an opaque surface. Outline does: it paints the control colour, so it
-  // stays a control wherever it sits instead of letting the backdrop show
-  // through, and it draws a border. Ghost owns neither, and only becomes
-  // visible when the pointer arrives.
-  // Both answer hover by tinting their background with their own accent
-  // rather than by swapping to a filled treatment: the point of a quiet
-  // button is that it stays quiet, and a wash is enough to say it is live.
-  // Ghost mixes toward transparent rather than toward the canvas so the
-  // wash composites over whatever it is actually on (a card, a header, a
-  // popover) while outline, already opaque, mixes toward the canvas it
-  // is painting. That mix is in oklab: the surface carries the neutral
-  // family's hue and the label an accent's, and a polar space would walk
-  // the hue angle between them, so a magenta wash on an olive page came
-  // out beige.
-  // The border stays declared as transparent on ghost rather than removed:
-  // a border-width of zero would resize the control, and these two are
-  // meant to be swappable with the filled variants without the layout
-  // moving.
+  // Outline and ghost: two quiet variants. Outline owns an opaque surface
+  // (the control colour) and an edge; ghost owns neither. Both answer hover
+  // with a wash of their own accent rather than a fill: ghost mixes toward
+  // transparent so it composites over whatever it sits on, outline toward
+  // the surface it paints, in oklab so the hue does not drift. Ghost keeps a
+  // transparent border, so every variant has the same geometry.
   #{$parent-selector}
     :is(button, [type="submit"], [type="button"], [role="button"]).outline,
   #{$parent-selector} [type="reset"].outline {
@@ -414,9 +375,9 @@
     }
   }
 
-  // Danger composes with the two quiet silhouettes. These rules sit after
-  // the primary/secondary/contrast variants because the semantic role is the
-  // final color decision, while outline/ghost still decide the surface.
+  // Danger composes with the quiet variants: after the colour variants,
+  // because the semantic role is the final colour decision, while outline
+  // and ghost still decide the surface.
   #{$parent-selector}
     :is(
       button,
@@ -483,13 +444,9 @@
 
 // Button [disabled]
 // A state, not a transparency: every variant becomes the same neutral wash
-// with its label at half the ink, and keeps its geometry. Painted here
-// rather than through the variant slots, because every variant sets those
-// at a higher weight; the paint itself is set once, above, at (0,1,0) at
-// most, and this rule matches that weight later in the sheet, so it wins
-// whatever the variant was. Half opacity used to
-// composite the accent toward the page and turn it into a paler colour of
-// its own (the default accent into a pale tint at L 0.75).
+// with its label at half the ink, and keeps its geometry. The variants set
+// their slots at a higher weight, so the paint itself is set here, at the
+// weight of the base rule and later in the sheet.
 
 #{$parent-selector}
   :where(
@@ -516,28 +473,12 @@
   transform: none;
 }
 
-// Submit control of a form the reader has made invalid
-// Visual only, deliberately not [disabled]/pointer-events: none: the
-// button stays clickable so a submit attempt still triggers the browser's
-// native constraint-validation UI (the "Please fill in this field"
-// bubbles), which a truly disabled/inert control could never surface.
-// grayscale(), not opacity: a dimmed-but-clickable control gets no
-// disabled-state exemption from WCAG 1.4.3, and compositing the whole
-// button toward the canvas collapses its text/background contrast below
-// AA. Luminance-preserving desaturation keeps every contrast ratio
-// exactly as the theme defined it while still draining the "ready"
-// color from the control.
-
-// :has(:user-invalid), not :invalid. `form:invalid` is true from first
-// paint for any form holding a `required` field, so a login form nobody
-// has touched yet drew its submit in grey: the previous version of this
-// rule said so in a comment and accepted it. It does not have to be
-// accepted: the fields in the same form already wait for interaction
-// (forms/_basics.scss binds the invalid treatment to :user-invalid, not
-// :invalid), so the button was the one control in the group reacting to a
-// state the reader had not caused. Now the whole group agrees, and the
-// zero-JS feedback the rule exists for still arrives the moment a field
-// is actually left invalid.
+// The submit control of a form the reader has left invalid is drained of
+// colour but stays clickable, so a submit attempt still surfaces the
+// browser's own validation messages. grayscale(), not opacity, keeps every
+// contrast ratio (WCAG 1.4.3). :user-invalid, like the fields
+// (forms/_basics.scss), so an untouched form with required fields does not
+// start grey.
 
 #{$parent-selector}
   form:has(:user-invalid)

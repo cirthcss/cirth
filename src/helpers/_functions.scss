@@ -4,9 +4,8 @@
 
 $white: oklch(100% 0 0deg);
 
-// Display color as RGB (kept in the legacy rgb() form so it's safe to embed,
-// unencoded, inside data-URI SVGs: oklch()'s "%" would otherwise be
-// misread as a URL percent-escape)
+// A colour as legacy rgb(), safe to embed unencoded in a data-URI SVG:
+// oklch()'s "%" would be read as a URL escape.
 @function display-rgb($color) {
   @return string.unquote(
     "rgb(" + math.round(color.channel($color, "red", $space: rgb)) + ", " +
@@ -15,10 +14,8 @@ $white: oklch(100% 0 0deg);
   );
 }
 
-// Pair a compile-time color with a runtime alpha (e.g. a CSS custom
-// property). color.change() requires $alpha to be a literal number, so it
-// can't take a var(): this builds the oklch() CSS function directly
-// instead of asking Sass to resolve the alpha channel.
+// A compile-time colour with a runtime alpha (a var()), which
+// color.change() cannot take.
 @function with-var-alpha($color, $alpha) {
   @return string.unquote(
     "oklch(" + color.channel($color, "lightness", $space: oklch) + " " +
@@ -27,25 +24,15 @@ $white: oklch(100% 0 0deg);
   );
 }
 
-// A shadow colour per scheme. light-dark() only accepts colours, so the
-// scheme choice has to sit on each layer's colour: wrapping two whole
-// shadow lists in one light-dark() is invalid at computed-value time, and
-// every box-shadow that read it resolved to none.
+// A shadow colour per scheme, as light-dark() on each layer's colour:
+// light-dark() only accepts colours, so wrapping two shadow lists in one is
+// invalid at computed-value time.
 
-// The dark half takes its own, larger alpha. One opacity for both schemes
-// darkened the light canvas by about 0.035 of OKLab lightness beside a
-// floating panel and the dark canvas by under 0.01, so dropdowns,
-// popovers and modals had no elevation at all in the dark scheme. A shadow
-// is read as a lightness step against what it falls on, and a canvas near
-// black has little room left below it: the same step needs several times
-// the ink. See specs/dark-elevation-shadow.md for the measurements.
-// Ten since specs/surface-depth.md: the dark canvas moved toward black
-// and the dark shadow colour became black itself, and two pixels under a
-// panel the ambient layer decides the step, so the dark ambient has to
-// reach full opacity for the step to keep up with the light one. The light
-// step is -0.047 to -0.051 and the dark one -0.040 to -0.046 in Chromium,
-// Firefox and WebKit. At eight the dark ambient stopped short of opaque
-// and WebKit's dark step fell to 0.72 of its light one.
+// A shadow reads as a lightness step against what it falls on, and a canvas
+// near black has little room below it, so the dark half needs several
+// times the alpha for a comparable step. Ten keeps the dark ambient layer
+// opaque enough to match the light step in Chromium, Firefox and WebKit
+// (specs/dark-elevation-shadow.md, specs/surface-depth.md).
 $shadow-dark-opacity-factor: 10;
 
 @function shadow-color($light, $dark, $opacity) {
@@ -58,21 +45,14 @@ $shadow-dark-opacity-factor: 10;
   );
 }
 
-// An overlay's elevation, in two layers: a tight contact shadow that draws
-// the panel's edge onto whatever is under it, and a wide ambient one that
-// says how far above it the panel sits. Light falls from straight above, so
-// neither layer is offset sideways. This replaced a seven-layer ramp
-// inherited from Pico: the eye reads an edge and a distance, and the five
-// layers in between said neither more clearly. See
-// specs/surface-and-edge-model.md.
-// In the dark scheme a third, inset layer catches that light on the
-// panel's top edge: one pixel row of white at 5%, which is how a lifted
-// panel reads on a near-black page. In light it is transparent, because a
-// near-white panel has nothing to catch. See specs/surface-depth.md.
 @function shadow-layer($y, $blur, $spread, $opacity, $light, $dark) {
   @return 0 #{$y} #{$blur} #{$spread} shadow-color($light, $dark, $opacity);
 }
 
+// An overlay's elevation: a tight contact layer that draws the panel's edge
+// and a wide ambient layer for its distance, lit from straight above. In
+// the dark scheme an inset layer catches that light on the top edge
+// (specs/surface-and-edge-model.md, specs/surface-depth.md).
 @function shadow($light, $dark) {
   @return (
     inset 0 0.0625rem 0
@@ -82,9 +62,8 @@ $shadow-dark-opacity-factor: 10;
   );
 }
 
-// A card's elevation: the overlay's contact layer, lighter and tighter,
-// and nothing else. It finishes the small lightness step between a card
-// and a near-white page without the reach that says "floating".
+// A card's elevation: the overlay's contact layer, lighter and tighter, so a
+// near-white sheet separates from a near-white page without floating.
 @function raised-shadow($light, $dark) {
   @return shadow-layer(0.0625rem, 0.125rem, 0, 0.06, $light, $dark);
 }

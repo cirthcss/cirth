@@ -6,9 +6,8 @@
    * Input type file
    */
 
-// 1. Hack to display the outline on the focused file selector button
-
-//    with the forced overflow hidden on the input[type="file"] element.
+// 1. Room for the focus outline, which the input's forced overflow would
+//    otherwise clip.
 
 #{$parent-selector} [type="file"] {
   --cirth-color: var(--cirth-muted-color);
@@ -21,12 +20,8 @@
   background: none;
 
   &::file-selector-button {
-    // No target-size floor on this one, and the halved padding below is the
-    // same reasoning: the button is a part of the input, not a target of
-    // its own. WCAG 2.5.5 is satisfied by the input, which is 44px tall and
-    // is what the pointer is aimed at; forcing 44px onto the pseudo-element
-    // as well makes it taller than the content box it sits in and it spills
-    // out (scrollHeight 48 against a 44px input).
+    // Part of the input, not a target of its own: the 44px input satisfies
+    // WCAG 2.5.5, and a floor here would spill out of its content box.
     min-block-size: 0;
     margin-inline-end: calc(var(--cirth-spacing) / 2);
     padding: calc(var(--cirth-form-element-spacing-vertical) * 0.5)
@@ -40,8 +35,8 @@
     }
   }
 
-  // The ring goes around the input, which is the target (see above), in
-  // the secondary family's colour its button is drawn in.
+  // The ring goes around the input, the target, in its button's secondary
+  // colour.
   &:focus-visible {
     outline: var(--cirth-outline-width) solid var(--cirth-secondary-focus);
     outline-offset: var(--cirth-outline-offset);

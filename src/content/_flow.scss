@@ -7,19 +7,15 @@
  */
 
 // The space between two things is decided by what they are to each other,
-// never by one of them carrying a margin. No element in Cirth brings an
-// outer margin of its own: every reset that used to give one is written in
-// :where() and says 0. The rules below give the second of two siblings a
-// block-start margin, one step of the flow scale (theme/_styles.scss),
-// chosen by the relation between the two. They weigh nothing, so any rule
-// a component or a consumer writes about margins wins; and they come after
-// every reset in the sheet, so they win over those. Containers own the
-// rest: a card or a dialog its padding, a .grid or a .row its gap, a nav,
-// a dropdown or a segmented control its own internal rhythm.
-// A block is a flow element Cirth styles. <div> is deliberately not one: it
-// is what consumers build rows and grids out of, and a relation margin on
-// the second item of a row is a vertical offset. Buttons are not blocks
-// either: a row of them shares one line. See specs/container-owned-flow.md.
+// never by a margin one of them carries: every reset says 0 in :where(),
+// and the rules below give the second of two siblings a block-start margin,
+// one step of the flow scale (theme/_styles.scss). They weigh nothing, so
+// any component or consumer margin wins, and they come after every reset.
+// Containers own the rest: a card or dialog its padding, a .grid or .row
+// its gap, a nav, dropdown or segmented control its own rhythm.
+// <div> is not a block here (consumers build rows and grids from it), and
+// buttons are not either (a row of them shares one line).
+// See specs/container-owned-flow.md.
 
 $flow-field: "input:not([type='checkbox'], [type='radio'], [type='submit'], [type='button'], [type='reset'], [type='image'], [type='hidden']), select, textarea";
 $flow-block: "p, ul, ol, dl, pre, table, blockquote, figure, hr, address, details, hgroup, form, fieldset, label, article, section, aside, progress, meter, [role='search'], #{$flow-field}";
@@ -34,9 +30,8 @@ $flow-heading: "h1, h2, h3, h4, h5, h6";
 $flow-button: "button, [type='submit'], [type='reset'], [type='button'], [role='button']";
 $flow-option: "label:has(> [type='checkbox'], > [type='radio'])";
 
-// Element: a block after any block among its siblings. `~` rather than
-// `+`, so a script, a template or a hidden input between two paragraphs
-// does not take their space away.
+// Element: a block after any block among its siblings; `~`, so a script,
+// template or hidden input between two paragraphs keeps their space.
 #{$parent-selector}
   :where(#{$flow-block}, #{$flow-heading})
   ~ :where(#{$flow-block}) {
@@ -78,9 +73,8 @@ $flow-option: "label:has(> [type='checkbox'], > [type='radio'])";
   margin-block-start: var(--cirth-flow-chapter);
 }
 
-// Line: what binds a thing to what belongs to it. After these rules on
-// purpose, so a heading followed by another heading, or an option list's
-// second option, take the line and not the step above.
+// Line: what binds a thing to what belongs to it. Last, so a heading after
+// a heading, or a second option in a list of options, takes the line.
 #{$parent-selector} :where(#{$flow-heading}) + :where(*),
 #{$parent-selector} :where(li) + :where(li),
 #{$parent-selector} :where(dd) + :where(dt),

@@ -97,22 +97,16 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 
 /* cirth-component:start */
 
-// Force height for alternatives input types
+// A one-line field is exactly the control height.
 
 #{$parent-selector}
   input:not([type="checkbox"], [type="radio"], [type="range"]) {
   height: metrics.$control-block-size;
 }
 
-// The same 44px target, as a floor rather than a fixed height. A select
-// grows with its longest option and a textarea with its rows, so neither
-// can be pinned the way an input is, but both would otherwise reach the
-// target only by coincidence, since their height falls out of the text
-// inside them. Set a smaller font-size on a select and it quietly drops
-// below the threshold; this is what keeps WCAG 2.5.5 a property of the
-// component instead of a property of the default type scale. Measured
-// from --cirth-font-size-md, not from the element's own font-size, so the
-// floor stays put when the type does not.
+// A select grows with its longest option and a textarea with its rows, so
+// the 44px target (WCAG 2.5.5) is a floor, measured from the root type
+// scale so a smaller font-size cannot take it below the threshold.
 
 #{$parent-selector} select,
 #{$parent-selector} textarea {
@@ -132,10 +126,9 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 }
 
 // Label & legend
-// Two roles. A label names one field: smaller than the value it names, at
-// the label weight. A legend names a group of fields and outranks every
-// label in it: body size, title weight, strong ink. Neither changes the
-// field's own text, which forms/_basics.scss keeps at 16px or more.
+// A label names one field: smaller than the value, at the label weight. A
+// legend names a group and outranks every label in it: body size, title
+// weight, strong ink.
 
 #{$parent-selector} label,
 #{$parent-selector} fieldset legend {
@@ -160,9 +153,8 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 }
 
 // Blocks, 100%
-// An explicit `size` (the standard, semantic way to size a field to its
-// expected content: a postcode, a short code, an OTP digit) opts an
-// input out of the full-width default and lets UA-native sizing apply.
+// An explicit `size` (a postcode, a short code, an OTP digit) opts an input
+// out of the full-width default.
 
 #{$parent-selector} input:not([type="checkbox"], [type="radio"], [size]),
 #{$parent-selector} select,
@@ -183,11 +175,9 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 
 // Commons styles
 
-// A field has no surface level of its own: it paints the one it sits on
-// (--cirth-surface, rebound by every container that paints a level), so
-// its edge is the only thing marking it as a control. Recessed fields said
-// it twice, with a fill below the page and a border around it. Setting
-// --cirth-form-element-background-color still gives every field a fill.
+// A field paints the surface level it sits on (--cirth-surface), so its
+// edge alone marks it as a control. Setting
+// --cirth-form-element-background-color gives every field a fill.
 #{$parent-selector} input,
 #{$parent-selector} select,
 #{$parent-selector} textarea {
@@ -207,9 +197,8 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   color: var(--cirth-color);
   font-weight: var(--cirth-font-weight);
 
-  // The reset above inherits letter-spacing, which would hand a field the
-  // tracking of the label wrapped around it. Its own size decides, as for
-  // every other role: zero at 16px.
+  // The reset inherits letter-spacing, which would hand a field its label's
+  // tracking; its own size decides instead.
   letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
   transition:
     background-color var(--cirth-transition),
@@ -218,18 +207,14 @@ $helper-previous-tags: "input, select, textarea, fieldset";
     box-shadow var(--cirth-transition);
 }
 
-// Read-only is a state, not simply the absence of focus. The dashed frame
-// remains legible without colour and keeps it distinct from disabled input;
-// the fill stays the surface's, like any other field's.
+// Read-only is a state: a dashed frame stays legible without colour and
+// distinct from disabled.
 #{$parent-selector} :where(input, textarea)[readonly] {
   border-style: dashed;
 }
 
-// A readonly number has no operation for its native stepper to perform. The
-// standard textfield appearance removes it in Firefox; WebKit exposes the
-// controls as pseudo-elements as well, so hide those explicitly. Keep this
-// scoped to readonly inputs: an editable number retains its existing native
-// affordance and keyboard behaviour in every engine.
+// A readonly number has nothing for its stepper to do: textfield appearance
+// removes it in Firefox, and WebKit's spin buttons are hidden explicitly.
 #{$parent-selector} input[type="number"][readonly] {
   appearance: textfield;
 }
@@ -240,19 +225,10 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   margin: 0;
 }
 
-// Hover
-
-// Every other interactive control in the library answers the pointer, and
-// a field that does not reads as inert next to them: the affordance is
-// the point, not the decoration. It is deliberately not the focus
-// treatment: the border moves toward the field's own ink rather than to
-// the accent, so hover stays legible as "this is reachable" while focus
-// keeps the accent and the ring to itself.
-// Mixing toward --cirth-color needs no second value and no new token:
-// inside these rules that slot is the field's ink, so the hover darkens in
-// the light scheme and lightens in the dark one on its own. It also cannot
-// weaken the 3:1 the resting border owes WCAG 1.4.11: moving toward the
-// ink only ever increases the contrast against the field.
+// Hover: the edge moves toward the field's own ink, not to the accent, so
+// hover says "reachable" while focus keeps the accent and the ring. Inside
+// these rules --cirth-color is the field's ink, so it darkens in light and
+// lightens in dark, and it only ever increases the edge's 3:1 contrast.
 
 @media (hover: hover) and (pointer: fine) {
   #{$parent-selector}
@@ -277,12 +253,9 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   }
 }
 
-// Focus
-// One ring, the same geometry as a button's, and nothing else: the edge
-// keeps the colour it has at rest, so focus is carried by one signal
-// rather than by an accent border inside an accent ring. A field with a
-// validation state rebinds --cirth-form-element-focus-color below, which
-// is how its border and its ring always agree.
+// Focus: one ring, the same geometry as a button's; the edge keeps its
+// resting colour. A validation state rebinds
+// --cirth-form-element-focus-color, so its edge and ring agree.
 
 #{$parent-selector}
   input:not(
@@ -301,15 +274,9 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   }
 }
 
-// Disabled
-// The same state a disabled button takes: a faint wash, the separator for
-// an edge, and the ink at half strength. No opacity, so an accent-filled
-// control (a checked box) does not turn into a paler colour of its own.
-// Painted directly, as the button's is, so it wins over whatever state
-// slot the field was in.
-
-// A range is excluded: its box is not what it paints, and a wash there
-// would draw a rectangle behind the slider (forms/_input-range.scss).
+// Disabled: the state a disabled button takes, painted directly so it wins
+// over any state slot. A range is excluded: its box is not what it paints
+// (forms/_input-range.scss).
 
 #{$parent-selector}
   input:not(
@@ -338,15 +305,12 @@ $helper-previous-tags: "input, select, textarea, fieldset";
   pointer-events: none;
 }
 
-// Explicit ARIA validity & native invalidity
-// Native :user-invalid mirrors the explicit [aria-invalid="true"] treatment
-// once the browser has tested a constraint after user interaction. Native
-// :user-valid deliberately stays neutral: satisfying HTML constraints does
-// not necessarily mean that an application's data is correct, and browsers
-// differ in when they expose the state. Explicit aria-invalid always wins.
-// Range inputs are excluded because their value is sanitized into a valid
-// range by the browser. A focused select stays neutral until the user leaves
-// it, avoiding an error state merely from opening a required select.
+// Validity
+// :user-invalid mirrors [aria-invalid="true"] once the browser has tested a
+// constraint after interaction. :user-valid stays neutral: satisfying HTML
+// constraints does not mean the data is right. Explicit aria-invalid always
+// wins. Ranges are excluded (the browser sanitizes their value), and a
+// focused select stays neutral until the reader leaves it.
 
 $valid-explicit: '[aria-invalid="false"]';
 $invalid-explicit: '[aria-invalid="true"]';
@@ -464,21 +428,8 @@ $validation-any: "[aria-invalid], #{$invalid-native}";
   display: block;
   resize: vertical;
 
-  // Two rows is the user agent's default and it is too few: a control
-  // meant for a paragraph opens showing a line and a half of it, and the
-  // reader scrolls inside a box instead of reading what they wrote. Four
-  // rows is a paragraph.
-
-  // Only when the author has not said otherwise. `rows` is them declaring
-  // the height in the markup, and a framework quietly overruling an
-  // explicit rows="2" would be worse than the default it replaced. Same
-  // shape as select:not([multiple], [size]) above.
-
-  // Measured in `lh`: the element's own line box, so four rows means
-  // four rows of whatever text this textarea is actually set in, not four
-  // rows of the default type scale. That is the opposite of the target
-  // size floor below, which must not move when the type does. Padding and
-  // border are added because the box is border-box.
+  // Four rows unless `rows` says otherwise, measured in the textarea's own
+  // line box (`lh`); padding and border are added for border-box.
   &:not([rows]) {
     min-block-size: calc(
       4lh + (var(--cirth-form-element-spacing-vertical) * 2) +
@@ -525,8 +476,6 @@ $validation-any: "[aria-invalid], #{$invalid-native}";
     }
   }
 }
-
-// Styles for Input inside a label
 
 // A field inside its label sits a line under the label's text.
 
