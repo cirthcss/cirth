@@ -91,7 +91,7 @@ Cirth ships three optional, token-only preset stylesheets: `plain`,
 `material` and `metro`. Try them with the **Preset** control in this site's
 header.
 
-{% colorSwatches %}
+{% include "theme-swatches.njk" %}
 
 [Presets](/presets) owns their purpose, loading order, changed tokens,
 colour-scheme behavior and font setup.

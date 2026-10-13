@@ -2266,16 +2266,9 @@ test("the metrics panels are gridded description lists divided by their gap", as
 				classes: panel.className,
 				display: style.display,
 				gap: style.gap,
-				// The stroke this shell draws its frames with, read off a frame
-				// rather than off a token, so the two are compared as rendered.
-				strokeWidth: Number.parseFloat(
-					getComputedStyle(
-						/** @type {HTMLElement} */ (
-							panel.closest(".docs-proof-strip, .docs-brand-spec") ??
-								document.documentElement
-						),
-					).borderTopWidth,
-				) || 1,
+				// The stroke the plate's own frame is drawn with, so the gap and
+				// the frame are compared as rendered.
+				strokeWidth: Number.parseFloat(style.borderTopWidth) || 1,
 				background: style.backgroundColor,
 				cells,
 			};

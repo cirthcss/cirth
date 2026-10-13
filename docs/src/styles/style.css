@@ -32,8 +32,10 @@ html {
   --docs-index-title-size: 0.9375rem;
   --docs-rail-width: 15rem;
   --docs-toc-width: 13rem;
-  /* Rails stick under the header and are at most a window tall below it. */
-  --docs-rail-top: 5.5rem;
+  /* The sticky header's height. Rails stick a step under it and are at
+     most a window tall below it; the home page's held scenes stick to it. */
+  --docs-header-height: 4.5rem;
+  --docs-rail-top: calc(var(--docs-header-height) + var(--cirth-space-4));
   --docs-rail-height: calc(100dvh - var(--docs-rail-top) - var(--cirth-space-6));
 
   /* Cirth's own line-height, read before .docs-content re-times it, so
@@ -107,9 +109,9 @@ html {
   text-align: start;
 }
 
-/* Keep the placeholder colour through the button's state rebinding. */
-.docs-search-trigger:is(:hover, :focus, :focus-visible, :active) {
-  --cirth-color: var(--cirth-form-element-placeholder-color);
+/* Hidden until search.js has wired it: without a script it would do nothing. */
+.docs-search-trigger[hidden] {
+  display: none;
 }
 
 /* Hover deepens the wash; the secondary ink keeps AA on it. */
@@ -203,13 +205,11 @@ html {
   color: var(--cirth-primary-text);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .docs-search-dialog > article > header,
-  .docs-search-dialog > article > header > svg {
-    transition:
-      box-shadow var(--cirth-transition),
-      color var(--cirth-transition);
-  }
+.docs-search-dialog > article > header,
+.docs-search-dialog > article > header > svg {
+  transition:
+    box-shadow var(--cirth-transition),
+    color var(--cirth-transition);
 }
 
 /* A grid item: the library's float does not apply, only its margin. */
@@ -488,8 +488,7 @@ html {
   width: 8rem;
 }
 
-/* Scoped to the header to outweigh the library's `nav li [type=button]` (0,1,2). */
-.docs-header .docs-theme-toggle {
+.docs-theme-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -527,7 +526,7 @@ html {
   padding: 0;
 }
 
-.docs-header .docs-menu-toggle,
+.docs-menu-toggle,
 .docs-mobile-nav {
   display: none;
 }
@@ -540,14 +539,12 @@ html {
   justify-content: flex-end;
 }
 
-/* Slides in from the edge rather than the library's top; under reduced
-   motion it simply appears. Scroll lock comes from showModal(). */
-@media (prefers-reduced-motion: no-preference) {
-  .docs-drawer[open] > article {
-    @starting-style {
-      transform: translateX(100%);
-      opacity: 0;
-    }
+/* Slides in from the edge rather than the library's top. Scroll lock comes
+   from showModal(). */
+.docs-drawer[open] > article {
+  @starting-style {
+    transform: translateX(100%);
+    opacity: 0;
   }
 }
 
@@ -639,12 +636,12 @@ html {
   font-size: var(--docs-index-title-size);
 }
 
-.docs-header .docs-mobile-controls > ul {
+.docs-mobile-controls > ul {
   display: grid;
   padding: var(--cirth-space-1) 0;
 }
 
-.docs-header .docs-mobile-controls [data-docs-header-control] {
+.docs-mobile-controls [data-docs-header-control] {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
@@ -659,10 +656,7 @@ html {
   font-size: var(--cirth-font-size-sm);
 }
 
-.docs-header
-  .docs-mobile-controls
-  [data-docs-header-control]
-  > :is(select, button) {
+.docs-mobile-controls [data-docs-header-control] > :is(select, button) {
   grid-column: 2;
 }
 
@@ -684,7 +678,7 @@ html {
     display: none;
   }
 
-  .docs-header .docs-menu-toggle {
+  .docs-menu-toggle {
     display: inline-grid;
   }
 
@@ -712,7 +706,7 @@ html {
     padding: 0;
   }
 
-  .docs-header .docs-menu-toggle {
+  .docs-menu-toggle {
     flex: 0 0 var(--cirth-space-10);
   }
 
@@ -840,20 +834,8 @@ details.docs-toc-top {
   font-size: var(--docs-index-title-size);
 }
 
-/* Stacked: the gutter token at zero releases the nav's inline insets. */
-.docs-toc-top > nav {
-  --cirth-nav-element-spacing-horizontal: 0;
-
-  display: block;
-}
-
-.docs-toc-top nav :is(ul, li) {
-  display: block;
+.docs-toc-top nav li {
   padding: 0;
-}
-
-.docs-toc-top nav li a {
-  display: block;
 }
 
 .docs-toc {
@@ -913,7 +895,7 @@ details.docs-toc-top {
   border-inline-start-color: transparent;
 }
 
-/* `aside nav` already releases the inline insets; only the item padding is the shell's. */
+/* The stacked nav releases the inline insets; only the item padding is the shell's. */
 .docs-toc li {
   padding: 0;
 }
@@ -924,13 +906,12 @@ details.docs-toc-top {
   padding-inline-start: var(--cirth-space-4);
 }
 
-/* No underline at rest; the hover rule adds it. */
+/* The underline appears on hover only, as on every nav link. */
 .docs-toc-top a {
   margin-block: 0;
   padding: calc(var(--cirth-spacing) * 0.25) 0;
   color: var(--cirth-muted-color);
   font-size: var(--cirth-font-size-sm);
-  text-decoration: none;
 }
 
 .docs-toc-top a:hover {
@@ -956,7 +937,6 @@ details.docs-toc-top {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
   gap: var(--cirth-space-3);
-  margin: 0;
 }
 
 .docs-prev-next li {
@@ -992,10 +972,8 @@ details.docs-toc-top {
   border-color: var(--cirth-primary-border);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .docs-prev-next a {
-    transition: border-color var(--cirth-transition);
-  }
+.docs-prev-next a {
+  transition: border-color var(--cirth-transition);
 }
 
 
@@ -1008,7 +986,6 @@ details.docs-toc-top {
   border-block-start: var(--cirth-border-width) solid
     var(--cirth-muted-border-color);
   background: var(--cirth-background-color);
-  color: var(--cirth-ink);
 }
 
 .docs-footer .container {
@@ -1083,7 +1060,6 @@ details.docs-toc-top {
   padding: 0;
   color: var(--cirth-secondary-text);
   font-size: var(--cirth-font-size-sm);
-  text-decoration: none;
 }
 
 .docs-footer-column a:hover {
@@ -1110,19 +1086,13 @@ details.docs-toc-top {
 
 /* Prose and code */
 
-/* Header anchors from markdown-it-anchor. */
+/* Header anchors from markdown-it-anchor. Every transition in this sheet is
+   built from --cirth-transition, which Cirth sets to zero under
+   prefers-reduced-motion: reduce. */
 .header-anchor {
   margin-left: 0.25em;
   opacity: 0;
-}
-
-/* Transitions sit behind prefers-reduced-motion: no-preference. Cirth's
-   reduced-motion pass zeroes durations at (0,1,0), which any docs rule
-   would outrank. */
-@media (prefers-reduced-motion: no-preference) {
-  .header-anchor {
-    transition: opacity var(--cirth-transition);
-  }
+  transition: opacity var(--cirth-transition);
 }
 
 :is(h1, h2, h3, h4, h5, h6):hover .header-anchor,
@@ -1147,8 +1117,8 @@ pre:not(.docs-demo-preview *) {
 }
 
 /* Syntax highlighting (docs-owned). Hues 160 to 310deg, away from the
-   accent and the error family; each clears AA on the code surface.
-   Comments use the muted token, so they follow the preset. */
+   accent and the error family; each pair clears AA on the code surface in
+   its scheme. Comments use the muted token, so they follow the preset. */
 .hljs-comment,
 .hljs-quote {
   color: var(--cirth-muted-color);
@@ -1160,14 +1130,14 @@ pre:not(.docs-demo-preview *) {
 .hljs-doctag,
 .hljs-template-tag,
 .hljs-deletion {
-  color: #6b3991;
+  color: light-dark(#6b3991, #c1a2dd);
 }
 
 .hljs-string,
 .hljs-regexp,
 .hljs-addition,
 .hljs-meta .hljs-string {
-  color: #335d62;
+  color: light-dark(#335d62, #79bfc7);
 }
 
 .hljs-title,
@@ -1177,7 +1147,7 @@ pre:not(.docs-demo-preview *) {
 .hljs-selector-class,
 .hljs-selector-id,
 .hljs-selector-pseudo {
-  color: #3744b7;
+  color: light-dark(#3744b7, #a2afdd);
 }
 
 .hljs-attr,
@@ -1192,12 +1162,12 @@ pre:not(.docs-demo-preview *) {
 .hljs-built_in,
 .hljs-type,
 .hljs-meta {
-  color: #31587d;
+  color: light-dark(#31587d, #8db6dd);
 }
 
 .hljs-name,
 .hljs-tag .hljs-name {
-  color: #33604c;
+  color: light-dark(#33604c, #79c3a1);
 }
 
 .hljs-emphasis {
@@ -1208,52 +1178,6 @@ pre:not(.docs-demo-preview *) {
   font-weight: var(--cirth-font-weight-bold);
 }
 
-/* Dark scheme. Comments need no rule: the muted token is a light-dark() pair. */
-[data-theme="dark"] .hljs-keyword,
-[data-theme="dark"] .hljs-selector-tag,
-[data-theme="dark"] .hljs-doctag,
-[data-theme="dark"] .hljs-template-tag,
-[data-theme="dark"] .hljs-deletion {
-  color: #c1a2dd;
-}
-
-[data-theme="dark"] .hljs-string,
-[data-theme="dark"] .hljs-regexp,
-[data-theme="dark"] .hljs-addition,
-[data-theme="dark"] .hljs-meta .hljs-string {
-  color: #79bfc7;
-}
-
-[data-theme="dark"] .hljs-title,
-[data-theme="dark"] .hljs-title.class_,
-[data-theme="dark"] .hljs-title.function_,
-[data-theme="dark"] .hljs-section,
-[data-theme="dark"] .hljs-selector-class,
-[data-theme="dark"] .hljs-selector-id,
-[data-theme="dark"] .hljs-selector-pseudo {
-  color: #a2afdd;
-}
-
-[data-theme="dark"] .hljs-attr,
-[data-theme="dark"] .hljs-attribute,
-[data-theme="dark"] .hljs-variable,
-[data-theme="dark"] .hljs-template-variable,
-[data-theme="dark"] .hljs-number,
-[data-theme="dark"] .hljs-literal,
-[data-theme="dark"] .hljs-symbol,
-[data-theme="dark"] .hljs-bullet,
-[data-theme="dark"] .hljs-link,
-[data-theme="dark"] .hljs-built_in,
-[data-theme="dark"] .hljs-type,
-[data-theme="dark"] .hljs-meta {
-  color: #8db6dd;
-}
-
-[data-theme="dark"] .hljs-name,
-[data-theme="dark"] .hljs-tag .hljs-name {
-  color: #79c3a1;
-}
-
 /* Copy button, injected by base.njk. */
 pre > button.copy {
   position: absolute;
@@ -1262,16 +1186,13 @@ pre > button.copy {
   /* 44px square (WCAG 2.5.5); the library's control floor sets the height. */
   width: 2.75rem;
   padding: 0;
-  /* Ghost. An audit may list border-width and border-image here: they are
-     this shorthand's expansion, not separate declarations. */
+  /* Ghost. */
   border: none;
   background-color: transparent;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  pre > button.copy {
-    transition: background-color var(--cirth-transition);
-  }
+pre > button.copy {
+  transition: background-color var(--cirth-transition);
 }
 
 /* Not --cirth-background-color: a <button> rebinds it to its own fill. */
@@ -1318,25 +1239,20 @@ pre > button.copy.copied::before {
 
 /* Brand and color pages */
 
-/* Brand page logo tiles. Fixed columns turn three light and three dark
-   variants into two rows; the gap shows the border colour as dividers. */
 /* Brand page opening: the lockup at the size it is meant to be seen at,
    the line that says what it is, and the files most people come for. */
 .docs-brand-hero {
   display: grid;
   justify-items: start;
   gap: var(--cirth-flow-group);
-  margin-block: var(--cirth-flow-section) 0;
 }
 
 .docs-brand-hero > img {
   width: min(100%, 26rem);
-  height: auto;
 }
 
 .docs-brand-hero-line {
   max-width: 32ch;
-  margin: 0;
   color: var(--cirth-ink-strong);
   font-size: var(--cirth-font-size-2xl);
   font-weight: var(--cirth-title-font-weight);
@@ -1355,12 +1271,7 @@ pre > button.copy.copied::before {
 .docs-brand-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--cirth-border-width);
   margin: 1.5rem 0;
-  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
-  border-radius: var(--cirth-card-border-radius);
-  background: var(--cirth-card-border-color);
-  overflow: clip;
 }
 
 @media (width >= 48rem) {
@@ -1398,7 +1309,6 @@ pre > button.copy.copied::before {
 
 .docs-lockup-grid img {
   width: min(100%, 15rem);
-  height: auto;
 }
 
 @media (width >= 48rem) {
@@ -1415,20 +1325,26 @@ pre > button.copy.copied::before {
   margin: 1.5rem 0;
 }
 
-/* A card with its padding dropped: the swatch runs edge to edge. */
+/* A flush card (the card tokens at zero): the swatch runs edge to edge. */
 .docs-color-swatch {
+  --cirth-block-spacing-horizontal: 0;
+  --cirth-block-spacing-vertical: 0;
+
   display: flex;
   flex-direction: column;
   margin: 0;
-  padding: 0;
   overflow: clip;
 }
 
+/* White, as the label on each accent's fill. */
 .docs-color-swatch-preview {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 4.5rem;
+  color: #fff;
+  font-size: var(--cirth-font-size-xs);
+  font-weight: var(--cirth-font-weight-semibold);
 }
 
 .docs-color-swatch-label {
@@ -1560,10 +1476,6 @@ details.docs-demo-source pre {
   background: none;
 }
 
-details.docs-demo-source pre::before {
-  display: none;
-}
-
 details.docs-demo-source[open] > summary {
   margin-bottom: 0;
   background: transparent;
@@ -1584,12 +1496,7 @@ details.docs-demo-source > :not(summary) {
 /* Index tree (sidebar and compact menu). Groups are the library's
    disclosure set as index headings; every list is stacked. */
 .docs-nav-group,
-.docs-nav-group ul,
-.docs-nav-group li {
-  --cirth-nav-element-spacing-horizontal: 0;
-
-  display: block;
-  margin: 0;
+.docs-nav-group :is(ul, li) {
   padding: 0;
 }
 
@@ -1701,8 +1608,9 @@ details.docs-demo-source > :not(summary) {
   padding-inline-start: calc(var(--cirth-space-3) * 2 + var(--cirth-space-4));
 }
 
-/* Focus rings are drawn inset, so a scrolling rail cannot clip them. */
-:is(.docs-sidebar, .docs-toc, .docs-mobile-nav, .docs-toc-top) :is(a, summary):focus-visible {
+/* The library draws focus inside the rows of a stacked nav; the two compact
+   disclosures' own summaries match them. */
+.docs-mobile-tools > details > summary:focus-visible {
   outline-offset: calc(var(--cirth-outline-width) * -1);
 }
 
@@ -1732,8 +1640,6 @@ details.docs-demo-source > :not(summary) {
 /* Current entries keep semantic state in aria-current. The sidebar gets a
    quiet primary wash; the page outline delegates position to its marker. */
 .docs-nav-group a[aria-current="page"] {
-  border-start-start-radius: 0;
-  border-end-start-radius: 0;
   border-start-end-radius: var(--docs-chrome-radius);
   border-end-end-radius: var(--docs-chrome-radius);
   background: color-mix(
@@ -1750,13 +1656,11 @@ details.docs-demo-source > :not(summary) {
   font-weight: var(--cirth-font-weight-medium);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .docs-nav-group a,
-  .docs-toc a {
-    transition:
-      background-color var(--cirth-transition),
-      color var(--cirth-transition);
-  }
+.docs-nav-group a,
+.docs-toc a {
+  transition:
+    background-color var(--cirth-transition),
+    color var(--cirth-transition);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1803,11 +1707,7 @@ details.docs-demo-source > :not(summary) {
     font-size: var(--cirth-font-size-sm);
   }
 
-  /* Stacked: the gutter token at zero. */
   .docs-mobile-nav > nav {
-    --cirth-nav-element-spacing-horizontal: 0;
-
-    display: block;
     padding: var(--cirth-space-3) var(--cirth-space-4) var(--cirth-space-4);
     border-block-start: var(--cirth-border-width) solid
       var(--cirth-muted-border-color);
@@ -1822,18 +1722,6 @@ details.docs-demo-source > :not(summary) {
   .docs-mobile-nav .docs-nav-category > details > summary,
   .docs-mobile-nav .docs-nav-group a {
     min-block-size: 2.75rem;
-  }
-
-  /* Outside an <aside> the library marks the current page under the link;
-     move the mark to the start edge, as in the rail. */
-  .docs-mobile-nav .docs-nav-group a {
-    border-block-end-color: transparent;
-    border-inline-start: var(--cirth-border-width-2) solid transparent;
-  }
-
-  .docs-mobile-nav .docs-nav-group a[aria-current="page"] {
-    border-block-end-color: transparent;
-    border-inline-start-color: var(--cirth-primary-text);
   }
 
   /* An open disclosure takes the whole row. */
@@ -1860,116 +1748,32 @@ details.docs-demo-source > :not(summary) {
 
 /* Plates */
 
-/* Framed grids of cells divided by hairlines, not cards: one stroke
-   colour, no padding on the plate itself, a title band without tint. */
-.docs-brand-spec,
-.docs-proof-strip,
-.docs-build-comparison {
+/* Framed grids of cells divided by hairlines, not cards: the gap shows the
+   container edge colour painted behind the cells. */
+.docs-brand-grid,
+.docs-build-comparison,
+.docs-facts {
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
   border-radius: var(--cirth-card-border-radius);
-  background: var(--cirth-card-background-color);
   overflow: clip;
 }
 
-.docs-brand-spec-header,
-.docs-proof-strip > header {
-  padding: var(--cirth-space-5);
-  border-block-end: var(--cirth-border-width) solid
-    var(--cirth-card-border-color);
-}
-
-.docs-brand-spec-header h2,
-.docs-proof-strip > header h2 {
-  max-width: 30ch;
-}
-
-.docs-brand-spec-header > h2 + p {
-  max-width: 60ch;
-  margin-block: var(--cirth-space-2) 0;
-  color: var(--cirth-muted-color);
-}
-
-.docs-brand-spec {
-  margin-block: 2rem 5rem;
-}
-
-/* A .grid <dl> divided by its gap. The top border is the seam with the specimen. */
-.docs-brand-measures {
+.docs-brand-grid,
+.docs-build-comparison > div,
+.docs-facts {
   gap: var(--cirth-border-width);
-  border-block-start: var(--cirth-border-width) solid
-    var(--cirth-card-border-color);
   background: var(--cirth-card-border-color);
 }
 
-.docs-brand-measures > div {
-  padding: 1rem;
-  background: var(--cirth-card-background-color);
-}
-
-.docs-brand-measures dt {
-  color: var(--cirth-muted-color);
-  font-size: var(--cirth-meta-font-size);
-  letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
-}
-
-.docs-brand-measures dd {
-  margin: 0.5rem 0 0;
-}
-
-@media (width < 48rem) {
-  .docs-brand-measures {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.docs-proof-strip,
 .docs-build-comparison {
   margin-block: 2rem 5rem;
-}
-
-/* Divided by the gap, so no column count is repeated here. */
-.docs-proof-strip dl {
-  gap: var(--cirth-border-width);
-  background: var(--cirth-card-border-color);
-}
-
-.docs-proof-strip dl > div {
-  display: grid;
-  gap: 0.75rem;
-  min-height: 10rem;
-  padding: 1rem;
   background: var(--cirth-card-background-color);
 }
 
-.docs-proof-strip dt {
-  color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-sm);
-}
-
-.docs-proof-strip dd {
-  display: grid;
-  align-content: end;
-  gap: 0.25rem;
-}
-
-/* Figures are data: code face, tabular, strong ink. */
-.docs-proof-strip dd strong {
-  color: var(--cirth-ink-strong);
-  font-family: var(--cirth-font-family-mono);
-  font-size: var(--cirth-font-size-xl);
-  font-variant-numeric: tabular-nums;
-}
-
-.docs-proof-strip dd small {
-  color: var(--cirth-muted-color);
-}
-
-/* Build comparison: four panes divided by the gap. */
+/* Build comparison: four panes. */
 .docs-build-comparison > div {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--cirth-border-width);
-  background: var(--cirth-card-border-color);
 }
 
 .docs-build-comparison figure {
@@ -2007,10 +1811,6 @@ details.docs-demo-source > :not(summary) {
 }
 
 @media (width < 48rem) {
-  .docs-proof-strip dl {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .docs-build-comparison > div {
     grid-template-columns: 1fr;
   }
@@ -2162,12 +1962,7 @@ details.docs-demo-source > :not(summary) {
   max-inline-size: none;
 }
 
-/* After .docs-mark-image, which would show both variants. */
-.docs-mark .docs-logo-dark,
-[data-theme="dark"] .docs-mark .docs-logo-light {
-  display: none;
-}
-
+/* The shared logo rule hides the other variant; a mark shows as a block. */
 [data-theme="dark"] .docs-mark .docs-logo-dark {
   display: block;
 }
@@ -2210,10 +2005,6 @@ details.docs-demo-source > :not(summary) {
   border: var(--cirth-border-width) solid var(--cirth-muted-border-color);
   border-radius: var(--docs-chrome-radius);
   color: var(--cirth-ink-strong);
-  text-decoration: none;
-}
-
-.docs-guide-grid a:is(:hover, :focus-visible, :active) {
   text-decoration: none;
 }
 
@@ -2370,7 +2161,6 @@ details.docs-demo-source > :not(summary) {
 
 .docs-breadcrumb a {
   color: var(--cirth-secondary-text);
-  text-decoration: none;
 }
 
 .docs-breadcrumb a:hover {
@@ -2417,7 +2207,6 @@ details.docs-demo-source > :not(summary) {
 
 .docs-project-name {
   grid-area: name;
-  margin: 0;
   color: var(--cirth-ink-strong);
   font-size: var(--cirth-font-size-lg);
   font-weight: var(--cirth-heading-font-weight);
@@ -2494,12 +2283,7 @@ details.docs-demo-source > :not(summary) {
 /* Facts grid, divided by its gap. */
 .docs-facts {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
-  gap: var(--cirth-border-width);
   margin: var(--cirth-space-6) 0 var(--cirth-space-8);
-  border: var(--cirth-border-width) solid var(--cirth-card-border-color);
-  border-radius: var(--cirth-card-border-radius);
-  background: var(--cirth-card-border-color);
-  overflow: clip;
 }
 
 .docs-facts > div {
@@ -2578,13 +2362,11 @@ fieldset.docs-choice {
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .docs-choice > label {
-    transition:
-      background-color var(--cirth-transition),
-      border-color var(--cirth-transition),
-      color var(--cirth-transition);
-  }
+.docs-choice > label {
+  transition:
+    background-color var(--cirth-transition),
+    border-color var(--cirth-transition),
+    color var(--cirth-transition);
 }
 
 /* Forced colors: the chosen option keeps a Highlight edge. */

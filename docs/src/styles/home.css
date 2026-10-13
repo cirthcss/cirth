@@ -5,8 +5,6 @@
 .docs-home {
   --docs-home-gutter: clamp(1rem, 4vw, 2rem);
   --docs-home-max: 76rem;
-  /* The sticky header's height: held sections stick under it. */
-  --docs-header: 4.5rem;
   /* State changes; the theme copy reads these through its shadow root. */
   --docs-motion-medium: 440ms;
   --docs-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -135,17 +133,23 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
-.docs-pane-label {
+/* A listing's label band, in the meta role. The facts section's file
+   (.docs-facts-file) is the same band, framed on its own. */
+.docs-pane-label,
+.docs-facts-file {
   display: flex;
   align-items: center;
-  gap: var(--cirth-space-3);
   min-block-size: 2.5rem;
   padding: var(--cirth-space-2) var(--cirth-space-4);
-  border-block-end: var(--cirth-border-width) solid var(--cirth-card-border-color);
   background: var(--cirth-card-sectioning-background-color);
   color: var(--cirth-muted-color);
   font-size: var(--cirth-meta-font-size);
   font-weight: var(--cirth-font-weight-medium);
+}
+
+.docs-pane-label {
+  gap: var(--cirth-space-3);
+  border-block-end: var(--cirth-border-width) solid var(--cirth-card-border-color);
 }
 
 .docs-hero-source {
@@ -263,26 +267,17 @@
   min-inline-size: 0;
 }
 
-/* The file, as the label band of a listing (the hero's .docs-pane-label),
-   as wide as its name. */
+/* The file's label band, as wide as its name. */
 .docs-facts-file {
-  display: flex;
   position: relative;
   z-index: 2;
   justify-self: start;
-  align-items: center;
   justify-content: space-between;
   gap: var(--cirth-space-6);
   max-inline-size: 100%;
-  min-block-size: 2.5rem;
   margin: 0;
-  padding: var(--cirth-space-2) var(--cirth-space-4);
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
   border-radius: var(--cirth-card-border-radius);
-  background: var(--cirth-card-sectioning-background-color);
-  color: var(--cirth-muted-color);
-  font-size: var(--cirth-meta-font-size);
-  font-weight: var(--cirth-font-weight-medium);
 }
 
 .docs-facts-file code {
@@ -383,19 +378,19 @@
   gap: var(--cirth-space-1) var(--cirth-space-3);
 }
 
-/* Held: 273svh of scroll for a sticky frame (the four-card version's 280,
-   less the fourth card's stretch). The thresholds that drive it are
-   factsAt in the controller. */
+/* Held: 273svh of scroll for a sticky frame. The thresholds that drive it
+   are factsAt in the controller. */
 .docs-home[data-stage="held"] > .docs-facts-section {
   block-size: 273svh;
   padding-block: 0;
 }
 
-.docs-home[data-stage="held"] .docs-facts-scene {
+/* Each held section is a sticky frame one window tall under the header. */
+.docs-home[data-stage="held"] :is(.docs-facts-scene, .docs-story-scene, .docs-bench-scene, .docs-theme-scene) {
   display: grid;
   position: sticky;
-  inset-block-start: var(--docs-header);
-  block-size: calc(100svh - var(--docs-header));
+  inset-block-start: var(--docs-header-height);
+  block-size: calc(100svh - var(--docs-header-height));
   align-content: center;
 }
 
@@ -633,14 +628,6 @@
 .docs-home[data-stage="held"] > .docs-story {
   block-size: 300svh;
   padding-block: 0;
-}
-
-.docs-home[data-stage="held"] .docs-story-scene {
-  display: grid;
-  position: sticky;
-  inset-block-start: var(--docs-header);
-  block-size: calc(100svh - var(--docs-header));
-  align-content: center;
 }
 
 .docs-home[data-stage="held"] .docs-story-grid {
@@ -944,14 +931,6 @@
   padding-block: 0;
 }
 
-.docs-home[data-stage="held"] .docs-bench-scene {
-  display: grid;
-  position: sticky;
-  inset-block-start: var(--docs-header);
-  block-size: calc(100svh - var(--docs-header));
-  align-content: center;
-}
-
 .docs-home[data-stage="held"] .docs-bench-head {
   opacity: var(--docs-head, 1);
   translate: 0 calc((1 - var(--docs-head, 1)) * 1rem) 0;
@@ -1090,14 +1069,6 @@
 .docs-home[data-stage="held"] > .docs-theme {
   block-size: 240svh;
   padding-block: 0;
-}
-
-.docs-home[data-stage="held"] .docs-theme-scene {
-  display: grid;
-  position: sticky;
-  inset-block-start: var(--docs-header);
-  block-size: calc(100svh - var(--docs-header));
-  align-content: center;
 }
 
 .docs-home[data-stage="held"] .docs-theme-steps > li {
@@ -1452,7 +1423,7 @@
   .docs-home:not([data-stage="held"]) > :is(.docs-facts-section, .docs-bench, .docs-theme) {
     display: grid;
     align-content: center;
-    min-block-size: calc(100svh - var(--docs-header));
+    min-block-size: calc(100svh - var(--docs-header-height));
     padding-block: clamp(2rem, 4vw, 3.5rem);
   }
 }
