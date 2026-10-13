@@ -45,6 +45,13 @@ const tempEntryFoldername = fs.mkdtempSync(
 
 fs.mkdirSync(outputFoldername, { recursive: true });
 
+/** @param {string} folder @param {string[]} keep */
+const prune = (folder, keep) => {
+	for (const entry of fs.readdirSync(folder)) {
+		if (!keep.includes(entry)) fs.rmSync(path.join(folder, entry), { recursive: true, force: true });
+	}
+};
+
 try {
 	for (const variant of variants) {
 		const tempEntryFilename = path.join(
@@ -67,10 +74,19 @@ try {
 	// stylesheet to swap in rather than a reimplementation of one. Kept
 	// separate from npm run build's dist/presets/ output on purpose: docs:build
 	// stays runnable on its own, with no dependency on dist/ existing first.
-	compileScssFolder({
+	const presetsFoldername = path.join(outputFoldername, "presets");
+	const presets = compileScssFolder({
 		sourceFolder: path.join(projectRoot, "src/presets"),
-		outputFolder: path.join(outputFoldername, "presets"),
+		outputFolder: presetsFoldername,
 	});
+
+	// Generated files whose source is gone (a removed preset or variant)
+	// would otherwise keep being copied into the site.
+	prune(outputFoldername, [...variants.map((variant) => variant.filename), "presets"]);
+	prune(
+		presetsFoldername,
+		presets.map((source) => path.basename(source).replace(/\.scss$/, ".css")),
+	);
 
 	console.log("[cirth] docs assets built");
 } finally {
