@@ -169,20 +169,20 @@
   --cirth-nav-link-spacing-horizontal: var(--cirth-space-2);
   --cirth-nav-breadcrumb-divider: ">";
 
-  // Icons carry a viewBox only: every rule that consumes one sets its own
-  // background-size or mask-size.
+  // Icons use a 24 by 24 drawing area. Every rule that consumes one sets its
+  // own background-size or mask-size.
 
-  // Checkbox marks, applied as masks (forms/_checkbox-radio-switch.scss):
-  // only the alpha channel is read, so the stroke colour is inert.
-  --cirth-icon-checkbox: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
-  --cirth-icon-minus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='5' y1='12' x2='19' y2='12'%3E%3C/line%3E%3C/svg%3E");
+  // Checkbox marks, applied as masks (forms/_checkbox-radio-switch.scss).
+  // Only the alpha channel is read, so the fill colour is inert.
+  --cirth-icon-checkbox: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none'%3E%3Cpath fill='#{functions.display-rgb($white)}' d='M20.04 5.2a1.25 1.25 0 0 1 1.92 1.6L11.854 18.92a3.25 3.25 0 0 1-5.036-.052l-4.795-6a1.25 1.25 0 0 1 1.954-1.56l4.794 5.999a.75.75 0 0 0 1.163.012z'/%3E%3C/svg%3E");
+  --cirth-icon-minus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none'%3E%3Cpath fill='#{functions.display-rgb($white)}' d='M20.958 13.5a.96.96 0 0 0 .737-.366c.195-.235.305-.553.305-.884 0-.332-.11-.65-.305-.884a.96.96 0 0 0-.737-.366H3.042a.96.96 0 0 0-.737.366A1.4 1.4 0 0 0 2 12.25c0 .332.11.65.305.884s.46.366.737.366z'/%3E%3C/svg%3E");
 
   // Close icon, masked as well (components/_modal.scss).
-  --cirth-icon-close: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='18' y1='6' x2='6' y2='18'%3E%3C/line%3E%3Cline x1='6' y1='6' x2='18' y2='18'%3E%3C/line%3E%3C/svg%3E");
+  --cirth-icon-close: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none'%3E%3Cpath fill='#{functions.display-rgb($neutral-400)}' d='M19.647 2.433a1.36 1.36 0 1 1 1.92 1.92L13.921 12l7.647 7.647a1.358 1.358 0 1 1-1.921 1.92L12 13.921l-7.647 7.647a1.358 1.358 0 1 1-1.92-1.921L10.079 12 2.433 4.353a1.359 1.359 0 1 1 1.92-1.92L12 10.079z'/%3E%3C/svg%3E");
 
   // Loading icon (animated)
   // Inspired by https://codepen.io/aleksander351/pen/KzgKPo
-  --cirth-icon-loading: url("data:image/svg+xml,%3Csvg fill='none' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' %3E%3Cstyle%3E g %7B animation: rotate 2s linear infinite; transform-origin: center center; %7D circle %7B stroke-dasharray: 75,100; stroke-dashoffset: -5; animation: dash 1.5s ease-in-out infinite; stroke-linecap: round; %7D @keyframes rotate %7B 0%25 %7B transform: rotate(0deg); %7D 100%25 %7B transform: rotate(360deg); %7D %7D @keyframes dash %7B 0%25 %7B stroke-dasharray: 1,100; stroke-dashoffset: 0; %7D 50%25 %7B stroke-dasharray: 44.5,100; stroke-dashoffset: -17.5; %7D 100%25 %7B stroke-dasharray: 44.5,100; stroke-dashoffset: -62; %7D %7D %3C/style%3E%3Cg%3E%3Ccircle cx='12' cy='12' r='10' fill='none' stroke='#{functions.display-rgb($neutral-400)}' stroke-width='4' /%3E%3C/g%3E%3C/svg%3E");
+  --cirth-icon-loading: url("data:image/svg+xml,%3Csvg fill='none' height='24' width='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' %3E%3Cstyle%3E g %7B animation: rotate 2s linear infinite; transform-origin: center center; %7D circle %7B stroke-dasharray: 75,100; stroke-dashoffset: -5; animation: dash 1.5s ease-in-out infinite; stroke-linecap: round; %7D @keyframes rotate %7B 0%25 %7B transform: rotate(0deg); %7D 100%25 %7B transform: rotate(360deg); %7D %7D @keyframes dash %7B 0%25 %7B stroke-dasharray: 1,100; stroke-dashoffset: 0; %7D 50%25 %7B stroke-dasharray: 44.5,100; stroke-dashoffset: -17.5; %7D 100%25 %7B stroke-dasharray: 44.5,100; stroke-dashoffset: -62; %7D %7D %3C/style%3E%3Cg%3E%3Ccircle cx='12' cy='12' r='10' fill='none' stroke='#{functions.display-rgb($neutral-400)}' stroke-width='4' /%3E%3C/g%3E%3C/svg%3E");
 }
 
 @include selectors.scope {
