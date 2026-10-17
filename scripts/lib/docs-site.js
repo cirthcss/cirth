@@ -164,13 +164,13 @@ const snapshotDocs = ({ attempts = 3, label, source = docsDist }) => {
 // re-audit whatever the toolchain thought a year ago, and any finding
 // would be unfixable by definition. The /next/ preview is excluded for the
 // opposite reason: it is this site, built twice.
-// Share-card/icon routes are deterministic rasterization sources, not
+// Share-card routes are deterministic rasterization sources, not
 // navigable documentation. The lab routes are isolated iframe targets and
 // intentionally omit the docs preset controls that generic page audits wait
 // for; their real form markup and builds are covered by the home comparison
 // and the underlying component suites.
 const excludedTopLevel =
-	/^(v\d+\.\d+|next|lab|specimen|social-preview|readme-preview-light|readme-preview-dark|favicon-preview)$/;
+	/^(v\d+\.\d+|next|lab|specimen|social-preview|readme-preview-light|readme-preview-dark)$/;
 
 /** @param {string} file */
 const isForwardingPage = (file) =>

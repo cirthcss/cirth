@@ -1267,28 +1267,29 @@ pre > button.copy.copied::before {
   margin: 0;
 }
 
-/* Each variant on the scheme it is drawn for, divided by the grid's gap. */
+/* Each variant on a scheme it is used on, divided by the grid's gap. */
 .docs-brand-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin: 1.5rem 0;
 }
 
-@media (width >= 48rem) {
-  .docs-brand-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
+/* The picture takes the space the caption and the links leave, centred in
+   it; they sit at the foot. Tiles in a row share a height, so pictures of
+   different sizes share a centre and every caption a line. */
 .docs-brand-tile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  justify-items: center;
   gap: var(--cirth-spacing);
   margin: 0;
   padding: calc(var(--cirth-spacing) * 1.5) var(--cirth-spacing);
   background-color: var(--cirth-background-color);
   text-align: center;
+}
+
+.docs-brand-tile > img {
+  align-self: center;
 }
 
 .docs-brand-tile figcaption {
@@ -1299,7 +1300,7 @@ pre > button.copy.copied::before {
 .docs-brand-downloads {
   display: flex;
   gap: calc(var(--cirth-spacing) * 0.5);
-  margin: auto 0 0;
+  margin: 0;
 }
 
 /* The wide lockup takes a track of its own on a narrow screen. */
@@ -1311,9 +1312,15 @@ pre > button.copy.copied::before {
   width: min(100%, 15rem);
 }
 
+/* The compact lockup at the height the site header draws it. */
+.docs-lockup-grid .docs-brand-small {
+  width: auto;
+  height: 2.125rem;
+}
+
 @media (width >= 48rem) {
   .docs-lockup-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

@@ -75,7 +75,10 @@
 	</head>
 	<body>
 		<section class="brand">
-			<img class="lockup" src="../{% if cardTheme == 'dark' %}wordmark_dark.svg{% else %}wordmark.svg{% endif %}" alt="Cirth" />
+			{#- The README card draws the lockup 140px wide, its badge under 64px:
+			    the size the compact drawing is for. -#}
+			{%- set lockupFile = "wordmark_compact" if cardFormat == "readme" else "wordmark" -%}
+			<img class="lockup" src="../{{ lockupFile }}{% if cardTheme == 'dark' %}_dark{% endif %}.svg" alt="Cirth" />
 			<h1>UI from <em>semantic HTML.</em></h1>
 			<p class="tag">One stylesheet. Accessible baseline. No runtime.</p>
 		</section>

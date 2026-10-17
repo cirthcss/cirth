@@ -1,26 +1,28 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const process = require("node:process");
-const { SOURCE, read } = require("./lib/brand-mark");
+const { DRAWINGS, read } = require("./lib/brand-mark");
 const marks = require("./build-brand-marks");
 const lockups = require("./build-brand-lockup");
 
-// Every Cirth brand asset is generated from one drawing,
-// docs/public/logo_brand.svg, and the theme's scales: the recolours, the app
-// tiles, the favicons and the manifest by build-brand-marks.js, the lockups
-// by build-brand-lockup.js. Nothing in the build runs them, so a redrawn
-// mark or a moved accent step leaves the files on disk describing the old
-// one until someone regenerates them.
+// Every Cirth brand asset is generated from the two drawings in docs/brand/
+// and the theme's scales: the marks, the favicon and the manifest by
+// build-brand-marks.js, the lockups by build-brand-lockup.js. Nothing in the
+// build runs them, so a redrawn mark or a moved accent step leaves the
+// files on disk describing the old one until someone regenerates them.
 //
 // This check is what notices. It regenerates every file in memory and
-// compares it with the file on disk, byte for byte: geometry, pigment, crop
-// and tile together. A difference means the file was edited by hand, or not
+// compares it with the file on disk, byte for byte: geometry, pigment and
+// crop together. A difference means the file was edited by hand, or not
 // regenerated after the drawing or the scale moved.
 
 /** @type {Record<string, string>} */
 const generated = { ...marks.variants(), ...lockups.variants() };
 /** @type {string[]} */
 const failures = [];
+const SOURCES = Object.values(DRAWINGS)
+	.map(({ file }) => path.relative(path.join(__dirname, ".."), file))
+	.join(" and ");
 
 for (const [file, expected] of Object.entries(generated)) {
 	/** @type {string} */
@@ -33,21 +35,55 @@ for (const [file, expected] of Object.entries(generated)) {
 	}
 	if (actual !== expected) {
 		failures.push(
-			`${file}: differs from what the generators write from ${SOURCE} and src/theme/_colors.scss`,
+			`${file}: differs from what the generators write from ${SOURCES} and src/theme/_colors.scss`,
 		);
 	}
 }
 
 // Nothing brand-named is left over: every SVG is one the generators write,
-// and every PNG is the raster of one of those SVGs. A variant the
+// every mark or lockup PNG is the raster of one of those SVGs, and every
+// icon is one `icons` in build-brand-marks.js declares. A variant the
 // generators stopped writing would otherwise stay published, unnoticed.
-for (const file of fs.readdirSync(path.join(__dirname, "../docs/public"))) {
-	if (!/^(?:logo_|favicon|wordmark|mark_)/.test(file)) continue;
-	if (file.endsWith(".svg") && !(file in generated)) {
-		failures.push(`${file}: no generator writes it; remove it or add it to one`);
+const publicDir = path.join(__dirname, "../docs/public");
+/** @type {Map<string, { file: string, sizes: number[] }>} */
+const declaredIcons = new Map(marks.icons.map((icon) => [icon.file, icon]));
+for (const file of fs.readdirSync(publicDir)) {
+	if (declaredIcons.has(file)) continue;
+	if (!/^(?:logo_|favicon|wordmark|mark_|icon-|apple-touch-icon)/.test(file)) continue;
+	if (file.endsWith(".svg")) {
+		if (!(file in generated)) failures.push(`${file}: no generator writes it; remove it or add it to one`);
+	} else if (!/^(?:logo_|wordmark)/.test(file) || !file.endsWith(".png") || !(file.replace(/\.png$/, ".svg") in generated)) {
+		failures.push(`${file}: a raster of nothing the generators write; remove it, or declare it in \`icons\``);
 	}
-	if (file.endsWith(".png") && !(file.replace(/\.png$/, ".svg") in generated)) {
-		failures.push(`${file}: a raster of an SVG the generators no longer write`);
+}
+
+// Every declared icon is there, at the sizes it declares: read from the
+// PNG header, or from each entry of an .ico's directory. The pixels are
+// not compared, for the reason the PNGs above are not.
+const pngSignature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+for (const icon of declaredIcons.values()) {
+	const full = path.join(publicDir, icon.file);
+	if (!fs.existsSync(full)) {
+		failures.push(`${icon.file}: missing; run \`npm run docs:brand-assets\``);
+		continue;
+	}
+	const bytes = fs.readFileSync(full);
+	/** @type {number[]} */
+	let sizes = [];
+	if (icon.file.endsWith(".ico")) {
+		const count = bytes.readUInt16LE(2) === 1 ? bytes.readUInt16LE(4) : 0;
+		for (let index = 0; index < count; index++) {
+			const entry = 6 + 16 * index;
+			const width = bytes.readUInt8(entry) || 256;
+			const height = bytes.readUInt8(entry + 1) || 256;
+			const image = bytes.subarray(bytes.readUInt32LE(entry + 12));
+			sizes.push(width === height && image.subarray(0, 8).equals(pngSignature) ? width : -1);
+		}
+	} else if (bytes.subarray(0, 8).equals(pngSignature) && bytes.readUInt32BE(16) === bytes.readUInt32BE(20)) {
+		sizes = [bytes.readUInt32BE(16)];
+	}
+	if (sizes.join() !== icon.sizes.join()) {
+		failures.push(`${icon.file}: holds ${sizes.length ? sizes.join(", ") : "no readable image"}, not the declared ${icon.sizes.join(", ")}px`);
 	}
 }
 
@@ -68,7 +104,6 @@ const frameworkMarks = frameworkData.marks;
 const named = new Set(
 	Object.values(frameworkMarks).flatMap((mark) => [mark.file, mark.dark].filter(Boolean)),
 );
-const pngSignature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 /** @type {string[]} */
 const markFailures = [];
 for (const file of named) {
@@ -148,7 +183,7 @@ failures.push(...markFailures);
 
 if (failures.length > 0) {
 	console.error(
-		`[@cirthcss/cirth] check:brand-assets: ${failures.length} asset(s) failed: the Cirth mark drifted from ${SOURCE}, or an integration mark is missing, unsafe or unlisted`,
+		`[@cirthcss/cirth] check:brand-assets: ${failures.length} asset(s) failed: the Cirth mark drifted from ${SOURCES}, or an integration mark is missing, unsafe or unlisted`,
 	);
 	for (const failure of failures) console.error(`  ✗ ${failure}`);
 	console.error(
@@ -160,5 +195,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-	`[@cirthcss/cirth] check:brand-assets: ${Object.keys(generated).length} generated files match the mark in ${SOURCE} and the theme's scales; ${named.size} integration mark files (${Object.values(frameworkMarks).filter((record) => record.file).length} marks) are present, self-contained, listed and shown under their owners' terms; all ${frameworkData.count} guides name their project's site, ${frameworkData.guides.filter((guide) => !guide.markData).length} of them by name alone`,
+	`[@cirthcss/cirth] check:brand-assets: ${Object.keys(generated).length} generated files match the drawings in ${SOURCES} and the theme's scales; ${named.size} integration mark files (${Object.values(frameworkMarks).filter((record) => record.file).length} marks) are present, self-contained, listed and shown under their owners' terms; all ${frameworkData.count} guides name their project's site, ${frameworkData.guides.filter((guide) => !guide.markData).length} of them by name alone`,
 );

@@ -4,18 +4,38 @@ const path = require("node:path");
 // One reading of the brand mark, for every script that needs its geometry
 // or its colour.
 //
-// The mark's measurements are derived from its path data, never written
+// The mark's measurements are derived from its drawing, never written
 // down: a box measured by hand is right about one drawing and silently
-// wrong about the next. Its pigments are read from the theme's scales, so
-// the mark and the accent share a hue by construction.
+// wrong about the next. Its disc and the disc's highlight are painted from
+// the theme's scales, so the badge and the accent share a hue by
+// construction; every other ink is the drawing's own.
 
 const { parseColor } = require("./color");
 
 const publicDir = path.join(__dirname, "../../docs/public");
 const colorsFile = path.join(__dirname, "../../src/theme/_colors.scss");
 
-/** The file the mark's geometry is read from. Every other asset follows it. */
-const SOURCE = "logo_brand.svg";
+// The mark is drawn twice. The full drawing is for 64px and up; the compact
+// one, with a larger figure and fewer details, is for anything smaller: the
+// favicon, the site header, the home page orbit. Each names, by id, the
+// ring that bounds the badge, the magenta disc inside it and the highlight
+// on the disc.
+/** @typedef {"full" | "compact"} Drawing */
+/** @type {Record<Drawing, { file: string, ring: string, disc: string, highlight: string }>} */
+const DRAWINGS = {
+	full: {
+		file: path.join(__dirname, "../../docs/brand/cirth-mark.svg"),
+		ring: "badge-border",
+		disc: "brand-magenta",
+		highlight: "badge-highlight",
+	},
+	compact: {
+		file: path.join(__dirname, "../../docs/brand/cirth-mark-compact.svg"),
+		ring: "badge-ring",
+		disc: "badge-disc",
+		highlight: "badge-highlight",
+	},
+};
 
 /** @param {string} file */
 const read = (file) => fs.readFileSync(path.join(publicDir, file), "utf8");
@@ -59,21 +79,9 @@ const pigment = (name) => {
  */
 const pathData = (svg) => [...svg.matchAll(/<path[^>]*\sd="([^"]+)"/g)].map((m) => m[1]);
 
-/** The mark's own paths, from the one file that defines them. */
-const markPaths = () => {
-	const paths = pathData(read(SOURCE));
-	if (paths.length === 0) {
-		throw new Error(`brand-mark: no <path> found in ${SOURCE}`);
-	}
-	return paths;
-};
-
 // Exact bounds for a path. Straight segments are exact by inspection;
-// Bezier segments are exact at their extrema, found by solving the
-// derivative rather than by sampling the curve. Elliptical arcs are the one
-// command this does not bound exactly, so it refuses them instead of
-// returning a number that looks measured and is not: a mark drawn with arcs
-// needs this function extended, not trusted.
+// Bezier segments and elliptical arcs are exact at their extrema, found by
+// solving the derivative rather than by sampling the curve.
 /**
  * @param {number[]} values
  * @param {{ min: number, max: number }} into
@@ -138,6 +146,70 @@ const quadraticExtrema = (p0, p1, p2) => {
 		}
 	}
 	return out;
+};
+
+/**
+ * The points that bound an elliptical arc: its endpoints, plus each point
+ * where the ellipse turns on an axis and that lies inside the arc's sweep.
+ * The arc is converted to its centre form as SVG 1.1 appendix F.6.5 does,
+ * radii scaled up when they are too small to reach.
+ *
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} rxIn
+ * @param {number} ryIn
+ * @param {number} degrees
+ * @param {number} large
+ * @param {number} sweep
+ * @param {number} x2
+ * @param {number} y2
+ * @returns {{ xs: number[], ys: number[] }}
+ */
+const arcExtrema = (x1, y1, rxIn, ryIn, degrees, large, sweep, x2, y2) => {
+	const xs = [x1, x2];
+	const ys = [y1, y2];
+	let rx = Math.abs(rxIn);
+	let ry = Math.abs(ryIn);
+	if ((x1 === x2 && y1 === y2) || rx === 0 || ry === 0) return { xs, ys };
+	const phi = (degrees * Math.PI) / 180;
+	const cos = Math.cos(phi);
+	const sin = Math.sin(phi);
+	const hx = (x1 - x2) / 2;
+	const hy = (y1 - y2) / 2;
+	const px = cos * hx + sin * hy;
+	const py = -sin * hx + cos * hy;
+	const reach = (px * px) / (rx * rx) + (py * py) / (ry * ry);
+	if (reach > 1) {
+		rx *= Math.sqrt(reach);
+		ry *= Math.sqrt(reach);
+	}
+	const numerator = rx * rx * ry * ry - rx * rx * py * py - ry * ry * px * px;
+	const denominator = rx * rx * py * py + ry * ry * px * px;
+	const coefficient = (large === sweep ? -1 : 1) * Math.sqrt(Math.max(0, numerator / denominator));
+	const ccx = (coefficient * rx * py) / ry;
+	const ccy = (-coefficient * ry * px) / rx;
+	const cx = cos * ccx - sin * ccy + (x1 + x2) / 2;
+	const cy = sin * ccx + cos * ccy + (y1 + y2) / 2;
+	/** @param {number} ux @param {number} uy @param {number} vx @param {number} vy */
+	const angle = (ux, uy, vx, vy) => Math.atan2(ux * vy - uy * vx, ux * vx + uy * vy);
+	const start = angle(1, 0, (px - ccx) / rx, (py - ccy) / ry);
+	let span = angle((px - ccx) / rx, (py - ccy) / ry, (-px - ccx) / rx, (-py - ccy) / ry);
+	if (!sweep && span > 0) span -= 2 * Math.PI;
+	if (sweep && span < 0) span += 2 * Math.PI;
+	const turn = 2 * Math.PI;
+	/** @param {number} theta */
+	const inside = (theta) =>
+		span >= 0 ? (((theta - start) % turn) + turn) % turn <= span : (((start - theta) % turn) + turn) % turn <= -span;
+	/** @param {number} theta */
+	const at = (theta) => ({
+		x: cx + rx * cos * Math.cos(theta) - ry * sin * Math.sin(theta),
+		y: cy + rx * sin * Math.cos(theta) + ry * cos * Math.sin(theta),
+	});
+	const turnX = Math.atan2(-ry * sin, rx * cos);
+	const turnY = Math.atan2(ry * cos, rx * sin);
+	for (const theta of [turnX, turnX + Math.PI]) if (inside(theta)) xs.push(at(theta).x);
+	for (const theta of [turnY, turnY + Math.PI]) if (inside(theta)) ys.push(at(theta).y);
+	return { xs, ys };
 };
 
 /**
@@ -262,6 +334,29 @@ const boundingBox = (paths) => {
 				continue;
 			}
 
+			if (base === "A") {
+				const rx = next();
+				const ry = next();
+				const rotation = next();
+				const large = next();
+				const sweep = next();
+				// Flags written without separators ("011") would be read as
+				// one number; refuse them rather than misreading the arc.
+				if (![0, 1].includes(large) || ![0, 1].includes(sweep)) {
+					throw new Error(`brand-mark: unreadable arc flags in "${d}"`);
+				}
+				const nx = originX + next();
+				const ny = originY + next();
+				const arc = arcExtrema(x, y, rx, ry, rotation, large, sweep, nx, ny);
+				track(arc.xs, xs);
+				track(arc.ys, ys);
+				reflectX = nx;
+				reflectY = ny;
+				x = nx;
+				y = ny;
+				continue;
+			}
+
 			throw new Error(
 				`brand-mark: cannot bound the "${command}" command exactly. ` +
 					"Extend boundingBox() rather than letting it guess.",
@@ -285,7 +380,8 @@ const NAME_SOURCE = path.join(__dirname, "../../docs/brand/cirth-wordmark-martia
  * A path rewritten in absolute M, L, C, Q and Z commands, moved by
  * (dx, dy). Smooth curves are expanded and H and V become lines, so the
  * result is a path any consumer of this module can bound or transform.
- * Elliptical arcs are refused for the reason boundingBox() gives.
+ * Elliptical arcs are refused: the name's glyphs draw none, and rewriting
+ * one would need the centre form arcExtrema() works out.
  *
  * @param {string} d
  * @param {number} [dx]
@@ -381,4 +477,215 @@ const namePaths = () => {
 	return glyphs.map(([, tx, ty, d]) => absolutePath(d, Number(tx), Number(ty)));
 };
 
-module.exports = { NAME_SOURCE, SOURCE, absolutePath, boundingBox, markPaths, namePaths, pathData, pigment, publicDir, read, scaleStep };
+/** @typedef {{ x: number, y: number, width: number, height: number }} Box */
+
+/**
+ * The attributes of a tag, by name.
+ *
+ * @param {string} tag
+ * @returns {Record<string, string>}
+ */
+const attributes = (tag) =>
+	Object.fromEntries(
+		[...tag.matchAll(/([\w:-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g)].map(([, name, double, single]) => [name, double ?? single]),
+	);
+
+/**
+ * A transform as the shift it makes, or, where the shape allows it, the
+ * one rotation it turns by. Anything else is refused: the box of a shape
+ * moved by an arbitrary matrix is not the moved box.
+ *
+ * @param {string | undefined} value
+ * @param {boolean} rotatable
+ * @returns {{ dx: number, dy: number, rotate?: { angle: number, cx: number, cy: number } }}
+ */
+const readTransform = (value, rotatable) => {
+	/** @type {{ dx: number, dy: number, rotate?: { angle: number, cx: number, cy: number } }} */
+	const out = { dx: 0, dy: 0 };
+	if (!value) return out;
+	const steps = [...value.matchAll(/(\w+)\(([^)]*)\)/g)];
+	for (const [, name, args] of steps) {
+		const n = args.trim().split(/[\s,]+/).map(Number);
+		if (name === "translate") {
+			out.dx += n[0];
+			out.dy += n[1] ?? 0;
+		} else if (name === "rotate" && rotatable && steps.length === 1) {
+			out.rotate = { angle: n[0], cx: n[1] ?? 0, cy: n[2] ?? 0 };
+		} else {
+			throw new Error(`brand-mark: cannot bound a shape under transform="${value}"`);
+		}
+	}
+	return out;
+};
+
+/**
+ * The box of one shape in its own coordinates.
+ *
+ * @param {string} tag
+ * @param {Record<string, string>} a
+ * @returns {Box}
+ */
+const shapeBox = (tag, a) => {
+	/** @param {string} name */
+	const num = (name) => Number(a[name] ?? 0);
+	if (tag === "path") return boundingBox([a.d]);
+	if (tag === "rect") return { x: num("x"), y: num("y"), width: num("width"), height: num("height") };
+	if (tag === "circle") {
+		const r = num("r");
+		return { x: num("cx") - r, y: num("cy") - r, width: 2 * r, height: 2 * r };
+	}
+	if (tag === "ellipse") {
+		// An ellipse turned by θ about (px, py): its centre turns with it,
+		// and its half-extents are the exact ones of the rotated curve.
+		const { rotate } = readTransform(a.transform, true);
+		const theta = ((rotate?.angle ?? 0) * Math.PI) / 180;
+		const px = rotate?.cx ?? 0;
+		const py = rotate?.cy ?? 0;
+		const ox = num("cx") - px;
+		const oy = num("cy") - py;
+		const cx = px + ox * Math.cos(theta) - oy * Math.sin(theta);
+		const cy = py + ox * Math.sin(theta) + oy * Math.cos(theta);
+		const rx = num("rx");
+		const ry = num("ry");
+		const hx = Math.hypot(rx * Math.cos(theta), ry * Math.sin(theta));
+		const hy = Math.hypot(rx * Math.sin(theta), ry * Math.cos(theta));
+		return { x: cx - hx, y: cy - hy, width: 2 * hx, height: 2 * hy };
+	}
+	throw new Error(`brand-mark: cannot bound a <${tag}>; extend shapeBox() rather than skipping it`);
+};
+
+const STROKE = ["stroke", "stroke-width", "stroke-linejoin", "stroke-miterlimit"];
+
+/**
+ * The ink box of a drawing's markup, and the box of every shape that has
+ * an id. Groups may only translate. A stroke widens a shape's box by half
+ * its width times the miter limit, the furthest a mitred corner can reach:
+ * a bound, not a measurement, and in these drawings never more than about
+ * three units in 1254.
+ *
+ * @param {string} markup
+ * @returns {{ ink: Box, byId: Record<string, Box> }}
+ */
+const inkOf = (markup) => {
+	/** @type {Array<{ dx: number, dy: number, style: Record<string, string> }>} */
+	const stack = [{ dx: 0, dy: 0, style: {} }];
+	/** @type {Record<string, Box>} */
+	const byId = {};
+	const xs = { min: Infinity, max: -Infinity };
+	const ys = { min: Infinity, max: -Infinity };
+	for (const [tagText, closing, tag, , selfClosing] of markup.matchAll(/<(\/?)([a-zA-Z][\w:-]*)\b([^>]*?)(\/?)>/g)) {
+		const top = /** @type {{ dx: number, dy: number, style: Record<string, string> }} */ (stack.at(-1));
+		if (tag === "g") {
+			if (closing) stack.pop();
+			else if (!selfClosing) {
+				const a = attributes(tagText);
+				const shift = readTransform(a.transform, false);
+				const style = { ...top.style };
+				for (const name of STROKE) if (a[name]) style[name] = a[name];
+				stack.push({ dx: top.dx + shift.dx, dy: top.dy + shift.dy, style });
+			}
+			continue;
+		}
+		if (closing || ["svg", "title", "desc"].includes(tag)) continue;
+		const a = attributes(tagText);
+		const box = shapeBox(tag, a);
+		const shift = tag === "ellipse" ? { dx: 0, dy: 0 } : readTransform(a.transform, tag === "circle");
+		const style = { ...top.style };
+		for (const name of STROKE) if (a[name]) style[name] = a[name];
+		const stroked = style.stroke && style.stroke !== "none";
+		const width = Number(style["stroke-width"] ?? 1);
+		const join = style["stroke-linejoin"] ?? "miter";
+		const pad = !stroked ? 0 : join === "miter" ? (width * Number(style["stroke-miterlimit"] ?? 4)) / 2 : width / 2;
+		const placed = {
+			x: box.x + top.dx + shift.dx - pad,
+			y: box.y + top.dy + shift.dy - pad,
+			width: box.width + 2 * pad,
+			height: box.height + 2 * pad,
+		};
+		if (a.id) byId[a.id] = placed;
+		track([placed.x, placed.x + placed.width], xs);
+		track([placed.y, placed.y + placed.height], ys);
+	}
+	if (xs.min === Infinity) throw new Error("brand-mark: no drawable geometry");
+	/** @param {number} value */
+	const round = (value) => Math.round(value * 1000) / 1000;
+	return {
+		ink: { x: round(xs.min), y: round(ys.min), width: round(xs.max - xs.min), height: round(ys.max - ys.min) },
+		byId,
+	};
+};
+
+/**
+ * The markup with every colour of one element, and of everything inside
+ * it, repainted. The element is found by id; its drawn colour is its own
+ * fill, which must be a hex value.
+ *
+ * @param {string} markup
+ * @param {string} id
+ * @param {string} colour
+ * @param {string} where
+ */
+const repaint = (markup, id, colour, where) => {
+	const open = new RegExp(`<([a-zA-Z]+)\\b[^>]*\\sid="${id}"[^>]*?(/?)>`).exec(markup);
+	if (!open) throw new Error(`brand-mark: no element with id "${id}" in ${where}`);
+	const [tagText, tag, selfClosing] = open;
+	let end = open.index + tagText.length;
+	if (!selfClosing) {
+		const inner = new RegExp(`<(/?)${tag}\\b[^>]*?(/?)>`, "g");
+		inner.lastIndex = end;
+		let depth = 1;
+		/** @type {RegExpExecArray | null} */
+		let match = null;
+		while (depth > 0 && (match = inner.exec(markup))) {
+			if (match[1]) depth--;
+			else if (!match[2]) depth++;
+		}
+		if (!match || depth > 0) throw new Error(`brand-mark: "${id}" in ${where} is never closed`);
+		end = match.index + match[0].length;
+	}
+	const drawn = attributes(tagText).fill;
+	if (!/^#[0-9a-f]{6}$/i.test(drawn ?? "")) throw new Error(`brand-mark: "${id}" in ${where} has no hex fill to repaint`);
+	const painted = markup.slice(open.index, end).replace(new RegExp(drawn, "gi"), colour);
+	return markup.slice(0, open.index) + painted + markup.slice(end);
+};
+
+/**
+ * One drawing of the mark, ready to publish: its view box, its markup with
+ * the disc and the highlight painted, its ink box, and the box of its ring,
+ * the circle a lockup aligns. The drawing's title and description, and its
+ * ids and data attributes, stay in the source: nothing refers to them, and
+ * they describe how the drawing was made rather than the mark.
+ *
+ * @param {Drawing} kind
+ * @param {{ disc: string, highlight: string }} paint hex fills
+ * @returns {{ viewBox: Box, body: string, ink: Box, ring: Box }}
+ */
+const drawing = (kind, paint) => {
+	const spec = DRAWINGS[kind];
+	const where = path.relative(path.join(__dirname, "../.."), spec.file);
+	const source = fs.readFileSync(spec.file, "utf8");
+	const root = /<svg\b[^>]*>/.exec(source);
+	const box = root ? (attributes(root[0]).viewBox ?? "").trim().split(/[\s,]+/).map(Number) : [];
+	if (!root || box.length !== 4 || box.some((n) => !Number.isFinite(n))) {
+		throw new Error(`brand-mark: ${where} has no <svg> with a viewBox`);
+	}
+	let body = source
+		.slice(root.index + root[0].length, source.lastIndexOf("</svg>"))
+		.replace(/\s*<title\b[\s\S]*?<\/title>/g, "")
+		.replace(/\s*<desc\b[\s\S]*?<\/desc>/g, "");
+	if (/<(?:script|style|image|use|text|foreignObject|defs|clipPath|mask|pattern|filter|\w+Gradient)\b|url\(|href\s*=/i.test(body)) {
+		throw new Error(`brand-mark: ${where} uses something the generators do not carry over (a reference, a style sheet, text or an image)`);
+	}
+	body = repaint(body, spec.disc, paint.disc, where);
+	body = repaint(body, spec.highlight, paint.highlight, where);
+	const { ink, byId } = inkOf(body);
+	const ring = byId[spec.ring];
+	if (!ring) throw new Error(`brand-mark: no ring "${spec.ring}" in ${where}`);
+	body = body
+		.replace(/\s(?:id|data-[\w-]+)="[^"]*"/g, "")
+		.replace(/^\s*\n/, "")
+		.replace(/\s+$/, "");
+	return { viewBox: { x: box[0], y: box[1], width: box[2], height: box[3] }, body, ink, ring };
+};
+
+module.exports = { DRAWINGS, NAME_SOURCE, absolutePath, boundingBox, drawing, namePaths, pathData, pigment, publicDir, read, scaleStep };

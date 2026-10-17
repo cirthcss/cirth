@@ -2,7 +2,7 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/wordmark_dark.svg">
     <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/wordmark.svg">
-    <img alt="Cirth" src="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/wordmark.svg" width="281" height="96">
+    <img alt="Cirth" src="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/wordmark.svg" width="276" height="96">
   </picture>
 </h1>
 

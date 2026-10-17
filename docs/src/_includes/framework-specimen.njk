@@ -4,8 +4,8 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>{{ specimenTitle }} — Cirth framework specimen</title>
-		<link rel="icon" href="/favicon.svg" media="(prefers-color-scheme: light)" />
-		<link rel="icon" href="/favicon_dark.svg" media="(prefers-color-scheme: dark)" />
+		<link rel="icon" href="{{ brandIcons.ico }}" sizes="32x32" />
+		<link rel="icon" href="{{ brandIcons.svg }}" type="image/svg+xml" />
 		<link rel="stylesheet" href="/styles/generated/cirth-lab-default.css" />
 		{% if specimenPreset %}<link rel="stylesheet" href="/styles/generated/presets/{{ specimenPreset }}.css" />{% endif %}
 		{% if specimenPrimary %}<style>:root { --cirth-primary: {{ specimenPrimary }}; }</style>{% endif %}

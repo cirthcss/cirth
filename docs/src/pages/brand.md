@@ -10,11 +10,11 @@ an integration. It provides the current assets and the rules that keep the
 project identifiable.
 
 <section class="docs-brand-hero" aria-label="The Cirth lockup">
-  <img class="docs-logo-light" src="/wordmark.svg" alt="Cirth" width="{{ brandLockup.width | round }}" height="{{ brandLockup.height }}" />
-  <img class="docs-logo-dark" src="/wordmark_dark.svg" alt="Cirth" width="{{ brandLockup.width | round }}" height="{{ brandLockup.height }}" />
+  <img class="docs-logo-light" src="/wordmark.svg" alt="Cirth" width="{{ brandLockup.full.width | round }}" height="{{ brandLockup.height }}" />
+  <img class="docs-logo-dark" src="/wordmark_dark.svg" alt="Cirth" width="{{ brandLockup.full.width | round }}" height="{{ brandLockup.height }}" />
   <p class="docs-brand-hero-line">A semantic-first CSS framework for the HTML the browser already understands.</p>
   <p class="docs-brand-hero-actions">
-    <a href="/logo_brand.svg" download role="button">Download the mark<span class="sr-only">, SVG for light backgrounds</span></a>
+    <a href="/logo_brand.svg" download role="button">Download the mark<span class="sr-only">, SVG</span></a>
     <a href="/wordmark.svg" download role="button" class="secondary outline">Download the lockup<span class="sr-only">, SVG for light backgrounds</span></a>
     <a href="#downloads">Every variant</a>
   </p>
@@ -24,11 +24,18 @@ project identifiable.
 
 The identity has two primary forms:
 
-- **Mark:** a filled sign containing a figure with a feathered hat and lute.
-  Use it where nearby text already names Cirth or where the available area is
-  square.
-- **Lockup:** the mark followed by the outlined Cirth name. Use it when the
+- **Mark:** a round badge, a figure playing a flute in front of a magenta
+  disc inside a black ring. Use it where nearby text already names Cirth or
+  where the available area is square.
+- **Lockup:** the badge followed by the outlined Cirth name. Use it when the
   asset must carry the project name by itself.
+
+Both forms come in two drawings, chosen by the size they are displayed at:
+
+- **Full**, at 64px and larger: README headers, slides, social cards, print.
+- **Compact**, below 64px: favicons, app icons, navigation bars, small
+  avatars. It enlarges the figure and leaves out the cloak and sleeves,
+  whose lines close up at small sizes.
 
 The name refers to the Cirth writing system invented by J. R. R. Tolkien.
 [About](/about#origin-of-the-name) explains that reference and the project's
@@ -42,42 +49,26 @@ is `@cirthcss/cirth`.
 
 <div class="docs-brand-grid">
   <figure class="docs-brand-tile" data-theme="light">
-    <img src="/logo_brand.svg" alt="Cirth mark, magenta" width="96" height="96" />
-    <figcaption><strong>Mark</strong><span>Colour, light backgrounds</span></figcaption>
+    <img src="/logo_brand.svg" alt="Cirth mark, full drawing" width="96" height="96" />
+    <figcaption><strong>Mark</strong><span>64px and larger</span></figcaption>
     <p class="docs-brand-downloads">
-      <a class="secondary" href="/logo_brand.svg" download>SVG<span class="sr-only">, mark for light backgrounds</span></a>
-      <a class="secondary" href="/logo_brand.png" download>PNG<span class="sr-only">, mark for light backgrounds</span></a>
-    </p>
-  </figure>
-  <figure class="docs-brand-tile" data-theme="light">
-    <img src="/logo_mono.svg" alt="Cirth mark, black" width="96" height="96" />
-    <figcaption><strong>Mono mark</strong><span>One ink, light backgrounds</span></figcaption>
-    <p class="docs-brand-downloads">
-      <a class="secondary" href="/logo_mono.svg" download>SVG<span class="sr-only">, black mark</span></a>
-      <a class="secondary" href="/logo_mono.png" download>PNG<span class="sr-only">, black mark</span></a>
+      <a class="secondary" href="/logo_brand.svg" download>SVG<span class="sr-only">, full mark</span></a>
+      <a class="secondary" href="/logo_brand.png" download>PNG<span class="sr-only">, full mark</span></a>
     </p>
   </figure>
   <figure class="docs-brand-tile" data-theme="dark">
-    <img src="/logo_brand_dark.svg" alt="Cirth mark, light magenta" width="96" height="96" />
-    <figcaption><strong>Mark</strong><span>Colour, dark backgrounds</span></figcaption>
+    <img src="/logo_compact.svg" alt="Cirth mark, compact drawing" width="48" height="48" />
+    <figcaption><strong>Compact mark</strong><span>Below 64px</span></figcaption>
     <p class="docs-brand-downloads">
-      <a class="secondary" href="/logo_brand_dark.svg" download>SVG<span class="sr-only">, mark for dark backgrounds</span></a>
-      <a class="secondary" href="/logo_brand_dark.png" download>PNG<span class="sr-only">, mark for dark backgrounds</span></a>
-    </p>
-  </figure>
-  <figure class="docs-brand-tile" data-theme="dark">
-    <img src="/logo_mono_dark.svg" alt="Cirth mark, white" width="96" height="96" />
-    <figcaption><strong>Mono mark</strong><span>One ink, dark backgrounds</span></figcaption>
-    <p class="docs-brand-downloads">
-      <a class="secondary" href="/logo_mono_dark.svg" download>SVG<span class="sr-only">, white mark</span></a>
-      <a class="secondary" href="/logo_mono_dark.png" download>PNG<span class="sr-only">, white mark</span></a>
+      <a class="secondary" href="/logo_compact.svg" download>SVG<span class="sr-only">, compact mark</span></a>
+      <a class="secondary" href="/logo_compact.png" download>PNG<span class="sr-only">, compact mark</span></a>
     </p>
   </figure>
 </div>
 
 <div class="docs-brand-grid docs-lockup-grid">
   <figure class="docs-brand-tile" data-theme="light">
-    <img src="/wordmark.svg" alt="Cirth lockup, magenta mark and dark name" width="{{ brandLockup.width | round }}" height="{{ brandLockup.height }}" />
+    <img src="/wordmark.svg" alt="Cirth lockup with dark name" width="{{ brandLockup.full.width | round }}" height="{{ brandLockup.height }}" />
     <figcaption><strong>Lockup</strong><span>Light backgrounds</span></figcaption>
     <p class="docs-brand-downloads">
       <a class="secondary" href="/wordmark.svg" download>SVG<span class="sr-only">, lockup for light backgrounds</span></a>
@@ -85,7 +76,7 @@ is `@cirthcss/cirth`.
     </p>
   </figure>
   <figure class="docs-brand-tile" data-theme="dark">
-    <img src="/wordmark_dark.svg" alt="Cirth lockup, light magenta mark and light name" width="{{ brandLockup.width | round }}" height="{{ brandLockup.height }}" />
+    <img src="/wordmark_dark.svg" alt="Cirth lockup with light name" width="{{ brandLockup.full.width | round }}" height="{{ brandLockup.height }}" />
     <figcaption><strong>Lockup</strong><span>Dark backgrounds</span></figcaption>
     <p class="docs-brand-downloads">
       <a class="secondary" href="/wordmark_dark.svg" download>SVG<span class="sr-only">, lockup for dark backgrounds</span></a>
@@ -93,18 +84,30 @@ is `@cirthcss/cirth`.
     </p>
   </figure>
   <figure class="docs-brand-tile" data-theme="light">
-    <img src="/wordmark_mono.svg" alt="Cirth lockup in one ink" width="{{ brandLockup.width | round }}" height="{{ brandLockup.height }}" />
-    <figcaption><strong>Mono lockup</strong><span>One ink, vector</span></figcaption>
+    <img class="docs-brand-small" src="/wordmark_compact.svg" alt="Cirth compact lockup with dark name" width="{{ brandLockup.compact.width | round }}" height="{{ brandLockup.height }}" />
+    <figcaption><strong>Compact lockup</strong><span>Light backgrounds, below 64px</span></figcaption>
     <p class="docs-brand-downloads">
-      <a class="secondary" href="/wordmark_mono.svg" download>SVG<span class="sr-only">, one-ink lockup</span></a>
+      <a class="secondary" href="/wordmark_compact.svg" download>SVG<span class="sr-only">, compact lockup for light backgrounds</span></a>
+      <a class="secondary" href="/wordmark_compact.png" download>PNG<span class="sr-only">, compact lockup for light backgrounds</span></a>
+    </p>
+  </figure>
+  <figure class="docs-brand-tile" data-theme="dark">
+    <img class="docs-brand-small" src="/wordmark_compact_dark.svg" alt="Cirth compact lockup with light name" width="{{ brandLockup.compact.width | round }}" height="{{ brandLockup.height }}" />
+    <figcaption><strong>Compact lockup</strong><span>Dark backgrounds, below 64px</span></figcaption>
+    <p class="docs-brand-downloads">
+      <a class="secondary" href="/wordmark_compact_dark.svg" download>SVG<span class="sr-only">, compact lockup for dark backgrounds</span></a>
+      <a class="secondary" href="/wordmark_compact_dark.png" download>PNG<span class="sr-only">, compact lockup for dark backgrounds</span></a>
     </p>
   </figure>
 </div>
 
 Prefer SVG when the destination accepts it. SVG stays sharp at different
 sizes. The PNG marks are 1024 by 1024 pixels; lockup PNGs are rendered at
-four times the SVG dimensions. The mono lockup uses `currentColor` when it
-is inlined. When loaded through `img`, it falls back to black.
+four times the SVG dimensions.
+
+The badge carries its own black ring, so one mark file serves light and dark
+backgrounds. The lockups come in a light and a dark file only because the
+name's ink changes.
 
 The generated inventory and source relationship are recorded in
 [`docs/BRAND_ASSETS.md`](https://github.com/cirthcss/cirth/blob/master/docs/BRAND_ASSETS.md).
@@ -115,26 +118,30 @@ The generated inventory and source relationship are recorded in
 | --- | --- |
 | Nearby text already says Cirth | Mark |
 | README header, slide or partner page that must carry the name | Lockup |
-| Avatar or square profile image | Mark |
-| Light background | Light colour asset, or black mono asset |
-| Dark background | Dark colour asset, or white mono asset |
-| One-colour printing, engraving or embossing | Mono mark or mono lockup |
-| Browser tab | `favicon.svg` and `favicon_dark.svg` |
+| Avatar or square profile image | Mark; compact mark when it is shown below 64px |
+| Navigation bar, toolbar or footer | Compact lockup |
+| Browser tab or app icon | Compact mark; the site serves `favicon.svg`, `favicon.ico` for browsers without SVG icons, and touch and app icons drawn from the same file |
+| Light background | Mark, or the lockup for light backgrounds |
+| Dark background | Mark, or the lockup for dark backgrounds |
+| One-colour printing, engraving or embossing | No file yet: the badge is drawn in several inks. Open an issue to ask for one |
 
-Do not shrink the lockup until its name becomes unreadable. Switch to the
-mark and write “Cirth” in nearby text. Preview raster output at its final
-display size.
+Choose the drawing by the size the badge is displayed at, not by the size of
+the file. Do not shrink the lockup until its name becomes unreadable. Switch
+to the mark and write “Cirth” in nearby text. Preview raster output at its
+final display size.
 
 ## Colour
 
-The colour mark uses the same accent scale as the default interface. The
-files are generated from the theme source, so the recorded values remain
-aligned with the build.
+The badge's disc and its highlight use the same accent scale as the default
+interface: the disc is the colour of a primary button. The files are
+generated from the theme source, so the recorded values remain aligned with
+the build. The black ring, the figure and its greys are fixed inks of the
+drawing.
 
-| Role | Source step | Value | Contrast on its canvas |
-| --- | --- | --- | --- |
-| Mark on light | `{{ brandMark.markLight.step }}` | `{{ brandMark.markLight.hex }}` (`{{ brandMark.markLight.oklch }}`) | {{ brandMark.contrast.light | ratio }} |
-| Mark on dark | `{{ brandMark.markDark.step }}` | `{{ brandMark.markDark.hex }}` (`{{ brandMark.markDark.oklch }}`) | {{ brandMark.contrast.dark | ratio }} |
+| Role | Source step | Value |
+| --- | --- | --- |
+| Disc | `{{ brandMark.disc.step }}` | `{{ brandMark.disc.hex }}` (`{{ brandMark.disc.oklch }}`) |
+| Highlight | `{{ brandMark.highlight.step }}` | `{{ brandMark.highlight.hex }}` (`{{ brandMark.highlight.oklch }}`) |
 
 Use the supplied file rather than sampling and recreating these colours. In a
 Cirth interface, use the `--cirth-primary*` tokens instead of brand-file

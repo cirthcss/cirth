@@ -1,3 +1,4 @@
+const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 const { EleventyHtmlBasePlugin } = require("@11ty/eleventy");
@@ -244,13 +245,26 @@ module.exports = (eleventyConfig) => {
 	eleventyConfig.addGlobalData("measured", measuredTheme(path.join(docsRoot, "..")));
 	// The scale steps the brand files are painted with.
 	eleventyConfig.addGlobalData("brandMark", brandPalette());
-	// The lockup's box, so every <img> reserves its space, and where its name's
-	// capitals are centred, for the header.
-	eleventyConfig.addGlobalData("brandLockup", {
-		width: brandLockup.width,
-		height: brandLockup.HEIGHT,
-		nameCentre: brandLockup.nameCentre,
+	// The icons' URLs, each with a hash of the file's content. Browsers keep
+	// a favicon by its URL long after the file behind it changes (Safari
+	// across reloads and restarts), so a redrawn icon has to be a new URL.
+	// A function, so a rebuild reads the files again.
+	eleventyConfig.addGlobalData("brandIcons", () => {
+		/** @param {string} file */
+		const versioned = (file) => {
+			const hash = crypto.createHash("sha256").update(fs.readFileSync(path.join(docsRoot, "public", file))).digest("hex");
+			return `/${file}?v=${hash.slice(0, 10)}`;
+		};
+		return {
+			svg: versioned("favicon.svg"),
+			ico: versioned("favicon.ico"),
+			touch: versioned("apple-touch-icon.png"),
+		};
 	});
+	// Each lockup's box, so every <img> reserves its space, and where its
+	// name's capitals are centred, for the header: `brandLockup.full` and
+	// `brandLockup.compact`, both `brandLockup.height` high.
+	eleventyConfig.addGlobalData("brandLockup", brandLockup.boxes());
 	// The markup comparison, read through its check, so fixtures edited without
 	// `npm run benchmark` fail the build.
 	eleventyConfig.addGlobalData("benchmark", markupBenchmark());
