@@ -133,9 +133,18 @@
     align-items: center;
     justify-content: start;
 
+    // A trail too long for its width wraps onto another line rather than
+    // running past the page (WCAG 1.4.10 reflow).
+    & :is(ol, ul) {
+      flex-wrap: wrap;
+    }
+
+    // The gap between two items belongs to the one before, because its
+    // divider is drawn there: an item that ends a wrapped line keeps the
+    // room its divider needs, and the next line starts flush.
     & :is(ol, ul) li {
-      &:not(:first-child) {
-        margin-inline-start: var(--cirth-nav-link-spacing-horizontal);
+      &:not(:last-child) {
+        margin-inline-end: var(--cirth-nav-link-spacing-horizontal);
       }
 
       a {
@@ -146,12 +155,15 @@
       }
 
       // The default ">" divider is Bidi_Mirrored, so RTL needs no override.
+      // Two spacings wide from the end of the item's text: centred where it
+      // has always been, and inside the item's padding and trailing gap, so
+      // it never reaches past a line it ends.
       &:not(:last-child) {
         &::after {
           display: inline-block;
           position: absolute;
-          width: calc(var(--cirth-nav-link-spacing-horizontal) * 4);
-          margin: 0 calc(var(--cirth-nav-link-spacing-horizontal) * -1);
+          width: calc(var(--cirth-nav-link-spacing-horizontal) * 2);
+          margin: 0;
           content: var(--cirth-nav-breadcrumb-divider);
           color: var(--cirth-muted-color);
           text-align: center;

@@ -37,7 +37,7 @@ the sequence has meaning, and name the navigation landmark.
 {% demo "nav-breadcrumb" %}
 
 ```html
-<nav aria-label="Breadcrumb">
+<nav aria-label="breadcrumb">
   <ol>
     <li><a href="/docs">Docs</a></li>
     <li><a href="/components">Components</a></li>
@@ -50,6 +50,10 @@ Cirth inserts `--cirth-nav-breadcrumb-divider` between items and removes pointer
 interaction from the current-page link. The default divider mirrors in a
 right-to-left document. `ul` receives the same visual treatment, but `ol`
 communicates the path order more precisely.
+
+The styles apply to `aria-label="breadcrumb"`, written in lowercase. A trail
+too long for its width wraps onto another line, with each divider closing the
+line it ends, so it never runs past a narrow screen.
 
 ## Navbar
 

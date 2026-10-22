@@ -970,6 +970,96 @@ for (const build of scopedAndUnscoped) {
 	});
 }
 
+// A breadcrumb that does not fit its width wraps onto more lines. A nav's
+// lists are a flex row, and a row that may not wrap pushed a long trail
+// past the edge of the page: the documentation's WordPress guide was 12px
+// wider than a 320px window in Linux's system face, a WCAG 1.4.10 reflow
+// failure. The container is narrow enough that the trail cannot fit in
+// any face.
+for (const build of scopedAndUnscoped) {
+	test(`${build.name}: a breadcrumb too long for its width wraps instead of overflowing`, async ({
+		page,
+	}) => {
+		const markup = `<div id="narrow" style="inline-size: 200px">
+			<nav aria-label="breadcrumb">
+				<ol>
+					<li><a href="/guides/">Framework guides</a></li>
+					<li><a href="/guides/#cms">Content management</a></li>
+					<li aria-current="page">WordPress</li>
+				</ol>
+			</nav>
+		</div>`;
+		await setContent(
+			page,
+			`<style>${read(build.file)}</style><main>${
+				build.wrapper ? `<div class="${build.wrapper}">${markup}</div>` : markup
+			}</main>`,
+		);
+
+		const measured = await page.evaluate(() => {
+			const box = /** @type {HTMLElement} */ (document.getElementById("narrow")).getBoundingClientRect();
+			const list = /** @type {HTMLElement} */ (document.querySelector("#narrow ol"));
+			const items = [...list.querySelectorAll("li")].map((item) => item.getBoundingClientRect());
+			return {
+				// The list's own negative inline margins reach into the
+				// container's gutter by design; what may not happen is an item
+				// past the container's far edge.
+				overflow: Math.max(...items.map((item) => item.right)) - box.right,
+				lines: new Set(items.map((item) => Math.round(item.top))).size,
+			};
+		});
+
+		expect(measured.overflow, "a breadcrumb item runs past its container").toBeLessThanOrEqual(1);
+		expect(measured.lines, "the trail wraps onto more than one line").toBeGreaterThan(1);
+	});
+
+	// The divider is drawn after an item, so an item that ends a line must
+	// keep room for it: a first fix that only let the trail wrap left that
+	// divider hanging past the edge wherever a line ended near it, which is
+	// some width in any face. So every width from 160 to 360px, in both
+	// directions, and the measure is the container's own scroll width, which
+	// counts the divider as an element's box would not.
+	test(`${build.name}: no width makes a wrapped breadcrumb's divider overflow, in either direction`, async ({
+		page,
+	}) => {
+		// The padding is where a nav list's own negative inline margins land,
+		// as they do in any container that holds one. Positioned, so the
+		// divider, which is absolutely positioned, counts in this box's
+		// scroll width rather than the page's.
+		const trailIn = (/** @type {string} */ dir) => `<div class="probe" dir="${dir}" style="position: relative; overflow: auto; padding-inline: var(--cirth-nav-element-spacing-horizontal)">
+			<nav aria-label="breadcrumb">
+				<ol>
+					<li><a href="/guides/">Framework guides</a></li>
+					<li><a href="/guides/#apps">Server-rendered apps</a></li>
+					<li><a href="/guides/#cms">Content management</a></li>
+					<li aria-current="page">Laravel</li>
+				</ol>
+			</nav>
+		</div>`;
+		const markup = `${trailIn("ltr")}${trailIn("rtl")}`;
+		await setContent(
+			page,
+			`<style>${read(build.file)}</style><main>${
+				build.wrapper ? `<div class="${build.wrapper}">${markup}</div>` : markup
+			}</main>`,
+		);
+
+		const overflowing = await page.evaluate(() => {
+			/** @type {string[]} */
+			const found = [];
+			for (const probe of /** @type {HTMLElement[]} */ ([...document.querySelectorAll(".probe")])) {
+				for (let width = 160; width <= 360; width += 2) {
+					probe.style.inlineSize = `${width}px`;
+					const over = probe.scrollWidth - probe.clientWidth;
+					if (over > 1) found.push(`${probe.dir} ${width}px: +${over}`);
+				}
+			}
+			return found;
+		});
+		expect(overflowing, "widths at which the trail overflows its container").toEqual([]);
+	});
+}
+
 // The same contract outside a breadcrumb: a plain navigation list and a
 // navbar both take the flex row whichever list element they are written
 // with, and a stacked nav releases it for both in the same way.

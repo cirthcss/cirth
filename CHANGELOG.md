@@ -21,6 +21,15 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Fixed
 
+- **A long breadcrumb wraps instead of overflowing.** The list in
+  `nav[aria-label="breadcrumb"]` now wraps onto another line when its items
+  do not fit, so a trail no longer runs past a narrow viewport (WCAG 1.4.10
+  reflow) or squeezes an item's label onto two lines. The gap between two
+  items now belongs to the one before (`margin-inline-end` instead of the
+  next item's `margin-inline-start`), because its divider is drawn there: a
+  line ends with its divider inside the trail and the next line starts
+  flush. A trail that fits renders exactly as before.
+
 - **Dropdowns and popovers have visible elevation in the dark scheme.** The
   dark half of `--cirth-box-shadow` now carries four times the alpha of the
   light half, so a floating panel darkens the graphite canvas beside it by
