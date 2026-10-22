@@ -160,6 +160,12 @@ const measure = (page) =>
  * @param {(page: import("@playwright/test").Page) => Promise<void>} [prepare]
  */
 const auditAllPages = async (page, theme, prepare) => {
+	// One test visits every page, so its budget follows the number of pages
+	// rather than Playwright's fixed 30 seconds, which these runs outgrew as
+	// the site did. A page costs about 0.1s on an idle laptop, 0.3s on a slow
+	// CI runner and up to 0.8s when every one of these tests runs at once on
+	// one machine; it is allowed 1.5s, so a timeout means a page that hangs.
+	test.setTimeout(15_000 + pages.length * 1_500);
 	const failures = [];
 	for (const target of pages) {
 		await openPage(page, target, theme);
