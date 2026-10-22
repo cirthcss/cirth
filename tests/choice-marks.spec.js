@@ -205,6 +205,9 @@ test("the mark centres on the capital height, and a wrapped label hangs under it
 			);
 			context.font = `${font.fontWeight} ${font.fontSize} ${font.fontFamily}`;
 			const cap = context.measureText("H").actualBoundingBoxAscent;
+			// The indent counts the space after the mark as a quarter em; the
+			// face decides how wide it really is (specs/choice-marks.md).
+			const spaceExcess = context.measureText(" ").width - Number.parseFloat(font.fontSize) / 4;
 			const text = /** @type {Text} */ (
 				[...label.childNodes].find((node) => node.nodeType === 3 && node.textContent?.trim())
 			);
@@ -222,13 +225,19 @@ test("the mark centres on the capital height, and a wrapped label hangs under it
 				firstWord: first.getBoundingClientRect().left,
 				secondLine: second?.left ?? null,
 				lines: lines.length,
+				spaceExcess,
 			};
 		});
 		expect(Math.abs(geometry.capOffset), `${id}: mark on the cap height`).toBeLessThanOrEqual(1);
 		expect(geometry.lines, `${id} wraps`).toBeGreaterThan(1);
+		// The first word sits past the second line by what the face's space
+		// exceeds a quarter em: about 0.2px with the macOS system face, about
+		// 1px with Linux's, whose space is wider. Within a pixel of that,
+		// because WebKit places a text run on whole pixels; an indent that
+		// misses the box, margin or space is off by several.
 		expect(
-			Math.abs(/** @type {number} */ (geometry.secondLine) - geometry.firstWord),
-			`${id}: the second line starts under the first word`,
+			Math.abs(geometry.firstWord - /** @type {number} */ (geometry.secondLine) - geometry.spaceExcess),
+			`${id}: the second line starts under the first word, give or take the face's space`,
 		).toBeLessThanOrEqual(1);
 	}
 });

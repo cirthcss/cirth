@@ -500,11 +500,22 @@ test("every scene is a frame of about one window at desktop and laptop sizes, an
 		const header = await page.locator(".docs-header").evaluate((element) => element.getBoundingClientRect().height);
 		const frame = height - header;
 		// The scenes that are not held: at least a window below the header,
-		// and no more than that where what they hold fits one.
+		// and no more than that where what they hold fits one. Where it does
+		// not, the scene grows by what its content needs and no more: the
+		// copy wraps onto more lines in a wider face (Linux's system face
+		// makes the presets scene 15px taller at 1024x768 than macOS's does).
 		for (const selector of [".docs-presets", ".docs-agnostic", ".docs-pure"]) {
-			const section = await page.locator(selector).evaluate((element) => element.getBoundingClientRect().height);
+			const { section, content } = await page.locator(selector).evaluate((element) => {
+				const height = element.getBoundingClientRect().height;
+				const style = /** @type {HTMLElement} */ (element).style;
+				const before = style.minBlockSize;
+				style.minBlockSize = "0px";
+				const natural = element.getBoundingClientRect().height;
+				style.minBlockSize = before;
+				return { section: height, content: natural };
+			});
 			expect(section, `${selector} at ${width}x${height}`).toBeGreaterThanOrEqual(frame - 2);
-			expect(section, `${selector} at ${width}x${height}`).toBeLessThanOrEqual(frame + 2);
+			expect(section, `${selector} at ${width}x${height}`).toBeLessThanOrEqual(Math.max(frame, content) + 2);
 		}
 		expect(await page.locator(".docs-hero").evaluate((element) => element.getBoundingClientRect().height)).toBeGreaterThanOrEqual(frame - 2);
 		// The held scenes: at every point of their scroll, everything they
