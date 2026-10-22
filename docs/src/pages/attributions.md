@@ -56,13 +56,19 @@ Open-source code licensing is not treated as a trademark license.
 
 ## Cirth lockup lettering
 
-The Cirth lockup uses outlines derived from Martian Grotesk Condensed Bold by
-Evil Martians. The font is distributed under the
-[SIL Open Font License 1.1](https://github.com/evilmartians/grotesk).
-Documentation serves the outlined lockup, not the font file.
+The Cirth lockup uses outlines derived from Onest, set at weight 650 with
+softened corners. Onest is distributed under the
+[SIL Open Font License 1.1](https://openfontlicense.org). Source: Onest 2.001
+from the Google Fonts repository
+([github.com/google/fonts](https://github.com/google/fonts/tree/main/ofl/onest),
+`ofl/onest`), retrieved 2026-10-22.
 
-The typeface attribution explains the source of the letterforms. It does not
-make Martian Grotesk the interface font or a dependency of Cirth.
+Documentation serves the outlined lockup, not the font file. The license does
+not require an acknowledgement for artwork made with the font
+([OFL FAQ 1.1.2](https://openfontlicense.org/ofl-faq/)); this entry records
+the source of the letterforms.
+
+The entry does not make Onest the interface font or a dependency of Cirth.
 
 ## Documentation image
 

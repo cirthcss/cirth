@@ -1,12 +1,12 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const process = require("node:process");
-const { DRAWINGS, read } = require("./lib/brand-mark");
+const { DRAWING, read } = require("./lib/brand-mark");
 const marks = require("./build-brand-marks");
 const lockups = require("./build-brand-lockup");
 
-// Every Cirth brand asset is generated from the two drawings in docs/brand/
-// and the theme's scales: the marks, the favicon and the manifest by
+// Every Cirth brand asset is generated from the drawing in docs/brand/ and
+// the theme's scales: the marks, the favicon and the manifest by
 // build-brand-marks.js, the lockups by build-brand-lockup.js. Nothing in the
 // build runs them, so a redrawn mark or a moved accent step leaves the
 // files on disk describing the old one until someone regenerates them.
@@ -20,9 +20,7 @@ const lockups = require("./build-brand-lockup");
 const generated = { ...marks.variants(), ...lockups.variants() };
 /** @type {string[]} */
 const failures = [];
-const SOURCES = Object.values(DRAWINGS)
-	.map(({ file }) => path.relative(path.join(__dirname, ".."), file))
-	.join(" and ");
+const SOURCES = path.relative(path.join(__dirname, ".."), DRAWING.file);
 
 for (const [file, expected] of Object.entries(generated)) {
 	/** @type {string} */
@@ -195,5 +193,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-	`[@cirthcss/cirth] check:brand-assets: ${Object.keys(generated).length} generated files match the drawings in ${SOURCES} and the theme's scales; ${named.size} integration mark files (${Object.values(frameworkMarks).filter((record) => record.file).length} marks) are present, self-contained, listed and shown under their owners' terms; all ${frameworkData.count} guides name their project's site, ${frameworkData.guides.filter((guide) => !guide.markData).length} of them by name alone`,
+	`[@cirthcss/cirth] check:brand-assets: ${Object.keys(generated).length} generated files match the drawing in ${SOURCES} and the theme's scales; ${named.size} integration mark files (${Object.values(frameworkMarks).filter((record) => record.file).length} marks) are present, self-contained, listed and shown under their owners' terms; all ${frameworkData.count} guides name their project's site, ${frameworkData.guides.filter((guide) => !guide.markData).length} of them by name alone`,
 );

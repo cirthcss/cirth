@@ -27,14 +27,12 @@ const captures = [
 const lockupCaptures = [
 	{ source: "wordmark.svg", file: "wordmark.png" },
 	{ source: "wordmark_dark.svg", file: "wordmark_dark.png" },
-	{ source: "wordmark_compact.svg", file: "wordmark_compact.png" },
-	{ source: "wordmark_compact_dark.svg", file: "wordmark_compact_dark.png" },
 ];
 
-// The mark's rasters, at 1024px, rendered from the generated SVGs for the
+// The mark's raster, at 1024px, rendered from the generated SVG for the
 // same reason as the lockups: a PNG exported by hand falls behind its SVG
 // without anything noticing.
-const logoCaptures = ["logo_brand", "logo_compact"];
+const logoCaptures = ["logo_brand"];
 
 // An .ico file of PNG images, the form every browser that reads .ico
 // accepts: a six-byte header, a sixteen-byte entry per image, the images.

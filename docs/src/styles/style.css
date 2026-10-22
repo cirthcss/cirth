@@ -434,7 +434,7 @@ html {
 /* In the header the name, not the lockup's box, is centred on the text
    beside it. The box is centred on the nav link band, the line the links'
    capitals are centred on; the picture moves up by the distance between
-   its box's centre and the middle of the name's capitals
+   its box's centre and the middle of the name's x-height
    (--docs-lockup-name-centre, a share of the lockup's height from the
    lockup generator), and the mark moves with the name it is aligned to. */
 .docs-header-start-group .docs-brand img {
@@ -1310,12 +1310,6 @@ pre > button.copy.copied::before {
 
 .docs-lockup-grid img {
   width: min(100%, 15rem);
-}
-
-/* The compact lockup at the height the site header draws it. */
-.docs-lockup-grid .docs-brand-small {
-  width: auto;
-  height: 2.125rem;
 }
 
 @media (width >= 48rem) {

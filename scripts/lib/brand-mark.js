@@ -6,35 +6,24 @@ const path = require("node:path");
 //
 // The mark's measurements are derived from its drawing, never written
 // down: a box measured by hand is right about one drawing and silently
-// wrong about the next. Its disc and the disc's highlight are painted from
-// the theme's scales, so the badge and the accent share a hue by
-// construction; every other ink is the drawing's own.
+// wrong about the next. Every ink is painted from the theme's scales: the
+// disc from the accent, so the badge and the primary share a hue by
+// construction, and the figure from the neutrals.
 
 const { parseColor } = require("./color");
 
 const publicDir = path.join(__dirname, "../../docs/public");
 const colorsFile = path.join(__dirname, "../../src/theme/_colors.scss");
 
-// The mark is drawn twice. The full drawing is for 64px and up; the compact
-// one, with a larger figure and fewer details, is for anything smaller: the
-// favicon, the site header, the home page orbit. Each names, by id, the
-// ring that bounds the badge, the magenta disc inside it and the highlight
-// on the disc.
-/** @typedef {"full" | "compact"} Drawing */
-/** @type {Record<Drawing, { file: string, ring: string, disc: string, highlight: string }>} */
-const DRAWINGS = {
-	full: {
-		file: path.join(__dirname, "../../docs/brand/cirth-mark.svg"),
-		ring: "badge-border",
-		disc: "brand-magenta",
-		highlight: "badge-highlight",
-	},
-	compact: {
-		file: path.join(__dirname, "../../docs/brand/cirth-mark-compact.svg"),
-		ring: "badge-ring",
-		disc: "badge-disc",
-		highlight: "badge-highlight",
-	},
+// The mark is one drawing, used at every size from the 16px tab icon up. It
+// names, by id, the disc that bounds the badge and the figure's two inks,
+// the light fills and the dark lines drawn over them.
+/** @type {{ file: string, disc: string, light: string, dark: string }} */
+const DRAWING = {
+	file: path.join(__dirname, "../../docs/brand/cirth-mark.svg"),
+	disc: "disc",
+	light: "figure-light",
+	dark: "figure-dark",
 };
 
 /** @param {string} file */
@@ -374,7 +363,7 @@ const boundingBox = (paths) => {
 };
 
 /** The name's outlines: the word as drawn for the lockup, not set in type. */
-const NAME_SOURCE = path.join(__dirname, "../../docs/brand/cirth-wordmark-martian-condensed.svg");
+const NAME_SOURCE = path.join(__dirname, "../../docs/brand/cirth-wordmark-onest.svg");
 
 /**
  * A path rewritten in absolute M, L, C, Q and Z commands, moved by
@@ -560,8 +549,7 @@ const STROKE = ["stroke", "stroke-width", "stroke-linejoin", "stroke-miterlimit"
  * The ink box of a drawing's markup, and the box of every shape that has
  * an id. Groups may only translate. A stroke widens a shape's box by half
  * its width times the miter limit, the furthest a mitred corner can reach:
- * a bound, not a measurement, and in these drawings never more than about
- * three units in 1254.
+ * a bound, not a measurement. The current drawing has no strokes.
  *
  * @param {string} markup
  * @returns {{ ink: Box, byId: Record<string, Box> }}
@@ -650,18 +638,18 @@ const repaint = (markup, id, colour, where) => {
 };
 
 /**
- * One drawing of the mark, ready to publish: its view box, its markup with
- * the disc and the highlight painted, its ink box, and the box of its ring,
- * the circle a lockup aligns. The drawing's title and description, and its
- * ids and data attributes, stay in the source: nothing refers to them, and
- * they describe how the drawing was made rather than the mark.
+ * The drawing of the mark, ready to publish: its view box, its markup with
+ * every ink painted, its ink box, and the box of its disc, the circle a
+ * lockup aligns and an icon is framed on. The drawing's title and
+ * description, and its ids and data attributes, stay in the source:
+ * nothing refers to them, and they describe how the drawing was made
+ * rather than the mark.
  *
- * @param {Drawing} kind
- * @param {{ disc: string, highlight: string }} paint hex fills
- * @returns {{ viewBox: Box, body: string, ink: Box, ring: Box }}
+ * @param {{ disc: string, light: string, dark: string }} paint hex fills
+ * @returns {{ viewBox: Box, body: string, ink: Box, disc: Box }}
  */
-const drawing = (kind, paint) => {
-	const spec = DRAWINGS[kind];
+const drawing = (paint) => {
+	const spec = DRAWING;
 	const where = path.relative(path.join(__dirname, "../.."), spec.file);
 	const source = fs.readFileSync(spec.file, "utf8");
 	const root = /<svg\b[^>]*>/.exec(source);
@@ -677,15 +665,16 @@ const drawing = (kind, paint) => {
 		throw new Error(`brand-mark: ${where} uses something the generators do not carry over (a reference, a style sheet, text or an image)`);
 	}
 	body = repaint(body, spec.disc, paint.disc, where);
-	body = repaint(body, spec.highlight, paint.highlight, where);
+	body = repaint(body, spec.light, paint.light, where);
+	body = repaint(body, spec.dark, paint.dark, where);
 	const { ink, byId } = inkOf(body);
-	const ring = byId[spec.ring];
-	if (!ring) throw new Error(`brand-mark: no ring "${spec.ring}" in ${where}`);
+	const disc = byId[spec.disc];
+	if (!disc) throw new Error(`brand-mark: no disc "${spec.disc}" in ${where}`);
 	body = body
 		.replace(/\s(?:id|data-[\w-]+)="[^"]*"/g, "")
 		.replace(/^\s*\n/, "")
 		.replace(/\s+$/, "");
-	return { viewBox: { x: box[0], y: box[1], width: box[2], height: box[3] }, body, ink, ring };
+	return { viewBox: { x: box[0], y: box[1], width: box[2], height: box[3] }, body, ink, disc };
 };
 
-module.exports = { DRAWINGS, NAME_SOURCE, absolutePath, boundingBox, drawing, namePaths, pathData, pigment, publicDir, read, scaleStep };
+module.exports = { DRAWING, NAME_SOURCE, absolutePath, boundingBox, drawing, namePaths, pathData, pigment, publicDir, read, scaleStep };

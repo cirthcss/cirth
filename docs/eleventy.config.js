@@ -261,9 +261,9 @@ module.exports = (eleventyConfig) => {
 			touch: versioned("apple-touch-icon.png"),
 		};
 	});
-	// Each lockup's box, so every <img> reserves its space, and where its
-	// name's capitals are centred, for the header: `brandLockup.full` and
-	// `brandLockup.compact`, both `brandLockup.height` high.
+	// The lockup's box, so every <img> reserves its space, and where its
+	// name's capitals are centred, for the header: `brandLockup.width`,
+	// `brandLockup.height` and `brandLockup.nameCentre`.
 	eleventyConfig.addGlobalData("brandLockup", brandLockup.boxes());
 	// The markup comparison, read through its check, so fixtures edited without
 	// `npm run benchmark` fail the build.
