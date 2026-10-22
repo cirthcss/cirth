@@ -201,6 +201,11 @@ const capture = async (page, pagePath, theme, prepare) => {
 						}),
 			),
 		);
+		// Loaded is not painted: an image marked decoding="async" can first
+		// show a frame later, which on a slow runner is after the first
+		// capture. The dark WordPress mark, a PNG in the home page's orbit,
+		// made two consecutive captures differ that way.
+		await Promise.all(images.map((image) => image.decode().catch(() => undefined)));
 	});
 	if (pagePath === "forms/input-date/index.html") {
 		// Empty date segments in WebKit use today's date as their visual

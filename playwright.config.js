@@ -50,6 +50,12 @@ module.exports = defineConfig({
 	snapshotPathTemplate:
 		"{testDir}/__screenshots__/{projectName}-{platform}/{arg}{ext}",
 	expect: {
+		// toHaveScreenshot waits for two identical captures in a row. A
+		// full-page capture of the home page takes about 2s on a CI runner,
+		// and Chromium's first one rasterises the page beyond the window a
+		// little differently from every later one, so a stable page needs
+		// three captures: more than the default 5s allows.
+		timeout: 15_000,
 		toHaveScreenshot: {
 			// CSS animations frozen; JS-driven motion (the hero typing demo)
 			// already stops itself under reduced motion.
