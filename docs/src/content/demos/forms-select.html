@@ -1,0 +1,31 @@
+<label>
+  Country
+  <select name="country" autocomplete="country" required>
+    <option value="" selected disabled>Choose a country…</option>
+    <option value="it">Italy</option>
+    <option value="fr">France</option>
+    <option value="de">Germany</option>
+  </select>
+</label>
+<label>
+  Time zone
+  <select name="timezone">
+    <optgroup label="Europe">
+      <option value="Europe/Rome">Rome</option>
+      <option value="Europe/London" selected>London</option>
+    </optgroup>
+    <optgroup label="Americas">
+      <option value="America/New_York">New York</option>
+      <option value="America/Sao_Paulo">São Paulo</option>
+    </optgroup>
+  </select>
+</label>
+<label>
+  Notify me about
+  <select name="topics" multiple size="4">
+    <option value="releases" selected>Releases</option>
+    <option value="security">Security advisories</option>
+    <option value="breaking" selected>Breaking changes</option>
+    <option value="community">Community events</option>
+  </select>
+</label>

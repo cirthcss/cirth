@@ -1,0 +1,86 @@
+@use "../config" as *;
+
+/* cirth-component:start */
+
+/**
+ * Flow
+ */
+
+// The space between two things is decided by what they are to each other,
+// never by a margin one of them carries: every reset says 0 in :where(),
+// and the rules below give the second of two siblings a block-start margin,
+// one step of the flow scale (theme/_styles.scss). They weigh nothing, so
+// any component or consumer margin wins, and they come after every reset.
+// Containers own the rest: a card or dialog its padding, a .grid or .row
+// its gap, a nav, dropdown or segmented control its own rhythm.
+// <div> is not a block here (consumers build rows and grids from it), and
+// buttons are not either (a row of them shares one line).
+// See specs/container-owned-flow.md.
+
+$flow-field: "input:not([type='checkbox'], [type='radio'], [type='submit'], [type='button'], [type='reset'], [type='image'], [type='hidden']), select, textarea";
+$flow-block: "p, ul, ol, dl, pre, table, blockquote, figure, hr, address, details, hgroup, form, fieldset, label, article, section, aside, progress, meter, [role='search'], #{$flow-field}";
+
+@if $enable-classes {
+  $flow-block: "#{$flow-block}, .grid, .row, .group, .overflow-auto";
+} @else {
+  $flow-block: "#{$flow-block}, [role='group']:not(fieldset)";
+}
+
+$flow-heading: "h1, h2, h3, h4, h5, h6";
+$flow-button: "button, [type='submit'], [type='reset'], [type='button'], [role='button']";
+$flow-option: "label:has(> [type='checkbox'], > [type='radio'])";
+
+// Element: a block after any block among its siblings; `~`, so a script,
+// template or hidden input between two paragraphs keeps their space.
+#{$parent-selector}
+  :where(#{$flow-block}, #{$flow-heading})
+  ~ :where(#{$flow-block}) {
+  margin-block-start: var(--cirth-flow-element);
+}
+
+// The first action after a block. Only the first: the next button is on
+// the same line.
+#{$parent-selector} :where(#{$flow-block}) + :where(#{$flow-button}) {
+  margin-block-start: var(--cirth-flow-element);
+}
+
+// Group: a fieldset, and whatever follows one; two cards.
+#{$parent-selector} :where(#{$flow-block}, #{$flow-heading}) ~ :where(fieldset),
+#{$parent-selector} :where(fieldset) + :where(#{$flow-block}, #{$flow-button}),
+#{$parent-selector} :where(article) + :where(article) {
+  margin-block-start: var(--cirth-flow-group);
+}
+
+// A heading opens more than it closes: a section before h1 and h2, a group
+// before the four below them.
+#{$parent-selector} :where(#{$flow-block}, #{$flow-heading}) ~ :where(h1, h2) {
+  margin-block-start: var(--cirth-flow-section);
+}
+
+#{$parent-selector}
+  :where(#{$flow-block}, #{$flow-heading})
+  ~ :where(h3, h4, h5, h6) {
+  margin-block-start: var(--cirth-flow-group);
+}
+
+// A section opens a new subject wherever it starts; the top-level ones of a
+// page are its chapters.
+#{$parent-selector} :where(#{$flow-block}, #{$flow-heading}) ~ :where(section) {
+  margin-block-start: var(--cirth-flow-section);
+}
+
+#{$parent-selector} :where(main) > :where(section) + :where(section) {
+  margin-block-start: var(--cirth-flow-chapter);
+}
+
+// Line: what binds a thing to what belongs to it. Last, so a heading after
+// a heading, or a second option in a list of options, takes the line.
+#{$parent-selector} :where(#{$flow-heading}) + :where(*),
+#{$parent-selector} :where(li) + :where(li),
+#{$parent-selector} :where(dd) + :where(dt),
+#{$parent-selector} :where(#{$flow-option}) + :where(#{$flow-option}),
+#{$parent-selector} :where(blockquote) > :where(footer) {
+  margin-block-start: var(--cirth-flow-line);
+}
+
+/* cirth-component:end */

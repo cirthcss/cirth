@@ -3,7 +3,7 @@ const { defineConfig } = require("@playwright/test");
 // Interaction tests exercise behavior that static screenshots cannot cover,
 // including keyboard flows and browser-managed validity states. One
 // desktop/light project per engine is enough here: resilience and parity
-// specs explicitly exercise the default, plain, and playroom themes, while
+// specs explicitly exercise the default theme and every shipped preset, while
 // screenshot coverage across schemes and viewports remains elsewhere.
 
 module.exports = defineConfig({
@@ -14,7 +14,12 @@ module.exports = defineConfig({
 		"box-shadow.spec.js",
 		"button-overflow.spec.js",
 		"cascade-layers.spec.js",
+		"choice-marks.spec.js",
 		"doc-links.spec.js",
+		"docs-boundary.spec.js",
+		"docs-home.spec.js",
+		"docs-integrations.spec.js",
+		"docs-navigation.spec.js",
 		"docs-stack.spec.js",
 		"date-input-group.spec.js",
 		"exclusion.spec.js",
@@ -32,13 +37,18 @@ module.exports = defineConfig({
 		"modal.spec.js",
 		"native-element-defaults.spec.js",
 		"nav-dropdown.spec.js",
+		"nav-stacked.spec.js",
+		"nav-target-size.spec.js",
 		"number-readonly.spec.js",
 		"overflow-containment.spec.js",
 		"popover.spec.js",
 		"prefers-contrast.spec.js",
 		"shell-overlays.spec.js",
+		"signal-separation.spec.js",
 		"print.spec.js",
+		"radius-relations.spec.js",
 		"segmented.spec.js",
+		"surface-depth.spec.js",
 		"surface-derivation.spec.js",
 		"table-controls.spec.js",
 		"token-override.spec.js",
@@ -51,9 +61,13 @@ module.exports = defineConfig({
 		contextOptions: { reducedMotion: "reduce" },
 		viewport: { width: 1280, height: 720 },
 	},
+	// The docs build's own regression test builds docs/dist, which empties
+	// it for a moment: it runs first, alone, and every engine's project waits
+	// for it, so no spec ever reads a site that is being rebuilt.
 	projects: [
-		{ name: "behavior-chromium", use: { browserName: "chromium" } },
-		{ name: "behavior-firefox", use: { browserName: "firefox" } },
-		{ name: "behavior-webkit", use: { browserName: "webkit" } },
+		{ name: "docs-build", testMatch: ["docs-build-output.spec.js"], use: { browserName: "chromium" } },
+		{ name: "behavior-chromium", use: { browserName: "chromium" }, dependencies: ["docs-build"] },
+		{ name: "behavior-firefox", use: { browserName: "firefox" }, dependencies: ["docs-build"] },
+		{ name: "behavior-webkit", use: { browserName: "webkit" }, dependencies: ["docs-build"] },
 	],
 });

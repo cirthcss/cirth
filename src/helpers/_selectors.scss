@@ -23,16 +23,31 @@
   }
 }
 
-// Every element a build declares the theme on, whichever build is loaded:
-// the document root or a shadow host unscoped, the wrapper when scoped.
-// For a stylesheet compiled once for all builds: a preset. With only
-// :root it would stop at a scoped wrapper, which redeclares every token on
-// itself, and a declaration there beats one inherited from :root. The
-// wrapper is the one src/cirth*.scoped.scss configure as $parent-selector.
+// Every element a build declares the theme on, for a stylesheet compiled
+// once for all builds (a preset): the root or a shadow host unscoped, the
+// `.cirth` wrapper scoped. The wrapper redeclares every token, so :root
+// alone would stop at it.
 @mixin theme-roots {
   :root,
   :host,
   .cirth {
+    @content;
+  }
+}
+
+// The theme roots plus every element that forces a scheme, for a preset
+// that overrides a derived token: the build re-derives those on each
+// [data-theme] element (theme/_schemes.scss). Inputs do not belong here: a
+// declaration on a [data-theme] element would stop a consumer's :root
+// override at that edge. Each branch weighs just enough to beat the build
+// it follows: the unscoped build re-derives at zero specificity, the scoped
+// one at (0,1,0) inside `.cirth`.
+@mixin scheme-roots {
+  :root,
+  :host,
+  .cirth,
+  :where([data-theme]),
+  .cirth [data-theme] {
     @content;
   }
 }

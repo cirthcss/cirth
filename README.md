@@ -1,12 +1,10 @@
-<p align="center">
+<h1 align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/logo_brand_dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/logo_brand.svg">
-    <img alt="" src="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/logo_brand.svg" width="72" height="72">
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/wordmark_dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/wordmark.svg">
+    <img alt="Cirth" src="https://raw.githubusercontent.com/cirthcss/cirth/master/docs/public/wordmark.svg" width="276" height="96">
   </picture>
-</p>
-
-<h1 align="center">Cirth</h1>
+</h1>
 
 <p align="center"><strong>CSS for the HTML you already write.</strong></p>
 
@@ -17,7 +15,7 @@
 </p>
 
 <p align="center">
-  <a href="https://cirthcss.github.io/cirth/get-started/">Documentation</a>
+  <a href="https://cirthcss.github.io/cirth/installation/">Documentation</a>
   · <a href="https://cirthcss.github.io/cirth/examples/">Examples</a>
   · <a href="https://www.npmjs.com/package/@cirthcss/cirth">npm</a>
 </p>
@@ -30,7 +28,7 @@ Add the stylesheet from a CDN:
 <link
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.min.css"
-  integrity="sha384-lI8cp0vEMgtcAMV0HDytp7C+rad0hVfW/yXmsl87XmnuvTiMsx7O7ADf2lg5IQZq"
+  integrity="sha384-53LU4r3+obTw7a8xZbgzbJxpTHvqBizlnFrXEzhKxAdyyCzI4VcUZxfEFDpiLL8q"
   crossorigin="anonymous">
 ```
 
@@ -74,18 +72,15 @@ See [About Cirth](docs/src/pages/about.md) for the scope and trade-offs.
 
 ## Choose a build
 
-| Stylesheet | Use it for |
-| --- | --- |
-| `dist/cirth.min.css` | The default semantic build. |
-| `dist/cirth.classless.min.css` | Pages with almost no classes. |
-| `dist/cirth.scoped.min.css` | An existing site or app; styles stay inside `.cirth`. |
-| `dist/cirth.classless.scoped.min.css` | Scoped and classless together. |
+The default build is the right starting point for most projects. Classless
+and scoped variants are available when you need a stricter selector boundary.
+[Package and builds](docs/src/pages/package.md) is the authoritative list of
+entry points, generated files, presets, token JSON and print companions.
 
-All four share the same copper theme and light/dark support. Load an optional
-[`plain` or `playroom` preset](docs/src/pages/colors.md) after the main
-stylesheet to change its look. Print stylesheets are available separately.
-The [Get Started guide](docs/src/pages/get-started.md) has examples and npm
-import paths for each build.
+Use the [installation quickstart](docs/src/pages/installation/index.md) for
+the basic setup. Then choose one of the 53 verified
+[framework guides](docs/src/pages/framework-guides.md) if a build tool or
+application framework owns your global stylesheet.
 
 To keep Cirth's content, form, and component declarations off a third-party
 widget, mark its root with `.no-cirth`:
@@ -96,7 +91,7 @@ widget, mark its root with `.no-cirth`:
 
 This is a component opt-out, not complete isolation: reset, theme, inherited,
 layout, accessibility, motion, and print rules still apply. See
-[Get Started](docs/src/pages/get-started.md#excluding-a-third-party-component)
+[Using Cirth with existing CSS](docs/src/pages/guides/existing-css.md#excluding-a-third-party-component)
 for the boundary's `:has()` and sibling-selector limits.
 
 ## Customize
@@ -120,10 +115,9 @@ system and contrast guidance.
 
 ## Browser support
 
-Cirth targets Chrome and Edge 123+, Firefox 130+, and Safari and iOS 18.2+.
-The full [Browserslist target](package.json) also covers mobile Chromium,
-Opera, and Samsung Internet. Older browsers, including Internet Explorer,
-are not supported.
+Cirth targets modern browser engines and does not support Internet Explorer.
+[Compatibility](docs/src/pages/compatibility.md) owns the exact browser
+floor, required CSS features and build-pipeline limits.
 
 ## Documentation and contributing
 

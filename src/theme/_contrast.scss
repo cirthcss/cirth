@@ -1,6 +1,6 @@
 @use "sass:meta";
-@use "../config" as *;
 @use "../helpers/functions";
+@use "../helpers/selectors";
 @use "colors" as *;
 @use "schemes";
 
@@ -8,167 +8,136 @@
    * Increased contrast (prefers-contrast: more)
    */
 
-// The softer complement to the forced-colors handling already scattered
-// through the components. forced-colors hands the palette over to the
-// operating system wholesale; this keeps Cirth's own palette and simply
-// stops spending contrast on subtlety: text inks go to WCAG AAA (>= 7:1)
-// on the surface they sit on, hairlines and control borders climb well
-// past the 3:1 non-text floor, link underlines lose their half-alpha
-// tint, and focus rings turn fully opaque.
+// Keeps Cirth's own palette and stops spending contrast on subtlety: text
+// inks reach WCAG AAA (>= 7:1) on the surface they sit on, hairlines and
+// control edges climb well past 3:1, underlines lose their half-alpha tint
+// and focus rings turn opaque. (forced-colors, handled in the components,
+// hands the palette to the operating system instead.)
 
-// Tokens only, no geometry. Control heights are built from
-// --cirth-border-width (44px, WCAG 2.5.5 ; see theme/_styles.scss), so
-// thickening borders here would silently resize every control in the
-// library; contrast is bought with color instead.
+// Tokens only, no geometry: control heights are built from
+// --cirth-border-width, so thicker borders would resize every control.
 
-// Runs through the same schemes.apply() wiring as the base themes, so
-// each override lands on exactly the selector it overrides and wins on
-// source order. Ratios in the comments below are measured against the
-// worst surface of each scheme: the paper canvas in light, a card in
-// dark, so they hold everywhere the token is used.
+// Each override lands where its token is owned and wins there on source
+// order: a light-dark() input from theme/_dual.scss is overridden at the
+// root as a pair (`root`), a derived token in the same scheme wiring
+// (`light`, `dark`). A scheme block's zero-weight selector would lose to
+// the root declaration of an input (specs/surface-and-edge-model.md).
+
+// Ratios are measured against the worst surface level of each scheme: the
+// recessed one in light, the overlay in dark.
+
+@mixin root {
+  // Text: 14.3:1 in light, 13.2:1 in dark, and the heading ramp collapses
+  // onto it. Set on --cirth-ink, so the --cirth-color slot and everything
+  // else reading the page's ink follow.
+  --cirth-ink: light-dark(#{$neutral-900}, #{$neutral-50});
+  --cirth-ink-strong: var(--cirth-ink);
+
+  // Secondary inks: 7.7:1 or better in light and 7.6:1 in dark, still
+  // subordinate.
+  --cirth-muted-color: light-dark(#{$neutral-700}, #{$neutral-250});
+  --cirth-secondary-text: light-dark(#{$neutral-700}, #{$neutral-250});
+  --cirth-link-visited-color: light-dark(#{$neutral-750}, #{$neutral-250});
+
+  // Link accent: 8.5:1 in light and 8.3:1 in dark, with underlines at full
+  // strength instead of the 50%-alpha tint. In dark the step is 200, not
+  // 250: from 250 the text role reads 7.06:1, too close to 7:1 to hold.
+  --cirth-primary: light-dark(#{$accent-700}, #{$accent-200});
+  --cirth-secondary-underline: var(--cirth-secondary-text);
+  --cirth-contrast-underline: var(--cirth-contrast-text);
+}
 
 @mixin light {
-  // Text: 16.0:1 on paper, and the heading ramp collapses onto it rather
-  // than fading out over six steps. Set as --cirth-ink, the page role:
-  // --cirth-color aliases it at the root, so the slot follows, and so does
-  // anything else reading the page's ink.
-  --cirth-ink: #{$neutral-900};
-  --cirth-h1-color: var(--cirth-color);
-  --cirth-h2-color: var(--cirth-color);
-  --cirth-h3-color: var(--cirth-color);
-  --cirth-h4-color: var(--cirth-color);
-  --cirth-h5-color: var(--cirth-color);
-  --cirth-h6-color: var(--cirth-color);
-
-  // Secondary inks: 8.7:1 or better, up from 5.0:1, still subordinate, no
-  // longer AA-and-no-further.
-  --cirth-muted-color: #{$neutral-700};
-  --cirth-secondary-text: #{$neutral-700};
-  --cirth-code-color: #{$neutral-750};
-  --cirth-link-visited-color: #{$neutral-750};
-
-  // Hairlines and control borders: 4.2:1 and 8.7:1, up from ~1.1:1 and
-  // 3.5:1. Table, card, blockquote and accordion borders all derive from
-  // --cirth-muted-border-color, so they follow this one line.
-  --cirth-muted-border-color: #{$neutral-500};
-
-  // The form-control icons are baked per scheme (see theme/_light.scss),
-  // so the contrast pass has to re-bake them: --cirth-muted-color climbing
-  // here does not reach a data URI. Without this the masked chevrons in
-  // the accordion and the dropdown would strengthen while the <select>,
-  // date, time and search icons stayed at the base tone: the split this
-  // pass exists to avoid.
+  // The baked form-control icons (theme/_light.scss) are re-baked, so the
+  // <select>, date, time and search icons strengthen with the masked
+  // chevrons.
   --cirth-icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-700)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   --cirth-icon-date: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-700)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
   --cirth-icon-time: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-700)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpolyline points='12 6 12 12 16 14'%3E%3C/polyline%3E%3C/svg%3E");
   --cirth-icon-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-700)}' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
-  --cirth-form-element-border-color: #{$neutral-700};
-  --cirth-form-element-invalid-border-color: #{$error-600};
+
+  // Edges: the same three roles, derived the same way, further from the
+  // canvas. The separator clears 3:1 on the canvas and the raised level and
+  // reads 2.94:1 on the recessed one; the control clears 7:1; the container
+  // follows its relation between them.
+  --cirth-muted-border-color: oklch(
+    from var(--cirth-canvas) calc(l - 0.35) c h
+  );
+  --cirth-form-element-border-color: oklch(
+    from var(--cirth-canvas) calc(l - 0.56) c h
+  );
+
+  // The invalid border is the error input at rest (theme/_light.scss), so
+  // this pass has to go darker than it, not lighter: 750 against 700.
+  --cirth-form-element-invalid-border-color: #{$error-750};
   --cirth-form-element-valid-border-color: #{$success-600};
 
-  // Link accent: 8.9:1, with the underline at full strength instead of
-  // the 50%-alpha tint.
-  --cirth-primary: #{$copper-700};
-  --cirth-primary-active: #{$copper-800};
+  // Derived from the accent, so an author's accent keeps its hue here too.
+  // 78.1% toward black takes $accent-700 onto $accent-800.
+  --cirth-primary-active: color-mix(
+    in oklch,
+    var(--cirth-primary) 78.1%,
+    black
+  );
   --cirth-primary-underline: var(--cirth-primary);
-  --cirth-secondary-underline: var(--cirth-secondary-text);
-  --cirth-contrast-underline: var(--cirth-contrast-text);
 
-  // Focus rings drop their alpha: a translucent ring composites against
-  // whatever it lands on, which is exactly what "more contrast" asks us
-  // to stop doing.
-  --cirth-primary-focus: #{$copper-600};
-  --cirth-secondary-focus: #{$neutral-600};
-  --cirth-contrast-focus: #{$neutral-600};
-
-  // Non-text controls whose *state* is a fill: the unchecked switch track,
-  // the progress track's extent, and a meter's three readings (5.8:1,
-  // 7.3:1 and 9.3:1 against the track, up from 4.0:1, 5.1:1 and 6.6:1).
-  --cirth-switch-background-color: #{$neutral-600};
-  --cirth-progress-border-color: #{$neutral-600};
+  // A meter's three readings: 6.2:1, 7.9:1 and 9.9:1 against the track.
   --cirth-meter-optimum-color: #{$success-650};
   --cirth-meter-suboptimum-color: #{$warning-700};
   --cirth-meter-even-less-good-color: #{$error-750};
-
-  @if $enable-classes {
-    --cirth-dropdown-border-color: var(--cirth-muted-border-color);
-  }
 }
 
 @mixin dark {
-  // 14.7:1 on a card, the worst surface in this scheme.
-  --cirth-ink: #{$neutral-50};
-  --cirth-h1-color: var(--cirth-color);
-  --cirth-h2-color: var(--cirth-color);
-  --cirth-h3-color: var(--cirth-color);
-  --cirth-h4-color: var(--cirth-color);
-  --cirth-h5-color: var(--cirth-color);
-  --cirth-h6-color: var(--cirth-color);
-
-  // 8.4:1 or better, up from 5.2:1.
-  --cirth-muted-color: #{$neutral-250};
-
-  // The form-control icons are baked per scheme (see theme/_light.scss),
-  // so the contrast pass has to re-bake them: --cirth-muted-color climbing
-  // here does not reach a data URI. Without this the masked chevrons in
-  // the accordion and the dropdown would strengthen while the <select>,
-  // date, time and search icons stayed at the base tone: the split this
-  // pass exists to avoid.
+  // Re-baked icons, as in the light mixin.
   --cirth-icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-250)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   --cirth-icon-date: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-250)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
   --cirth-icon-time: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-250)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpolyline points='12 6 12 12 16 14'%3E%3C/polyline%3E%3C/svg%3E");
   --cirth-icon-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#{functions.display-rgb($neutral-250)}' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
-  --cirth-secondary-text: #{$neutral-250};
-  --cirth-code-color: #{$neutral-200};
-  --cirth-link-visited-color: #{$neutral-250};
 
-  // 3.7:1 and 6.2:1, up from 1.2:1 and 3.1:1. The card border is normally
-  // the card background: an invisible seam, and becomes a real edge
-  // here.
-  --cirth-muted-border-color: #{$neutral-500};
-  --cirth-card-border-color: var(--cirth-muted-border-color);
-  --cirth-form-element-border-color: #{$neutral-350};
-  --cirth-form-element-invalid-border-color: #{$error-250};
+  // Edges, as in the light mixin: the separator at 2.5:1 or better on
+  // every level, the control at 7.0:1. The dark levels span 0.15 of
+  // lightness, so both sit further above the canvas than in light.
+  --cirth-muted-border-color: oklch(
+    from var(--cirth-canvas) calc(l + 0.34) c h
+  );
+  --cirth-form-element-border-color: oklch(
+    from var(--cirth-canvas) calc(l + 0.6) c h
+  );
+
+  // The unchecked switch track stops at 400: the thumb on it is
+  // --cirth-primary-on-surface (white), which still clears 3:1 there
+  // (WCAG 1.4.11).
+  --cirth-switch-background-color: #{$neutral-400};
+  --cirth-form-element-invalid-border-color: #{$error-150};
   --cirth-form-element-valid-border-color: #{$success-250};
 
-  // 8.2:1, underlines at full strength.
-  --cirth-primary: #{$copper-250};
-  --cirth-primary-active: #{$copper-150};
+  // Derived from the accent, so an author's accent keeps its hue here too.
+  --cirth-primary-active: oklch(
+    from var(--cirth-primary) calc(l * 1.1093) calc(c * 0.5544) h
+  );
 
-  // The accent above lightens for *text* legibility, and the button fill
-  // derives from it, so left alone it would lighten too, and the white
-  // label on top would come out at 4.2:1, worse than the 5.5:1 it has with
-  // no preference at all. Pinning the fill keeps the two moving in the
-  // directions they each need: white on these clears 7:1 (WCAG 1.4.6) at
-  // 8.1:1 resting and 9.6:1 on hover.
-  --cirth-primary-surface: #{$copper-650};
-  --cirth-primary-surface-active: #{$copper-700};
+  // The accent lightens for text legibility, and the fill derives from it,
+  // which would leave the white label at 3.7:1. The fill takes a fixed
+  // lightness instead, keeping white above 7:1 (WCAG 1.4.6) for any hue:
+  // 8.4:1 resting and 9.9:1 on hover with the default accent.
+  --cirth-primary-surface: oklch(
+    from var(--cirth-primary) 44% calc(c * 0.978) h
+  );
+  --cirth-primary-surface-active: oklch(
+    from var(--cirth-primary) 39.7% calc(c * 0.88) h
+  );
   --cirth-primary-underline: var(--cirth-primary);
-  --cirth-secondary-underline: var(--cirth-secondary-text);
-  --cirth-contrast-underline: var(--cirth-contrast-text);
 
-  // Opaque focus rings, as in the light scheme above.
-  --cirth-primary-focus: #{$copper-350};
-  --cirth-secondary-focus: #{$neutral-350};
-  --cirth-contrast-focus: #{$neutral-150};
-
-  // Not lighter than the 400 step: the thumb riding on this track is
-  // --cirth-primary-on-surface (white), and 400 is where white still clears
-  // 3:1 against it (WCAG 1.4.11).
-  --cirth-switch-background-color: #{$neutral-400};
-  --cirth-progress-border-color: #{$neutral-350};
-
-  // 7.2:1, 7.8:1 and 8.8:1 against the track, up from 5.2:1, 5.7:1
-  // and 6.3:1.
+  // 9.4:1, 10.2:1 and 13.4:1 against the track.
   --cirth-meter-optimum-color: #{$success-300};
   --cirth-meter-suboptimum-color: #{$warning-250};
-  --cirth-meter-even-less-good-color: #{$error-200};
-
-  @if $enable-classes {
-    --cirth-dropdown-border-color: var(--cirth-muted-border-color);
-  }
+  --cirth-meter-even-less-good-color: #{$error-150};
 }
 
 @media (prefers-contrast: more) {
+  @include selectors.root {
+    @include root;
+  }
+
   @include schemes.apply(meta.get-mixin("light"), meta.get-mixin("dark"));
 }

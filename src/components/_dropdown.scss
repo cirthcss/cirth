@@ -29,13 +29,9 @@
         margin-inline-start: var(--cirth-space-1);
         float: right;
 
-        // The float pins the marker at the content edge, i.e. the trigger's
-        // horizontal padding away from its border, but a regular <select>
-        // paints its chevron at --cirth-space-3 from the border (see
-        // forms/_basics.scss). The translate bridges exactly that
-        // difference, so the chevron lands at --cirth-space-3 from the edge
-        // for any trigger padding. (Inherited Pico hardcoded 0.2rem here:
-        // an eyeballed approximation of this 0.25rem gap.)
+        // The float pins the marker at the content edge; the translate
+        // moves it to --cirth-space-3 from the border, where a <select>
+        // paints its chevron (forms/_basics.scss), for any trigger padding.
         transform: rotate(0deg)
           translateX(
             calc(
@@ -45,8 +41,7 @@
             )
           );
 
-        // Masked over a theme token ; see components/_accordion.scss for
-        // why the matching <select> chevron cannot follow.
+        // Masked over a theme token (components/_accordion.scss).
         background-color: var(--cirth-muted-color);
         mask-image: var(--cirth-icon-chevron);
         mask-position: right center;
@@ -62,16 +57,7 @@
     }
   }
 
-  // Container type accordion
-  // inside a nav
-  // ––––––––––––––––––––
-  #{$parent-selector} nav details.dropdown {
-    // Override height
-    margin-bottom: 0;
-  }
-
-  // Button as a select
-  // inside container type accordion
+  // Trigger, drawn as a field
   // ––––––––––––––––––––
   #{$parent-selector} details.dropdown > summary:not([role]) {
     height: metrics.$control-block-size;
@@ -81,7 +67,12 @@
       solid
       var(--cirth-form-element-border-color);
     border-radius: var(--cirth-border-radius);
-    background-color: var(--cirth-form-element-background-color);
+
+    // A field paints the surface it sits on (forms/_basics.scss).
+    background-color: var(
+      --cirth-form-element-background-color,
+      var(--cirth-surface)
+    );
     color: var(--cirth-form-element-placeholder-color);
     line-height: inherit;
     cursor: pointer;
@@ -102,40 +93,18 @@
       }
     }
 
-    &:active,
-    &:focus {
-      border-color: var(--cirth-form-element-active-border-color);
-      background-color: var(--cirth-form-element-active-background-color);
-    }
-
-    &:focus {
-      box-shadow: 0
-        0
-        0
-        var(--cirth-outline-width)
-        var(--cirth-form-element-focus-color);
-    }
-
-    // Reset the accordion's visible outline: the box-shadow ring above is
-    // the indicator here. Kept transparent instead of none so forced-colors
-    // mode (which strips box-shadow) still paints a system-color ring.
-    // The offset is reset too, and not left to inherit the accordion's: a
-    // disclosure row is a rule and holds its ring clear of the text, but a
-    // dropdown is a framed control whose real indicator is the box-shadow
-    // above, drawn at the border box. Anchoring the forced-colors outline
-    // to the same edge keeps the two modes showing the same ring.
+    // The field's ring, in the slot a validation state rebinds below.
     &:focus-visible {
-      outline: var(--cirth-outline-width) solid transparent;
-      outline-offset: 0;
+      outline: var(--cirth-outline-width)
+        solid
+        var(--cirth-form-element-focus-color);
+      outline-offset: var(--cirth-outline-offset);
     }
 
     // Aria-invalid
     &[aria-invalid="false"] {
       --cirth-form-element-border-color: var(
         --cirth-form-element-valid-border-color
-      );
-      --cirth-form-element-active-border-color: var(
-        --cirth-form-element-valid-focus-color
       );
       --cirth-form-element-focus-color: var(
         --cirth-form-element-valid-focus-color
@@ -146,9 +115,6 @@
       --cirth-form-element-border-color: var(
         --cirth-form-element-invalid-border-color
       );
-      --cirth-form-element-active-border-color: var(
-        --cirth-form-element-invalid-focus-color
-      );
       --cirth-form-element-focus-color: var(
         --cirth-form-element-invalid-focus-color
       );
@@ -158,9 +124,8 @@
   // Dropdown inside a nav
   // ––––––––––––––––––––
   #{$parent-selector} nav details.dropdown {
-    // An inline positioned container gives Firefox's absolutely positioned
-    // menu the viewport as its containing block. Inline-block preserves the
-    // inline nav flow while containing the menu (upstream #701).
+    // Inline-block keeps the nav's inline flow and still contains the
+    // absolutely positioned menu in Firefox (upstream #701).
     display: inline-block;
     margin: calc(var(--cirth-nav-element-spacing-vertical) * -1) 0;
 
@@ -170,7 +135,6 @@
       }
 
       &:not([role]) {
-        // Override height
         height: calc(
           (var(--cirth-font-size-md) * var(--cirth-line-height)) +
             (var(--cirth-nav-link-spacing-vertical) * 2)
@@ -192,9 +156,12 @@
     }
   }
 
-  // Submenu
+  // Menu
   // ––––––––––––––––––––
   #{$parent-selector} details.dropdown > summary + ul {
+    // The overlay level, rebound as the surface its items sit on.
+    --cirth-surface: var(--cirth-dropdown-background-color);
+
     display: flex;
     z-index: var(--cirth-z-index-dropdown);
     position: absolute;
@@ -212,13 +179,15 @@
     color: var(--cirth-dropdown-color);
     white-space: nowrap;
     opacity: 0;
+    transform: translateY(calc(var(--cirth-space-1) * -1)) scale(0.99);
+    transform-origin: top center;
     transition:
       opacity var(--cirth-transition),
-      transform var(--cirth-duration-instant) var(--cirth-ease-in-out) 1s;
+      transform var(--cirth-transition);
 
     li {
       width: 100%;
-      margin-bottom: 0;
+      margin-block: 0;
       padding: calc(var(--cirth-form-element-spacing-vertical) * 0.5)
         var(--cirth-form-element-spacing-horizontal);
       list-style: none;
@@ -250,8 +219,8 @@
         }
       }
 
-      // Same row treatment as links: the clickable area fills the whole
-      // row, not just the label's text box (upstream #691)
+      // A label fills the whole row, as a link does (upstream #691), and the
+      // whole row highlights.
       label {
         display: block;
         margin: calc(var(--cirth-form-element-spacing-vertical) * -0.5)
@@ -260,40 +229,31 @@
           var(--cirth-form-element-spacing-horizontal);
       }
 
-      // The whole row highlights, not just the label inside it.
       &:has(label):hover {
         background-color: var(--cirth-dropdown-hover-background-color);
       }
     }
   }
 
-  // Button opened
-  // inside container type accordion
+  // Open
   // ––––––––––––––––––––
   #{$parent-selector} details.dropdown[open] > summary {
     margin-bottom: 0;
-  }
 
-  // Menu opened
-  // ––––––––––––––––––––
-  // 1. Inside container type accordion
-  #{$parent-selector} details.dropdown[open] > summary {
     + ul {
-      transform: scaleY(1);
+      transform: translateY(0) scale(1);
       opacity: 1;
       transition:
         opacity var(--cirth-transition),
-        transform
-          var(--cirth-duration-instant)
-          var(--cirth-ease-in-out)
-          var(--cirth-duration-instant);
-    }
-  }
+        transform var(--cirth-transition);
 
-  // Close for dropdown
-  // inside container type accordion
-  // ––––––––––––––––––––
-  #{$parent-selector} details.dropdown[open] > summary {
+      @starting-style {
+        opacity: 0;
+        transform: translateY(calc(var(--cirth-space-1) * -1)) scale(0.99);
+      }
+    }
+
+    // A transparent layer under the menu closes it on an outside click.
     &::before {
       display: block;
       z-index: 1;
@@ -307,17 +267,9 @@
     }
   }
 
-  // Nested dropdown
-  // ––––––––––––––––––––
-  // A dropdown nested inside another open dropdown's menu gets its own
-  // close-catcher too, but that catcher is position: fixed, so it belongs
-  // to the outer menu's stacking context (its nearest positioned ancestor,
-  // not the viewport it visually covers). There it paints above the outer
-  // menu's own non-positioned items, in front of DOM order and regardless
-  // of z-index, and swallows clicks meant for them (upstream picocss/pico
-  // #614). Only the outermost open dropdown needs a catcher: a click
-  // outside the whole nested chain already reaches it once nothing above
-  // it covers that point.
+  // Only the outermost open dropdown keeps that layer: a nested one is fixed
+  // within the outer menu's stacking context and would swallow clicks on the
+  // outer menu's items (upstream picocss/pico #614).
   #{$parent-selector}
     details.dropdown[open]
     details.dropdown[open]
@@ -333,9 +285,8 @@
 
   // RTL
   // ––––––––––––––––––––
-  // The marker floats toward the end of the trigger; float has no logical
-  // values within the Browserslist floor (Chrome 111), so mirror it, and
-  // the translateX bridging the <select> chevron gap flips sign with it.
+  // Float has no logical values within the Browserslist floor, so the marker
+  // is mirrored, and its translate flips sign with it.
   [dir="rtl"] {
     #{$parent-selector} details.dropdown {
       > summary,
@@ -354,7 +305,6 @@
                   -1
               )
             );
-          background-position: left center;
         }
       }
     }

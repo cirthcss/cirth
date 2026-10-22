@@ -401,6 +401,16 @@ const channel = (token, percentScale, channels, env) => {
   const call = functionCall(token);
   if (call?.name === "calc") return evaluateCalc(call.args, channels);
   if (call?.name === "var") return env.number(env.variable(call.args));
+  // A clamp on a channel: the accent's text role holds the origin's
+  // lightness within the range every surface level can carry.
+  if (call?.name === "min" || call?.name === "max") {
+    const values = splitTopLevel(call.args, ",").map((argument) =>
+      channel(argument.trim(), percentScale, channels, env),
+    );
+    if (values.some((value) => value === null))
+      throw new Unsupported(`${call.name}(${call.args})`);
+    return Math[call.name](.../** @type {number[]} */ (values));
+  }
   return parseNumber(token, percentScale);
 };
 

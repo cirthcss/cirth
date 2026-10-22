@@ -1,5 +1,6 @@
 ---
 layout: docs.njk
+description: Migrate existing Cirth projects across breaking selector, token, layout and component changes.
 ---
 
 # Upgrading
@@ -11,6 +12,170 @@ documentation: the selector in the header switches between them.
 
 After 1.0 the same boundary becomes a major release, and this page keeps
 working the way it already does.
+
+## Next release, from v0.16.x
+
+Not released yet: this section describes the development line. The class
+and selector changes are listed below, together with the defaults that move.
+Surfaces and edges come from four named levels and three named edges, type
+comes from roles, the primary is always the heaviest action, every corner
+takes one of two radii by what it is, and space between elements comes from
+their relation rather than from margins they carry. Containers size
+continuously, `.grid` wraps intrinsically, `.row` owns the fixed-row pattern,
+and visual groups opt in with `.group`. The `playroom` preset is replaced by
+`material`. Each observable change has a spec in the repository's `specs/`
+directory.
+
+### Surfaces and edges
+
+| If you | Then |
+| --- | --- |
+| Override `--cirth-canvas` | Nothing: every surface level and every edge follows it |
+| Override `--cirth-card-background-color`, `--cirth-code-background-color`, `--cirth-dropdown-background-color` or `--cirth-popover-background-color` | Still works. To move a whole level, override `--cirth-surface-raised`, `-recessed` or `-overlay` instead |
+| Rely on fields being darker than the page | A field now paints the surface it sits on, `--cirth-surface`; set `--cirth-form-element-background-color` to give every field a fill of its own |
+| Use `--cirth-form-element-active-background-color` | Removed: focus no longer changes a field's fill |
+| Paint your own container background and put fields in it | Set `--cirth-surface` on it to the same colour |
+| Read `--cirth-table-border-color` as the card's edge | It is the separator now; `--cirth-card-border-color` sits between the separator and the control edge unless you set it |
+| Count on the modal having no shadow | It takes the overlay shadow; set `--cirth-modal-box-shadow: none` |
+| Read `--cirth-box-shadow` as seven layers | It is three: a one-pixel highlight on the top edge, transparent in light, a contact shadow and an ambient one |
+| Rely on cards having no shadow | A card casts one faint contact layer; set `--cirth-card-box-shadow: none` |
+| Set `--cirth-box-shadow: none` to flatten the page | Set `--cirth-card-box-shadow: none` too |
+| Matched your own surfaces to the canvas by value | The light canvas is near white (L 0.978) and the dark one near black (L 0.165); read `--cirth-canvas` or a level token rather than a colour |
+| Read `--cirth-primary-text` as exactly `--cirth-primary` | It is the accent held within the lightness range every surface level can carry: at most 0.52 in light, at least 0.72 in dark |
+
+### Type
+
+| If you | Then |
+| --- | --- |
+| Set `--cirth-letter-spacing-tight` or `-snug` | Removed. Set `--cirth-tracking-optical` (0 turns the correction off), or `--cirth-letter-spacing` on one heading |
+| Relied on `h1`, `h2` or `h3` growing with the viewport | Content headings are now 28px, 24px and 20px. Set `--cirth-font-size` on the heading that needs another size; for a hero, set it to `var(--cirth-display-font-size)` |
+| Relied on the 650 default heading weight | Set `--cirth-heading-font-weight: 650`; the new default is 600 |
+| Relied on headings at 700 | Set `--cirth-heading-font-weight` and `--cirth-title-font-weight` |
+| Relied on buttons, summaries or terms at 600 | Set `--cirth-font-weight` on them |
+| Styled column heads as body text | They are metadata now (13px, medium, muted); set `font-size` and `color` on `thead th` |
+| Relied on the heading colour fade from h1 to h6 | Set `--cirth-h1-color` … `--cirth-h6-color` |
+| Read `--cirth-code-color` as the muted ink | It is the body ink |
+
+### Controls
+
+| If you | Then |
+| --- | --- |
+| Relied on the dark filled `.secondary` button | It is tonal now; set `--cirth-secondary-surface`, `-surface-active`, `-on-surface` and `-border` to the old values |
+| Relied on full-width submit buttons | Add `width: 100%` to them, or place them in a `.grid` |
+| Set `--cirth-opacity-disabled` or `--cirth-form-element-disabled-opacity` | Removed. Disabled controls take `--cirth-disabled-surface` and `--cirth-disabled-color` |
+| Set `--cirth-form-element-active-border-color` or the valid/invalid `-active-border-color` tokens | Removed: an edge keeps its colour on focus, and the ring (`--cirth-form-element-focus-color`, rebound by each state) carries the focus |
+| Set `--cirth-group-box-shadow-focus-with-button` or `-with-input` | Removed: a group draws one outline ring around the row |
+| Styled a focus ring through `box-shadow` | Focus is an `outline` with `outline-offset: var(--cirth-outline-offset)` |
+| Styled inline `code` expecting the chip | Set `padding`, `background` and `display: inline-block` on it |
+| Expected an enabled button to stay still while pressed | Set `--cirth-control-press-offset: 0px`; the tonal active state remains |
+| Relied on 2px checkbox and radio borders | Set `--cirth-border-width` on `[type="checkbox"], [type="radio"]` |
+| Expected a checkbox or radio drawn edge to edge at 24px | The box is still 24px and is the target; the mark drawn inside it is 20px. Set `width` and `height` to `1.75em` on the input for the old drawn size |
+| Relied on the thick ring of a checked radio | A checked radio is the accent with a dot in `--cirth-primary-on-surface`; nothing to set |
+| Laid out a checkbox or radio label with `display: flex` or `grid` | A label that starts with its checkbox or radio now hangs its wrapped lines under the first word; set `padding-inline-start: 0` and `text-indent: 0` on a flex or grid label |
+| Drew your own edge on a checkbox or radio with `border-color` | The edge is an inset ring of `--cirth-border-color`; the border is a transparent band. Set `--cirth-border-color` instead |
+
+### Radii
+
+| If you | Then |
+| --- | --- |
+| Relied on the 4px control and 6px container defaults | Set `--cirth-border-radius: var(--cirth-radius-sm)`; the derived container radius returns to 6px |
+| Relied on the pill search field or search group | Search takes the control radius. To keep the pill: `[type="search"], [role="search"] { --cirth-border-radius: var(--cirth-radius-pill); }`, plus `.group [type="search"] { --cirth-border-radius: inherit; }` for a search field inside a generic group |
+| Relied on popovers at the control radius | They take the container radius, as a dialog does; set `border-radius: var(--cirth-border-radius)` on `[popover]` |
+| Relied on block code at the control radius | It takes the container radius; set `pre { border-radius: var(--cirth-border-radius); }` |
+
+### Space between elements
+
+| If you | Then |
+| --- | --- |
+| Zeroed `margin-bottom` on a Cirth element to remove its space | Zero `margin-block-start` on the element after it, or `margin: 0` on both |
+| Built a flex or grid row out of Cirth blocks (`article`, `label`, `fieldset`, fields, paragraphs) | Give the row `gap` and its children `margin: 0`: the second item would otherwise take the element step as a vertical offset |
+| Relied on space after a `div` wrapper | A `div` is not a flow block; put the space on the wrapper, or use a block element |
+| Set `--cirth-typography-spacing-top` on a heading | Removed. Set `margin-block-start` on the heading, or change `--cirth-flow-section` or `--cirth-flow-group` |
+| Relied on 4px between list items | Items are a line apart (`--cirth-flow-line`, 8px at the default) |
+| Set `--cirth-spacing` | Nothing: every step of the flow follows it |
+
+### Layout and grouping selectors
+
+#### Container width
+
+`.container` uses one continuously resizing content track capped by
+`--cirth-container-max-width`, which defaults to `60rem`. It does not step
+through fixed maximum widths at viewport breakpoints. `.container-fluid` uses
+the same three-track structure without the content cap.
+
+If a layout depended on one of the fixed widths from v0.16.x, set the new
+maximum explicitly on that container:
+
+```css
+.docs-shell {
+  --cirth-container-max-width: 76rem;
+}
+```
+
+The gutter has its own `--cirth-container-gutter` token. See
+[Container](/layout/container) for the current layout contract.
+
+#### Grid and row
+
+`.grid` is an intrinsic wrapping layout in this line. It creates as many
+columns as fit at `--cirth-grid-min-column` and moves extra items to another
+row. The equal-width layout that stacks below `768px` and stays on one row
+above it is named `.row`.
+
+Rename existing fixed-row uses:
+
+```html
+<!-- v0.16.x -->
+<div class="grid">...</div>
+
+<!-- current development line -->
+<div class="row">...</div>
+```
+
+Keep `.grid` where wrapping is intended, then tune
+`--cirth-grid-min-column` if the default `12rem` minimum does not fit the
+content. The [Grid](/layout/grid) and [Row](/layout/row) pages compare the two
+current contracts.
+
+#### Visual groups
+
+In a class-enabled build, `[role="group"]` no longer triggers the joined
+control layout by itself. Add `.group` for the visual component and retain the
+role only when it correctly describes the relationship between the controls:
+
+```html
+<!-- v0.16.x -->
+<div role="group">...</div>
+
+<!-- current development line -->
+<div class="group" role="group">...</div>
+```
+
+This separates an ARIA semantic from a presentation choice. In the classless
+build, a non-`fieldset` element with `role="group"` remains the visual trigger
+because no component class is available. A `fieldset` uses its native
+`legend` pattern and does not opt into the joined layout. See
+[Group](/components/group) for current markup.
+
+### Presets
+
+`playroom` is removed, with no alias, and `material` takes its place as the
+preset that overrides broadly. The two are not the same design: `material`
+is Material Design 3's baseline scheme, not a recolouring of `playroom`.
+
+| If you | Then |
+| --- | --- |
+| Load `dist/presets/playroom.min.css` or import `@cirthcss/cirth/presets/playroom` | Load `dist/presets/material.min.css` or import `@cirthcss/cirth/presets/material`, or keep the values you want from the old file in a stylesheet of your own |
+| Relied on `playroom`'s rounded system face, 20px flow or 300ms easing | `material` sets none of them: it uses Roboto, the default flow and 200ms. Set `--cirth-font-family`, `--cirth-spacing` or `--cirth-transition` yourself |
+| Use `plain` | Nothing changes |
+
+```html
+<!-- before -->
+<link rel="stylesheet" href="dist/presets/playroom.min.css">
+
+<!-- after -->
+<link rel="stylesheet" href="dist/presets/material.min.css">
+```
 
 ## To v0.16.0, from v0.14.x
 
@@ -250,7 +415,7 @@ To vary a token by scheme, write the pair rather than two rules:
 The pair is resolved wherever the token is used, against the color scheme in
 effect at that point, so one line covers the page and any subtree that
 forces a scheme. See
-[Customization](/customization#light-and-dark).
+[Customization](/themes#light-and-dark).
 
 ### The presets are renamed and redesigned
 
@@ -423,7 +588,7 @@ Worth grepping your stylesheets for `--cirth-` before upgrading. Two
 things to know: a bare `:root` override now applies to **both** color
 schemes, and anything written against the old workaround
 (`:root:not([data-theme="dark"])`, `[data-theme="dark"]`) is more specific
-and keeps winning. [Customization](/customization#light-and-dark)
+and keeps winning. [Customization](/themes#light-and-dark)
 covers overriding one scheme at a time.
 
 ### The browser floor moved

@@ -20,7 +20,9 @@
 #{$parent-selector} code,
 #{$parent-selector} kbd,
 #{$parent-selector} samp {
-  font-size: 0.875em; // 2
+  // A step smaller than the text around it, so the code face's larger
+  // x-height does not outweigh the sentence, but never under 12px.
+  font-size: max(0.875em, var(--cirth-font-size-xs)); // 2
   font-family: var(--cirth-font-family); // 1
 }
 
@@ -46,37 +48,39 @@
 #{$parent-selector} code,
 #{$parent-selector} kbd,
 #{$parent-selector} samp {
-  border-radius: var(--cirth-border-radius);
-  background: var(--cirth-code-background-color);
   color: var(--cirth-code-color);
   font-weight: var(--cirth-font-weight);
-  line-height: initial;
 }
 
+// Code in a sentence is text in the code face: no box, the body's ink and
+// line. A long URL, token or hash breaks inside the line.
 #{$parent-selector} code,
-#{$parent-selector} kbd,
 #{$parent-selector} samp {
-  display: inline-block;
-
-  // Keep a long URL, token, or hash inside the available line instead of
-  // letting the inline box widen the document at narrow viewports. `pre`
-  // overrides these elements to `display: block` below and remains the
-  // intentionally scrollable variant.
-  max-inline-size: 100%;
-  padding: var(--cirth-space-1) var(--cirth-space-2);
   overflow-wrap: anywhere;
 }
 
+// A key is an object, not a word: <kbd> keeps its cap.
+#{$parent-selector} kbd {
+  display: inline-block;
+  max-inline-size: 100%;
+  padding: var(--cirth-space-1) var(--cirth-space-2);
+  border-radius: var(--cirth-border-radius);
+  line-height: initial;
+  overflow-wrap: anywhere;
+}
+
+// The block listing: the recessed surface level, framed by the container
+// edge.
 #{$parent-selector} pre {
   display: block;
-  margin-bottom: var(--cirth-spacing);
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
+  border-radius: var(--cirth-card-border-radius);
+  background: var(--cirth-code-background-color);
+  line-height: initial;
   overflow-x: auto;
 
-  // The block above is the deliberately scrollable one, which makes it a
-  // scroll container an author must expose to the keyboard. Same reason
-  // as .overflow-auto in layout/_overflow-auto.scss: ship the ring with
-  // the container instead of leaving every page to add it back.
+  // A scrolling listing needs `tabindex="0"` to be keyboard operable, so it
+  // ships with the framework's focus ring, like .overflow-auto.
   &:focus-visible {
     outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
   }
@@ -98,13 +102,13 @@
   vertical-align: baseline;
 }
 
-// var: a variable within running text: monospace and italic like code,
-// but without the chip background (upstream #696)
+// A variable in running text: the code face in italic, without a box
+// (upstream #696).
 
 #{$parent-selector} var {
   color: var(--cirth-code-color);
   font-style: italic;
-  font-size: 0.875em;
+  font-size: max(0.875em, var(--cirth-font-size-xs));
   font-family: var(--cirth-font-family);
 }
 

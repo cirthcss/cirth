@@ -160,6 +160,12 @@ const measure = (page) =>
  * @param {(page: import("@playwright/test").Page) => Promise<void>} [prepare]
  */
 const auditAllPages = async (page, theme, prepare) => {
+	// One test visits every page, so its budget follows the number of pages
+	// rather than Playwright's fixed 30 seconds, which these runs outgrew as
+	// the site did. A page costs about 0.1s on an idle laptop, 0.3s on a slow
+	// CI runner and up to 0.8s when every one of these tests runs at once on
+	// one machine; it is allowed 1.5s, so a timeout means a page that hangs.
+	test.setTimeout(15_000 + pages.length * 1_500);
 	const failures = [];
 	for (const target of pages) {
 		await openPage(page, target, theme);
@@ -342,17 +348,22 @@ for (const theme of themeVariants) {
 				expect(focus.width).toBeGreaterThan(0);
 
 				await openPage(page, "index.html", theme);
+				// Where motion is welcome the story shows one picture at a
+				// time; the live ticket is reachable whatever is shown.
+				await page.locator(".docs-story-result").evaluate((element) => element.scrollIntoView({ block: "center" }));
 				for (const target of [
-					// A control inside one of the home page's live stages, the
-					// tab that chooses which stage that is, and a FAQ trigger:
-					// the shapes of focusable the page has outside the shell
-					// chrome. The stage control is taken from the theme
-					// showcase rather than the example deck, because the deck
-					// shows one example at a time and the one it opens on has
-					// no form control in it.
-					page.locator(".docs-theme-showcase .docs-stage-preview input").first(),
-					page.locator("[data-docs-tab]").first(),
-					page.locator(".docs-faq-list summary").first(),
+					// The live radio and button in the story, the presets list,
+					// a project's mark in the framework band and the live
+					// controls of the theme's card: the shapes of focusable the
+					// home page has outside the shell chrome. The comparator's
+					// copies are inert pictures; the range is checked below, on
+					// the handle that draws its ring.
+					page.locator(".docs-story-result input[type='radio']:checked"),
+					page.locator(".docs-story-result button"),
+					page.locator("[data-docs-compare-preset]"),
+					page.locator(".docs-agnostic-orbit a").first(),
+					page.locator(".docs-theme-copy input[type='checkbox']"),
+					page.locator(".docs-theme-copy footer button").last(),
 				]) {
 					await page.keyboard.press("Tab");
 					await target.focus();
@@ -372,34 +383,51 @@ for (const theme of themeVariants) {
 					expect(targetFocus.width).toBeGreaterThan(0);
 				}
 
-				// The showcase strip says which example is showing with a
-				// background, and a background is the first thing forced
-				// colors takes away: both states came out Canvas, and the
-				// only cue left was `aria-selected`, which a sighted reader
-				// does not get. Every button's transparent border is forced
-				// to CanvasText as well, so the border cannot carry it
-				// either: the selected tab has to differ in a system colour.
-				const strip = await page
-					.locator("[data-docs-tab]")
-					.evaluateAll((tabs) =>
-						tabs.map((tab) => {
-							const style = getComputedStyle(tab);
+				// The comparator's range is transparent; its ring is the
+				// handle's, in a system colour.
+				const range = page.locator("[data-docs-compare-range]");
+				await range.scrollIntoViewIfNeeded();
+				await page.keyboard.press("Tab");
+				await range.focus();
+				expect(await range.evaluate((element) => element.matches(":focus-visible"))).toBe(true);
+				const handle = await page.locator(".docs-compare-handle").evaluate((element) => ({
+					style: getComputedStyle(element).outlineStyle,
+					width: Number.parseFloat(getComputedStyle(element).outlineWidth),
+				}));
+				expect(handle.style).not.toBe("none");
+				expect(handle.width).toBeGreaterThan(0);
+
+				// The chosen package manager is told by the radio's dot, a
+				// shape, and by its label's edge in the system's highlight:
+				// forced colors takes the accent tint away, so colour alone
+				// could not carry it, and neither could a background.
+				await openPage(page, "installation/index.html", theme);
+				const options = await page
+					.locator("[data-docs-install] fieldset")
+					.first()
+					.locator("label")
+					.evaluateAll((labels) =>
+						labels.map((label) => {
+							const input = /** @type {HTMLInputElement} */ (label.querySelector("input"));
 							return {
-								selected: tab.getAttribute("aria-selected") === "true",
-								paint: `${style.backgroundColor}|${style.color}`,
+								checked: input.checked,
+								edge: getComputedStyle(label).borderTopColor,
+								dot: getComputedStyle(input, "::before").scale,
 							};
 						}),
 					);
-				const chosen = strip.filter((tab) => tab.selected);
-				const rest = strip.filter((tab) => !tab.selected);
-				expect(chosen, "one tab is selected").toHaveLength(1);
+				const chosen = options.filter((option) => option.checked);
+				const rest = options.filter((option) => !option.checked);
+				expect(chosen, "one package manager is chosen").toHaveLength(1);
 				expect(rest.length).toBeGreaterThan(0);
-				for (const tab of rest) {
+				for (const option of rest) {
 					expect(
-						tab.paint,
-						`${theme}: the selected tab is distinguishable in forced colors`,
-					).not.toBe(chosen[0].paint);
+						option.edge,
+						`${theme}: the chosen option's edge differs in forced colors`,
+					).not.toBe(chosen[0].edge);
+					expect(option.dot).toBe("0");
 				}
+				expect(chosen[0].dot).toBe("1");
 
 				await page.goto(`${origin}/specimen/default/`);
 				const markColors = await page.locator("mark").first().evaluate((element) => {
@@ -434,7 +462,7 @@ for (const theme of themeVariants) {
 					element.showModal();
 				});
 				await expect(
-					page.getByRole("dialog", { name: "Confirm action" }),
+					page.getByRole("dialog", { name: "Delete this item?" }),
 				).toBeVisible();
 
 				await dialog.evaluate((element) => {

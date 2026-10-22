@@ -4,8 +4,11 @@ const { defineConfig } = require("@playwright/test");
 // Baselines live in tests/__screenshots__/<project>-<platform>/ and are
 // platform-specific: system font rendering differs between macOS and
 // Linux, so local (darwin) and CI (linux) each compare against their
-// own committed set. Regenerate deliberately with
-// `npm run check:visual:update` after a wanted visual change.
+// own set. The folders are not in Git: tests/visual-baselines.json pins
+// them, and scripts/visual-baselines.js fetches them from the
+// visual-baselines release. Regenerate deliberately with
+// `npm run check:visual:update` after a wanted visual change, then
+// publish them with `npm run baselines:push`.
 
 const viewports = {
 	desktop: { width: 1440, height: 900 },
@@ -47,6 +50,12 @@ module.exports = defineConfig({
 	snapshotPathTemplate:
 		"{testDir}/__screenshots__/{projectName}-{platform}/{arg}{ext}",
 	expect: {
+		// toHaveScreenshot waits for two identical captures in a row. A
+		// full-page capture of the home page takes about 2s on a CI runner,
+		// and Chromium's first one rasterises the page beyond the window a
+		// little differently from every later one, so a stable page needs
+		// three captures: more than the default 5s allows.
+		timeout: 15_000,
 		toHaveScreenshot: {
 			// CSS animations frozen; JS-driven motion (the hero typing demo)
 			// already stops itself under reduced motion.

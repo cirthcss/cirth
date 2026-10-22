@@ -35,6 +35,20 @@ test.afterAll(() => {
 });
 
 /**
+ * Press the search shortcut the trigger declares for this platform:
+ * Command+K on Apple platforms, Ctrl+K elsewhere. Read from the page rather than
+ * written here, so the suite runs the same on macOS and on Linux.
+ * @param {import("@playwright/test").Page} page
+ */
+const pressSearchShortcut = async (page) => {
+	const declared = await page
+		.locator("[data-docs-search-trigger]")
+		.getAttribute("aria-keyshortcuts");
+	const [shortcut] = String(declared).split(" ");
+	await page.keyboard.press(shortcut.replace(/K$/, "k"));
+};
+
+/**
  * Tab `steps` times, returning a description of the active element after
  * each press.
  * @param {import("@playwright/test").Page} page
@@ -83,7 +97,7 @@ test("Tab reaches every landmark control on the home page", async ({
 	// Landmarks and the controls a reader has to be able to get to, not a
 	// transcript of the page: pinning the full sequence would fail on any
 	// edit to the home page rather than on a keyboard regression.
-	const reached = await walk(page, 60);
+	const reached = await walk(page, 120);
 	/** @param {RegExp} pattern */
 	const found = (pattern) =>
 		reached.some((entry) => pattern.test(entry.text) || pattern.test(entry.href || ""));
@@ -91,9 +105,10 @@ test("Tab reaches every landmark control on the home page", async ({
 	expect(found(/^Skip to main content$/), "skip link").toBe(true);
 	expect(found(/^Docs$/), "navbar: Docs").toBe(true);
 	expect(found(/^Search documentation/), "navbar: search trigger").toBe(true);
-	expect(found(/^Get Started$/), "hero: Get Started").toBe(true);
+	expect(found(/^Get started$/), "hero: Get started").toBe(true);
 	expect(found(/^Examples$/), "hero: Examples").toBe(true);
-	expect(found(/^\/colors$/), "footer: Colors").toBe(true);
+	expect(found(/discussions$/), "footer: Discussions").toBe(true);
+	expect(found(/^\/customization$/), "footer: Customization").toBe(true);
 	expect(found(/^\/about$/), "footer: About").toBe(true);
 });
 
@@ -101,47 +116,41 @@ test("the hero preview is a picture, not four tab stops", async ({ page }) => {
 	await page.setViewportSize({ width: 1440, height: 900 });
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
-	// The Output card renders a real sign-in form in an iframe. It is a
-	// demonstration of what the library paints, so nothing in it is
-	// operable: without this, Tab walked the reader through an email
-	// field, a password field, a checkbox and a Sign in button that
-	// belong to a picture, and a screen reader announced a working
-	// sign-in form on the Cirth home page.
-	const frame = page.frameLocator("[data-lab-frame]");
-	await expect(frame.locator("form")).toBeAttached();
-	expect(
-		await page
-			.locator("[data-lab-frame]")
-			.contentFrame()
-			.locator("body")
-			.evaluate((body) => body.hasAttribute("inert")),
-	).toBe(true);
+	// The result renders a real sign-in form with the page's own Cirth. It
+	// is a demonstration of what the library paints, so nothing in it is
+	// operable: without `inert`, Tab would walk the reader through an email
+	// field, a password field, a checkbox and a Sign in button that belong
+	// to a picture, and a screen reader would announce a working sign-in
+	// form on the Cirth home page. The same holds for the browser's own
+	// rendering in the story and both copies in the presets comparator:
+	// interfaces shown, not offered. The theme's card is the one exception,
+	// and on purpose: its controls are there to be used, so the states they
+	// draw can be seen to follow the theme.
+	for (const selector of [
+		".docs-hero-render",
+		".docs-story-ua",
+		".docs-compare-light",
+		".docs-compare-dark",
+	]) {
+		await expect(page.locator(selector)).toHaveAttribute("inert", "");
+	}
+	await expect(page.locator(".docs-theme-copy")).not.toHaveAttribute("inert", /.*/);
+	const fields = await page.locator(".docs-hero-render").evaluate(
+		(element) => element.querySelectorAll("input, button").length,
+	);
+	expect(fields, "the preview renders a real form").toBeGreaterThan(0);
 
-	const reached = await walk(page, 30);
-	expect(
-		reached.filter((entry) => entry.tag === "iframe").length,
-		"the frame itself takes a stop",
-	).toBe(0);
-
-	// The fields are in the frame's own document, and the walk above cannot
-	// see them: focus entering an iframe is reported on the host as the
-	// <iframe> element, which the assertion above already excludes. This
-	// used to be approximated by counting <input> stops on the host page,
-	// which held only while the home page happened to own no fields of its
-	// own: it now has several, in the section whose whole argument is that
-	// its controls *are* reachable. Asserted where it is true instead: the
-	// preview renders a real form, and nothing in it was ever focused.
-	const preview = await page
-		.locator("[data-lab-frame]")
-		.contentFrame()
-		.locator("body")
-		.evaluate((body) => ({
-			fields: body.querySelectorAll("input, button").length,
-			active: body.ownerDocument.activeElement?.tagName.toLowerCase() ?? null,
-		}));
-
-	expect(preview.fields, "the preview renders a real form").toBeGreaterThan(0);
-	expect(preview.active, "nothing in the preview took focus").toBe("body");
+	/** @type {boolean[]} */
+	const insidePictures = [];
+	for (let index = 0; index < 40; index += 1) {
+		await page.keyboard.press("Tab");
+		insidePictures.push(
+			await page.evaluate(() =>
+				Boolean(document.activeElement?.closest("[inert]")),
+			),
+		);
+	}
+	expect(insidePictures.filter(Boolean).length, "focus entered a picture").toBe(0);
 });
 
 test("Shift+Tab walks the home page back out the way it came", async ({
@@ -186,6 +195,87 @@ test("search opens to the field, returns results, and gives focus back", async (
 	await expect(dialog).not.toHaveAttribute("open", "");
 	await expect(trigger).toHaveAttribute("aria-expanded", "false");
 	await expect(trigger).toBeFocused();
+});
+
+test("search accepts HTML tags with their angle brackets", async ({ page }) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+
+	const dialog = page.locator("[data-docs-search-dialog]");
+	const input = dialog.locator("[data-docs-search-input]");
+	const status = dialog.locator("[data-docs-search-status]");
+	/** @param {string} path */
+	const result = (path) =>
+		dialog.locator(`[data-docs-search-result][href$="${path}"]`);
+	const expectSearchComplete = () =>
+		expect(status).toHaveText(/^\d+ results?\./);
+
+	await page.locator("[data-docs-search-trigger]").click();
+	await input.fill("<dialog>");
+	await expectSearchComplete();
+	await expect(result("/components/modal/")).toBeVisible();
+	await expect(input).toHaveValue("<dialog>");
+
+	await input.fill("</dialog>");
+	await expectSearchComplete();
+	await expect(result("/components/modal/")).toBeVisible();
+
+	await input.fill("<dialog></dialog>");
+	await expectSearchComplete();
+	await expect(result("/components/modal/")).toBeVisible();
+
+	await input.fill("</i");
+	await expect(dialog.locator("[data-docs-search-result]")).toHaveCount(0);
+	await expect(status).toHaveText(
+		"Type at least two characters to search.",
+	);
+
+	// Quoting a complete tag keeps one-letter element names exact instead of
+	// treating the letter as a match on almost every page.
+	await input.fill("<i>");
+	await expectSearchComplete();
+	await expect(result("/content/typography/")).toBeVisible();
+});
+
+// The shortcut is the one the trigger shows and announces, and only that
+// one: each platform's other modifier keeps its own meaning (Ctrl+K in a
+// Mac text field deletes to the end of the line).
+test("search opens on the shortcut its trigger declares, and on no other", async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 1440, height: 900 });
+	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
+
+	const trigger = page.locator("[data-docs-search-trigger]");
+	const dialog = page.locator("[data-docs-search-dialog]");
+	const input = page.locator("[data-docs-search-input]");
+	const apple = await page.evaluate(() =>
+		/mac|iphone|ipad/i.test(navigator.platform),
+	);
+
+	await expect(trigger).toHaveAttribute(
+		"aria-keyshortcuts",
+		apple ? "Meta+K /" : "Control+K /",
+	);
+	await expect(trigger.locator("[data-docs-search-modifier]")).toHaveText(
+		apple ? "⌘" : "Ctrl",
+	);
+
+	await page.keyboard.press(apple ? "Control+k" : "Meta+k");
+	await page.keyboard.press("Alt+k");
+	await expect(dialog).not.toHaveAttribute("open", "");
+
+	await pressSearchShortcut(page);
+	await expect(dialog).toHaveAttribute("open", "");
+	await expect(input).toBeFocused();
+
+	// Focus goes back to the trigger in the dialog's close event, a moment
+	// after it closes; "/" typed while the field still has focus is text.
+	await page.keyboard.press("Escape");
+	await expect(dialog).not.toHaveAttribute("open", "");
+	await expect(trigger).toBeFocused();
+	await page.keyboard.press("/");
+	await expect(dialog).toHaveAttribute("open", "");
+	await expect(input).toBeFocused();
 });
 
 test("search is a full surface on a phone, not a shrunken panel", async ({
@@ -417,15 +507,10 @@ test("the home page never scrolls sideways", async ({ page }) => {
 			0,
 		);
 
-		// The six-row ledger table that used to be the one block wide enough
-		// to need a scroll region is gone: its four measurements are a
-		// hairline strip that reflows, and the two claims left are a list
-		// that wraps. What still scrolls on this page is the code panes,
-		// and the reason they are allowed to is that a listing must not
-		// break an attribute across two lines, so the contract that
-		// survives is the same one, asserted where it is now true: anything
-		// that scrolls can be reached to scroll it.
-		const panes = page.locator(".docs-native-home pre");
+		// What can still scroll on this page is the code panes, and the
+		// contract is that anything that scrolls can be reached to scroll
+		// it.
+		const panes = page.locator(".docs-home pre");
 		const count = await panes.count();
 		expect(count, "the home page still shows source").toBeGreaterThan(0);
 		for (let index = 0; index < count; index++) {
@@ -435,4 +520,83 @@ test("the home page never scrolls sideways", async ({ page }) => {
 			).toHaveAttribute("tabindex", "0");
 		}
 	}
+});
+
+// --- The search field's focus --------------------------------------------
+
+// The field in the search dialog is a bare row: no border, no box. The
+// library's focus ring on it drew a second rectangle inside a panel that
+// already has an edge, round nothing. The row carries the focus instead,
+// as an inset accent line along its bottom edge, and the field's own
+// outline is transparent, which forced colors repaints: the ring comes
+// back exactly where the line cannot follow.
+test("the search field takes focus on its row, not as a second rectangle", async ({
+	page,
+}) => {
+	const { contrastRatio } = require("../scripts/lib/color");
+	for (const scheme of /** @type {const} */ (["light", "dark"])) {
+		await page.emulateMedia({ colorScheme: scheme, forcedColors: "none" });
+		await page.setViewportSize({ width: 1440, height: 900 });
+		await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
+
+		const input = page.locator("[data-docs-search-input]");
+		const row = page.locator(".docs-search-dialog > article > header");
+		await pressSearchShortcut(page);
+		await expect(input).toBeFocused();
+		expect(await input.evaluate((element) => element.matches(":focus-visible"))).toBe(true);
+
+		const focused = await page.evaluate(() => {
+			const field = /** @type {HTMLElement} */ (document.querySelector("[data-docs-search-input]"));
+			const header = /** @type {HTMLElement} */ (field.closest("header"));
+			const panel = /** @type {HTMLElement} */ (header.closest("article"));
+			const probe = document.createElement("span");
+			probe.style.color = "var(--cirth-primary-focus)";
+			panel.append(probe);
+			const focusColor = getComputedStyle(probe).color;
+			probe.remove();
+			return {
+				outlineColor: getComputedStyle(field).outlineColor,
+				outlineStyle: getComputedStyle(field).outlineStyle,
+				rowShadow: getComputedStyle(header).boxShadow,
+				panel: getComputedStyle(panel).backgroundColor,
+				focusColor,
+				rowBox: header.getBoundingClientRect().toJSON(),
+			};
+		});
+		// No visible rectangle round the field.
+		expect(
+			focused.outlineStyle === "none" || focused.outlineColor === "rgba(0, 0, 0, 0)",
+			`${scheme}: the field draws no ring of its own`,
+		).toBe(true);
+		// The row says it instead, in the colour every ring on the site takes,
+		// at the contrast a focus indicator needs against the panel.
+		expect(focused.rowShadow, `${scheme}: the row carries the focus`).toMatch(/inset/);
+		expect(focused.rowShadow).toContain("-2px");
+		expect(contrastRatio(focused.focusColor, focused.panel)).toBeGreaterThanOrEqual(3);
+
+		// Moving focus off the field takes the line away and moves nothing.
+		await page.keyboard.press("Tab");
+		const after = await row.evaluate((element) => ({
+			shadow: getComputedStyle(element).boxShadow,
+			box: element.getBoundingClientRect().toJSON(),
+		}));
+		expect(after.shadow).not.toContain("-2px");
+		expect(after.box).toEqual(focused.rowBox);
+	}
+
+	// Forced colors drops the line, and the ring comes back. An engine that
+	// matches the query without forcing colours (WebKit's emulation) keeps
+	// the line instead; either way the focus stays visible.
+	await page.emulateMedia({ forcedColors: "active" });
+	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
+	await pressSearchShortcut(page);
+	const forced = await page.locator("[data-docs-search-input]").evaluate((element) => ({
+		outline: getComputedStyle(element).outlineColor,
+		width: Number.parseFloat(getComputedStyle(element).outlineWidth),
+		row: getComputedStyle(/** @type {HTMLElement} */ (element.closest("header"))).boxShadow,
+	}));
+	expect(
+		(forced.outline !== "rgba(0, 0, 0, 0)" && forced.width > 0) || forced.row.includes("-2px"),
+		`forced colors keeps a visible focus: ${JSON.stringify(forced)}`,
+	).toBe(true);
 });

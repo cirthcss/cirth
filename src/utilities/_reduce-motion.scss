@@ -32,17 +32,10 @@
     transition-delay: var(--cirth-duration-instant); // 4
     transition-duration: var(--cirth-duration-instant); // 4
 
-    // 5. `transition-duration` above reaches elements, ::before and ::after,
-    //    and nothing else, so the engine pseudo-elements that make up a
-    //    control's interior kept animating. Measured in Firefox with the
-    //    playroom preset: the host input went to 0s while
-    //    ::-moz-range-track and ::-moz-range-thumb stayed at 0.3s. Those
-    //    cannot be added to the list above, because a selector list
-    //    containing one engine's pseudo-element is discarded whole by the
-    //    other engine. The token can: custom properties inherit into these
-    //    pseudo-elements, which is how they already read their own colours,
-    //    so neutralising it here reaches every transition built from it:
-    //    including any a consumer writes.
+    // 5. transition-duration does not reach engine pseudo-elements (a range's
+    //    track and thumb), which cannot be listed without one engine
+    //    dropping the whole selector. The token inherits into them, and
+    //    into every transition built from it, a consumer's included.
     --cirth-transition: var(--cirth-duration-instant) var(--cirth-ease-out); // 5
   }
 }

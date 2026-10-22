@@ -53,11 +53,8 @@ $border-thumb: var(--cirth-border-width-2);
   }
 
   &::-webkit-slider-thumb {
-    // The one -webkit-appearance the Browserslist floor still needs, and
-    // the reason it sits here rather than in the mixin: on the thumb
-    // pseudo-element the unprefixed property resets nothing, while on the
-    // input itself Safari 15.4 handles it. Sharing it with the Firefox
-    // thumb below would only ship a declaration that engine ignores.
+    // On the thumb pseudo-element only the prefixed property resets the
+    // appearance; the Firefox thumb does not need it.
     -webkit-appearance: none;
 
     @include slider-thumb;
@@ -82,7 +79,18 @@ $border-thumb: var(--cirth-border-width-2);
 
   &:focus-visible {
     outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
-    outline-offset: var(--cirth-space-1);
+    outline-offset: var(--cirth-outline-offset);
+  }
+
+  // Disabled: the thumb takes the disabled ink and the groove stays a
+  // separator, as every other control's disabled state.
+  &:disabled,
+  :where(fieldset[disabled]) & {
+    --cirth-range-thumb-color: var(--cirth-disabled-color);
+    --cirth-range-thumb-active-color: var(--cirth-disabled-color);
+    --cirth-range-border-color: var(--cirth-muted-border-color);
+
+    pointer-events: none;
   }
 
   &:active {

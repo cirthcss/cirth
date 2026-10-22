@@ -7,6 +7,39 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Changed
+
+- **A nav inside a `details` disclosure stacks.** `:is(aside, details) nav`
+  now renders as a stacked list: block rows, no horizontal gutter, and the
+  current entry marked on the inline-start edge. Collapsible menus no longer
+  need hand-written layout CSS. A nav in any other container is unchanged.
+
+- **Focus rings in a stacked nav are drawn inside the row.** A focused link
+  or summary in an `aside` or `details` nav takes
+  `outline-offset: calc(var(--cirth-outline-width) * -1)`, so a scrolling rail
+  cannot clip the ring and it never overlaps the next row.
+
+### Fixed
+
+- **A long breadcrumb wraps instead of overflowing.** The list in
+  `nav[aria-label="breadcrumb"]` now wraps onto another line when its items
+  do not fit, so a trail no longer runs past a narrow viewport (WCAG 1.4.10
+  reflow) or squeezes an item's label onto two lines. The gap between two
+  items now belongs to the one before (`margin-inline-end` instead of the
+  next item's `margin-inline-start`), because its divider is drawn there: a
+  line ends with its divider inside the trail and the next line starts
+  flush. A trail that fits renders exactly as before.
+
+- **Dropdowns and popovers have visible elevation in the dark scheme.** The
+  dark half of `--cirth-box-shadow` now carries four times the alpha of the
+  light half, so a floating panel darkens the graphite canvas beside it by
+  about as much as it darkens the paper canvas. Geometry and the light
+  scheme are unchanged; an override of the token still replaces it whole.
+
+- **A one-character nav link is a 24px target.** Links in a `nav` now have a
+  24px minimum inline size, so a numbered pagination entry meets WCAG 2.5.8
+  instead of measuring 23px. Wider labels and stacked navs are unchanged.
+
 ## [0.16.0] - 2026-09-25
 
 ### Added

@@ -1,0 +1,49 @@
+{#- Installation widgets, shared by the Installation page and the guides.
+
+    packageManagers(id, verb): one command per package manager, chosen with
+    native radios (a choice of one, not tabs). The choice is pure CSS
+    (`.docs-install:has(:checked)`); base.njk only remembers it.
+
+    Single lines on purpose: markdown-it ends an HTML block at a blank line,
+    and whitespace inside <pre> is content. -#}
+{%- macro packageManagers(id, args = "@cirthcss/cirth") -%}
+<div class="docs-install" data-docs-install>
+<fieldset class="docs-choice"><legend>Package manager</legend><label><input type="radio" name="pm-{{ id }}" value="npm" checked> npm</label><label><input type="radio" name="pm-{{ id }}" value="pnpm"> pnpm</label><label><input type="radio" name="pm-{{ id }}" value="yarn"> Yarn</label><label><input type="radio" name="pm-{{ id }}" value="bun"> Bun</label></fieldset>
+<pre tabindex="0" data-pm="npm"><code class="hljs language-sh">npm install {{ args }}</code></pre>
+<pre tabindex="0" data-pm="pnpm"><code class="hljs language-sh">pnpm add {{ args }}</code></pre>
+<pre tabindex="0" data-pm="yarn"><code class="hljs language-sh">yarn add {{ args }}</code></pre>
+<pre tabindex="0" data-pm="bun"><code class="hljs language-sh">bun add {{ args }}</code></pre>
+</div>
+{%- endmacro -%}
+
+{#- A mark as a link to the project's site, named "<Project> official
+    website"; its images are decorative. Where the owner names another
+    address for its logo (`linkTo`), the mark leads there. -#}
+{%- macro siteLink(guide, height, className) -%}
+<a class="{{ className }}" href="{{ guide.brand.linkTo or guide.officialUrl }}" aria-label="{{ guide.name }} official website"><span class="docs-mark">{{ guide.markData | markImages(height) | safe }}</span></a>
+{%- endmacro -%}
+
+{#- Guide cards: each one link to its guide, the whole card its target.
+    The link's name is the guide's name; the mark is decorative, the same
+    one the guide's own card draws. A project named by text alone shows its
+    host in text instead, hidden from the link's name like the arrow. Each
+    heading's id is the anchor the breadcrumbs link to. The fine print
+    under the list is the one line the logos need. -#}
+{%- macro guideGrid(groups) -%}
+<div class="docs-guide-groups">
+{%- for group in groups %}
+<section aria-labelledby="guides-{{ group.id }}">
+<h3 id="guides-{{ group.id }}" class="docs-guide-group-title">{{ group.text }}</h3>
+{%- if group.description %}
+<p class="docs-guide-group-description">{{ group.description }}</p>
+{%- endif %}
+<ul class="docs-guide-grid">
+{%- for guide in group.guides %}
+<li><a href="{{ guide.link }}"><span class="docs-guide-mark">{% if guide.markData %}<span class="docs-mark">{{ guide.markData | markImages(28) | safe }}</span>{% else %}<span class="docs-guide-address" aria-hidden="true">{{ guide.officialUrl | siteHost | replace(".", ".<wbr>") | safe }}</span>{% endif %}</span><span class="docs-guide-name">{{ guide.name }}<span class="docs-guide-arrow" aria-hidden="true">→</span></span></a></li>
+{%- endfor %}
+</ul>
+</section>
+{%- endfor %}
+<p class="docs-fine-print">Logos belong to their projects; none of these projects is affiliated with Cirth or endorses it (<a href="/attributions/#framework-logos">sources and terms</a>).</p>
+</div>
+{%- endmacro -%}

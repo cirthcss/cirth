@@ -1,49 +1,82 @@
 ---
 layout: docs.njk
+description: Show determinate or indeterminate task completion with the native progress element and Cirth styling.
 ---
-
 
 # Progress
 
-The native `<progress>` element is restyled with Cirth's own track/value
-colors, including an animated indeterminate state.
+Use `progress` for a task that is running toward completion. Provide `value`
+and `max` when completion can be measured; omit `value` when the amount is not
+known.
 
 {% demo "progress" %}
 
 ```html
-<label id="file-upload-label" for="file-upload-progress">File upload</label>
-<progress id="file-upload-progress" aria-labelledby="file-upload-label" value="25" max="100">25%</progress>
-<label id="data-import-label" for="data-import-progress">Data import</label>
-<progress id="data-import-progress" aria-labelledby="data-import-label" value="75" max="100">75%</progress>
-<label id="loading-results-label" for="loading-results-progress">Loading results</label>
-<progress id="loading-results-progress" aria-labelledby="loading-results-label"></progress> <!-- no value: indeterminate -->
+<label id="upload-label" for="upload-progress">File upload</label>
+<progress id="upload-progress" aria-labelledby="upload-label"
+          value="25" max="100">25%</progress>
+
+<label id="import-label" for="import-progress">Importing records</label>
+<progress id="import-progress" aria-labelledby="import-label">
+  In progress
+</progress>
 ```
+
+`aria-labelledby` points to the visible label's `id` and gives the progress
+indicator an accessible name. The same label also uses its native `for`
+association. Text between the progress tags is fallback content and is not the
+visible percentage in supporting browsers.
+
+## Determinate and indeterminate states
+
+A determinate progress indicator has a numeric `value`. The browser interprets
+it relative to `max`, whose default is 1 when omitted. Application code must
+update the value as the task advances and report completion or failure in text.
+
+An indeterminate progress indicator has no `value` attribute at all. Do not set
+`value=""` or an arbitrary looping number to represent an unknown amount.
 
 ## Behavior
 
-* Track: `--cirth-progress-background-color`; value/bar:
-  `--cirth-progress-color` (defaults to `--cirth-primary-surface` in
-  light mode; dark mode uses a lighter step of the accent so the bar keeps
-  a 3:1 contrast against the track).
-* Border: `--cirth-progress-border-color` outlines the track so the
-  component's extent stays perceivable against the page background
-  (WCAG 1.4.11); the track fill itself is deliberately subtle.
-* Cross browser: the native appearance is reset and implemented again via
-  `::-webkit-progress-bar`/`::-webkit-progress-value` and
-  `::-moz-progress-bar` so track/value colors stay consistent across
-  engines.
-* A `progress` with no `value` attribute is indeterminate: an animated
-  gradient sweep, reversed in `[dir="rtl"]`, disabled entirely under
-  `prefers-reduced-motion: reduce` (see
-  [Reduce motion](/utilities/reduce-motion)).
-* For a measurement inside a known range rather than a task running to
-  completion (disk used, a score, capacity), reach for
-  [meter](/components/meter) instead. It is styled as this component's
-  matched pair.
-* Give every progress indicator an accessible name. The examples connect a
-  visible `<label>` with both `for` and `aria-labelledby`, which remains
-  robust in browser/screen-reader combinations that do not expose
-  `<progress>` as a labelable element consistently. `aria-label` is a terse
-  alternative when no visible label is appropriate. The numeric value is
-  exposed by the native element; fallback text such as `25%` also helps
-  older user agents.
+The browser exposes the task value and state through the native element. Cirth
+resets engine-specific paint, makes the component full width and draws a track,
+contrasting edge and value bar consistently across supported engines.
+
+The indeterminate state uses a moving gradient when motion is allowed. It moves
+in the opposite direction in a right-to-left document. Under
+`prefers-reduced-motion: reduce`, Cirth leaves a static track instead.
+
+For a measurement that is not a task, such as capacity or a score, use
+[Meter](/components/meter).
+
+## Accessibility
+
+- Give every progress indicator a visible or programmatic name. Visible text is
+  preferable when the task is not already obvious from context.
+- Keep the accessible value synchronised with the real task by updating the
+  native `value` property.
+- Announce completion and errors separately. A full or stopped bar does not
+  explain the outcome.
+- Do not rely on animation alone to mean that work continues.
+
+## Tokens
+
+| Token | What it sets |
+| --- | --- |
+| `--cirth-progress-background-color` | Track |
+| `--cirth-progress-border-color` | Track edge |
+| `--cirth-progress-color` | Determinate value and indeterminate sweep |
+| `--cirth-border-radius` | Track radius |
+
+## Common mistakes
+
+- Using progress for a static measurement.
+- Leaving a stale numeric value after the task becomes indeterminate.
+- Showing a percentage as fallback text but never updating the native value.
+- Omitting an accessible name.
+
+## Related
+
+- [Meter](/components/meter)
+- [Loading](/components/loading), for a compact busy state.
+- [Reduced motion](/guides/accessibility#reduced-motion)

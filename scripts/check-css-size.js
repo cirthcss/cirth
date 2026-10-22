@@ -45,16 +45,23 @@ const distDir = path.join(projectRoot, "dist");
 // is not the budgeted number.
 /** @type {Record<string, number>} */
 const budgets = {
-	"cirth.classless.min.css": 13_300,
-	"cirth.classless.scoped.min.css": 13_400,
-	"cirth.min.css": 15_200,
+	// The filled icon family adds nine compact vector drawings. The four
+	// bundles grow by 1,228 to 1,266 B gzip against 66c30160e; keep a few
+	// hundred bytes of useful headroom after that deliberate default.
+	"cirth.classless.min.css": 14_600,
+	"cirth.classless.scoped.min.css": 14_800,
+	// The Elena-informed refresh adds one public press role and transform
+	// states for buttons and overlays. The filled icon family then adds the
+	// vector paths described above.
+	"cirth.min.css": 16_700,
 	"cirth.print.classless.min.css": 1_024,
 	"cirth.print.classless.scoped.min.css": 1_024,
 	"cirth.print.min.css": 1_024,
 	"cirth.print.scoped.min.css": 1_024,
-	"cirth.scoped.min.css": 15_400,
+	"cirth.scoped.min.css": 17_000,
 	"presets/plain.min.css": 400,
-	"presets/playroom.min.css": 700,
+	"presets/material.min.css": 1_000,
+	"presets/metro.min.css": 1_000,
 };
 
 const warnOnly = process.argv.includes("--warn-only");

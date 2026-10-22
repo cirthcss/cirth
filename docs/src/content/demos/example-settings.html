@@ -1,0 +1,43 @@
+<form>
+  <fieldset>
+    <legend>Profile</legend>
+    <div class="grid">
+      <label>
+        Display name
+        <input type="text" name="display-name" value="Ada Lovelace" autocomplete="name">
+      </label>
+      <label>
+        Email
+        <input type="email" name="settings-email" value="ada@example" aria-invalid="true" aria-describedby="ex-settings-email-help" autocomplete="email">
+        <small id="ex-settings-email-help">Enter a full address, such as ada@example.com.</small>
+      </label>
+    </div>
+    <label>
+      Bio
+      <textarea name="bio" rows="3">Writes the notes that outlast the machine.</textarea>
+    </label>
+  </fieldset>
+  <fieldset class="segmented">
+    <legend>Appearance</legend>
+    <label><input type="radio" name="appearance" value="system" checked> System</label>
+    <label><input type="radio" name="appearance" value="light"> Light</label>
+    <label><input type="radio" name="appearance" value="dark"> Dark</label>
+  </fieldset>
+  <fieldset>
+    <legend>Notifications</legend>
+    <label><input type="checkbox" role="switch" name="notify-mentions" checked> Mentions</label>
+    <label><input type="checkbox" role="switch" name="notify-digest"> Weekly digest</label>
+    <label>
+      Language
+      <select name="language" autocomplete="language">
+        <option>English</option>
+        <option>Italiano</option>
+        <option>Français</option>
+      </select>
+    </label>
+  </fieldset>
+  <div class="grid">
+    <button type="submit">Save changes</button>
+    <button type="reset" class="secondary outline">Discard</button>
+  </div>
+</form>

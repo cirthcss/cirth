@@ -79,27 +79,28 @@ jobs:
       - name: Check all themes accessibility (axe, WCAG 2.0–2.2 A/AA)
         run: npm run check:a11y
 
-      # Visual baselines are Git LFS objects and platform-specific (font
-      # rendering differs between macOS and Linux); checkout leaves LFS
-      # pointers, so fetch just the Linux set, cached by content so
-      # steady-state runs use no LFS bandwidth. The update-visual-baselines
-      # workflow generates and commits the Linux set automatically when
-      # it is missing.
-      - name: List Linux visual baseline objects
-        run: >
-          git lfs ls-files -l -I 'tests/__screenshots__/*-linux/**'
-          | awk '{print $1}' | sort > .lfs-baseline-oids
+      # Visual baselines are platform-specific (font rendering differs
+      # between macOS and Linux) and live outside Git, as assets of the
+      # visual-baselines pre-release; tests/visual-baselines.json pins the
+      # set this commit compares against (scripts/visual-baselines.js).
+      # Fetch just the Linux sets, cached by their digests, so a run whose
+      # baselines did not move downloads nothing. The update-visual-baselines
+      # workflow generates, uploads and pins the Linux sets when they are
+      # missing or stale.
+      - name: Key the Linux visual baselines
+        run: |
+          mkdir -p .cache
+          node scripts/visual-baselines.js key --platform linux > .cache/visual-baselines.key
 
-      - name: Cache LFS baseline objects
+      - name: Cache Linux visual baselines
         uses: actions/cache@v4
         with:
-          path: .git/lfs
-          key: lfs-visual-${{ hashFiles('.lfs-baseline-oids') }}
+          path: tests/__screenshots__
+          key: visual-baselines-linux-${{ hashFiles('.cache/visual-baselines.key') }}
+          restore-keys: visual-baselines-linux-
 
       - name: Pull Linux visual baselines
-        run: |
-          git lfs install --local
-          git lfs pull -I 'tests/__screenshots__/*-linux/**'
+        run: node scripts/visual-baselines.js pull --platform linux
 
       - name: Visual regression (Playwright screenshot diff)
         run: |

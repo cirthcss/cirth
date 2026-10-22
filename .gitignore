@@ -25,6 +25,11 @@ pnpm-debug.log*
 /docs/src/styles/generated/
 /docs/dist/
 
+# Visual-regression baselines: assets of the visual-baselines release,
+# pinned by tests/visual-baselines.json and fetched by
+# scripts/visual-baselines.js (npm run baselines:pull).
+/tests/__screenshots__/
+
 # Local caches
 /.cache/
 /.parcel-cache/

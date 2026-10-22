@@ -1,137 +1,210 @@
 # Brand assets
 
-Every file that carries the Cirth mark, what uses it, and what has to
-happen to it when the mark is replaced.
-
-The mark is currently being redrawn. This page exists because the drawing
-is copied by hand into fourteen files and referenced from nine places, and
-without a list the substitution is a search for things to forget.
-`npm run check:brand-assets` (part of `npm run lint`) fails when a file's
-geometry no longer matches `docs/public/logo_brand.svg`, so the forgetting
-is caught rather than shipped.
+Every file that carries the Cirth mark, what produces it, what uses it, and
+what to do when a drawing changes.
 
 ## How the assets relate
 
+Three sources, and everything else is generated from them:
+
 ```text
-docs/public/logo_brand.svg          the drawing. One source of geometry.
+docs/brand/cirth-mark.svg                        the badge, drawn by a person
+docs/brand/cirth-wordmark-onest.svg              the name: outlines, edited by a person
+src/theme/_colors.scss                           the pigments: accent, neutral and canvas steps
   |
-  |-- recolour ------------------>  logo_brand_dark, logo_mono, logo_mono_dark
-  |-- recolour + tile ----------->  logo_*_app, logo_*_app_dark
-  |-- reduce (a human decides) -->  favicon, favicon_dark, mark_small*
-  |-- generated ----------------->  wordmark, wordmark_dark, wordmark_mono
-  |                                   npm run docs:lockup
-  |
-  '-- rasterised ---------------->  *.png, apple-touch-icon, social-preview
-                                      npm run docs:brand-assets (partly)
+  |-- node scripts/build-brand.js --> logo_brand, favicon, site.webmanifest,
+  |                                   wordmark, wordmark_dark
+  '-- npm run docs:brand-assets ----> the above, then the rasters:
+                                      logo_*.png, wordmark*.png, the icons
+                                      (favicon.ico, apple-touch-icon.png,
+                                      icon-*.png), social-preview.png
 ```
 
-Only the wordmarks are generated today. Everything on the `recolour` and
-`reduce` rows is maintained by hand, and the 1024px logo PNGs are produced
-outside the repository altogether.
+`scripts/build-brand.js` writes the mark, the favicon, the manifest and the
+lockups, and declares the raster icons (`icons`);
+`scripts/capture-brand-assets.js` renders the PNGs from those SVGs, each icon
+from its own SVG at each of its sizes, and the share cards from their pages
+in `docs/dist`, so it needs a current docs build. `scripts/lib/brand-mark.js`
+reads the drawing and the name for it: it paints the drawing, strips what
+describes the drawing's history rather than the mark, and measures the ink
+of both.
+
+`npm run check:brand-assets` (part of `npm run lint`) regenerates every SVG
+and the manifest in memory and fails when a file on disk differs from it,
+when a brand-named file in `docs/public/` is one no generator writes, or
+when a declared icon is missing or holds other sizes than it declares. A
+difference means a hand edit, or a source that moved without a
+regeneration. The rasters' pixels are not compared, because rasterisation
+differs between machines; regenerate them whenever the SVGs change.
+
+## The drawing
+
+The mark is a round badge: a figure playing a flute over a magenta disc,
+drawn in a dark and a light ink. One drawing serves every size, from the
+16px tab icon to the README header and the Brand page.
+
+The source is the maintainer's export with its figure enlarged by 17.5%
+against the disc: scaled about (219.24, 842.97), the point on the disc's
+edge where the left hand meets the arc the body's foot follows, and
+trimmed to the circle through that point (radius 453.32, the export's own
+0.8 units outside the disc, so the figure covers the disc's anti-aliased
+edge). Left of that point the flute and the hand still reach past the
+disc, as they do in the export. The disc (radius 452.5) is centred in a
+950.64-unit square that holds the whole figure with a 4.5-unit margin; the
+end of the flute reaches 18.3 units past the disc's square, on the left.
+The generators find three shapes by id: the disc that bounds the badge, and
+the figure's light fills and dark lines. The ids are listed in `DRAWING` in
+`scripts/lib/brand-mark.js`.
+
+Rendered at 16, 24, 32 and 48px, at 1x and 2x, on light and dark tab
+strips, the badge reads at 16px as a magenta disc with a dark figure and the
+white flute across it; the face reads from 24px up.
+
+There is one mark file, not one per colour scheme. On a near-black page the
+figure's dark ink meets the background at the foot of the badge, and the
+magenta disc draws the rest of its edge. There is no one-colour version: a
+drawing in several inks has no mechanical one-ink reduction, and one would
+have to be drawn.
+
+## The name
+
+The name is not typeset. `docs/brand/cirth-wordmark-onest.svg` holds
+"cirth" in lowercase, set in Onest at weight 650 with -0.5% tracking and the
+font's own kerning, then converted to outlines: every corner is rounded with
+a 23-unit radius (0.023em) and the outlines are simplified, one path per
+glyph with the baseline at y = 1000. The face is licensed under the SIL Open
+Font License 1.1 (<https://github.com/googlefonts/onest>); the file's
+metadata says so, and `NOTICE.md` records it. The license asks for no
+acknowledgement in artwork made with the font. The lockup reads the glyphs as
+they are, so replacing the name means replacing this file.
+
+The lowercase is the lockup's styling only. Running text writes the name as
+Cirth, and the lockup SVGs keep `aria-label="Cirth"`.
+
+## Pigments
+
+Assigned in `roles` in `scripts/build-brand.js`:
+
+| Role | Step | Used by |
+| --- | --- | --- |
+| Disc | `$accent-500`, the light `--cirth-primary` | every mark, favicon and lockup |
+| Figure, dark ink | `$neutral-900`, the light `--cirth-ink-strong` | every mark, favicon and lockup |
+| Figure, light ink | `$neutral-50`, the dark `--cirth-ink-strong` | every mark, favicon and lockup |
+| Paper | `$canvas-light` | the ground of the touch icon and the maskable icon, the manifest's colours |
+
+The generators repaint every ink of the drawing, so the badge always
+follows the theme's scales, whatever colours the source carries. The
+figure's two inks are the two ends of `--cirth-ink-strong`, the darkest and
+the lightest neutral the interface sets text in. The lockup's name takes
+`$neutral-900` on light, the figure's dark ink, and `$neutral-100` on dark.
+The Brand page prints the painted values from the same function
+(`palette()` in `build-brand.js`).
 
 ## Inventory
 
-`Blocked` means the file cannot be produced until the definitive mark is in
-`docs/public/logo_brand.svg`.
-
-| File | Used by | Format | Size | Variant | Blocked | Check after substitution |
-| --- | --- | --- | --- | --- | --- | --- |
-| `logo_brand.svg` | README header, site header (light), site footer (light), share card, Brand grid, lockup build, every derived file | SVG | 512 viewBox | Copper `#BD5928` | Yes, it **is** the mark | `check:brand-assets`, `docs:lockup`, visual suite |
-| `logo_brand_dark.svg` | README header (dark), site header (dark), site footer (dark), share card, Brand grid | SVG | 512 viewBox | Copper `#E16B31` | Yes, recolour | `check:brand-assets`, visual suite |
-| `logo_mono.svg` | Brand grid, one-colour use | SVG | 512 viewBox | Black | Yes, recolour | `check:brand-assets` |
-| `logo_mono_dark.svg` | Brand grid, one-colour use | SVG | 512 viewBox | White | Yes, recolour | `check:brand-assets` |
-| `logo_brand_app.svg` | Brand grid, square containers | SVG | 512 viewBox | Copper tile, `#FFFBF9` mark | Yes, recolour on a tile | `check:brand-assets` |
-| `logo_brand_app_dark.svg` | Brand grid, square containers | SVG | 512 viewBox | `#2C1409` tile, copper mark | Yes, recolour on a tile | `check:brand-assets` |
-| `logo_mono_app.svg` | One-colour square containers | SVG | 512 viewBox | Black tile, white mark | Yes, recolour on a tile | `check:brand-assets` |
-| `logo_mono_app_dark.svg` | One-colour square containers | SVG | 512 viewBox | White tile, black mark | Yes, recolour on a tile | `check:brand-assets` |
-| `favicon.svg` | `base.njk`, light scheme; `site.webmanifest`; `favicon-preview` page | SVG | 64 viewBox, 6px tile radius | Paper `#FAF5F3` tile | Yes, **reduction** | `check:brand-assets`, then look at it at 16px |
-| `favicon_dark.svg` | `base.njk`, dark scheme | SVG | 64 viewBox, 6px tile radius | Canvas `#141521` tile | Yes, **reduction** | `check:brand-assets`, then look at it at 16px |
-| `mark_small.svg` | Nothing, since the Brand page retired its fidelity ladder | SVG | 64px, cropped viewBox | Copper `#BD5928` | Yes, **reduction** | Decide whether it is still wanted before redrawing it |
-| `mark_small_dark.svg` | Nothing, as above | SVG | 64px, cropped viewBox | Copper `#E16B31` | Yes, **reduction** | As above |
-| `wordmark.svg` | Brand lockup grid | SVG, generated | 327.51 x 78 | Copper mark, graphite name | No, regenerate | `npm run docs:lockup`, then `check:brand-assets` |
-| `wordmark_dark.svg` | Brand lockup grid | SVG, generated | 327.51 x 78 | Copper mark, paper name | No, regenerate | `npm run docs:lockup` |
-| `wordmark_mono.svg` | Brand page download | SVG, generated | 327.51 x 78 | `currentColor` | No, regenerate | `npm run docs:lockup` |
-| `logo_brand.png` | Brand page download | PNG | 1024 x 1024 | Copper | Yes, and **no script produces it** | Re-export by hand, or add it to a script |
-| `logo_brand_dark.png` | Brand page download | PNG | 1024 x 1024 | Copper dark | Yes, no script | As above |
-| `logo_mono.png` | Brand page download | PNG | 1024 x 1024 | Black | Yes, no script | As above |
-| `logo_mono_dark.png` | Brand page download | PNG | 1024 x 1024 | White | Yes, no script | As above |
-| `logo_brand_app.png` | Brand page download | PNG | 1024 x 1024 | Copper tile | Yes, no script | As above |
-| `logo_brand_app_dark.png` | Brand page download | PNG | 1024 x 1024 | Dark tile | Yes, no script | As above |
-| `logo_mono_app.png` | Not linked from the site | PNG | 1024 x 1024 | Mono tile | Yes, no script | Decide whether it is still wanted |
-| `logo_mono_app_dark.png` | Not linked from the site | PNG | 1024 x 1024 | Mono tile | Yes, no script | Decide whether it is still wanted |
-| `wordmark.png` | Brand lockup download | PNG, generated at 4x | 1312 x 312 | Copper and graphite | No, regenerate | `npm run docs:brand-assets` |
-| `wordmark_dark.png` | Brand lockup download | PNG, generated at 4x | 1312 x 312 | Copper and paper | No, regenerate | `npm run docs:brand-assets` |
-| `apple-touch-icon.png` | `base.njk` `apple-touch-icon` | PNG, generated | 180 x 180 | Renders `favicon.svg` | After the favicon | `npm run docs:brand-assets` |
-| `social-preview.png` | `base.njk` `og:image`, absolute GitHub Pages URL | PNG, generated | 1200 x 630 | Light | Yes, page embeds the mark | `npm run docs:brand-assets`, then a card validator |
-| `site.webmanifest` | `base.njk` manifest link | JSON | n/a | `theme_color` `#faf5f3` | No, but see gaps | Install the site as an app |
+| File | Used by | Produced by | Notes |
+| --- | --- | --- | --- |
+| `logo_brand.svg` | Brand page, home page orbit | `build-brand.js` | The drawing, painted. Declared 512px, the source's view box |
+| `favicon.svg` | `base.njk`, the specimens | `build-brand.js` | The drawing in its disc's square, edge to edge, on a transparent ground. Declared 32px |
+| `site.webmanifest` | `base.njk` | `build-brand.js` | The `icons` marked for the manifest; colours from `$canvas-light` |
+| `wordmark.svg`, `wordmark_dark.svg` | README title, site header, mobile menu and footer, share card, Brand page | `build-brand.js` | Badge and outlined name |
+| `logo_brand.png` | Brand page downloads | `capture-brand-assets.js` | 1024 x 1024, transparent |
+| `wordmark*.png` (two) | Brand page downloads | `capture-brand-assets.js` | 4x the SVG's box |
+| `social-preview.png` | `base.njk` `og:image`, absolute GitHub Pages URL | `capture-brand-assets.js` | Renders `share-card.njk`, which embeds the lockup |
 
 ### References outside `docs/public/`
 
 | Place | What it points at | Note |
 | --- | --- | --- |
-| `README.md` | `logo_brand.svg`, `logo_brand_dark.svg` | Absolute `raw.githubusercontent.com` URLs on `master`. They update only when `master` does, and they are cached by GitHub's image proxy |
-| `docs/src/_includes/site-header.njk` | Both brand SVGs, twice each | Header and mobile drawer |
-| `docs/src/_includes/site-footer.njk` | Both brand SVGs | |
-| `docs/src/_includes/share-card.njk` | Both brand SVGs | Feeds `social-preview.png` |
-| `docs/src/_includes/base.njk` | Favicons, touch icon, manifest, `og:image` | |
-| `docs/src/pages/brand.md` | The download grid | |
-| `docs/src/pages/favicon-preview.njk` | `favicon.svg` | Exists only to be screenshotted |
-| `scripts/build-brand-lockup.js` | `logo_brand*.svg` | Geometry and pigment |
-| `scripts/check-brand-assets.js` | All fourteen SVGs | The drift check |
+| `README.md` | `wordmark.svg`, `wordmark_dark.svg` | The title, 96px high. Absolute `raw.githubusercontent.com` URLs on `master`: they update only when `master` does, and GitHub's image proxy caches them |
+| `docs/src/_includes/site-header.njk` | Both lockups, twice each | Header and mobile menu, 34px high, centred on the nav link band, 32px from the first link |
+| `docs/src/_includes/site-footer.njk` | Both lockups | 34px high |
+| `docs/src/_includes/home.njk` | `logo_brand.svg` | The centre of the integrations orbit, at most 64px |
+| `docs/src/_includes/share-card.njk` | Both lockups | Feeds `social-preview.png` and the README preview images. The README card draws the lockup 140px wide |
+| `docs/src/_includes/base.njk`, `framework-specimen.njk` | `favicon.ico`, then `favicon.svg`; the base layout also the touch icon, manifest and `og:image` | The .ico declares `sizes="32x32"` so that browsers which take SVG icons prefer the SVG. The icon URLs come from `brandIcons` in `docs/eleventy.config.js`, each with `?v=` and a hash of the file: browsers keep a favicon by its URL, so a redrawn icon is a new URL |
+| `docs/src/pages/brand.md` | The marks and lockups, SVG and PNG | The hero and the download grid |
 
-## Gaps this list found
+## Icons
 
-These are real today and do not depend on the new mark.
+Every icon is declared once in `icons` in `build-brand.js` and
+rendered by `capture-brand-assets.js` from its own SVG at each of its
+sizes, never scaled from another raster.
 
-1. **`mark_small*.svg` are orphaned.** The Brand page's fidelity ladder was
-   the only thing referencing them. Keep or drop, but decide.
-2. **`logo_mono_app*.png` are orphaned too.** Never linked from any page.
-3. **Eight PNGs have no producing script.** The wordmark PNGs are captured
-   from their SVGs; the eight 1024px logo PNGs are not, so they can silently
-   fall behind their SVGs. Nothing checks them.
-4. **The manifest declares one icon.** `site.webmanifest` lists
-   `favicon.svg` only: no maskable icon, no PNG fallback, and no dark
-   variant, so an installed shortcut has nothing sized for it.
-5. **`theme_color` is a literal.** `#faf5f3` is written into the manifest
-   and is the light canvas by coincidence, not by derivation.
-6. **The README's images bypass the site.** They resolve against `master`
-   on `raw.githubusercontent.com`, so a logo on a branch never shows there,
-   and the substitution is only visible once it merges.
+| File | Sizes | Frame and ground | For |
+| --- | --- | --- | --- |
+| `favicon.svg` | vector, declared 32 | disc's square, edge to edge; transparent | the tab, in every browser that takes an SVG icon |
+| `favicon.ico` | 16, 32 | disc's square, edge to edge; transparent | the tab in Safari before 26, which takes no SVG icon |
+| `apple-touch-icon.png` | 180 | disc 140px across, whole drawing; paper | the iOS home screen and Safari's favourites. Opaque, since iOS fills transparency with black, and square, since iOS rounds the corners |
+| `icon-192.png`, `icon-512.png` | 192, 512 | whole drawing; transparent | the web manifest: an installed shortcut |
+| `icon-maskable.png` | 512 | disc 80% across, whole drawing; paper | the web manifest, `purpose: maskable`: Android crops it to its own shape, keeping the central 80% the disc is fitted to |
 
-## Substituting the definitive mark
+A tab icon is edge to edge because at 16px every pixel goes to the badge,
+and the edge of the icon explains the end of the flute it cuts (18.3 units
+in 905, about half a pixel at 32px). Every larger icon shows the whole
+flute, which otherwise would end in the air beside the disc.
 
-Do these in order. Stop at the first failure rather than working around it.
+The manifest declares `display: browser`: the documentation is not meant
+to be installed as an app, and the icons serve a shortcut to it.
 
-1. **Put the drawing in `docs/public/logo_brand.svg`.** Keep the 512
-   viewBox if the artwork allows it; if it does not, note the new one here,
-   because the favicons and the app tiles crop against it.
-2. **Run `npm run check:brand-assets`.** It fails, and lists every file
-   that still holds the old drawing. That list is the work.
-3. **Recolour the eight flat variants** from the new paths: the three
-   recolours and the four tiles, plus the source itself. Fills stay as they
-   are unless the brand colours change.
-4. **Redraw the reductions.** `favicon.svg`, `favicon_dark.svg` and, if
-   they are kept, `mark_small*.svg`. Which parts a reduction keeps is a
-   drawing decision and no script can make it. Check each at 16px.
-5. **Regenerate the lockups:** `npm run docs:lockup`. The mark is placed
-   against its own measured ink box, so this needs no hand measurement.
-   Look at the result: the name sits on the cap height, and a mark with a
-   different aspect ratio will change the lockup's width.
-6. **Re-export the eight logo PNGs** at 1024px, or add them to a script.
-7. **Regenerate the captured rasters:** `npm run docs:brand-assets`. This
-   covers the wordmark PNGs, the touch icon and the social preview.
-8. **Re-run `npm run check:brand-assets`.** It must pass.
-9. **Measure the mark and complete the Brand page.** Clearspace, minimum
-   size, construction grid, size thresholds, lockup alignment and the
-   reduced variant are all listed as pending on
-   [the Brand page](src/pages/brand.md) and each needs a number taken off
-   the new drawing.
-10. **Rewrite the mark's description.** The Brand page says the mark is
-    being redrawn. Replace that with what it is.
-11. **Re-run the suites:** `npm run build`, `npm run lint`,
-    `npm run docs:build`, `npm run check:a11y`, `npm run check:visual`.
-    Visual baselines will change wherever the mark appears. Review every
-    changed image before accepting it, and update baselines deliberately.
-12. **Check the surfaces a test does not see:** the README on GitHub, the
-    social card in a validator, the favicon in a real tab strip at 16px,
-    and the installed web app icon.
+## The lockup
+
+`build-brand.js` sets the badge beside the name with the centre of
+the disc on the middle of the name's ink, from the top of the ascenders to
+the foot of the round letters. The badge is round, so its centre is also its
+optical centre. The disc is 1.55 times the height of the name's ink
+(`MARK_RATIO`), which puts Onest's cap height at 0.6 of the disc, as in the
+approved design; the gap is 0.3 of the same height (`GAP_RATIO`). Both
+lockups are 108 units high.
+
+The generator also exports where the middle of the name's x-height falls
+(`nameCentre`, the middle of the round c), which the site header uses to
+centre the name, rather than the lockup's box, on the text beside it. A
+lowercase word reads on its x-height, so that is the band lined up with the
+links.
+
+## Measuring a drawing
+
+The generators measure every number they need from the drawing: the ink
+box (for the lockup's extent and the frames that show the whole drawing)
+and the disc's box (for every frame, and the lockup's scale and
+alignment). `inkOf()` in `scripts/lib/brand-mark.js`
+reads paths, circles, rectangles and ellipses, the last turned by a
+rotation, inside groups that translate. Path bounds are exact at their
+extrema, elliptical arcs included. A stroke widens a shape by half its width
+times the miter limit, a bound rather than a measurement; the current
+drawing has no strokes. Anything else (a
+transform it cannot bound, a shape it does not know, a reference, text or
+an embedded image) is refused instead of skipped.
+
+## Gaps
+
+1. **The README's images bypass the site.** They resolve against `master`
+   on `raw.githubusercontent.com`, so a lockup on a branch never shows
+   there.
+2. **No clearspace is published.** The Brand page asks for the built-in
+   margin to be kept, but gives no measured clearspace.
+
+## Replacing the drawing or the name
+
+1. **Replace the source:** export the drawing to `docs/brand/cirth-mark.svg`,
+   keeping the ids `DRAWING` names (or updating them there), or replace the
+   glyphs in `docs/brand/cirth-wordmark-onest.svg` (one
+   `<g transform="translate(x y)">` and one `<path>` per glyph). The
+   generators measure both from their geometry, so nothing else needs a
+   number.
+2. **Run `npm run docs:build`, then `npm run docs:brand-assets`.** The
+   first brings `docs/dist` up to date for the captured rasters.
+3. **Run `npm run check:brand-assets`.** It must pass.
+4. **Look at the result:** the favicon at 16, 24, 32 and 48px on a light
+   and a dark tab strip, the lockup at 34px, its height in the site
+   header, and at 96px, its height in the README.
+5. **Re-run the suites:** `npm run build`, `npm run lint`,
+   `npm run check:a11y`, `npm run check:visual`. Visual baselines change
+   wherever the mark or the lockup appears, which is every page; review
+   every changed image before accepting it.
+6. **Check the surfaces a test does not see:** the README on GitHub, the
+   social card in a validator, the favicon in a real tab strip at 16px
+   (Safari 18 as well, for the .ico), and the touch icon on a phone's home
+   screen. The icon URLs change with the files' content, so a reload picks
+   up a new favicon; a tab that still shows the old one is reading a page
+   built before the files changed.

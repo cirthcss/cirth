@@ -477,8 +477,8 @@ for (const [name, css] of builds) {
 }
 
 // A preset, or the high-contrast pass, that moves the page's ink has to move
-// the *role* and let the slot follow, not the other way round. Playroom set
-// --cirth-color directly, so under it --cirth-ink still held the base
+// the *role* and let the slot follow, not the other way round. The removed
+// playroom preset set --cirth-color directly, so under it --cirth-ink still held the base
 // theme's near-black: the two names disagreed about what the page's ink was,
 // which is the one thing a page role must never do.
 const presetFiles = fs
@@ -650,7 +650,7 @@ for (const [name, css] of builds) {
 			`<table>
 				<caption id="caption">Project team and roles</caption>
 				<thead><tr><th id="head" scope="col">Name</th></tr></thead>
-				<tbody><tr><td>Alex Doe</td></tr></tbody>
+				<tbody><tr><td id="data">Alex Doe</td></tr></tbody>
 			</table>`,
 		);
 
@@ -661,12 +661,17 @@ for (const [name, css] of builds) {
 			const cell = getComputedStyle(
 				/** @type {Element} */ (document.getElementById("head")),
 			);
+			// The data, not the column head: since specs/typographic-roles.md
+			// the head is metadata too, in the caption's own role.
+			const data = getComputedStyle(
+				/** @type {Element} */ (document.getElementById("data")),
+			);
 			const root = getComputedStyle(document.documentElement);
 			return {
 				captionAlign: caption.textAlign,
 				cellAlign: cell.textAlign,
 				captionColor: caption.color,
-				cellColor: cell.color,
+				cellColor: data.color,
 				muted: root.getPropertyValue("--cirth-muted-color").trim(),
 				spaceBelow: Number.parseFloat(caption.paddingBlockEnd),
 			};
@@ -965,6 +970,96 @@ for (const build of scopedAndUnscoped) {
 	});
 }
 
+// A breadcrumb that does not fit its width wraps onto more lines. A nav's
+// lists are a flex row, and a row that may not wrap pushed a long trail
+// past the edge of the page: the documentation's WordPress guide was 12px
+// wider than a 320px window in Linux's system face, a WCAG 1.4.10 reflow
+// failure. The container is narrow enough that the trail cannot fit in
+// any face.
+for (const build of scopedAndUnscoped) {
+	test(`${build.name}: a breadcrumb too long for its width wraps instead of overflowing`, async ({
+		page,
+	}) => {
+		const markup = `<div id="narrow" style="inline-size: 200px">
+			<nav aria-label="breadcrumb">
+				<ol>
+					<li><a href="/guides/">Framework guides</a></li>
+					<li><a href="/guides/#cms">Content management</a></li>
+					<li aria-current="page">WordPress</li>
+				</ol>
+			</nav>
+		</div>`;
+		await setContent(
+			page,
+			`<style>${read(build.file)}</style><main>${
+				build.wrapper ? `<div class="${build.wrapper}">${markup}</div>` : markup
+			}</main>`,
+		);
+
+		const measured = await page.evaluate(() => {
+			const box = /** @type {HTMLElement} */ (document.getElementById("narrow")).getBoundingClientRect();
+			const list = /** @type {HTMLElement} */ (document.querySelector("#narrow ol"));
+			const items = [...list.querySelectorAll("li")].map((item) => item.getBoundingClientRect());
+			return {
+				// The list's own negative inline margins reach into the
+				// container's gutter by design; what may not happen is an item
+				// past the container's far edge.
+				overflow: Math.max(...items.map((item) => item.right)) - box.right,
+				lines: new Set(items.map((item) => Math.round(item.top))).size,
+			};
+		});
+
+		expect(measured.overflow, "a breadcrumb item runs past its container").toBeLessThanOrEqual(1);
+		expect(measured.lines, "the trail wraps onto more than one line").toBeGreaterThan(1);
+	});
+
+	// The divider is drawn after an item, so an item that ends a line must
+	// keep room for it: a first fix that only let the trail wrap left that
+	// divider hanging past the edge wherever a line ended near it, which is
+	// some width in any face. So every width from 160 to 360px, in both
+	// directions, and the measure is the container's own scroll width, which
+	// counts the divider as an element's box would not.
+	test(`${build.name}: no width makes a wrapped breadcrumb's divider overflow, in either direction`, async ({
+		page,
+	}) => {
+		// The padding is where a nav list's own negative inline margins land,
+		// as they do in any container that holds one. Positioned, so the
+		// divider, which is absolutely positioned, counts in this box's
+		// scroll width rather than the page's.
+		const trailIn = (/** @type {string} */ dir) => `<div class="probe" dir="${dir}" style="position: relative; overflow: auto; padding-inline: var(--cirth-nav-element-spacing-horizontal)">
+			<nav aria-label="breadcrumb">
+				<ol>
+					<li><a href="/guides/">Framework guides</a></li>
+					<li><a href="/guides/#apps">Server-rendered apps</a></li>
+					<li><a href="/guides/#cms">Content management</a></li>
+					<li aria-current="page">Laravel</li>
+				</ol>
+			</nav>
+		</div>`;
+		const markup = `${trailIn("ltr")}${trailIn("rtl")}`;
+		await setContent(
+			page,
+			`<style>${read(build.file)}</style><main>${
+				build.wrapper ? `<div class="${build.wrapper}">${markup}</div>` : markup
+			}</main>`,
+		);
+
+		const overflowing = await page.evaluate(() => {
+			/** @type {string[]} */
+			const found = [];
+			for (const probe of /** @type {HTMLElement[]} */ ([...document.querySelectorAll(".probe")])) {
+				for (let width = 160; width <= 360; width += 2) {
+					probe.style.inlineSize = `${width}px`;
+					const over = probe.scrollWidth - probe.clientWidth;
+					if (over > 1) found.push(`${probe.dir} ${width}px: +${over}`);
+				}
+			}
+			return found;
+		});
+		expect(overflowing, "widths at which the trail overflows its container").toEqual([]);
+	});
+}
+
 // The same contract outside a breadcrumb: a plain navigation list and a
 // navbar both take the flex row whichever list element they are written
 // with, and a stacked nav releases it for both in the same way.
@@ -1042,7 +1137,7 @@ for (const [name, css] of builds) {
 // It reads as the density control and it was only half wired. `.grid` gaps
 // and section margins followed it; paragraph rhythm did not, because
 // --cirth-typography-spacing-vertical was declared as its own copy of
-// --cirth-space-4, so the playroom preset had to restate it, and every
+// --cirth-space-4, so a preset that opened the flow had to restate it, and every
 // future preset would have had to remember. It is derived now.
 //
 // The other half of the contract is what deliberately does *not* follow:
@@ -1068,6 +1163,7 @@ const flowRhythm = async (page, css, spacing) => {
 			(spacing ? `<style>:root { --cirth-spacing: ${spacing} }</style>` : "") +
 			`<main>
 				<p id="copy">Body copy.</p>
+				<p id="copy2">More body copy.</p>
 				<section id="section">A section.</section>
 				<article id="card">On a card.</article>
 				<input id="field" type="text">
@@ -1083,9 +1179,12 @@ const flowRhythm = async (page, css, spacing) => {
 
 		return {
 			spacing: root.getPropertyValue("--cirth-spacing").trim(),
-			// Flow: follows the knob.
-			paragraph: style("copy").marginBottom,
-			section: style("section").marginBottom,
+			// Flow: follows the knob. Since specs/container-owned-flow.md the
+			// space is set on the second of two siblings, by their relation:
+			// the element step between two paragraphs, the section step
+			// before a section.
+			paragraph: style("copy2").marginTop,
+			section: style("section").marginTop,
 			// Components: pinned, on purpose.
 			cardPadding: style("card").paddingTop,
 			fieldPadding: style("field").paddingTop,
@@ -1113,9 +1212,10 @@ for (const [name, css] of builds) {
 				dense.paragraph,
 				"paragraph rhythm did not follow --cirth-spacing",
 			).toBe(expected);
-			expect(dense.section, "section rhythm did not follow --cirth-spacing").toBe(
-				expected,
-			);
+			expect(
+				Number.parseFloat(dense.section),
+				"section rhythm did not follow --cirth-spacing",
+			).toBeCloseTo(Number.parseFloat(expected) * 3, 1);
 			expect(dense.paragraph).not.toBe(control.paragraph);
 
 			expect(dense.cardPadding, "card padding followed the flow knob").toBe(
@@ -1151,17 +1251,18 @@ for (const [name, css] of builds) {
 
 // And the reason the derivation was worth making: a preset that opens the
 // flow up no longer has to restate the typography token to be consistent.
-// Playroom does not declare it any more; measured against the default
-// build, prose and grid gaps move together under it.
-test("default: the playroom preset retimes prose through --cirth-spacing alone", async ({
+// The preset here is written the way the shipped ones are, one declaration
+// in Cirth's layer after the build, so the test holds whichever shipped
+// preset happens to move the knob; measured against the default build,
+// prose and grid gaps move together under it.
+test("default: a preset retimes prose through --cirth-spacing alone", async ({
 	page,
 }) => {
 	await setContent(
 		page,
-		`<style>${defaultBuild}</style><style>${read(
-			"dist/presets/playroom.css",
-		)}</style><main class="container">
-			<p id="copy">Body copy.</p>
+		`<style>${defaultBuild}</style><style>@layer cirth { :root { --cirth-spacing: var(--cirth-space-5); } }</style><main class="container">
+			<p>Body copy.</p>
+			<p id="copy">More body copy.</p>
 			<div class="grid" id="grid"><div>a</div><div>b</div></div>
 		</main>`,
 	);
@@ -1179,7 +1280,7 @@ test("default: the playroom preset retimes prose through --cirth-spacing alone",
 			typography: root
 				.getPropertyValue("--cirth-typography-spacing-vertical")
 				.trim(),
-			paragraph: copy.marginBottom,
+			paragraph: copy.marginTop,
 			columnGap: grid.columnGap,
 		};
 	});
@@ -1189,3 +1290,63 @@ test("default: the playroom preset retimes prose through --cirth-spacing alone",
 	expect(measured.paragraph).toBe("20px");
 	expect(measured.columnGap).toBe("20px");
 });
+
+// --- Compact default theme typography ---------------------------------
+
+const themeBuilds = [
+	{ name: "default", css: defaultBuild, scope: "" },
+	{ name: "classless", css: read("dist/cirth.classless.css"), scope: "" },
+	{ name: "scoped", css: read("dist/cirth.scoped.css"), scope: "cirth" },
+	{
+		name: "classless scoped",
+		css: read("dist/cirth.classless.scoped.css"),
+		scope: "cirth",
+	},
+];
+
+for (const build of themeBuilds) {
+	for (const width of [390, 1440]) {
+		test(`${build.name}: content headings stay 28/24/20 and system-ui at ${width}px`, async ({
+			page,
+		}) => {
+			await page.setViewportSize({ width, height: 900 });
+			const content = `<p id="body">Body copy</p>
+				<div id="display" style="font-family: var(--cirth-font-family-display)">Display</div>
+				<h1 id="h1">Heading one</h1>
+				<h2 id="h2">Heading two</h2>
+				<h3 id="h3">Heading three</h3>`;
+			await setContent(
+				page,
+				`<style>${build.css}</style>${
+					build.scope ? `<main class="${build.scope}">${content}</main>` : `<main>${content}</main>`
+				}`,
+			);
+
+			const measured = await page.evaluate(() => {
+				/** @param {string} id */
+				const style = (id) =>
+					getComputedStyle(/** @type {Element} */ (document.getElementById(id)));
+				return {
+					bodyFamily: style("body").fontFamily,
+					bodySize: style("body").fontSize,
+					bodyLineHeight: style("body").lineHeight,
+					displayFamily: style("display").fontFamily,
+					headings: ["h1", "h2", "h3"].map((id) => ({
+						size: style(id).fontSize,
+						weight: style(id).fontWeight,
+					})),
+				};
+			});
+
+			expect(measured.bodyFamily).toContain("system-ui");
+			expect(measured.displayFamily).toBe(measured.bodyFamily);
+			expect(measured.bodySize).toBe("16px");
+			expect(measured.bodyLineHeight).toBe("24px");
+			expect(measured.headings).toEqual([
+				{ size: "28px", weight: "600" },
+				{ size: "24px", weight: "600" },
+				{ size: "20px", weight: "600" },
+			]);
+		});
+	}
+}

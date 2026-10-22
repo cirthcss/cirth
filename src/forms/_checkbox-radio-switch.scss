@@ -6,15 +6,37 @@
    * Checkboxes, Radios and Switches
    */
 
-// Labels
-
 // A label wrapping its own control shrinks to the control and its text, so
-// the pointer cursor covers exactly what is clickable and no further.
+// the pointer cursor covers exactly what is clickable. Its text is an
+// option, so it takes the body weight.
 
 #{$parent-selector} label {
   &:has([type="checkbox"], [type="radio"]) {
+    --cirth-form-label-font-weight: var(--cirth-font-weight-regular);
+
     width: fit-content;
+    font-size: var(--cirth-font-size-md);
     cursor: pointer;
+  }
+}
+
+// A label that opens with its checkbox or radio hangs: the mark sits in the
+// indent and a second line starts under the first word. The indent is the
+// box, its margin and the space after it. Zero weight, so a label an author
+// lays out as flex or grid overrides it (reset text-indent there too). A
+// switch keeps its label as it is (specs/choice-marks.md).
+
+#{$parent-selector}
+  label:where(
+    :has(
+      > :is([type="checkbox"]:not([role="switch"]), [type="radio"]):first-child
+    )
+  ) {
+  padding-inline-start: 1.875em;
+  text-indent: -1.875em;
+
+  > * {
+    text-indent: 0;
   }
 }
 
@@ -22,15 +44,27 @@
 #{$parent-selector} [type="radio"] {
   appearance: none;
 
-  // 1.5em = 24px at the default root font size: the WCAG 2.5.8 (AA)
-  // minimum target size, without relying on the adjacent label
+  // 1.5em is 24px at the default scale, the WCAG 2.5.8 target without the
+  // label. The mark is drawn smaller inside it: the outer 0.125em is a
+  // transparent band, and the edge is an inset ring the state slots reach.
+  // The negative margin centres the mark on the first line's capitals.
+  display: inline-grid;
+  grid-template: 100% / 100%;
+  place-items: center;
   width: 1.5em;
   height: 1.5em;
-  margin-top: -0.125em;
-  margin-inline-end: 0.5em;
-  border-width: var(--cirth-border-width);
+  margin-top: -0.1875em;
+  margin-inline-end: 0.125em;
+  border: 0.125em solid #0000;
+  background-clip: padding-box;
+  box-shadow: inset 0 0 0 var(--cirth-border-width) var(--cirth-border-color);
   vertical-align: middle;
   cursor: pointer;
+
+  // Forced colours removes the ring (a shadow); the border carries the edge.
+  @media (forced-colors: active) {
+    border-color: CanvasText;
+  }
 
   &:checked,
   &:checked:active,
@@ -41,7 +75,7 @@
 
   & ~ label {
     display: inline-block;
-    margin-bottom: 0;
+    margin-block: 0;
     cursor: pointer;
 
     &:not(:last-of-type) {
@@ -51,17 +85,9 @@
 }
 
 // Checkboxes
-
-// The mark is the icon applied as a mask over --cirth-primary-on-surface, not
-// an SVG with a baked stroke: a data URI cannot read a custom property, so
-// a baked white mark stays white on a light custom accent and disappears.
-// The on-surface token is the one the theme already computes for text on the
-// accent, so the mark follows any retheme.
-
-// Scoped away from [role="switch"]: a switch paints its own thumb through
-// ::before (see below), and a mask set here would cut that thumb to the
-// shape of the mark. Radios are excluded by construction: they draw their
-// dot with a thick border, and this block never reaches them.
+// The mark is masked over --cirth-primary-on-surface, so it follows any
+// retheme (a data URI cannot read a custom property). Switches paint their
+// thumb through ::before, so they are excluded.
 
 #{$parent-selector} [type="checkbox"]:not([role="switch"]) {
   &:checked::before,
@@ -75,8 +101,7 @@
     mask-size: 0.9em auto;
     mask-repeat: no-repeat;
 
-    // Forced colors strips author backgrounds, which would blank the
-    // masked mark; a system color stays visible.
+    // Forced colours strips author backgrounds, which would blank the mark.
     @media (forced-colors: active) {
       background-color: CanvasText;
     }
@@ -96,17 +121,58 @@
   }
 }
 
-// Radios
+// Radios: checked is the accent with a dot in the label colour, so the
+// selection has a shape as well as a colour, which forced colours keeps.
 
 #{$parent-selector} [type="radio"] {
   border-radius: 50%;
 
-  &:checked,
-  &:checked:active,
-  &:checked:focus {
-    --cirth-background-color: var(--cirth-primary-on-surface);
+  &::before {
+    inline-size: 0.5em;
+    block-size: 0.5em;
+    border-radius: 50%;
+    background-color: var(--cirth-primary-on-surface);
+    content: "";
+    scale: 0;
 
-    border-width: 0.42em;
+    @media (forced-colors: active) {
+      background-color: CanvasText;
+    }
+  }
+
+  &:checked::before {
+    scale: 1;
+  }
+
+  &:disabled::before {
+    background-color: var(--cirth-disabled-color);
+  }
+}
+
+// Hover, for fine pointers: the edge moves toward the ink as a field's does
+// and the secondary wash comes up; a checked mark takes the accent's hover
+// step. A label under the pointer counts as its control.
+
+@media (hover: hover) and (pointer: fine) {
+  #{$parent-selector}
+    :is([type="checkbox"], [type="radio"]):is(:hover, label:hover > *):not(
+      :disabled,
+      [aria-invalid],
+      [role="switch"]
+    ) {
+    &:not(:checked, :indeterminate, :user-invalid) {
+      --cirth-background-color: var(--cirth-secondary-surface);
+      --cirth-border-color: color-mix(
+        in oklch,
+        var(--cirth-form-element-border-color) 65%,
+        var(--cirth-color)
+      );
+    }
+
+    &:is(:checked, :indeterminate) {
+      --cirth-background-color: var(--cirth-primary-surface-active);
+      --cirth-border-color: var(--cirth-primary-border-active);
+    }
   }
 }
 
@@ -116,17 +182,20 @@
   --cirth-background-color: var(--cirth-switch-background-color);
   --cirth-color: var(--cirth-switch-color);
 
-  // Config
-  // 1.5em tall = 24px at the default root font size (WCAG 2.5.8 minimum
-  // target size); width keeps the original 1.8:1 track proportion
+  // 1.5em tall, the WCAG 2.5.8 target at the default scale, at the original
+  // 1.8:1 track proportion.
   $switch-height: 1.5em;
   $switch-width: 2.7em;
   $switch-transition: var(--cirth-duration-fast) var(--cirth-ease-in-out);
 
-  // Styles
+  // A track, not a mark: no band, no ring, the thumb laid out in flow.
+  display: inline-block;
   width: $switch-width;
   height: $switch-height;
+  margin-top: -0.125em;
+  margin-inline-end: 0.5em;
   border: var(--cirth-border-width) solid var(--cirth-border-color);
+  box-shadow: none;
   border-radius: $switch-height;
   background-color: var(--cirth-background-color);
   line-height: $switch-height;
@@ -160,31 +229,52 @@
     }
   }
 
-  &[disabled] {
-    --cirth-background-color: var(--cirth-border-color);
+  // The track takes the disabled wash (forms/_basics.scss) and the thumb
+  // the disabled ink, since a white thumb would vanish on it.
+  &[disabled]::before {
+    background-color: var(--cirth-disabled-color);
   }
+}
+
+// Disabled marks take the disabled ink: drawn in the on-surface white, they
+// would vanish into the disabled wash.
+#{$parent-selector} [type="checkbox"]:not([role="switch"]):disabled::before {
+  background-color: var(--cirth-disabled-color);
+}
+
+// The focus ring every control draws; the band already holds it off the
+// mark. A radio takes it on :focus too: WebKit does not match
+// :focus-visible on a radio its arrow keys moved to, and :focus is the one
+// state every engine sets there (specs/choice-marks.md).
+#{$parent-selector}
+  input:is(
+    [type="checkbox"]:not([role="switch"]),
+    [type="radio"]
+  ):focus-visible,
+#{$parent-selector} input[type="radio"]:focus {
+  outline: var(--cirth-outline-width) solid
+    var(--cirth-form-element-focus-color);
+  outline-offset: 0;
+}
+
+// A mark's edge is its ring, so the disabled separator edge goes there and
+// the band stays clear.
+#{$parent-selector}
+  input:is([type="checkbox"], [type="radio"]):not([role="switch"]):disabled {
+  --cirth-border-color: var(--cirth-muted-border-color);
+
+  border-color: #0000;
+
+  @media (forced-colors: active) {
+    border-color: GrayText;
+  }
+}
+
+#{$parent-selector} [type="radio"]:checked:disabled {
+  --cirth-border-color: var(--cirth-disabled-color);
 }
 
 // Aria-invalid
-
-#{$parent-selector} [type="checkbox"],
-#{$parent-selector} [type="checkbox"][role="switch"] {
-  &[aria-invalid="false"] {
-    &:checked,
-    &:checked:active,
-    &:checked:focus {
-      --cirth-background-color: var(--cirth-form-element-valid-border-color);
-    }
-  }
-
-  &:checked,
-  &:checked:active,
-  &:checked:focus {
-    &[aria-invalid="true"] {
-      --cirth-background-color: var(--cirth-form-element-invalid-border-color);
-    }
-  }
-}
 
 #{$parent-selector} [type="checkbox"],
 #{$parent-selector} [type="radio"],
@@ -193,6 +283,7 @@
     &:checked,
     &:checked:active,
     &:checked:focus {
+      --cirth-background-color: var(--cirth-form-element-valid-border-color);
       --cirth-border-color: var(--cirth-form-element-valid-border-color);
     }
   }
@@ -201,6 +292,7 @@
   &:checked:active,
   &:checked:focus {
     &[aria-invalid="true"] {
+      --cirth-background-color: var(--cirth-form-element-invalid-border-color);
       --cirth-border-color: var(--cirth-form-element-invalid-border-color);
     }
   }

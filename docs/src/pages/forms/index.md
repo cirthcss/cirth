@@ -1,120 +1,170 @@
 ---
 layout: docs.njk
+description: Build understandable, accessible HTML forms with Cirth labels, help text, fieldsets, legends and native controls.
 ---
-
 
 # Forms
 
-`input`, `select`, `textarea`, `label`, and `fieldset`/`legend` are styled
-directly. This page covers the shared basics; see the sibling pages for
-behavior specific to each input type.
+Cirth styles standard form elements. Start with the HTML that describes the
+data you need, then let the browser provide input, keyboard and submission
+behavior.
 
-{% demo "forms-basics" %}
+{% demo "forms-structure" %}
 
 ```html
 <form>
   <fieldset>
+    <legend>Account</legend>
     <label>
       Full name
-      <input type="text" name="name" placeholder="Ada Lovelace" autocomplete="name">
+      <input type="text" name="name" autocomplete="name" required>
     </label>
     <label>
-      Role
-      <select name="role" required>
-        <option value="" selected disabled>Select…</option>
-        <option>Engineer</option>
-      </select>
-    </label>
-    <label>
-      Bio
-      <textarea name="bio"></textarea>
-      <small>Optional, shown on your public profile.</small>
+      Email
+      <input type="email" name="email" autocomplete="email"
+             aria-describedby="email-help" required>
+      <small id="email-help">Receipts go here. We never share it.</small>
     </label>
   </fieldset>
-  <button type="submit">Submit</button>
+
+  <fieldset>
+    <legend>Plan</legend>
+    <label>
+      <input type="radio" name="plan" value="free" checked>
+      Free
+    </label>
+    <label>
+      <input type="radio" name="plan" value="team">
+      Team, billed monthly
+    </label>
+  </fieldset>
+
+  <button type="submit">Create account</button>
 </form>
 ```
 
-## Layout
+This form asks for two account values and one plan. The browser collects
+controls that have a `name`. For example, the checked plan produces either
+`plan=free` or `plan=team`. Your application still has to receive, validate
+and store that data.
 
-* `label` is a block, with a bottom margin. Put the control right after
-  its text, inside the same `label`, and it gets a small top margin
-  automatically.
-* Text inputs, `select`, and `textarea` are full width and get a bottom
-  margin (`--cirth-spacing`) so stacked fields space themselves. An
-  explicit `size` attribute (`<input size="6">`) opts a text input out
-  of the full-width default instead, sizing it to its native,
-  content-based width.
-* `textarea` opens four rows tall instead of the browser's two, so a
-  field meant for a paragraph shows a paragraph. An explicit `rows`
-  attribute (`<textarea rows="2">`) takes over completely: the default
-  only applies when you haven't said how tall you want it. The four rows
-  are measured in `lh`, so they stay four rows of *this* textarea's text
-  if you change its font size.
-* Controls are at least 44px tall (the WCAG 2.5.5 target size) whatever
-  font size you set on them: buttons, `select` and `textarea` each hold
-  that floor independently of the type scale. Inside a `nav` the floor
-  becomes a compact 40px band, still above WCAG 2.5.8's 24px AA minimum.
-  Equivalent one-line controls share the same font, line-height, padding,
-  border and height formula, so an input, select and adjacent button align
-  without per-component offsets.
-* A `small` immediately after a form control becomes helper/hint text:
-  block, muted, with a small negative top margin to sit tight under the
-  field.
-* `fieldset` is full width with no border/padding of its own; `legend`
-  matches label styling.
+## Label, control, help text
 
-## States
-
-{% demo "forms-validation" %}
+A `label` gives a control its accessible name and makes the label text
+clickable. The example nests each control inside its label. If the two
+elements cannot be nested, give the control an `id` and use the same value in
+the label's `for` attribute:
 
 ```html
-<input type="email" value="ada@example.com" aria-invalid="false">
-<input type="email" value="not-an-email" aria-invalid="true">
-<input type="text" value="Unavailable" disabled>
-<input type="number" value="3">
-<input type="number" value="3" readonly>
+<label for="company">Company</label>
+<input id="company" name="company" type="text">
 ```
 
-* **`aria-invalid="false"`** marks the valid state: border in
-  `--cirth-form-element-valid-border-color`, a check icon, and the adjacent
-  `small` colored with `--cirth-ins-color`.
-* **`aria-invalid="true"`** marks the invalid state: border in
-  `--cirth-form-element-invalid-border-color`, an alert icon, and the
-  adjacent `small` colored with `--cirth-del-color`.
-* **`:user-invalid`** gets the invalid treatment automatically, with no
-  `aria-invalid` attribute and no JS, once a field has been interacted with
-  and the browser has checked it against its native constraints (`required`,
-  `type="email"`, `pattern`, …). Native `:user-valid` stays neutral because
-  satisfying HTML constraints does not necessarily mean that the submitted
-  data is correct. Use `aria-invalid="false"` when an explicit positive state
-  is useful. Range inputs are excluded from automatic validity styling, and a
-  native-invalid `select` stays neutral while focused so merely opening it
-  does not show an error. An explicit `aria-invalid` always wins.
-* **`:focus`** lifts the recessed field surface back to the canvas, adds an
-  accent border, and adds a box shadow ring in
-  `--cirth-form-element-focus-color` (or the valid/invalid focus variant when
-  an explicit `aria-invalid` or matching `:user-invalid` state applies).
-* **`[disabled]`** (or an ancestor `fieldset[disabled]`) applies opacity
-  `--cirth-form-element-disabled-opacity`, pointer events off.
-* **`[readonly]`** uses a distinct surface and dashed border. A readonly
-  number input also hides its increment/decrement controls, while an editable
-  number input keeps its existing native affordance and behaviour.
-* **`::placeholder`** is colored with `--cirth-form-element-placeholder-color`.
+The attributes have different jobs:
 
-## Key tokens
+- `id` identifies one element in the page. Labels and ARIA references use it.
+- `name` identifies the value when the browser submits the form.
+- `value` is the submitted value. For text fields it also provides an initial
+  value; for radios and checkboxes it identifies the selected choice.
+- `autocomplete` tells the browser what kind of saved information may fill the
+  field. Use a standard token such as `name`, `email` or `postal-code`.
+- `required` adds a native constraint. A supporting browser will not submit
+  the form while the control has no acceptable value.
 
-`--cirth-form-element-background-color`, `-border-color`, `-color`,
-`-placeholder-color`, `-focus-color`, `-active-border-color`,
-`-valid-border-color`, `-invalid-border-color`, `-disabled-opacity`. See
-[Customization](/customization) for how these relate to the semantic color
-groups.
+A `small` immediately after a control is styled as help text. Its `id` lets
+`aria-describedby` connect the explanation to the control, so assistive
+technology can announce it after the label. `aria-describedby` adds a
+description; it does not replace the label.
 
-## Other input types
+## Grouping with fieldset and legend
 
-* [Checkbox, radio, switch](/forms/checkbox-radio-switch)
-* [Input color](/forms/input-color)
-* [Input date](/forms/input-date)
-* [Input file](/forms/input-file)
-* [Input range](/forms/input-range)
-* [Input search](/forms/input-search)
+A `fieldset` groups controls that answer one question. Its first `legend`
+names that group. This relationship is especially important for radio buttons,
+because a label such as "Team" only makes sense after the group question
+"Plan" is known.
+
+The browser exposes the group and its name to assistive technology. Setting
+`disabled` on the `fieldset` disables its form controls together. Cirth removes
+the browser's fieldset frame and styles the legend as the group's heading.
+
+## Native behavior and Cirth styling
+
+The browser owns editing, selection, keyboard input, autocomplete, constraint
+validation and form submission. Cirth adds a consistent control height,
+surface, edge, spacing, typography and visible states. It does not send form
+data, validate business rules or write error messages.
+
+Text fields, `select` and `textarea` fill their container by default. Buttons
+size to their text. One-line controls and buttons share a 44px minimum height,
+so they align when placed together.
+
+## Layout
+
+- Stack labels in source order for the clearest reading and keyboard order.
+- Use [Grid](/layout/grid) when related fields need to share a row. It wraps
+  when the available width becomes too small.
+- An input with a `size` attribute keeps its native content-based width instead
+  of filling the row.
+- Use [Group](/components/group) when a field and button must form one joined
+  control.
+
+Do not use visual position to change the meaning or order of fields. The DOM
+order remains the order used by keyboards and assistive technology.
+
+## Accessibility
+
+- Give every control a visible label. A placeholder is an example or hint; it
+  disappears during editing and is not a label.
+- Choose an input `type` that matches the data. Browsers can then provide a
+  suitable mobile keyboard and native constraints.
+- Put persistent instructions in help text connected with
+  `aria-describedby`.
+- Describe errors in words and associate them with the field. Cirth supplies
+  state styling, not the error message or application validation.
+- Keep the native element whenever it already represents the interaction.
+  Styling a `div` to look like an input does not give it input behavior.
+
+## Controls
+
+<ul class="docs-path-list">
+<li><a href="/forms/text-inputs"><strong>Text inputs</strong><span>Text, email, password, URL, phone and number.</span></a></li>
+<li><a href="/forms/select"><strong>Select</strong><span>One or several choices from a list.</span></a></li>
+<li><a href="/forms/textarea"><strong>Textarea</strong><span>Multi-line text.</span></a></li>
+<li><a href="/forms/validation"><strong>Validation and states</strong><span>Valid, invalid, disabled and read-only.</span></a></li>
+<li><a href="/forms/checkbox-radio-switch"><strong>Checkbox, radio and switch</strong><span>Toggles, single choices and segmented choices.</span></a></li>
+<li><a href="/forms/input-color"><strong>Color</strong><span>The native colour picker.</span></a></li>
+<li><a href="/forms/input-date"><strong>Date</strong><span>Date, time, month and week fields.</span></a></li>
+<li><a href="/forms/input-file"><strong>File</strong><span>File uploads.</span></a></li>
+<li><a href="/forms/input-range"><strong>Range</strong><span>A value on a scale.</span></a></li>
+<li><a href="/forms/input-search"><strong>Search</strong><span>A search field.</span></a></li>
+</ul>
+
+## Tokens
+
+| Token | What it sets |
+| --- | --- |
+| `--cirth-form-element-background-color` | Optional field fill; otherwise the field uses its current surface |
+| `--cirth-form-element-border-color` | Field edge |
+| `--cirth-form-element-color` | Entered text |
+| `--cirth-form-element-placeholder-color` | Placeholder text |
+| `--cirth-form-element-focus-color` | Focus ring |
+| `--cirth-form-element-spacing-vertical`, `--cirth-form-element-spacing-horizontal` | Field padding |
+| `--cirth-form-label-font-weight` | Label weight |
+
+[Customization](/customization) explains where to set token overrides and how
+they participate in the cascade.
+
+## Common mistakes
+
+- Omitting `name`, which leaves a control out of ordinary form submission.
+- Reusing an `id`, which makes `for`, `aria-describedby` and other references
+  ambiguous.
+- Using a placeholder as the only label.
+- Treating browser validation as server validation. Data must still be checked
+  by the application.
+
+## Related
+
+- [Validation and states](/forms/validation)
+- [Buttons](/content/button)
+- [Accessibility and user preferences](/guides/accessibility)

@@ -1,7 +1,7 @@
 // Row breakpoint
 // ––––––––––––––––––––
-// Layout and component sizing is otherwise intrinsic. `.row` deliberately
-// keeps one viewport decision: peers stack on narrow pages and become one
-// indivisible row when the page is wide enough.
+// Layout and component sizing is otherwise intrinsic. `.row` keeps one
+// viewport decision: peers stack on narrow pages and share one row on wide
+// ones.
 
 $row-breakpoint: 768px;

@@ -1,0 +1,2072 @@
+// The integration guides and the marks that name them, once. The sidebar
+// and the pager (nav.js), the Framework Guides page, the home page, each
+// guide's breadcrumb, header and verification note, and the Brand page all
+// read this file, so a guide cannot be linked from one place and missing
+// from another, a count cannot drift from the list it counts, and a logo
+// cannot be drawn without its provenance.
+//
+// One guide per tool a reader would look for by name. Tools that are the
+// same set-up under two names share one guide and say so in `covers`
+// (HTML on Vite is the Vite guide; Phoenix LiveView is the Phoenix guide),
+// and a package manager is never a guide: every guide that installs from
+// npm offers all four. Integrations whose only purpose is another CSS
+// framework (its CLI, its standalone binary, an atomic engine) are not
+// guides either; `excluded` below names them so a test can keep them out.
+//
+// Every project is named by its name: nominative use, which identifies the
+// tool a guide covers and needs nobody's permission. Its logo is shown
+// beside the name when four things hold: the file comes from the project's
+// own site, press or design kit or repository; it is committed unmodified
+// under docs/public/logos/frameworks/ (nothing hotlinked, nothing redrawn,
+// no colour filter); no official rule asks for permission before this use
+// or forbids it; and the colours, clear space, notices and links its owner
+// asks for are kept. Otherwise, where a policy asks for permission that has
+// not been given, forbids the use, or leaves it genuinely ambiguous, the
+// project is named by text alone and its record says why (`textOnly`).
+// Every record names its owner, the policy read and the day it was read,
+// which is what the Brand page lists.
+//
+// Some records are a decision the maintainers took instead (`nominative`):
+// the logo identifies the guide for that project, as a nominative
+// reference, where the owner's policy asks to be asked first or allows
+// nominative use on conditions the record states. Such a
+// record keeps what the policy asks, where and when the file was taken,
+// and states that the use implies no affiliation and that the logo comes
+// down if its owner asks. It never rests on the project's open source
+// licence, which covers code and not trademarks.
+//
+// Where a project publishes a separate file for dark backgrounds, `dark`
+// names it. A file drawn only for light backgrounds, with no official
+// variant for dark ones, sits on a neutral light ground in the dark scheme
+// (`ground: "light"`) instead of being inverted.
+//
+// Wherever a mark is a link, it leads to the project's official site
+// (`officialUrl`), named as such, and the guide is a separate link beside
+// it, or to the address the owner names for its logo (`linkTo`): JetBrains
+// asks that its product logos link to www.jetbrains.com. On the
+// Framework Guides page a mark is a decorative picture inside its card, which
+// is one link to the guide; the guide's own card is where the mark leads to
+// the project.
+
+const fs = require("node:fs");
+const path = require("node:path");
+
+// The date the first marks were retrieved. A mark added later carries its
+// own `retrieved`. Every record's policy was last read on `checked`.
+const retrieved = "2026-09-30";
+const checked = "2026-10-08";
+const logoDir = path.join(__dirname, "../../public/logos/frameworks");
+
+// Width over height, from the file itself, so every <img> carries its
+// intrinsic size and nothing moves while the logos load: an SVG's viewBox,
+// or its width and height when it has none; a PNG's header.
+/** @param {string} file */
+const aspect = (file) => {
+	const full = path.join(logoDir, file);
+	if (file.endsWith(".png")) {
+		const header = fs.readFileSync(full).subarray(16, 24);
+		return header.readUInt32BE(0) / header.readUInt32BE(4);
+	}
+	const svg = fs.readFileSync(full, "utf8");
+	const root = /<svg\b[^>]*>/.exec(svg)?.[0] ?? "";
+	const box = /viewBox="([\d.\s-]+)"/.exec(root);
+	if (box) {
+		const [, , width, height] = box[1].trim().split(/\s+/).map(Number);
+		return width / height;
+	}
+	const width = Number(/\swidth="([\d.]+)"/.exec(root)?.[1]);
+	const height = Number(/\sheight="([\d.]+)"/.exec(root)?.[1]);
+	if (width > 0 && height > 0) return width / height;
+	throw new Error(`frameworks.js: ${file} has neither a viewBox nor a width and height`);
+};
+
+/**
+ * @typedef {object} Mark
+ * @property {string} name The project's name, printed beside the mark.
+ * @property {string} [file] The mark, for the light scheme or for both;
+ *   absent where the project is named by text alone.
+ * @property {string} [dark] The project's own variant for dark backgrounds.
+ * @property {string} [darkSource] Where the dark variant came from, if not `source`.
+ * @property {"light"} [ground] Drawn for light backgrounds only, with no
+ *   official dark variant: shown on a light ground in the dark scheme.
+ * @property {boolean} [wide] A wordmark rather than a symbol.
+ * @property {number} [aspect] Width over height, read from the file below.
+ * @property {number} [darkAspect] The dark variant's, where its frame differs.
+ * @property {string} owner
+ * @property {string} [source] Where the file was downloaded from.
+ * @property {string} terms The policy or licence read.
+ * @property {string} termsUrl
+ * @property {string} [retrieved] When the file was downloaded, if not on the first date above.
+ * @property {string} [permission] What the policy asks permission for, where it says.
+ * @property {string} [textOnly] Why the project is named by text alone.
+ * @property {string} [nominative] Why the logo is shown although the policy
+ *   asks to be asked: the maintainers' decision, as the Brand page states it.
+ * @property {string} [linkTo] Where the logo links, if not the project's site.
+ * @property {{ text: string, url: string }[]} [alsoRead] Other policies the
+ *   decision rests on.
+ * @property {string} [note]
+ * @property {string} [trademarkNotice] The notice the owner's terms ask for,
+ *   printed on the guide's page, after its verification note.
+ */
+
+const openJs = {
+	terms: "OpenJS Foundation trademark policy",
+	termsUrl: "https://trademark-policy.openjsf.org/",
+	permission: "Written permission for any use of a project logo other than as a link to the project's home page.",
+};
+
+// What a record whose owner asks for its logo to be a link to the project
+// states: where that holds here, and where the maintainers decided it does
+// not.
+const inCard =
+	"On the guide's page the logo is that link; on the Framework Guides page it is a decorative picture inside the card, which links to the guide, by the maintainers' decision.";
+
+// What every nominative record states after its own reason.
+const removal = "Cirth is not affiliated with or endorsed by the owner, and the logo comes down if the owner asks.";
+
+/** @type {Record<string, Mark>} */
+const marks = {
+	vite: {
+		name: "Vite",
+		file: "vite.svg",
+		owner: "VoidZero Inc. and Vite contributors",
+		source: "https://github.com/vitejs/vite/blob/cf5c0288d526/docs/public/logo-without-border.svg",
+		terms: "MIT (repository)",
+		note: "Published in the MIT-licensed vitejs/vite repository; the project states no separate logo terms.",
+		termsUrl: "https://github.com/vitejs/vite/blob/main/LICENSE",
+	},
+	postcss: {
+		name: "PostCSS",
+		file: "postcss.svg",
+		owner: "The PostCSS project",
+		source: "https://github.com/postcss/brand/blob/a07ead1904a6/dist/postcss-logo-symbol.svg",
+		terms: "CC BY 4.0",
+		termsUrl: "https://github.com/postcss/brand/blob/master/LICENSE",
+		retrieved: "2026-10-02",
+		note: "The symbol from the postcss/brand repository, the project's own store for its artwork.",
+	},
+	rsbuild: {
+		name: "Rsbuild",
+		file: "rsbuild.svg",
+		owner: "The Rstack team (web-infra-dev)",
+		source:
+			"https://github.com/rspack-contrib/rstack-design-resources/blob/9d4a5e80043a/rsbuild/rsbuild-logo.svg",
+		terms: "CC BY-NC-SA 4.0",
+		termsUrl: "https://github.com/rspack-contrib/rstack-design-resources#license",
+		retrieved: "2026-10-02",
+		note: "From the Rstack design resources, licensed for non-commercial use with attribution; this documentation is free and sells nothing.",
+	},
+	react: {
+		name: "React",
+		file: "react.svg",
+		dark: "react-dark.svg",
+		owner: "Meta Platforms, Inc. and affiliates",
+		source: "https://github.com/reactjs/react.dev/tree/75ef18a9172e/public/images/brand",
+		terms: "CC BY 4.0",
+		termsUrl: "https://github.com/reactjs/react.dev/blob/main/LICENSE-DOCS.md",
+	},
+	reactRouter: {
+		name: "React Router",
+		file: "react-router.svg",
+		dark: "react-router-dark.svg",
+		owner: "Shopify Inc.",
+		source:
+			"https://github.com/remix-run/react-router-website/tree/cce55dc06443/public/_brand/react-router-brand-assets/logo",
+		terms: "React Router brand guidelines",
+		permission: "Written consent for merchandise only.",
+		termsUrl: "https://reactrouter.com/brand",
+		retrieved: "2026-10-02",
+		note: "The logo pair from the brand page, light and dark. The guidelines rule out any suggestion of endorsement, and there is none.",
+	},
+
+	nextjs: {
+		name: "Next.js",
+		file: "nextjs.svg",
+		dark: "nextjs-dark.svg",
+		wide: true,
+		owner: "Vercel, Inc.",
+		source: "https://vercel.com/geist/brands",
+		retrieved: "2026-10-08",
+		terms: "Vercel brand guidelines",
+		termsUrl: "https://vercel.com/geist/brands",
+		permission: "Prior written permission for any use of Vercel marks other than describing Vercel's own products or saying one uses them, including uses in connection with software that uses its open source code.",
+		nominative: `The Next.js logotype, black on light pages and white on dark ones, exactly as Vercel's brand page publishes it (nextjs-logotype-black.svg and nextjs-logotype-white.svg). It is shown only to identify the guide for Next.js, as a nominative reference, with Vercel's notice; Next.js's open source licence covers its code, not its marks, and is not what this use rests on. ${removal}`,
+		trademarkNotice:
+			"Vercel, the Vercel design, Next.js and related marks, designs and logos are trademarks or registered trademarks of Vercel, Inc. or its affiliates in the US and other countries.",
+	},
+	vue: {
+		name: "Vue",
+		file: "vue.svg",
+		owner: "Evan You",
+		source: "https://github.com/vuejs/art/blob/366e8fad63e6/logo.svg",
+		terms: "CC BY-NC-SA 4.0",
+		permission: "Prior written consent to use the logo in a commercial product for anything but illustrating its Vue.js integration; this documentation is not a commercial product.",
+		note: "The terms allow the logo in open-source projects related to Vue.js. Designed by Evan You.",
+		termsUrl: "https://github.com/vuejs/art#readme",
+	},
+	nuxt: {
+		name: "Nuxt",
+		file: "nuxt.svg",
+		owner: "Nuxt Team",
+		source: "https://nuxt.com/design-kit",
+		terms: "Nuxt design kit",
+		note: "The mountain icon may stand alone; the wordmark may not, so it is not used.",
+		termsUrl: "https://nuxt.com/design-kit",
+	},
+	svelte: {
+		name: "Svelte",
+		file: "svelte.svg",
+		owner: "Svelte contributors",
+		source: "https://github.com/sveltejs/branding/blob/2af7bc72f1bf/svelte-logo.svg",
+		terms: "Svelte branding guidelines",
+		termsUrl: "https://github.com/sveltejs/branding#readme",
+		note: "SvelteKit has no logo of its own and uses Svelte's, so both guides carry it.",
+	},
+	solid: {
+		name: "Solid",
+		file: "solid.svg",
+		owner: "Solid contributors",
+		source: "https://github.com/solidjs/solid-start/blob/a4ed2a4cd811/apps/landing-page/public/solid-logo.svg",
+		terms: "MIT (repository)",
+		termsUrl: "https://github.com/solidjs/solid-start/blob/main/LICENSE",
+		retrieved: "2026-10-02",
+		note: "From the SolidStart landing page in the MIT-licensed solidjs/solid-start repository; the project states no separate logo terms.",
+	},
+	solidStart: {
+		name: "SolidStart",
+		file: "solidstart.svg",
+		owner: "Solid contributors",
+		source: "https://github.com/solidjs/solid-start/blob/a4ed2a4cd811/apps/landing-page/public/start-logo.svg",
+		terms: "MIT (repository)",
+		termsUrl: "https://github.com/solidjs/solid-start/blob/main/LICENSE",
+		retrieved: "2026-10-02",
+	},
+	qwik: {
+		name: "Qwik",
+		file: "qwik.svg",
+		owner: "Qwik contributors",
+		source: "https://github.com/QwikDev/qwik/blob/83a98c261d9d/packages/docs/public/logos/qwik-logo.svg",
+		terms: "MIT (repository)",
+		termsUrl: "https://github.com/QwikDev/qwik/blob/main/LICENSE",
+		retrieved: "2026-10-02",
+		note: "The symbol qwik.dev serves from its own logos folder; the project states no separate logo terms.",
+	},
+	preact: {
+		name: "Preact",
+		file: "preact.svg",
+		owner: "Preact contributors",
+		source: "https://github.com/preactjs/preact-www/blob/4f0b067a3da7/src/assets/branding/symbol.svg",
+		terms: "MIT (repository)",
+		termsUrl: "https://github.com/preactjs/preact-www/blob/master/LICENSE",
+		retrieved: "2026-10-02",
+		note: "The symbol offered on preactjs.com/branding, which states no terms beyond the repository's licence.",
+	},
+	lit: {
+		name: "Lit",
+		file: "lit.svg",
+		owner: "OpenJS Foundation and Lit contributors",
+		source: "https://github.com/lit/lit.dev/blob/697feba856f5/packages/lit-dev-content/site/images/flame.svg",
+		...openJs,
+		retrieved: "2026-10-02",
+		note: `The flame lit.dev serves. Lit is an OpenJS Foundation project, and the foundation's policy allows a project logo as a link to the project's home page. ${inCard}`,
+	},
+	angular: {
+		name: "Angular",
+		file: "angular.svg",
+		owner: "Google LLC",
+		source: "https://github.com/angular/angular/blob/b6bf6504adab/adev/src/app/core/layout/navigation/navigation.component.html",
+		terms: "CC BY 4.0",
+		note: "The SVG is the one angular.dev draws in its own navigation, taken from the Angular repository unmodified.",
+		termsUrl: "https://angular.dev/press-kit",
+	},
+	ember: {
+		name: "Ember",
+		file: "ember.svg",
+		dark: "ember-dark.svg",
+		wide: true,
+		owner: "Tilde Inc.",
+		source:
+			"https://github.com/ember-learn/ember-website/tree/1cb3da94b3e4/public/images/brand/Ember%20Logos/Ember",
+		terms: "Ember logo guidelines",
+		permission: "Not required for the standard art set, with the footer notice below.",
+		termsUrl: "https://emberjs.com/logos/",
+		retrieved: "2026-10-02",
+		note: "The four-colour logo on light and the white one-colour logo on dark, the pairing the guidelines give, each with its registration mark.",
+		trademarkNotice:
+			"Ember is a trademark of Tilde Inc. This site is unaffiliated with the Ember project.",
+	},
+	vike: {
+		name: "Vike",
+		file: "vike.svg",
+		owner: "Vike contributors",
+		source: "https://github.com/vikejs/vike/blob/b2c0d5206df4/docs/assets/logo/vike.svg",
+		terms: "MIT (repository)",
+		termsUrl: "https://github.com/vikejs/vike/blob/main/LICENSE.md",
+		retrieved: "2026-10-02",
+	},
+	astro: {
+		name: "Astro",
+		file: "astro.svg",
+		dark: "astro-dark.svg",
+		wide: true,
+		owner: "The Astro project",
+		source: "https://astro.build/press/",
+		terms: "Astro press guidelines",
+		permission: "Written consent for the logomark alone, which is why the full logo is the one used.",
+		note: "The full logo, unmodified. The guidelines list linking to Astro's website as a use of the logo.",
+		termsUrl: "https://astro.build/press/",
+	},
+	fresh: {
+		name: "Fresh",
+		file: "fresh.svg",
+		owner: "Deno Land Inc. and Fresh contributors",
+		source: "https://github.com/freshframework/fresh/blob/86d6cdeb331a/www/static/logo.svg",
+		terms: "MIT (repository)",
+		termsUrl: "https://github.com/freshframework/fresh/blob/main/LICENSE",
+		retrieved: "2026-10-02",
+		note: "The lemon usefresh.dev serves, byte for byte. The file has no viewBox and is sized by its own width and height.",
+	},
+	htmx: {
+		name: "htmx",
+		file: "htmx.svg",
+		dark: "htmx-dark.svg",
+		owner: "Big Sky Software",
+		source: "https://github.com/bigskysoftware/htmx/tree/fa978b24e75f/editors/jetbrains",
+		terms: "Zero-Clause BSD (repository)",
+		termsUrl: "https://github.com/bigskysoftware/htmx/blob/master/LICENSE",
+		retrieved: "2026-10-02",
+		note: "The icon the htmx repository ships for its editor plugin, in its light and dark versions.",
+	},
+	laravel: {
+		name: "Laravel",
+		file: "laravel.svg",
+		owner: "Laravel Holdings Inc.",
+		source: "https://github.com/laravel/art/blob/d5f5e725c27f/logo-mark/5%20svg/3%20rgb/1%20Full%20Color/laravel-mark-rgb-red.svg",
+		terms: "Laravel trademark policy",
+		permission: "Permission for commercial uses and for anything that suggests endorsement; neither applies here.",
+		termsUrl: "https://laravel.com/legal/trademark",
+		retrieved: "2026-10-01",
+		note: "The red logomark from the official laravel/art repository. The policy permits referring to Laravel in documentation.",
+	},
+	rails: {
+		name: "Rails",
+		file: "rails.svg",
+		ground: "light",
+		wide: true,
+		owner: "David Heinemeier Hansson, under exclusive licence to the Rails Foundation",
+		source: "https://github.com/rails/website/blob/fb413c108b1b/assets/images/logo.svg",
+		terms: "Rails trademark policy",
+		termsUrl: "https://rubyonrails.org/trademarks",
+		retrieved: "2026-10-02",
+		permission: "Permission for merchandise and book covers; not for using the logo to say something supports Ruby on Rails.",
+		note: "The one-colour file rubyonrails.org itself colours with CSS. The project publishes no variant for dark backgrounds, so in the dark scheme it sits on a light ground.",
+	},
+	adonisjs: {
+		name: "AdonisJS",
+		file: "adonisjs.svg",
+		dark: "adonisjs-dark.svg",
+		wide: true,
+		owner: "The AdonisJS project",
+		source: "https://adonisjs.com/brand",
+		terms: "AdonisJS brand guidelines",
+		termsUrl: "https://adonisjs.com/brand",
+		retrieved: "2026-10-04",
+		note: "The black logo on light pages and the white one on dark pages, as the brand guidelines pair them, each exactly as the brand page's Copy SVG gives it (its Download links answered 404 on the day). Shown at its own proportions, with room round it and no effect, outline or other colour, as the guidelines ask.",
+	},
+	django: {
+		name: "Django",
+		file: "django.svg",
+		dark: "django-dark.svg",
+		wide: true,
+		owner: "Django Software Foundation",
+		source: "https://www.djangoproject.com/community/logos/",
+		terms: "Django trademark licence",
+		permission: "Approval for merchandise and for the name DjangoCon only.",
+		termsUrl: "https://www.djangoproject.com/trademarks/",
+		retrieved: "2026-10-01",
+		note: `The positive logo on light and the negative logo, white on its own green, on dark: both official files, in the official colours. The DSF asks that the logo act as a hyperlink to djangoproject.com wherever technically possible. ${inCard}`,
+		},
+	flask: {
+		name: "Flask",
+		file: "flask.svg",
+		owner: "Pallets",
+		source: "https://github.com/pallets/flask/blob/d73fa1cdcbd8/docs/_static/flask-icon.svg",
+		terms: "BSD 3-Clause (repository)",
+		termsUrl: "https://github.com/pallets/flask/blob/main/LICENSE.txt",
+		retrieved: "2026-10-02",
+		note: "The icon from Flask's own documentation sources; the project states no separate logo terms.",
+	},
+	phoenix: {
+		name: "Phoenix",
+		file: "phoenix.svg",
+		owner: "Phoenix Framework contributors",
+		source: "https://github.com/phoenixframework/phoenix/blob/v1.8.15/installer/templates/phx_assets/logo.svg.eex",
+		terms: "MIT (repository)",
+		termsUrl: "https://github.com/phoenixframework/phoenix/blob/main/LICENSE.md",
+		retrieved: "2026-10-01",
+		note: "The mark the Phoenix installer writes into every new project, byte for byte, in Phoenix orange on both schemes; the project states no separate logo terms.",
+	},
+	dotnet: {
+		name: ".NET",
+		file: "dotnet.svg",
+		owner: "Microsoft Corporation",
+		source: "https://github.com/dotnet/brand/blob/91845f6ddf21/logo/dotnet-logo.svg",
+		terms: ".NET brand repository",
+		termsUrl: "https://github.com/dotnet/brand",
+		retrieved: "2026-10-02",
+		note: "The repository allows the logo to represent .NET in related content. ASP.NET Core is part of .NET and has no logo of its own, so its guide carries it.",
+	},
+	blazor: {
+		name: "Blazor",
+		file: "blazor.png",
+		owner: "Microsoft Corporation",
+		source:
+			"https://github.com/dotnet/aspnetcore/blob/a4248d87c324/src/ProjectTemplates/Web.ProjectTemplates/content/ComponentsWebAssembly-CSharp/wwwroot/icon-512.png",
+		retrieved: "2026-10-09",
+		terms: "Microsoft Trademark and Brand Guidelines",
+		termsUrl: "https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks",
+		permission: "An express licence for any use of a Microsoft logo or product icon; the guidelines allow the names, not the logos, to describe a product truthfully.",
+		nominative: `The Blazor logo exactly as Microsoft ships it in its own Blazor WebAssembly project template (icon-512.png, the purple flame round an @, on its own white square), unmodified, in place of the .NET logo. It is shown only to identify the guide for Blazor, as a nominative reference; the template's open source licence covers its code, not the logo. ${removal}`,
+	},
+	express: {
+		name: "Express",
+		file: "express.svg",
+		dark: "express-dark.svg",
+		wide: true,
+		owner: "OpenJS Foundation and Express contributors",
+		source: "https://github.com/expressjs/expressjs.com/tree/c936b6310349/public/images/logos",
+		...openJs,
+		retrieved: "2026-10-02",
+		note: `The black and white logos from the expressjs.com repository. The OpenJS Foundation's policy allows a project logo as a link to the project's home page. ${inCard}`,
+	},
+	elysia: {
+		name: "Elysia",
+		file: "elysia.svg",
+		ground: "light",
+		owner: "Elysia contributors",
+		source: "https://github.com/elysiajs/documentation/blob/f68573703415/docs/public/assets/elysia.svg",
+		terms: "MIT (repository)",
+		termsUrl: "https://github.com/elysiajs/documentation/blob/main/LICENSE",
+		retrieved: "2026-10-02",
+		note: "The documentation's own icon. Elysia publishes no variant for dark backgrounds, so in the dark scheme it sits on a light ground.",
+	},
+	wordpress: {
+		name: "WordPress",
+		file: "wordpress.svg",
+		dark: "wordpress-dark.png",
+		darkSource: "https://s.w.org/style/images/about/WordPress-logotype-wmark-white.png",
+		owner: "WordPress Foundation",
+		source: "https://github.com/WordPress/wporg-mu-plugins/blob/31aa3534aa28/mu-plugins/blocks/global-header-footer/images/w-mark.svg",
+		terms: "WordPress trademark policy",
+		termsUrl: "https://wordpressfoundation.org/trademark-policy/",
+		permission: "Permission to use the name or logo as part of a product, project, service, domain or company name; the logo may appear on a page that describes a product or service.",
+		retrieved: "2026-10-01",
+		note: "The W mark from the header of WordPress.org on light pages, and the white W mark wordpress.org/about/logos publishes (PNG, White/transparent, downloaded 2026-10-08) on dark ones.",
+	},
+	hugo: {
+		name: "Hugo",
+		file: "hugo.svg",
+		wide: true,
+		owner: "The Hugo authors",
+		source: "https://github.com/gohugoio/hugoDocs/blob/bc18dd113c10/static/images/hugo-logo-wide.svg",
+		terms: "Apache 2.0 (documentation content)",
+		termsUrl: "https://github.com/gohugoio/hugoDocs/blob/master/content/LICENSE.md",
+		retrieved: "2026-10-02",
+	},
+	zola: {
+		name: "Zola",
+		file: "zola.svg",
+		dark: "zola-dark.svg",
+		owner: "Zola contributors",
+		source: "https://github.com/getzola/zola/tree/42c89b672144/docs/static/logos",
+		terms: "EUPL 1.2 (repository)",
+		termsUrl: "https://github.com/getzola/zola/blob/master/LICENSE",
+		retrieved: "2026-10-02",
+		note: "Coffee on white for light pages and cream on coffee for dark ones, both from the logos folder of Zola's own documentation.",
+	},
+	electron: {
+		name: "Electron",
+		file: "electron.svg",
+		owner: "OpenJS Foundation",
+		source: "https://github.com/electron/website/blob/e29b95b3c844/static/assets/img/logo.svg",
+		...openJs,
+		retrieved: "2026-10-02",
+		note: `The logo electronjs.org serves. The OpenJS Foundation's policy allows a project logo as a link to the project's home page. ${inCard}`,
+		trademarkNotice: "Electron® is a registered trademark of the OpenJS Foundation.",
+	},
+	yew: {
+		name: "Yew",
+		file: "yew.svg",
+		owner: "Yew contributors",
+		source: "https://github.com/yewstack/yew/blob/bfa6c19af971/website/static/img/logo.svg",
+		terms: "MIT or Apache 2.0 (repository)",
+		termsUrl: "https://github.com/yewstack/yew#license",
+		retrieved: "2026-10-01",
+		note: "The logo the Yew website serves, from the dual-licensed yewstack/yew repository; the project states no separate logo terms.",
+	},
+	waku: {
+		name: "Waku",
+		file: "waku.svg",
+		dark: "waku-dark.svg",
+		wide: true,
+		owner: "Daishi Kato and Waku contributors",
+		source: "https://cdn.candycode.com/waku/waku-logo.zip",
+		terms: "No logo policy published (MIT licence covers the code)",
+		termsUrl: "https://github.com/wakujs/waku/blob/main/LICENSE",
+		retrieved: "2026-10-08",
+		note: "The black and the white logo from the logo kit waku.gg itself offers for download from its own logo. Waku publishes no rules for its logo.",
+	},
+	stimulus: {
+		name: "Stimulus",
+		file: "stimulus.svg",
+		ground: "light",
+		owner: "37signals, LLC",
+		source: "https://github.com/hotwired/stimulus/blob/4145d2672562/assets/logo.svg",
+		retrieved: "2026-10-08",
+		terms: "37signals Terms of Service",
+		termsUrl: "https://37signals.com/policies/terms",
+		permission: "Permission to use the company's logos, or any of its services' logos, for promotional purposes.",
+		nominative: `The symbol from the hotwired/stimulus repository, unmodified. The file names no colour and draws black, and Stimulus publishes no variant for dark backgrounds, so in the dark scheme it sits on a light ground instead of being recoloured. It is shown only to identify the guide for Stimulus, as a nominative reference, and not to promote Cirth. ${removal}`,
+	},
+	livewire: {
+		name: "Livewire",
+		file: "livewire.svg",
+		wide: true,
+		owner: "Caleb Porzio",
+		source: "https://github.com/livewire/livewire/blob/2750bdd142ad/art/logo.svg",
+		terms: "No logo policy published (MIT licence covers the code)",
+		termsUrl: "https://github.com/livewire/livewire/blob/main/LICENSE.md",
+		retrieved: "2026-10-08",
+		note: "The logo Livewire's own README shows. The one file draws its wordmark dark or light by the colour scheme; WebKit takes that from the system rather than the page, so in Safari, on a page switched to the other scheme by hand, the wordmark can lose contrast. The name is printed beside it.",
+	},
+	symfony: {
+		name: "Symfony",
+		owner: "Symfony SAS",
+		terms: "Symfony trademark and logo policy",
+		termsUrl: "https://symfony.com/trademark",
+		permission: "Written authorisation for any use of the logos.",
+		textOnly: "The Symfony trademark and logo policy asks for written authorisation for any use of its logos, and none has been given, so the guide is named by text alone.",
+		trademarkNotice: "Symfony™ is a trademark of Symfony SAS. Cirth is not affiliated with or endorsed by Symfony SAS or the Symfony project.",
+	},
+	fastapi: {
+		name: "FastAPI",
+		file: "fastapi.svg",
+		wide: true,
+		owner: "Sebastián Ramírez",
+		source: "https://github.com/fastapi/fastapi/blob/f5c6e9b4f9ca/docs/en/docs/img/logo-teal-vector.svg",
+		retrieved: "2026-10-09",
+		terms: "No logo policy published (MIT licence covers the code)",
+		termsUrl: "https://github.com/fastapi/fastapi/blob/master/LICENSE",
+		note: "The teal logo from FastAPI's own documentation sources, the version with its lettering drawn as outlines, unmodified; the same file serves both schemes. The project states that the FastAPI trademark is registered and owned by its author, and publishes no rule that limits the logo's use.",
+	},
+	go: {
+		name: "Go",
+		owner: "Google LLC",
+		terms: "Go brand and trademark usage guidelines",
+		termsUrl: "https://go.dev/brand",
+		permission: "Permission for any use of the Go logo; nominative use covers the word mark in plain text only.",
+		textOnly: "The Go trademark guidelines allow the name Go in plain text to identify the language, and ask for permission before the Go logo is used. The guide is named by text alone.",
+	},
+	eleventy: {
+		name: "Eleventy",
+		file: "eleventy.svg",
+		owner: "The Eleventy project",
+		source: "https://github.com/11ty/11ty-logo/blob/82352f4ede5a/assets/logo-bg.svg",
+		terms: "No logo policy published (MIT licence covers the code)",
+		termsUrl: "https://github.com/11ty/11ty-logo",
+		retrieved: "2026-10-08",
+		note: "The logo on its own dark square, from the project's 11ty-logo repository; the same file serves both schemes. Neither 11ty.dev nor its repositories publish rules for the logo.",
+	},
+	dioxus: {
+		name: "Dioxus",
+		file: "dioxus.svg",
+		dark: "dioxus-dark.svg",
+		owner: "Dioxus Labs",
+		source: "https://github.com/DioxusLabs/brand/tree/4f5601935824/logos",
+		terms: "Dioxus brand repository",
+		termsUrl: "https://github.com/DioxusLabs/brand#logos",
+		retrieved: "2026-10-08",
+		permission: "None: the logo may be used if it is kept intact and not used commercially. This documentation is free and sells nothing.",
+		note: "The colour logo on light pages and the inverted one on dark pages, both from the logos folder of the brand repository.",
+	},
+	codeigniter: {
+		name: "CodeIgniter",
+		file: "codeigniter.png",
+		ground: "light",
+		owner: "CodeIgniter Foundation",
+		source: "https://codeigniter.com/data/ci-logo.zip",
+		retrieved: "2026-10-08",
+		terms: "CodeIgniter trademark guidelines (The Fine Print)",
+		termsUrl: "https://codeigniter.com/the-fine-print",
+		permission: "None for the logo files the Foundation supplies, with a legend and a disclaimer on every page that uses the mark.",
+		note: "CIlogo-200x200.png from the logo kit the Foundation supplies for projects to use, unmodified. Its flame is partly transparent and drawn for light backgrounds, so in the dark scheme it sits on a light ground.",
+		trademarkNotice:
+			"CodeIgniter® is a registered trademark of the CodeIgniter Foundation. The CodeIgniter mark is owned and may be registered by the CodeIgniter Foundation. Cirth is an independent CSS framework and has not been authorized, sponsored, or otherwise approved by the CodeIgniter Foundation.",
+	},
+	yii: {
+		name: "Yii",
+		file: "yii.svg",
+		dark: "yii-dark.svg",
+		wide: true,
+		owner: "Yii Software",
+		source: "https://www.yiiframework.com/logo",
+		retrieved: "2026-10-08",
+		terms: "CC BY-ND 3.0",
+		termsUrl: "https://www.yiiframework.com/logo",
+		note: "The Yii 2 logos for light and for dark backgrounds from the project's logo page (yii_logo_light.svg and yii_logo_dark.svg), unmodified, as the no-derivatives licence requires. Yii logo by Yii Software, licensed under CC BY-ND 3.0.",
+	},
+	slim: {
+		name: "Slim",
+		file: "slim.png",
+		dark: "slim-dark.png",
+		owner: "Slim Framework contributors",
+		source: "https://github.com/slimphp/Slim-Website/tree/193ec4f7d0d0/assets/images",
+		retrieved: "2026-10-08",
+		terms: "No logo policy published (MIT licence covers the code)",
+		termsUrl: "https://github.com/slimphp/Slim/blob/4.x/LICENSE.md",
+		note: "The green Slim wordmark from the website's own images, on white for light pages (200x200-Typo-White.png) and on grey for dark ones (200x200-Typo-Grey.png, also the project's GitHub avatar). Slim publishes no rules for its logo.",
+	},
+	quarkus: {
+		name: "Quarkus",
+		file: "quarkus.svg",
+		dark: "quarkus-dark.svg",
+		wide: true,
+		owner: "Commonhaus Foundation",
+		source: "https://github.com/commonhaus/artwork/tree/6c22d7843888/projects/quarkus/logo",
+		retrieved: "2026-10-08",
+		terms: "Commonhaus Foundation trademark policy",
+		termsUrl: "https://www.commonhaus.org/policies/trademark-policy/",
+		permission: "None on a website with its own branding, where the site's name is the more prominent, the logo links to the project's site and the page says it is not affiliated with or endorsed by the Foundation.",
+			note: `The horizontal logo, in its default colours on light pages and its reverse colours on dark ones, from the artwork repository quarkus.io/brand links to; unmodified, and never the logotype alone. ${inCard}`,
+		trademarkNotice: "Quarkus is a Commonhaus Foundation project. Cirth is not affiliated with or endorsed by the Commonhaus Foundation.",
+	},
+	// No file: the guidelines reserve the logo. Written permission from
+	// Broadcom would add `file` and `dark`, with `source` and `retrieved`,
+	// and replace `textOnly` with what was granted; every template that
+	// draws a mark would then draw it.
+	spring: {
+		name: "Spring Boot",
+		owner: "Broadcom Inc.",
+		terms: "Spring trademark guidelines",
+		termsUrl: "https://spring.io/trademarks",
+		permission: "Written authorisation for any use of a Spring logo: the guidelines reserve the logos for Broadcom, and nominative use covers the word marks only.",
+		textOnly: "The Spring trademark guidelines allow the name Spring Boot as a nominative reference, but say in so many words that this does not allow the logo, which is reserved for Broadcom. The guide is named by text alone, with no leaf, no lookalike icon and no wordmark set in another typeface.",
+		trademarkNotice: "Spring and Spring Boot are trademarks of Broadcom Inc. and/or its subsidiaries.",
+	},
+	jakarta: {
+		name: "Jakarta EE",
+		file: "jakarta.svg",
+		dark: "jakarta-dark.svg",
+		wide: true,
+		owner: "Eclipse Foundation AISBL",
+		source: "https://www.eclipse.org/org/artwork/",
+		retrieved: "2026-10-09",
+		terms: "Jakarta EE trademark guidelines",
+		termsUrl: "https://jakarta.ee/legal/trademark_guidelines/",
+		alsoRead: [
+			{ text: "Eclipse Foundation Trademark Usage Policy", url: "https://www.eclipse.org/legal/logo-guidelines/" },
+			{ text: "Eclipse official artwork", url: "https://www.eclipse.org/org/artwork/" },
+		],
+		permission: "None for nominative fair use by the community; the Compatible and Member logos only under their programmes, and none of them is used.",
+		nominative: `The standard Jakarta EE logo from the Eclipse Foundation's artwork pack (jakarta_ee_logo_schooner_color_horizontal_default.svg on light pages, and the reverse file, on its own black field, on dark ones), unmodified. It names the family of specifications the guide for Jakarta Servlet and Jakarta Pages follows, as the guidelines allow by nominative fair use; it is not the Jakarta EE Compatible or Member logo, and claims no certified compatibility. The mark carries its ® at its first prominent use in text. ${removal}`,
+		trademarkNotice: "Jakarta EE is a trademark of Eclipse Foundation AISBL.",
+	},
+	micronaut: {
+		name: "Micronaut",
+		file: "micronaut.svg",
+		dark: "micronaut-dark.svg",
+		wide: true,
+		owner: "Object Computing, Inc., governed by the Commonhaus Foundation",
+		source: "https://micronaut.io/brand-guidelines/micronaut-logos/",
+		retrieved: "2026-10-09",
+		terms: "Micronaut logos and the Commonhaus Foundation trademark policy",
+		termsUrl: "https://micronaut.io/brand-guidelines/micronaut-logos/",
+		alsoRead: [{ text: "Commonhaus Foundation trademark policy", url: "https://www.commonhaus.org/policies/trademark-policy/" }],
+		permission: "None for community users publishing on a medium no commercial user controls, which this free documentation is; a logo on a website links to the project's site, and the page says it is not affiliated.",
+			note: `The horizontal logo, black on light pages and white on dark ones, as the Micronaut logos page offers them, unmodified. ${inCard}`,
+		trademarkNotice: "Micronaut® is a registered trademark of Object Computing, Inc. Cirth is not affiliated with or endorsed by the Micronaut project or the Commonhaus Foundation.",
+	},
+	helidon: {
+		name: "Helidon",
+		owner: "Oracle and/or its affiliates",
+		terms: "Oracle third-party usage guidelines for logos",
+		termsUrl: "https://www.oracle.com/legal/logos.html",
+		permission: "A licence or written authorisation for any use of an Oracle logo or design mark.",
+		alsoRead: [{ text: "Helidon licence (Apache 2.0, which grants no trademark rights)", url: "https://github.com/helidon-io/helidon/blob/main/LICENSE.txt" }],
+		textOnly: "Helidon is an Oracle project and publishes no logo rules of its own; Oracle's guidelines say its logos and design marks are generally not to be used without a licence or written authorisation, and none has been given. The repository's Apache licence covers code, not marks. The guide is named by text alone.",
+	},
+	ktor: {
+		name: "Ktor",
+		file: "ktor.svg",
+		dark: "ktor-dark.svg",
+		wide: true,
+		owner: "JetBrains s.r.o.",
+		source: "https://resources.jetbrains.com/storage/products/company/brand/logos/Ktor.zip",
+		retrieved: "2026-10-09",
+		terms: "JetBrains brand guidelines",
+		termsUrl: "https://www.jetbrains.com/company/brand/",
+		permission: "None to refer to JetBrains products, provided the logo links back to www.jetbrains.com, carries the attribution and does not outweigh the site's own brand.",
+			linkTo: "https://www.jetbrains.com",
+		note: "Ktor.svg and Ktor-white.svg from the Ktor logo package on JetBrains' brand page, unmodified. On the guide's page the logo links to www.jetbrains.com, as the guidelines ask; on the Framework Guides page it is a decorative picture inside the card, which links to the guide, by the maintainers' decision.",
+		trademarkNotice: "Copyright © 2026 JetBrains s.r.o. Ktor and the Ktor logo are trademarks of JetBrains s.r.o.",
+	},
+};
+
+// Every guide sits in one category, the one a reader would look under
+// first. The Framework Guides page and the sidebar group them in this order,
+// alphabetical inside each.
+const categories = [
+	{ id: "build", text: "Build tools", short: "Build tool" },
+	{ id: "javascript", text: "JavaScript frameworks", short: "JavaScript" },
+	{ id: "html", text: "HTML enhancement", short: "HTML enhancement" },
+	{
+		id: "server",
+		text: "Server-rendered apps",
+		short: "Server-rendered",
+		description:
+			"Frameworks and template systems that generate HTML on the server and serve Cirth as a static stylesheet.",
+	},
+	{ id: "cms", text: "Content management", short: "CMS" },
+	{ id: "static", text: "Static site generators", short: "Static sites" },
+	{ id: "rust", text: "WebAssembly and Rust", short: "Rust" },
+];
+
+// How sure a guide is, in the words the guide prints. Every guide today is
+// `verified`; the other levels exist so that a guide added from the
+// documentation alone, or from a report, says so instead of borrowing a
+// claim it has not earned.
+const statuses = {
+	verified: { text: "Verified", detail: "built and checked in a new project" },
+	"docs-verified": { text: "Docs verified", detail: "written from the official documentation, not built here" },
+	reported: { text: "Reported", detail: "reported to work, not reproduced here" },
+	unsupported: { text: "Not supported", detail: "known not to work" },
+};
+
+// The browser floor a pipeline that lowers CSS needs to be told about.
+const cssTarget = '["chrome123", "edge123", "firefox130", "safari18.2"]';
+
+/**
+ * @typedef {object} Guide
+ * @property {string} id
+ * @property {string} name The tool, as the sidebar, the grid and the h1 print it.
+ * @property {string} category
+ * @property {string} mark A key of `marks`: the project's record, with or without a file.
+ * @property {string} description What the project is, in one neutral sentence.
+ * @property {string} [github] The project's official repository.
+ * @property {string} officialUrl The project's own site.
+ * @property {string} summary What the guide has you do, in one line.
+ * @property {{ text: string, url: string }[]} docs The official pages the guide follows.
+ * @property {{ status: keyof typeof statuses, date: string, with: string, result: string }} verified
+ * @property {string} [toolchain] What the tool does to CSS on the way through.
+ * @property {string[]} [covers] Set-ups this guide covers under another name.
+ * @property {boolean} [lowers] Whether its build rewrites light-dark() by default;
+ *   absent where nothing in the stack processes CSS (the file is served or copied as is).
+ * @property {string} [fix] What to set where it does, as Compatibility lists it.
+ */
+
+/** @type {Guide[]} */
+const guides = [
+	// Build tools
+	{
+		id: "vite",
+		name: "Vite",
+		category: "build",
+		mark: "vite",
+		officialUrl: "https://vite.dev",
+		description: "A frontend build tool with a development server and a production bundler.",
+		github: "https://github.com/vitejs/vite",
+		summary: "Import it in the entry module and set build.cssTarget.",
+		covers: ["HTML and Vite"],
+		docs: [
+			{ text: "Vite: CSS", url: "https://vite.dev/guide/features#css" },
+			{ text: "Vite: build.cssTarget", url: "https://vite.dev/config/build-options#build-csstarget" },
+		],
+		toolchain: "Vite 8 minifies CSS with Lightning CSS for an older target than Cirth's and rewrites light-dark().",
+		lowers: true,
+		fix: "`build.cssTarget`",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Vite 8.3.2 (`create-vite` 9.2.1, vanilla template)",
+			result: "Without `build.cssTarget` the build kept none of Cirth's 46 `light-dark()` values; with it, all 46.",
+		},
+	},
+	{
+		id: "postcss",
+		name: "PostCSS",
+		category: "build",
+		mark: "postcss",
+		officialUrl: "https://postcss.org",
+		description: "A tool that transforms CSS with JavaScript plugins.",
+		github: "https://github.com/postcss/postcss",
+		summary: "Inline it with postcss-import; nothing else to set.",
+		docs: [
+			{ text: "postcss-import", url: "https://github.com/postcss/postcss-import" },
+			{ text: "PostCSS", url: "https://postcss.org" },
+		],
+		toolchain: "postcss-import inlines the file as it is; Autoprefixer adds two prefixed rules and changes nothing else.",
+		lowers: false,
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "PostCSS 8.5.28, postcss-cli 12.0.0, postcss-import 17.0.0, and Autoprefixer 10.6.1 with its default browsers",
+			result: "All 46 `light-dark()` values kept, with and without Autoprefixer.",
+		},
+	},
+	{
+		id: "rsbuild",
+		name: "Rsbuild",
+		category: "build",
+		mark: "rsbuild",
+		officialUrl: "https://rsbuild.rs",
+		description: "A build tool for web applications, based on Rspack.",
+		github: "https://github.com/web-infra-dev/rsbuild",
+		summary: "Import it in the entry module and give the project Cirth's browsers.",
+		docs: [
+			{ text: "Rsbuild: CSS usage", url: "https://rsbuild.rs/guide/styling/css-usage" },
+			{ text: "Rsbuild: Browserslist", url: "https://rsbuild.rs/guide/advanced/browserslist" },
+		],
+		toolchain: "Rsbuild lowers CSS for its default browserslist, which predates light-dark().",
+		lowers: true,
+		fix: "`browserslist` in `package.json`",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Rsbuild 2.2.11 (`create-rsbuild`, vanilla)",
+			result: "The default build lowered all 46 `light-dark()` values; with a browserslist at Cirth's floor, all 46 were kept.",
+		},
+	},
+	// JavaScript frameworks
+	{
+		id: "angular",
+		name: "Angular",
+		category: "javascript",
+		mark: "angular",
+		officialUrl: "https://angular.dev",
+		description: "A TypeScript framework from Google for building web applications.",
+		github: "https://github.com/angular/angular",
+		summary: "A path in the styles array of angular.json, or an @import.",
+		docs: [
+			{
+				text: "Angular: workspace configuration, styles",
+				url: "https://angular.dev/reference/configs/workspace-config",
+			},
+		],
+		toolchain: "Angular's build keeps light-dark() and inlines the critical part into index.html, also unchanged.",
+		lowers: false,
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Angular 22.2.1 (`ng new`, CSS, no SSR)",
+			result: "All 46 `light-dark()` values kept, in the stylesheet and in the critical CSS inlined into index.html.",
+		},
+	},
+	{
+		id: "astro",
+		name: "Astro",
+		category: "javascript",
+		mark: "astro",
+		officialUrl: "https://astro.build",
+		description: "A web framework for content-driven websites that ships HTML by default.",
+		github: "https://github.com/withastro/astro",
+		summary: "Import it in a layout's frontmatter.",
+		docs: [{ text: "Astro: Styles and CSS", url: "https://docs.astro.build/en/guides/styling/" }],
+		toolchain: "Astro's build keeps light-dark() as it is.",
+		lowers: false,
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Astro 7.3.5 (`create astro`, minimal) on Vite 8.3.2",
+			result: "All 46 `light-dark()` values kept with no configuration.",
+		},
+	},
+	{
+		id: "ember",
+		name: "Ember",
+		category: "javascript",
+		mark: "ember",
+		officialUrl: "https://emberjs.com",
+		description: "A JavaScript framework for web applications, built around conventions and a CLI.",
+		github: "https://github.com/emberjs/ember.js",
+		summary: "Import it in app/app.js; Embroider builds for your targets.",
+		docs: [
+			{ text: "Ember Guides: Vite", url: "https://guides.emberjs.com/release/build-tools/vite/" },
+			{
+				text: "Ember Guides: build targets",
+				url: "https://guides.emberjs.com/release/configuring-ember/build-targets/",
+			},
+		],
+		toolchain: "Embroider sets Vite's target from config/targets.js, which names current browsers.",
+		lowers: false,
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Ember 7.3 (`ember-cli` 7.3.0, Embroider and Vite 8.3.2)",
+			result: "All 46 `light-dark()` values kept with the default targets.",
+		},
+	},
+	{
+		id: "fresh",
+		name: "Fresh",
+		category: "javascript",
+		mark: "fresh",
+		officialUrl: "https://usefresh.dev",
+		description: "A web framework for Deno that renders on the server and hydrates islands.",
+		github: "https://github.com/freshframework/fresh",
+		summary: "Add the npm package and @import it in assets/styles.css.",
+		docs: [
+			{ text: "Fresh: Vite", url: "https://usefresh.dev/docs/advanced/vite" },
+			{ text: "Fresh: static files", url: "https://usefresh.dev/docs/concepts/static-files" },
+		],
+		toolchain: "Fresh builds with Vite 7, whose CSS minifier keeps light-dark().",
+		lowers: false,
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Fresh 2.3.3 and @fresh/plugin-vite 1.1.2 (Vite 7.3.6) on Deno 2.9.7",
+			result: "All 46 `light-dark()` values kept with no configuration.",
+		},
+	},
+	{
+		id: "lit",
+		name: "Lit",
+		category: "javascript",
+		mark: "lit",
+		officialUrl: "https://lit.dev",
+		description: "A library for building web components.",
+		github: "https://github.com/lit/lit",
+		summary: "Adopt it in each component's shadow root.",
+		docs: [{ text: "Lit: Styles", url: "https://lit.dev/docs/components/styles/" }],
+		toolchain: "A stylesheet in the document does not reach a shadow root; the component adopts Cirth itself.",
+		lowers: true,
+		fix: "`build.cssTarget`",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Lit 3.3.3 on Vite 8.3.2 (`create-vite` lit template)",
+			result: "A button inside the component's shadow root took Cirth's styles; with `build.cssTarget` all 46 `light-dark()` values were kept.",
+		},
+	},
+	{
+		id: "nextjs",
+		name: "Next.js",
+		category: "javascript",
+		mark: "nextjs",
+		officialUrl: "https://nextjs.org",
+		description: "A React framework for full-stack web applications, made by Vercel.",
+		github: "https://github.com/vercel/next.js",
+		summary: "Import it in the root layout and give the project Cirth's browsers.",
+		docs: [
+			{ text: "Next.js: CSS", url: "https://nextjs.org/docs/app/getting-started/css" },
+			{ text: "Next.js: supported browsers", url: "https://nextjs.org/docs/architecture/supported-browsers" },
+		],
+		toolchain: "Next compiles CSS for its default browsers and rewrites light-dark().",
+		lowers: true,
+		fix: "`browserslist` in `package.json`",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Next.js 16.3.8 (`create-next-app`, App Router, TypeScript)",
+			result: "The default build lowered all 46 `light-dark()` values; with a browserslist at Cirth's floor, all 46 were kept.",
+		},
+	},
+	{
+		id: "nuxt",
+		name: "Nuxt",
+		category: "javascript",
+		mark: "nuxt",
+		officialUrl: "https://nuxt.com",
+		description: "A Vue framework for full-stack web applications.",
+		github: "https://github.com/nuxt/nuxt",
+		summary: "One entry in the css array and Vite's CSS target.",
+		docs: [
+			{ text: "Nuxt: Styling", url: "https://nuxt.com/docs/getting-started/styling" },
+		],
+		toolchain: "Nuxt builds with Vite 8, which rewrites light-dark() unless told the target.",
+		lowers: true,
+		fix: "`vite.build.cssTarget`",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Nuxt 4.5.2 (`nuxi init`, minimal template)",
+			result: "The default build lowered all 46 `light-dark()` values; with `vite.build.cssTarget`, all 46 were kept.",
+		},
+	},
+	{
+		id: "preact",
+		name: "Preact",
+		category: "javascript",
+		mark: "preact",
+		officialUrl: "https://preactjs.com",
+		description: "A small JavaScript UI library with an API compatible with React's.",
+		github: "https://github.com/preactjs/preact",
+		summary: "Import it in src/main.jsx and set Vite's CSS target.",
+		docs: [{ text: "Preact: Getting started", url: "https://preactjs.com/guide/v10/getting-started" }],
+		toolchain: "Preact's starter builds with Vite 8, which rewrites light-dark() unless told the target.",
+		lowers: true,
+		fix: "`build.cssTarget`",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Preact 10.29.8 on Vite 8.3.2 (`create-vite` preact template)",
+			result: "Without `build.cssTarget` none of the 46 `light-dark()` values survived; with it, all 46.",
+		},
+	},
+	{
+		id: "qwik",
+		name: "Qwik",
+		category: "javascript",
+		mark: "qwik",
+		officialUrl: "https://qwik.dev",
+		description: "A JavaScript framework that resumes server-rendered pages instead of hydrating them.",
+		github: "https://github.com/QwikDev/qwik",
+		summary: "Import it in src/root.tsx; nothing else to set.",
+		docs: [{ text: "Qwik: Styles", url: "https://qwik.dev/docs/components/styles/" }],
+		toolchain: "Qwik's starter builds with Vite 7, whose CSS minifier keeps light-dark().",
+		lowers: false,
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Qwik 1.20.1 and Qwik City 1.20.1 (`create-qwik`) on Vite 7.3.1",
+			result: "All 46 `light-dark()` values kept with no configuration.",
+		},
+	},
+	{
+		id: "react",
+		name: "React",
+		category: "javascript",
+		mark: "react",
+		officialUrl: "https://react.dev",
+		description: "A JavaScript library for building user interfaces from components.",
+		github: "https://github.com/react/react",
+		summary: "Import it where the app mounts and set Vite's CSS target.",
+		covers: ["React and Vite"],
+		docs: [
+			{ text: "React: Build a React app from scratch", url: "https://react.dev/learn/build-a-react-app-from-scratch" },
+			{ text: "Vite: build.cssTarget", url: "https://vite.dev/config/build-options#build-csstarget" },
+		],
+		toolchain: "React's Vite starter rewrites light-dark() unless Vite is told the target.",
+		lowers: true,
+		fix: "`build.cssTarget`",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "React 19.3.0 on Vite 8.3.2 (`create-vite` react template)",
+			result: "Without `build.cssTarget` none of the 46 `light-dark()` values survived; with it, all 46.",
+		},
+	},
+	{
+		id: "react-router",
+		name: "React Router",
+		category: "javascript",
+		mark: "reactRouter",
+		officialUrl: "https://reactrouter.com",
+		description: "A routing library and framework for React applications.",
+		github: "https://github.com/remix-run/react-router",
+		summary: "Replace Tailwind in app/app.css and set Vite's CSS target; the same for an app coming from Remix v2.",
+		covers: ["Remix"],
+		docs: [
+			{ text: "React Router: installation", url: "https://reactrouter.com/start/framework/installation" },
+			{ text: "React Router: route module, links", url: "https://reactrouter.com/start/framework/route-module" },
+			{ text: "React Router: picking a mode", url: "https://reactrouter.com/start/modes" },
+			{ text: "React Router: upgrading from Remix", url: "https://reactrouter.com/upgrading/remix" },
+			{ text: "Remix v2 documentation", url: "https://v2.remix.run/docs/" },
+		],
+		toolchain: "Framework mode builds with Vite 8, which rewrites light-dark() unless told the target.",
+		lowers: true,
+		fix: "`build.cssTarget`",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "React Router 8.4.0 (`create-react-router`, framework mode) on Vite 8.3.2",
+			result: "The default build lowered all 46 `light-dark()` values; with `build.cssTarget`, all 46 were kept.",
+		},
+	},
+	{
+		id: "solid",
+		name: "Solid",
+		category: "javascript",
+		mark: "solid",
+		officialUrl: "https://www.solidjs.com",
+		description: "A JavaScript library for user interfaces with fine-grained reactivity.",
+		github: "https://github.com/solidjs/solid",
+		summary: "Import it in src/index.jsx and set Vite's CSS target.",
+		docs: [
+			{ text: "Solid: styling your components", url: "https://docs.solidjs.com/guides/styling-your-components" },
+		],
+		toolchain: "Solid's Vite starter rewrites light-dark() unless Vite is told the target.",
+		lowers: true,
+		fix: "`build.cssTarget`",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Solid 1.9.15 on Vite 8.3.2 (`create-vite` solid template)",
+			result: "Without `build.cssTarget` none of the 46 `light-dark()` values survived; with it, all 46.",
+		},
+	},
+	{
+		id: "solidstart",
+		name: "SolidStart",
+		category: "javascript",
+		mark: "solidStart",
+		officialUrl: "https://docs.solidjs.com/solid-start",
+		description: "The full-stack framework for Solid.",
+		github: "https://github.com/solidjs/solid-start",
+		summary: "Import it in src/app.jsx and set Vite's CSS target.",
+		docs: [{ text: "SolidStart documentation", url: "https://docs.solidjs.com/solid-start" }],
+		toolchain: "SolidStart 2 builds with Vite 8, which rewrites light-dark() unless told the target.",
+		lowers: true,
+		fix: "`build.cssTarget`",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "SolidStart 2.0.5 (`create-solid --v2`) on Vite 8.3.2",
+			result: "The default build lowered all 46 `light-dark()` values; with `build.cssTarget`, all 46 were kept.",
+		},
+	},
+	{
+		id: "svelte",
+		name: "Svelte",
+		category: "javascript",
+		mark: "svelte",
+		officialUrl: "https://svelte.dev",
+		description: "A UI framework that compiles components to JavaScript at build time.",
+		github: "https://github.com/sveltejs/svelte",
+		summary: "Import it in src/main.js and set Vite's CSS target.",
+		docs: [{ text: "Svelte: Getting started", url: "https://svelte.dev/docs/svelte/getting-started" }],
+		toolchain: "Svelte's Vite starter rewrites light-dark() unless Vite is told the target.",
+		lowers: true,
+		fix: "`build.cssTarget`",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Svelte 5.57.1 on Vite 8.3.2 (`create-vite` svelte template)",
+			result: "Without `build.cssTarget` none of the 46 `light-dark()` values survived; with it, all 46.",
+		},
+	},
+	{
+		id: "sveltekit",
+		name: "SvelteKit",
+		category: "javascript",
+		mark: "svelte",
+		officialUrl: "https://svelte.dev/docs/kit",
+		description: "The application framework for Svelte, with routing and server rendering.",
+		github: "https://github.com/sveltejs/kit",
+		summary: "Import it in the root layout and set Vite's CSS target.",
+		docs: [{ text: "SvelteKit: Routing, +layout", url: "https://svelte.dev/docs/kit/routing" }],
+		toolchain: "SvelteKit builds with Vite 8, which rewrites light-dark() unless told the target.",
+		lowers: true,
+		fix: "`build.cssTarget`",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "SvelteKit 3.0.0 (`sv create`, minimal) on Vite 8.3.2",
+			result: "The default build lowered all 46 `light-dark()` values; with `build.cssTarget`, all 46 were kept.",
+		},
+	},
+	{
+		id: "vike",
+		name: "Vike",
+		category: "javascript",
+		mark: "vike",
+		officialUrl: "https://vike.dev",
+		description: "A Vite-based framework for server-rendered and pre-rendered applications.",
+		github: "https://github.com/vikejs/vike",
+		summary: "Import it in pages/+Layout and set Vite's CSS target.",
+		docs: [{ text: "Vike: Layout", url: "https://vike.dev/Layout" }],
+		toolchain: "Vike builds with Vite 8, which rewrites light-dark() unless told the target.",
+		lowers: true,
+		fix: "`build.cssTarget`",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Vike 0.4.267 with React on Vite 8.3.2",
+			result: "The default build lowered all 46 `light-dark()` values; with `build.cssTarget`, all 46 were kept.",
+		},
+	},
+	{
+		id: "vue",
+		name: "Vue",
+		category: "javascript",
+		mark: "vue",
+		officialUrl: "https://vuejs.org",
+		description: "A JavaScript framework for building user interfaces.",
+		github: "https://github.com/vuejs/core",
+		summary: "Import it in src/main.js and set Vite's CSS target.",
+		docs: [{ text: "Vue: Quick start", url: "https://vuejs.org/guide/quick-start" }],
+		toolchain: "Vue's Vite starter rewrites light-dark() unless Vite is told the target.",
+		lowers: true,
+		fix: "`build.cssTarget`",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Vue 3.5.43 on Vite 8.3.2 (`create-vite` vue template)",
+			result: "Without `build.cssTarget` none of the 46 `light-dark()` values survived; with it, all 46.",
+		},
+	},
+	{
+		id: "waku",
+		name: "Waku",
+		category: "javascript",
+		mark: "waku",
+		officialUrl: "https://waku.gg",
+		description: "A minimal React framework built around React Server Components.",
+		github: "https://github.com/wakujs/waku",
+		summary: "Replace Tailwind in src/styles.css and set Vite's CSS target.",
+		docs: [{ text: "Waku: guides", url: "https://waku.gg/guides" }],
+		toolchain: "Waku builds with Vite 8, which rewrites light-dark() unless told the target.",
+		lowers: true,
+		fix: "`vite.build.cssTarget`",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Waku 1.0.0-rc.2 on Vite 8.3.2",
+			result: "The default build lowered all 46 `light-dark()` values; with `vite.build.cssTarget`, all 46 were kept.",
+		},
+	},
+	// HTML enhancement
+	{
+		id: "htmx",
+		name: "htmx",
+		category: "html",
+		mark: "htmx",
+		officialUrl: "https://htmx.org",
+		description: "A JavaScript library that adds requests and partial updates through HTML attributes.",
+		github: "https://github.com/bigskysoftware/htmx",
+		summary: "Link it once in the page htmx swaps into.",
+		docs: [{ text: "htmx: documentation", url: "https://htmx.org/docs/" }],
+		toolchain: "htmx swaps HTML into a page that already has the stylesheet; nothing to build.",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "htmx 2.0.11, served by Express 5.2.1",
+			result: "A fragment swapped in by `hx-get` was styled on arrival, invalid field included.",
+		},
+	},
+	{
+		id: "stimulus",
+		name: "Stimulus",
+		category: "html",
+		mark: "stimulus",
+		officialUrl: "https://stimulus.hotwired.dev",
+		description: "A JavaScript framework that connects behaviour to HTML through data attributes.",
+		github: "https://github.com/hotwired/stimulus",
+		summary: "Let controllers set the attributes Cirth already styles.",
+		docs: [{ text: "Stimulus Handbook", url: "https://stimulus.hotwired.dev/handbook/introduction" }],
+		toolchain: "Stimulus adds no CSS step; the stylesheet comes from whatever builds the page.",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Stimulus 3.2.2 on Vite 8.3.2",
+			result: "A controller that set `aria-busy` on a button drew Cirth's busy state.",
+		},
+	},
+	// Server-rendered apps
+	{
+		id: "adonisjs",
+		name: "AdonisJS",
+		category: "server",
+		mark: "adonisjs",
+		officialUrl: "https://adonisjs.com",
+		description: "A TypeScript framework for web applications and APIs on Node.js.",
+		github: "https://github.com/adonisjs/core",
+		summary: "Import it in resources/css/app.css and set Vite's CSS target.",
+		docs: [{ text: "AdonisJS: Vite", url: "https://docs.adonisjs.com/guides/frontend/vite" }],
+		toolchain: "AdonisJS bundles with Vite 8, which rewrites light-dark() unless told the target.",
+		lowers: true,
+		fix: "`build.cssTarget`",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "AdonisJS 7.5.2 (hypermedia starter kit), @adonisjs/vite 6.0.3 on Vite 8.3.2",
+			result: "The default build lowered all 46 `light-dark()` values; with `build.cssTarget`, all 46 were kept.",
+		},
+	},
+	{
+		id: "aspnet-core",
+		name: "ASP.NET Core",
+		category: "server",
+		mark: "dotnet",
+		officialUrl: "https://dotnet.microsoft.com/apps/aspnet",
+		description: "Microsoft's framework for building web apps and services with .NET.",
+		github: "https://github.com/dotnet/aspnetcore",
+		summary: "A file in wwwroot, fingerprinted by MapStaticAssets.",
+		docs: [
+			{
+				text: "ASP.NET Core: static files",
+				url: "https://learn.microsoft.com/aspnet/core/fundamentals/static-files",
+			},
+		],
+		toolchain: "Static web assets are copied unchanged, compressed beside the original and fingerprinted.",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: ".NET SDK 10.0.401 (`dotnet new webapp`, Razor Pages)",
+			result: "The published app linked a fingerprinted copy and rendered it.",
+		},
+	},
+	{
+		id: "blazor",
+		name: "Blazor",
+		category: "server",
+		mark: "blazor",
+		officialUrl: "https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor",
+		description: "A .NET framework for interactive web UI written in C# and Razor.",
+		github: "https://github.com/dotnet/aspnetcore",
+		summary: "A file in wwwroot, linked through @Assets in App.razor.",
+		docs: [
+			{
+				text: "Blazor: static files",
+				url: "https://learn.microsoft.com/aspnet/core/blazor/fundamentals/static-files",
+			},
+		],
+		toolchain: "Static web assets are copied unchanged, compressed beside the original and fingerprinted.",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: ".NET SDK 10.0.401 (`dotnet new blazor`, Interactive Server)",
+			result: "The published app linked a fingerprinted copy; markup added by an interactive re-render was styled.",
+		},
+	},
+	{
+		id: "django",
+		name: "Django",
+		category: "server",
+		mark: "django",
+		officialUrl: "https://www.djangoproject.com",
+		description: "A Python web framework with an ORM, templates and an admin site.",
+		github: "https://github.com/django/django",
+		summary: "A static file in your app, linked with the static tag.",
+		docs: [
+			{
+				text: "Django: How to manage static files",
+				url: "https://docs.djangoproject.com/en/6.1/howto/static-files/",
+			},
+		],
+		toolchain: "collectstatic and ManifestStaticFilesStorage copy the file unchanged under a hashed name.",
+		verified: {
+			status: "verified",
+			date: "2026-10-01",
+			with: "Django 6.1.1 (startproject and startapp)",
+			result: "It rendered under `runserver`, and `collectstatic` with `ManifestStaticFilesStorage` wrote a byte-identical hashed copy that the template resolved with `DEBUG` off.",
+		},
+	},
+	{
+		id: "flask",
+		name: "Flask",
+		category: "server",
+		mark: "flask",
+		officialUrl: "https://flask.palletsprojects.com",
+		description: "A lightweight Python web framework built on Werkzeug and Jinja.",
+		github: "https://github.com/pallets/flask",
+		summary: "A file in static/, linked with url_for.",
+		docs: [{ text: "Flask: static files", url: "https://flask.palletsprojects.com/en/stable/tutorial/static/" }],
+		toolchain: "Flask serves static/ as it is.",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Flask 3.1.3 on Python 3.13.7",
+			result: "The page rendered with the file served from `static/`.",
+		},
+	},
+	{
+		id: "laravel",
+		name: "Laravel",
+		category: "server",
+		mark: "laravel",
+		officialUrl: "https://laravel.com",
+		description: "A PHP web framework with routing, an ORM and Blade templates.",
+		github: "https://github.com/laravel/framework",
+		summary: "Import it in resources/css/app.css, in place of Tailwind, and set Vite's CSS target.",
+		docs: [{ text: "Laravel: Asset bundling (Vite)", url: "https://laravel.com/docs/vite" }],
+		toolchain: "Laravel bundles with Vite 8, which rewrites light-dark() unless told the target.",
+		lowers: true,
+		fix: "`build.cssTarget`",
+		verified: {
+			status: "verified",
+			date: "2026-10-01",
+			with: "Laravel 13.34.0 (`composer create-project`), Vite 8.3.2 and laravel-vite-plugin 3.2.0",
+			result: "Without `build.cssTarget` the build kept none of the 46 `light-dark()` values and a forced-dark subtree stayed light; with it, all 46 and the subtree turned dark.",
+		},
+	},
+	{
+		id: "livewire",
+		name: "Livewire",
+		category: "server",
+		mark: "livewire",
+		officialUrl: "https://livewire.laravel.com",
+		description: "A Laravel library for dynamic interfaces written in PHP and Blade.",
+		github: "https://github.com/livewire/livewire",
+		summary: "Cirth comes from Laravel's Vite build; Livewire's updates keep it.",
+		docs: [{ text: "Livewire: installation", url: "https://livewire.laravel.com/docs/installation" }],
+		toolchain: "Livewire injects its own small styles and morphs the DOM; it does not touch the stylesheet.",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Livewire 4.4.7 on Laravel 13.34.0 and Vite 8.3.2",
+			result: "Markup a component added after `wire:click` was styled once Livewire morphed it in.",
+		},
+	},
+	{
+		id: "phoenix",
+		name: "Phoenix",
+		category: "server",
+		mark: "phoenix",
+		officialUrl: "https://www.phoenixframework.org",
+		description: "An Elixir web framework, with LiveView for server-rendered interactive pages.",
+		github: "https://github.com/phoenixframework/phoenix",
+		summary: "Installed into assets/ and bundled by esbuild.",
+		covers: ["Phoenix LiveView"],
+		docs: [{ text: "Phoenix: Asset management", url: "https://hexdocs.pm/phoenix/asset_management.html" }],
+		toolchain: "esbuild bundles and minifies the file and keeps light-dark().",
+		lowers: false,
+		verified: {
+			status: "verified",
+			date: "2026-10-01",
+			with: "Phoenix 1.8.15 (`mix phx.new --no-tailwind`), esbuild 0.25.4, Elixir 1.20.4 on OTP 28",
+			result: "`mix assets.deploy` kept all 46 `light-dark()` values. esbuild warns about one empty `:is()` in 0.16.0; the rule still works in every browser.",
+		},
+	},
+	{
+		id: "rails",
+		name: "Rails",
+		category: "server",
+		mark: "rails",
+		officialUrl: "https://rubyonrails.org",
+		description: "A Ruby web framework for database-backed applications.",
+		github: "https://github.com/rails/rails",
+		summary: "A file in vendor/assets, linked before the app's own stylesheets.",
+		docs: [
+			{ text: "Rails Guides: The Asset Pipeline", url: "https://guides.rubyonrails.org/asset_pipeline.html" },
+		],
+		toolchain: "Propshaft copies the file unchanged under a digest.",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Rails 8.1.4 with Propshaft 1.3.2 on Ruby 4.0.7",
+			result: "`assets:precompile` wrote a byte-identical digested copy, and the production server linked and rendered it.",
+		},
+	},
+	{
+		id: "elysia",
+		name: "Elysia",
+		category: "server",
+		mark: "elysia",
+		officialUrl: "https://elysiajs.com",
+		description: "A TypeScript web framework built for the Bun runtime.",
+		github: "https://github.com/elysiajs/elysia",
+		summary: "Serve dist/ with the static plugin and link it.",
+		docs: [{ text: "Elysia: static plugin", url: "https://elysiajs.com/plugins/static" }],
+		toolchain: "The static plugin serves the file as it is, as text/css.",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Elysia 1.4.30 and @elysiajs/static 1.4.10 on Bun 1.4.2",
+			result: "The stylesheet was served as text/css and the page rendered with it.",
+		},
+	},
+	{
+		id: "express",
+		name: "Express",
+		category: "server",
+		mark: "express",
+		officialUrl: "https://expressjs.com",
+		description: "A minimal web framework for Node.js.",
+		github: "https://github.com/expressjs/express",
+		summary: "Serve dist/ with express.static and link it.",
+		docs: [{ text: "Express: serving static files", url: "https://expressjs.com/en/starter/static-files.html" }],
+		toolchain: "express.static serves the file as it is.",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Express 5.2.1 on Node 24.18.0",
+			result: "The stylesheet was served as text/css and the page rendered with it.",
+		},
+	},
+	{
+		id: "codeigniter",
+		name: "CodeIgniter",
+		category: "server",
+		mark: "codeigniter",
+		officialUrl: "https://codeigniter.com",
+		description: "A PHP framework with a small footprint, built around models, views and controllers.",
+		github: "https://github.com/codeigniter4/CodeIgniter4",
+		summary: "A file in public/css, linked from a view layout with link_tag().",
+		docs: [
+			{ text: "CodeIgniter: application structure", url: "https://codeigniter.com/user_guide/concepts/structure.html" },
+			{ text: "CodeIgniter: HTML helper", url: "https://codeigniter.com/user_guide/helpers/html_helper.html" },
+			{ text: "CodeIgniter: view layouts", url: "https://codeigniter.com/user_guide/outgoing/view_layouts.html" },
+		],
+		toolchain: "CodeIgniter serves public/ as it is; nothing in it processes CSS.",
+		verified: {
+			status: "verified",
+			date: "2026-10-08",
+			with: "CodeIgniter 4.7.4 (`codeigniter4/appstarter`) on PHP 8.5.8",
+			result: "After `composer install --no-dev --optimize-autoloader`, with `CI_ENVIRONMENT = production`, `php spark serve` served the file byte for byte as text/css; `link_tag()` linked it from `app.baseURL`, and a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "yii",
+		name: "Yii",
+		category: "server",
+		mark: "yii",
+		officialUrl: "https://www.yiiframework.com",
+		description: "A PHP framework for web applications, with asset bundles and a code generator.",
+		github: "https://github.com/yiisoft/yii2",
+		summary: "A file in web/css, listed first in AppAsset in place of Bootstrap.",
+		docs: [{ text: "Yii: asset bundles", url: "https://www.yiiframework.com/doc/guide/2.0/en/structure-assets" }],
+		toolchain: "An asset bundle with basePath @webroot links the file where it is; nothing is published or processed.",
+		verified: {
+			status: "verified",
+			date: "2026-10-08",
+			with: "Yii 2.0.55 (`yiisoft/yii2-app-basic`) on PHP 8.5.8",
+			result: "With Bootstrap out of `AppAsset` and a semantic layout, `composer install --no-dev` and `YII_DEBUG` off, the page linked `css/cirth.min.css` and then `css/site.css` and nothing else; the file arrived byte for byte, and a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "slim",
+		name: "Slim",
+		category: "server",
+		mark: "slim",
+		officialUrl: "https://www.slimframework.com",
+		description: "A PHP micro-framework for web applications and APIs, built on PSR-7.",
+		github: "https://github.com/slimphp/Slim",
+		summary: "A file in public/css, linked from a PHP-View layout.",
+		docs: [
+			{ text: "Slim: templates", url: "https://www.slimframework.com/docs/v4/features/templates.html" },
+			{ text: "Slim: PHP-View", url: "https://www.slimframework.com/docs/v4/features/php-view.html" },
+			{ text: "Slim: web servers", url: "https://www.slimframework.com/docs/v4/start/web-servers.html" },
+		],
+		toolchain: "Slim has no asset pipeline; the web server serves public/ as it is.",
+		verified: {
+			status: "verified",
+			date: "2026-10-08",
+			with: "Slim 4.15.3 and PHP-View 3.4.0 (`slim/slim-skeleton`) on PHP 8.5.8",
+			result: "After `composer install --no-dev --optimize-autoloader`, PHP's built-in server with `public/` as its root served the file byte for byte as text/css; the page rendered in standards mode once PHP-DI was on 7, and a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "jakarta-jsp",
+		name: "Jakarta EE + JSP",
+		category: "server",
+		mark: "jakarta",
+		officialUrl: "https://jakarta.ee/specifications/pages/",
+		description: "Jakarta Servlet and Jakarta Server Pages, the Jakarta EE specifications for Java web pages.",
+		github: "https://github.com/jakartaee/pages",
+		summary: "A file in src/main/webapp/assets, linked from a JSP tag file through the context path.",
+		docs: [
+			{
+				text: "Jakarta Server Pages 4.0",
+				url: "https://jakarta.ee/specifications/pages/4.0/jakarta-server-pages-spec-4.0.html",
+			},
+			{ text: "Jakarta Servlet 6.1", url: "https://jakarta.ee/specifications/servlet/6.1/" },
+			{ text: "Apache Tomcat 11: deployment", url: "https://tomcat.apache.org/tomcat-11.0-doc/deployer-howto.html" },
+		],
+		toolchain: "Maven copies src/main/webapp into the WAR as it is, and the container serves it as it is.",
+		verified: {
+			status: "verified",
+			date: "2026-10-08",
+			with: "Apache Tomcat 11.0.26 (Servlet 6.1, Pages 4.0), Maven 3.9.16 and `maven-archetype-webapp` 1.5, on Java 21",
+			result: "`mvn package` built `signup.war` without Node.js or npm; deployed to Tomcat under `/signup`, the JSP linked `/signup/assets/cirth.min.css`, which arrived byte for byte as text/css, and a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "spring-boot",
+		name: "Spring Boot",
+		category: "server",
+		mark: "spring",
+		officialUrl: "https://spring.io/projects/spring-boot",
+		description: "A Java framework for stand-alone, production-grade applications built on Spring.",
+		github: "https://github.com/spring-projects/spring-boot",
+		summary: "A file among the static resources, linked from Thymeleaf in a jar or from JSP in a WAR.",
+		docs: [
+			{ text: "Spring guide: Serving Web Content", url: "https://spring.io/guides/gs/serving-web-content" },
+			{ text: "Spring Boot: servlet web applications", url: "https://docs.spring.io/spring-boot/reference/web/servlet.html" },
+			{
+				text: "Spring Boot: traditional deployment",
+				url: "https://docs.spring.io/spring-boot/how-to/deployment/traditional-deployment.html",
+			},
+		],
+		toolchain: "Spring Boot serves the classpath's static/ folder as it is; Thymeleaf and Jasper render views, not CSS.",
+		verified: {
+			status: "verified",
+			date: "2026-10-08",
+			with: "Spring Boot 4.1.1 (start.spring.io) on Java 21, with Thymeleaf 3.1.5 in an executable jar and with JSP (Jasper 11.0.24) in a WAR",
+			result: "Both ways were built and opened. Thymeleaf: `./mvnw package`, then `java -jar`, served the file byte for byte as text/css from embedded Tomcat 11.0.24. JSP: `./mvnw package` built an executable WAR, which rendered under `java -jar` and deployed to Apache Tomcat 11.0.26 under `/demo`, linking the file through the context path. Each time a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "micronaut",
+		name: "Micronaut",
+		category: "server",
+		mark: "micronaut",
+		officialUrl: "https://micronaut.io",
+		description: "A JVM framework for modular, easily testable services, with compile-time dependency injection.",
+		github: "https://github.com/micronaut-projects/micronaut-core",
+		summary: "A file in the static resources, mapped in application.properties, linked from a Thymeleaf view.",
+		docs: [
+			{
+				text: "Micronaut guide: serving static resources",
+				url: "https://guides.micronaut.io/latest/micronaut-static-resources-maven-java.html",
+			},
+			{ text: "Micronaut Views: Thymeleaf", url: "https://micronaut-projects.github.io/micronaut-views/latest/guide/#thymeleaf" },
+		],
+		toolchain: "Micronaut serves the mapped classpath folder as it is.",
+		verified: {
+			status: "verified",
+			date: "2026-10-09",
+			with: "Micronaut 5.2.2 (Micronaut Launch, Maven, `views-thymeleaf`) with Micronaut Views 6.3.1 on Java 25",
+			result: "`./mvnw package` ran the generated test and built the jar; `java -jar` answered the page as text/html and served the file byte for byte as text/css, and a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "helidon",
+		name: "Helidon",
+		category: "server",
+		mark: "helidon",
+		officialUrl: "https://helidon.io",
+		description: "A set of Java libraries for microservices, with a lightweight web server at its core.",
+		github: "https://github.com/helidon-io/helidon",
+		summary: "Static content from the classpath, and a route that answers HTML.",
+		docs: [
+			{ text: "Helidon SE Quickstart", url: "https://helidon.io/docs/v4/se/guides/quickstart" },
+			{ text: "Helidon WebServer: static content", url: "https://helidon.io/docs/core/v27/modules/webserver" },
+		],
+		toolchain: "Helidon's static content feature serves the classpath folder as it is.",
+		verified: {
+			status: "verified",
+			date: "2026-10-09",
+			with: "Helidon 27.0.0 SE (Helidon CLI quickstart) on Java 27",
+			result: "`mvn package` ran the quickstart's tests and built the jar; `java -jar` answered the route with `Content-Type: text/html` and served the file byte for byte as text/css, and a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "ktor",
+		name: "Ktor",
+		category: "server",
+		mark: "ktor",
+		officialUrl: "https://ktor.io",
+		description: "A Kotlin framework from JetBrains for asynchronous servers and clients.",
+		github: "https://github.com/ktorio/ktor",
+		summary: "staticResources() for the file, and the HTML DSL for the page.",
+		docs: [
+			{ text: "Ktor: templating", url: "https://ktor.io/docs/server-templating.html" },
+			{ text: "Ktor: HTML DSL", url: "https://ktor.io/docs/server-html-dsl.html" },
+			{ text: "Ktor: responses", url: "https://ktor.io/docs/server-responses.html" },
+			{ text: "Ktor: static content", url: "https://ktor.io/docs/server-static-content.html" },
+		],
+		toolchain: "staticResources() serves the resources folder as it is.",
+		verified: {
+			status: "verified",
+			date: "2026-10-09",
+			with: "Ktor 3.6.0 (Ktor project generator, Gradle 9.5.1, HTML DSL and Static Content) with Kotlin 2.4.0 on Java 21",
+			result: "`./gradlew build buildFatJar` ran the generated test and built the fat jar; `java -jar` answered the page as text/html and served the file byte for byte as text/css, and a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "symfony",
+		name: "Symfony",
+		category: "server",
+		mark: "symfony",
+		officialUrl: "https://symfony.com",
+		description: "A PHP framework and a set of reusable PHP components.",
+		github: "https://github.com/symfony/symfony",
+		summary: "Require it through AssetMapper's importmap and import it in app.js.",
+		docs: [
+			{ text: "Symfony: AssetMapper", url: "https://symfony.com/doc/current/frontend/asset_mapper.html" },
+			{ text: "Symfony: creating pages, templates", url: "https://symfony.com/doc/current/templates.html" },
+		],
+		toolchain: "AssetMapper downloads the file from the npm registry's CDN and serves it unchanged under a digest.",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Symfony 8.1.8 with AssetMapper 8.1.8 on PHP 8.5.8",
+			result: "`importmap:require` fetched the file; `asset-map:compile` wrote a byte-identical digested copy, which the page linked.",
+		},
+	},
+	{
+		id: "fastapi",
+		name: "FastAPI + Jinja2",
+		category: "server",
+		mark: "fastapi",
+		officialUrl: "https://fastapi.tiangolo.com",
+		description: "A Python framework for APIs that also renders HTML pages with Jinja2 templates.",
+		github: "https://github.com/fastapi/fastapi",
+		summary: "StaticFiles for the file, Jinja2Templates for the pages, url_for() for the link.",
+		docs: [
+			{ text: "FastAPI: templates", url: "https://fastapi.tiangolo.com/advanced/templates/" },
+			{ text: "FastAPI: static files", url: "https://fastapi.tiangolo.com/tutorial/static-files/" },
+		],
+		toolchain: "StaticFiles serves the folder as it is.",
+		verified: {
+			status: "verified",
+			date: "2026-10-09",
+			with: "FastAPI 0.143.0 with Jinja2 3.1.6, Starlette 1.7.0 and Uvicorn 0.54.0 on Python 3.14.8",
+			result: "After `pip install \"fastapi[standard]\" jinja2`, `fastapi run main.py` answered the page as text/html, `url_for` linked the file, which arrived byte for byte as text/css, and a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "go-templates",
+		name: "Go templates",
+		category: "server",
+		mark: "go",
+		officialUrl: "https://go.dev",
+		description: "The Go standard library's web server and HTML templates, with no framework.",
+		github: "https://github.com/golang/go",
+		summary: "net/http serves the file, html/template links it, and embed puts both in the binary.",
+		docs: [
+			{ text: "Go: package html/template", url: "https://pkg.go.dev/html/template" },
+			{ text: "Go: package net/http", url: "https://pkg.go.dev/net/http" },
+			{ text: "Go: package embed", url: "https://pkg.go.dev/embed" },
+		],
+		toolchain: "http.FileServerFS serves the embedded file as it is.",
+		verified: {
+			status: "verified",
+			date: "2026-10-09",
+			with: "Go 1.27.2 (standard library only)",
+			result: "`go vet` and `go build` passed; the binary, run alone from an empty folder, answered the page as text/html and served the embedded file byte for byte as text/css, and a `data-theme=\"dark\"` section stayed dark on a light page and on a dark one.",
+		},
+	},
+	{
+		id: "quarkus",
+		name: "Quarkus + Qute",
+		category: "server",
+		mark: "quarkus",
+		officialUrl: "https://quarkus.io",
+		description: "A Java framework for cloud applications, with Qute, its own template engine.",
+		github: "https://github.com/quarkusio/quarkus",
+		summary: "A file in META-INF/resources/css, linked from a Qute template.",
+		docs: [
+			{ text: "Quarkus: HTTP reference", url: "https://quarkus.io/guides/http-reference" },
+			{ text: "Quarkus: Qute templating", url: "https://quarkus.io/guides/qute" },
+		],
+		toolchain: "Quarkus serves META-INF/resources as it is.",
+		verified: {
+			status: "verified",
+			date: "2026-10-08",
+			with: "Quarkus 3.40.1 (code.quarkus.io, REST and Qute) on Java 21",
+			result: "`./mvnw package` built the production JVM app; `java -jar target/quarkus-app/quarkus-run.jar` served the file byte for byte as text/css, and the page a Qute template rendered kept a `data-theme=\"dark\"` section dark on a light page and on a dark one.",
+		},
+	},
+	// Content management
+	{
+		id: "wordpress",
+		name: "WordPress",
+		category: "cms",
+		mark: "wordpress",
+		officialUrl: "https://wordpress.org",
+		description: "An open-source content management system written in PHP.",
+		github: "https://github.com/WordPress/wordpress-develop",
+		summary: "Enqueued from your theme's functions.php.",
+		docs: [
+			{
+				text: "WordPress: Including assets",
+				url: "https://developer.wordpress.org/themes/basics/including-css-javascript/",
+			},
+		],
+		toolchain: "wp_enqueue_style links the file as it is, with ?ver= for cache busting.",
+		verified: {
+			status: "verified",
+			date: "2026-10-01",
+			with: "WordPress 7.1.2 on PHP 8.3, run by WordPress Playground CLI, with a classic theme",
+			result: "The stylesheet arrived as enqueued, with `?ver=` and the version.",
+		},
+	},
+	// Static site generators
+	{
+		id: "eleventy",
+		name: "Eleventy",
+		category: "static",
+		mark: "eleventy",
+		officialUrl: "https://www.11ty.dev",
+		description: "A static site generator that turns templates and data into HTML.",
+		github: "https://github.com/11ty/buildawesome",
+		summary: "Copy the file through and link it.",
+		docs: [{ text: "Eleventy: Passthrough file copy", url: "https://www.11ty.dev/docs/copy/" }],
+		toolchain: "Passthrough copy writes the file unchanged.",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Eleventy 3.1.6, with an ES module config and with a CommonJS one",
+			result: "The copy in `_site` was byte-identical either way. This documentation site is itself built with Eleventy and Cirth.",
+		},
+	},
+	{
+		id: "hugo",
+		name: "Hugo",
+		category: "static",
+		mark: "hugo",
+		officialUrl: "https://gohugo.io",
+		description: "A static site generator written in Go.",
+		github: "https://github.com/gohugoio/hugo",
+		summary: "A file in assets/, fingerprinted by Hugo Pipes.",
+		docs: [
+			{ text: "Hugo: resources.Fingerprint", url: "https://gohugo.io/functions/resources/fingerprint/" },
+		],
+		toolchain: "Hugo Pipes fingerprints the file and writes its SRI hash; minify also keeps light-dark().",
+		lowers: false,
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Hugo 0.167.0 extended",
+			result: "The fingerprinted file kept all 46 `light-dark()` values, with and without `minify`.",
+		},
+	},
+	{
+		id: "zola",
+		name: "Zola",
+		category: "static",
+		mark: "zola",
+		officialUrl: "https://www.getzola.org",
+		description: "A static site generator written in Rust, shipped as a single binary.",
+		github: "https://github.com/getzola/zola",
+		summary: "A file in static/, linked with get_url and a cache-busting hash.",
+		docs: [{ text: "Zola: templates, get_url", url: "https://www.getzola.org/documentation/templates/overview/" }],
+		toolchain: "Zola copies static/ unchanged.",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Zola 0.23.6",
+			result: "The copy in `public/` was byte-identical and linked with its hash.",
+		},
+	},
+	// Electron is a JavaScript runtime for desktop apps; its guide sits with
+	// the JavaScript frameworks.
+	{
+		id: "electron",
+		name: "Electron",
+		category: "javascript",
+		mark: "electron",
+		officialUrl: "https://www.electronjs.org",
+		description: "A framework for desktop applications built with JavaScript, HTML and CSS.",
+		github: "https://github.com/electron/electron",
+		summary: "Link it from the renderer's page and allow data: images in the CSP.",
+		docs: [
+			{ text: "Electron: security, Content Security Policy", url: "https://www.electronjs.org/docs/latest/tutorial/security" },
+		],
+		toolchain: "Electron loads the file as it is; a Content Security Policy decides whether Cirth's icons load.",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Electron 44.5.1 (Chromium 152)",
+			result: "The window followed the system scheme and a forced-dark subtree; with `img-src` lacking `data:`, the CSP blocked Cirth's icons, and with it none were blocked.",
+		},
+	},
+	// WebAssembly and Rust
+	{
+		id: "dioxus",
+		name: "Dioxus",
+		category: "rust",
+		mark: "dioxus",
+		officialUrl: "https://dioxuslabs.com",
+		description: "A Rust framework for user interfaces on the web, desktop and mobile.",
+		github: "https://github.com/DioxusLabs/dioxus",
+		summary: "An asset!() with minification off, linked by document::Stylesheet.",
+		docs: [{ text: "Dioxus: Assets", url: "https://dioxuslabs.com/learn/0.7/essentials/ui/assets" }],
+		toolchain: "Dioxus's asset pipeline minifies CSS for older browsers in release builds and rewrites light-dark().",
+		lowers: true,
+		fix: "`with_minify(false)` on the asset",
+		verified: {
+			status: "verified",
+			date: "2026-10-02",
+			with: "Dioxus 0.7.10 (`dx bundle --release`, web)",
+			result: "By default the release bundle lowered all 46 `light-dark()` values; with minification off, the copy was byte-identical.",
+		},
+	},
+	{
+		id: "yew",
+		name: "Yew",
+		category: "rust",
+		mark: "yew",
+		officialUrl: "https://yew.rs",
+		description: "A Rust framework for web applications compiled to WebAssembly.",
+		github: "https://github.com/yewstack/yew",
+		summary: "One Trunk link in index.html.",
+		docs: [{ text: "Trunk: assets", url: "https://trunkrs.dev/assets/" }],
+		toolchain: "Trunk copies the file, adds an integrity hash, and with --minify keeps light-dark().",
+		lowers: false,
+		verified: {
+			status: "verified",
+			date: "2026-10-01",
+			with: "Yew 0.23.0 (csr) and Trunk 0.21.14",
+			result: "`trunk build --release` copied the file byte for byte; with `--minify` all 46 `light-dark()` values were kept.",
+		},
+	},
+];
+
+// Integrations that are not guides here, and why: each exists to run
+// another CSS framework, or is a way of installing that every guide already
+// covers. A test keeps them out of the list.
+const excluded = [
+	{ name: "Tailwind CSS CLI", reason: "runs another CSS framework" },
+	{ name: "Tailwind CSS Standalone", reason: "runs another CSS framework" },
+	{ name: "UnoCSS", reason: "an atomic CSS engine, another CSS framework" },
+	{ name: "Bun dev server", reason: "a package manager's server; every npm guide covers Bun" },
+	{ name: "npm", reason: "a package manager; every guide offers it" },
+	{ name: "pnpm", reason: "a package manager; every guide offers it" },
+	{ name: "Yarn", reason: "a package manager; every guide offers it" },
+	{
+		name: "Vaadin",
+		reason: "its components draw inside shadow roots, which a page's stylesheet does not reach; a guide would promise more than Cirth can style",
+	},
+];
+// Next in line for a guide: Javalin, with JTE or Thymeleaf, for one more
+// lightweight Java stack.
+
+for (const mark of Object.values(marks)) {
+	if (!mark.file) continue;
+	mark.aspect = aspect(mark.file);
+	if (mark.dark) {
+		const dark = aspect(mark.dark);
+		// A project's dark variant is normally the same drawing in other
+		// colours. Django's is not: the negative logo sits on its own green
+		// field, so its frame is wider. It is still the project's file,
+		// unmodified, and the page sizes it by its own ratio.
+		if (Math.abs(dark - mark.aspect) > 0.01) mark.darkAspect = dark;
+	}
+}
+
+// Every record names its owner and the policy read; one with a file names
+// where the file came from, and one without says why. A file shown although
+// the policy asks to be asked says why, in a nominative record.
+const isoDate = /^\d{4}-\d{2}-\d{2}$/;
+for (const [id, mark] of Object.entries(marks)) {
+	for (const field of /** @type {const} */ (["owner", "terms", "termsUrl"])) {
+		if (typeof mark[field] !== "string" || mark[field].trim() === "") {
+			throw new Error(`frameworks.js: record ${id} has no ${field}`);
+		}
+	}
+	if (!/^https:\/\//.test(mark.termsUrl)) throw new Error(`frameworks.js: record ${id} needs an https policy URL`);
+	if (mark.file) {
+		if (mark.textOnly) throw new Error(`frameworks.js: record ${id} has a file and says it is named by text alone`);
+		if (!/^https:\/\//.test(mark.source ?? "")) throw new Error(`frameworks.js: record ${id} needs an https source`);
+		if (mark.dark && mark.ground) throw new Error(`frameworks.js: record ${id} has a dark variant and asks for a light ground`);
+	} else if (typeof mark.textOnly !== "string" || mark.textOnly.trim().length < 40) {
+		throw new Error(`frameworks.js: record ${id} has no file and does not say why`);
+	}
+	if (mark.linkTo !== undefined && !/^https:\/\//.test(mark.linkTo)) {
+		throw new Error(`frameworks.js: record ${id} names an address for its logo that is not https`);
+	}
+	if (mark.nominative !== undefined) {
+		if (!mark.file || !mark.retrieved) throw new Error(`frameworks.js: nominative record ${id} needs its file and the day it was taken`);
+		if (!mark.nominative.endsWith(removal)) throw new Error(`frameworks.js: nominative record ${id} does not say it implies no affiliation and comes down on request`);
+	}
+	if (!isoDate.test(mark.retrieved ?? retrieved)) throw new Error(`frameworks.js: record ${id} has a malformed retrieval date`);
+	if (!guides.some((guide) => guide.mark === id)) {
+		throw new Error(`frameworks.js: record ${id} is not used by any guide`);
+	}
+}
+
+for (const guide of guides) {
+	if (!marks[guide.mark]) {
+		throw new Error(`frameworks.js: ${guide.id} names unknown record ${guide.mark}`);
+	}
+	if (typeof guide.description !== "string" || !/^[A-Z.].{20,110}\.$/.test(guide.description)) {
+		throw new Error(`frameworks.js: ${guide.id} needs a one-sentence description`);
+	}
+	if (guide.github !== undefined && !/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+$/.test(guide.github)) {
+		throw new Error(`frameworks.js: ${guide.id} has a malformed GitHub URL`);
+	}
+	const category = categories.find((entry) => entry.id === guide.category);
+	if (!category) {
+		throw new Error(`frameworks.js: ${guide.id} has unknown category ${guide.category}`);
+	}
+	if (guide.mark !== null && !marks[guide.mark]) {
+		throw new Error(`frameworks.js: ${guide.id} names unknown mark ${guide.mark}`);
+	}
+	if (!(guide.verified.status in statuses)) {
+		throw new Error(`frameworks.js: ${guide.id} has unknown status ${guide.verified.status}`);
+	}
+	if (guide.lowers && !guide.fix) {
+		throw new Error(`frameworks.js: ${guide.id} rewrites light-dark() and does not say what to set`);
+	}
+	if (!/^https:\/\//.test(guide.officialUrl)) {
+		throw new Error(`frameworks.js: ${guide.id} has no official https URL`);
+	}
+}
+
+const byName = (/** @type {Guide} */ a, /** @type {Guide} */ b) =>
+	a.name.localeCompare(b.name, "en", { sensitivity: "base" });
+
+// The guides with everything a page needs to draw one: its route, its
+// mark, its category's and subgroup's names and its status's words.
+const entries = guides.map((guide) => {
+	const category = /** @type {(typeof categories)[number]} */ (categories.find((entry) => entry.id === guide.category));
+	return {
+		...guide,
+		link: `/installation/${guide.id}`,
+		brand: marks[guide.mark],
+		markData: marks[guide.mark].file ? marks[guide.mark] : null,
+		// The release a guide was checked with, as its header prints it.
+		version: /** @type {RegExpExecArray} */ (/^(.+?)(?= \(|,| on | with | and |$)/.exec(guide.verified.with))[1],
+		categoryText: category.text,
+		status: statuses[guide.verified.status],
+	};
+});
+
+// The guides grouped for the Framework Guides page and the sidebar, in the
+// order of `categories`, alphabetical inside each.
+const groups = categories
+	.map((category) => ({
+		...category,
+		guides: entries.filter((guide) => guide.category === category.id).sort(byName),
+	}))
+	.filter((group) => group.guides.length > 0);
+
+// The marks the home page's orbit shows, one or two per ecosystem: bundlers
+// and client frameworks, server-rendered frameworks in five languages, a
+// CMS, a static site generator and Rust. None of them needs a notice where
+// it appears.
+const featured = [
+	"vite",
+	"react",
+	"vue",
+	"svelte",
+	"angular",
+	"astro",
+	"laravel",
+	"django",
+	"rails",
+	"phoenix",
+	"aspnet-core",
+	"flask",
+	"wordpress",
+	"htmx",
+	"hugo",
+	"yew",
+];
+
+// Every list of the guides reads them in the order the sidebar does.
+const ordered = groups.flatMap((group) => group.guides);
+
+module.exports = {
+	retrieved,
+	checked,
+	marks,
+	categories,
+	statuses,
+	cssTarget,
+	excluded,
+	guides: ordered,
+	groups,
+	count: ordered.length,
+	verifiedCount: ordered.filter((guide) => guide.verified.status === "verified").length,
+	// What each stack's build does to Cirth's colours, for Compatibility.
+	pipelines: {
+		lowers: ordered.filter((guide) => guide.lowers === true),
+		keeps: ordered.filter((guide) => guide.lowers === false),
+		asIs: ordered.filter((guide) => guide.lowers === undefined),
+	},
+	checkedBetween: [
+		ordered.map((guide) => guide.verified.date).sort()[0],
+		ordered.map((guide) => guide.verified.date).sort().at(-1),
+	],
+	byId: Object.fromEntries(ordered.map((guide) => [guide.id, guide])),
+	featured: featured.map((id) => {
+		const guide = ordered.find((entry) => entry.id === id);
+		if (!guide?.markData || guide.markData.trademarkNotice) {
+			throw new Error(`frameworks.js: featured ${id} is not a guide with a mark that needs no notice`);
+		}
+		return guide;
+	}),
+};

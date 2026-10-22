@@ -63,10 +63,10 @@ const { auditSources, watchSources } = require("./lib/source-guard");
 //     actions cluster 66px wide holding 88px of controls in Firefox,
 //     hanging the menu toggle 6px off a 320px screen.
 //   - Presets move tokens, and two declarations that resolve to the same
-//     value under the default theme need not under `playroom`: a
+//     value under the default theme need not under `material`: a
 //     `font-family: var(--cirth-font-family-sans)` pinning the shell's
-//     chrome to the plain system stack is inert until a preset makes the
-//     page face rounded.
+//     chrome to the plain system stack is inert until a preset gives the
+//     page a face of its own.
 //
 // Running the whole corpus on three engines and four presets would cost a
 // working day. It is also unnecessary: only the declarations this sweep
@@ -77,7 +77,7 @@ const { auditSources, watchSources } = require("./lib/source-guard");
 //   node scripts/audit-dead-css.js --json .cache/dead-css.json
 //   node scripts/verify-dead-css.js --report .cache/dead-css.json
 //
-// which re-runs them in Firefox, in WebKit, and under `playroom`, and
+// which re-runs them in Firefox, in WebKit, and under `material`, and
 // turns `inert` into `inert`, `engine-dependent` or `preset-dependent`.
 // Nothing is deleted on this report alone.
 //
@@ -749,7 +749,7 @@ const run = async () => {
 				`Before deleting any of the ${report.inert.length} inert declarations above, run the\n` +
 					"second pass: they are inert *in Chromium, under the default theme*, and\n" +
 					"that has produced a false inert twice. It re-probes exactly these, on the\n" +
-					`${visits} rendering${visits === 1 ? "" : "s"} that can see them, in Firefox, in WebKit and under playroom:\n`,
+					`${visits} rendering${visits === 1 ? "" : "s"} that can see them, in Firefox, in WebKit and under material:\n`,
 			);
 			console.log(
 				"  node scripts/audit-dead-css.js --json .cache/dead-css.json\n" +

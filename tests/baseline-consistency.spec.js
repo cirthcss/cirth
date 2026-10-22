@@ -7,6 +7,7 @@ const {
 	listPages,
 	startServer,
 } = require("../scripts/lib/docs-site");
+const { listPresetNames } = require("../scripts/lib/presets");
 
 // The consistency contract the Native Baseline pass settled: one card
 // contract, one button geometry, one active-navigation marker, and no
@@ -91,51 +92,83 @@ test("every button variant carries the same border on all four sides", async ({
 	}
 });
 
-test("a pressed button does not translate", async ({ page }) => {
+test("a pressed button keeps its tonal state without moving under reduced motion", async ({
+	page,
+}) => {
 	await page.goto(`${origin}/content/button/`, { waitUntil: "networkidle" });
 
 	const button = page.locator(".docs-demo-preview button").first();
 	await button.hover();
 	await page.mouse.down();
-	const pressed = await styleOf(button, ["transform"]);
+	const pressed = await styleOf(button, ["backgroundImage", "transform"]);
 	await page.mouse.up();
 
 	expect(pressed.transform).toBe("none");
+	expect(pressed.backgroundImage).not.toBe("none");
+});
+
+test("an enabled button settles by one edge when motion is allowed", async ({
+	page,
+}) => {
+	await page.emulateMedia({ reducedMotion: "no-preference" });
+	await page.goto(`${origin}/content/button/`, { waitUntil: "networkidle" });
+
+	const button = page.locator(".docs-demo-preview button").first();
+	await button.hover();
+	await page.mouse.down();
+	await expect
+		.poll(() =>
+			button.evaluate((element) => {
+				const style = getComputedStyle(element);
+				return {
+					border: style.getPropertyValue("--cirth-border-width").trim(),
+					offset: style.getPropertyValue("--cirth-control-press-offset").trim(),
+					y: new DOMMatrixReadOnly(style.transform).m42,
+				};
+			}),
+		)
+		.toEqual({ border: "0.0625rem", offset: "0.0625rem", y: 1 });
+
+	await button.evaluate((element) => element.setAttribute("disabled", ""));
+	await expect
+		.poll(() =>
+			button.evaluate((element) =>
+				new DOMMatrixReadOnly(getComputedStyle(element).transform).m42,
+			),
+		)
+		.toBe(0);
+	await page.mouse.up();
 });
 
 // --- The card contract -------------------------------------------------
 
-test("the hero demo surface uses the card radius and clips its panels", async ({
+test("the hero's source slab uses the card radius and clips its listing", async ({
 	page,
 }) => {
 	await page.goto(origin, { waitUntil: "networkidle" });
 
-	// One plate per region now; the source card is the one that has to clip
-	// a code pane running flush to its own edge.
-	const figure = page.locator(".docs-source-panel");
-	const style = await styleOf(figure, [
+	// The slab holds a code pane running flush to its own edge, and a card
+	// laid over it: it has to clip the one and match the other's corners.
+	const slab = page.locator(".docs-hero-source");
+	const style = await styleOf(slab, [
 		"borderTopLeftRadius",
 		"borderBottomRightRadius",
 		"overflow",
 	]);
-	const cardRadius = await page.evaluate(() =>
-		getComputedStyle(document.documentElement)
-			.getPropertyValue("--cirth-card-border-radius")
-			.trim(),
-	);
+	const card = await styleOf(page.locator(".docs-hero-render > article"), [
+		"borderTopLeftRadius",
+	]);
 
-	// The outer surface was square while the sign-in card it renders inside
-	// itself was rounded.
 	expect(style.borderTopLeftRadius).not.toBe("0px");
 	expect(style.borderTopLeftRadius).toBe(style.borderBottomRightRadius);
-	expect(cardRadius, "the shell reads the card radius token").not.toBe("");
+	expect(style.borderTopLeftRadius).toBe(card.borderTopLeftRadius);
 	expect(["clip", "hidden"]).toContain(style.overflow);
 });
 
 test("the colour swatches paint a surface, not the canvas", async ({
 	page,
 }) => {
-	await page.goto(`${origin}/colors/`, { waitUntil: "networkidle" });
+	await page.goto(`${origin}/themes/`, { waitUntil: "networkidle" });
 
 	const swatch = page.locator(".docs-color-swatch").first();
 	const surface = await styleOf(swatch, ["backgroundColor"]);
@@ -159,8 +192,6 @@ test("the home page's specimen cards all share one card contract", async ({
 }) => {
 	await page.goto(origin, { waitUntil: "networkidle" });
 
-	/** @type {Record<string, string>[]} */
-	const cards = [];
 	const properties = [
 		"borderTopWidth",
 		"borderTopLeftRadius",
@@ -169,31 +200,45 @@ test("the home page's specimen cards all share one card contract", async ({
 		"padding",
 	];
 
-	// One example shows at a time, so each one is opened to be measured:
-	// a card in a panel nobody looked at is exactly where a shell
-	// treatment would go unnoticed.
-	for (const id of ["article", "details", "form"]) {
-		await page.locator(`[data-docs-tab="${id}"]`).click();
-		await expect(page.locator(`[data-docs-panel="${id}"]`)).toBeVisible();
-		cards.push(
-			await styleOf(
-				page.locator(`[data-docs-panel="${id}"] .docs-stage-preview article`),
-				properties,
-			),
-		);
-	}
-	cards.push(
-		await styleOf(
-			page.locator(".docs-theme-showcase .docs-stage-preview article"),
-			properties,
-		),
-	);
+	// The specimens are fragments now (a field, a disclosure group, a
+	// table), so the hero's card is compared with a plain <article> the
+	// page's own Cirth renders beside it: the contract is the library's,
+	// not anything a section of the shell adds.
+	await page.evaluate(() => {
+		const article = document.createElement("article");
+		article.id = "probe-card";
+		article.innerHTML = "<p>Probe</p>";
+		document.querySelector("main")?.append(article);
+	});
+	const first = await styleOf(page.locator("#probe-card"), properties);
 
-	const [first, ...rest] = cards;
-	expect(cards.length).toBeGreaterThan(1);
-	for (const card of rest) expect(card).toEqual(first);
+	// The hero's card is the library's card, shadow included. It is laid
+	// over the source, so the overlay's elevation is cast by the wrapper
+	// around it, never by the article.
+	const hero = await styleOf(page.locator(".docs-hero-render > article"), properties);
+	const overlay = await page.evaluate(() => {
+		const probe = document.createElement("div");
+		probe.style.boxShadow = "var(--cirth-box-shadow)";
+		document.body.append(probe);
+		const value = getComputedStyle(probe).boxShadow;
+		probe.remove();
+		return value;
+	});
+	expect(hero).toEqual(first);
+	expect(await page.locator(".docs-hero-render").evaluate((element) => getComputedStyle(element).boxShadow)).toBe(overlay);
 
-	expect(first.boxShadow, "cards carry no decorative shadow").toBe("none");
+	// A card casts the card token's single contact layer and nothing a
+	// shell added (specs/surface-depth.md).
+	const token = await page.evaluate(() => {
+		const probe = document.createElement("div");
+		probe.style.boxShadow = "var(--cirth-card-box-shadow)";
+		document.body.append(probe);
+		const value = getComputedStyle(probe).boxShadow;
+		probe.remove();
+		return value;
+	});
+	expect(first.boxShadow, "cards carry the card's own shadow").toBe(token);
+	expect(first.boxShadow.split(/,(?![^(]*\))/), "one contact layer").toHaveLength(1);
 });
 
 // --- :visited must not repaint a card ----------------------------------
@@ -243,10 +288,10 @@ test("the visited rule stands aside for a link wrapping a card", () => {
 test("an open disclosure keeps a bottom gutter whatever its last child is", async ({
 	page,
 }) => {
-	for (const url of ["/", "/components/accordion/"]) {
+	for (const url of ["/why-cirth/", "/components/accordion/"]) {
 		await page.goto(`${origin}${url}`, { waitUntil: "networkidle" });
 
-		const scope = url === "/" ? ".docs-faq-list" : ".docs-demo-preview";
+		const scope = url === "/why-cirth/" ? ".docs-content" : ".docs-demo-preview";
 		const details = page.locator(`${scope} details:not(.dropdown)`);
 		const count = await details.count();
 
@@ -301,12 +346,15 @@ test("the active navigation item squares off on the rail side", async ({
 	expect(style.borderInlineStartWidth).not.toBe("0px");
 });
 
-test("the outline highlights an entry with exactly one indicator", async ({
+test("the outline uses one decorative marker and no generated duplicate", async ({
 	page,
 }) => {
 	await page.goto(`${origin}/about/`, { waitUntil: "networkidle" });
+	const toc = page.locator("#docs-toc-nav");
+	await expect(toc.locator('.docs-toc-marker[aria-hidden="true"]')).toHaveCount(1);
+	await expect(toc).toHaveAttribute("data-toc-marker-ready", "");
 
-	const marker = await page
+	const generated = await page
 		.locator(".docs-toc a")
 		.first()
 		.evaluate((element) => {
@@ -314,9 +362,9 @@ test("the outline highlights an entry with exactly one indicator", async ({
 			return { content: before.content, width: before.width };
 		});
 
-	// The outline used to draw its own amber bar as a ::before on top of the
-	// rail the framework already paints for aria-current.
-	expect(["none", "normal", ""]).toContain(marker.content);
+	// A generated bar would sit on top of the explicit marker and the static
+	// fallback rail, producing the doubled state this contract prevents.
+	expect(["none", "normal", ""]).toContain(generated.content);
 });
 
 test("the sidebar group headers share the inline gutter of their entries", async ({
@@ -324,8 +372,10 @@ test("the sidebar group headers share the inline gutter of their entries", async
 }) => {
 	await page.goto(`${origin}/about/`, { waitUntil: "networkidle" });
 
+	// The groups fold: each is named by its disclosure summary, and the
+	// summary keeps the same gutter as the entries it holds.
 	const summary = await styleOf(
-		page.locator(".docs-sidebar details > summary").first(),
+		page.locator(".docs-sidebar .docs-nav-group > summary").first(),
 		["paddingInlineStart"],
 	);
 	const link = await styleOf(page.locator(".docs-sidebar nav li a").first(), [
@@ -348,7 +398,7 @@ test("no documentation page draws a rule under its title", async ({ page }) => {
 		"/about/",
 		"/brand/",
 		"/colors/",
-		"/get-started/",
+		"/installation/",
 		"/customization/",
 		"/upgrading/",
 		"/contributions/",
@@ -357,7 +407,7 @@ test("no documentation page draws a rule under its title", async ({ page }) => {
 		"/content/button/",
 		"/forms/",
 		"/utilities/breakout/",
-		"/utilities/reduce-motion/",
+		"/guides/accessibility/",
 		"/utilities/truncate/",
 	];
 
@@ -391,17 +441,13 @@ test("the card and table borders keep a neutral hue in every theme", async ({
 	// palette anywhere near it. Mixed `in oklab` there is no angle to
 	// rotate. This asserts the outcome, not the mechanism: whatever the
 	// derivation, the result has to stay in the family its inputs are in.
-	for (const [preset, storage] of [
-		["default", "default"],
-		["plain", "plain"],
-		["playroom", "playroom"],
-	]) {
+	for (const preset of ["default", ...listPresetNames()]) {
 		await page.goto(`${origin}/components/card/`, {
 			waitUntil: "domcontentloaded",
 		});
 		await page.evaluate((value) => {
 			sessionStorage.setItem("cirth-preset", value);
-		}, storage);
+		}, preset);
 		await page.reload({ waitUntil: "networkidle" });
 
 		const hues = await page.evaluate(() => {
@@ -520,7 +566,7 @@ test("navigation links reserve the accent for position, while header chrome uses
 	// the hover step, hover below the current entry, and the current entry
 	// at the emphasis ink rather than at whatever the header happens to
 	// inherit. Neither convention paints membership with the action colour.
-	for (const variant of ["default", "plain", "playroom"]) {
+	for (const variant of ["default", ...listPresetNames()]) {
 		await page.goto(`${origin}/specimen/${variant}/`, {
 			waitUntil: "networkidle",
 		});
@@ -583,10 +629,13 @@ test("navigation links reserve the accent for position, while header chrome uses
 				sample.muted,
 			);
 		}
+		// The label role's weight since specs/typographic-roles.md: the
+		// current item is marked by ink and weight together, and the weight
+		// step is 400 to 500, as for every other named control.
 		expect(sample.current).toEqual({
 			borderBottomWidth: "0px",
 			color: sample.contrast,
-			fontWeight: "600",
+			fontWeight: "500",
 			textDecorationLine: "none",
 		});
 		// Full contrast, and still not the accent: in chrome the accent

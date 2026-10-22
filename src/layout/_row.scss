@@ -18,24 +18,12 @@
       grid-template-columns: repeat(auto-fit, minmax(0%, 1fr));
     }
 
+    // Cells shrink below their content instead of overflowing, and the
+    // container owns the space between them: a flow relation would offset
+    // every cell after the first (upstream #738).
     & > * {
-      min-width: 0; // HACK for children in overflow
-    }
-
-    // Form controls carry a stacking margin-bottom; inside a row the
-    // row-gap already provides that rhythm and the two would stack,
-    // misaligning columns (upstream #738)
-    &
-      > :where(
-        button,
-        [type="submit"],
-        [type="reset"],
-        [role="button"],
-        input:not([type="checkbox"], [type="radio"]),
-        select,
-        textarea
-      ) {
-      margin-bottom: 0;
+      min-width: 0;
+      margin-block: 0;
     }
   }
 }
