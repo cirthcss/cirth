@@ -599,6 +599,15 @@ module.exports = (eleventyConfig) => {
 		"docs/src/styles/generated": "styles/generated",
 	});
 
+	// Under `npm run dev` (scripts/dev.js), a change to src/ recompiles the
+	// generated stylesheets and copies them into the output; the dev
+	// server's own watcher reloads the page's CSS when they land. Eleventy's
+	// watcher cannot do it: the folder is gitignored, and Eleventy skips
+	// whatever .gitignore lists.
+	if (process.env.CIRTH_DEV_OUTPUT) {
+		eleventyConfig.setServerOptions({ watch: [path.join(process.env.CIRTH_DEV_OUTPUT, "styles/generated")] });
+	}
+
 	// The way out of the /next/ preview: a relative path, the one shape
 	// EleventyHtmlBasePlugin does not rewrite with this build's prefix.
 	eleventyConfig.addFilter("siteRoot", (/** @type {string} */ url) => {

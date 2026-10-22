@@ -36,10 +36,15 @@ checked-out commit pins.
 Start the documentation locally:
 
 ```sh
-npm run docs:dev
+npm run dev
 ```
 
-The development process rebuilds source and documentation as files change.
+It serves the documentation at `http://localhost:8080` and rebuilds as files
+change: a page or template rebuilds the site, and a change to `src/`
+recompiles the stylesheets the site is styled with, reloads them in the open
+page, and rebuilds `dist/` for the test suites. Eleventy's own options pass
+through, as in `npm run dev -- --port=8081`. `npm run docs:dev` is the same
+command.
 
 ## Repository map
 
