@@ -91,8 +91,9 @@ does not match `:focus-visible` on a radio its arrow keys moved to, and no
 CSS state tells keyboard focus from pointer focus, so the radio's ring is
 keyed to the one state every engine sets when focus lands on it. The
 cost, accepted: in Chromium and Firefox a radio focused by a click shows
-the ring until focus moves on. WebKit does not focus a radio on click, so
-there it shows only for the keyboard. A checkbox is reached with Tab,
+the ring until focus moves on. WebKit on macOS does not focus a radio on
+click, so there it shows only for the keyboard; WebKit on Linux does, and
+shows it as the other two do. A checkbox is reached with Tab,
 which every engine marks `:focus-visible`, and keeps the narrower rule.
 
 Inside `fieldset.segmented` the segment draws the ring, on
@@ -158,6 +159,7 @@ Inside `fieldset.segmented`, centred by the label's flex box: −0.36px,
 | The keyboard's ring shows on every radio it reaches | Not in WebKit: a radio the arrow keys move to does not match `:focus-visible` there, for this drawing and the one before it, so no ring is drawn; the first radio, reached with Option+Tab, has one | WebKit 26.5, ring keyed to `:focus-visible` | Invalid |
 | With the ring keyed to `:focus`, the keyboard's ring shows on every radio it reaches | After Tab and after each arrow key the focused radio paints a solid ring, in all three engines; inside `.segmented` the segment paints it and the radio does not; at page zoom 2 and 4; on a radio whose label wraps; and, in Chromium's forced-colors emulation, in a system colour | `tests/choice-marks.spec.js`, `dist/cirth.css` from this change, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5 | Verified |
 | A click focuses a radio | In Chromium and Firefox, yes, and the ring shows (the compromise); in WebKit focus stays where it was | Same run | Verified |
+| A click focuses a radio in WebKit on Linux | Yes: after the click `document.activeElement` is the radio, which failed the test's WebKit branch on every attempt, so focus on click is the platform's convention, not the engine's | Playwright's WebKit on GitHub's `ubuntu-latest`, CI run 39831282337 at `328868b95` | Verified |
 | Before the change, WebKit lost the segment's ring too | After an arrow key in `.segmented`, neither the radio nor the segment painted a ring, and the radio inside a Tab-focused segment drew a second ring on the accent | Probe over `dist/cirth.css` before this change, WebKit 26.5 and Chromium 149.0.7827.55 | Verified |
 | The change fits the size budgets | `cirth.min.css` 14770 → 15092 B gzip (108 B left of 15200), `cirth.scoped.min.css` 15340 B (60 B left of 15400), classless 13070 B, classless scoped 13246 B | `npm run check:size` over `dist/` built from this change, 2026-10-02 | Verified |
 | No build carries an empty functional pseudo-class | `[aria-current]` written into the button's state list compiled to `::file-selector-button:is()` in every build; it now sits in a rule of its own, and `check:dist` fails any empty `:is()`, `:where()`, `:not()` or `:has()` in the expanded and minified files | `npm run check:dist` over `dist/` from this change and over `dist/` from `a0c077e5` (fails there, as it should) | Verified |

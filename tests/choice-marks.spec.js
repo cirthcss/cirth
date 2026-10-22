@@ -382,13 +382,16 @@ test("a click shows the ring where the engine focuses the radio: the documented 
 	await page.locator('input[value="l"]').click();
 	await expect(page.locator('input[value="l"]')).toBeChecked();
 	const focused = await page.evaluate(() => /** @type {HTMLInputElement} */ (document.activeElement)?.value);
-	if (browserName === "webkit") {
-		// WebKit does not move focus to a radio on click: nothing to ring.
-		expect(focused).not.toBe("l");
+	// Whether a click focuses a radio is the platform's convention, not the
+	// engine's: WebKit on macOS leaves focus where it was, as Safari does,
+	// and WebKit on Linux moves it, like Chromium and Firefox everywhere.
+	// Only WebKit may leave it, and then there is nothing to ring.
+	if (focused !== "l") {
+		expect(browserName, "a click left the radio unfocused").toBe("webkit");
 		return;
 	}
-	// Chromium and Firefox focus it, and no CSS state tells this focus from
-	// the keyboard's, so the ring shows until focus moves on. Keyboard
+	// Where the click focuses it, no CSS state tells this focus from the
+	// keyboard's, so the ring shows until focus moves on. Keyboard
 	// visibility is what the rule is for (specs/choice-marks.md).
 	expect(await focusPaint(page)).toEqual({ value: "l", ring: true, segmentRing: false });
 });
