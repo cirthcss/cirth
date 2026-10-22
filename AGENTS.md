@@ -18,6 +18,30 @@ dead-CSS audit share it, so check for potentially conflicting concurrent work
 before starting them. Do not terminate or interfere with another session's
 processes. If a conflict cannot be resolved safely, stop and report it.
 
+## Visual baselines
+
+The visual-regression baselines are not in Git. Each Playwright project's
+screenshots are one archive on the `visual-baselines` GitHub pre-release,
+`tests/visual-baselines.json` pins the archives each commit compares
+against, and `tests/__screenshots__/` is gitignored.
+`scripts/visual-baselines.js` moves them; the Contributions page explains
+the workflow.
+
+- `npm run check:visual` downloads this platform's sets first, then runs
+  the suite. A folder changed locally and not yet pushed is kept, not
+  overwritten; `npm run baselines:status` says which.
+- After a wanted visual change: `npm run check:visual:update`, inspect
+  every changed image, `npm run baselines:push`, then commit
+  `tests/visual-baselines.json` with the change. Only the macOS sets are
+  pushed by hand; CI regenerates and publishes the Linux ones.
+- `baselines:push` uploads to a public release. Run it only for images you
+  have inspected, and only when the task asks for new baselines.
+- The release is test storage, not a version of Cirth. Never delete it,
+  its tag or its assets by hand (the update workflow prunes archives
+  nothing refers to), never make it a full release (the roadmap sweep runs
+  on every published release that is not a pre-release), and leave it out
+  of every release step.
+
 ## Specs
 
 A change that alters what a consumer can observe in the published artifact

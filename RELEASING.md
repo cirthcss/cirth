@@ -266,10 +266,10 @@ advertise a beta.
 5. **that commit is reachable from `origin/master`**;
 6. **CI already concluded successfully on that exact commit** — which is
    where the browser suites live (behavior, accessibility, and the visual
-   baselines, the Linux set `tests/visual-baselines.json` pins). The release job
-   reads that result rather than spending twenty minutes reproducing it;
-   if CI was cancelled or never ran, the release fails and the fix is to
-   re-run CI, not to lower the bar;
+   check against the Linux baselines `tests/visual-baselines.json` pins).
+   The release job reads that result rather than spending twenty minutes
+   reproducing it; if CI was cancelled or never ran, the release fails and
+   the fix is to re-run CI, not to lower the bar;
 7. `lint`, `build`, `check:dist`, `check:size`, `docs:build` and
    `check:tooling`, in a clean checkout with nothing left over from
    development;
@@ -295,6 +295,31 @@ provenance is generated automatically, linking the published tarball back
 to this repository, this workflow, and the `master` commit it was built
 from. The trusted publisher is bound to the workflow **filename**, so
 `npm-publish.yml` cannot be renamed without reconfiguring it on npmjs.com.
+
+## The visual-baselines pre-release
+
+The Releases page also lists **Visual test baselines (not a release)**,
+tagged `visual-baselines`. It is not a version of Cirth. It stores the
+visual-regression screenshots as one archive per Playwright project;
+`tests/visual-baselines.json` pins the archives each commit compares
+against, and CI's visual check, which gate 6 depends on, downloads them
+from it.
+
+- **Keep it a pre-release.** `roadmap-sweep.yml` runs on every published
+  release that is not one, and would move the roadmap's Done items to
+  Released.
+- **Never delete it, its tag or its assets by hand.** A commit whose
+  manifest names a missing archive cannot run its visual check, so its CI
+  fails, and so does gate 6 for a release cut from it. The Update visual
+  baselines workflow prunes the archives that no branch, tag or open pull
+  request refers to.
+- **No release step touches it.** `release:prepare` reads no tags;
+  `release:status`, `check:release`, `package.yml` and `npm-publish.yml`
+  each address a release by its own `v*` tag, never the latest one. This
+  tag cannot be mistaken for a version.
+
+A release changes nothing about the baselines: its commit is already on
+`master` with CI green, which means its manifest's archives exist.
 
 ## Subresource Integrity
 
