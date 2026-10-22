@@ -101,8 +101,8 @@ jobs:
           --base origin/master
 
       # --- Gate 2: master was already green at this commit ----------------
-      # The browser suites — behavior, a11y, and the visual baselines, which
-      # are Linux-specific Git LFS objects — run on every push in CI. What
+      # The browser suites (behavior, a11y, and the visual baselines, the
+      # Linux set tests/visual-baselines.json pins) run on every push in CI. What
       # matters for a release is that they passed *on this exact commit*, so
       # this reads that result rather than spending twenty minutes
       # reproducing it. If CI was cancelled or never ran, this fails and the

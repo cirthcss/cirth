@@ -28,8 +28,10 @@ npm install
 npm run setup:hooks
 ```
 
-Git LFS stores the visual-regression baselines. If the repository was cloned
-before Git LFS was installed, run `git lfs pull` before visual tests.
+Git LFS is still required: the repository's Git hooks call it, and commits
+made before October 2026 stored the visual-regression baselines in it. Current
+baselines are not in Git; `npm run check:visual` downloads the ones the
+checked-out commit pins.
 
 Start the documentation locally:
 
@@ -156,9 +158,18 @@ they do not claim that every exact browser-floor release was launched.
 clean result is a verified baseline for those pages, not automatic proof that
 every consumer interface is accessible.
 
-`check:visual` compares rendered pages with reviewed Git LFS baselines.
-Regenerate baselines only when the visual change is intentional, then inspect
-every changed image.
+`check:visual` compares rendered pages with reviewed baselines, one set per
+platform, since font rendering differs between macOS and Linux. Each set is
+an asset of the
+[`visual-baselines`](https://github.com/cirthcss/cirth/releases/tag/visual-baselines)
+pre-release, and `tests/visual-baselines.json` pins the sets each commit
+compares against; `check:visual` downloads the ones for your platform first.
+Regenerate baselines only when the visual change is intentional, with
+`npm run check:visual:update`, and inspect every changed image. A maintainer
+then publishes them with `npm run baselines:push` and commits the updated
+`tests/visual-baselines.json` with the change. CI regenerates and publishes
+the Linux set by itself. `npm run baselines:status` shows which local sets
+are current, stale or changed.
 
 ## Documentation lines
 

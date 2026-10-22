@@ -4,8 +4,11 @@ const { defineConfig } = require("@playwright/test");
 // Baselines live in tests/__screenshots__/<project>-<platform>/ and are
 // platform-specific: system font rendering differs between macOS and
 // Linux, so local (darwin) and CI (linux) each compare against their
-// own committed set. Regenerate deliberately with
-// `npm run check:visual:update` after a wanted visual change.
+// own set. The folders are not in Git: tests/visual-baselines.json pins
+// them, and scripts/visual-baselines.js fetches them from the
+// visual-baselines release. Regenerate deliberately with
+// `npm run check:visual:update` after a wanted visual change, then
+// publish them with `npm run baselines:push`.
 
 const viewports = {
 	desktop: { width: 1440, height: 900 },

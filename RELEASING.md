@@ -266,7 +266,7 @@ advertise a beta.
 5. **that commit is reachable from `origin/master`**;
 6. **CI already concluded successfully on that exact commit** — which is
    where the browser suites live (behavior, accessibility, and the visual
-   baselines, which are Linux-specific Git LFS objects). The release job
+   baselines, the Linux set `tests/visual-baselines.json` pins). The release job
    reads that result rather than spending twenty minutes reproducing it;
    if CI was cancelled or never ran, the release fails and the fix is to
    re-run CI, not to lower the bar;
@@ -373,9 +373,9 @@ npm run check:hooks           # verifies the first is active
   not run a hook a repository merely ships, so `core.hooksPath` has to be
   pointed at `.githooks/`, which `npm run setup:hooks` does locally (never
   `--global`). That directory also carries the Git LFS hooks, because
-  `core.hooksPath` replaces `.git/hooks/` wholesale and the visual
-  baselines live in LFS — dropping them would make pushes succeed with the
-  objects missing.
+  `core.hooksPath` replaces `.git/hooks/` wholesale and commits before
+  October 2026 keep their visual baselines in LFS. Current baselines are
+  release assets, pinned by `tests/visual-baselines.json`.
 - **A Claude Code `PreToolUse` hook** refuses `npm publish`,
   `npm stage publish`, `npm stage approve`, `npm dist-tag add`/`rm`, and
   the same dangerous pushes, before the shell sees them. It covers what

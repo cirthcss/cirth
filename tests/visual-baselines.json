@@ -1,0 +1,30 @@
+{
+	"repository": "cirthcss/cirth",
+	"release": "visual-baselines",
+	"sets": {
+		"dark-desktop-darwin": "295a9399a703ff5dd8e7aacf32aa49115d43dcd4e471068b98fdbd37a9762b12",
+		"dark-desktop-firefox-darwin": "05e310e985d7fcaf68f21da55015523f9423993be39b0c0b49b681aa9a669e6e",
+		"dark-desktop-firefox-linux": "c1b4ebe1af506d9dff2c0d72d058d539f0f1906626f65da07140a0c1f56865ac",
+		"dark-desktop-linux": "7bfb30cf65eb92e2296296623c7244753391d5913f575b73d414d95cc5af5d20",
+		"dark-desktop-webkit-darwin": "d6e4c3ea6052ea597439d8a7fd0d1a72c2bbe62e60374fefbbe194249ba1ca15",
+		"dark-desktop-webkit-linux": "95770e21c5bc7a495b77a7a167367cdbc7f3d7ef495bc836a94d62be3297f99d",
+		"dark-mobile-darwin": "b053277cad4c71f274c4f9ef72ebd526f2ef039eec384d0b203d6eb7be6357f2",
+		"dark-mobile-firefox-darwin": "2f34315aa441bf0e92e6b6c0160fe544a2338e92e980cc949f0e1cfc8a526f96",
+		"dark-mobile-firefox-linux": "6e1fde645cbccd60b89d6e9903054b465a3c5c731290e14e7580bc5829ed295f",
+		"dark-mobile-linux": "1339de923611596e756ce676f955bb5ca299f9e4d17eeaeb9c7e672ec357244a",
+		"dark-mobile-webkit-darwin": "d4c1d23aab4169c34cb48f795812dd0eeb4768d90ad064d52242dc43c91b70cb",
+		"dark-mobile-webkit-linux": "26f0215d7ff253744c905fbc2928df3df7476ed772b648669f78f02cd87484b4",
+		"light-desktop-darwin": "126fa4748de948bf5902e2b80f98426ef229d19159969711a1ec043783ba7a30",
+		"light-desktop-firefox-darwin": "b7613d304695c8579579e8937657e3bf04baca2400695b9aab73ce75ce68c299",
+		"light-desktop-firefox-linux": "c4996207a669718dd3c59abaedcc1a94940b04d4d9e01402ddb9c3adfa6f88d5",
+		"light-desktop-linux": "a00b2cd0c29dd84ee318112f7395cce4bbae3627b61b9e4a3aec65961f48797c",
+		"light-desktop-webkit-darwin": "e08be391bd2ca34b712f32daaadadcac5abe78e402e524246a80c4ddcfd9c5c3",
+		"light-desktop-webkit-linux": "fdb7e5a976e7e43822412f275959806e1482b755d7ba6cb494559b1143416414",
+		"light-mobile-darwin": "d7616290521d4b62630f73b6dc4be6db72d5a2a963febe7b9175f283e6f091d7",
+		"light-mobile-firefox-darwin": "8899ac73bb93e9b5acaa5e8b5cf9dec870e274caeecaf68d217d54b069c78289",
+		"light-mobile-firefox-linux": "d825cfb4deb174ce857a50debc00df453ac25c1d55f01c4fb37fd555bd683eb9",
+		"light-mobile-linux": "a366ce7f95b6d27cfc55bc351ee418304d8b44614be0a78e21b096d7fe39baba",
+		"light-mobile-webkit-darwin": "bfe28098cc5cf2848488a99c13412201a29fec4ef25cd641c54c64d084749d39",
+		"light-mobile-webkit-linux": "5e35c79779dbe3f05d01a5a1b7e40fcc18c04b0479da5c29fcdea6eb0b9804b3"
+	}
+}
