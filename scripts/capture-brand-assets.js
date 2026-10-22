@@ -3,7 +3,7 @@ const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 const { chromium } = require("playwright");
 const { createServer, startServer } = require("./lib/docs-site");
-const { iconSource, icons } = require("./build-brand-marks");
+const { iconSource, icons } = require("./build-brand");
 
 const projectRoot = path.join(__dirname, "..");
 const captures = [

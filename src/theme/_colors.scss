@@ -18,7 +18,7 @@
 // the warning hue as it can before the grey turns sage.
 
 // Families are named for their role, not their hue. The accent's hue
-// (324deg) seeds --cirth-primary; scripts/build-brand-marks.js paints the
+// (324deg) seeds --cirth-primary; scripts/build-brand.js paints the
 // brand mark from it, and `npm run check:brand-assets` fails if a step it
 // reads is renamed. specs/default-palette.md records why this hue.
 

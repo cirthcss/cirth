@@ -1,24 +1,31 @@
 const fs = require("node:fs");
 const path = require("node:path");
-const { drawing, pigment, publicDir, scaleStep } = require("./lib/brand-mark");
+const { boundingBox, drawing, namePaths, pigment, publicDir, scaleStep } = require("./lib/brand-mark");
 
-// Writes every published file of the mark from two sources, so that none
-// of them is a hand-made copy:
+// Writes every published SVG of the mark and the lockup, and the web
+// manifest, from three sources, so that none of them is a hand-made copy:
 //
-//   drawing    docs/brand/cirth-mark.svg   (the badge)
-//   pigment    src/theme/_colors.scss      (accent, neutral and canvas steps)
+//   drawing    docs/brand/cirth-mark.svg            (the badge)
+//   name       docs/brand/cirth-wordmark-onest.svg  (the word in lowercase,
+//                                                    outlined from Onest,
+//                                                    SIL OFL 1.1)
+//   pigment    src/theme/_colors.scss               (accent, neutral and
+//                                                    canvas steps)
 //
-// The drawing is the one thing a person edits. Painting it from the
-// theme's scales or framing it for an icon is mechanical, and a mechanical
-// copy kept by hand is the copy that goes stale. `npm run
-// check:brand-assets` compares the files on disk with what this module
-// produces.
+// The drawing and the name are the things a person edits. Painting them
+// from the theme's scales, framing the badge for an icon or setting it
+// beside the name is mechanical, and a mechanical copy kept by hand is the
+// copy that goes stale. `npm run check:brand-assets` compares the files on
+// disk with what this module produces; capture-brand-assets.js renders the
+// rasters from them.
 //
 // One drawing serves every size, from the 16px tab icon to the README
 // header, and one file serves both schemes: on a dark ground the figure's
 // dark ink meets the page at the foot of the badge, and the magenta disc
 // draws the rest of its edge. There is no one-colour file, since a drawing
 // in several inks has no mechanical one-ink version.
+
+// ––– The mark –––
 
 // Which step each role takes. The disc is the light accent itself, the
 // colour of a primary button. The figure's two inks are the two ends of
@@ -44,8 +51,10 @@ const painted = () => {
 	return drawing({ disc: p.disc, light: p.light, dark: p.dark });
 };
 
+// Frames are written to two decimals, the lockup's transforms to three:
+// each is the precision its files have always had.
 /** @param {number} value */
-const round = (value) => Math.round(value * 100) / 100;
+const roundFrame = (value) => Math.round(value * 100) / 100;
 
 /**
  * The square the drawing is shown in, centred on its disc.
@@ -70,7 +79,7 @@ const frame = (mark, inset) => {
 	);
 	const side = inset === "whole" ? disc.width + 2 * overhang : disc.width / (1 - 2 * inset);
 	if (typeof inset === "number" && inset > 0 && (side - disc.width) / 2 < overhang) {
-		throw new Error(`build-brand-marks: the drawing reaches past an inset of ${inset}`);
+		throw new Error(`build-brand: the drawing reaches past an inset of ${inset}`);
 	}
 	return { x: disc.x + disc.width / 2 - side / 2, y: disc.y + disc.height / 2 - side / 2, side };
 };
@@ -84,9 +93,9 @@ const frame = (mark, inset) => {
 const framed = ({ inset, size, ground = false }) => {
 	const mark = painted();
 	const { x, y, side } = frame(mark, inset);
-	const box = `${round(x)} ${round(y)} ${round(side)} ${round(side)}`;
+	const box = `${roundFrame(x)} ${roundFrame(y)} ${roundFrame(side)} ${roundFrame(side)}`;
 	const paper = ground
-		? `<rect x="${round(x)}" y="${round(y)}" width="${round(side)}" height="${round(side)}" fill="${pigments().paper}"/>\n`
+		? `<rect x="${roundFrame(x)}" y="${roundFrame(y)}" width="${roundFrame(side)}" height="${roundFrame(side)}" fill="${pigments().paper}"/>\n`
 		: "";
 	return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="${box}" role="img" aria-label="Cirth">
 <title>Cirth</title>
@@ -164,11 +173,109 @@ const manifest = (paper) =>
 		2,
 	)}\n`;
 
+// ––– The lockup –––
+
+// The badge with "cirth" beside it. The name is outlines, not text, so the
+// lockup renders the same on every platform and needs no font installed.
+// There is one lockup, written twice for the name's ink on a light and on
+// a dark ground: the README, the share card, the Brand page and the site
+// header and footer, where it is drawn 34px high, all use it.
+
+// Both halves are measured from their geometry. The name is set in
+// lowercase, so its reference is its whole ink, from the top of the
+// ascenders to the foot of the round letters. The ink of its first glyph,
+// the round c, is the x-height plus its overshoot.
+const NAME = namePaths();
+const NAME_BOX = boundingBox(NAME);
+const X_BOX = boundingBox([NAME[0]]);
+
+// The badge's disc is this many times the height of the name's ink.
+const MARK_RATIO = 1.55;
+
+// How the two halves are aligned: the centre of the disc on the middle of
+// the name's ink. The badge is round, so its centre is also its optical
+// centre.
+
+// The gap between the disc and the name, as a fraction of the height of
+// the name's ink.
+const GAP_RATIO = 0.3;
+
+// The lockup's own height, in user units: the size its SVG declares.
+const HEIGHT = 108;
+
+/** @param {number} value */
+const roundLockup = (value) => Math.round(value * 1000) / 1000;
+
+const layout = () => {
+	const mark = painted();
+	// Lay both halves out in the name's units, then scale the whole to
+	// HEIGHT.
+	const inkCentre = NAME_BOX.y + NAME_BOX.height / 2;
+	const xCentre = X_BOX.y + X_BOX.height / 2;
+	const scale = (MARK_RATIO * NAME_BOX.height) / mark.disc.height;
+	const discCentre = mark.disc.y + mark.disc.height / 2;
+	/** @param {number} y a height in the drawing, as one in the name's units */
+	const toName = (y) => inkCentre + (y - discCentre) * scale;
+	const top = Math.min(toName(mark.ink.y), NAME_BOX.y);
+	const bottom = Math.max(toName(mark.ink.y + mark.ink.height), NAME_BOX.y + NAME_BOX.height);
+	const unit = HEIGHT / (bottom - top);
+	const markWidth = mark.ink.width * scale * unit;
+	const nameX = markWidth + GAP_RATIO * NAME_BOX.height * unit;
+	const width = nameX + NAME_BOX.width * unit;
+	return {
+		mark,
+		markTransform: `translate(0 ${roundLockup((toName(0) - top) * unit)}) scale(${roundLockup(scale * unit)}) translate(${roundLockup(-mark.ink.x)} 0)`,
+		nameTransform: `translate(${roundLockup(nameX)} 0) scale(${roundLockup(unit)}) translate(${roundLockup(-NAME_BOX.x)} ${roundLockup(-top)})`,
+		width: roundLockup(width),
+		// Where the middle of the name's x-height falls, as a share of the
+		// lockup's height: what a page needs to centre the name, rather than
+		// the lockup's box, on the text beside it. A lowercase word reads on
+		// its x-height, so that band is the one lined up with the text.
+		nameCentre: roundLockup((xCentre - top) / (bottom - top)),
+	};
+};
+
+/**
+ * @param {object} variant
+ * @param {string} variant.nameFill
+ * @param {string} variant.title
+ */
+const lockup = ({ nameFill, title }) => {
+	const { mark, markTransform, nameTransform, width } = layout();
+	const name = NAME.map((d) => `    <path d="${d}"/>`).join("\n");
+	return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${HEIGHT}" viewBox="0 0 ${width} ${HEIGHT}" role="img" aria-label="Cirth">
+  <title>${title}</title>
+  <g transform="${markTransform}">
+${mark.body}
+  </g>
+  <g transform="${nameTransform}" fill="${nameFill}">
+${name}
+  </g>
+</svg>
+`;
+};
+
+/** The lockup's box, for the pages that reserve its space. */
+const boxes = () => {
+	const { width, nameCentre } = layout();
+	return { height: HEIGHT, width, nameCentre };
+};
+
+// ––– Everything it writes –––
+
 /** @returns {Record<string, string>} Every generated file, by name, as it should read on disk. */
 const variants = () => ({
 	"logo_brand.svg": full(),
 	"favicon.svg": framed({ inset: 0, size: 32 }),
 	"site.webmanifest": manifest(pigments().paper),
+	"wordmark.svg": lockup({
+		nameFill: pigment("neutral-900"),
+		title: "Cirth — horizontal lockup, light backgrounds",
+	}),
+	"wordmark_dark.svg": lockup({
+		nameFill: pigment("neutral-100"),
+		title: "Cirth — horizontal lockup, dark backgrounds",
+	}),
 });
 
 // What the Brand page prints: each painted role's step and value, from the
@@ -180,12 +287,12 @@ const palette = () => {
 	return { disc: entry("disc"), light: entry("light"), dark: entry("dark"), paper: entry("paper") };
 };
 
-module.exports = { iconSource, icons, palette, painted, roles, variants };
+module.exports = { HEIGHT, MARK_RATIO, boxes, iconSource, icons, painted, palette, roles, variants };
 
 if (require.main === module) {
 	const files = variants();
 	for (const [file, content] of Object.entries(files)) {
 		fs.writeFileSync(path.join(publicDir, file), content);
 	}
-	console.log(`[cirth] brand marks generated: ${Object.keys(files).join(", ")}`);
+	console.log(`[cirth] brand files generated: ${Object.keys(files).join(", ")}`);
 }

@@ -2,12 +2,11 @@ const fs = require("node:fs");
 const path = require("node:path");
 const process = require("node:process");
 const { DRAWING, read } = require("./lib/brand-mark");
-const marks = require("./build-brand-marks");
-const lockups = require("./build-brand-lockup");
+const brand = require("./build-brand");
 
 // Every Cirth brand asset is generated from the drawing in docs/brand/ and
-// the theme's scales: the marks, the favicon and the manifest by
-// build-brand-marks.js, the lockups by build-brand-lockup.js. Nothing in the
+// the theme's scales: the marks, the favicon, the manifest and the lockups,
+// all by build-brand.js. Nothing in the
 // build runs them, so a redrawn mark or a moved accent step leaves the
 // files on disk describing the old one until someone regenerates them.
 //
@@ -17,7 +16,7 @@ const lockups = require("./build-brand-lockup");
 // regenerated after the drawing or the scale moved.
 
 /** @type {Record<string, string>} */
-const generated = { ...marks.variants(), ...lockups.variants() };
+const generated = brand.variants();
 /** @type {string[]} */
 const failures = [];
 const SOURCES = path.relative(path.join(__dirname, ".."), DRAWING.file);
@@ -40,11 +39,11 @@ for (const [file, expected] of Object.entries(generated)) {
 
 // Nothing brand-named is left over: every SVG is one the generators write,
 // every mark or lockup PNG is the raster of one of those SVGs, and every
-// icon is one `icons` in build-brand-marks.js declares. A variant the
+// icon is one `icons` in build-brand.js declares. A variant the
 // generators stopped writing would otherwise stay published, unnoticed.
 const publicDir = path.join(__dirname, "../docs/public");
 /** @type {Map<string, { file: string, sizes: number[] }>} */
-const declaredIcons = new Map(marks.icons.map((icon) => [icon.file, icon]));
+const declaredIcons = new Map(brand.icons.map((icon) => [icon.file, icon]));
 for (const file of fs.readdirSync(publicDir)) {
 	if (declaredIcons.has(file)) continue;
 	if (!/^(?:logo_|favicon|wordmark|mark_|icon-|apple-touch-icon)/.test(file)) continue;

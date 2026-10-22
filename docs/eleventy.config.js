@@ -14,11 +14,10 @@ const { docsPathPrefix } = require("../scripts/lib/docs-site");
 const { measuredTheme } = require("../scripts/lib/measured-theme");
 // Brand data comes from the generators. A running dev server reloads this
 // file but keeps required modules cached, so they are dropped first.
-for (const id of ["../scripts/build-brand-lockup", "../scripts/build-brand-marks", "../scripts/lib/brand-mark"]) {
+for (const id of ["../scripts/build-brand", "../scripts/lib/brand-mark"]) {
 	delete require.cache[require.resolve(id)];
 }
-const { palette: brandPalette } = require("../scripts/build-brand-marks");
-const brandLockup = require("../scripts/build-brand-lockup");
+const brand = require("../scripts/build-brand");
 const { documentedVersion } = require("../scripts/lib/documented-version");
 const { readResults: markupBenchmark } = require("../scripts/lib/markup-benchmark");
 const frameworks = require("./src/_data/frameworks.js");
@@ -244,7 +243,7 @@ module.exports = (eleventyConfig) => {
 	// without a build, where the pages print token names only.
 	eleventyConfig.addGlobalData("measured", measuredTheme(path.join(docsRoot, "..")));
 	// The scale steps the brand files are painted with.
-	eleventyConfig.addGlobalData("brandMark", brandPalette());
+	eleventyConfig.addGlobalData("brandMark", brand.palette());
 	// The icons' URLs, each with a hash of the file's content. Browsers keep
 	// a favicon by its URL long after the file behind it changes (Safari
 	// across reloads and restarts), so a redrawn icon has to be a new URL.
@@ -262,9 +261,9 @@ module.exports = (eleventyConfig) => {
 		};
 	});
 	// The lockup's box, so every <img> reserves its space, and where its
-	// name's capitals are centred, for the header: `brandLockup.width`,
+	// name's x-height is centred, for the header: `brandLockup.width`,
 	// `brandLockup.height` and `brandLockup.nameCentre`.
-	eleventyConfig.addGlobalData("brandLockup", brandLockup.boxes());
+	eleventyConfig.addGlobalData("brandLockup", brand.boxes());
 	// The markup comparison, read through its check, so fixtures edited without
 	// `npm run benchmark` fail the build.
 	eleventyConfig.addGlobalData("benchmark", markupBenchmark());

@@ -60,14 +60,6 @@ const pigment = (name) => {
 	return `#${channel(r)}${channel(g)}${channel(b)}`;
 };
 
-/**
- * The `d` command of every path in an SVG, in document order.
- *
- * @param {string} svg
- * @returns {string[]}
- */
-const pathData = (svg) => [...svg.matchAll(/<path[^>]*\sd="([^"]+)"/g)].map((m) => m[1]);
-
 // Exact bounds for a path. Straight segments are exact by inspection;
 // Bezier segments and elliptical arcs are exact at their extrema, found by
 // solving the derivative rather than by sampling the curve.
@@ -677,4 +669,4 @@ const drawing = (paint) => {
 	return { viewBox: { x: box[0], y: box[1], width: box[2], height: box[3] }, body, ink, disc };
 };
 
-module.exports = { DRAWING, NAME_SOURCE, absolutePath, boundingBox, drawing, namePaths, pathData, pigment, publicDir, read, scaleStep };
+module.exports = { DRAWING, NAME_SOURCE, absolutePath, boundingBox, drawing, namePaths, pigment, publicDir, read, scaleStep };

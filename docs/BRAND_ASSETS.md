@@ -12,22 +12,22 @@ docs/brand/cirth-mark.svg                        the badge, drawn by a person
 docs/brand/cirth-wordmark-onest.svg              the name: outlines, edited by a person
 src/theme/_colors.scss                           the pigments: accent, neutral and canvas steps
   |
-  |-- npm run docs:marks ---------> logo_brand, favicon, site.webmanifest
-  |-- npm run docs:lockup --------> wordmark, wordmark_dark
-  '-- npm run docs:brand-assets --> both of the above, then the rasters:
-                                    logo_*.png, wordmark*.png, the icons
-                                    (favicon.ico, apple-touch-icon.png,
-                                    icon-*.png), social-preview.png
+  |-- node scripts/build-brand.js --> logo_brand, favicon, site.webmanifest,
+  |                                   wordmark, wordmark_dark
+  '-- npm run docs:brand-assets ----> the above, then the rasters:
+                                      logo_*.png, wordmark*.png, the icons
+                                      (favicon.ico, apple-touch-icon.png,
+                                      icon-*.png), social-preview.png
 ```
 
-`scripts/build-brand-marks.js` writes the marks, the favicon and the
-manifest, and declares the raster icons (`icons`); `scripts/build-brand-lockup.js`
-writes the lockups; `scripts/capture-brand-assets.js` renders the PNGs from
-those SVGs, each icon from its own SVG at each of its sizes, and the share
-cards from their pages in `docs/dist`, so it needs a current docs build.
-`scripts/lib/brand-mark.js` reads the drawing for both generators: it paints
-it, strips what describes the drawing's history rather than the mark, and
-measures its ink.
+`scripts/build-brand.js` writes the mark, the favicon, the manifest and the
+lockups, and declares the raster icons (`icons`);
+`scripts/capture-brand-assets.js` renders the PNGs from those SVGs, each icon
+from its own SVG at each of its sizes, and the share cards from their pages
+in `docs/dist`, so it needs a current docs build. `scripts/lib/brand-mark.js`
+reads the drawing and the name for it: it paints the drawing, strips what
+describes the drawing's history rather than the mark, and measures the ink
+of both.
 
 `npm run check:brand-assets` (part of `npm run lint`) regenerates every SVG
 and the manifest in memory and fails when a file on disk differs from it,
@@ -83,7 +83,7 @@ Cirth, and the lockup SVGs keep `aria-label="Cirth"`.
 
 ## Pigments
 
-Assigned in `roles` in `scripts/build-brand-marks.js`:
+Assigned in `roles` in `scripts/build-brand.js`:
 
 | Role | Step | Used by |
 | --- | --- | --- |
@@ -98,16 +98,16 @@ figure's two inks are the two ends of `--cirth-ink-strong`, the darkest and
 the lightest neutral the interface sets text in. The lockup's name takes
 `$neutral-900` on light, the figure's dark ink, and `$neutral-100` on dark.
 The Brand page prints the painted values from the same function
-(`palette()` in `build-brand-marks.js`).
+(`palette()` in `build-brand.js`).
 
 ## Inventory
 
 | File | Used by | Produced by | Notes |
 | --- | --- | --- | --- |
-| `logo_brand.svg` | Brand page, home page orbit | `docs:marks` | The drawing, painted. Declared 512px, the source's view box |
-| `favicon.svg` | `base.njk`, the specimens | `docs:marks` | The drawing in its disc's square, edge to edge, on a transparent ground. Declared 32px |
-| `site.webmanifest` | `base.njk` | `docs:marks` | The `icons` marked for the manifest; colours from `$canvas-light` |
-| `wordmark.svg`, `wordmark_dark.svg` | README title, site header, mobile menu and footer, share card, Brand page | `docs:lockup` | Badge and outlined name |
+| `logo_brand.svg` | Brand page, home page orbit | `build-brand.js` | The drawing, painted. Declared 512px, the source's view box |
+| `favicon.svg` | `base.njk`, the specimens | `build-brand.js` | The drawing in its disc's square, edge to edge, on a transparent ground. Declared 32px |
+| `site.webmanifest` | `base.njk` | `build-brand.js` | The `icons` marked for the manifest; colours from `$canvas-light` |
+| `wordmark.svg`, `wordmark_dark.svg` | README title, site header, mobile menu and footer, share card, Brand page | `build-brand.js` | Badge and outlined name |
 | `logo_brand.png` | Brand page downloads | `capture-brand-assets.js` | 1024 x 1024, transparent |
 | `wordmark*.png` (two) | Brand page downloads | `capture-brand-assets.js` | 4x the SVG's box |
 | `social-preview.png` | `base.njk` `og:image`, absolute GitHub Pages URL | `capture-brand-assets.js` | Renders `share-card.njk`, which embeds the lockup |
@@ -126,7 +126,7 @@ The Brand page prints the painted values from the same function
 
 ## Icons
 
-Every icon is declared once in `icons` in `build-brand-marks.js` and
+Every icon is declared once in `icons` in `build-brand.js` and
 rendered by `capture-brand-assets.js` from its own SVG at each of its
 sizes, never scaled from another raster.
 
@@ -148,7 +148,7 @@ to be installed as an app, and the icons serve a shortcut to it.
 
 ## The lockup
 
-`build-brand-lockup.js` sets the badge beside the name with the centre of
+`build-brand.js` sets the badge beside the name with the centre of
 the disc on the middle of the name's ink, from the top of the ascenders to
 the foot of the round letters. The badge is round, so its centre is also its
 optical centre. The disc is 1.55 times the height of the name's ink
