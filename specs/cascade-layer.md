@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | gh#124, superseding the "do not wrap" decision recorded in gh#110 |
-| Status | Implementing |
+| Status | Landed in v0.16.0 |
 | Baseline | `c4dcd4c5` on `master`; implemented in `7a98b5d6` on `feat/issue-124-cascade-layers` |
 | Breaking | Yes — cascade only; no class, token, file or markup change |
 

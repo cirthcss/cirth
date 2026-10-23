@@ -11,10 +11,11 @@ const {
 	parseColor,
 	simulateCvd,
 } = require("../scripts/lib/color");
+const { listPresetNames } = require("../scripts/lib/presets");
 
 assertDocsBuilt("framework-specimen.spec");
 
-const specimens = ["default", "plain", "playroom", "blue"];
+const specimens = ["default", ...listPresetNames(), "blue"];
 /** @type {import("node:http").Server} */
 let server;
 /** @type {string} */
@@ -107,7 +108,7 @@ for (const specimen of specimens) {
 		// The radius is a *pair*, not a number: a container is one step
 		// softer than the controls inside it, so a card reads as a sheet
 		// holding buttons rather than as a big button. A preset is expected
-		// to move both ends of that pair: plain squares them off, playroom
+		// to move both ends of that pair: plain squares them off, material
 		// rounds them, and the invariant is the relationship, not the value
 		// it had in the default theme.
 		const geometry = await page
@@ -126,10 +127,15 @@ for (const specimen of specimens) {
 			});
 		expect(geometry.bottom).toBe(geometry.top);
 		expect(geometry.radius).toBeGreaterThanOrEqual(0);
-		expect(
-			geometry.cardRadius,
-			`${specimen}: the container radius is not softer than the control radius`,
-		).toBeGreaterThan(geometry.radius);
+		// A square preset zeroes both ends; otherwise the container is softer.
+		if (geometry.radius === 0) {
+			expect(geometry.cardRadius, `${specimen}: a square preset squares its containers too`).toBe(0);
+		} else {
+			expect(
+				geometry.cardRadius,
+				`${specimen}: the container radius is not softer than the control radius`,
+			).toBeGreaterThan(geometry.radius);
+		}
 
 		const buttonGeometry = await page
 			.getByRole("button", { name: "Approve selected" })
@@ -243,7 +249,7 @@ for (const specimen of specimens) {
 					`${specimen} ${scheme} ${name}: danger label`,
 				).toBeGreaterThanOrEqual(4.5);
 				// A label carries the meaning; this modest perceptual-distance floor
-				// additionally prevents copper and destructive red collapsing into
+				// additionally prevents the accent and destructive red collapsing into
 				// one fill when red/green discrimination is reduced.
 				expect(
 					oklabDistance(primaryFill, dangerFill),
@@ -303,7 +309,13 @@ for (const specimen of specimens) {
 				`${specimen} ${scheme}: disabled range is inert`,
 			).toEqual(disabledRest);
 			expect(disabledRest.pointerEvents).toBe("none");
-			expect(Number.parseFloat(disabledRest.opacity)).toBeLessThan(1);
+			// Disabled is a neutral state, not a transparency
+			// (specs/control-emphasis.md): the thumb takes the disabled ink
+			// instead of fading the accent.
+			expect(Number.parseFloat(disabledRest.opacity)).toBe(1);
+			// The custom property holds the resolved relative colour, so its
+			// signature is the half-strength ink rather than the token name.
+			expect(disabledRest.thumb.trim()).toMatch(/l c h \/ 50%\)$/);
 		});
 	}
 }
@@ -314,7 +326,7 @@ for (const specimen of specimens) {
 // identical radius, identical stroke, which made the shipped presets a
 // demonstration of one token and left the rest of the contract unexercised.
 // A preset is supposed to be the worked example of what the token surface
-// can do, so plain and playroom now also move the radius pair, the spacing
+// can do, so the presets now also move the radius pair, the spacing
 // rhythm and the transition. What must not move is the part docs/brand.md
 // calls the structural signature: one hairline on every resting edge, the
 // 44px control floor, and the radius *pairing*. Those are asserted below,
@@ -365,16 +377,20 @@ test("presets change the dialect, not the grammar", async ({ page }) => {
 		// 24px AA minimum, and never as far as pretending to be a form.
 		expect(value.navButtonHeight, name).toBeGreaterThanOrEqual(40);
 		expect(value.navButtonHeight, name).toBeLessThan(44);
-		// The pair holds wherever the scale is moved to.
-		expect(value.cardRadius, name).toBeGreaterThan(value.controlRadius);
+		// The pair holds wherever the scale is moved to, zero included.
+		if (value.controlRadius === 0) {
+			expect(value.cardRadius, name).toBe(0);
+		} else {
+			expect(value.cardRadius, name).toBeGreaterThan(value.controlRadius);
+		}
 	}
 
 	// One stroke width across the whole lineup.
 	expect(
 		new Set(values.map(({ borderBottomWidth }) => borderBottomWidth)).size,
 	).toBe(1);
-	// Four distinct accents...
-	expect(new Set(values.map(({ primary }) => primary)).size).toBe(4);
+	// One distinct accent per specimen...
+	expect(new Set(values.map(({ primary }) => primary)).size).toBe(specimens.length);
 	// ...and at least two distinct geometries, which is what stops a preset
 	// from being a palette with extra steps.
 	expect(
@@ -399,6 +415,8 @@ const controlStyle = (locator) =>
 			borderTopColor: style.borderTopColor,
 			borderTopWidth: style.borderTopWidth,
 			boxShadow: style.boxShadow,
+			outline: `${style.outlineStyle} ${style.outlineWidth} ${style.outlineColor}`,
+			outlineOffset: style.outlineOffset,
 			color: style.color,
 			height: element.getBoundingClientRect().height,
 			radius: style.borderRadius,
@@ -462,8 +480,11 @@ for (const specimen of specimens) {
 				true,
 			);
 			const focusInput = await controlStyle(input);
-			expect(focusInput.boxShadow).not.toBe("none");
-			expect(focusInput.boxShadow).not.toBe(hoverInput.boxShadow);
+			// Focus is one outline held off the edge (specs/control-emphasis.md),
+			// not a box-shadow band against it; the edge keeps its rest colour.
+			expect(focusInput.outline).toMatch(/solid/);
+			expect(focusInput.outline).not.toBe(hoverInput.outline);
+			expect(focusInput.outlineOffset).not.toBe("0px");
 
 			await page.goto(url);
 			const primary = page.locator("[data-state-button]");
@@ -505,8 +526,10 @@ for (const specimen of specimens) {
 				await focusVisibly(page, variant);
 				await page.waitForTimeout(transitionDuration);
 				const focus = await controlStyle(variant);
-				expect(focus.boxShadow).not.toBe("none");
-				expect(focus.boxShadow).not.toBe(rest.boxShadow);
+				// One outline, held off the fill (specs/control-emphasis.md).
+				expect(focus.outline).toMatch(/^solid/);
+				expect(focus.outline).not.toBe(rest.outline);
+				expect(focus.outlineOffset).not.toBe("0px");
 			}
 
 			await page.goto(url);
@@ -531,7 +554,6 @@ for (const specimen of specimens) {
 			}
 
 			const flatSelectors = [
-				"[data-state-card]",
 				"[data-state-code]",
 				"[data-state-button]",
 				"[data-state-outline]",
@@ -557,6 +579,22 @@ for (const specimen of specimens) {
 					`unexpected shadow: ${style.boxShadow}`,
 				).toBe(true);
 			}
+
+			// A card is a sheet with a contact shadow, not a panel with an
+			// overlay one (specs/surface-depth.md): whatever it casts is the
+			// card token, one layer or none, never inset.
+			const card = page.locator("[data-state-card]");
+			const cardShadow = await card.evaluate((element) => {
+				const probe = document.createElement("div");
+				probe.style.boxShadow = "var(--cirth-card-box-shadow)";
+				element.append(probe);
+				const token = getComputedStyle(probe).boxShadow;
+				probe.remove();
+				return { cast: getComputedStyle(element).boxShadow, token };
+			});
+			expect(cardShadow.cast).toBe(cardShadow.token);
+			expect(cardShadow.cast).not.toMatch(/inset/);
+			expect(cardShadow.cast.split(/,(?![^(]*\))/)).toHaveLength(1);
 
 			const details = page.locator("[data-state-accordion]");
 			const summary = details.locator("summary");
@@ -606,6 +644,96 @@ for (const specimen of specimens) {
 	}
 }
 
+// In a group of actions the primary is the heaviest (specs/control-emphasis.md):
+// its fill, composited over what the group sits on, stands further from it
+// in luminance contrast than any secondary, outline or ghost beside it, for
+// every accent, in both schemes and under prefers-contrast: more. `.danger`
+// and `.contrast` are alternative primaries and are not compared.
+for (const specimen of specimens) {
+	for (const scheme of /** @type {const} */ (["light", "dark"])) {
+		for (const more of [false, true]) {
+			test(`${specimen} ${scheme}${more ? " more" : ""}: the primary is the heaviest action in its group`, async ({
+				page,
+			}) => {
+				if (more) {
+					await page.emulateMedia({ contrast: "more" });
+					await page.setContent(
+						"<style>#s{color:rgb(255,0,0)}@media (prefers-contrast: more){#s{color:rgb(0,255,0)}}</style><p id=s>s</p>",
+					);
+					const reported = await page
+						.locator("#s")
+						.evaluate((element) => getComputedStyle(element).color === "rgb(0, 255, 0)");
+					test.skip(!reported, "this engine does not expose prefers-contrast to automation");
+				}
+				await page.emulateMedia({ colorScheme: scheme, contrast: more ? "more" : "no-preference" });
+				await page.goto(`${origin}/specimen/${specimen}/`);
+
+				const groups = await page.evaluate(() => {
+					const canvas = document.createElement("canvas");
+					canvas.width = canvas.height = 1;
+					const context = /** @type {CanvasRenderingContext2D} */ (
+						canvas.getContext("2d", { willReadFrequently: true })
+					);
+					/** @param {string[]} layers */
+					const fill = (layers) => {
+						context.clearRect(0, 0, 1, 1);
+						for (const layer of layers) {
+							context.fillStyle = layer;
+							context.fillRect(0, 0, 1, 1);
+						}
+						const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
+						return /** @type {[number, number, number]} */ ([r, g, b]);
+					};
+					/** @param {Element} element */
+					const ground = (element) => {
+						const layers = [];
+						for (let node = element.parentElement; node; node = node.parentElement) {
+							layers.unshift(getComputedStyle(node).backgroundColor);
+						}
+						return layers;
+					};
+					return [...document.querySelectorAll('[role="group"], footer')]
+						.map((group) => {
+							const buttons = [...group.querySelectorAll(":scope > button, :scope > * > button")].filter(
+								(button) => !button.matches(".danger, .contrast"),
+							);
+							if (!buttons.some((button) => button.classList.length === 0)) return null;
+							const under = ground(buttons[0]);
+							return {
+								name: group.getAttribute("aria-label") ?? group.tagName.toLowerCase(),
+								ground: fill(under),
+								buttons: buttons.map((button) => ({
+									label: (button.textContent ?? "").trim(),
+									primary: button.classList.length === 0,
+									fill: fill([...under, getComputedStyle(button).backgroundColor]),
+								})),
+							};
+						})
+						.filter((group) => group !== null);
+				});
+
+				/** @param {[number, number, number]} rgb */
+				const color = ([r, g, b]) => ({ r: r / 255, g: g / 255, b: b / 255, alpha: 1 });
+				expect(groups.length, "groups with a primary action").toBeGreaterThan(0);
+				for (const group of groups) {
+					const weight = group.buttons.map((button) => ({
+						...button,
+						contrast: contrastColors(color(button.fill), color(group.ground)),
+					}));
+					const primary = weight.filter((button) => button.primary);
+					const others = weight.filter((button) => !button.primary);
+					const line = weight.map((button) => `${button.label} ${button.contrast.toFixed(2)}`).join(", ");
+					for (const button of primary) {
+						for (const other of others) {
+							expect(button.contrast, `${group.name}: ${line}`).toBeGreaterThan(other.contrast);
+						}
+					}
+				}
+			});
+		}
+	}
+}
+
 test("multiline accordion keeps its full target at 320px", async ({ page }) => {
 	await page.setViewportSize({ width: 320, height: 720 });
 	await page.goto(`${origin}/specimen/states/default/`);
@@ -642,7 +770,7 @@ test("dark progress follows each public primary instead of one fixed accent", as
 		);
 	}
 
-	expect(new Set(values).size).toBe(4);
+	expect(new Set(values).size).toBe(specimens.length);
 });
 
 test("dialog behavior is specimen-only and keyboard reachable", async ({

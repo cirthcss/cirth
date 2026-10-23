@@ -6,7 +6,9 @@ const {
 	startServer,
 } = require("../scripts/lib/docs-site");
 const { withAndWithoutScrollbar } = require("./helpers/viewport");
+const { listPresetNames, presetsSourceDir } = require("../scripts/lib/presets");
 const versions = require("../docs/src/_data/versions.js");
+const frameworks = require("../docs/src/_data/frameworks.js");
 
 assertDocsBuilt("docs-stack.spec");
 
@@ -42,92 +44,68 @@ test.afterAll(() => {
 const tabSkipsButtons = (browserName) => browserName === "webkit";
 
 /**
- * The hero is a source card and the interface it produces, overlapping:
- * not one panel split in two, and not two panels: only the source is in a
- * frame. The geometry worth pinning is the relationship between them: the
- * output reaches back over the source by a real, bounded amount, sits
- * below it, and neither leaves the stage. An overlap built out of flow
- * rather than out of absolute positioning is exactly the thing that can
- * quietly start clipping at some width, which is what this asserts
- * against.
+ * The hero's demo is two surfaces, one over the other: the source slab and
+ * the card it renders, laid over the slab so both read at once. What has to
+ * hold at every width is that the card never hides the source: no line of
+ * code sits under it. Both stay inside the figure, the card sits after the
+ * source on the block axis (it starts lower), and the listing never needs
+ * a horizontal scrollbar down to a 360px phone.
  * @param {import("@playwright/test").Page} page
  */
 const assertHeroDemoGeometry = async (page) => {
-	const stageBox = await page.locator(".docs-lab-stage").boundingBox();
-	const sourceBox = await page.locator(".docs-source-panel").boundingBox();
-	const outputBox = await page.locator(".docs-output-frame").boundingBox();
-	const frameBox = await page.locator("[data-lab-frame]").boundingBox();
-	if (!stageBox || !sourceBox || !outputBox || !frameBox) {
-		throw new Error("Expected the source card and the output");
-	}
+	const width = page.viewportSize()?.width ?? 0;
+	const geometry = await page.evaluate(() => {
+		const figure = /** @type {HTMLElement} */ (document.querySelector(".docs-hero-demo"));
+		const source = /** @type {HTMLElement} */ (document.querySelector(".docs-hero-source"));
+		const card = /** @type {HTMLElement} */ (document.querySelector(".docs-hero-render > article"));
+		const code = /** @type {HTMLElement} */ (source.querySelector("pre code"));
+		const range = document.createRange();
+		range.selectNodeContents(code);
+		const lines = [...range.getClientRects()].filter((rect) => rect.width > 0);
+		const box = (/** @type {DOMRect} */ rect) => ({
+			left: rect.left,
+			right: rect.right,
+			top: rect.top,
+			bottom: rect.bottom,
+		});
+		return {
+			figure: box(figure.getBoundingClientRect()),
+			source: box(source.getBoundingClientRect()),
+			card: box(card.getBoundingClientRect()),
+			lines: lines.map(box),
+		};
+	});
 
-	// The iframe fills its surface exactly: no letterbox, no overhang.
-	// The surface is the output itself now, and there is no panel around it:
-	// so this is the frame against its own box.
-	expect(Math.abs(frameBox.y - outputBox.y)).toBeLessThanOrEqual(1);
-	expect(
-		Math.abs(
-			frameBox.y + frameBox.height - (outputBox.y + outputBox.height),
-		),
-	).toBeLessThanOrEqual(1);
-
-	// Neither card escapes the stage on either edge, at any width.
-	expect(Math.min(sourceBox.x, outputBox.x)).toBeGreaterThanOrEqual(
-		stageBox.x - 1,
-	);
-	expect(
-		Math.max(sourceBox.x + sourceBox.width, outputBox.x + outputBox.width),
-	).toBeLessThanOrEqual(stageBox.x + stageBox.width + 1);
-
-	// Stacked is the case where the two cards share a column: same x, same
-	// width. Reading it off the vertical relation instead would get mobile
-	// backwards, where the output is ordered first and therefore sits
-	// entirely above the source.
-	const stacked =
-		Math.abs(outputBox.x - sourceBox.x) <= 1 &&
-		Math.abs(outputBox.width - sourceBox.width) <= 1;
-	if (!stacked) {
-		// Overlapping: the output reaches back over the source by an amount
-		// you can see rather than by a hairline.
-		const overlapX = sourceBox.x + sourceBox.width - outputBox.x;
-		expect(overlapX).toBeGreaterThan(8);
-		expect(overlapX).toBeLessThan(sourceBox.width / 2);
-
-		// And it is centred on the card it overlaps. It used to sit on the
-		// row's end edge, which put its middle 154px below the source's and
-		// read as a stack that had slipped. Measured against the *card*
-		// rather than the row, which is the whole point: a row-centred
-		// output would be 20px low, on the source's own bottom margin.
-		const sourceCentre = sourceBox.y + sourceBox.height / 2;
-		const outputCentre = outputBox.y + outputBox.height / 2;
-		expect(
-			Math.abs(outputCentre - sourceCentre),
-			"the output is optically centred on the source",
-		).toBeLessThanOrEqual(2);
-
-		// Which, the output being the shorter of the two, means it sits
-		// inside the source's span on both edges rather than hanging past
-		// it.
-		expect(outputBox.y).toBeGreaterThan(sourceBox.y);
-		expect(outputBox.y + outputBox.height).toBeLessThan(
-			sourceBox.y + sourceBox.height,
+	for (const [name, rect] of /** @type {const} */ ([
+		["source", geometry.source],
+		["card", geometry.card],
+	])) {
+		expect(rect.left, `${name} starts inside the figure at ${width}px`).toBeGreaterThanOrEqual(
+			geometry.figure.left - 1,
 		);
-	} else {
-		// Stacked: the offset is unwound completely rather than shrunk, so
-		// the two cards read as a column and not as a misalignment.
-		expect(
-			Math.abs(outputBox.x + outputBox.width - (sourceBox.x + sourceBox.width)),
-		).toBeLessThanOrEqual(1);
+		expect(rect.right, `${name} ends inside the figure at ${width}px`).toBeLessThanOrEqual(
+			geometry.figure.right + 1,
+		);
 	}
-
-	// Whatever follows the demo starts below both halves of it: the stage
-	// is intrinsically as tall as the taller of the two, which is the
-	// property an overlap built out of flow has and an absolutely
-	// positioned one does not.
-	expect(stageBox.y + stageBox.height).toBeGreaterThanOrEqual(
-		Math.max(sourceBox.y + sourceBox.height, outputBox.y + outputBox.height) -
-			1,
+	expect(geometry.card.top, `the card starts below the source at ${width}px`).toBeGreaterThan(
+		geometry.source.top,
 	);
+
+	const covered = geometry.lines.filter(
+		(line) =>
+			line.right > geometry.card.left + 1 &&
+			line.left < geometry.card.right - 1 &&
+			line.bottom > geometry.card.top + 1 &&
+			line.top < geometry.card.bottom - 1,
+	);
+	expect(covered, `lines of code under the card at ${width}px`).toEqual([]);
+
+	if (width >= 360) {
+		const overflow = await page
+			.locator(".docs-hero-source pre")
+			.evaluate((element) => element.scrollWidth - element.clientWidth);
+		expect(overflow, `the source scrolls sideways at ${width}px`).toBeLessThanOrEqual(0);
+	}
 };
 
 test("homepage keeps the source and authentic output comparison focused on mobile", async ({
@@ -136,40 +114,27 @@ test("homepage keeps the source and authentic output comparison focused on mobil
 	await page.setViewportSize({ width: 390, height: 844 });
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
-	const output = page.locator(".docs-output-frame");
-	const source = page.locator(".docs-source-panel");
-	await expect(output).toHaveCount(1);
-	await expect(source.locator("[data-lab-source]")).toContainText(
-		'<main class="container">',
-	);
-	await expect(source.locator("[data-lab-source]")).toContainText(
-		'name="email"',
-	);
-	await expect(source.locator("[data-lab-source]")).not.toContainText("…");
+	const source = page.locator(".docs-hero-source pre code");
+	const result = page.locator(".docs-hero-render");
+	await expect(source).toContainText("<article>");
+	await expect(source).toContainText('<input type="email" required>');
+	await expect(source).toContainText("<button>Sign in</button>");
+	await expect(source).not.toContainText("…");
+	const hero = page.locator(".docs-hero");
 	await expect(
-		page.getByRole("button", { name: "Get Started" }),
-	).toHaveAttribute("href", "/get-started");
-	await expect(page.getByRole("button", { name: "Examples" })).toHaveAttribute(
-		"href",
-		"/examples",
-	);
+		hero.getByRole("button", { name: "Get started" }),
+	).toHaveAttribute("href", "/installation");
+	await expect(
+		hero.getByRole("button", { name: "Examples", exact: true }),
+	).toHaveAttribute("href", "/examples");
 
-	// Source first, output second. Stacked, the two are read in sequence
-	// rather than compared side by side, and the sequence this page argues
-	// for is markup → interface: the output used to be ordered first, which
-	// put the result above its own cause.
-	const order = await Promise.all(
-		[source, output].map((locator) =>
-			locator.evaluate((element) => Number(getComputedStyle(element).order)),
-		),
-	);
-	expect(order).toEqual([1, 2]);
-
-	const frame = page.frameLocator("[data-lab-frame]");
-	await expect(frame.getByRole("heading", { name: "Sign in" })).toBeVisible();
-	await expect(frame.locator("header, footer")).toHaveCount(0);
-	await expect(frame.locator("article")).toHaveCount(1);
-	await expect(frame.locator("form")).toHaveCount(1);
+	// The result is the page's own Cirth rendering the card, not an image
+	// or a frame, and it is a picture of the output rather than a form on
+	// the home page: inert, so it adds no tab stops.
+	await expect(result).toHaveAttribute("inert", "");
+	await expect(result.locator("article")).toHaveCount(1);
+	await expect(result.locator("form")).toHaveCount(1);
+	await expect(result.locator("h2")).toHaveText("Sign in");
 
 	const builds = [
 		{
@@ -197,12 +162,10 @@ test("homepage keeps the source and authentic output comparison focused on mobil
 			scoped: true,
 		},
 	];
-	// The hero shows the default build and offers no switch, so each
-	// specimen is checked where it lives rather than through a control on
-	// the home page. The assertions are the ones that matter either way:
-	// every build's page is the real distributed stylesheet rendering the
-	// real markup, with the wrapper and the container class the build is
-	// supposed to have and nothing else.
+	// The four build specimens the Examples page frames. Each is checked
+	// where it lives: every build's page is the real distributed stylesheet
+	// rendering the real markup, with the wrapper and the container class
+	// the build is supposed to have and nothing else.
 	for (const build of builds) {
 		await page.goto(`${origin}/lab/${build.name}/`, {
 			waitUntil: "networkidle",
@@ -222,12 +185,13 @@ test("homepage keeps the source and authentic output comparison focused on mobil
 	}
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
-	await assertHeroDemoGeometry(page);
-	await page.setViewportSize({ width: 1440, height: 900 });
-	await assertHeroDemoGeometry(page);
+	for (const width of [390, 360, 768, 1024, 1440]) {
+		await page.setViewportSize({ width, height: 900 });
+		await assertHeroDemoGeometry(page);
+	}
 
 	const actionAlignment = await page
-		.locator(".docs-hero-actions")
+		.locator(".docs-hero .docs-hero-actions")
 		.evaluate((element) => ({
 			containerX: element.getBoundingClientRect().x,
 			firstActionX: element.firstElementChild?.getBoundingClientRect().x,
@@ -335,26 +299,45 @@ test("header keeps navigation, search, and automatic versioning distinct", async
 	expect(await type(searchTrigger)).toEqual(placeholder);
 	expect(placeholder.weight).toBe("400");
 
-	// Hover and focus move the surface and the border, the way a field's
-	// do, and leave the placeholder, and the size, exactly where they are.
+	// The header's controls are quiet chrome with no edge: hover deepens the
+	// wash on the trigger exactly as it does on the field beside it, and
+	// leaves the edge and the size where they are. The text keeps every
+	// property of a placeholder but its ink, which steps up to the secondary
+	// ink: the placeholder ink on the deeper wash measured 4.21:1 in the
+	// dark scheme of the former playroom preset, under AA.
+	await version.hover();
+	const fieldHover = await box(version);
 	await searchTrigger.hover();
 	const searchHover = await box(searchTrigger);
-	expect(searchHover.background).toBe(searchRest.background);
-	expect(searchHover.border).not.toBe(searchRest.border);
+	expect(searchHover.background).not.toBe(searchRest.background);
+	expect(searchHover.background).toBe(fieldHover.background);
+	expect(searchHover.border).toBe(searchRest.border);
 	expect(searchHover.height).toBe(searchRest.height);
-	expect(await type(searchTrigger)).toEqual(placeholder);
+	const secondaryInk = await page.evaluate(() => {
+		const probe = document.createElement("span");
+		probe.style.color = "var(--cirth-secondary-text)";
+		document.body.append(probe);
+		const color = getComputedStyle(probe).color;
+		probe.remove();
+		return color;
+	});
+	expect(await type(searchTrigger)).toEqual({ ...placeholder, color: secondaryInk });
 
+	// Focus is the one ring every control draws, outside the box.
+	await page.mouse.move(0, 0);
 	await searchTrigger.focus();
 	const searchFocus = await searchTrigger.evaluate((element) => {
 		const style = getComputedStyle(element);
 		return {
-			border: style.borderColor,
-			shadow: style.boxShadow,
+			outline: style.outlineStyle,
+			outlineWidth: Number.parseFloat(style.outlineWidth),
+			offset: Number.parseFloat(style.outlineOffset),
 			height: Math.round(element.getBoundingClientRect().height),
 		};
 	});
-	expect(searchFocus.shadow).not.toBe("none");
-	expect(searchFocus.border).not.toBe(searchRest.border);
+	expect(searchFocus.outline).toBe("solid");
+	expect(searchFocus.outlineWidth).toBeGreaterThan(0);
+	expect(searchFocus.offset).toBeGreaterThan(0);
 	expect(searchFocus.height).toBe(searchRest.height);
 	expect(await type(searchTrigger)).toEqual(placeholder);
 	await searchTrigger.blur();
@@ -466,30 +449,21 @@ test("compact header orders search before its complete keyboard menu", async ({
 	await expect(page.locator(".docs-header-controls-group [data-docs-header-control]")).toHaveCount(3);
 });
 
-test("the homepage FAQ exposes consistent interactive states", async ({
+test("the questions before installing expose consistent interactive states", async ({
 	page,
 }) => {
 	await page.emulateMedia({ reducedMotion: "no-preference" });
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	await page.goto(`${origin}/why-cirth/`, { waitUntil: "networkidle" });
 
-	// The card half of this test went with the three shell-built cards it
-	// hovered. What replaced them renders from the specimen strings the
-	// page shows the source of, so it carries no shell hover treatment by
-	// design: its contract is "this is the library's card and nothing
-	// else", pinned in baseline-consistency.spec.js.
-
-	const details = page.locator(".docs-native-faq details").first();
+	const details = page.locator('.docs-content details[name="faq"]').first();
 	const summary = details.locator("summary");
 	const closedWidths = await Promise.all([
 		details.evaluate((element) => element.getBoundingClientRect().width),
 		summary.evaluate((element) => element.getBoundingClientRect().width),
 	]);
 	await summary.click();
-	// Wait for the panel to actually be in layout before measuring it. The
-	// disclosure now animates open (::details-content starts at block-size
-	// 0), so reading straight after the click can catch the paragraph
-	// before it has a box, which under a loaded suite it intermittently
-	// did. The state being measured is "open", not "opening".
+	// The state measured is "open", not "opening": the disclosure animates
+	// its content in, so wait for the answer to have a box.
 	await expect(details).toHaveAttribute("open", "");
 	await expect(details.locator("p")).toBeVisible();
 	const openWidths = await Promise.all([
@@ -504,7 +478,7 @@ test("the homepage FAQ exposes consistent interactive states", async ({
 	expect(openWidths[1]).toBe(closedWidths[1]);
 	expect(openWidths[2]).toBe(openWidths[1]);
 
-	const nextSummary = page.locator(".docs-native-faq summary").nth(1);
+	const nextSummary = page.locator('.docs-content details[name="faq"] summary').nth(1);
 	const stateBefore = await nextSummary.evaluate(
 		(element) => ({
 			background: getComputedStyle(element).backgroundColor,
@@ -521,12 +495,22 @@ test("the homepage FAQ exposes consistent interactive states", async ({
 	);
 	expect(stateAfter.background).toBe(stateBefore.background);
 	expect(stateAfter.color).not.toBe(stateBefore.color);
+
+	// The FAQ stays a short decision aid. Package facts point to the package
+	// reference instead of reproducing its inventory here.
+	await expect(page.locator(".docs-content")).not.toContainText("<!--");
+	await expect(page.locator('.docs-content details[name="faq"]')).toHaveCount(6);
+	const packageAnswer = page.locator('.docs-content details[name="faq"]', {
+		hasText: "What does the package contain?",
+	});
+	await expect(packageAnswer.locator('a[href="/package"]')).toHaveCount(1);
+	await expect(packageAnswer.locator("table, pre, ul, ol")).toHaveCount(0);
 });
 
 test("documentation active navigation uses the public registered state", async ({
 	page,
 }) => {
-	await page.goto(`${origin}/get-started/`, { waitUntil: "networkidle" });
+	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
 	const active = page.locator('.docs-sidebar a[aria-current="page"]');
 	const inactive = page.locator(".docs-sidebar a:not([aria-current])").first();
 	const inactiveStyle = await inactive.evaluate((element) => ({
@@ -538,14 +522,30 @@ test("documentation active navigation uses the public registered state", async (
 		const marker = getComputedStyle(element, "::before");
 		const probe = document.createElement("div");
 		document.body.append(probe);
-		probe.style.color = "var(--cirth-primary-border)";
+		// The rail is the accent's text role: it sits on the surface, not
+		// on a fill, and the fill's edge falls to 2.84:1 on the dark canvas
+		// (specs/surface-and-edge-model.md).
+		probe.style.color = "var(--cirth-primary-text)";
 		const accent = getComputedStyle(probe).color;
+		probe.style.color = "var(--cirth-contrast-text)";
+		const contrast = getComputedStyle(probe).color;
+		probe.style.background =
+			"color-mix(in oklab, var(--cirth-primary-text) 8%, transparent)";
+		const wash = getComputedStyle(probe).backgroundColor;
+		probe.style.borderRadius = "var(--docs-chrome-radius)";
+		const chromeRadius = getComputedStyle(probe).borderStartEndRadius;
 		probe.remove();
 		return {
 			accent,
+			contrast,
+			chromeRadius,
+			wash,
 			backgroundColor: style.backgroundColor,
 			backgroundImage: style.backgroundImage,
-			borderRadius: style.borderRadius,
+			borderEndEndRadius: style.borderEndEndRadius,
+			borderEndStartRadius: style.borderEndStartRadius,
+			borderStartEndRadius: style.borderStartEndRadius,
+			borderStartStartRadius: style.borderStartStartRadius,
 			color: style.color,
 			fontWeight: style.fontWeight,
 			leadingEdge: Number.parseFloat(style.borderInlineStartWidth),
@@ -555,18 +555,27 @@ test("documentation active navigation uses the public registered state", async (
 		};
 	});
 
-	// One marker and no more: the registered edge. Text stays neutral and
-	// keeps the same weight, with no tint, pill, or generic link underline.
+	// One accent marker and no more: the registered edge. Position is also
+	// carried by contrast, the convention the header's current entry follows.
+	// The quiet wash belongs to the sidebar alone and stays square against the
+	// rail, so it reads as a current row rather than a detached pill.
 	expect(geometry.backgroundImage).toBe("none");
-	expect(geometry.backgroundColor).toBe("rgba(0, 0, 0, 0)");
-	expect(geometry.borderRadius).toBe("0px");
+	expect(geometry.backgroundColor).toBe(geometry.wash);
+	expect(geometry.borderStartStartRadius).toBe("0px");
+	expect(geometry.borderEndStartRadius).toBe("0px");
+	expect(geometry.borderStartEndRadius).toBe(geometry.chromeRadius);
+	expect(geometry.borderEndEndRadius).toBe(geometry.chromeRadius);
 	expect(geometry.leadingEdge).toBe(2);
 	expect(geometry.leadingEdgeColor).toBe(geometry.accent);
-	expect(geometry.color).toBe(inactiveStyle.color);
-	expect(geometry.fontWeight).toBe(inactiveStyle.fontWeight);
+	expect(geometry.color).toBe(geometry.contrast);
+	expect(geometry.color).not.toBe(geometry.accent);
+	expect(geometry.color).not.toBe(inactiveStyle.color);
+	expect(Number(geometry.fontWeight)).toBeGreaterThan(
+		Number(inactiveStyle.fontWeight),
+	);
 	expect(geometry.textDecoration).toBe("none");
 
-	// One rail. The shell used to add a second amber bar as a ::before on
+	// One rail. The shell used to add a second accent-coloured bar as a ::before on
 	// top of the one the framework paints.
 	expect(geometry.markerContent).toBe("none");
 });
@@ -595,7 +604,7 @@ test("the navbar collapses at a single breakpoint with a complete menu", async (
 
 	for (const width of widths) {
 		await page.setViewportSize({ width, height: 800 });
-		await page.goto(`${origin}/get-started/`, { waitUntil: "networkidle" });
+		await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
 
 		// Ask the browser the question the stylesheet asks, rather than
 		// recomputing it from a width. Chromium evaluates a width media
@@ -667,7 +676,7 @@ test("the collapsed menu is complete, ordered, and returns focus", async ({
 }) => {
 	// 900px: squarely inside the range that used to be broken.
 	await page.setViewportSize({ width: 900, height: 800 });
-	await page.goto(`${origin}/get-started/`, { waitUntil: "networkidle" });
+	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
 
 	const actions = page.locator(".docs-header-actions");
 	const search = page.locator("[data-docs-search-trigger]");
@@ -704,7 +713,7 @@ test("the collapsed menu is complete, ordered, and returns focus", async ({
 	for (const name of ["Docs", "Examples"]) {
 		await expect(panel.getByRole("link", { name, exact: true })).toBeVisible();
 	}
-	await expect(panel.getByRole("link", { name: /GitHub/ })).toBeVisible();
+	await expect(panel.getByRole("link", { name: /^Source/ })).toBeVisible();
 	await expect(controls.locator("[data-docs-version-select]")).toBeVisible();
 	await expect(controls.locator("[data-cirth-preset-select]")).toBeVisible();
 	await expect(controls.locator(".docs-theme-toggle")).toBeVisible();
@@ -734,7 +743,8 @@ test("the navbar states are a contrast ladder, not the accent", async ({
 	// below the current item, current at full contrast, and none of the
 	// three is the accent, which in chrome belongs to actions.
 	await page.setViewportSize({ width: 1280, height: 800 });
-	await page.goto(`${origin}/get-started/`, { waitUntil: "networkidle" });
+	// Where "Docs" leads, so it is the current item there.
+	await page.goto(`${origin}/why-cirth/`, { waitUntil: "networkidle" });
 
 	const current = page.locator('.docs-nav-item a[aria-current="page"]');
 	const other = page.locator(".docs-nav-item a:not([aria-current])");
@@ -808,309 +818,417 @@ test("the navbar states are a contrast ladder, not the accent", async ({
 	expect(scoped.edgeColor).toBe(accent);
 });
 
-// --- The proof band -----------------------------------------------------
+// --- The three facts ---------------------------------------------------
 
-// Four claims and two more below them, and what is worth pinning is no
-// longer only that each has a path to check it: it is that each says what
-// kind of claim it is. A guarantee and a capability age differently, and a
-// page that presents them identically is promising the weaker one. The
-// strip used to carry a measurement as well; the byte count now lives on
-// /deploy, where a reader is deciding something with it.
-test("every claim says what kind it is, and how to check it", async ({
-	page,
-}) => {
+// Three facts of three kinds about one file. What is worth pinning is that
+// each is a Cirth card that says what kind of fact it is and where to
+// check it: values in text, pictures hidden from assistive technology.
+test("the three facts are a section of their own: a heading, its argument and three cards", async ({ page }) => {
 	await page.setViewportSize({ width: 1280, height: 900 });
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
-	const cells = page.locator(".docs-proof-metrics > div");
-	await expect(cells).toHaveCount(4);
+	// Between the hero and the story, named by a visible heading.
+	const order = await page.locator("main > section").evaluateAll((sections) => sections.map((section) => section.className.split(" ")[0]));
+	expect(order.slice(0, 3)).toEqual(["docs-hero", "docs-facts-section", "docs-story"]);
+	const section = page.locator(".docs-facts-section");
+	await expect(section).toHaveAttribute("aria-labelledby", "facts-title");
+	await expect(section.locator("h2#facts-title")).toHaveText("One stylesheet. Three facts.");
+	await expect(section.locator(".docs-facts-head > p")).toHaveText(
+		"Cirth ships compiled CSS with no JavaScript runtime. Its default build is measured in CI, and its accessibility baseline is audited and documented.",
+	);
+	await expect(section).not.toContainText(/promised|guide/i);
 
-	for (const value of [
-		"0 B JS runtime",
-		"WCAG 2.2 AA baseline",
-		"Flexible distribution",
-		"Small by construction",
-	]) {
-		await expect(
-			page.locator(".docs-proof-metrics", { hasText: value }),
-			`${value} is stated`,
-		).toBeVisible();
+	// Three of the library's own cards, in the order they are read.
+	const facts = section.locator(".docs-facts-list > article.docs-fact");
+	await expect(facts).toHaveCount(3);
+	await expect(section.locator(".docs-facts-list > *")).toHaveCount(3);
+	await expect(facts.locator("dt")).toHaveText(["JavaScript runtime", "Default CSS, gzipped", "Accessibility baseline"]);
+	// The size is read off the build, not written down.
+	await expect(facts.locator(".docs-fact-value")).toHaveText(["0 B", /^\d+\.\d KB$/, "WCAG 2.2 AA"]);
+	await expect(facts.locator("dd > a")).toHaveText(["Nothing to run", "See the size budget", "See the accessibility audit"]);
+	for (const href of await facts.locator("dd > a").evaluateAll((links) => links.map((link) => link.getAttribute("href")))) {
+		expect(href).toMatch(/^\/[a-z-]+(\/[a-z-]+)?#[a-z-]+$/);
 	}
+	// Every picture is hidden from assistive technology and made of what
+	// Cirth draws; the button in it cannot take focus.
+	await expect(section.locator(".docs-fact-visual:not([aria-hidden='true'])")).toHaveCount(0);
+	// One picture each, and nothing in them a reader could take for a control.
+	await expect(section.locator(".docs-fact-visual")).toHaveCount(3);
+	await expect(section.locator(".docs-fact-visual progress")).toHaveCount(1);
+	await expect(section.locator(".docs-fact-visual :is(button, a, input, select, img)")).toHaveCount(0);
 
-	// Every cell: a kind, a claim, what it means, and a way to check it.
-	const count = await cells.count();
-	for (let index = 0; index < count; index++) {
-		const cell = cells.nth(index);
-		await expect(cell.locator("dt .docs-proof-state")).toHaveCount(1);
-		await expect(cell.locator("dd > strong")).toHaveCount(1);
-		await expect(cell.locator("dd small")).toHaveCount(1);
-		const link = cell.locator("dd a");
-		await expect(link, `cell ${index} has a check path`).toHaveCount(1);
-		expect(
-			(await link.getAttribute("href")) || "",
-			`cell ${index} path is real`,
-		).not.toBe("");
-	}
-
-	// The vocabulary is shared by both halves of the section, the strip and
-	// the list under it, so a reader learns it once. Two of its three words
-	// are in use here; "Current fact" left with the size cell and the macro
-	// keeps it for whatever states a measurement next.
-	const kinds = await page
-		.locator(".docs-proof .docs-proof-state")
-		.evaluateAll((marks) => marks.map((mark) => mark.textContent?.trim()));
-	expect(kinds).toEqual([
-		"Guarantee",
-		"Guarantee",
-		"Capability",
-		"Guarantee",
-		"Guarantee",
-		"Capability",
-	]);
-
-	// The size is not a claim on this page at all now. What the strip states
-	// is the model the size follows from, and the byte count moved to
-	// /deploy where it is something a reader acts on rather than scores the
-	// project by. A bare "<14 KB" headline is the shape of a promise the
-	// project does not make; so is any figure standing on its own up here,
-	// which is why the strip is asserted to carry no byte count.
-	const model = cells.nth(3);
-	await expect(model.locator("dd > strong")).toHaveText("Small by construction");
-	await expect(model.locator("dd small")).toContainText("no component catalogue");
-	await expect(page.locator(".docs-proof")).not.toContainText("<14 KB");
-	await expect(page.locator(".docs-proof")).not.toContainText(/\d+(\.\d+)? KB/);
-
-	// No claim rests on a count of builds either. "4 builds" was accurate,
-	// and the promise it implied (that there will always be exactly four)
-	// is not one worth making when print sheets and presets already sit
-	// beside them.
-	await expect(page.locator(".docs-proof")).not.toContainText(/\d+ builds/);
-
-	// The two claims that are not about the package's shape are a list, not
-	// a second table of the four above.
-	const claims = page.locator(".docs-proof-claims li");
-	await expect(claims).toHaveCount(2);
-	await expect(page.locator(".docs-proof table")).toHaveCount(0);
-	for (const value of ["0 B JS", "WCAG 2.2", "footprint"]) {
-		await expect(
-			page.locator(".docs-proof-claims", { hasText: value }),
-			`${value} is not restated below the strip`,
-		).toHaveCount(0);
-	}
-
-	// The marks are still glyphs from the shell's own set: one size, no
-	// container, hidden from assistive technology because the word is right
-	// beside them.
-	const marks = await page
-		.locator(".docs-proof-state svg")
-		.evaluateAll((nodes) =>
-			nodes.map((node) => ({
-				tag: node.tagName.toLowerCase(),
-				hidden: node.getAttribute("aria-hidden"),
-				width: Math.round(node.getBoundingClientRect().width),
-				height: Math.round(node.getBoundingClientRect().height),
-				border: getComputedStyle(node).borderTopWidth,
-			})),
-		);
-	expect(marks).toHaveLength(6);
-	for (const mark of marks) {
-		expect(mark.tag).toBe("svg");
-		expect(mark.hidden).toBe("true");
-		expect(mark.width).toBe(16);
-		expect(mark.height).toBe(16);
-		expect(Number.parseFloat(mark.border)).toBe(0);
-	}
-
-	// The band has no frame of its own: the two showcases above are each a
-	// hairline plate, and a third would be the shape this page was rebuilt
-	// to stop having. Its tint is what separates it from them, and from the
-	// FAQ below, which is back on the canvas for the same reason.
-	const grounds = await page.evaluate(() => {
-		const read = (/** @type {string} */ selector) => {
-			const element = document.querySelector(selector);
-			if (!element) return null;
+	// The card is the library's: its edge, radius and spacing are an
+	// <article>'s anywhere else; only its surface is cleared, through the
+	// card's own token, so the glow behind shows through.
+	const paint = await page.evaluate(() => {
+		const read = (/** @type {Element} */ element) => {
 			const style = getComputedStyle(element);
-			return {
-				background: style.backgroundColor,
-				border: Number.parseFloat(style.borderTopWidth),
-			};
+			return [style.borderTopColor, style.borderTopWidth, style.borderTopLeftRadius, style.paddingTop].join(" | ");
 		};
-		return {
-			proof: read(".docs-proof"),
-			faq: read(".docs-native-faq"),
-			metrics: read(".docs-proof-metrics"),
-			showcase: read(".docs-showcase"),
-		};
+		const bare = document.createElement("article");
+		document.querySelector("main")?.append(bare);
+		const reference = read(bare);
+		bare.remove();
+		return { reference, cards: [...document.querySelectorAll(".docs-fact")].map(read) };
 	});
-	expect(grounds.metrics?.border, "the metric strip has no frame").toBe(0);
-	expect(
-		grounds.proof?.background,
-		"the proof band is tinted away from its neighbours",
-	).not.toBe(grounds.faq?.background);
-	expect(grounds.proof?.background).not.toBe(grounds.showcase?.background);
+	for (const card of paint.cards) expect(card).toBe(paint.reference);
+	for (const alpha of await section.locator(".docs-fact").evaluateAll((cards) => cards.map((card) => {
+		const match = /\/\s*([\d.]+)\)$|rgba\([^)]*,\s*([\d.]+)\)$/.exec(getComputedStyle(card).backgroundColor);
+		return match ? Number(match[1] ?? match[2]) : 1;
+	}))) {
+		expect(alpha).toBeLessThan(0.5);
+	}
 
-	// It stays a hairline grid at every width: two columns on a phone, four
-	// once the row can hold them, and never a set of stacked cards with the
-	// claims' relationship to each other taken out.
-	for (const width of [1440, 1023, 767, 390, 320]) {
+	// In a row on a wide screen, in a row or two and one on a tablet, one
+	// per row on a phone, and nothing wider than the viewport at any of them.
+	for (const [width, columns] of /** @type {const} */ ([
+		[1280, [3]],
+		[768, [2, 3]],
+		[390, [1]],
+	])) {
 		await page.setViewportSize({ width, height: 900 });
-		const columns = await page
-			.locator(".docs-proof-metrics")
-			.evaluate(
-				(element) =>
-					getComputedStyle(element).gridTemplateColumns.split(" ").length,
-			);
-		expect(columns, `metric columns at ${width}px`).toBe(width >= 960 ? 4 : 2);
+		const layout = await page.locator(".docs-facts-list").evaluate((element) => ({
+			columns: getComputedStyle(element).gridTemplateColumns.split(" ").length,
+			overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+		}));
+		expect(columns, `columns at ${width}px`).toContain(layout.columns);
+		expect(layout.overflow, `horizontal overflow at ${width}px`).toBeLessThanOrEqual(0);
 	}
 });
 
 // --- The hero composition -----------------------------------------------
 
-/**
- * What the hero has to be true about, now that the reveal is a CSS wipe
- * over markup that never changes: the source is whole and highlighted at
- * every moment, the output is the real build, and neither of those facts
- * depends on JavaScript having run, on the animation having finished, or
- * on a preference being set one way rather than the other.
- * @param {import("@playwright/test").Page} page
- */
-const heroState = (page) =>
-	page.evaluate(() => {
-		const code = /** @type {HTMLElement} */ (
-			document.querySelector("[data-lab-source]")
-		);
-		const pre = /** @type {HTMLElement} */ (
-			document.querySelector(".docs-source-panel pre")
-		);
-		return {
-			text: code.textContent?.length ?? 0,
-			highlighted: code.querySelectorAll(".hljs-name, .hljs-attr").length,
-			preHeight: Math.round(pre.getBoundingClientRect().height),
-			preScrollWidth: pre.scrollWidth,
-			cardHeight: Math.round(
-				/** @type {HTMLElement} */ (
-					document.querySelector(".docs-source-panel")
-				).getBoundingClientRect().height,
-			),
-		};
-	});
+// The source pane and the card beside it are one string in home.njk,
+// highlighted into one and rendered into the other. The contract is that
+// they cannot drift: the rendered card is exactly the markup listed.
+test("the hero's result is exactly the markup in its source pane", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
-test("the hero writes the source in without ever changing it", async ({
+	const [listed, rendered] = await Promise.all([
+		page.locator(".docs-hero-source pre code").evaluate((element) => element.textContent ?? ""),
+		page.locator(".docs-hero-render").evaluate((element) => element.innerHTML),
+	]);
+	expect(normalizeMarkup(rendered)).toBe(normalizeMarkup(listed));
+	// Highlighted at build time: there is no highlighter in the browser.
+	expect(
+		await page.locator(".docs-hero-source .hljs-name").count(),
+	).toBeGreaterThan(10);
+});
+
+test("the hero moves once, only where motion is welcome, and its result follows the page", async ({
 	page,
 }) => {
 	await page.emulateMedia({ reducedMotion: "no-preference" });
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
 
-	// Mid-animation.
-	const during = await heroState(page);
-	expect(during.text).toBeGreaterThan(300);
-	expect(during.highlighted).toBeGreaterThan(10);
-
-	const animation = await page
-		.locator(".docs-source-panel pre > code")
-		.evaluate((element) => {
-			const running = element.getAnimations();
-			return {
-				count: running.length,
-				// One pass and done: a hero that keeps re-typing itself is a
-				// thing to look away from, not a thing to read.
-				iterations: running.map(
-					(item) =>
-						/** @type {CSSAnimation & { effect: KeyframeEffect }} */ (item)
-							.effect.getTiming().iterations,
-				),
-			};
-		});
-	expect(animation.count).toBe(1);
-	expect(animation.iterations).toEqual([1]);
-
-	// Let it finish, then compare. The wipe only ever changed the ink, so
-	// nothing about the pane (its height, its scroll extent, the card
-	// around it, the text inside it, or the highlighting) is allowed to
-	// differ between a half-written state and a finished one.
-	await page
-		.locator(".docs-source-panel pre > code")
-		.evaluate((element) =>
-			Promise.all(element.getAnimations().map((item) => item.finished)),
-		);
-	const after = await heroState(page);
-	expect(after).toEqual(during);
-
-	// And the whole snippet is selectable and copyable throughout, because
-	// it was never taken out of the document to begin with. The last line
-	// of the markup, so reaching it means none of it was cut.
-	await expect(page.locator("[data-lab-source]")).toContainText("</main>");
-});
-
-test("the hero holds still under reduced motion", async ({ page }) => {
-	// The behavior project already runs reduced, which is what makes the
-	// screenshot suite deterministic; assert the contract rather than
-	// assume it.
-	await page.emulateMedia({ reducedMotion: "reduce" });
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	const animations = await page.evaluate(() =>
-		document
-			.getAnimations()
-			.map((item) => /** @type {CSSAnimation} */ (item).animationName)
-			.filter(Boolean),
+	// The demo makes its argument by being read. The copy button stays: it
+	// is the affordance every code block on the site carries. Everything
+	// else operable in there belongs to the rendered card, which is inert.
+	await expect(page.locator(".docs-hero-render")).toHaveAttribute("inert", "");
+	const stray = await page.locator(".docs-hero-demo").evaluate((element) =>
+		[...element.querySelectorAll("a, button, input, select, textarea")].filter(
+			(node) => !node.closest("[inert]") && !node.classList.contains("copy"),
+		).length,
 	);
-	expect(animations).not.toContain("docs-lab-write");
-	expect(animations).not.toContain("docs-lab-render");
+	expect(stray, "operable controls outside the inert card").toBe(0);
 
-	// The finished composition is the resting state, so removing the
-	// animation removes nothing: full source, unclipped, output visible.
-	const state = await heroState(page);
-	expect(state.text).toBeGreaterThan(300);
-	expect(state.highlighted).toBeGreaterThan(10);
+	// One entrance, and it ends: every animation in the hero that runs on
+	// the clock is finite, and none of them repeats. The field's drift is
+	// tied to the scroll where scroll timelines exist, so it moves only
+	// while the reader does and has no duration of its own.
+	const animations = await page.locator(".docs-hero").evaluate((element) =>
+		element.getAnimations({ subtree: true }).map((animation) => {
+			const timing = animation.effect?.getComputedTiming();
+			return {
+				scroll: !(animation.timeline instanceof DocumentTimeline),
+				iterations: timing?.iterations,
+				duration: Number(timing?.duration),
+			};
+		}),
+	);
+	const timed = animations.filter((animation) => !animation.scroll);
+	expect(timed.length, "the entrance runs where motion is welcome").toBeGreaterThan(0);
+	for (const animation of timed) {
+		expect(animation.iterations).toBe(1);
+		expect(animation.duration).toBeLessThanOrEqual(2000);
+	}
+	for (const animation of animations.filter((animation) => animation.scroll)) {
+		expect(animation.iterations, "a scroll-linked drift does not repeat").toBe(1);
+	}
+
+	// With the preference set, nothing in the hero moves at all.
+	await page.emulateMedia({ reducedMotion: "reduce" });
+	await page.reload({ waitUntil: "networkidle" });
 	expect(
 		await page
-			.locator(".docs-source-panel pre > code")
-			.evaluate((element) => getComputedStyle(element).clipPath),
-	).toBe("none");
-	await expect(page.locator(".docs-output-frame")).toBeVisible();
-	expect(
-		await page
-			.locator(".docs-output-frame")
-			.evaluate((element) => getComputedStyle(element).opacity),
-	).toBe("1");
+			.locator(".docs-hero")
+			.evaluate((element) => element.getAnimations({ subtree: true }).length),
+	).toBe(0);
+
+	// The result is rendered by the page's own stylesheet, so it follows the
+	// page's scheme without being told.
+	const card = page.locator(".docs-hero-render article");
+	const light = await card.evaluate((element) => getComputedStyle(element).backgroundColor);
+	await page.locator(".docs-theme-toggle").click();
+	await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+	const dark = await card.evaluate((element) => getComputedStyle(element).backgroundColor);
+	expect(dark).not.toBe(light);
 });
 
-test("the hero has no controls, and its output follows the page", async ({
+// --- Framework agnostic --------------------------------------------------
+
+test("the framework band shows the ecosystems and leads each mark to its project", async ({
 	page,
 }) => {
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	const band = page.locator(".docs-agnostic");
+	await expect(band.locator("h2")).toHaveText("Framework agnostic. Works everywhere.");
+	// The page's own scheme: no scheme forced on the band, so each mark
+	// shows the variant its project publishes for the page's ground.
+	await expect(band).not.toHaveAttribute("data-theme", /.*/);
+	await expect(band.locator("[data-theme]")).toHaveCount(0);
+	// No card under any mark: the orbit is the composition.
+	const tile = await band.locator(".docs-agnostic-mark").first().evaluate((link) => ({
+		border: getComputedStyle(link).borderTopStyle,
+		background: getComputedStyle(link).backgroundColor,
+	}));
+	expect(tile.border).toBe("none");
+	expect(tile.background).toBe("rgba(0, 0, 0, 0)");
 
-	// The demo makes its argument by being read, not by being operated:
-	// the build and theme selects that used to sit in the two title bands
-	// are gone, and nothing replaced them.
-	await expect(page.locator(".docs-lab-stage select")).toHaveCount(0);
-	// The copy button stays: it belongs to the code block, is the same
-	// affordance every <pre> on the site carries, and asks nothing of a
-	// reader who ignores it.
-	await expect(
-		page.locator(".docs-lab-stage button:not(.copy)"),
-	).toHaveCount(0);
-
-	// The one thing markup cannot express: the framed document is a
-	// separate document and does not inherit the page's colour scheme. So
-	// it follows it, rather than asking the reader to pick.
-	const before = await heroState(page);
-	await expect(page.locator("[data-lab-frame]")).toHaveAttribute(
-		"src",
-		/theme=light/,
+	// The marks are the data's featured set, each a link to the project's
+	// own site, named as one; the images inside are decorative and carry
+	// their size, so nothing moves while they load.
+	const links = await band.locator(".docs-agnostic-orbit a").evaluateAll((items) =>
+		items.map((item) => ({
+			href: item.getAttribute("href"),
+			name: item.getAttribute("aria-label"),
+			images: [...item.querySelectorAll("img")].map((image) => ({
+				alt: image.getAttribute("alt"),
+				src: image.getAttribute("src"),
+				width: Number(image.getAttribute("width")),
+				height: Number(image.getAttribute("height")),
+				shown: getComputedStyle(image).display !== "none",
+			})),
+		})),
 	);
+	expect(links.map((link) => link.href)).toEqual(
+		frameworks.featured.map((/** @type {{ officialUrl: string }} */ guide) => guide.officialUrl),
+	);
+	links.forEach((link, index) => {
+		expect(link.name).toBe(`${frameworks.featured[index].name} official website`);
+		expect(link.images.filter((image) => image.shown), `${link.name}: one variant shows`).toHaveLength(1);
+		for (const image of link.images) {
+			expect(image.alt).toBe("");
+			expect(image.src).toMatch(/^\/logos\/frameworks\/[\w-]+\.(svg|png)$/);
+			expect(image.width).toBeGreaterThan(0);
+			expect(image.height).toBeGreaterThan(0);
+		}
+	});
+	// Spread over the ecosystems, not one family of tools.
+	const categories = new Set(frameworks.featured.map((/** @type {{ category: string }} */ guide) => guide.category));
+	expect(categories.size).toBeGreaterThanOrEqual(5);
+
+	// One way on, with the list's own count.
+	const action = band.getByRole("button");
+	await expect(action).toHaveText(`Browse all ${frameworks.count} guides`);
+	await expect(action).toHaveAttribute("href", "/framework-guides");
+
+	// The variant follows the page: Django's positive logo on a light page,
+	// its negative one on a dark page.
+	const django = band.locator(`a[href="${frameworks.byId.django.officialUrl}"] img`);
+	const shown = () =>
+		django.evaluateAll((images) => images.filter((image) => getComputedStyle(image).display !== "none").map((image) => image.getAttribute("src")));
+	const scheme = await page.locator("html").getAttribute("data-theme");
+	const first = await shown();
 	await page.locator(".docs-theme-toggle").click();
-	await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-	await expect(page.locator("[data-lab-frame]")).toHaveAttribute(
-		"src",
-		/theme=dark/,
-	);
+	await expect(page.locator("html")).not.toHaveAttribute("data-theme", String(scheme));
+	const second = await shown();
+	const byScheme = scheme === "dark" ? { dark: first, light: second } : { light: first, dark: second };
+	expect(byScheme.light).toEqual([`/logos/frameworks/${frameworks.marks.django.file}`]);
+	expect(byScheme.dark).toEqual([`/logos/frameworks/${frameworks.marks.django.dark}`]);
+});
 
-	// And the markup on the other side is untouched by any of it.
-	const after = await heroState(page);
-	expect(after.text).toBe(before.text);
-	expect(after.highlighted).toBeGreaterThan(10);
+test("the marks orbit Cirth's behind no line, stay upright, and turn only with the scroll", async ({ page }) => {
+	await page.emulateMedia({ reducedMotion: "no-preference" });
+	await page.setViewportSize({ width: 1440, height: 900 });
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	const band = page.locator(".docs-agnostic");
+	const orbit = page.locator(".docs-agnostic-orbit");
+	/** Each mark's centre, and how far its box is turned. */
+	const read = () =>
+		orbit.locator("li").evaluateAll((items) =>
+			items.map((item) => {
+				const box = item.getBoundingClientRect();
+				const matrix = new DOMMatrix(getComputedStyle(item).transform);
+				return {
+					x: Math.round(box.left + box.width / 2),
+					y: Math.round(box.top + box.height / 2),
+					turn: Math.round((Math.atan2(matrix.b, matrix.a) * 180) / Math.PI),
+				};
+			}),
+		);
+	await band.evaluate((element) => window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY - 200));
+	await page.waitForFunction(() => document.querySelector(".docs-agnostic-orbit")?.getAttribute("style")?.includes("--docs-orbit"));
+	const at = await read();
+	for (const mark of at) expect(Math.abs(mark.turn), "a mark is turned").toBeLessThanOrEqual(0);
+
+	// Two rings round one centre, drawn behind the marks: the rings sit
+	// under the orbit and the core above it, and neither takes the pointer.
+	const field = await page.locator(".docs-agnostic-field").evaluate((element) => {
+		const box = element.getBoundingClientRect();
+		const ring = getComputedStyle(element, "::after");
+		return {
+			x: box.left + box.width / 2,
+			y: box.top + box.height / 2,
+			size: box.width,
+			isolated: getComputedStyle(element).isolation,
+			ringZ: ring.zIndex,
+			ringEvents: ring.pointerEvents,
+			orbitZ: getComputedStyle(/** @type {Element} */ (element.querySelector(".docs-agnostic-orbit"))).zIndex,
+			coreZ: getComputedStyle(/** @type {Element} */ (element.querySelector(".docs-agnostic-core"))).zIndex,
+			coreEvents: getComputedStyle(/** @type {Element} */ (element.querySelector(".docs-agnostic-core"))).pointerEvents,
+		};
+	});
+	expect(field.isolated).toBe("isolate");
+	expect(Number(field.ringZ)).toBeLessThan(Number(field.orbitZ));
+	expect(Number(field.coreZ)).toBeGreaterThan(Number(field.orbitZ));
+	expect(field.ringEvents).toBe("none");
+	expect(field.coreEvents).toBe("none");
+	const radii = at.map((mark) => Math.hypot(mark.x - field.x, mark.y - field.y) / field.size);
+	expect([...new Set(radii.map((radius) => Math.round(radius * 10)))].sort()).toEqual([2, 4]);
+	await expect(page.locator(".docs-agnostic-core img:visible")).toHaveCount(1);
+	// Every mark's link stands on a disc of the canvas, so no ring line runs
+	// through it, and is the element under its own centre (nothing on top).
+	const marks = await orbit.locator("a").evaluateAll((links) =>
+		links.map((link) => {
+			const box = link.getBoundingClientRect();
+			const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+			return { disc: getComputedStyle(link).backgroundImage, own: Boolean(hit && link.contains(hit)) };
+		}),
+	);
+	for (const mark of marks) {
+		expect(mark.disc).toMatch(/radial-gradient/);
+		expect(mark.own, "a mark is covered").toBe(true);
+	}
+
+	// The rings turn with the scroll, never on their own, and hold still
+	// under the pointer. The scenes follow the scroll with a short ease, so
+	// "on their own" is once that has landed.
+	await page.waitForFunction(() => !document.querySelector(".docs-home")?.hasAttribute("data-animating"));
+	const still = await read();
+	await page.waitForTimeout(600);
+	expect(await read(), "the orbit moved on its own").toEqual(still);
+	await page.mouse.wheel(0, 300);
+	await expect.poll(async () => (await read()).some((mark, index) => mark.x !== still[index].x)).toBe(true);
+	for (const mark of await read()) expect(Math.abs(mark.turn)).toBeLessThanOrEqual(0);
+	const box = await orbit.boundingBox();
+	if (!box) throw new Error("no orbit");
+	await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+	const held = await orbit.getAttribute("style");
+	await page.mouse.wheel(0, 120);
+	await page.waitForTimeout(200);
+	expect(await orbit.getAttribute("style"), "the orbit moved under the pointer").toBe(held);
+
+	// A phone and reduced motion: still, and no CSS animation anywhere.
+	for (const [width, motion] of /** @type {const} */ ([[390, "no-preference"], [1440, "reduce"]])) {
+		await page.emulateMedia({ reducedMotion: motion });
+		await page.setViewportSize({ width, height: 900 });
+		await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+		await band.evaluate((element) => element.scrollIntoView());
+		await page.mouse.wheel(0, 200);
+		await page.waitForTimeout(200);
+		expect(await orbit.getAttribute("style"), `${width}px ${motion}`).toBeNull();
+		await expect(orbit).toHaveCSS("animation-name", "none");
+	}
+});
+
+// --- Installation widgets -----------------------------------------------
+
+test("the package manager switch shows one command and remembers the choice", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/installation/`, { waitUntil: "networkidle" });
+	const install = page.locator("[data-docs-install]").first();
+	const visible = () =>
+		install.locator("pre").evaluateAll((items) =>
+			items
+				.filter((item) => getComputedStyle(item).display !== "none")
+				.map((item) => item.textContent?.trim()),
+		);
+	expect(await visible()).toEqual(["npm install @cirthcss/cirth"]);
+
+	await install.getByLabel("pnpm").check();
+	expect(await visible()).toEqual(["pnpm add @cirthcss/cirth"]);
+
+	// A radio group named by its legend: native radios in labels of their
+	// own, apart rather than joined, each label the whole target, as tall as
+	// the header's controls. Not a tab strip: no tab roles, and no class
+	// that draws one.
+	const group = install.getByRole("group", { name: "Package manager" });
+	await expect(group).toHaveCount(1);
+	await expect(group.getByRole("radio")).toHaveCount(4);
+	await expect(install.locator("fieldset.segmented, [role='tab'], [role='tablist']")).toHaveCount(0);
+	const labels = await install.locator("label").evaluateAll((items) =>
+		items.map((item) => item.getBoundingClientRect()),
+	);
+	for (const label of labels) expect(Math.round(label.height)).toBeGreaterThanOrEqual(40);
+	for (let index = 1; index < labels.length; index++) {
+		expect(
+			labels[index].left - labels[index - 1].right,
+			"the options stand apart",
+		).toBeGreaterThanOrEqual(4);
+	}
+
+	// The keyboard walks it the way it walks any radio group.
+	await install.getByLabel("pnpm").focus();
+	await page.keyboard.press("ArrowRight");
+	await expect(install.getByLabel("Yarn")).toBeChecked();
+	expect(await visible()).toEqual(["yarn add @cirthcss/cirth"]);
+	await install.getByLabel("pnpm").check();
+
+	// The choice follows the reader to the next guide.
+	await page.goto(`${origin}/installation/vite/`, { waitUntil: "networkidle" });
+	await expect(page.locator("[data-docs-install] input[value='pnpm']")).toBeChecked();
+});
+
+// --- Pages that moved ---------------------------------------------------
+
+test("an old address forwards to the page that replaced it", async ({ page }) => {
+	for (const [from, to] of [
+		["/get-started/#cdn", "/installation/#cdn"],
+		["/get-started/#excluding-a-third-party-component", "/guides/existing-css/#excluding-a-third-party-component"],
+		["/deploy/#caching", "/delivery/#caching"],
+		["/utilities/reduce-motion/", "/guides/accessibility/#reduced-motion"],
+		// The CDN guide became the Installation page's first section. For a
+		// while the JavaScript guides were one page with a section each;
+		// each tool has its own page again, and a link to a section lands
+		// on that tool's page.
+		["/installation/cdn/", "/installation/#cdn"],
+		["/installation/cdn/#choosing-a-build", "/package/#screen-builds"],
+		["/installation/javascript/", "/framework-guides/"],
+		["/installation/javascript/#react", "/installation/react/"],
+		["/installation/javascript/#3-set-the-css-target", "/installation/vite/#3-set-the-css-target"],
+	]) {
+		await page.goto(`${origin}${from}`);
+		await page.waitForURL(`${origin}${to}`);
+		expect(page.url()).toBe(`${origin}${to}`);
+	}
+	// And says so without script, with a canonical link and a way to go on.
+	const response = await page.request.get(`${origin}/deploy/`);
+	const html = await response.text();
+	expect(html).toMatch(/<link rel="canonical" href="\/delivery\/"/);
+	expect(html).toMatch(/<meta name="robots" content="noindex"/);
+	expect(html).toMatch(/<a href="\/delivery\/">Delivery and deployment<\/a>/);
+
+	// The guides that came back are pages again, not forwards.
+	for (const slug of ["vite", "react", "vue", "sveltekit", "astro"]) {
+		const guide = await page.request.get(`${origin}/installation/${slug}/`);
+		const text = await guide.text();
+		expect(text, slug).not.toMatch(/<meta name="robots" content="noindex"/);
+		expect(text, slug).toMatch(/class="docs-project"/);
+	}
 });
 
 test.describe("without JavaScript", () => {
@@ -1121,740 +1239,443 @@ test.describe("without JavaScript", () => {
 	}) => {
 		await page.goto(`${origin}/`, { waitUntil: "load" });
 
-		const code = page.locator("[data-lab-source]");
-		await expect(code).toContainText('<main class="container">');
-		await expect(code).toContainText('name="password"');
+		const code = page.locator(".docs-hero-source pre code");
+		await expect(code).toContainText("<article>");
+		await expect(code).toContainText('<input type="password" required>');
 		await expect(code).toContainText("<button>Sign in</button>");
 		await expect(code).not.toContainText("…");
 		// Highlighted at build time, so it is highlighted here too.
 		expect(await code.locator("span").count()).toBeGreaterThan(10);
-		// The output is the real build, not a placeholder.
-		await expect(page.locator("[data-lab-frame]")).toHaveAttribute(
-			"src",
-			/\/lab\/default\//,
-		);
+		// The output is the real stylesheet rendering the real card.
 		await expect(
-			page.frameLocator("[data-lab-frame]").getByRole("heading", {
-				name: "Sign in",
-			}),
-		).toBeVisible();
-		// And the proof band is readable without a line of script.
-		await expect(page.locator(".docs-proof-metrics > div")).toHaveCount(4);
-		await expect(page.locator(".docs-proof-claims li")).toHaveCount(2);
+			page.locator(".docs-hero-render").getByRole("heading", { name: "Sign in" }),
+		).toHaveCount(1);
+		await expect(page.locator(".docs-hero-render article")).toBeVisible();
+		// The facts are readable without a line of script.
+		await expect(page.locator(".docs-facts-list > article")).toHaveCount(3);
 	});
 
-	// The showcase's fallback is the whole reason its tab strip ships
-	// `hidden` rather than inert: with no script there is no tablist, so
-	// all three examples are served rendered, complete, and under their own
-	// headings. A row of buttons that cannot change anything would be the
-	// other outcome, and this page's own rule, stated on the preset select
-	// beside it, is that a choice which cannot be applied is not offered.
-	test("the showcase degrades to three complete examples", async ({ page }) => {
+	// Every scene is whole without a script: the story's three pictures,
+	// the browser's own rendering from a declarative shadow root, the
+	// markup comparison with its bars, the finished theme, the presets
+	// comparator at the middle, without a control that could not move
+	// anything, and the close with its command and its figures.
+	test("every scene of the home page needs no script", async ({ page }) => {
 		await page.goto(`${origin}/`, { waitUntil: "load" });
 
-		const strip = page.locator("[data-docs-switch]");
-		await expect(strip).toHaveCount(1);
-		await expect(strip).toBeHidden();
-		// No roles either: a tabpanel with no tablist anywhere would be a
-		// lie about the document, so the script that implements them is
-		// what puts them there.
-		await expect(page.locator('[role="tablist"], [role="tab"]')).toHaveCount(0);
-		await expect(page.locator('[role="tabpanel"]')).toHaveCount(0);
-
-		const panels = page.locator("[data-docs-panel]");
-		await expect(panels).toHaveCount(3);
-		for (let index = 0; index < 3; index++) {
-			await expect(panels.nth(index)).toBeVisible();
-			await expect(
-				panels.nth(index).locator(".docs-example-name"),
-				`example ${index} names itself without the tab`,
-			).toBeVisible();
+		await expect(page.locator(".docs-home")).not.toHaveAttribute("data-stage", /.*/);
+		for (const part of ["1", "2", "3"]) {
+			await expect(page.locator(`[data-docs-story-part="${part}"]`)).toBeVisible();
+			await expect(page.locator(`[data-docs-story-part="${part}"] figcaption`)).not.toBeEmpty();
 		}
+		await expect(page.locator("[data-docs-story-code]")).toContainText("<button type=\"button\">Show ticket</button>");
+		expect(
+			await page
+				.locator(".docs-story-ua")
+				.evaluate((element) => element.shadowRoot?.querySelector("meter") !== null),
+		).toBe(true);
+		await expect(page.locator('[role="tablist"], [role="tab"], [role="tabpanel"]')).toHaveCount(0);
+		await expect(page.locator("[data-docs-bench-card]")).toHaveCount(2);
+		await expect(page.locator("[data-docs-bench-card] data").first()).toHaveText("0");
+		const bars = await page.locator(".docs-bench-bar").evaluateAll((items) => items.map((bar) => getComputedStyle(bar, "::before").scale));
+		expect(bars.every((scale) => scale === "1")).toBe(true);
+		await expect(page.locator(".docs-close pre code")).toHaveText("npm install @cirthcss/cirth");
 
-		// And the theme section is a listing and a finished interface, both
-		// served. The custom element never upgrades, so what renders is its
-		// own children: the same specimen, in the light DOM, painted by the
-		// page's Cirth. `:not(:defined)` is that state, and it is what
-		// carries the pane's padding while it lasts.
-		const listing = page.locator("[data-docs-theme-block]");
-		await expect(listing).toHaveCount(1);
-		await expect(listing).toContainText(".cirth {");
-		await expect(listing).toContainText("--cirth-primary");
+		// The finished theme, with all three of its declarations.
+		const themeOn = await page
+			.locator(".docs-theme-copy")
+			.evaluate((element) => [...(element.shadowRoot?.querySelectorAll("style[data-docs-theme-state]") ?? [])].filter((style) => /** @type {HTMLStyleElement} */ (style).media === "all").map((style) => /** @type {HTMLElement} */ (style).dataset.docsThemeState));
+		expect(themeOn).toEqual(["canvas"]);
+		await expect(page.locator(".docs-theme-code")).toContainText("1.125rem");
 
-		const preview = page.locator("cirth-theme-preview");
-		await expect(preview).toBeVisible();
-		const fallback = await preview.evaluate((element) => ({
-			defined: element.matches(":not(:defined)"),
-			shadow: element.shadowRoot !== null,
-			children: element.children.length,
-			padding: Number.parseFloat(getComputedStyle(element).paddingTop),
-		}));
-		expect(fallback.defined, "the element never upgrades").toBe(true);
-		expect(fallback.shadow).toBe(false);
-		expect(fallback.children).toBe(1);
-		// The pane gave its padding to the element, so the un-upgraded
-		// element has to carry it; otherwise the specimen sits against the
-		// stage's own edge.
-		expect(fallback.padding).toBeGreaterThan(8);
-		await expect(
-			preview.locator("article button", { hasText: "Save changes" }),
-		).toBeVisible();
+		await expect(page.locator("[data-docs-compare-range]")).toBeHidden();
+		await expect(page.locator("[data-docs-compare-preset]")).toBeHidden();
+		const halves = await page
+			.locator(".docs-compare-layer")
+			.evaluateAll((layers) => layers.map((layer) => layer.shadowRoot?.querySelectorAll("button").length ?? 0));
+		expect(halves).toEqual([2, 2]);
+		await expect(page.locator(".docs-compare")).toBeVisible();
 
-		// The control that drives the sequence is not offered, because
-		// without script there is no sequence to pause.
-		await expect(page.locator("[data-docs-theme-toggle]")).toBeHidden();
+		await page.locator(".docs-pure").getByRole("button", { name: "Get started" }).click();
+		await expect(page).toHaveURL(/\/installation\/?$/);
 	});
 });
 
 
-// --- The home page's showcase sections ---------------------------------
+// --- The home page's story -----------------------------------------------
 
-// Every specimen on this page is declared once in home.njk and used twice:
-// rendered into the page, and highlighted into the pane beside it. The
-// point of doing it that way is that the two cannot drift: the hero has
-// had exactly that bug before, a snippet declaring attributes the rendered
-// output no longer had, so the contract to pin is equality, not the
-// presence of either half.
+// The story's specimen is declared once in home.njk and used three times:
+// listed, rendered with no stylesheet, and rendered by Cirth. The contract
+// worth pinning is that the three are the same markup.
 const normalizeMarkup = (/** @type {string} */ html) =>
 	html
 		.replace(/\s+/g, " ")
 		.replace(/>\s+</g, "><")
-		// `open` and `open=""` are the same attribute. The specimen writes
-		// the bare form, which is what an author writes and what the pane
-		// therefore lists; `outerHTML` always serialises the empty-string
-		// form. Normalising both sides the same way compares the markup
-		// rather than the serialiser.
+		// `open` and `open=""` are the same attribute; `outerHTML` always
+		// writes the second.
 		.replace(/=""/g, "")
 		.trim();
 
-/** The three examples, in the order the strip offers them. */
-const showcaseExamples = ["article", "details", "form"];
-
-/**
- * @param {import("@playwright/test").Page} page
- * @param {string} id
- */
-const openExample = async (page, id) => {
-	await page.locator(`[data-docs-tab="${id}"]`).click();
-	await expect(page.locator(`[data-docs-panel="${id}"]`)).toBeVisible();
-};
-
-test("each source pane is the markup that produced the specimen beside it", async ({
-	page,
-}) => {
+test("the story lists the markup it renders, with and without Cirth", async ({ page }) => {
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	// All three, not just the one that happens to be showing: an example
-	// nobody looks at is exactly where a listing drifts from its specimen.
-	for (const id of showcaseExamples) {
-		await openExample(page, id);
-		const scope = page.locator(`[data-docs-panel="${id}"]`);
-		const listed = await scope.locator(".docs-stage-code pre code").innerText();
-		const rendered = await scope
-			.locator(".docs-stage-preview article")
-			.evaluate((element) => element.outerHTML);
-
-		expect(
-			normalizeMarkup(listed),
-			`${id}: the pane lists what the page rendered`,
-		).toBe(normalizeMarkup(rendered));
-
-		// Highlighted at build time, like every other code block on the site.
-		expect(
-			await scope.locator("pre code span").count(),
-			`${id} is highlighted`,
-		).toBeGreaterThan(10);
-	}
-});
-
-// The strip is the WAI-ARIA tabs pattern or it is three buttons pretending:
-// one tab stop for the whole strip, arrows walking it, one panel showing,
-// and the panel named by the tab that opened it.
-test("the showcase strip is a real tablist", async ({ page }) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	const strip = page.locator("[data-docs-switch]");
-	await expect(strip).toBeVisible();
-	await expect(strip).toHaveAttribute("role", "tablist");
-
-	const tabs = page.getByRole("tab");
-	await expect(tabs).toHaveCount(3);
-
-	/** Exactly one panel is in the document at a time. */
-	const assertOnlyOpen = async (/** @type {string} */ id) => {
-		for (const other of showcaseExamples) {
-			await expect(
-				page.locator(`[data-docs-panel="${other}"]`),
-				`${other} while ${id} is selected`,
-			)[other === id ? "toBeVisible" : "toBeHidden"]();
-		}
-		// Roving tabindex: one stop for the strip, on the selected tab.
-		expect(
-			await tabs.evaluateAll((items) =>
-				items.map((item) => `${item.getAttribute("aria-selected")}/${item.tabIndex}`),
-			),
-		).toEqual(
-			showcaseExamples.map((other) =>
-				other === id ? "true/0" : "false/-1",
-			),
-		);
-	};
-
-	await assertOnlyOpen("article");
-
-	// Each tab controls a panel, and each panel is named by its tab:
-	// which is what lets the heading in the panel be dropped once the
-	// strip is on without the panel losing its name.
-	for (const id of showcaseExamples) {
-		const tab = page.locator(`[data-docs-tab="${id}"]`);
-		const panel = page.locator(`[data-docs-panel="${id}"]`);
-		await expect(tab).toHaveAttribute("aria-controls", `panel-${id}`);
-		await expect(panel).toHaveAttribute("role", "tabpanel");
-		await expect(panel).toHaveAttribute("aria-labelledby", `tab-${id}`);
-		await expect(panel).toHaveAttribute("tabindex", "0");
-	}
-
-	// Arrow keys walk the strip and selection follows focus, because every
-	// panel is already in the document: nothing is fetched by arrowing.
-	await page.locator('[data-docs-tab="article"]').focus();
-	await page.keyboard.press("ArrowRight");
-	await assertOnlyOpen("details");
-	await expect(page.locator('[data-docs-tab="details"]')).toBeFocused();
-	await page.keyboard.press("End");
-	await assertOnlyOpen("form");
-	await page.keyboard.press("ArrowRight");
-	await assertOnlyOpen("article");
-	await page.keyboard.press("Home");
-	await assertOnlyOpen("article");
-
-	// The tab strip is the only control in this section, and it takes a
-	// ring like everything else the page asks a reader to operate.
-	expect(
-		await page
-			.locator('[data-docs-tab="article"]')
-			.evaluate((element) => {
-				const style = getComputedStyle(element);
-				return (
-					(style.outlineStyle !== "none" &&
-						Number.parseFloat(style.outlineWidth) > 0) ||
-					style.boxShadow !== "none"
-				);
-			}),
-		"the focused tab paints a ring",
-	).toBe(true);
-
-	// With the strip on, the panel's own heading is redundant with the tab
-	// above it and is taken out of the page rather than repeated.
-	await expect(page.locator(".docs-example-name").first()).toBeHidden();
-
-	// And the strip is the section's control, not a row of the stage's
-	// band: it sits outside the stage, above it, on the section's own
-	// column. In the band it read as part of the listing's toolbar, beside
-	// the file name and the copy affordance.
-	const stage = page.locator('[aria-labelledby="semantic-title"] .docs-stage');
-	expect(
-		await strip.evaluate((element) => element.closest(".docs-stage") !== null),
-		"the strip is outside the stage",
-	).toBe(false);
-	await expect(stage.locator(".docs-switch")).toHaveCount(0);
-
-	const [stripBox, stageBox] = await Promise.all([
-		strip.boundingBox(),
-		stage.boundingBox(),
-	]);
-	if (!stripBox || !stageBox) throw new Error("Expected the strip and stage");
-	expect(stripBox.y + stripBox.height).toBeLessThanOrEqual(stageBox.y + 1);
-	expect(Math.round(stripBox.x)).toBe(Math.round(stageBox.x));
-	// Close enough to read as attached to what it switches, and not so far
-	// that it reads as loose copy.
-	expect(stageBox.y - (stripBox.y + stripBox.height)).toBeLessThan(24);
-});
-
-// The two sections this one absorbed both claimed the browser does the
-// work. That claim now belongs to two of the three examples, and it has to
-// be true of the elements the page actually renders.
-test("the showcase's examples are the browser's own behaviour", async ({
-	page,
-}) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	// 1 — an exclusive disclosure group. One `name`, so opening the second
-	// closes the first, and it is the browser doing it.
-	await openExample(page, "details");
-	const panel = page.locator('[data-docs-panel="details"]');
-	const rows = panel.locator("details");
-	await expect(rows).toHaveCount(2);
-	const names = await rows.evaluateAll((items) =>
-		items.map((item) => item.getAttribute("name")),
+	const listed = normalizeMarkup((await page.locator("[data-docs-story-code]").textContent()) ?? "");
+	const cirth = normalizeMarkup(await page.locator(".docs-story-result").evaluate((element) => element.innerHTML));
+	const browser = normalizeMarkup(
+		await page.locator(".docs-story-ua").evaluate((element) => element.shadowRoot?.querySelector(".ua")?.innerHTML ?? ""),
 	);
-	expect(new Set(names).size).toBe(1);
-	expect(names[0]).toBeTruthy();
-
-	await expect(rows.nth(0)).toHaveAttribute("open", "");
-	await rows.nth(1).locator("summary").click();
-	await expect(rows.nth(1)).toHaveAttribute("open", "");
-	await expect(rows.nth(0)).not.toHaveAttribute("open", "");
-
-	// 2 — the browser's own validity state, painted by the framework, and
-	// held back until the reader has caused it. `:user-invalid`, not
-	// `:invalid`: a required field is invalid on arrival, and nothing on
-	// this page is painted red before anyone has touched it.
-	await openExample(page, "form");
-	const email = page.locator('[data-docs-panel="form"] input[type="email"]');
-	expect(
-		await email.evaluate((el) => el.matches(":user-invalid")),
-		"nothing is invalid on arrival",
-	).toBe(false);
-	const resting = await email.evaluate(
-		(el) => getComputedStyle(el).borderColor,
-	);
-	await email.fill("not-an-address");
-	await email.blur();
-	expect(await email.evaluate((el) => el.matches(":user-invalid"))).toBe(true);
-	expect(
-		await email.evaluate((el) => getComputedStyle(el).borderColor),
-		"an invalid field is repainted",
-	).not.toBe(resting);
-
-	// And nothing in any of the three samples is wired to anything, which
-	// is the sentence under the heading. The switcher is in the band, not
-	// in a sample, and there is no inline handler anywhere in the section.
-	const section = page.locator('[aria-labelledby="semantic-title"]');
-	expect(
-		await section.locator(".docs-stage-deck :is(script, [onclick], [onchange], [onsubmit])").count(),
-	).toBe(0);
-
-	// No <form> in the samples either, and that is deliberate: a form with
-	// no action submits to this page, so a reader who filled the field in
-	// would be navigated off the home page by a demo whose claim is that
-	// nothing here is wired. Constraint validation does not need a form
-	// owner, which is why the example above still works.
-	expect(await section.locator("form").count()).toBe(0);
+	expect(listed).toContain('<meter value="0.7" low="0.5" high="0.8" optimum="0">70%</meter>');
+	// No class anywhere in it: the elements say what they are.
+	expect(listed).not.toMatch(/\sclass=/);
+	expect(cirth).toBe(listed);
+	expect(browser).toBe(listed);
 });
 
-test("every control in the showcase specimens is reachable and takes a ring", async ({
-	page,
-}) => {
+test("the browser's picture is its defaults and a picture; Cirth's ticket is live and the library's own", async ({ page }) => {
 	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	const ua = page.locator(".docs-story-ua");
+	await expect(ua).toHaveAttribute("inert", "");
+	const looks = await page.evaluate(() => {
+		const host = /** @type {HTMLElement} */ (document.querySelector(".docs-story-ua"));
+		const plain = /** @type {HTMLElement} */ (host.shadowRoot?.querySelector("button"));
+		const styled = /** @type {HTMLElement} */ (document.querySelector(".docs-story-result button"));
+		return {
+			plainFont: getComputedStyle(/** @type {Element} */ (host.shadowRoot?.querySelector(".ua"))).fontFamily,
+			pageFont: getComputedStyle(document.body).fontFamily,
+			plainHeight: plain.getBoundingClientRect().height,
+			styledHeight: styled.getBoundingClientRect().height,
+			// Nothing in home.css restyles the ticket's own elements: no rule
+			// there names an element inside the result.
+			homeRules: [...document.styleSheets]
+				.filter((sheet) => sheet.href?.endsWith("/styles/home.css"))
+				.flatMap((sheet) => [...sheet.cssRules].flatMap((rule) => ("cssRules" in rule ? [rule, .../** @type {CSSGroupingRule} */ (rule).cssRules] : [rule])))
+				.map((rule) => /** @type {CSSStyleRule} */ (rule).selectorText ?? "")
+				.filter((selector) => /\.docs-story-result\s*>?\s*(?:article\s+)?(?:hgroup|dl|dt|dd|meter|fieldset|legend|input|button|label|time|h3|p)\b/.test(selector)),
+		};
+	});
+	// No stylesheet reaches the picture: neither the page's face nor
+	// Cirth's control size.
+	expect(looks.plainFont).not.toBe(looks.pageFont);
+	expect(looks.styledHeight).toBeGreaterThan(looks.plainHeight + 8);
+	expect(looks.homeRules).toEqual([]);
 
-	let checked = 0;
-	// Every example, not only the one showing: a control in a panel nobody
-	// opened is still a control a reader can reach.
-	for (const id of [...showcaseExamples, null]) {
-		if (id) await openExample(page, id);
+	// Cirth's copy is the real thing: the radios keep one choice, the gauge
+	// has its region, and the button takes the keyboard.
+	const radios = page.locator(".docs-story-result [type=radio]");
+	await expect(radios.nth(0)).toBeChecked();
+	await radios.nth(1).click();
+	await expect(radios.nth(1)).toBeChecked();
+	await expect(radios.nth(0)).not.toBeChecked();
+	await page.locator(".docs-story-result label", { hasText: "Email" }).click();
+	await expect(radios.nth(0)).toBeChecked();
+	expect(await page.locator(".docs-story-result meter").evaluate((meter) => /** @type {HTMLMeterElement} */ (meter).value)).toBe(0.7);
+	const button = page.locator(".docs-story-result button");
+	await button.focus();
+	await expect(button).toBeFocused();
+});
 
-		// Form controls and summaries only, which is what every engine
-		// reaches with default settings (see the note at the top of this
-		// file). Visible ones, because a hidden panel's controls are out of
-		// the document's tab order by design.
-		const controls = page.locator(
-			".docs-example:not([hidden]) .docs-stage-preview :is(input, select, summary), .docs-theme-showcase .docs-stage-preview :is(input, select, summary)",
-		);
-		const count = await controls.count();
-		for (let index = 0; index < count; index++) {
-			const control = controls.nth(index);
-			// A Tab first, because opening an example is a click and every
-			// engine's `:focus-visible` heuristic remembers that the last
-			// interaction was a pointer: a programmatic focus after a click
-			// is deliberately not focus-visible. The keypress puts the
-			// browser back in the modality this assertion is about.
-			await page.keyboard.press("Tab");
-			await control.focus();
-			expect(
-				await control.evaluate((element) => element.matches(":focus-visible")),
-				`${id ?? "theme"} control ${index} takes focus`,
-			).toBe(true);
-			const ring = await control.evaluate((element) => {
-				const style = getComputedStyle(element);
+// --- The presets comparator -------------------------------------------
+
+test("the imports under the list load the preset the halves wear", async ({ page }) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	const options = await page.locator("[data-docs-compare-preset] option").evaluateAll((items) => items.map((item) => [item.getAttribute("value"), item.textContent?.trim()]));
+	expect(options).toEqual([["default", "Default"], ["material", "Material"], ["metro", "Metro"], ["plain", "Plain"]]);
+	const line = page.locator("[data-docs-compare-import][data-current]");
+	await expect(line).toHaveText('@import "@cirthcss/cirth";', { useInnerText: true });
+	for (const name of ["material", "metro", "plain"]) {
+		await page.locator("[data-docs-compare-preset]").selectOption(name);
+		// Cirth, then the preset after it, as the Presets page loads one.
+		await expect(line).toHaveText(`@import "@cirthcss/cirth";\n@import "@cirthcss/cirth/presets/${name}";`, { useInnerText: true });
+		await expect(line).toBeVisible();
+		await expect(page.locator("[data-docs-compare-import]:not([data-current])").first()).toHaveCSS("visibility", "hidden");
+	}
+	// Two short lines, not a block competing with the comparator.
+	await expect(page.locator(".docs-presets pre")).toHaveCount(0);
+});
+
+test("one preset in both halves: light on the left, dark on the right, never on the host", async ({ page }) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	const read = () =>
+		page.locator(".docs-compare-layer").evaluateAll((layers) =>
+			layers.map((layer) => {
+				const root = /** @type {ShadowRoot} */ (layer.shadowRoot);
+				const surface = /** @type {Element} */ (root.querySelector("[data-docs-compare-surface]"));
 				return {
-					style: style.outlineStyle,
-					width: Number.parseFloat(style.outlineWidth),
-					shadow: style.boxShadow,
+					host: layer.getAttribute("data-theme"),
+					theme: surface.getAttribute("data-theme"),
+					scheme: getComputedStyle(surface).colorScheme,
+					canvas: getComputedStyle(surface).backgroundColor,
+					radius: getComputedStyle(/** @type {Element} */ (root.querySelector('input[type="email"]'))).borderTopLeftRadius,
+					on: [...root.querySelectorAll("link[data-docs-preset]")].filter((link) => /** @type {HTMLLinkElement} */ (link).media === "all").map((link) => /** @type {HTMLElement} */ (link).dataset.docsPreset),
+				};
+			}),
+		);
+	const pick = page.locator("[data-docs-compare-preset]");
+	await expect(pick).toBeVisible();
+	await expect(pick).toHaveValue("default");
+	/** @type {Record<string, string>} */
+	const radii = {};
+	for (const name of ["default", "material", "metro", "plain"]) {
+		await pick.selectOption(name);
+		const [light, dark] = await read();
+		expect(light.host, "a data-theme on the shadow host").toBeNull();
+		expect(dark.host, "a data-theme on the shadow host").toBeNull();
+		expect([light.theme, dark.theme]).toEqual(["light", "dark"]);
+		expect([light.scheme, dark.scheme]).toEqual(["light", "dark"]);
+		expect(light.canvas).not.toBe(dark.canvas);
+		// The same theme on both sides.
+		expect(light.radius).toBe(dark.radius);
+		expect(light.on).toEqual(name === "default" ? [] : [name]);
+		expect(dark.on).toEqual(light.on);
+		radii[name] = light.radius;
+	}
+	expect(radii.metro).toBe("0px");
+	expect(new Set(Object.values(radii)).size).toBeGreaterThan(2);
+
+	// The page's own scheme and preset reach neither half.
+	const before = await read();
+	await page.locator(".docs-theme-toggle").click();
+	await page.locator("[data-cirth-preset-select]").first().selectOption("material");
+	await page.waitForTimeout(500);
+	expect((await read()).map((half) => [half.scheme, half.canvas, half.radius])).toEqual(before.map((half) => [half.scheme, half.canvas, half.radius]));
+});
+
+test("picking a preset moves nothing on the page", async ({ page }) => {
+	for (const width of [320, 390, 1024, 1440]) {
+		await page.setViewportSize({ width, height: 900 });
+		await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+		const layout = () =>
+			page.evaluate(() =>
+				[".docs-compare-frame", ".docs-compare > figcaption", ".docs-presets .docs-section-more", ".docs-agnostic"].map((selector) => {
+					const box = /** @type {Element} */ (document.querySelector(selector)).getBoundingClientRect();
+					return [Math.round(box.top + window.scrollY), Math.round(box.height)];
+				}),
+			);
+		const first = await layout();
+		for (const name of ["material", "metro", "plain", "default"]) {
+			await page.locator("[data-docs-compare-preset]").selectOption(name);
+			expect(await layout(), `${width}px ${name}`).toEqual(first);
+		}
+	}
+});
+
+test("the divider is a real range: keyboard, pointer, a name and a value", async ({ page }) => {
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	const compare = page.locator("[data-docs-compare]");
+	const range = page.getByRole("slider", { name: "Divider between the light and the dark scheme" });
+	await expect(range).toHaveCount(1);
+	await expect(range).toHaveAttribute("aria-valuetext", "Half light, half dark");
+	const split = () => compare.evaluate((element) => getComputedStyle(element).getPropertyValue("--docs-split").trim());
+
+	await range.focus();
+	await page.keyboard.press("Home");
+	await expect(range).toHaveValue("0");
+	await expect(range).toHaveAttribute("aria-valuetext", "All dark");
+	await page.keyboard.press("End");
+	await expect(range).toHaveAttribute("aria-valuetext", "All light");
+	await page.keyboard.press("Home");
+	for (let index = 0; index < 20; index++) await page.keyboard.press("ArrowRight");
+	await expect(range).toHaveValue("20");
+	expect(await split()).toBe("20%");
+	await expect(range).toHaveAttribute("aria-valuetext", "20% light, 80% dark");
+	// The ring is drawn on the handle, where the reader looks.
+	await expect(page.locator(".docs-compare-handle")).not.toHaveCSS("outline-style", "none");
+
+	// A press anywhere on the frame moves the divider there.
+	const frame = await page.locator(".docs-compare-frame").boundingBox();
+	if (!frame) throw new Error("no frame");
+	await page.mouse.click(frame.x + frame.width * 0.75, frame.y + frame.height / 2);
+	const value = Number(await range.inputValue());
+	expect(value).toBeGreaterThanOrEqual(72);
+	expect(value).toBeLessThanOrEqual(78);
+
+	// The two copies are pictures: the list and the range are the only
+	// controls, and Tab meets each of them once.
+	for (const layer of await page.locator(".docs-compare-layer").all()) {
+		await expect(layer).toHaveAttribute("inert", "");
+	}
+	const focusable = await page.locator(".docs-presets").evaluate((section) =>
+		[...section.querySelectorAll("a, button, input, select, [tabindex]")].filter((element) => {
+			const style = getComputedStyle(element);
+			return !element.closest("[inert]") && style.visibility === "visible" && style.display !== "none" && !element.hasAttribute("hidden");
+		}).map((element) => element.tagName),
+	);
+	expect(focusable.filter((tag) => tag === "SELECT")).toHaveLength(1);
+	expect(focusable.filter((tag) => tag === "INPUT")).toHaveLength(1);
+
+	// No labels drawn as badges over the frame: the schemes are named in
+	// the copies' own ink.
+	await expect(page.locator(".docs-compare-label")).toHaveCount(0);
+	const names = await page.locator(".docs-compare-layer").evaluateAll((layers) => layers.map((layer) => layer.shadowRoot?.querySelector(".scheme")?.textContent));
+	expect(names).toEqual(["Light", "Dark"]);
+});
+
+test("nothing moves the divider but the reader", async ({ page }) => {
+	await page.emulateMedia({ reducedMotion: "no-preference" });
+	await page.setViewportSize({ width: 1440, height: 900 });
+	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+	const range = page.locator("[data-docs-compare-range]");
+	const split = () => page.locator("[data-docs-compare]").evaluate((element) => getComputedStyle(element).getPropertyValue("--docs-split").trim());
+	// Arriving at the comparator plays nothing: no hint, no animation.
+	await page.locator(".docs-compare").evaluate((element) => element.scrollIntoView({ block: "center" }));
+	await page.waitForTimeout(1800);
+	expect(await split()).toBe("50%");
+	expect(await page.locator(".docs-compare").evaluate((element) => element.getAnimations({ subtree: true }).length)).toBe(0);
+	await range.focus();
+	await page.keyboard.press("ArrowLeft");
+	await page.waitForTimeout(1200);
+	expect(await range.inputValue()).toBe("49");
+	expect(await split()).toBe("49%");
+});
+
+// --- Your theme --------------------------------------------------------
+
+test("the demonstration's theme is its own: no value is the default's or a preset's", () => {
+	const fs = require("node:fs");
+	const path = require("node:path");
+	const themeDemo = require("../docs/src/_data/themeDemo.js");
+	/** @param {string} text */
+	const declared = (text) =>
+		Object.fromEntries(
+			[...text.matchAll(/(--cirth-[\w-]+):\s*([^;]+);/g)].map(([, prop, value]) => [
+				prop,
+				value.replace(/\s+/g, " ").replace(/\(\s+/g, "(").replace(/\s+\)/g, ")").replace(/(\d)deg\b/g, "$1").trim(),
+			]),
+		);
+	const postcss = require("postcss");
+	const generated = path.join(__dirname, "../docs/src/styles/generated");
+	// A theme root's own declarations, at the top of the file or of its one
+	// cascade layer, as the docs build reads them for the presets page.
+	/** @param {string} file */
+	const themeRoot = (file) => {
+		/** @type {Record<string, string>} */
+		const found = {};
+		postcss.parse(fs.readFileSync(path.join(generated, file), "utf8")).walkRules((rule) => {
+			const parent = rule.parent;
+			const top = parent?.type === "root" || (parent?.type === "atrule" && /** @type {import("postcss").AtRule} */ (parent).name === "layer" && parent.parent?.type === "root");
+			if (!top || !rule.selector.split(",").every((selector) => /^(:root|:host|\.cirth)$/.test(selector.trim()))) return;
+			Object.assign(found, declared(rule.toString()));
+		});
+		return found;
+	};
+	/** @type {Record<string, Record<string, string>>} */
+	const shipped = { default: themeRoot("cirth-lab-scoped.css") };
+	for (const name of ["material", "metro", "plain"]) shipped[name] = themeRoot(`presets/${name}.css`);
+	for (const [name, values] of Object.entries(shipped)) {
+		expect(values["--cirth-primary"], `${name} declares an accent`).toBeTruthy();
+	}
+	const normal = (/** @type {string} */ value) => value.replace(/\s+/g, " ").replace(/(\d)deg\b/g, "$1").trim();
+	expect(themeDemo.states).toHaveLength(4);
+	// The first state is Cirth as it ships: nothing declared, no stylesheet.
+	expect(themeDemo.states[0].values).toEqual({});
+	expect(themeDemo.states[0].css).toBe("");
+	// Every value a later state declares is the demonstration's own.
+	for (const state of themeDemo.changes) {
+		for (const [token, raw] of Object.entries(state.values)) {
+			const value = normal(String(raw));
+			for (const [name, values] of Object.entries(shipped)) {
+				if (values[token]) expect(value, `${state.id} ${token} is ${name}'s`).not.toBe(normal(values[token]));
+			}
+		}
+	}
+	// One declaration changes at each step, in the order the steps name.
+	expect(themeDemo.states.slice(1).map((state) => state.changes)).toEqual(themeDemo.tokens);
+	for (let index = 1; index < themeDemo.states.length; index += 1) {
+		const changed = themeDemo.tokens.filter((token) => themeDemo.states[index].values[token] !== themeDemo.states[index - 1].values[token]);
+		expect(changed).toEqual([themeDemo.states[index].changes]);
+	}
+});
+
+test("the theme copy wears each state inside its shadow root, and reads at AA in every one", async ({ page }) => {
+	const themeDemo = require("../docs/src/_data/themeDemo.js");
+	for (const scheme of /** @type {const} */ (["light", "dark"])) {
+		await page.emulateMedia({ colorScheme: scheme, reducedMotion: "no-preference" });
+		await page.setViewportSize({ width: 1440, height: 900 });
+		await page.goto(`${origin}/`, { waitUntil: "networkidle" });
+		const host = page.locator(".docs-theme-copy");
+		// Live, not a picture: its controls are there to be used.
+		await expect(host).not.toHaveAttribute("inert", /.*/);
+		expect(await host.getAttribute("data-theme"), "a data-theme on the shadow host").toBeNull();
+		for (const [index, p] of [0.05, 0.3, 0.52, 0.85].entries()) {
+			await page.locator("[data-docs-theme]").evaluate((section, p) => {
+				window.scrollTo(0, section.getBoundingClientRect().top + window.scrollY + p * (/** @type {HTMLElement} */ (section).offsetHeight - window.innerHeight));
+			}, p);
+			const id = themeDemo.states[index].id;
+			await expect(page.locator("[data-docs-theme]")).toHaveAttribute("data-state", id);
+			// Cirth's own control transitions finish before reading colours.
+			await page.waitForTimeout(400);
+			const read = await host.evaluate((element) => {
+				const root = /** @type {ShadowRoot} */ (element.shadowRoot);
+				const on = [...root.querySelectorAll("style[data-docs-theme-state]")].filter((style) => /** @type {HTMLStyleElement} */ (style).media === "all").map((style) => /** @type {HTMLElement} */ (style).dataset.docsThemeState);
+				const surface = /** @type {HTMLElement} */ (root.querySelector("[data-docs-theme-surface]"));
+				const canvas = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
+				if (!canvas) throw new Error("no canvas");
+				/** @param {string} colour */
+				const rgb = (colour) => {
+					canvas.clearRect(0, 0, 1, 1);
+					canvas.fillStyle = colour;
+					canvas.fillRect(0, 0, 1, 1);
+					return [...canvas.getImageData(0, 0, 1, 1).data];
+				};
+				/** @param {number[]} colour */
+				const luminance = ([r, g, b]) => {
+					const f = (/** @type {number} */ v) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+					return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+				};
+				/** @param {number[]} a @param {number[]} b */
+				const ratio = (a, b) => {
+					const [x, y] = [luminance(a), luminance(b)].sort((m, n) => n - m);
+					return (x + 0.05) / (y + 0.05);
+				};
+				// What is behind a node: every background up to the first
+				// opaque one, painted bottom up, so a translucent wash (a
+				// secondary button's) is read over what it washes.
+				/** @param {Element | null} node */
+				const background = (node) => {
+					const layers = [];
+					for (let at = node; at; at = at.parentElement) {
+						const colour = getComputedStyle(at).backgroundColor;
+						const alpha = rgb(colour)[3];
+						if (alpha > 0) layers.push(colour);
+						if (alpha === 255) break;
+					}
+					canvas.clearRect(0, 0, 1, 1);
+					canvas.fillStyle = getComputedStyle(surface).backgroundColor;
+					canvas.fillRect(0, 0, 1, 1);
+					for (const colour of layers.reverse()) {
+						canvas.fillStyle = colour;
+						canvas.fillRect(0, 0, 1, 1);
+					}
+					return [...canvas.getImageData(0, 0, 1, 1).data];
+				};
+				/** @param {string} selector */
+				const text = (selector) => {
+					const node = /** @type {Element} */ (root.querySelector(selector));
+					const behind = background(node);
+					return ratio(rgb(getComputedStyle(node).color), behind);
+				};
+				return {
+					on,
+					scheme: getComputedStyle(surface).colorScheme,
+					theme: surface.getAttribute("data-theme"),
+					primary: text("footer button:not(.secondary)"),
+					secondary: text("footer button.secondary"),
+					chosen: text("fieldset > label:has(:checked)"),
+					unchosen: text("fieldset > label:not(:has(:checked))"),
+					legend: text("legend"),
+					checkbox: text("label:has([type=checkbox])"),
+					checklist: text("article > label"),
+					subtitle: text("hgroup p"),
 				};
 			});
-			expect(
-				(ring.style !== "none" && ring.width > 0) || ring.shadow !== "none",
-				`${id ?? "theme"} control ${index} paints a focus ring`,
-			).toBe(true);
-			checked += 1;
+			// The first state is Cirth as it ships, with no stylesheet of its own on.
+			expect(read.on, `${scheme} ${id}`).toEqual(index === 0 ? [] : [id]);
+			expect(read.theme).toBe(scheme);
+			expect(read.scheme).toBe(scheme);
+			for (const [what, value] of Object.entries(read)) {
+				if (typeof value === "number") expect(value, `${scheme} ${id}: ${what}`).toBeGreaterThanOrEqual(4.5);
+			}
 		}
 	}
-	expect(checked).toBeGreaterThanOrEqual(8);
-});
-
-// --- The theme section --------------------------------------------------
-
-/**
- * The listing beside the preview and the stylesheet the preview is really
- * carrying, normalised the same way. The listing breaks a `light-dark()`
- * value over three lines to fit the pane; the applied declaration is one
- * line. Collapsing whitespace, and the padding a broken line leaves
- * inside the parentheses: compares the declarations rather than the two
- * formattings of them.
- * @param {string} css
- */
-const normalizeCss = (css) =>
-	css
-		.replace(/\s+/g, " ")
-		.replace(/\(\s+/g, "(")
-		.replace(/\s+\)/g, ")")
-		.trim();
-
-/**
- * What the demo is showing and what it is doing, read together.
- * @param {import("@playwright/test").Page} page
- */
-const themeState = (page) =>
-	page.evaluate(() => {
-		const element = document.querySelector("cirth-theme-preview");
-		const shadow = element?.shadowRoot;
-		const surface = shadow?.querySelector(".cirth");
-		const style = shadow?.querySelector("style[data-cirth-theme]");
-		const block = document.querySelector("[data-docs-theme-block]");
-		return {
-			applied: style?.textContent ?? "",
-			listed: block?.textContent ?? "",
-			marked: [...document.querySelectorAll(".docs-token.is-changed")].map(
-				(line) => line.getAttribute("data-token"),
-			),
-			// Resolved through the element, which is the only way to ask what
-			// the demo's own copy of Cirth thinks a token is.
-			accent: surface
-				? getComputedStyle(surface).getPropertyValue("--cirth-primary").trim()
-				: "",
-			radius: surface
-				? getComputedStyle(
-						/** @type {Element} */ (surface.querySelector("article")),
-					).borderTopLeftRadius
-				: "",
-			button: surface
-				? getComputedStyle(
-						/** @type {Element} */ (surface.querySelector("button")),
-					).backgroundColor
-				: "",
-			pageAccent: getComputedStyle(document.documentElement)
-				.getPropertyValue("--cirth-primary")
-				.trim(),
-			chip: getComputedStyle(
-				/** @type {Element} */ (
-					document.querySelector(
-						'.docs-token-legend li[data-token="--cirth-primary"] .docs-token-chip',
-					)
-				),
-			).backgroundColor,
-		};
-	});
-
-// The demo is a custom element with its own copy of Cirth in a shadow
-// root, and every claim this section makes rests on that: the declarations
-// it applies have to reach the preview and nothing else, and the listing
-// beside it has to be the stylesheet the preview is carrying rather than a
-// picture of one.
-test("the theme preview carries its own Cirth, in a shadow root", async ({
-	page,
-}) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	const element = page.locator("cirth-theme-preview");
-	await expect(element).toHaveCount(1);
-
-	const shadow = await element.evaluate((host) => {
-		const root = host.shadowRoot;
-		const sheets = [...(root?.querySelectorAll("link[rel=stylesheet]") ?? [])];
-		return {
-			mode: root ? "open" : "none",
-			// The real compiled scoped build, not a look-alike written for
-			// the demo: the same artifact the /lab/ specimens load.
-			stylesheets: sheets.map((sheet) =>
-				String(sheet.getAttribute("href")).replace(/^.*\/styles\//, "styles/"),
-			),
-			// The theme comes after Cirth's own sheet: an ordinary stylesheet
-			// loaded after it, overriding custom properties at the same
-			// specificity, which is what the documentation tells an author to
-			// write. Before it, every declaration would lose.
-			themeAfterCirth:
-				[...(root?.children ?? [])].findIndex((child) =>
-					child.matches("style[data-cirth-theme]"),
-				) >
-				[...(root?.children ?? [])].findIndex((child) =>
-					child.matches("link[rel=stylesheet]"),
-				),
-			// The scoped build's theme root, which is what the listing names.
-			wrapper: root?.querySelector(".cirth")?.tagName.toLowerCase() ?? null,
-			specimen: root?.querySelector(".cirth > article")?.tagName.toLowerCase() ?? null,
-			// The fallback children were taken into the shadow root, not left
-			// behind as a second, unrendered copy of the same form.
-			lightChildren: host.children.length,
-		};
-	});
-	expect(shadow.mode).toBe("open");
-	expect(shadow.stylesheets).toEqual(["styles/generated/cirth-lab-scoped.css"]);
-	expect(shadow.themeAfterCirth).toBe(true);
-	expect(shadow.wrapper).toBe("div");
-	expect(shadow.specimen).toBe("article");
-	expect(shadow.lightChildren).toBe(0);
-
-	// The listing is the stylesheet. Not "shows the same values": the same
-	// text, which is the only version of this claim that cannot drift.
-	const state = await themeState(page);
-	expect(normalizeCss(state.listed)).toBe(normalizeCss(state.applied));
-	expect(state.applied).toContain(".cirth {");
-	for (const token of [
-		"--cirth-primary",
-		"--cirth-border-radius",
-		"--cirth-canvas",
-	]) {
-		expect(state.applied, `${token} is applied`).toContain(token);
-	}
-
-	// Nothing is marked before anything has moved, and the demo is served
-	// in the default theme: the page's own, so the section opens on
-	// agreement rather than on a difference the reader did not ask for.
-	expect(state.marked).toEqual([]);
-	expect(state.accent).toBe(state.pageAccent);
-
-	// The chip is painted by the value the preview is carrying, so a swatch
-	// cannot show one accent while the preview shows another.
-	expect(state.chip).toBe(state.button);
-});
-
-// The isolation, exercised rather than asserted: the site's own preset
-// switcher moves the page's tokens, and the demo, which has just been
-// given a different set of values, does not move with it. This is the
-// property the shadow root is for, and the reason the section can show a
-// page theme and a demo theme at the same time.
-test("the theme demo and the page keep separate themes", async ({ page }) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	const toggle = page.locator("[data-docs-theme-toggle]");
-	await expect(toggle).toBeVisible();
-
-	// Step the demo off its opening state by hand. The suite runs under
-	// reduced motion, where nothing autoplays, which is the contract
-	// below, and here it means the sequence only moves when asked.
-	const opening = await themeState(page);
-	await toggle.click();
-	await expect
-		.poll(async () => (await themeState(page)).accent, {
-			message: "the demo takes a value of its own",
-			timeout: 15000,
-		})
-		.not.toBe(opening.accent);
-	await toggle.click();
-
-	const moved = await themeState(page);
-	// The demo moved; the page did not.
-	expect(moved.pageAccent).toBe(opening.pageAccent);
-	expect(moved.accent).not.toBe(moved.pageAccent);
-	// And the listing still is the stylesheet, mid-sequence.
-	expect(normalizeCss(moved.listed)).toBe(normalizeCss(moved.applied));
-
-	// Now the other direction: the site's preset switcher repaints the page
-	// and leaves the demo exactly where it was.
-	const header = page.locator("[data-cirth-preset-select]");
-	await header.selectOption("playroom");
-	await expect(page.locator("#cirth-preset-stylesheet")).toHaveAttribute(
-		"href",
-		/presets\/playroom\.css$/,
-	);
-	// The href is set synchronously on change; the accent only moves once
-	// the sheet behind it has loaded. Waiting on the attribute alone reads
-	// the page mid-swap, which is a race the machine wins often enough
-	// under a loaded suite to fail here and nowhere else.
-	await expect
-		.poll(async () => (await themeState(page)).pageAccent, {
-			message: "the preset repaints the page",
-			timeout: 15000,
-		})
-		.not.toBe(moved.pageAccent);
-	const after = await themeState(page);
-	expect(after.accent, "the demo is not repainted by the page").toBe(
-		moved.accent,
-	);
-	expect(after.applied).toBe(moved.applied);
-
-	await header.selectOption("default");
-});
-
-// The sequence itself: one token at a time, marked where it stands, and
-// the value that lands is the value the listing then shows. Every value in
-// it is read out of a compiled file at build time, so "no fake code" is a
-// property of the pipeline; what this checks is that the demo applies
-// what it prints, at every step.
-test("the token animation applies exactly what it prints", async ({ page }) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	const toggle = page.locator("[data-docs-theme-toggle]");
-	const seen = new Set();
-
-	for (let step = 0; step < 4; step += 1) {
-		const before = await themeState(page);
-		await toggle.click();
-		await expect
-			.poll(async () => (await themeState(page)).applied, {
-				message: "a declaration moves",
-				timeout: 15000,
-			})
-			.not.toBe(before.applied);
-		await toggle.click();
-
-		const after = await themeState(page);
-		// The listing is still the stylesheet.
-		expect(normalizeCss(after.listed)).toBe(normalizeCss(after.applied));
-
-		// One declaration moved, and it is the one that is marked.
-		const changed = ["--cirth-primary", "--cirth-border-radius", "--cirth-canvas"]
-			.filter((token) => {
-				const read = (/** @type {string} */ css) =>
-					new RegExp(`${token}:([^;]+);`).exec(normalizeCss(css))?.[1];
-				return read(before.applied) !== read(after.applied);
-			});
-		expect(changed, `step ${step}: one declaration at a time`).toHaveLength(1);
-		expect(after.marked, `step ${step}: the moved line is marked`).toEqual(
-			changed,
-		);
-		seen.add(changed[0]);
-	}
-
-	// And the sequence walks the tokens rather than sitting on one of them.
-	expect(seen.size).toBeGreaterThan(1);
-});
-
-// Auto-updating content that is presented beside everything else needs a
-// way to stop it (WCAG 2.2.2), and a reader who has asked for reduced
-// motion should not have to use it: the demo holds its opening state and
-// the control is what starts the sequence.
-test("the theme demo holds still under reduced motion", async ({ page }) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	const toggle = page.locator("[data-docs-theme-toggle]");
-	// The suite runs with reduced motion set (playwright.behavior.config).
-	await expect(toggle).toHaveText("Play");
-	await expect(toggle).toHaveAttribute("aria-label", /play/i);
-
-	const opening = await themeState(page);
-	await page.waitForTimeout(2500);
-	expect(
-		(await themeState(page)).applied,
-		"nothing autoplays with the preference set",
-	).toBe(opening.applied);
-
-	// It is still available on request, and the button says which state it
-	// is in rather than only what it does.
-	await toggle.click();
-	await expect(toggle).toHaveText("Pause");
-	await expect
-		.poll(async () => (await themeState(page)).applied, { timeout: 15000 })
-		.not.toBe(opening.applied);
-	await toggle.click();
-	await expect(toggle).toHaveText("Play");
-	const paused = await themeState(page);
-	await page.waitForTimeout(2500);
-	expect((await themeState(page)).applied, "pausing pauses it").toBe(
-		paused.applied,
-	);
-});
-
-// The control the section grew, and the trap the tab strip fell into once
-// already: a <button> rebinds `--cirth-color` and `--cirth-background-color`
-// to the pair the framework paints a filled button with, so a rule inside
-// the button reaching for either name gets white-on-accent. Hovering this
-// one turned it white on the band's own surface at 1.07:1, caught by an
-// axe pass over the section, and pinned here because it comes back the
-// moment a state is left out of the rule.
-test("the theme demo's control keeps the band's ink in every state", async ({
-	page,
-}) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	const toggle = page.locator("[data-docs-theme-toggle]");
-	// The framework's own page roles, read off the band rather than
-	// restated here. The shell used to capture all three into --docs-band-*
-	// aliases, because a <button> rebinds --cirth-color and a control
-	// reaching for it inside itself got the button's on-surface ink. The
-	// library now names the page roles separately: --cirth-ink and
-	// --cirth-canvas, neither of which a component may rebind, so the
-	// control reads them directly and there is no alias left to drift.
-	const band = await page
-		.locator(".docs-theme-showcase .docs-stage-band")
-		.evaluate((element) => {
-			const style = getComputedStyle(element);
-			return {
-				ink: style.getPropertyValue("--cirth-ink").trim(),
-				muted: style.getPropertyValue("--cirth-muted-color").trim(),
-				surface: style.getPropertyValue("--cirth-canvas").trim(),
-			};
-		});
-
-	/** @param {import("@playwright/test").Locator} locator */
-	const paint = (locator) =>
-		locator.evaluate((element) => {
-			const style = getComputedStyle(element);
-			return { color: style.color, background: style.backgroundColor };
-		});
-	/** @param {string} value */
-	const resolve = (value) =>
-		page.evaluate((raw) => {
-			const probe = document.createElement("span");
-			probe.style.color = raw;
-			document.body.append(probe);
-			const resolved = getComputedStyle(probe).color;
-			probe.remove();
-			return resolved;
-		}, value);
-
-	const [ink, muted, surface] = await Promise.all(
-		[band.ink, band.muted, band.surface].map(resolve),
-	);
-
-	const rest = await paint(toggle);
-	expect(rest.color).toBe(muted);
-	expect(rest.background).toBe(surface);
-
-	await toggle.hover();
-	const hovered = await paint(toggle);
-	expect(hovered.color).toBe(ink);
-	expect(hovered.background).toBe(surface);
-
-	await toggle.focus();
-	const focused = await paint(toggle);
-	expect([ink, muted]).toContain(focused.color);
-	expect(focused.background).toBe(surface);
-
-	// And it takes a ring, like everything else this page asks a reader to
-	// operate.
-	await page.keyboard.press("Tab");
-	await toggle.focus();
-	expect(
-		await toggle.evaluate((element) => {
-			const style = getComputedStyle(element);
-			return (
-				(style.outlineStyle !== "none" &&
-					Number.parseFloat(style.outlineWidth) > 0) ||
-				style.boxShadow !== "none"
-			);
-		}),
-		"the focused control paints a ring",
-	).toBe(true);
-});
-
-// The one thing the old block-per-preset structure existed to protect: the
-// shell injects a copy button on every `pre > code` and copies
-// `textContent`, so anything hidden inside the block would be handed over
-// with it. One block whose values are replaced has nothing hidden in it.
-test("copying the theme listing hands over the declarations on screen", async ({
-	page,
-}) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	const block = page.locator("[data-docs-theme-block]");
-	const copied = await block.innerText();
-	const state = await themeState(page);
-	expect(normalizeCss(copied)).toBe(normalizeCss(state.applied));
-	// One value per token, not every state's version of it.
-	expect(copied.match(/--cirth-primary/g)).toHaveLength(1);
-	expect(copied).toContain("--cirth-radius-sm");
-	expect(copied).not.toContain("--cirth-radius-lg");
 });
 
 test("the home page states its argument in one heading outline", async ({
@@ -1870,9 +1691,7 @@ test("the home page states its argument in one heading outline", async ({
 
 	expect(outline[0], "the page opens on its h1").toBe(1);
 	expect(outline.filter((level) => level === 1)).toHaveLength(1);
-	// No skipped levels: the specimen cards sit at h3 inside sections
-	// titled h2, and nothing on this page reaches for a level to get a
-	// size (axe: heading-order).
+	// No skipped levels (axe: heading-order).
 	for (let index = 1; index < outline.length; index++) {
 		expect(
 			outline[index] - outline[index - 1],
@@ -1880,166 +1699,73 @@ test("the home page states its argument in one heading outline", async ({
 		).toBeLessThanOrEqual(1);
 	}
 
-	// Five sections, because eight was the problem. "Native behavior stays
-	// native" and "You're already looking at Cirth" are examples and a
-	// sentence inside the showcase now; "Small surface, finished defaults"
-	// and "Claims with a check path" are one proof band.
+	// Eight sections, in order: the claim and its proof, the figures that
+	// follow from it, what the browser does and what Cirth adds, the markup measured against a
+	// utility-first version of it, a theme of the reader's own, the
+	// presets, the stacks, and the close.
 	const sections = await page
 		.locator("main > section")
 		.evaluateAll((items) => items.map((item) => item.className.split(" ")[0]));
 	expect(sections).toEqual([
-		"docs-native-hero",
-		"docs-showcase",
-		"docs-showcase",
-		"docs-proof",
-		"docs-native-faq",
+		"docs-hero",
+		"docs-facts-section",
+		"docs-story",
+		"docs-bench",
+		"docs-theme",
+		"docs-presets",
+		"docs-agnostic",
+		"docs-pure",
 	]);
+	expect(
+		await page.locator("main > section h2[id]").evaluateAll((headings) => headings.map((heading) => heading.textContent?.trim())),
+	).toEqual([
+		"One stylesheet. Three facts.",
+		"Built on HTML, not around it.",
+		"Less markup to maintain.",
+		"Your theme. Same HTML.",
+		"Pick a preset. Both schemes are ready.",
+		"Framework agnostic. Works everywhere.",
+		"Your HTML is already enough.",
+	]);
+	// The sections it replaced are gone, with everything that drew them.
+	await expect(page.locator(".docs-showcase, .docs-narrative, .docs-themes")).toHaveCount(0);
+	const last = page.locator("main > section").last();
+	await expect(last.locator("h2")).toHaveText("Your HTML is already enough.");
+	await expect(page.locator("main h2", { hasText: "Your HTML is already enough." })).toHaveCount(1);
+	await expect(last.getByRole("button", { name: "Get started" })).toHaveAttribute("href", "/installation");
 	for (const gone of [
-		"Native behavior stays native",
-		"You're already looking at Cirth",
-		"Small surface, finished defaults",
-		"Claims with a check path",
+		"One stylesheet. Whole interfaces.",
+		"Three declarations. A different interface.",
+		"Before you install",
+		"Every claim has a check path.",
+		"Less markup. The same interface.",
+		"Add one stylesheet. Keep your HTML.",
+		"Describe what it is. Cirth draws it.",
+		"Less markup. Nothing to run.",
+		"Presets, light and dark.",
+		"Pure CSS. Whatever writes your HTML.",
+		"Measured, not promised.",
+		"One stylesheet. Four facts.",
 	]) {
 		await expect(
 			page.locator("main h2", { hasText: gone }),
-			`${gone} is not a section any more`,
+			`${gone} is not a section of the home page`,
 		).toHaveCount(0);
 	}
-});
-
-test("every showcase is one contained stage, not three loose columns", async ({
-	page,
-}) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-
-	const grid = await page
-		.locator(".docs-native-grid")
-		.first()
-		.evaluate((element) => element.getBoundingClientRect().width);
-
-	for (const section of ["semantic", "theme"]) {
-		const stage = page.locator(`[aria-labelledby="${section}-title"] .docs-stage`);
-		await expect(stage, `${section} has one stage`).toHaveCount(1);
-
-		// The stage spans the content column. What this replaced put the
-		// heading in a narrow rail and left the evidence at two thirds of the
-		// width, with the live half at under a third of it.
-		const width = await stage.evaluate(
-			(element) => element.getBoundingClientRect().width,
-		);
-		expect(Math.round(width), `${section} stage width`).toBeGreaterThanOrEqual(
-			Math.round(grid) - 1,
-		);
-
-		// Everything the demo needs is inside it: the band that names it and
-		// carries its control, and the panes, sharing one frame.
-		await expect(
-			stage.locator(":scope > .docs-stage-band"),
-			`${section} stage names itself`,
-		).toHaveCount(1);
-	}
-
-	// The live half is not a thumbnail: it takes at least as much of the row
-	// as the listing that explains it, and in the theme stage, where the
-	// cause is three declarations long, rather more.
-	for (const scope of [
-		'[data-docs-panel="article"]',
-		".docs-theme-showcase",
-	]) {
-		const [code, preview] = await Promise.all(
-			[".docs-stage-code", ".docs-stage-preview"].map((selector) =>
-				page
-					.locator(`${scope} ${selector}`)
-					.first()
-					.evaluate((element) => element.getBoundingClientRect().width),
-			),
-		);
-		expect(
-			preview / (code + preview),
-			`${scope}: the preview's share of the split`,
-		).toBeGreaterThanOrEqual(0.5);
-	}
-
-	// Switching examples must not move the page under the reader. The
-	// listings were levelled for this: at one element per line the article
-	// was 27 lines against the disclosure's 14, and the stage jumped 240px.
-	const heights = [];
-	for (const id of showcaseExamples) {
-		await openExample(page, id);
-		heights.push(
-			await page
-				.locator('[aria-labelledby="semantic-title"] .docs-stage')
-				.evaluate((element) => Math.round(element.getBoundingClientRect().height)),
-		);
-	}
-	expect(
-		Math.max(...heights) - Math.min(...heights),
-		`stage heights across examples: ${heights.join(", ")}`,
-	).toBeLessThanOrEqual(96);
-});
-
-// The section that used to make this claim in its own heading ("You're
-// already looking at Cirth") is gone, and the claim moved into one sentence
-// under the disclosure example. A sentence is cheaper than a section, so
-// the thing worth pinning is that it is still true: the questions at the
-// bottom of this page are the element the example is showing.
-test("the disclosure example is the element the FAQ below is made of", async ({
-	page,
-}) => {
-	await page.goto(`${origin}/`, { waitUntil: "networkidle" });
-	await openExample(page, "details");
-
-	/** @param {string} selector */
-	const shapeOf = (selector) =>
-		page.locator(selector).first().evaluate((element) => {
-			const summary = element.querySelector("summary");
-			const paragraph = element.querySelector("p");
-			return {
-				tag: element.tagName.toLowerCase(),
-				grouped: element.hasAttribute("name"),
-				classes: [
-					element.className,
-					summary?.className ?? "",
-					paragraph?.className ?? "",
-				].join("").trim(),
-				children: [...element.children].map((child) =>
-					child.tagName.toLowerCase(),
-				),
-				answerColor: paragraph && getComputedStyle(paragraph).color,
-				summaryColor: summary && getComputedStyle(summary).color,
-			};
-		});
-
-	const [specimen, question] = await Promise.all([
-		shapeOf('[data-docs-panel="details"] details'),
-		shapeOf(".docs-faq-list details"),
-	]);
-
-	// The same element, the same four parts, and no classes on any of
-	// them: `<details name>` + `<summary>` + `<p>`.
-	expect(specimen.tag).toBe("details");
-	expect(specimen).toEqual(question);
-	expect(specimen.classes, "the specimen wears no classes").toBe("");
-	expect(specimen.grouped, "and it is a group, like the FAQ is").toBe(true);
-
-	// The FAQ is a real list of questions, and the note under the example
-	// says so in a link a reader can follow.
-	await expect(page.locator(".docs-faq-list details")).not.toHaveCount(0);
-	await expect(
-		page.locator('[data-docs-panel="details"] .docs-example-note a'),
-	).toHaveAttribute("href", "#faq-title");
-
-	// Two groups on the page, and they are separate ones: the specimen is
-	// its own accordion, not a member of the FAQ's. The section this
-	// replaced shipped a specimen carrying `name="faq"`, so opening it
-	// closed an answer 2000px further down.
-	expect(
-		await page
-			.locator("main details[name]")
-			.evaluateAll((items) =>
-				[...new Set(items.map((item) => item.getAttribute("name")))].sort(),
-			),
-	).toEqual(["delivery", "faq"]);
+	// No radio is a control of the page, and nothing poses as tabs: the
+	// only radios are the ticket's (in both its renderings) and the theme
+	// card's own, parts of the specimens they belong to, which the page
+	// never reads.
+	const radios = await page.locator("main [type=radio]").evaluateAll((items) =>
+		items.map((item) => {
+			const root = item.getRootNode();
+			const host = root instanceof ShadowRoot ? root.host : null;
+			return Boolean(item.closest(".docs-story-result") ?? host?.closest(".docs-story-ua, .docs-theme-copy"));
+		}),
+	);
+	expect(radios.length).toBeGreaterThan(0);
+	expect(radios.every(Boolean)).toBe(true);
+	await expect(page.locator('main [role="tab"], main [role="tablist"]')).toHaveCount(0);
 });
 
 // --- The boundary of a live example -------------------------------------
@@ -2081,6 +1807,45 @@ test("a live example resolves the framework's own rhythm, not the reading column
 	expect(readings.column).not.toEqual(readings.root);
 	// And the preview hands both back.
 	expect(readings.preview).toEqual(readings.root);
+});
+
+// The other side of the same boundary: the column re-times its own prose,
+// and the re-timing has to arrive. The library reads --cirth-line-height
+// once, on the root, so a token set on the column and never applied left
+// every paragraph at the root's 1.5. And prose runs the column's full
+// width, as the code blocks, tables and demos in it do: one edge for
+// everything in the column, not a narrower one for text.
+test("the reading column applies its rhythm and runs prose to its full width", async ({
+	page,
+}) => {
+	await page.goto(`${origin}/components/card/`);
+
+	const measured = await page.evaluate(() => {
+		const column = /** @type {HTMLElement} */ (document.querySelector(".docs-content"));
+		const inner = column.getBoundingClientRect().width -
+			Number.parseFloat(getComputedStyle(column).paddingLeft) -
+			Number.parseFloat(getComputedStyle(column).paddingRight);
+		const widths = (/** @type {string} */ selector) =>
+			[...column.querySelectorAll(selector)].map((element) => element.getBoundingClientRect().width);
+		const paragraphs = [...column.querySelectorAll(":scope > p")].filter(
+			(element) => (element.textContent ?? "").length > 250,
+		);
+		return {
+			inner,
+			ratios: paragraphs.map((paragraph) => {
+				const style = getComputedStyle(paragraph);
+				return Number.parseFloat(style.lineHeight) / Number.parseFloat(style.fontSize);
+			}),
+			prose: widths(":scope > :is(p, ul, h2)"),
+			code: widths(":scope > pre"),
+		};
+	});
+
+	expect(measured.ratios.length).toBeGreaterThan(0);
+	for (const ratio of measured.ratios) expect(ratio).toBeGreaterThanOrEqual(1.6);
+	for (const width of [...measured.prose, ...measured.code]) {
+		expect(width).toBeCloseTo(measured.inner, 0);
+	}
 });
 
 // The same claim, made against the thing itself rather than against two
@@ -2197,13 +1962,13 @@ test("a demo renders the same as the same markup under cirth.css alone", async (
 
 // The documentation's chapter separators are the documentation's. As
 // descendant selectors they reached headings inside live examples: an <h2>
-// in the classless demo on /get-started/ took a 1px rule and 12px of
+// in the classless demo on the install page took a 1px rule and 12px of
 // padding, and three <h3>s took 32px of editorial margin.
 test("no shell chapter rule or margin lands on a heading inside a live example", async ({
 	page,
 }) => {
 	for (const url of [
-		"/get-started/",
+		"/installation/",
 		"/examples/",
 		"/layout/landmarks/",
 		"/colors/",
@@ -2213,12 +1978,27 @@ test("no shell chapter rule or margin lands on a heading inside a live example",
 			[...document.querySelectorAll(".docs-demo-preview :is(h1,h2,h3,h4,h5,h6)")].map(
 				(heading) => {
 					const style = getComputedStyle(heading);
+					/** @param {string} name */
+					const step = (name) => {
+						const probe = document.createElement("div");
+						probe.style.marginTop = `var(${name})`;
+						heading.after(probe);
+						const value = getComputedStyle(probe).marginTop;
+						probe.remove();
+						return value;
+					};
 					return {
 						tag: heading.tagName,
 						text: (heading.textContent ?? "").trim().slice(0, 24),
 						borderBlockStart: style.borderBlockStartWidth,
 						paddingBlockStart: style.paddingBlockStart,
 						marginBlockStart: style.marginBlockStart,
+						steps: [
+							"0px",
+							step("--cirth-flow-line"),
+							step("--cirth-flow-group"),
+							step("--cirth-flow-section"),
+						],
 					};
 				},
 			),
@@ -2226,12 +2006,13 @@ test("no shell chapter rule or margin lands on a heading inside a live example",
 		for (const heading of headings) {
 			expect(heading.borderBlockStart, `${url} ${heading.text}`).toBe("0px");
 			expect(heading.paddingBlockStart, `${url} ${heading.text}`).toBe("0px");
-			// The shell's h3 step is 2rem; the framework's own values for a
-			// heading in a specimen are 0 or its typography-spacing-top.
-			expect(
-				Number.parseFloat(heading.marginBlockStart),
-				`${url} ${heading.text}`,
-			).not.toBe(32);
+			// The framework's own values for a heading in a specimen are the
+			// flow relations' (specs/container-owned-flow.md): nothing, a
+			// line, a group or a section. The shell's chapter spacing is a
+			// clamp that lands on none of them.
+			expect(heading.steps, `${url} ${heading.text}`).toContain(
+				heading.marginBlockStart,
+			);
 		}
 	}
 });
@@ -2239,7 +2020,7 @@ test("no shell chapter rule or margin lands on a heading inside a live example",
 // A <pre> inside a preview is the example, and the copy affordance is
 // chrome: the shell's positioning context, its fade and its injected button
 // used to be painted onto the one demo on the site that renders a code
-// block. The disclosure under that demo keeps its button, because that
+// block. The listing under that demo keeps its button, because that
 // listing is the shell's.
 test("the shell's code-block chrome stops at the edge of a live example", async ({
 	page,
@@ -2264,7 +2045,7 @@ test("the shell's code-block chrome stops at the edge of a live example", async 
 	// And the shell's own listing still has all three.
 	const shellBlock = await page.evaluate(() => {
 		const block = /** @type {HTMLElement} */ (
-			document.querySelector("details.docs-demo-source pre")
+			document.querySelector(".docs-demo-source pre")
 		);
 		const style = getComputedStyle(block);
 		return {
@@ -2307,10 +2088,12 @@ test("every stacked nav in the shell paints inside its own container", async ({
 						Number.parseFloat(style.paddingRight) -
 						Number.parseFloat(style.borderRightWidth),
 				};
-				const boxes = [...document.querySelectorAll(links)].map((link) => {
-					const rect = link.getBoundingClientRect();
-					return { left: rect.left, right: rect.right };
-				});
+				// Links in a folded group are not rendered; what is drawn has
+				// to stay inside.
+				const boxes = [...document.querySelectorAll(links)]
+					.map((link) => link.getBoundingClientRect())
+					.filter((rect) => rect.width > 0)
+					.map((rect) => ({ left: rect.left, right: rect.right }));
 				return { inner, boxes, gutter: style.getPropertyValue("--cirth-nav-element-spacing-horizontal").trim() };
 			},
 			{ container, links },
@@ -2432,15 +2215,6 @@ test("the shell's flush panels are cards with their knobs moved", async ({
 		}, selector);
 
 	await page.setViewportSize({ width: 1440, height: 900 });
-	await page.goto(`${origin}/`);
-	const source = await readPanel(".docs-source-panel");
-	expect(source.tag).toBe("ARTICLE");
-	expect(source.horizontal).toBe("0");
-	expect(source.vertical).toBe("0");
-	expect(source.padding).toBe("0px");
-	expect(source.headerInset).toBeCloseTo(1, 1);
-	expect(source.headerRule).toBe("1px");
-
 	await page.goto(`${origin}/components/nav/`);
 	await page.evaluate(() => {
 		const trigger = /** @type {HTMLElement} */ (
@@ -2456,10 +2230,9 @@ test("the shell's flush panels are cards with their knobs moved", async ({
 	expect(search.headerInset).toBeCloseTo(1, 1);
 });
 
-// A metrics panel is `.grid` plus a <dl>, which is what the framework tells
-// everyone else to do, and the panel's cells are divided by the grid gap
-// with the container's colour showing through, which holds at any column
-// count without a :nth-child ladder to restate in a media query.
+// A facts panel is `.grid` plus a <dl>, which is what the framework tells
+// readers to do. Its cells are divided by the grid gap with the container's
+// colour showing through, which holds at any column count.
 test("the metrics panels are gridded description lists divided by their gap", async ({
 	page,
 }) => {
@@ -2493,16 +2266,9 @@ test("the metrics panels are gridded description lists divided by their gap", as
 				classes: panel.className,
 				display: style.display,
 				gap: style.gap,
-				// The stroke this shell draws its frames with, read off a frame
-				// rather than off a token, so the two are compared as rendered.
-				strokeWidth: Number.parseFloat(
-					getComputedStyle(
-						/** @type {HTMLElement} */ (
-							panel.closest(".docs-proof-strip, .docs-brand-spec") ??
-								document.documentElement
-						),
-					).borderTopWidth,
-				) || 1,
+				// The stroke the plate's own frame is drawn with, so the gap and
+				// the frame are compared as rendered.
+				strokeWidth: Number.parseFloat(style.borderTopWidth) || 1,
 				background: style.backgroundColor,
 				cells,
 			};
@@ -2510,9 +2276,8 @@ test("the metrics panels are gridded description lists divided by their gap", as
 	};
 
 	for (const [url, selector] of [
-		["/", ".docs-proof-metrics"],
-		["/brand/", ".docs-brand-measures"],
-		["/about/", ".docs-proof-strip dl"],
+		["/why-cirth/", ".docs-facts"],
+		["/guides/accessibility/", ".docs-facts"],
 	]) {
 		const panel = await readPanel(url, selector);
 		expect(panel.tag, selector).toBe("DL");
@@ -2546,18 +2311,15 @@ test("a divider grid keeps one stroke at every column count", async ({
 }) => {
 	for (const width of [1440, 900, 640, 390]) {
 		await page.setViewportSize({ width, height: 900 });
-		await page.goto(`${origin}/about/`);
+		await page.goto(`${origin}/why-cirth/`);
 		const reading = await page.evaluate(() => {
 			const panel = /** @type {HTMLElement} */ (
-				document.querySelector(".docs-proof-strip dl")
-			);
-			const plate = /** @type {HTMLElement} */ (
-				document.querySelector(".docs-proof-strip")
+				document.querySelector(".docs-facts")
 			);
 			return {
 				columns: getComputedStyle(panel).gridTemplateColumns.split(" ").length,
 				divider: getComputedStyle(panel).backgroundColor,
-				frame: getComputedStyle(plate).borderTopColor,
+				frame: getComputedStyle(panel).borderTopColor,
 				cellBorders: [...panel.children].map((cell) =>
 					[
 						getComputedStyle(cell).borderTopWidth,
@@ -2577,9 +2339,21 @@ test("a divider grid keeps one stroke at every column count", async ({
 });
 
 // Shell chrome that is ordinary Cirth UI follows the knob a preset moves.
-// The stage a live example stands on is one: under `playroom` the example
-// re-times and the frame around it used to stay pinned.
+// The stage a live example stands on is one: under a preset that opens the
+// flow the example re-times, and the frame around it used to stay pinned.
+// The preset is whichever shipped one sets --cirth-spacing, read from its
+// source, so the test does not hang on one name.
+const spacingPreset = listPresetNames().find((name) =>
+	/--cirth-spacing\s*:/.test(
+		require("node:fs").readFileSync(
+			require("node:path").join(presetsSourceDir, `${name}.scss`),
+			"utf8",
+		),
+	),
+);
+
 test("the demo stage follows the preset's spacing knob", async ({ page }) => {
+	test.skip(!spacingPreset, "no shipped preset sets --cirth-spacing");
 	const stagePadding = async (/** @type {string} */ preset) => {
 		await page.context().addInitScript((value) => {
 			sessionStorage.setItem("cirth-preset", value);
@@ -2606,10 +2380,84 @@ test("the demo stage follows the preset's spacing knob", async ({ page }) => {
 	};
 
 	const base = await stagePadding("default");
-	const roomier = await stagePadding("playroom");
+	const roomier = await stagePadding(/** @type {string} */ (spacingPreset));
 
 	// The preset really does move the knob…
 	expect(roomier.spacing).not.toBe(base.spacing);
 	// …and the stage moves with it.
 	expect(roomier.padding).toBeGreaterThan(base.padding);
+});
+
+// --- The footer -----------------------------------------------------------
+
+// Paths out of the page, not a second index of the reference: the sidebar
+// and search are that. Like the header, it follows the page's scheme.
+test("the footer offers paths out, not the reference", async ({ page }) => {
+	for (const url of ["/", "/installation/"]) {
+		await page.goto(`${origin}${url}`, { waitUntil: "networkidle" });
+		const footer = page.locator(".docs-footer");
+		await expect(footer).not.toHaveAttribute("data-theme", /.*/);
+		await expect(footer.locator("nav[aria-label='Footer'] h2")).toHaveText([
+			"Start",
+			"Project",
+			"Community",
+		]);
+		await expect(footer.getByRole("link", { name: "Get started" })).toHaveAttribute(
+			"href",
+			"/installation",
+		);
+		await expect(
+			footer.getByRole("link", { name: /^Discussions/ }),
+		).toHaveAttribute("href", "https://github.com/orgs/cirthcss/discussions");
+		// No reference entries: layout, forms and components live in the
+		// sidebar.
+		for (const reference of ["/layout/document", "/forms/", "/components/accordion"]) {
+			await expect(footer.locator(`a[href="${reference}"]`)).toHaveCount(0);
+		}
+		// The deeper ground in both page schemes.
+		const grounds = await page.evaluate(() => ({
+			footer: getComputedStyle(/** @type {Element} */ (document.querySelector(".docs-footer"))).backgroundColor,
+			body: getComputedStyle(document.body).backgroundColor,
+		}));
+		expect(grounds.footer).not.toBe(grounds.body);
+	}
+});
+
+// --- The framework guides -------------------------------------------------
+
+// A guide opens on the project's mark and its name, says what it will
+// have you do, and sets its numbered chapters as steps. The mark is
+// decorative, so the title a reader, a search index and <title> get is the
+// name alone; a project whose terms keep its logo off the site has none.
+test("each framework guide opens on its project's card, then its h1, and reads as steps", async ({ page }) => {
+	// Every guide, one page load each.
+	test.setTimeout(120_000);
+	const frameworks = require("../docs/src/_data/frameworks.js");
+	for (const guide of frameworks.guides) {
+		await page.goto(`${origin}${guide.link}/`, { waitUntil: "networkidle" });
+		const title = page.locator(".docs-content > h1");
+		await expect(title, `${guide.id} title`).toHaveCount(1);
+		await expect(title).toHaveText(`Install Cirth for ${guide.name}`);
+		expect(await page.title()).toBe(`Install Cirth for ${guide.name} — Cirth`);
+		await expect(title.locator("img, a")).toHaveCount(0);
+
+		// The mark is in the card, decorative beside the printed name.
+		const marks = page.locator(".docs-project-mark img");
+		for (const alt of await marks.evaluateAll((items) => items.map((item) => item.getAttribute("alt")))) {
+			expect(alt, `${guide.id}: a mark beside the name is decorative`).toBe("");
+		}
+		const shown = await marks.evaluateAll(
+			(items) => items.filter((item) => getComputedStyle(item).display !== "none").length,
+		);
+		expect(shown, `${guide.id}: one variant of its mark, or none`).toBe(guide.markData ? 1 : 0);
+
+		const steps = page.locator(".docs-content > h2.docs-step-heading");
+		const count = await steps.count();
+		expect(count, `${guide.id} has steps`).toBeGreaterThanOrEqual(2);
+		// The number is in the heading's name.
+		await expect(steps.first()).toHaveAccessibleName(/^1 \S/);
+		await expect(page.locator(".docs-content > .docs-guide-summary")).toHaveText(
+			new RegExp(`^(Two|Three|Four|Five|Six) steps: `),
+		);
+	}
 });

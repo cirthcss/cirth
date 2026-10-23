@@ -1,124 +1,265 @@
 ---
 layout: base.njk
 ---
+{% from "docs-nav.njk" import navTree, pageOutline %}
 {% set pageHeaders = content | headings %}
-{% set pageIndex = nav.flatPages | findPageIndex(page.url) %}
+{% set pageOutlineData = pageHeaders | outline %}
+{% set pager = nav.pager[page.url] %}
+{% set trail = nav.sidebar | breadcrumb(page.url) %}
 <main id="main-content" class="container docs-page-shell">
 	<div class="docs-mobile-tools">
 		<details class="docs-mobile-nav">
-			<summary>Browse documentation</summary>
+			<summary>Documentation</summary>
 			<nav aria-label="Mobile documentation navigation">
-				{% for group in nav.sidebar %}
-					<section>
-						<strong>{{ group.text }}</strong>
-						<ul>
-							{% for item in group.items %}
-								<li><a href="{{ item.link }}"{% if page.url == (item.link | withSlash) %} aria-current="page"{% endif %}>{{ item.text }}</a></li>
-							{% endfor %}
-						</ul>
-					</section>
-				{% endfor %}
+				{{ navTree(nav.sidebar, page.url) }}
 			</nav>
 		</details>
 		{% if pageHeaders.length > 1 %}
 			<details class="docs-toc-top">
 				<summary>On this page</summary>
 				<nav aria-label="On this page">
-					<ul>
-						{% for header in pageHeaders %}
-							<li class="docs-toc-level-{{ header.depth }}">
-								<a href="#{{ header.slug }}">{{ header.text }}</a>
-							</li>
-						{% endfor %}
-					</ul>
+					{{ pageOutline(pageOutlineData) }}
 				</nav>
 			</details>
 		{% endif %}
 	</div>
 	<div class="docs-layout">
-		<aside class="docs-sidebar">
+		{#- Every group folds; the one holding this page arrives open. -#}
+		<aside class="docs-sidebar" data-docs-rail>
 			<nav aria-label="docs navigation">
-				{% for group in nav.sidebar %}
-					<details{% if group.items | hasActiveItem(page.url) %} open{% endif %}>
-						<summary>{{ group.text }}</summary>
-						<ul>
-							{% for item in group.items %}
-								<li>
-									<a href="{{ item.link }}"{% if page.url == (item.link | withSlash) %} aria-current="page"{% endif %}>{{ item.text }}</a>
-								</li>
-							{% endfor %}
-						</ul>
-					</details>
-				{% endfor %}
+				{{ navTree(nav.sidebar, page.url) }}
 			</nav>
 		</aside>
-		<div class="docs-content" data-pagefind-body>
-			{{ content | safe }}
-			{% if pageIndex > -1 %}
-				{% set prevPage = nav.flatPages[pageIndex - 1] if pageIndex > 0 %}
-				{% set nextPage = nav.flatPages[pageIndex + 1] if pageIndex < nav.flatPages.length - 1 %}
-				{% if prevPage or nextPage %}
-					<footer class="docs-prev-next">
-						{% if prevPage %}
-							<a href="{{ prevPage.link }}" class="secondary">← {{ prevPage.text }}</a>
-						{% else %}
-							<span></span>
+		<div class="docs-content" data-docs-kind="{{ page.url | docsKind }}" data-pagefind-body>
+			{%- if trail.length %}
+			{#- Breadcrumb, from the same tree the sidebar draws. -#}
+			<nav class="docs-breadcrumb" aria-label="breadcrumb">
+				<ol>
+					{%- for crumb in trail %}
+					{%- if loop.last %}
+					<li aria-current="page">{{ crumb.text }}</li>
+					{%- else %}
+					<li><a href="{{ crumb.link if '#' in crumb.link else (crumb.link | withSlash) }}">{{ crumb.text }}</a></li>
+					{%- endif %}
+					{%- endfor %}
+				</ol>
+			</nav>
+			{%- endif %}
+			{{ (content | frameworkGuide(framework) if framework else content) | safe }}
+			{#- Previous and next in the reading order (nav.js), not the sidebar's
+			    tree: a guide leads back to Installation, never to another guide. -#}
+			{% if pager and (pager.prev or pager.next) %}
+				<nav class="docs-prev-next" aria-label="Previous and next page">
+					<ul>
+						{% if pager.prev %}
+							<li><a href="{{ pager.prev.link }}" rel="prev"><small>← Previous · {{ pager.prev.group }}</small><strong>{{ pager.prev.text }}</strong></a></li>
 						{% endif %}
-						{% if nextPage %}
-							<a href="{{ nextPage.link }}" class="secondary">{{ nextPage.text }} →</a>
+						{% if pager.next %}
+							<li><a href="{{ pager.next.link }}" rel="next"><small>Next · {{ pager.next.group }} →</small><strong>{{ pager.next.text }}</strong></a></li>
 						{% endif %}
-					</footer>
-				{% endif %}
+					</ul>
+				</nav>
 			{% endif %}
 		</div>
 		{% if pageHeaders.length > 1 %}
-			<aside class="docs-toc">
+			<aside class="docs-toc" data-docs-rail>
 				<nav aria-label="On this page" id="docs-toc-nav">
 					<strong>On this page</strong>
-					<ul>
-						{% for header in pageHeaders %}
-							<li class="docs-toc-level-{{ header.depth }}">
-								<a href="#{{ header.slug }}" data-toc-link data-slug="{{ header.slug }}">{{ header.text }}</a>
-							</li>
-						{% endfor %}
-					</ul>
+					<span class="docs-toc-marker" aria-hidden="true"></span>
+					{{ pageOutline(pageOutlineData, true) }}
 				</nav>
 			</aside>
 		{% endif %}
 	</div>
 </main>
 <script>
-	// Scroll-spy for the "On this page" aside: highlight whichever heading
-	// was most recently scrolled past. Purely additive: the TOC works
-	// (and its links navigate) without this script.
-	const links = Array.from(document.querySelectorAll("[data-toc-link]"));
-	if (links.length > 0) {
+	(() => {
+		// A rail scrolls inside itself, and on a long index the current entry
+		// can be out of its view. Scroll the rail, never the page: this runs
+		// on arrival, and moving the document would undo the reader's own
+		// scroll position or the fragment they followed.
+		/** @param {Element | null} element */
+		const reveal = (element) => {
+			const rail = element?.closest("[data-docs-rail]");
+			if (!(element instanceof HTMLElement) || !(rail instanceof HTMLElement)) return;
+			if (rail.scrollHeight <= rail.clientHeight) return;
+			const railBox = rail.getBoundingClientRect();
+			const box = element.getBoundingClientRect();
+			// One row of context keeps the destination legible without coupling
+			// the rail to a fixed pixel offset.
+			const margin = box.height;
+			if (box.top < railBox.top + margin) {
+				rail.scrollTop += box.top - railBox.top - margin;
+			} else if (box.bottom > railBox.bottom - margin) {
+				rail.scrollTop += box.bottom - railBox.bottom + margin;
+			}
+		};
+
+		// The groups a reader opened stay open for the rest of the visit, so
+		// moving between pages of a group they expanded does not fold it
+		// back each time. What the page opened itself (its own group) is
+		// already in the markup; this only adds to it.
+		const key = "cirth-nav-open";
+		/** @type {Set<string>} */
+		let opened = new Set();
+		try {
+			opened = new Set(JSON.parse(sessionStorage.getItem(key) || "[]"));
+		} catch {}
+		const groups = document.querySelectorAll("details[data-docs-nav-group]");
+		for (const group of groups) {
+			if (!(group instanceof HTMLDetailsElement)) continue;
+			if (opened.has(group.dataset.docsNavGroup ?? "")) group.open = true;
+			// Only the reader's own toggles count. A disclosure the markup
+			// opens fires `toggle` too, and recording that would keep every
+			// group a page ever opened open on every later page. A summary
+			// operated by mouse or keyboard fires `click` first.
+			let byReader = false;
+			group.querySelector(":scope > summary")?.addEventListener("click", () => {
+				byReader = true;
+			});
+			group.addEventListener("toggle", () => {
+				if (!byReader) return;
+				byReader = false;
+				const name = group.dataset.docsNavGroup ?? "";
+				if (group.open) opened.add(name);
+				else opened.delete(name);
+				try {
+					sessionStorage.setItem(key, JSON.stringify([...opened]));
+				} catch {}
+			});
+		}
+		reveal(document.querySelector(".docs-sidebar [aria-current='page']"));
+
+		// Scroll-spy for the "On this page" rail. aria-current is the state;
+		// the marker only follows its geometry. Purely additive: the static
+		// rail and its first current link remain useful without this script.
+		const links = Array.from(document.querySelectorAll("[data-toc-link]"));
+		if (links.length === 0) return;
 		const headings = Array.from(
 			document.querySelectorAll(".docs-content :is(h2, h3)[id]"),
 		);
+		const toc = document.querySelector("#docs-toc-nav");
+		const marker = toc?.querySelector(".docs-toc-marker");
+		/** @type {HTMLDetailsElement | null} */
+		let spyOpened = null;
+		let active = "";
+		let frame = 0;
+		let geometryDirty = true;
+		/** @type {Array<{ id: string, top: number }>} */
+		let headingPositions = [];
+
+		// A section the reader opened or closed is theirs: the spy only ever
+		// folds back the one it opened itself.
+		for (const group of document.querySelectorAll("[data-toc-group]")) {
+			group.querySelector("summary")?.addEventListener("click", () => {
+				if (group === spyOpened) spyOpened = null;
+			});
+		}
+
+		const measure = () => {
+			headingPositions = headings.map((heading) => ({
+				id: heading.id,
+				top: heading.getBoundingClientRect().top + window.scrollY,
+			}));
+		};
+
+		const scrollPadding = () => {
+			const value = getComputedStyle(document.documentElement)
+				.getPropertyValue("scroll-padding-block-start");
+			return Number.parseFloat(value) || 0;
+		};
+
+		/** @param {Element | null} activeLink */
+		const placeMarker = (activeLink) => {
+			if (!(toc instanceof HTMLElement) || !(marker instanceof HTMLElement)) return;
+			if (!(activeLink instanceof HTMLElement)) {
+				toc.removeAttribute("data-toc-marker-ready");
+				return;
+			}
+			const tocBox = toc.getBoundingClientRect();
+			const linkBox = activeLink.getBoundingClientRect();
+			// Read the used height, not parseFloat(customProperty): the custom
+			// property is authored in rem and parseFloat would mistake 1.125rem
+			// for 1.125px.
+			const markerHeight = marker.getBoundingClientRect().height || linkBox.height;
+			const y = linkBox.top - tocBox.top + (linkBox.height - markerHeight) / 2;
+			toc.style.setProperty("--docs-toc-marker-y", `${y}px`);
+			toc.setAttribute("data-toc-marker-ready", "");
+		};
 
 		const update = () => {
-			// 96px offset: the heading counts as "reached" slightly before it
-			// touches the top edge, matching where the eye lands after a jump.
-			let current = "";
-			for (const heading of headings) {
-				if (heading.getBoundingClientRect().top <= 96) current = heading.id;
-				else break;
+			if (geometryDirty || headingPositions.length !== headings.length) measure();
+			geometryDirty = false;
+
+			const scrolling = document.scrollingElement;
+			const scrollTop = scrolling?.scrollTop ?? window.scrollY;
+			const atEnd = scrolling
+				? scrollTop + scrolling.clientHeight >= scrolling.scrollHeight
+				: false;
+			let activeSlug = headingPositions[0]?.id ?? "";
+			if (atEnd) {
+				activeSlug = headingPositions.at(-1)?.id ?? activeSlug;
+			} else {
+				// Scrolling is quantised to device pixels while layout positions can
+				// remain fractional. One device pixel closes that rounding gap; it is
+				// not a visual offset from the sticky header.
+				const reached = scrollTop + scrollPadding() + 1 / (window.devicePixelRatio || 1);
+				for (const heading of headingPositions) {
+					if (heading.top <= reached) activeSlug = heading.id;
+					else break;
+				}
 			}
-			const activeSlug = current || (headings[0] ? headings[0].id : "");
-			// aria-current only: the framework paints its one registered
-			// edge on the inline-start rail from it, and the stylesheet
-			// deliberately adds no second marker of its own.
+
+			const changed = activeSlug !== active;
+			active = activeSlug;
+			/** @type {Element | null} */
+			let activeLink = null;
 			for (const link of links) {
 				if (link.dataset.slug === activeSlug) {
 					link.setAttribute("aria-current", "true");
+					activeLink = link;
 				} else {
 					link.removeAttribute("aria-current");
 				}
 			}
+			const branch = activeLink?.closest(".docs-toc-branch");
+			const group = branch?.querySelector(":scope > details[data-toc-group]");
+			if (group instanceof HTMLDetailsElement && group !== spyOpened) {
+				if (spyOpened) spyOpened.open = false;
+				spyOpened = group.open ? null : group;
+				group.open = true;
+			} else if (!group && spyOpened) {
+				spyOpened.open = false;
+				spyOpened = null;
+			}
+			placeMarker(activeLink);
+			if (changed) reveal(activeLink);
 		};
 
-		window.addEventListener("scroll", update, { passive: true });
-		update();
-	}
+		/** @param {boolean} [remeasure] */
+		const schedule = (remeasure = false) => {
+			geometryDirty ||= remeasure;
+			if (frame) return;
+			frame = requestAnimationFrame(() => {
+				frame = 0;
+				update();
+			});
+		};
+
+		window.addEventListener("scroll", () => schedule(), { passive: true });
+		window.addEventListener("resize", () => schedule(true), { passive: true });
+		window.addEventListener("hashchange", () => schedule(true));
+		window.addEventListener("pageshow", () => schedule(true));
+		window.addEventListener("load", () => schedule(true), { once: true });
+
+		if ("ResizeObserver" in window) {
+			const observer = new ResizeObserver(() => schedule(true));
+			const content = document.querySelector(".docs-content");
+			if (content) observer.observe(content);
+			if (toc) observer.observe(toc);
+		}
+
+		document.fonts?.ready.then(() => schedule(true));
+		schedule(true);
+	})();
 </script>

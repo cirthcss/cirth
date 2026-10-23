@@ -1,76 +1,68 @@
 ---
 layout: docs.njk
+description: Center page content in a readable column with fluid gutters, or use a fluid container for full-width application layouts.
 ---
-
 
 # Container
 
-`.container` is an editorial container: a centered content column capped
-at a reading-friendly measure, with fluid side gutters.
-`.container-fluid` is a dashboard/app-shell container: edge to edge, no
-cap, gutters only. Both are only available in the **default** build with
-classes enabled; the classless build applies `.container`'s behavior to
-`body > header/main/footer` directly instead (see
-[Landmarks](/layout/landmarks)).
+Use `.container` for a centered page or article whose content should stop at
+a readable maximum width. Use `.container-fluid` when the content should use
+all available width while keeping a gutter at each edge.
+
+Both classes are available in the default build. The classless build applies
+container behavior to the page landmarks instead; see
+[Landmarks](/layout/landmarks).
 
 {% demo "container" %}
 
 ```html
 <main class="container">
-  <p>Centered content with a capped reading measure.</p>
+  <h1>Project overview</h1>
+  <p>This content stays centered and readable on wide screens.</p>
 </main>
 ```
 
+The `<main>` element identifies the primary content of the page. The
+`container` class changes only its layout. It does not add or replace the
+meaning supplied by `<main>`.
+
 ## How it works
 
-Both classes are three-track CSS grids with named `full` and `content`
-lines: two gutter tracks that never drop out, and a center track that
-holds the content:
+Cirth makes each container a three-track CSS grid. The middle `content`
+track holds every direct child. The two outer tracks provide the inline
+gutters.
+
+`.container` caps the middle track at `--cirth-container-max-width`, which
+defaults to `60rem`. Extra space is shared by the outer tracks, so the content
+remains centered. `.container-fluid` leaves the middle track uncapped and
+keeps only the gutters.
+
+The width changes continuously with the available space. There is no
+container breakpoint table to account for.
+
+## Choosing a container
+
+| Use | When |
+| --- | --- |
+| `.container` | Articles, settings pages, forms, and other content that becomes hard to read when lines are very long |
+| `.container-fluid` | Dashboards, data-heavy screens, and application shells that need the available width |
+
+Do not add a container only to style a small component. A container defines
+the main horizontal measure of a region, not the appearance of its contents.
+
+## Customizing width and gutters
+
+Change the maximum width on one container when a layout needs a wider or
+narrower measure:
 
 ```css
-.container {
-  display: grid;
-  grid-template-columns:
-    [full-start] minmax(var(--cirth-container-gutter), 1fr)
-    [content-start]
-      minmax(0, var(--cirth-container-max-width))
-    [content-end]
-    minmax(var(--cirth-container-gutter), 1fr) [full-end];
-}
-.container > *,
-.container-fluid > * {
-  grid-column: content;
-}
-```
-
-`.container`'s center track is capped at `--cirth-container-max-width`
-(default `60rem`, 960px at the standard 16px root);
-`.container-fluid`'s isn't. The cap resizes continuously with the
-viewport: there's no breakpoint table to memorize, and no jump between
-fixed widths as the window is resized. The gutters are controlled by
-`--cirth-container-gutter`, which defaults to
-`clamp(1rem, 4%, 3rem)`: they grow with the container itself but never drop
-out. A container nested in a narrow panel therefore gets a narrow gutter
-even on a large viewport. This is deliberately separate from
-`--cirth-spacing`, so opening up a page shell does not also enlarge
-controls, cards, and grid gaps.
-
-`.container-fluid` fixes each outer track to that gutter and gives all the
-remaining width to `content`. It does not split the box into three equal
-`1fr` columns.
-
-Override `--cirth-container-max-width` per instance for layouts that sit
-between the two: for example a docs shell with a sidebar might want a
-wider measure than an article:
-
-```css
-.container {
+.docs-shell {
   --cirth-container-max-width: 76rem;
 }
 ```
 
-Override the gutter independently when a particular shell needs a fixed
-edge:
+Change `--cirth-container-gutter` when the distance from the outer edge needs
+to differ from the default `clamp(1rem, 4%, 3rem)`:
 
 ```css
 .dashboard-shell {
@@ -78,78 +70,51 @@ edge:
 }
 ```
 
-## `.breakout`
+The gutter token is separate from `--cirth-spacing`. Changing the page gutter
+therefore does not also change component padding or grid gaps.
 
-A direct child of `.container` normally stops at the center track. Give
-it `.breakout` to fill the container's own box instead, for a wide
-table, image, or figure that shouldn't be squeezed to the reading
-measure:
+## Wide children
 
-{% demo "breakout" %}
-
-```html
-<div class="container">
-  <p>Regular content stays inside the reading measure.</p>
-  <table class="breakout">
-    <!-- wide table -->
-  </table>
-</div>
-```
-
-```css
-.container > .breakout {
-  grid-column: full;
-}
-```
-
-`.breakout` deliberately isn't the classic
-`width: 100vw; margin-inline: calc(50% - 50vw)` trick, which only works
-when the container itself is centered in the viewport, which isn't true
-everywhere a container is used (a docs layout with a sidebar, for
-example). Breaking out via `grid-column` instead escapes only to the
-container's *own* edges, so it's correct regardless of what surrounds
-it, and it doesn't have the `100vw` trick's scrollbar-gutter overflow
-bug. `.container-fluid` doesn't need `.breakout`: it's already full
-width.
-
-The selector is deliberately limited to a direct child of `.container`.
-A `.breakout` inside an unrelated `.grid` remains an ordinary grid item,
-and a nested descendant cannot jump into an ancestor's grid. Put
-`.container` on the semantic element whose direct children need to switch
-between the two tracks:
-
-```html
-<section class="container">
-  <h1>Release notes</h1>
-  <p>Regular prose.</p>
-  <figure class="breakout">…</figure>
-</section>
-```
-
-## Composition contract
-
-One class should own an element's layout. Do not combine `.container` with
-`.grid`, `.row`, or another class that defines `grid-template-columns` on
-the same node; nest the second layout instead:
+A direct child can span the container's own width with `.breakout`. Use it for
+content such as a wide figure or table, and keep ordinary content on the
+reading measure:
 
 ```html
 <main class="container">
-  <div class="grid">…</div>
+  <p>This paragraph stays on the content track.</p>
+  <figure class="breakout">...</figure>
 </main>
 ```
 
-Cirth intentionally exposes one escape lane, `.breakout`, rather than a
-scale of `popout`/`feature`/`full` classes. More lanes would add vocabulary
-and markup before the library has distinct recurring uses for them; local
-CSS can add a specialized editorial grid without enlarging the core API.
+The direct-child requirement and the full layout contract belong to the
+[Breakout utility](/utilities/breakout).
 
-`.breakout` is only available in the default build with classes enabled.
+## Composition contract
 
-## Breaking change
+Do not combine `.container` or `.container-fluid` with `.grid`, `.row`, or
+another class that defines grid columns on the same element. One class would
+replace the layout created by the other. Nest the layouts instead:
 
-Before this release, `.container`'s max width stepped up at five fixed
-breakpoints (from 510px to 1450px) and `.container-fluid` was little
-more than full width with padding. Both are now the grid described
-above. If you relied on the old stepped widths, set
-`--cirth-container-max-width` to the value you need: there's no longer
-a breakpoint table, just one continuously-resizing cap.
+```html
+<main class="container">
+  <div class="grid">
+    <article>First card</article>
+    <article>Second card</article>
+  </div>
+</main>
+```
+
+## Common mistakes
+
+- Do not use `.container-fluid` when the content is mainly long prose. Full
+  width can make lines difficult to follow.
+- Do not put page gutters on every child. The container already owns the
+  distance from the edge.
+- Do not expect `.container` classes in the classless build.
+
+## Related pages
+
+- [Breakout](/utilities/breakout)
+- [Grid](/layout/grid)
+- [Row](/layout/row)
+- [Landmarks](/layout/landmarks)

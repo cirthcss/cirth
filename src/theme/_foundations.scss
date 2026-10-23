@@ -5,10 +5,8 @@
    */
 
 @include selectors.root {
-  // Font families
-  // Single source for every font stack. Components read the role tokens
-  // set in theme/_styles.scss (--cirth-font-family, -display), which point
-  // back here; don't redeclare these stacks anywhere else.
+  // Font families: the single source of every stack. Components read the
+  // role tokens in theme/_styles.scss, which point back here.
   --cirth-font-family-emoji:
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --cirth-font-family-sans:
@@ -19,15 +17,8 @@
     ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
     monospace, var(--cirth-font-family-emoji);
 
-  // Font sizes
-  // The display end (2xl and up) is spaced so the fluid heading clamps in
-  // theme/_styles.scss can read their own bounds off this ladder instead
-  // of restating rem literals: 2xl and 4xl bound h2, 2xl caps h3, 5xl and
-  // 7xl bound h1. Before, the ladder stopped at 2.3rem while h1 ran to
-  // 3.5rem, so the scale could not express the headings it was supposed
-  // to govern and the top five steps had no consumer at all. Overriding a
-  // step still moves the heading it bounds: the fluidity lives in the
-  // clamp, the sizes live here.
+  // Font sizes. Headings take their steps from this ladder
+  // (theme/_styles.scss), so overriding a step moves the heading set in it.
   --cirth-font-size-xs: 0.75rem;
   --cirth-font-size-sm: 0.875rem;
   --cirth-font-size-md: 1rem;
@@ -47,14 +38,13 @@
   --cirth-font-weight-semibold: 600;
   --cirth-font-weight-bold: 700;
 
-  // Letter spacing
-  // Negative tracking for display sizes only: body text stays at normal.
-  // Both steps have consumers: -tight on h1/h2, -snug on h3/h4 (see
-  // theme/_styles.scss). -tight moved from -0.02em to -0.03em when the
-  // heading scale went back up: a token that names the tracking for the
-  // largest type on the page has to be worth setting at that size.
-  --cirth-letter-spacing-tight: -0.03em;
-  --cirth-letter-spacing-snug: -0.01em;
+  // Tracking: one optical correction for every size, applied as
+  //   letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em))
+  // zero at the body size, positive below it and negative above (+0.006em
+  // at 13px, -0.019em at 64px). Gentle, because system faces already
+  // tighten their display sizes; 0 turns it off, a face with no optical
+  // sizes takes about 0.04 (specs/typographic-roles.md).
+  --cirth-tracking-optical: 0.025;
 
   // Line heights
   --cirth-line-height-none: 1;
@@ -89,12 +79,8 @@
   --cirth-radius-2xl: 1rem;
   --cirth-radius-pill: 9999px;
 
-  // Stroke widths
-  // One ladder for borders and outlines both. They used to be two, with
-  // identical values step for step: the same duplication the old size
-  // scale had against the spacing scale, and the same fix: one scale, with
-  // the role tokens (--cirth-border-width, --cirth-outline-width in
-  // theme/_styles.scss) deciding which step each use gets.
+  // Stroke widths: one ladder for borders and outlines. The role tokens in
+  // theme/_styles.scss pick the step each use gets.
   --cirth-border-width-0: 0;
   --cirth-border-width-1: 0.0625rem;
   --cirth-border-width-2: 0.125rem;
@@ -112,7 +98,6 @@
   --cirth-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 
   // Opacity
-  --cirth-opacity-disabled: 0.5;
   --cirth-opacity-overlay: 0.75;
 
   // Layering

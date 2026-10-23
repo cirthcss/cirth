@@ -1,15 +1,13 @@
 ---
 layout: docs.njk
+description: Build a responsive grid whose columns wrap according to available space, without writing breakpoint rules.
 ---
-
 
 # Grid
 
-`.grid` is an intrinsically responsive wrapping grid: columns follow
-available space, wrapping onto a new row once children no longer fit at
-the minimum column width. Resize the window on the demo below: columns
-appear and disappear on their own, no breakpoint involved. For a grid
-that stays on one row regardless of item count, see [Row](/layout/row).
+Use `.grid` for a collection of peers that may wrap onto more than one row,
+such as cards, products, or gallery items. The number of columns follows the
+space available to the grid, not the viewport width.
 
 {% demo "grid" %}
 
@@ -18,62 +16,72 @@ that stays on one row regardless of item count, see [Row](/layout/row).
   <article>Card one</article>
   <article>Card two</article>
   <article>Card three</article>
-  <article>Card four</article>
-  <article>Card five</article>
-  <article>Card six</article>
 </div>
 ```
 
-## `.row` vs `.grid`
+The `<article>` elements remain independent pieces of content. `.grid` only
+controls how the direct children are arranged.
 
-Both are single-declaration, class-only layouts with no per-column
-markup: the difference is what happens when there are more items than
-fit comfortably on one row:
+## How it behaves
 
-| | `.row` | `.grid` |
-| --- | --- | --- |
-| Column width | Equal share of the row, however many children | At least `--cirth-grid-min-column`, then grows to fill |
-| Extra children | Squeeze the existing row narrower | Wrap onto a new row |
-| Driven by | Child count | Available space |
-| Typical use | Form rows, toolbars, a fixed set of stat tiles | Card grids, galleries, an unknown or large item count |
+CSS Grid places each direct child in a column. Cirth defines the columns with
+`auto-fit` and a default minimum width of `12rem`. Columns grow equally to use
+the remaining space. When another minimum-width column no longer fits, the
+next item starts a new row.
 
-## Behavior
+On a container narrower than the minimum, the grid uses one column at the
+container's full width. No narrow-screen media query is needed.
 
-* `grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--cirth-grid-min-column)), 1fr))`.
-  Each column is at least `--cirth-grid-min-column` wide (default `12rem`)
-  and grows evenly to fill any remaining space; once a row can't fit
-  another column at that minimum, children wrap onto the next row.
-* `min(100%, var(--cirth-grid-min-column))` caps the minimum at the
-  container's own width, so a single child, or a very narrow
-  viewport, gets one full-width column instead of overflowing. No media
-  query is needed for the narrow case; it falls out of the `min()` for
-  free.
-* Gaps are controlled by `--cirth-grid-column-gap` and
-  `--cirth-grid-row-gap` (both default to `--cirth-spacing`).
-* Children get `min-width: 0` so long content (text, tables) doesn't force
-  a column wider than its track.
-* A form control (`input`, `select`, `textarea`, `button`, …) that is a
-  direct child of `.grid` drops its own `margin-bottom`: the row-gap
-  already provides that rhythm (upstream pico#738).
+The grid also:
 
-Tune `--cirth-grid-min-column` per grid to change how eagerly it wraps:
-a smaller value packs in more, narrower columns; a larger one wraps
-sooner:
+- uses `--cirth-grid-column-gap` and `--cirth-grid-row-gap` for spacing;
+- gives direct children `min-width: 0`, allowing long content to shrink
+  within its track;
+- removes direct-child flow margins because the grid gap owns the space
+  between cells.
+
+## Grid or row
+
+| Choose | When the layout should |
+| --- | --- |
+| `.grid` | Add and remove columns as available space changes, and wrap extra items |
+| [`.row`](/layout/row) | Stack below `768px`, then keep all items on one equal-width row |
+
+Use `.grid` when the number of items can change. Use `.row` when a small,
+known set belongs together on one wide-screen row.
+
+## Changing the minimum column width
+
+Set `--cirth-grid-min-column` on one grid. A larger value wraps earlier; a
+smaller value fits more columns:
 
 ```css
-.grid {
+.product-grid {
   --cirth-grid-min-column: 16rem;
 }
 ```
 
-`.grid` and `.row` only exist in the default build with classes enabled;
-there's no classless equivalent since both require a class to opt in.
+Change the gaps independently when needed:
 
-## Breaking change
+```css
+.compact-grid {
+  --cirth-grid-column-gap: var(--cirth-space-3);
+  --cirth-grid-row-gap: var(--cirth-space-3);
+}
+```
 
-Before this release, `.grid` was what `.row` is now: a single row of
-equal-width columns (`minmax(0%, 1fr)`, which never wraps) that stacked
-to one column below `md`. If you were using `.grid` for that behavior,
-rename it to `.row`: the markup and behavior are unchanged, only the
-class name is. `.grid` itself now wraps, has no `md` breakpoint, and
-needs the new `--cirth-grid-min-column` token instead.
+`.grid` is available only in class-enabled builds.
+
+## Common mistakes
+
+- Do not set fixed widths on the direct children unless the design requires
+  them. Fixed widths can prevent the tracks from shrinking.
+- Do not use `.grid` when every item must stay on one row. Use `.row`.
+- Do not combine `.grid` with `.container` on the same element. Nest the grid
+  inside the container.
+
+## Related pages
+
+- [Row](/layout/row)
+- [Container](/layout/container)
+- [Cards](/components/card)

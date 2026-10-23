@@ -1,63 +1,102 @@
 ---
 layout: docs.njk
+description: Join related Cirth form controls and buttons into one visual group while preserving labels and form behavior.
 ---
-
 
 # Group
 
-`.group` (or `[role="search"]`) merges a row of form controls and buttons
-into one visually joined control, without extra markup for the joins.
-
-**A `.group` class is required, on top of `role="group"`** (default build):
-`[role="group"]` alone used to be the trigger, but that meant any element
-grouped for pure accessibility reasons, including a plain `<fieldset
-role="group">`, where the role is entirely redundant since a fieldset's
-*implicit* role is already `group`, got hijacked into this decorative
-layout it never asked for, making a semantic group and a decorative one
-visually indistinguishable (WCAG 3.2.4, Consistent Identification). Keep
-`role="group"` for the semantics and add `class="group"` for the layout
-when you want both, as below. The classless build has no class to require,
-so it keeps `[role="group"]` as its only opt-in, but still excludes
-`fieldset` for the same reason.
+Use a group when related controls should read as one joined row, such as an
+email field with its submit button.
 
 {% demo "group" %}
 
 ```html
-<fieldset class="group" role="group">
-  <input type="text" placeholder="Email" autocomplete="email">
-  <button type="submit">Subscribe</button>
-</fieldset>
+<form>
+  <label id="subscribe-label" for="subscribe-email">Email</label>
+  <div class="group" role="group" aria-labelledby="subscribe-label">
+    <input id="subscribe-email" type="email" name="email"
+           autocomplete="email" required>
+    <button type="submit">Subscribe</button>
+  </div>
+</form>
 ```
+
+`role="group"` tells assistive technology that the controls are related.
+`aria-labelledby` points to the `id` of the text that names that group. It
+does not label the email input by itself, so the regular `label for` connection
+is still present.
+
+In a class-based build, `.group` opts into the visual component and
+`role="group"` supplies semantics when needed. In a classless build, use a
+non-`fieldset` element with `role="group"`; that role is the visual trigger.
+Classless builds omit component and utility classes but retain `.no-cirth` as
+the component-exclusion boundary.
 
 ## Search group
 
-`role="search"` additionally pills the whole group (`--cirth-radius-pill`)
-at both ends:
+`role="search"` creates a search landmark. Cirth uses it as a group trigger in
+every build.
 
 {% demo "group-search" %}
 
 ```html
-<form role="search">
-  <input type="search" name="search" placeholder="Search…">
+<form role="search" aria-label="Documentation">
+  <label class="sr-only" for="group-query">Search documentation</label>
+  <input id="group-query" type="search" name="q">
   <button type="submit">Search</button>
 </form>
 ```
 
+Use an accessible name such as `aria-label` when the page has more than one
+search landmark. The visually hidden label still names the field itself.
+
+A search group is shaped like any other group: its outer corners take the
+control radius, and the field inside it matches them.
+
 ## Behavior
 
-* Children are laid out with `display: inline-flex`; adjoining corners are
-  squared off so only the group's outer corners are rounded.
-* Elements with `[hidden]` and `input[type="hidden"]` are ignored when the
-  first and last visible controls are calculated, so hidden form metadata
-  does not break the group's outer corners.
-* Focusing any child raises it above its siblings (`z-index: 2`) and
-  recolors the whole group's shadow to match whichever child (button or
-  input) is focused:
-  `--cirth-group-box-shadow-focus-with-button` /
-  `-focus-with-input`.
-* A focused button's own shadow is suppressed in favor of the group's,
-  so the ring doesn't double up.
-* A `small` inside the group drops below the row as full-width helper
-  text, wherever it sits in the markup, keeping the usual muted helper
-  style; the control before a trailing `small` keeps the group's end
-  rounding.
+Cirth lays visible children out with inline flexbox, removes adjoining corner
+radii and overlaps shared edges. Text fields grow to take available space;
+buttons retain content-based widths. Groups can wrap when the container becomes
+too narrow.
+
+Hidden elements and hidden inputs do not affect which visible child receives
+the outer corners. A direct `small` becomes full-width help text below the row.
+Connect it to the relevant field with `aria-describedby`.
+
+When a child receives keyboard focus, Cirth draws one ring around the whole
+group. Its colour follows the focused control's primary, secondary, contrast
+or validation state.
+
+## Accessibility
+
+- Every form control still needs its own label.
+- Name a semantic group with `aria-labelledby` or `aria-label` when its purpose
+  is not already clear.
+- Keep DOM order equal to the expected reading and keyboard order.
+- Use `fieldset` and `legend` for a question with several radio buttons or
+  checkboxes. That semantic pattern is different from this visual join.
+
+## Tokens
+
+| Token | What it sets |
+| --- | --- |
+| `--cirth-group-box-shadow` | Group shadow |
+| `--cirth-border-radius` | Outer corners |
+| `--cirth-primary-focus` | Default group focus ring |
+
+Validation and button variants reuse their own focus tokens.
+
+## Common mistakes
+
+- Adding `.group` without labels or a form submission purpose.
+- Assuming `role="group"` labels the child inputs.
+- Using `<fieldset role="group">` as the classless visual trigger. Fieldsets
+  are deliberately excluded from that selector.
+- Placing unrelated actions in one joined row.
+
+## Related
+
+- [Forms](/forms/)
+- [Search input](/forms/input-search)
+- [Buttons](/content/button)

@@ -1,0 +1,32 @@
+<article>
+  <header>
+    <hgroup>
+      <h2>Why the form was the product</h2>
+      <p>What a checkout teaches about semantic HTML</p>
+    </hgroup>
+    <small>By Grace Hopper · <time datetime="2026-09-21">21 September 2026</time> · 6 min read</small>
+  </header>
+  <p>
+    The first version of the checkout had forty components and one
+    <code>&lt;form&gt;</code>. The second had one form, and the browser did
+    the rest: <mark>validation, autofill and the keyboard came for free</mark>
+    the moment each field said what it was.
+  </p>
+  <blockquote>
+    <p>The most expensive widget is the one that already exists.</p>
+    <footer><cite>A lesson learned twice</cite></footer>
+  </blockquote>
+  <h3>Three rules we kept</h3>
+  <ol>
+    <li>Every field has a label you can see.</li>
+    <li>Errors are words next to the field, not colours.</li>
+    <li>Submitting works with <kbd>Enter</kbd>, because it is a form.</li>
+  </ol>
+  <figure>
+    <pre><code>&lt;input type="email" autocomplete="email" required&gt;</code></pre>
+    <figcaption>One element, three behaviours the browser supplies.</figcaption>
+  </figure>
+  <footer>
+    <small>Filed under <a href="#">Forms</a> and <a href="#">Accessibility</a></small>
+  </footer>
+</article>

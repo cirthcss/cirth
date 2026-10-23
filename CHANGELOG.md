@@ -7,6 +7,188 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Changed
+
+- **The default palette is a magenta accent on near-grey neutrals.** The
+  accent moves from hue 44° to 324° and to 85% of its chroma ceiling:
+  `#b431c1` in light and `#c638d4` in dark. The neutrals and both canvases
+  move to hue 132°, and success, warning and error take new hues and steps.
+  No token is renamed and no derivation changes, so an author who sets
+  `--cirth-primary`, `--cirth-canvas` or a status input keeps what they set.
+  **Breaking** — see the Upgrading page.
+
+- **A near-white page, a near-black one, and four surface levels between
+  them.** The light canvas moves to L 0.978 and the dark one to L 0.165.
+  Recessed, canvas, raised and overlay are levels derived from
+  `--cirth-canvas` (`--cirth-surface-recessed`, `--cirth-surface-raised`,
+  `--cirth-surface-overlay`): code sits on the recessed level, a card on the
+  raised one, and a dialog, popover or dropdown on the overlay.
+  `--cirth-surface` is the surface an element sits on, rebound by every
+  container that paints one; a field paints it instead of a fill of its own,
+  and focus no longer changes the fill. The separator, container and control
+  edges derive from the canvas, and the control edge keeps 3:1 on every
+  level. `--cirth-primary-text` holds the accent within the lightness every
+  level can carry, so accent text keeps 4.5:1 for any accent. Overlays share
+  one shadow of a contact and an ambient layer, the modal included; a card
+  casts a faint contact layer through `--cirth-card-box-shadow`.
+  **Breaking** — see the Upgrading page.
+
+- **Type comes from roles.** Headings are set at 600 on a compact ladder that
+  does not grow with the viewport: 28, 24, 20, 18, 16 and 14px from `h1` to
+  `h6`, with `--cirth-display-font-size` for a hero. `h1` to `h4` take
+  `--cirth-ink-strong` and `h5` and `h6` the body ink, instead of a fade. A
+  field's label is 14px at 500, a legend outranks it, column heads, captions,
+  a quotation's attribution and help text are metadata (13px, medium, muted),
+  and buttons, summaries and terms are set at 500. Tracking is one relation
+  of size, `--cirth-tracking-optical`: none at the body size, positive below
+  it, negative above it. A field's value never renders under 16px.
+  **Breaking** — see the Upgrading page.
+
+- **The primary is the heaviest action, and focus is one ring.** `.secondary`
+  is tonal, a wash of the page ink with no border, so the primary outweighs
+  it in every scheme. Every control draws focus as one opaque outline held
+  `--cirth-outline-offset` off it, in its family's text colour: a field's
+  edge keeps its colour on focus, a validation state recolours the ring and
+  the edge together, and a group draws one ring round the row. Disabled is a
+  state rather than a transparency, `--cirth-disabled-surface` and
+  `--cirth-disabled-color` for every variant and every field, whether it is
+  disabled itself or by its fieldset. A pressed button moves down by
+  `--cirth-control-press-offset` (1px) when motion is allowed. A submit
+  button sizes to its label, and inline `code` and `samp` are text in the
+  code face, without a chip.
+  **Breaking** — see the Upgrading page.
+
+- **Space between elements comes from their relation.** No element carries
+  an outer margin of its own. The second of two siblings takes one step of a
+  flow scale by what the two are to each other, `--cirth-flow-line`,
+  `-element`, `-group`, `-section` or `-chapter`: 8, 16, 32, 48 and 80px at
+  the default `--cirth-spacing`. The steps weigh nothing, so a margin rule of
+  yours wins, and `.grid`, `.row`, `.group`, a nav, a dropdown and a card's
+  bands own their children's spacing. Stacked fields are 16px apart in a
+  grid or out of one, and two fieldsets sit further apart than two fields.
+  **Breaking** — see the Upgrading page.
+
+- **Every corner takes one of two radii, by what it is.** Something operated
+  takes the control radius, now 6px, and something that holds content the
+  container radius, 9px, never rounder than what holds it. A search field and
+  the search group lose their pill, a popover and block code take the
+  container radius, and a checkbox and inline code stay at 4px.
+  **Breaking** — see the Upgrading page.
+
+- **A checkbox or radio draws its mark inside its target.** The box stays
+  24px and is the target; the mark drawn in it is 20px. A checked radio is
+  filled with the accent and carries a dot, as a checked checkbox carries its
+  tick, so checked differs from unchecked by shape as well as colour; an
+  unchecked mark answers the pointer, and the focus ring sits 2px off the
+  mark. The mark is centred on
+  the label's first line, and a label that starts with one hangs its wrapped
+  lines under its first word. **Breaking** — see the Upgrading page.
+
+- **Dialogs, popovers and dropdown lists open with a short fade.** Their
+  entrance uses `@starting-style`, so it needs no script and no layout
+  animation, and reduced motion keeps them still.
+
+- **The interface icons are filled** (gh#82). The checkbox, minus, chevron,
+  date, time, search, close, valid and invalid icons are compact filled
+  shapes that sit beside the date picker Firefox draws itself. The icon
+  tokens keep their names.
+
+- **A nav inside a `details` disclosure stacks.** `:is(aside, details) nav`
+  now renders as a stacked list: block rows, no horizontal gutter, and the
+  current entry marked on the inline-start edge. Collapsible menus no longer
+  need hand-written layout CSS. A nav in any other container is unchanged.
+
+- **Focus rings in a stacked nav are drawn inside the row.** A focused link
+  or summary in an `aside` or `details` nav takes
+  `outline-offset: calc(var(--cirth-outline-width) * -1)`, so a scrolling rail
+  cannot clip the ring and it never overlaps the next row.
+
+### Added
+
+- **Two presets, `material` and `metro`.** `material` is Material Design 3's
+  baseline scheme in Cirth's tokens, and takes `playroom`'s place as the
+  preset that overrides broadly. `metro` recalls the Windows Phone design
+  language: a cobalt accent on a near-white or near-black page, achromatic
+  neutrals, square corners, no shadows and Segoe in light weights.
+
+- **Tokens for the new roles.** Surfaces: `--cirth-surface`,
+  `--cirth-surface-recessed`, `--cirth-surface-raised`,
+  `--cirth-surface-overlay`. Type: `--cirth-heading-font-weight`,
+  `--cirth-title-font-weight`, `--cirth-display-font-size`,
+  `--cirth-display-font-weight`, `--cirth-label-font-size`,
+  `--cirth-meta-font-size`, `--cirth-ink-strong`, `--cirth-tracking-optical`.
+  Flow: `--cirth-flow-line`, `--cirth-flow-element`, `--cirth-flow-group`,
+  `--cirth-flow-section`, `--cirth-flow-chapter`. Controls:
+  `--cirth-outline-offset`, `--cirth-disabled-surface`,
+  `--cirth-disabled-color`, `--cirth-control-press-offset`, and
+  `--cirth-danger-on-surface`, the label a danger button and a filled
+  summary's chevron take from the fill they sit on. The modal:
+  `--cirth-modal-background-color`, `--cirth-modal-box-shadow`.
+
+### Removed
+
+- **The `playroom` preset**, with no alias. `material` takes its place.
+  **Breaking** — see the Upgrading page.
+
+- **Tokens the new roles replace:** `--cirth-opacity-disabled`,
+  `--cirth-form-element-disabled-opacity`,
+  `--cirth-form-element-active-background-color`,
+  `--cirth-form-element-active-border-color`,
+  `--cirth-form-element-valid-active-border-color`,
+  `--cirth-form-element-invalid-active-border-color`,
+  `--cirth-group-box-shadow-focus-with-button`,
+  `--cirth-group-box-shadow-focus-with-input`, `--cirth-letter-spacing-tight`,
+  `--cirth-letter-spacing-snug` and `--cirth-typography-spacing-top`.
+  `--cirth-form-element-background-color` and `--cirth-letter-spacing` are no
+  longer declared, but still apply when you set them. **Breaking** — see the
+  Upgrading page.
+
+### Fixed
+
+- **A long breadcrumb wraps instead of overflowing.** The list in
+  `nav[aria-label="breadcrumb"]` now wraps onto another line when its items
+  do not fit, so a trail no longer runs past a narrow viewport (WCAG 1.4.10
+  reflow) or squeezes an item's label onto two lines. The gap between two
+  items now belongs to the one before (`margin-inline-end` instead of the
+  next item's `margin-inline-start`), because its divider is drawn there: a
+  line ends with its divider inside the trail and the next line starts
+  flush. A trail that fits renders exactly as before.
+
+- **Floating panels have visible elevation in the dark scheme.** Dark overlay
+  shadows are black at ten times the light alpha, and a panel carries a
+  one-pixel highlight on its top edge, so a dropdown, popover or dialog
+  stands off the near-black canvas as clearly as off the light one.
+
+- **A one-character nav link is a 24px target.** Links in a `nav` now have a
+  24px minimum inline size, so a numbered pagination entry meets WCAG 2.5.8
+  instead of measuring 23px. Wider labels and stacked navs are unchanged.
+
+- **Increased contrast applies under a forced dark root.** With
+  `data-theme="dark"` on the root element, `prefers-contrast: more` left the
+  tokens declared at the root at their normal values: ink, muted text, the
+  accent, hairlines, control borders and the switch track. It now applies,
+  in Chromium, Firefox and WebKit.
+
+- **A custom accent keeps its hue under increased contrast.** Under
+  `prefers-contrast: more`, four accent roles were pinned to the default
+  accent's steps, so a teal theme got brown buttons. They now derive from
+  `--cirth-primary`; the default accent's values are unchanged.
+
+- **A focused field keeps its validation colour.** A focused field with
+  `aria-invalid` drew the accent border inside a green or red ring. Its
+  border and ring now share the state's colour.
+
+- **A modal footer is symmetric.** Its buttons kept a flow margin, 13px
+  above them and 28px below; it is gone.
+
+- **The file input button's current state compiles.** `[aria-current]` on
+  `::file-selector-button` produced an empty selector, which browsers
+  dropped and esbuild warned about on every build.
+
+- **An outline button's hover wash keeps its hue.** It was mixed in oklch
+  between the accent and the surface, and turned beige; it is mixed in
+  oklab.
+
 ## [0.16.0] - 2026-09-25
 
 ### Added

@@ -40,10 +40,10 @@ const render = (page, css, markup) =>
 	setContent(page, `<style>${css}</style><main>${markup}</main>`);
 
 /**
- * A token read off the element that resolves it. Several of these are
- * rebound per element: every heading level carries its own
- * --cirth-typography-spacing-top, so reading them off the root would
- * compare a measurement against a value nothing on the page uses.
+ * A length token, resolved in pixels next to the element that reads it.
+ * The flow steps are calc() relations of --cirth-spacing, so the raw token
+ * text is not a number: a probe beside the element lets the browser do
+ * the arithmetic, in the same inheritance context.
  * @param {import("@playwright/test").Page} page
  * @param {string} selector
  * @param {string} name
@@ -53,9 +53,16 @@ const token = (page, selector, name) =>
 		({ target, property }) => {
 			const element = document.querySelector(target);
 			if (!element) throw new Error(`missing ${target}`);
-			const value = getComputedStyle(element).getPropertyValue(property);
-			if (!value.trim()) throw new Error(`${property} unset on ${target}`);
-			return Number.parseFloat(value) * 16;
+			if (!getComputedStyle(element).getPropertyValue(property).trim()) {
+				throw new Error(`${property} unset on ${target}`);
+			}
+			const probe = document.createElement("div");
+			probe.style.marginTop = `var(${property})`;
+			probe.style.display = "block";
+			element.after(probe);
+			const value = Number.parseFloat(getComputedStyle(probe).marginTop);
+			probe.remove();
+			return value;
 		},
 		{ target: selector, property: name },
 	);
@@ -82,11 +89,17 @@ for (const [build, css] of builds) {
 			};
 		});
 
+		// The chapter step between the top-level sections of <main>; a
+		// nested region directly under its heading takes the line that binds
+		// anything to the heading above it (specs/container-owned-flow.md).
 		expect(measured.chapter).toBeCloseTo(
-			await token(page, "#chapter", "--cirth-space-8"),
+			await token(page, "#chapter", "--cirth-flow-chapter"),
 			1,
 		);
-		expect(measured.nested).toBe(0);
+		expect(measured.nested).toBeCloseTo(
+			await token(page, "#nested", "--cirth-flow-line"),
+			1,
+		);
 	});
 
 	test(`${build}: an open disclosure puts its panel one rhythm step under its trigger`, async ({
@@ -196,15 +209,18 @@ for (const [build, css] of builds) {
 		expect(measured.aloneInset).toBeCloseTo(measured.headerPadding, 0);
 
 		// A heading that follows something in the band takes no section
-		// break: the gap is whatever the element above it already carried.
-		expect(measured.afterMarginTop).toBe(0);
-		expect(measured.eyebrowGap).toBeCloseTo(measured.eyebrowMarginBottom, 1);
+		// break: the band is a group, so the heading sits a line under what
+		// precedes it, and nothing else carries a margin.
+		const line = await token(page, "#after", "--cirth-flow-line");
+		expect(measured.afterMarginTop).toBeCloseTo(line, 1);
+		expect(measured.eyebrowMarginBottom).toBe(0);
+		expect(measured.eyebrowGap).toBeCloseTo(line, 1);
 
 		// Scoped to the band, and to nothing else: the same heading after the
 		// same paragraph in the card's *body* is document flow, and still
-		// gets the section break the framework gives it everywhere.
+		// gets the group step the framework gives an h3 everywhere.
 		expect(measured.inFlowMarginTop).toBeCloseTo(
-			await token(page, "#inflow", "--cirth-typography-spacing-top"),
+			await token(page, "#inflow", "--cirth-flow-group"),
 			1,
 		);
 	});
@@ -323,5 +339,82 @@ for (const [build, css] of builds) {
 
 		// And it turns rather than jumping.
 		expect(measured.shut.transition).toContain("transform");
+	});
+}
+
+// --- The relation table (specs/container-owned-flow.md) ----------------
+
+// Nothing carries a margin of its own: the space between two siblings is
+// one step of the flow scale, picked by what the two are to each other.
+// Measured between rendered boxes, where a reader sees it, at the width a
+// phone gives a stacked form.
+for (const [build, css] of builds) {
+	test(`${build}: every relation measures its step, and the steps rise`, async ({
+		page,
+	}) => {
+		await page.setViewportSize({ width: 390, height: 900 });
+		await render(
+			page,
+			css,
+			`<section id="s1">
+				<p id="p0">Before the heading.</p>
+				<h2 id="h2">Heading</h2>
+				<p id="p1">One.</p>
+				<p id="p2">Two.</p>
+				<ul><li id="li1">One</li><li id="li2">Two</li></ul>
+				<h3 id="h3">Title</h3>
+				<form>
+					<fieldset id="fs1">
+						<legend>Group</legend>
+						<label id="l1">Name<input id="i1"></label>
+						<label id="l2">Email<input id="i2"></label>
+					</fieldset>
+					<fieldset id="fs2">
+						<legend>Grid</legend>
+						<div class="grid" id="grid"><label id="g1">A<input id="gi1"></label><label id="g2">B<input id="gi2"></label><label id="g3">C<input id="gi3"></label></div>
+					</fieldset>
+					<button id="b1" type="submit">Send</button> <button id="b2" type="button">Other</button>
+				</form>
+			</section>
+			<section id="s2"><p>Next part.</p></section>`,
+		);
+
+		const gaps = await page.evaluate(() => {
+			/** @param {string} id */
+			const box = (id) =>
+				/** @type {HTMLElement} */ (document.getElementById(id)).getBoundingClientRect();
+			/** @param {string} a @param {string} b */
+			const gap = (a, b) => box(b).top - box(a).bottom;
+			return {
+				line: gap("h2", "p1"),
+				element: gap("p1", "p2"),
+				listItem: gap("li1", "li2"),
+				group: gap("fs1", "fs2"),
+				titleAfterBlock: gap("li2", "h3"),
+				section: gap("p0", "h2"),
+				chapter: gap("s1", "s2"),
+				stacked: [gap("i1", "l2")],
+				gridStacked: [gap("gi1", "g2"), gap("gi2", "g3")],
+				buttonsShareALine: box("b2").top - box("b1").top,
+			};
+		});
+
+		const scale = [gaps.line, gaps.element, gaps.group, gaps.section, gaps.chapter];
+		for (let index = 1; index < scale.length; index++) {
+			expect(scale[index], `step ${index} is larger than the one below`).toBeGreaterThan(
+				scale[index - 1],
+			);
+		}
+		expect(gaps.listItem).toBeCloseTo(gaps.line, 0);
+		expect(gaps.titleAfterBlock).toBeCloseTo(gaps.group, 0);
+
+		// Stacked fields are equal to a pixel, in a grid or out of one, and a
+		// group of fields is further from the next group than a field is
+		// from the next field.
+		for (const stacked of [...gaps.stacked, ...gaps.gridStacked]) {
+			expect(Math.abs(stacked - gaps.element)).toBeLessThanOrEqual(1);
+		}
+		expect(gaps.group).toBeGreaterThan(gaps.element);
+		expect(gaps.buttonsShareALine).toBe(0);
 	});
 }

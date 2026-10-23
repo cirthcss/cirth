@@ -6,21 +6,14 @@
    */
 
   #{$parent-selector} .overflow-auto {
-    // A scroll container only clips what it contains, and an absolutely
-    // positioned descendant is contained by its nearest positioned
-    // ancestor, not by its parent. Without this, the .sr-only header a
-    // table puts on its action column escaped the scroll area and widened
-    // the page it was meant to protect: +1,111px at 320px (WCAG 1.4.10).
+    // Positioned, so an absolutely positioned descendant (a table's .sr-only
+    // header) is clipped by the scroll area instead of widening the page
+    // (WCAG 1.4.10).
     position: relative;
     overflow: auto;
 
-    // A scroll container has to be keyboard reachable to be operable at
-    // all (WCAG 2.1.1; it is what axe's scrollable-region-focusable
-    // reports), so authors put `tabindex="0"` on this utility. Cirth
-    // shipped the container but not the indicator, and the browser's own
-    // 1px ring is the one focus treatment on the page that is not the
-    // framework's. Painting it here means the affordance the library asks
-    // for arrives finished.
+    // A scroll container needs `tabindex="0"` to be keyboard operable
+    // (WCAG 2.1.1), so it ships with the framework's focus ring.
     &:focus-visible {
       outline: var(--cirth-outline-width) solid var(--cirth-primary-focus);
     }

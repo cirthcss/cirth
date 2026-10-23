@@ -1,9 +1,9 @@
-<a href="#" class="sr-only sr-only-focusable">Skip to content</a>
+<a href="#example-content" class="sr-only sr-only-focusable">Skip to example content</a>
 <p>
-  <button aria-label="Close">
+  <button type="button">
+    <span aria-hidden="true">&times;</span>
     <span class="sr-only">Close</span>
-    &times;
   </button>
   The button above has no visible label: its text is screen-reader only.
 </p>
-<p>Tab to the link above the button to see the skip link appear on focus.</p>
+<p id="example-content" tabindex="-1">Tab to the link above the button to see it appear on focus.</p>

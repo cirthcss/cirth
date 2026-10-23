@@ -39,6 +39,10 @@
 @use "components/popover"; // [popover]
 @use "components/progress"; // progress
 
+// After every component, so its zero-weight relations follow every
+// zero-weight reset in the sheet.
+@use "content/flow"; // space between siblings, by relation
+
 // Utilities
 @use "utilities/accessibility"; // aria-*, [dir="rtl"]
 @use "utilities/reduce-motion"; // prefers-reduced-motion
@@ -46,15 +50,10 @@
 @use "utilities/truncate"; // .truncate
 
 // Theme
-// src/theme/ is the single source of Cirth's official design tokens.
-// Alternate accents (see src/presets/) are published as separate
-// stylesheets that only override CSS custom properties, meant to be
-// loaded after this one: they are not alternate builds of this file.
-// They emit into the same cascade layer, so source order still decides.
+// src/theme/ is the single source of the design tokens. Presets
+// (src/presets/) are separate stylesheets that only override custom
+// properties, loaded after this one into the same cascade layer.
 @use "theme";
 
-// Print is not here on purpose. It ships as its own stylesheet
-// (src/cirth.print*.scss -> dist/cirth.print*.css), loaded with
-// media="print", so the bytes that only matter on paper stay out of the
-// payload that has to arrive in the first round trip. See those entry
-// files for why source order still works.
+// Print ships as its own stylesheet (src/cirth.print*.scss), loaded with
+// media="print", so its bytes stay out of the first round trip.

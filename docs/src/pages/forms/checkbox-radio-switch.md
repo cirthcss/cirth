@@ -1,66 +1,141 @@
 ---
 layout: docs.njk
+description: Use native checkboxes, radio groups, switches and segmented choices with Cirth.
 ---
 
+# Checkbox, radio and switch
 
-# Checkbox, radio, switch
-
-`[type="checkbox"]` and `[type="radio"]` are restyled from scratch
-(`appearance: none`) with custom check/dash icons; adding `role="switch"` to
-a checkbox turns it into a toggle switch with no extra markup.
+Use a checkbox for an independent yes-or-no choice and radios for one choice
+from a set. Add `role="switch"` to a checkbox when it represents a setting
+that takes effect as soon as it is toggled.
 
 {% demo "checkbox-radio-switch" %}
 
 ```html
-<label><input type="checkbox" checked> Checked</label>
-<label><input type="radio" name="r" checked> Option A</label>
-<label><input type="checkbox" role="switch" checked> Enable notifications</label>
+<label>
+  <input type="checkbox" name="terms" value="accepted" required>
+  I accept the terms
+</label>
+
+<fieldset>
+  <legend>Delivery</legend>
+  <label>
+    <input type="radio" name="delivery" value="standard" checked>
+    Standard
+  </label>
+  <label>
+    <input type="radio" name="delivery" value="express">
+    Express
+  </label>
+</fieldset>
+
+<label>
+  <input type="checkbox" name="notifications" role="switch" checked>
+  Email notifications
+</label>
 ```
 
-## Behavior
+The shared radio `name` makes the two delivery controls one native group, so
+selecting either one clears the other. Each `value` is the text submitted for
+that choice. An unchecked checkbox is normally omitted from form data, so the
+application must decide how to interpret its absence.
 
-* Checked state uses `--cirth-primary-surface` and the matching border token,
-  plus an inline check icon (`--cirth-icon-checkbox`); an indeterminate checkbox shows
-  a dash (`--cirth-icon-minus`) instead.
-* Radios are checked with a filled inner circle instead of an icon.
-* A `[type="checkbox"][role="switch"]` becomes a pill shaped toggle: track
-  color from `--cirth-switch-background-color` /
-  `--cirth-switch-checked-background-color`, thumb color from
-  `--cirth-switch-color`, which defaults to `--cirth-primary-on-surface` (the
-  same token buttons use for their text) rather than a fixed white: keep
-  the two in sync if you customize `--cirth-primary-on-surface`, and recheck
-  contrast (WCAG 1.4.11, >= 3:1) against both `--cirth-switch-background-color`
-  and `--cirth-switch-checked-background-color` if you do.
-* `aria-invalid="true"`/`"false"` recolor the checked state the same way as
-  other form elements (see [Forms overview](/forms/)).
-* A `label` that contains a checkbox/radio becomes `cursor: pointer` and
-  sizes itself to its content instead of stretching full width.
+## The mark
+
+Cirth redraws checkboxes and radios while keeping their native input behavior.
+The 24px input box is the pointer target. A smaller visible mark sits inside
+it. Labels that begin with a checkbox or radio use a hanging indent, so wrapped
+text aligns with the first word instead of the mark.
+
+The label remains part of the clickable target. If custom CSS changes that
+label to `display: flex` or `grid`, reset its `padding-inline-start` and
+`text-indent` because a flex or grid layout does not need the hanging indent.
+
+## States
+
+- A checked checkbox uses the primary surface and displays the check icon.
+- The `indeterminate` state displays a dash. It is a JavaScript property, not
+  an HTML attribute, and does not change the submitted value by itself.
+- A checked radio uses the primary surface and a visible dot, so selection is
+  not conveyed by colour alone.
+- Pointer hover changes the edge or active surface. Focus draws the shared
+  control ring. Radios use the focus state needed to keep arrow-key navigation
+  visible across supported browsers.
+- A disabled choice uses the disabled surface, edge and text treatment.
+- A switch uses a pill track and moving thumb. `role="switch"` changes the
+  announced state to on or off; the underlying form control remains a
+  checkbox.
+- `aria-invalid="true"` and `aria-invalid="false"` use the shared validation
+  colours. See [Validation and states](/forms/validation).
+
+## Grouping choices
+
+Wrap related radios in a `fieldset` and put the question in its `legend`.
+The browser exposes that group relationship to assistive technology and uses
+the common `name` for single selection. A related set of checkboxes can use the
+same structure even though each checkbox remains independent.
 
 ## Segmented choice
 
-A compact single choice, drawn as joined segments, that is still an ordinary
-radio group. Add `class="segmented"` to a `fieldset` whose `legend` names the
-choice and whose labels each wrap one radio:
+The class-based builds can draw a compact radio group as joined segments. The
+markup stays a real fieldset with labelled radios:
 
 {% demo "segmented" %}
 
 ```html
 <fieldset class="segmented">
   <legend>View</legend>
-  <label><input type="radio" name="view" value="list" checked> List</label>
-  <label><input type="radio" name="view" value="grid"> Grid</label>
-  <label><input type="radio" name="view" value="map" disabled> Map</label>
+  <label>
+    <input type="radio" name="view" value="list" checked>
+    List
+  </label>
+  <label>
+    <input type="radio" name="view" value="grid">
+    Grid
+  </label>
+  <label>
+    <input type="radio" name="view" value="map" disabled>
+    Map
+  </label>
 </fieldset>
 ```
 
-* The radios are not hidden. Arrow keys move the selection, the checked
-  value submits with the form, and assistive technology announces a radio
-  group named by the `legend`.
-* The selected segment takes the primary button's fill, and its radio keeps
-  its dot, so the selection does not depend on colour. In forced-colors mode,
-  where the fill is removed, the dot and the segment borders remain.
-* Keyboard focus draws an outline around the whole segment, outside the fill.
-* Each segment is at least 44px tall, like a button. A disabled radio fades
-  its segment once.
-* Class-based builds only. The classless build has no opt-in, so a
-  `fieldset` there always stays a plain group.
+The inputs stay available to keyboards, form submission and assistive
+technology. Arrow keys move through the radio group, and focus appears around
+the active segment. `.segmented` is not emitted by classless builds; there the
+fieldset remains an ordinary radio group.
+
+## Accessibility
+
+- Keep meaningful text in each label. The fieldset legend names the overall
+  question; it does not replace each choice label.
+- Use a switch only for an immediate setting. Use a checkbox for a choice that
+  is collected and applied when a form is submitted.
+- Do not hide native radio inputs to build a segmented control. The Cirth
+  pattern deliberately leaves them operable.
+- If the switch thumb colour is customised, preserve at least 3:1 contrast
+  against both track states.
+
+## Tokens
+
+| Token | What it sets |
+| --- | --- |
+| `--cirth-primary-surface`, `--cirth-primary-border` | Checked fill and edge |
+| `--cirth-icon-checkbox`, `--cirth-icon-minus` | Checkbox marks |
+| `--cirth-switch-background-color` | Off track |
+| `--cirth-switch-checked-background-color` | On track |
+| `--cirth-switch-color` | Switch thumb |
+
+## Common mistakes
+
+- Giving each radio a different `name`, which allows several choices at once.
+- Omitting radio values, which submits the browser default instead of a useful
+  application value.
+- Using a switch for a choice that has no effect until form submission.
+- Styling a non-input element as a checkbox instead of using the native
+  control.
+
+## Related
+
+- [Forms](/forms/), for labels, fieldsets and legends.
+- [Select](/forms/select), for a longer single-choice list.

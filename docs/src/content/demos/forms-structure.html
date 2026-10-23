@@ -1,0 +1,20 @@
+<form>
+  <fieldset>
+    <legend>Account</legend>
+    <label>
+      Full name
+      <input type="text" name="name" autocomplete="name" required>
+    </label>
+    <label>
+      Email
+      <input type="email" name="email" autocomplete="email" aria-describedby="structure-email-help" required>
+      <small id="structure-email-help">Receipts go here. We never share it.</small>
+    </label>
+  </fieldset>
+  <fieldset>
+    <legend>Plan</legend>
+    <label><input type="radio" name="plan" value="free" checked> Free</label>
+    <label><input type="radio" name="plan" value="team"> Team, billed monthly</label>
+  </fieldset>
+  <button type="submit">Create account</button>
+</form>

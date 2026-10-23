@@ -24,10 +24,17 @@ const lines = [
 	{
 		current: true,
 		href: root,
-		label: "from v0.16.0",
+		label: "from v0.17.0",
+		shortLabel: "v0.17",
+		summary:
+			"Surfaces, type, space between elements and corners come from named roles, and the default accent is magenta.",
+	},
+	{
+		href: `${root}v0.16/`,
+		label: "up to v0.16.0",
 		shortLabel: "v0.16",
 		summary:
-			"Every stylesheet emits its rules inside the cascade layer `cirth`, so unlayered CSS on the page wins whatever its specificity.",
+			"The last line with the copper accent, element margins, and a heading ladder that grew with the viewport.",
 	},
 	{
 		href: `${root}v0.15/`,

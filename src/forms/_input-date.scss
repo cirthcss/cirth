@@ -65,27 +65,13 @@
   }
 }
 
-// Firefox's own native picker icon is hidden for date and datetime-local
-// Firefox draws its own native picker icon for [type="date"] and
-// [type="datetime-local"] (verified against unstyled inputs) but not for
-// [type="month"], [type="week"], or [type="time"], and, unlike
-// Chromium/WebKit, gives no pseudo-element to opacity: 0 it away (no
-// ::-moz-calendar-picker-indicator), so stacking our own SVG on top of
-// date/datetime-local used to produce two icons there.
-// `color: transparent` hides it: Firefox paints that icon using the
-// element's `color`, decoupled from the field's actual text glyphs, which
-// are repainted independently via the non-standard but Firefox-supported
-// `-webkit-text-fill-color`. An explicit color is required on that
-// property: `currentColor` resolves circularly to the `color: transparent`
-// set right above it on the same element, hiding the text along with the
-// icon. Interaction is unaffected: the (now invisible) native icon's
-// picker button still opens Firefox's date picker on click, so this only
-// swaps which icon is visible, not the field's behavior. Firefox has no
-// officially supported way to do this (bugzil.la/1817839#c1); this is a
-// browser-shipped implementation detail, not a spec guarantee.
-// Detect Firefox by testing for the absence of
-// ::-webkit-calendar-picker-indicator support, since that's otherwise
-// universal among current engines.
+// Firefox draws its own picker icon for date and datetime-local, with no
+// pseudo-element to hide it, so Cirth's icon would be a second one. It is
+// painted in the element's `color`, so `color: transparent` hides it while
+// -webkit-text-fill-color repaints the text; that needs an explicit colour,
+// because currentColor would resolve to the transparent one. The hidden
+// icon still opens the picker. Not a supported API (bugzil.la/1817839#c1).
+// Firefox is the engine without ::-webkit-calendar-picker-indicator.
 @supports not selector(::-webkit-calendar-picker-indicator) {
   #{$parent-selector}
     input:not(

@@ -129,6 +129,60 @@ test("an invoker opens it, and the platform closes it", async ({ page }) => {
 		.toBe(false);
 });
 
+test("it enters with a short fade and transform settle", async ({ page }) => {
+	await page.emulateMedia({ reducedMotion: "no-preference" });
+	await render(page);
+
+	const running = await page.evaluate(async () => {
+		const hint = document.getElementById("hint");
+		if (!hint) throw new Error("missing popover");
+		hint.showPopover();
+		for (let frame = 0; frame < 10; frame++) {
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+			const transitions = hint
+				.getAnimations()
+				.filter((animation) => animation instanceof CSSTransition)
+				.map((animation) => /** @type {CSSTransition} */ (animation).transitionProperty);
+			if (transitions.length > 0) {
+				return {
+					duration: getComputedStyle(hint).transitionDuration,
+					transitions,
+				};
+			}
+		}
+		return { duration: getComputedStyle(hint).transitionDuration, transitions: [] };
+	});
+
+	expect(running.transitions).toContain("opacity");
+	expect(running.transitions).toContain("transform");
+	const longest = Math.max(
+		...running.duration.split(",").map((value) => Number.parseFloat(value) * (value.includes("ms") ? 1 : 1000)),
+	);
+	expect(longest).toBeLessThanOrEqual(300);
+});
+
+test("under reduced motion the popover appears in its final state", async ({
+	page,
+}) => {
+	await render(page);
+	const state = await page.evaluate(async () => {
+		const hint = document.getElementById("hint");
+		if (!hint) throw new Error("missing popover");
+		hint.showPopover();
+		await new Promise((resolve) => requestAnimationFrame(resolve));
+		await new Promise((resolve) => requestAnimationFrame(resolve));
+		const transform = new DOMMatrixReadOnly(getComputedStyle(hint).transform);
+		return {
+			animations: hint.getAnimations().length,
+			opacity: getComputedStyle(hint).opacity,
+			scaleX: transform.a,
+			y: transform.m42,
+		};
+	});
+
+	expect(state).toEqual({ animations: 0, opacity: "1", scaleX: 1, y: 0 });
+});
+
 test("it is painted as a sheet, not as bare text", async ({ page }) => {
 	await render(page);
 	await page.getByRole("button", { name: "Requirements" }).click();

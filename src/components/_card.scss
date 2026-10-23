@@ -7,7 +7,9 @@
    */
 
 #{$parent-selector} article {
-  margin-bottom: var(--cirth-block-spacing-vertical);
+  // The raised level, rebound as the surface its contents sit on.
+  --cirth-surface: var(--cirth-card-background-color);
+
   padding: var(--cirth-block-spacing-vertical)
     var(--cirth-block-spacing-horizontal);
   border: var(--cirth-border-width) solid var(--cirth-card-border-color);
@@ -15,30 +17,21 @@
   background: var(--cirth-card-background-color);
   box-shadow: var(--cirth-card-box-shadow);
 
-  // Container padding owns the final rhythm. Text and forms keep their
-  // normal flow spacing everywhere else, but do not stack a second gutter
-  // against the card edge. Adjacent body/footer margins already collapse to
-  // one rhythm step, so they need no selector or compensation here.
-  > :last-child:not(header, footer),
-  > :is(header, footer) > :last-child {
-    margin-bottom: 0;
-  }
-
-  // The mirror of the rule above, on the axis it was missing. A heading
-  // that follows a block takes --cirth-typography-spacing-top so a new
-  // section separates itself from the prose above it: 32px to 48px,
-  // depending on the level. That is a document-flow measure, and a card's
-  // header or footer is not document flow: it is a band padded to
-  // `block-spacing-vertical - space-2`. An eyebrow above a title in a card
-  // header therefore opened a 40px hole inside a 12px band, three times
-  // the padding that defines it. Inside the band the rhythm is the
-  // ordinary one its own elements already carry.
+  // A heading in a header or footer band is not document flow: it sits on
+  // the band's padding, or a line under an eyebrow before it, instead of
+  // opening a section step.
   > :is(header, footer) :is(h1, h2, h3, h4, h5, h6) {
     margin-top: 0;
   }
 
+  > :is(header, footer) > * + :is(h1, h2, h3, h4, h5, h6) {
+    margin-top: var(--cirth-flow-line);
+  }
+
   > header,
   > footer {
+    --cirth-surface: var(--cirth-card-sectioning-background-color);
+
     margin-inline: calc(var(--cirth-block-spacing-horizontal) * -1);
     padding: calc(var(--cirth-block-spacing-vertical) - var(--cirth-space-2))
       var(--cirth-block-spacing-horizontal);

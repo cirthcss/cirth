@@ -3,14 +3,13 @@ const path = require("node:path");
 const { expect, test } = require("@playwright/test");
 const { setContent } = require("./helpers/render");
 
-// gh#69 — a search field keeps its pill shape on its own and inside the
-// dedicated [role="search"] group, but inside a generic group it is one
-// segment of a shared shape and has to take the group's own radius. The
-// exposed corners used to stay pill-round against the group's square
-// ones, focus shadow included.
+// gh#69: inside a generic group a search field is one segment of a shared
+// shape. Its exposed corners used to stay pill-round against the group's
+// square ones, focus included. Search no longer has a pill of its own
+// (specs/radius-relations.md), so the search group and a search field in
+// any group are shaped exactly like a text group.
 
 const projectRoot = path.join(__dirname, "..");
-const pillThreshold = 100; // px: the pill token is 9999px, the group radius single digits
 
 const builds = [
 	{ file: "dist/cirth.css", name: "default", scope: "" },
@@ -88,14 +87,13 @@ for (const build of builds) {
 
 			expect(search.startStart).toBe(reference.startStart);
 			expect(search.endStart).toBe(reference.endStart);
-			expect(Number.parseFloat(search.startStart)).toBeLessThan(pillThreshold);
 
 			// Inner corners stay squared off against the button beside it.
 			expect(search.startEnd).toBe("0px");
 			expect(search.endEnd).toBe("0px");
 		});
 
-		test(`the dedicated search group keeps the pill (${build.name} build, ${colorScheme})`, async ({
+		test(`the search group is shaped like a text group (${build.name} build, ${colorScheme})`, async ({
 			page,
 		}) => {
 			await page.emulateMedia({ colorScheme });
@@ -103,13 +101,14 @@ for (const build of builds) {
 
 			const grouped = await radiiOf(page.locator("#search-field"));
 			const standalone = await radiiOf(page.locator("#standalone-search"));
+			const reference = await radiiOf(page.locator("#reference-text"));
+			const outer = await radiiOf(page.locator("#search-group"));
+			const referenceOuter = await radiiOf(page.locator("#reference-group"));
 
-			expect(
-				Number.parseFloat(grouped.startStart),
-			).toBeGreaterThanOrEqual(pillThreshold);
-			expect(
-				Number.parseFloat(standalone.startStart),
-			).toBeGreaterThanOrEqual(pillThreshold);
+			expect(grouped).toEqual(reference);
+			expect(outer).toEqual(referenceOuter);
+			expect(standalone.startStart).toBe(reference.startStart);
+			expect(standalone.endEnd).toBe(reference.startStart);
 		});
 	}
 

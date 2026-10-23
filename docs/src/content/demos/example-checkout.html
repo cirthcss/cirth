@@ -1,0 +1,56 @@
+<div class="grid">
+  <form>
+    <fieldset>
+      <legend>Shipping address</legend>
+      <label>
+        Full name
+        <input type="text" name="ship-name" autocomplete="shipping name" required>
+      </label>
+      <label>
+        Street address
+        <input type="text" name="ship-street" autocomplete="shipping street-address" required>
+      </label>
+      <div class="grid">
+        <label>
+          City
+          <input type="text" name="ship-city" autocomplete="shipping address-level2" required>
+        </label>
+        <label>
+          Postcode
+          <input type="text" name="ship-postcode" autocomplete="shipping postal-code" required>
+        </label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Delivery</legend>
+      <label><input type="radio" name="delivery" value="standard" checked> Standard, 3 to 5 days, free</label>
+      <label><input type="radio" name="delivery" value="express"> Express, next day, €9</label>
+    </fieldset>
+    <button type="submit">Pay €128.00</button>
+  </form>
+  <article>
+    <header><strong>Order summary</strong></header>
+    <table>
+      <thead>
+        <tr><th scope="col">Item</th><th scope="col">Price</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Field notebook × 2</th><td>€36.00</td></tr>
+        <tr><th scope="row">Fountain pen</th><td>€92.00</td></tr>
+        <tr><th scope="row">Shipping</th><td>Free</td></tr>
+      </tbody>
+      <tfoot>
+        <tr><th scope="row">Total</th><td>€128.00</td></tr>
+      </tfoot>
+    </table>
+    <details>
+      <summary>Have a gift card?</summary>
+      <form>
+        <fieldset class="group" role="group">
+          <input type="text" name="gift-card" placeholder="Card code" aria-label="Gift card code">
+          <button type="submit">Apply</button>
+        </fieldset>
+      </form>
+    </details>
+  </article>
+</div>

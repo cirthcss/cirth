@@ -14,9 +14,26 @@ if (
   results instanceof HTMLOListElement &&
   typeof dialog.showModal === "function"
 ) {
+  // The shortcut is Command+K on Apple platforms and Ctrl+K elsewhere, and
+  // the trigger says so: in its hint, and to assistive technology through
+  // aria-keyshortcuts. "/" opens search too, outside a field.
   const modifier = document.querySelector("[data-docs-search-modifier]");
-  const applePlatform = /Mac|iPhone|iPad/.test(navigator.platform);
+  const platform = navigator.userAgentData?.platform || navigator.platform || "";
+  const applePlatform = /mac|iphone|ipad/i.test(platform);
   if (modifier) modifier.textContent = applePlatform ? "⌘" : "Ctrl";
+  trigger.setAttribute("aria-keyshortcuts", applePlatform ? "Meta+K /" : "Control+K /");
+
+  // Matched on the physical key as well as on the character, so a layout
+  // that moves K still opens search with the key labelled K. Each
+  // platform's other modifier is left alone, and so is AltGr (Ctrl+Alt) on
+  // Windows: Ctrl+K in a Mac text field deletes to the end of the line.
+  const isShortcut = (event) =>
+    (event.code === "KeyK" || event.key.toLowerCase() === "k") &&
+    !event.shiftKey &&
+    !event.altKey &&
+    (applePlatform
+      ? event.metaKey && !event.ctrlKey
+      : event.ctrlKey && !event.metaKey);
 
   const baseUrl = (document.documentElement.dataset.base || "/").replace(
     /\/?$/,
@@ -38,6 +55,28 @@ if (
 
   const resultLinks = () =>
     Array.from(results.querySelectorAll("[data-docs-search-result]"));
+
+  // Pagefind indexes the name inside an HTML tag, while a query that keeps
+  // the angle brackets returns no matches. Quote a query made of one complete
+  // tag so short elements such as <i> stay exact. In longer queries, keep tag
+  // names as ordinary terms and discard unmatched brackets while the reader
+  // is still typing.
+  const normalizePagefindQuery = (query) => {
+    const completeTag = query.match(
+      /^\s*<\s*\/?\s*([a-z][a-z0-9:-]*)(?:\s[^<>]*?)?\s*\/?>\s*$/i,
+    );
+    if (completeTag) return `"${completeTag[1]}"`;
+
+    return query
+      .replace(
+        /<\s*\/?\s*([a-z][a-z0-9:-]*)(?:\s[^<>]*?)?\s*\/?>/gi,
+        " $1 ",
+      )
+      .replace(/<\s*\/?/g, " ")
+      .replace(/>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  };
 
   const openSearch = () => {
     if (!dialog.open) dialog.showModal();
@@ -78,8 +117,9 @@ if (
 
   const search = async () => {
     const query = input.value.trim();
+    const pagefindQuery = normalizePagefindQuery(query);
     currentQuery = query;
-    if (query.length < 2) {
+    if (pagefindQuery.length < 2) {
       results.replaceChildren();
       status.textContent = "Type at least two characters to search.";
       return;
@@ -88,7 +128,7 @@ if (
     status.textContent = "Searching documentation…";
     try {
       const pagefind = await loadPagefind();
-      const response = await pagefind.debouncedSearch(query, {}, 180);
+      const response = await pagefind.debouncedSearch(pagefindQuery, {}, 180);
       if (!response || currentQuery !== query) return;
       const items = await Promise.all(
         response.results.slice(0, 8).map((result) => result.data()),
@@ -150,11 +190,13 @@ if (
       target instanceof HTMLTextAreaElement ||
       target instanceof HTMLSelectElement ||
       (target instanceof HTMLElement && target.isContentEditable);
-    const command =
-      (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
     const slash =
-      event.key === "/" && !editing && !event.metaKey && !event.ctrlKey;
-    if (!command && !slash) return;
+      event.key === "/" &&
+      !editing &&
+      !event.metaKey &&
+      !event.ctrlKey &&
+      !event.altKey;
+    if (!isShortcut(event) && !slash) return;
     event.preventDefault();
     openSearch();
   });

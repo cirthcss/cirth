@@ -47,7 +47,7 @@ const { auditSources, watchSources } = require("./lib/source-guard");
 //                      verdict that makes a declaration safe to delete.
 //   engine-dependent   Chromium measured nothing; Firefox or WebKit did.
 //                      Keep it, and say which engine needs it.
-//   preset-dependent   the default theme measured nothing; playroom did.
+//   preset-dependent   the default theme measured nothing; material did.
 //   not observable     the configuration never entered the media condition
 //                      the rule sits under.
 //   unmatched          the selector matched nothing where this pass looked.
@@ -76,16 +76,16 @@ const quiet = args.includes("--quiet");
 // each one is in the list rather than an assumption that one stands in for
 // the others. Firefox and WebKit are separate engines, not one
 // "non-Chromium": they agree on the flex case above and need not agree on
-// the next one. `playroom` is the preset that moves the most tokens: face,
-// radius, weight, so it is the one most likely to separate two values that
-// coincide at the default.
+// the next one. `material` is the preset that moves the most tokens: face,
+// radius, weight, focus ring, elevation and derived colour roles, so it is
+// the one most likely to separate two values that coincide at the default.
 //
 // Any `<engine>` or `<engine>+<preset>` also works, so a fourth
 // combination is one argument away when a report asks for it.
 /** @type {Record<string, { browserName: "chromium" | "firefox" | "webkit", preset: string }>} */
 const CONFIGS = {
 	firefox: { browserName: "firefox", preset: "default" },
-	playroom: { browserName: "chromium", preset: "playroom" },
+	material: { browserName: "chromium", preset: "material" },
 	webkit: { browserName: "webkit", preset: "default" },
 };
 
@@ -107,7 +107,7 @@ const parseConfig = (name) => {
 	return { browserName: engine, label: name, preset };
 };
 
-const configs = (flag("--configs") ?? "firefox,webkit,playroom")
+const configs = (flag("--configs") ?? "firefox,webkit,material")
 	.split(",")
 	.map((name) => parseConfig(name.trim()));
 

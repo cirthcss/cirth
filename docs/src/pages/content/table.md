@@ -1,109 +1,119 @@
 ---
 layout: docs.njk
+description: Mark up accessible data tables, use captions and header scopes, and apply Cirth's striped and form-control variants.
 ---
-
 
 # Table
 
-Tables are styled directly, with an optional `.striped` modifier for
-alternating row backgrounds.
+Use a table for data whose meaning depends on rows and columns. Do not use it
+to arrange general page content. Cirth styles the native elements directly and
+provides optional `.striped` and `.controls` variants in class-enabled builds.
 
 {% demo "table" %}
 
 ```html
 <table>
+  <caption>Deployments this week</caption>
   <thead>
-    <tr><th scope="col">#</th><th scope="col">Name</th><th scope="col">Role</th></tr>
+    <tr>
+      <th scope="col">Service</th>
+      <th scope="col">Region</th>
+      <th scope="col">Duration</th>
+      <th scope="col">Result</th>
+    </tr>
   </thead>
   <tbody>
-    <tr><th scope="row">1</th><td>Alex Doe</td><td>Engineer</td></tr>
+    <tr>
+      <th scope="row">checkout-api</th>
+      <td>eu-west</td>
+      <td>3 min 12 s</td>
+      <td>Live</td>
+    </tr>
   </tbody>
 </table>
 ```
 
+## Anatomy
+
+- `<table>` contains the complete data relationship.
+- `<caption>` gives the table a name or concise purpose.
+- `<thead>` groups the column headings; `<tbody>` groups the data rows; an
+  optional `<tfoot>` groups totals or closing data.
+- `<tr>` creates a row.
+- `<th>` creates a header cell. `scope="col"` associates it with its column;
+  `scope="row"` associates it with its row.
+- `<td>` creates an ordinary data cell.
+
+Browsers create the table layout and expose these relationships to assistive
+technology. Cirth does not infer missing headings or cell associations.
+
 ## Caption
 
-`<caption>` is the native way to give a table an accessible name, and the one
-WCAG guidance prefers over a heading placed outside the table: the name
-travels with the table instead of depending on proximity.
+`<caption>` is the native name attached to a table. It remains associated with
+the table if the markup moves and gives assistive technology context before it
+presents the cells.
 
-```html
-<table>
-  <caption>Project team and roles</caption>
-  …
-</table>
-```
+Cirth aligns the caption with the start edge, uses the muted meta-text role,
+and adds space before the header row. Set `caption-side: bottom` in application
+CSS if a design requires it below the data.
 
-Cirth aligns it to `start` like the cells beneath it, sets it in
-`--cirth-muted-color`, and puts half a rhythm step between it and the header
-row. It stays above the table; `caption-side: bottom` is yours to set if you
-want it underneath.
+## Behavior
+
+Cirth makes tables full width and collapses the gaps between cell borders.
+Headers and data cells align to the logical start edge, which follows the
+document direction. Cells receive consistent padding and row separators.
+Numeric glyphs use tabular figures so values align more predictably.
+
+Column headings and footer cells use the muted meta role. Row headings keep
+the label weight. Footer cells draw their separator at the top.
+
+The main table tokens are `--cirth-table-border-color` and
+`--cirth-table-row-stripped-background-color`.
 
 ## Striped
 
 {% demo "table-striped" %}
 
 ```html
-<table class="striped">…</table>
+<table class="striped">
+  <caption>Monthly usage</caption>
+  <thead>...</thead>
+  <tbody>...</tbody>
+</table>
 ```
 
-`.striped` is only available in the default build with classes enabled.
-
-## Behavior
-
-* `border-collapse: collapse`, full width, left aligned cells
-  (`text-align: start`, so it flips correctly in `[dir="rtl"]`).
-* Cell padding is `calc(var(--cirth-spacing) / 2) var(--cirth-spacing)`, with
-  a bottom border in `--cirth-table-border-color`.
-* `tfoot` cells get a top border instead of a bottom one.
-* `thead`/`tfoot` cells are bolder (`--cirth-font-weight-semibold`) with a
-  thicker border.
-* `<caption>` is aligned to `start` in the muted ink, with half a rhythm step
-  below it.
+`.striped` gives odd body rows an alternate background. It does not replace
+row or column headers. The variant is available only in class-enabled builds.
 
 ## A wide table, scrollable and operable
 
-A table wider than its column has to scroll, and a scroll container is only
-operable if a keyboard can reach it. This is the pattern: four attributes,
-and all four are load-bearing:
+Wrap a table that can exceed its container in `.overflow-auto`. The wrapper
+also needs keyboard focus and an accessible name:
 
 ```html
 <div class="overflow-auto"
      tabindex="0"
      role="region"
-     aria-label="Project team and roles">
-  <table>…</table>
+     aria-label="Deployment history">
+  <table>...</table>
 </div>
 ```
 
-* `.overflow-auto` makes it scroll, and paints the focus ring
-  ([Overflow auto](/layout/overflow-auto)).
-* `tabindex="0"` makes the container itself focusable, which is what lets a
-  keyboard user scroll it at all (WCAG 2.1.1). This is what axe's
-  `scrollable-region-focusable` rule reports when it is missing.
-* `role="region"` plus `aria-label` give that new stop in the tab order a
-  name, so it is announced as something rather than as an unlabelled group.
-
-There is no component for this and there does not need to be one: it is a
-`<div>` with a utility and three attributes. Cirth ships the scroll container
-and its focus ring; naming the region is the page's job, because only the
-page knows what the table is. Give each scrollable region on a page a
-distinct name.
-
-This site applies it to every table in its own documentation, from
-`docs/eleventy.config.js`.
+The [Overflow auto](/layout/overflow-auto) page owns the complete pattern,
+including when to use `aria-label` or `aria-labelledby` and why each attribute
+is needed.
 
 ## Form controls in cells
 
-Inputs, selects and buttons already work inside cells, but a cell's padding
-around a full-size bordered control reads as a box inside a box. Add
-`.controls` to the table and a cell that holds a control directly hands
-most of its padding to it, so a row of fields reads as one surface:
+Use `table.controls` when cells contain editable fields or buttons directly.
+Cirth reduces the cell padding around those controls while keeping their
+borders, focus indicators, states, and target size.
 
 {% demo "table-controls" %}
 
 ```html
 <table class="controls">
+  <caption>Inventory</caption>
   <thead>
     <tr>
       <th scope="col" id="stock-item">Item</th>
@@ -113,25 +123,44 @@ most of its padding to it, so a row of fields reads as one surface:
   <tbody>
     <tr>
       <th scope="row" id="stock-apples">Apples</th>
-      <td><input type="number" value="12" aria-labelledby="stock-qty stock-apples"></td>
+      <td>
+        <input type="number"
+               name="apple_quantity"
+               value="12"
+               aria-labelledby="stock-qty stock-apples">
+      </td>
     </tr>
   </tbody>
 </table>
 ```
 
-* Only the cell changes. The controls keep their borders, their hover,
-  focus, readonly, disabled and validity states, and their 44px target, as
-  they would anywhere else in a form. The border is what identifies a field
-  as a field, so it is not removed.
-* **Name every control.** Row and column headers do not label the controls
-  beneath them. `aria-labelledby` pointing at the column header and the row
-  header gives each field a name such as "Quantity Apples". For a repeated
-  button, keep its visible label and point `aria-describedby` at the row
-  header.
-* For a table wider than the screen, wrap it in
-  [`.overflow-auto`](/layout/overflow-auto) with `tabindex="0"`, a
-  `role="region"` and a name, as the example does, so the scroll area can be
-  reached and named from the keyboard.
-* This is not a data grid: there is no cell-by-cell arrow-key navigation,
-  selection or editing state.
-* `.controls` is only available in the default build with classes enabled.
+Table headers describe data cells, but they do not automatically provide an
+accessible name for a form control. `aria-labelledby` accepts a space-separated
+list of element IDs. In the example, assistive technology combines the column
+header and row header as “Quantity Apples”. Keep every referenced ID unique.
+
+For a repeated button whose visible text already names the action, use
+`aria-describedby` to add row context instead. That attribute adds a
+description; it does not replace the button's visible accessible name.
+
+`.controls` is a visual variant, not an interactive data-grid pattern. It does
+not add arrow-key navigation, cell selection, editing state, validation, or
+data submission. Those behaviors remain the application's responsibility.
+
+## Common mistakes
+
+- Do not omit `<caption>` when the table's purpose is not already clear to all
+  readers.
+- Do not use bold `<td>` cells as visual headers. Use `<th>` and an appropriate
+  `scope`.
+- Do not leave blank header cells merely to obtain spacing.
+- Do not make a wide table smaller until its data becomes unreadable. Use a
+  keyboard-operable scroll wrapper when the columns need their width.
+- Do not assume column headers label inputs placed below them.
+
+## Related pages
+
+- [Overflow auto](/layout/overflow-auto)
+- [Forms](/forms/)
+- [Figure](/content/figure)
+- [Print](/utilities/print)

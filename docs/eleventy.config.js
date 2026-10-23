@@ -1,3 +1,4 @@
+const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 const { EleventyHtmlBasePlugin } = require("@11ty/eleventy");
@@ -6,208 +7,27 @@ const markdownItAnchor = require("markdown-it-anchor");
 const GithubSlugger = require("github-slugger").default;
 const hljs = require("highlight.js");
 const { buildPagefindIndex } = require("../scripts/build-pagefind");
+const { removeBuildOutput } = require("../scripts/lib/build-output");
 const { brotliSize, gzipSize } = require("../scripts/lib/compressed-size");
 const { listPresetNames, presetLabel } = require("../scripts/lib/presets");
 const { docsPathPrefix } = require("../scripts/lib/docs-site");
+const { measuredTheme } = require("../scripts/lib/measured-theme");
+// Brand data comes from the generators. A running dev server reloads this
+// file but keeps required modules cached, so they are dropped first.
+for (const id of ["../scripts/build-brand", "../scripts/lib/brand-mark"]) {
+	delete require.cache[require.resolve(id)];
+}
+const brand = require("../scripts/build-brand");
+const { documentedVersion } = require("../scripts/lib/documented-version");
+const { readResults: markupBenchmark } = require("../scripts/lib/markup-benchmark");
+const frameworks = require("./src/_data/frameworks.js");
 
-// Eleventy replacement for the previous Astro setup. Same site shape:
-// docs/src/pages -> docs/dist, one <path>/index.html per page, served at
-// https://cirthcss.github.io/cirth/ (GITHUB_PAGES=true sets the /cirth/
-// path prefix, rewritten into links by EleventyHtmlBasePlugin).
+// docs/src/pages -> docs/dist, one <path>/index.html per page.
 const docsRoot = __dirname;
 const demosFolder = path.join(docsRoot, "src/content/demos");
 
-// The theme preview's declarations, read out of the compiled stylesheets
-// rather than written here: the default theme's from the scoped build the
-// preview element actually loads, each preset's from its own compiled
-// file. A theme is literally a handful of custom properties, and this is
-// the honest way to show that — the listing beside the live preview is the
-// declaration the real file makes, and the same string is what the demo
-// applies.
-//
-// What this returns, per state, is one already-highlighted line per token
-// plus the single-line value to apply. The section shows one block and
-// swaps a line at a time, so the declaration that moved can be marked
-// where it stands and the two that did not are visibly the same two lines.
-// One block rather than one per state also means the shell's copy button —
-// which copies `textContent` — can only ever hand over the declarations
-// that are on screen.
-//
-// Whitespace inside a <pre> is content, so the block is assembled here in
-// JS where every newline is deliberate, rather than in a template where
-// tag boundaries would leak into the listing.
-const themePreview = () => {
-	const postcss = require("postcss");
-	// Preference order, intersected with reality below. Every token named
-	// here is one an author would actually write, and one whose effect is
-	// visible in the preview beside it.
-	const preferred = [
-		"--cirth-primary",
-		"--cirth-border-radius",
-		"--cirth-canvas",
-	];
-	const generated = path.join(docsRoot, "src/styles/generated");
-
-	// A theme root, and nothing else. The compiled files declare these same
-	// names in three other places — inside prefers-contrast and
-	// forced-colors blocks, and on components that rebind them locally
-	// (`.cirth [type=search] { --cirth-border-radius: … }`) — and none of
-	// those is what an author writes. Presets compile to `:root, :host`;
-	// the scoped build the preview loads puts the theme on `.cirth`.
-	const themeRootPattern = /^(:root|:host|\.cirth)$/;
-
-	// Top level of the file, or top level of the one `@layer cirth` block
-	// every compiled file now wraps itself in (gh#124). A rule nested any
-	// deeper sits in a media query, which is the case excluded above.
-	/** @param {import("postcss").Rule} rule */
-	const atTopLevel = (rule) => {
-		const parent = rule.parent;
-		if (parent?.type === "root") return true;
-		return (
-			parent?.type === "atrule" &&
-			/** @type {import("postcss").AtRule} */ (parent).name === "layer" &&
-			parent.parent?.type === "root"
-		);
-	};
-
-	/**
-	 * @param {string} file
-	 * @returns {Map<string, string>}
-	 */
-	const read = (file) => {
-		const found = new Map();
-		if (!fs.existsSync(file)) return found;
-		postcss.parse(fs.readFileSync(file, "utf8")).walkRules((rule) => {
-			if (!atTopLevel(rule)) return;
-			if (
-				!rule.selector
-					.split(",")
-					.every((selector) => themeRootPattern.test(selector.trim()))
-			) {
-				return;
-			}
-			for (const declaration of rule.nodes ?? []) {
-				if (declaration.type !== "decl") continue;
-				if (!preferred.includes(declaration.prop)) continue;
-				// One line, and none of the compiled file's own padding: the
-				// default build writes `light-dark( a, b )` with the parens
-				// spaced and the preset files do not, and this value is both
-				// listed and applied — two formattings of one declaration
-				// would show up as the listing and the demo disagreeing.
-				found.set(
-					declaration.prop,
-					declaration.value
-						.replace(/\s+/g, " ")
-						.replace(/\(\s+/g, "(")
-						.replace(/\s+\)/g, ")"),
-				);
-			}
-		});
-		return found;
-	};
-
-	const states = [
-		{
-			name: "default",
-			label: "Default theme",
-			file: "cirth.scoped.css",
-			declarations: read(path.join(generated, "cirth-lab-scoped.css")),
-		},
-		...listPresetNames().map((name) => ({
-			name,
-			label: `${presetLabel(name)} preset`,
-			file: `presets/${name}.css`,
-			declarations: read(path.join(generated, `presets/${name}.css`)),
-		})),
-	];
-
-	// Only the tokens every state really declares. A line that one file does
-	// not set could only be filled with an inherited value or a blank, and
-	// both would be a listing describing something the file does not say —
-	// so the set of lines is the intersection, and it maintains itself: a
-	// preset that stops declaring one drops the line for all of them rather
-	// than inventing it for one.
-	const tokens = preferred.filter((prop) =>
-		states.every((state) => state.declarations.has(prop)),
-	);
-
-	// `light-dark(a, b)` is one long line — 700px of it at the pane's
-	// measure, which scrolls rather than reads. Broken at the comma the way
-	// the source file itself breaks it, so the pane shows the whole
-	// declaration instead of the first two thirds of one. The captures are
-	// lazy and eat their own padding: the compiled default writes
-	// `light-dark( a, b )` with the parens spaced, and a greedy `(.+)`
-	// carried that space into the reflowed line.
-	/** @param {string} value */
-	const reflow = (value) =>
-		value.length > 46 && value.startsWith("light-dark(")
-			? value.replace(
-					/^light-dark\(\s*(.+?)\s*,\s*(.+?)\s*\)$/,
-					"light-dark(\n    $1,\n    $2\n  )",
-				)
-			: value;
-
-	// Highlighted one declaration at a time. Checked against the whole
-	// block: highlight.js emits byte-identical markup for `  --prop: value;`
-	// on its own as it does for the same line inside a rule, so the listing
-	// is the same listing the fenced-code pipeline would produce.
-	/**
-	 * @param {string} prop
-	 * @param {string} value
-	 */
-	const declaration = (prop, value) =>
-		hljs.highlight(`  ${prop}: ${value};`, {
-			language: "css",
-			ignoreIllegals: true,
-		}).value;
-
-	// The selector the demo's own stylesheet really carries. The preview is
-	// a custom element holding the scoped build in a shadow root, so
-	// `.cirth` is the theme root in there — printing `:root` would be
-	// printing a rule the page does not apply anywhere.
-	const selector = ".cirth";
-
-	// The listing as served: one line group per token, so the script can
-	// swap a line where it stands. Assembled here rather than in the
-	// template because every newline between these spans is content of a
-	// <pre> — a tag boundary in a template leaks into the listing, and a
-	// <pre> that carries its line breaks in CSS copies out as one line.
-	/** @param {{ lines: Record<string, { value: string, html: string }> }} state */
-	const block = (state) =>
-		`${hljs.highlight(`${selector} {`, { language: "css" }).value}\n` +
-		`${tokens
-			.map(
-				(prop) =>
-					`<span class="docs-token" data-token="${prop}">` +
-					`${state.lines[prop].html}</span>`,
-			)
-			.join("\n")}\n}`;
-
-	const rendered = states.map((state) => ({
-		name: state.name,
-		label: state.label,
-		file: state.file,
-		lines: Object.fromEntries(
-			tokens.map((prop) => {
-				const value = String(state.declarations.get(prop));
-				return [prop, { value, html: declaration(prop, reflow(value)) }];
-			}),
-		),
-	}));
-
-	return {
-		selector,
-		tokens,
-		states: rendered,
-		block: block(rendered[0]),
-	};
-};
-
-// The shipped build modes, counted off the source entrypoints rather than
-// written down: only top-level `src/cirth*.scss` files compile, and the
-// print sheets are a companion to a build rather than a build to choose
-// between. Adding a fifth mode moves this number and the proof cell that
-// quotes it without anyone remembering to.
+// The shipped build modes, counted off the top-level src/cirth*.scss entry
+// points; print sheets are companions, not modes.
 const buildModeCount = () =>
 	fs
 		.readdirSync(path.join(docsRoot, "../src"))
@@ -223,55 +43,40 @@ const runtimeTokenCount = () => {
 	return new Set(css.match(/--cirth-[a-z0-9-]+/g) ?? []).size;
 };
 
-// The gzipped size of the default build, measured here rather than
-// written down: the home page states the size as a measurement taken on
-// this build, not as a ceiling the project promises never to cross, so the
-// number has to come off the file every time the site is built.
-// `scripts/check-css-size.js` gzips the same bytes at the same level, and
-// is what fails a build that grows past the current budget.
-//
-// dist/ is produced by `npm run build`, which runs before `docs:build`
-// everywhere it matters (CI, the deploy workflow, the release script). If
-// it is missing — a docs-only local run — the cell falls back to the
-// budget rather than printing a zero, and says which it is.
+// The default build's size, measured on dist/ at every docs build: the home
+// page states it as a measurement, while scripts/check-css-size.js enforces
+// the budget. Null without dist/ (a docs-only run), so pages print their
+// fallback.
 const defaultBuildSize = () => {
 	const file = path.join(docsRoot, "../dist/cirth.min.css");
 	if (!fs.existsSync(file)) return null;
 	const source = fs.readFileSync(file);
 	const bytes = gzipSize(source);
 	const kb = (/** @type {number} */ value) => `${(value / 1024).toFixed(1)} KB`;
-	// `label` is the quoted figure: gzip, because that is what the delivery
-	// paths this site documents actually send. `brotliLabel` is the best case
-	// a host reaches by precompressing the file itself — reported, never
-	// promised. See scripts/lib/compressed-size.js.
-	return { bytes, label: kb(bytes), brotliLabel: kb(brotliSize(source)) };
+	// gzip is the quoted figure, what the documented delivery paths send;
+	// Brotli is the best case a host reaches by precompressing
+	// (scripts/lib/compressed-size.js).
+	return {
+		bytes,
+		label: kb(bytes),
+		brotliLabel: kb(brotliSize(source)),
+		minifiedBytes: source.length,
+		minified: kb(source.length),
+	};
 };
 
-// The radius pair (a container's corner against the corners of the
-// controls inside it), resolved off the compiled stylesheet rather than
-// written down. The Brand page quotes both numbers as the thing that
-// survives a retheme, and it quoted them wrong for three minor versions:
-// the knob moved from `radius-md` to `radius-sm` in "establish a
-// recognizable default surface" and the prose kept saying 9px and 6px
-// while the build shipped 6px and 4px. A number a reader can check
-// against `dist/` has to come out of `dist/`.
-//
-// The resolver is deliberately narrow. It follows the two shapes the
-// radius tokens actually use (`var(--other)` and
-// `calc(var(--other) * <n>)`) down to a `rem` or `px` literal, and
-// returns null on anything else rather than guessing. A null prints as a
-// token name with no measurement, which is missing information; a guess
-// would be wrong information.
+
+// The control and container radii, resolved from dist/. The resolver
+// follows only `var(--other)` and `calc(var(--other) * <n>)` down to a rem
+// or px literal and returns null on anything else: a token name with no
+// measurement is missing information, a guess would be wrong information.
 const radiusPair = () => {
 	const file = path.join(docsRoot, "../dist/cirth.min.css");
 	if (!fs.existsSync(file)) return null;
 	const css = fs.readFileSync(file, "utf8");
 
-	// Root custom properties only. A token redeclared inside a component
-	// scope (`article` moves --cirth-block-spacing-*, [type=search] moves
-	// the radius to a pill) is that component's decision, not the default
-	// this table describes, so the first declaration is the one read: the
-	// `:root` one, which the minifier emits ahead of the scoped overrides.
+	// The first declaration of each token is the :root one; component scopes
+	// redeclare some of them later.
 	/** @type {Map<string, string>} */
 	const declared = new Map();
 	for (const [, name, value] of css.matchAll(
@@ -319,12 +124,8 @@ const radiusPair = () => {
 	};
 };
 
-// The supported browsers, read off the one place that decides them: the
-// Browserslist target in package.json, which is what Lightning CSS
-// compiles against and what scripts/check-browserslist.js holds to a
-// single engine floor. Written out as a sentence so the FAQ answer cannot
-// drift from the target the build actually uses — raising the floor
-// rewrites the answer.
+// The supported browsers, as a sentence read from the Browserslist target
+// in package.json, so the documentation cannot drift from the build.
 const browserTargets = () => {
 	const names = {
 		Chrome: "Chrome",
@@ -353,9 +154,7 @@ const browserTargets = () => {
 		]);
 	}
 
-	// Families that share a floor share a clause: "Chrome, Chrome for
-	// Android and Edge 123+" is one fact, and three clauses would read as
-	// three.
+	// Families that share a floor share a clause.
 	const clauses = [...byVersion.entries()].map(([version, families]) => {
 		const listed =
 			families.length > 1
@@ -367,6 +166,44 @@ const browserTargets = () => {
 	return { sentence: clauses.join("; ") };
 };
 
+// A heading's text: its permalink and markup dropped, entities decoded,
+// whitespace collapsed. Templates escape it again where it is printed.
+const headingText = (html) =>
+	String(html)
+		.replace(/<a\b[^>]*class="header-anchor"[\s\S]*?<\/a>/g, "")
+		.replace(/<br\s*\/?>/g, " ")
+		.replace(/<[^>]+>/g, "")
+		.replace(/&lt;/g, "<")
+		.replace(/&gt;/g, ">")
+		.replace(/&quot;/g, '"')
+		.replace(/&#39;/g, "'")
+		.replace(/&amp;/g, "&")
+		.replace(/\s+/g, " ")
+		.trim();
+
+// The light accent the default theme and each preset declare at their
+// root, read from the generated stylesheets so the Themes page's swatches
+// cannot drift from the source. Null before `npm run docs:assets` has run.
+const accentOf = (/** @type {string} */ file) => {
+	if (!fs.existsSync(file)) return null;
+	const match = /--cirth-primary:\s*light-dark\(\s*((?:[^(),]|\([^()]*\))+?)\s*,/.exec(
+		fs.readFileSync(file, "utf8"),
+	);
+	return match?.[1] ?? null;
+};
+
+const themeAccents = () => {
+	const generated = path.join(docsRoot, "src/styles/generated");
+	return [
+		{ name: "default", note: "default theme", color: accentOf(path.join(generated, "cirth-docs.css")) },
+		...listPresetNames().map((name) => ({
+			name,
+			note: "preset",
+			color: accentOf(path.join(generated, "presets", `${name}.css`)),
+		})),
+	];
+};
+
 const escapeHtml = (value) =>
 	value
 		.replace(/&/g, "&amp;")
@@ -374,27 +211,13 @@ const escapeHtml = (value) =>
 		.replace(/>/g, "&gt;")
 		.replace(/"/g, "&quot;");
 
-// Static, build-time-only SVG icons: Phosphor, "regular" weight, viewBox
-// 0 0 256 256, path data extracted from @phosphor-icons/vue for pixel
-// parity. Zero client JS.
-//
-// One weight, one grid, one box, so the set reads as one set. Every entry
-// here is rendered somewhere: the shortcode throws on a name it does not
-// know, which catches a typo, and nothing catches a definition that no
-// page asks for. Add a glyph when a page needs it.
+// Build-time SVG icons: Phosphor, regular weight, viewBox 0 0 256 256. The
+// shortcode throws on an unknown name; add a glyph only when a page uses it.
 const iconPaths = {
 	search:
 		"M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z",
-	sliders:
-		"M136,120v96a8,8,0,0,1-16,0V120a8,8,0,0,1,16,0Zm64,72a8,8,0,0,0-8,8v16a8,8,0,0,0,16,0V200A8,8,0,0,0,200,192Zm24-32H208V40a8,8,0,0,0-16,0V160H176a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16ZM56,160a8,8,0,0,0-8,8v48a8,8,0,0,0,16,0V168A8,8,0,0,0,56,160Zm24-32H64V40a8,8,0,0,0-16,0v88H32a8,8,0,0,0,0,16H80a8,8,0,0,0,0-16Zm72-48H136V40a8,8,0,0,0-16,0V80H104a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16Z",
 	moon: "M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z",
-	zap: "M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17ZM109.37,214l10.47-52.38a8,8,0,0,0-5-9.06L62,132.71l84.62-90.66L136.16,94.43a8,8,0,0,0,5,9.06l52.8,19.8Z",
-	shield:
-		"M208,40H48A16,16,0,0,0,32,56v56c0,52.72,25.52,84.67,46.93,102.19,23.06,18.86,46,25.26,47,25.53a8,8,0,0,0,4.2,0c1-.27,23.91-6.67,47-25.53C198.48,196.67,224,164.72,224,112V56A16,16,0,0,0,208,40Zm0,72c0,37.07-13.66,67.16-40.6,89.42A129.3,129.3,0,0,1,128,223.62a128.25,128.25,0,0,1-38.92-21.81C61.82,179.51,48,149.3,48,112l0-56,160,0ZM82.34,141.66a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35a8,8,0,0,1,11.32,11.32l-56,56a8,8,0,0,1-11.32,0Z",
-	// Phosphor's dots-three-vertical: three r=28 discs on the vertical
-	// centreline at 48 / 128 / 208. Written as circles rather than copied
-	// out of the package because the geometry *is* the icon, so parity
-	// holds by construction.
+	// Three r=28 discs at 48, 128 and 208 on the vertical centreline.
 	"dots-three-vertical":
 		"M100,48a28,28,0,1,0,56,0a28,28,0,1,0-56,0ZM100,128a28,28,0,1,0,56,0a28,28,0,1,0-56,0ZM100,208a28,28,0,1,0,56,0a28,28,0,1,0-56,0Z",
 	sun: "M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z",
@@ -411,14 +234,44 @@ module.exports = (eleventyConfig) => {
 		"presets",
 		listPresetNames().map((name) => ({ label: presetLabel(name), name })),
 	);
-	eleventyConfig.addGlobalData("themePreview", themePreview());
 	eleventyConfig.addGlobalData("browsers", browserTargets());
+	eleventyConfig.addGlobalData("themeAccents", themeAccents);
+	// The version every download command and CDN snippet is pinned to
+	// (scripts/update-sri.js).
+	eleventyConfig.addGlobalData("release", { version: documentedVersion() });
+	// Theme measurements from dist/tokens for the Brand and Colors pages; null
+	// without a build, where the pages print token names only.
+	eleventyConfig.addGlobalData("measured", measuredTheme(path.join(docsRoot, "..")));
+	// The scale steps the brand files are painted with.
+	eleventyConfig.addGlobalData("brandMark", brand.palette());
+	// The icons' URLs, each with a hash of the file's content. Browsers keep
+	// a favicon by its URL long after the file behind it changes (Safari
+	// across reloads and restarts), so a redrawn icon has to be a new URL.
+	// A function, so a rebuild reads the files again.
+	eleventyConfig.addGlobalData("brandIcons", () => {
+		/** @param {string} file */
+		const versioned = (file) => {
+			const hash = crypto.createHash("sha256").update(fs.readFileSync(path.join(docsRoot, "public", file))).digest("hex");
+			return `/${file}?v=${hash.slice(0, 10)}`;
+		};
+		return {
+			svg: versioned("favicon.svg"),
+			ico: versioned("favicon.ico"),
+			touch: versioned("apple-touch-icon.png"),
+		};
+	});
+	// The lockup's box, so every <img> reserves its space, and where its
+	// name's x-height is centred, for the header: `brandLockup.width`,
+	// `brandLockup.height` and `brandLockup.nameCentre`.
+	eleventyConfig.addGlobalData("brandLockup", brand.boxes());
+	// The markup comparison, read through its check, so fixtures edited without
+	// `npm run benchmark` fail the build.
+	eleventyConfig.addGlobalData("benchmark", markupBenchmark());
 
-	// --- Markdown pipeline ------------------------------------------------
-	// Fenced code: highlight.js token classes (same .hljs-* classes the docs
-	// shell has colored since the VitePress era) + tabindex="0" so
-	// horizontally scrollable blocks stay keyboard-reachable (axe:
-	// scrollable-region-focusable).
+	// Markdown
+
+	// Fenced code is highlighted at build time, with tabindex="0" so a block
+	// that scrolls sideways is keyboard reachable.
 	const markdown = markdownIt({
 		html: true,
 		linkify: false,
@@ -434,10 +287,8 @@ module.exports = (eleventyConfig) => {
 		},
 	});
 
-	// Heading ids (GitHub-style slugs, matching the previous Astro output so
-	// existing #fragment links keep resolving) plus a visible-on-hover
-	// permalink anchor — the .header-anchor affordance the VitePress site
-	// had and the Astro port lost (gh#54).
+	// GitHub-style heading ids, so existing fragment links keep resolving, each
+	// with a permalink anchor (gh#54).
 	const slugger = new GithubSlugger();
 	markdown.use(markdownItAnchor, {
 		slugify: (title) => slugger.slug(title),
@@ -450,11 +301,8 @@ module.exports = (eleventyConfig) => {
 		}),
 	});
 
-	// Markdown tables can become wider than the reading column at narrow
-	// viewports or under text zoom. Keep that overflow local and make the
-	// resulting scroll region keyboard reachable. The column names produce
-	// a useful, page-specific accessible name instead of a repeated generic
-	// "scrollable table" landmark.
+	// Tables scroll inside a keyboard-reachable region named after their
+	// columns, so overflow stays local at narrow widths or under zoom.
 	markdown.renderer.rules.table_open = (tokens, index) => {
 		const columnNames = [];
 		for (let cursor = index + 1; cursor < tokens.length; cursor += 1) {
@@ -469,22 +317,26 @@ module.exports = (eleventyConfig) => {
 		return `<div class="overflow-auto docs-table-scroll" tabindex="0" role="region" aria-label="Table${escapeHtml(suffix)}"><table>`;
 	};
 	markdown.renderer.rules.table_close = () => "</table></div>";
-	// One slugger per build, reset per page, so repeated headings on a page
-	// dedupe (foo, foo-1) without pages leaking suffixes into each other.
+	// One slugger, reset per page, so repeated headings dedupe within a page
+	// without suffixes leaking between pages.
 	eleventyConfig.on("eleventy.before", () => slugger.reset());
 
-	// Eleventy doesn't clean its output directory (Astro did); start each
-	// process fresh so stale pages — or iCloud "name 2.html" duplicates —
-	// can't accumulate in docs/dist. The guard matters in --serve mode:
-	// eleventy.before also runs for incremental rebuilds, where deleting the
-	// active output directory leaves Eleventy with nowhere to write.
-	let outputCleaned = false;
-	eleventyConfig.on("eleventy.before", () => {
-		if (outputCleaned) return;
-		fs.rmSync(path.join(docsRoot, "dist"), { recursive: true, force: true });
-		outputCleaned = true;
+	// Each process starts from an empty output directory, the one Eleventy
+	// reports for this build. Cleaned once: in --serve mode eleventy.before
+	// also runs for incremental rebuilds.
+	const cleanedOutputs = new Set();
+	/** @param {{ directories: { output: string } }} event */
+	const buildOutput = ({ directories }) => path.resolve(directories.output);
+	eleventyConfig.on("eleventy.before", (/** @type {any} */ event) => {
+		const output = buildOutput(event);
+		if (cleanedOutputs.has(output)) return;
+		removeBuildOutput(output, {
+			sources: [event.directories.input, event.directories.includes, event.directories.data].filter(Boolean),
+		});
+		cleanedOutputs.add(output);
 	});
-	eleventyConfig.on("eleventy.after", buildPagefindIndex);
+	// Search is indexed from, and written into, the same directory.
+	eleventyConfig.on("eleventy.after", (/** @type {any} */ event) => buildPagefindIndex({ outputDir: buildOutput(event) }));
 	markdown.core.ruler.before("normalize", "cirth-reset-slugs", () => {
 		slugger.reset();
 		return true;
@@ -492,30 +344,22 @@ module.exports = (eleventyConfig) => {
 
 	eleventyConfig.setLibrary("md", markdown);
 
-	// --- Shortcodes -------------------------------------------------------
-	// Live example + "Show HTML" source (the previous Demo.astro): the raw
-	// snippet is read at build time and injected both rendered and as
-	// literal text. Zero client JS — the <details> disclosure is native.
-	//
-	// Two-phase on purpose: the shortcode runs before markdown-it, and a
-	// demo snippet containing a blank line would terminate the surrounding
-	// CommonMark HTML block, re-parsing the rest of the snippet as markdown
-	// (this silently broke the customization demo's <style> overrides). The
-	// shortcode emits a single-line placeholder comment — inert to markdown
-	// — and the transform below swaps in the real HTML after rendering.
-	const buildDemo = (src, variant) => {
+	// Shortcodes
+
+	// A live example and its source from content/demos. The shortcode emits a
+	// placeholder that survives Markdown (a blank line in a snippet would end
+	// the HTML block) and the transform swaps in the HTML after rendering.
+	const buildDemo = (src, frame) => {
 		const file = path.join(demosFolder, `${src}.html`);
 		if (!fs.existsSync(file)) {
 			throw new Error(`[demo] missing snippet: ${src}.html`);
 		}
 		const html = fs.readFileSync(file, "utf8").trim();
-		const classlessClass = variant === "classless" ? " cirth-classless" : "";
-		const variantLabel = variant === "classless" ? "Classless build" : "Default build";
-		return `<figure class="docs-demo">
-<figcaption class="docs-demo-caption"><span><strong>Live UI</strong> · ${variantLabel}</span><span>Authentic Cirth · shell overrides declared in source</span></figcaption>
-<div class="docs-demo-preview${classlessClass}">${html}</div>
+		const frameClass = frame === "narrow" ? " docs-demo-narrow" : "";
+		return `<figure class="docs-demo${frameClass}">
+<div class="docs-demo-preview">${html}</div>
 <details class="docs-demo-source">
-<summary>Show HTML</summary>
+<summary>HTML</summary>
 <pre tabindex="0"><code class="hljs language-html">${
 			hljs.highlight(html, { language: "html", ignoreIllegals: true }).value
 		}</code></pre>
@@ -523,16 +367,21 @@ module.exports = (eleventyConfig) => {
 </figure>`;
 	};
 
-	eleventyConfig.addShortcode(
-		"demo",
-		(src, variant = "default") => `<!--cirth-demo:${src}:${variant}-->`,
-	);
+	// An HTML listing written right after a demo becomes its source band,
+	// replacing the disclosure, so the code is shown once.
+	const adoptListing = (content) =>
+		content.replace(
+			/<details class="docs-demo-source">[\s\S]*?<\/details>\n<\/figure>\s*(<pre[^>]*><code class="hljs language-html">[\s\S]*?<\/code><\/pre>)/g,
+			(_, listing) => `<div class="docs-demo-source">${listing}</div>\n</figure>`,
+		);
+
+	// `frame`: "narrow" sizes the stage, never the example inside it.
+	eleventyConfig.addShortcode("demo", (src, frame = "") => `<!--cirth-demo:${src}${frame ? `:${frame}` : ""}-->`);
 
 	eleventyConfig.addTransform("cirth-demos", (content, outputPath) => {
 		if (!outputPath?.endsWith(".html")) return content;
-		return content.replace(
-			/<!--cirth-demo:([\w-]+):(\w+)-->/g,
-			(_, src, variant) => buildDemo(src, variant),
+		return adoptListing(
+			content.replace(/<!--cirth-demo:([\w-]+)(?::(\w+))?-->/g, (_, src, frame) => buildDemo(src, frame)),
 		);
 	});
 
@@ -543,67 +392,186 @@ module.exports = (eleventyConfig) => {
 		return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="${size}" height="${size}" fill="currentColor" aria-hidden="true"${classAttribute}><path d="${d}"/></svg>`;
 	});
 
-	// Light-mode --cirth-primary swatches for the default theme and each
-	// preset (values from src/theme/_dual.scss and src/presets/*.scss).
-	// A data URI cannot read a custom property, and neither can a swatch that
-	// has to sit next to the preset it names while the page is in another
-	// preset — so these are literals, and they have to be re-read from source
-	// when the default accent moves.
-	eleventyConfig.addShortcode("colorSwatches", () => {
-		const colors = [
-			{ name: "default", hex: "#9D5434", note: "default theme" },
-			{ name: "plain", hex: "#1c65c8", note: "preset" },
-			{ name: "playroom", hex: "#7347af", note: "preset" },
-		];
-		return `<div class="docs-colors-grid">${colors
-			.map(
-				(color) => `<article class="docs-color-swatch">
-<div class="docs-color-swatch-preview" style="background-color: ${color.hex}"><span style="color: #fff; font-size: 0.75rem; font-weight: 600;">Aa</span></div>
-<div class="docs-color-swatch-label">${color.name} (${color.note})</div>
-</article>`,
-			)
-			.join("")}</div>
-<section class="docs-theme-lab" aria-label="Default theme role comparison">
-  <figure data-theme="light">
-    <figcaption><strong>Light / mineral paper</strong><code>data-theme="light"</code></figcaption>
-    <div class="docs-theme-sample"><article><small>Verified state</small><h3>Semantic surface</h3><p>Canvas, card, text, border and copper signal are live theme roles.</p><button type="button">Primary action</button></article></div>
-    <dl class="grid"><div><dt>Canvas</dt><dd><i style="background:var(--cirth-background-color)"></i><code>--cirth-background-color</code></dd></div><div><dt>Signal</dt><dd><i style="background:var(--cirth-primary)"></i><code>--cirth-primary</code></dd></div></dl>
-  </figure>
-  <figure data-theme="dark">
-    <figcaption><strong>Dark / graphite</strong><code>data-theme="dark"</code></figcaption>
-    <div class="docs-theme-sample"><article><small>Verified state</small><h3>Semantic surface</h3><p>Dark roles are designed values, not a mathematical inversion.</p><button type="button">Primary action</button></article></div>
-    <dl class="grid"><div><dt>Canvas</dt><dd><i style="background:var(--cirth-background-color)"></i><code>--cirth-background-color</code></dd></div><div><dt>Signal</dt><dd><i style="background:var(--cirth-primary)"></i><code>--cirth-primary</code></dd></div></dl>
-  </figure>
-</section>`;
+	// Filters
+
+	// Build-time highlighting for the home page's specimens.
+	eleventyConfig.addFilter("highlight", (code) => hljs.highlight(String(code), { language: "html", ignoreIllegals: true }).value);
+
+	// A framework guide's head and foot, laid on the rendered Markdown from
+	// frameworks.js alone: the project card (mark, name, description, links;
+	// the mark links to the project's site, out of the tab order since
+	// "Website" goes there too), the <h1>, a status line, a summary taken from
+	// the step headings, numbered steps with their number in a badge (ids and
+	// anchors untouched), the verification note and, where the project's terms
+	// ask for one, its trademark notice.
+	const numberWords = ["", "One step", "Two steps", "Three steps", "Four steps", "Five steps", "Six steps"];
+	const longDate = (/** @type {string} */ iso) =>
+		new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-GB", {
+			day: "numeric",
+			month: "long",
+			year: "numeric",
+			timeZone: "UTC",
+		});
+	/**
+	 * A mark's <img> elements: one, or a project's light and dark pair, each
+	 * at its intrinsic ratio. A file drawn for light grounds only is marked
+	 * for the stylesheet.
+	 * @param {{ file: string, dark?: string, ground?: "light", aspect: number, darkAspect?: number }} mark
+	 * @param {number} height
+	 */
+	const markImages = (mark, height) => {
+		const image = (/** @type {string} */ file, /** @type {number} */ ratio, /** @type {string} */ variant) =>
+			`<img class="docs-mark-image${variant ? ` docs-logo docs-logo-${variant}` : ""}${mark.ground === "light" ? " docs-mark-on-light" : ""}${ratio > 2 ? " docs-mark-wide" : ""}" src="/logos/frameworks/${file}" alt="" width="${Math.round(ratio * height)}" height="${height}" decoding="async">`;
+		return mark.dark
+			? image(mark.file, mark.aspect, "light") +
+					image(mark.dark, mark.darkAspect ?? mark.aspect, "dark")
+			: image(mark.file, mark.aspect, "");
+	};
+	eleventyConfig.addFilter("markImages", (mark, height = 32) => markImages(mark, height));
+	eleventyConfig.addFilter("longDate", longDate);
+	// A count with its thousands grouped, as the page's prose writes them.
+	eleventyConfig.addFilter("grouped", (/** @type {number} */ value) => Number(value).toLocaleString("en-GB"));
+	// A site's host alone, for a card too small for a path.
+	eleventyConfig.addFilter("siteHost", (/** @type {string} */ url) => new URL(url).hostname.replace(/^www\./, ""));
+	eleventyConfig.addFilter("frameworkGuide", (content, id) => {
+		const guide = frameworks.byId[id];
+		if (!guide) throw new Error(`[frameworkGuide] unknown guide: ${id}`);
+		let html = String(content);
+		if (/class="docs-verified"/.test(html)) {
+			throw new Error(`[frameworkGuide] ${id}: the verification note comes from frameworks.js, not the page`);
+		}
+
+		const stepPattern =
+			/<h2 id="([^"]+)" tabindex="-1">(\d+)\. ([\s\S]*?) (<a class="header-anchor"[\s\S]*?<\/a>)<\/h2>/g;
+		const steps = [...html.matchAll(stepPattern)].map((match) => match[3]);
+		html = html.replace(
+			stepPattern,
+			(_, slug, number, title, anchor) =>
+				`<h2 id="${slug}" tabindex="-1" class="docs-step-heading"><span class="docs-step-number">${number}</span> ${title} ${anchor}</h2>`,
+		);
+
+		if (/<h1\b/.test(html)) {
+			throw new Error(`[frameworkGuide] ${id}: the page has its own <h1>; the guide's comes from frameworks.js`);
+		}
+		const name = escapeHtml(guide.name);
+		const card =
+			`<aside class="docs-project" aria-label="About ${name}">` +
+			(guide.markData
+				? `<a class="docs-project-mark" href="${guide.brand.linkTo ?? guide.officialUrl}" tabindex="-1" aria-hidden="true"><span class="docs-mark">${markImages(guide.markData, 40)}</span></a>`
+				: "") +
+			`<p class="docs-project-name">${name}</p>` +
+			`<p class="docs-project-description">${escapeHtml(guide.description)}</p>` +
+			`<p class="docs-project-links">` +
+			`<a href="${guide.officialUrl}" aria-label="${name} official website">Website</a>` +
+			(guide.github ? `<a href="${guide.github}" aria-label="${name} on GitHub">GitHub</a>` : "") +
+			`</p></aside>\n<h1>Install Cirth for ${name}</h1>\n`;
+
+		const { verified, status } = guide;
+		const meta =
+			`<p class="docs-guide-meta">` +
+			`<span class="docs-guide-status" data-status="${verified.status}">${status.text}</span> with ${escapeHtml(guide.version)} on ` +
+			`<time datetime="${verified.date}">${longDate(verified.date)}</time></p>`;
+		let lead = meta;
+		if (steps.length > 1 && steps.length < numberWords.length) {
+			const named = steps.map((step) => step.charAt(0).toLowerCase() + step.slice(1));
+			const list =
+				named.length === 2
+					? named.join(" and ")
+					: `${named.slice(0, -1).join(", ")} and ${named.at(-1)}`;
+			lead += `\n<p class="docs-guide-summary">${numberWords[steps.length]}: ${list}.</p>`;
+		}
+		if (!/^\s*<p>[\s\S]*?<\/p>/.test(html)) {
+			throw new Error(`[frameworkGuide] ${id}: the page does not open with its lead paragraph`);
+		}
+		html = card + html.trimStart().replace(/^(<p>[\s\S]*?<\/p>)/, `$1\n${lead}`);
+
+		// Data strings mark code with backticks, as markdown would.
+		const code = (/** @type {string} */ text) =>
+			escapeHtml(text).replace(/`([^`]+)`/g, "<code>$1</code>");
+		const docs = guide.docs.map((doc) => `<a href="${doc.url}">${escapeHtml(doc.text)}</a>`);
+		html +=
+			`\n<aside class="docs-verified" aria-labelledby="verified-${id}">` +
+			`<h2 id="verified-${id}" class="docs-verified-title">${status.text}</h2>` +
+			`<p><strong>${status.text} on <time datetime="${verified.date}">${longDate(verified.date)}</time></strong> (${status.detail}) with ${code(verified.with)}. ${code(verified.result)}</p>` +
+			`<p>Follows ${docs.length === 1 ? docs[0] : `${docs.slice(0, -1).join(", ")} and ${docs.at(-1)}`}.</p>` +
+			`</aside>` +
+			// The notice the project's terms ask for, in the site's fine print.
+			(guide.brand.trademarkNotice ? `\n<p class="docs-fine-print">${escapeHtml(guide.brand.trademarkNotice)}</p>` : "");
+		return html;
 	});
 
-	// --- Filters ----------------------------------------------------------
-	// Syntax highlighting for source that is not coming through markdown: the
-	// hero's source panel, and the specimens the home page declares once and
-	// renders twice (live, and highlighted into the pane beside it). Same
-	// highlight.js pass and same .hljs-* classes the fenced-code pipeline
-	// above emits, so there is one highlighter in the build and none in the
-	// browser. The language is a parameter because the theme section shows
-	// the stylesheet that moved the tokens, not markup.
-	eleventyConfig.addFilter(
-		"highlight",
-		(code, language = "html") =>
-			hljs.highlight(String(code), { language, ignoreIllegals: true }).value,
-	);
-
-	// Page URLs always end in "/" (one <path>/index.html per page) while
-	// nav-config links don't — normalize before comparing for active state.
+	// Page URLs end in "/"; nav links do not.
 	const withSlash = (link) => (link.endsWith("/") ? link : `${link}/`);
 	eleventyConfig.addFilter("withSlash", withSlash);
 
-	// Nunjucks `set` inside a for-loop doesn't escape the loop scope, so
-	// active-item and prev/next lookups live here instead of the template.
-	eleventyConfig.addFilter("hasActiveItem", (items, pageUrl) =>
-		items.some((item) => withSlash(item.link) === pageUrl),
+	// A contrast ratio as the pages print it: two decimals, so a value just
+	// over a threshold is not rounded onto it.
+	eleventyConfig.addFilter("ratio", (/** @type {number | null | undefined} */ value) =>
+		typeof value === "number" && Number.isFinite(value) ? `${value.toFixed(2)}:1` : "n/a",
 	);
-	eleventyConfig.addFilter("findPageIndex", (flatPages, pageUrl) =>
-		flatPages.findIndex((item) => withSlash(item.link) === pageUrl),
+
+	// Reference pages (layout, content, forms, components, utilities) are
+	// consulted and get chapter rules; everything else reads as a guide.
+	eleventyConfig.addFilter("docsKind", (url = "") =>
+		/^\/(?:layout|content|forms|components|utilities)\//.test(url)
+			? "reference"
+			: "guide",
 	);
+
+	// Nunjucks `set` does not escape a loop, so the lookup lives here. A group
+	// holding Installation holds every guide, so it opens on a guide too.
+	/** @param {{ link: string, items?: any[] }[]} items @param {string} pageUrl @returns {boolean} */
+	const hasActiveItem = (items, pageUrl) =>
+		items.some(
+			(item) =>
+				(typeof item.link === "string" && withSlash(item.link) === pageUrl) ||
+				(Array.isArray(item.items) && hasActiveItem(item.items, pageUrl)),
+		);
+	eleventyConfig.addFilter("hasActiveItem", hasActiveItem);
+
+	// The trail above a nested page, from the tree the sidebar draws. Empty for
+	// a top-level page.
+	eleventyConfig.addFilter("breadcrumb", (/** @type {any[]} */ sidebar, /** @type {string} */ pageUrl) => {
+		// A category has no page, so its crumb leads to its heading on the parent's
+		// page.
+		/** @param {any[]} items @returns {{ text: string, link?: string }[] | null} */
+		const trail = (items) => {
+			for (const entry of items) {
+				if (typeof entry.link === "string" && withSlash(entry.link) === pageUrl) return [{ text: entry.text }];
+				if (entry.link || !entry.items) continue;
+				const below = trail(entry.items);
+				if (below) return [{ text: entry.text, link: entry.anchor }, ...below];
+			}
+			return null;
+		};
+		for (const group of sidebar) {
+			for (const item of group.items) {
+				const below = trail(item.items ?? []);
+				if (below) return [{ text: item.text, link: item.link }, ...below];
+			}
+		}
+		return [];
+	});
+
+	// A page's title from its first <h1>, when front matter names none.
+	eleventyConfig.addFilter("firstHeading", (content) => {
+		const match = /<h1\b[^>]*>([\s\S]*?)<\/h1>/.exec(String(content ?? ""));
+		return match ? headingText(match[1]) : "";
+	});
+
+	// The outline as a tree, each h3 under its h2. Past `collapsible` the
+	// subsections fold, since a flat list would outgrow its rail.
+	eleventyConfig.addFilter("outline", (/** @type {{ depth: number, slug: string, text: string }[]} */ headings) => {
+		/** @type {{ slug: string, text: string, children: { slug: string, text: string }[] }[]} */
+		const sections = [];
+		for (const heading of headings) {
+			const last = sections.at(-1);
+			if (heading.depth === 3 && last) last.children.push({ slug: heading.slug, text: heading.text });
+			else sections.push({ slug: heading.slug, text: heading.text, children: [] });
+		}
+		const nested = sections.reduce((total, section) => total + section.children.length, 0);
+		return { sections, collapsible: headings.length > 14 && nested > 0 };
+	});
 
 	// "On this page" data: h2/h3 headings of the rendered page content.
 	eleventyConfig.addFilter("headings", (content) => {
@@ -612,20 +580,14 @@ module.exports = (eleventyConfig) => {
 		const headingPattern =
 			/<h([23])[^>]*\bid="([^"]+)"[^>]*>([\s\S]*?)<\/h\1>/g;
 		for (const match of content.matchAll(headingPattern)) {
-			const text = match[3]
-				.replace(/<a\b[^>]*class="header-anchor"[\s\S]*?<\/a>/g, "")
-				.replace(/<[^>]+>/g, "")
-				.trim();
-			found.push({ depth: Number(match[1]), slug: match[2], text });
+			found.push({ depth: Number(match[1]), slug: match[2], text: headingText(match[3]) });
 		}
 		return found;
 	});
 
-	// --- Copy & structure -------------------------------------------------
-	// Archived documentation lines: whole sites, built once at the breaking
-	// release that ended them and committed as-is. Copied rather than
-	// rebuilt, so an old line never has to keep compiling against today's
-	// toolchain to stay readable.
+	// Output
+
+	// Archived documentation lines are copied as built, never rebuilt.
 	eleventyConfig.addPassthroughCopy({
 		"docs/versions": "/",
 	});
@@ -633,13 +595,21 @@ module.exports = (eleventyConfig) => {
 	eleventyConfig.addPassthroughCopy({
 		"docs/public": "/",
 		"docs/src/styles/style.css": "styles/style.css",
+		"docs/src/styles/home.css": "styles/home.css",
 		"docs/src/styles/generated": "styles/generated",
 	});
 
-	// Getting out of the /next/ preview and back to the released site.
-	// Root-relative links are no use here: EleventyHtmlBasePlugin rewrites
-	// them with this build's own prefix, so "/" would resolve back inside
-	// /next/. A relative path is the one shape the plugin leaves alone.
+	// Under `npm run dev` (scripts/dev.js), a change to src/ recompiles the
+	// generated stylesheets and copies them into the output; the dev
+	// server's own watcher reloads the page's CSS when they land. Eleventy's
+	// watcher cannot do it: the folder is gitignored, and Eleventy skips
+	// whatever .gitignore lists.
+	if (process.env.CIRTH_DEV_OUTPUT) {
+		eleventyConfig.setServerOptions({ watch: [path.join(process.env.CIRTH_DEV_OUTPUT, "styles/generated")] });
+	}
+
+	// The way out of the /next/ preview: a relative path, the one shape
+	// EleventyHtmlBasePlugin does not rewrite with this build's prefix.
 	eleventyConfig.addFilter("siteRoot", (/** @type {string} */ url) => {
 		if (process.env.DOCS_VARIANT !== "next") {
 			return "/";

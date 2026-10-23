@@ -1,4 +1,5 @@
 const { expect, test } = require("@playwright/test");
+const { listPresetNames, presetLabel } = require("../scripts/lib/presets");
 const { setContent } = require("./helpers/render");
 const {
 	assertDocsBuilt,
@@ -23,13 +24,26 @@ assertDocsBuilt("visual.spec");
 const visualPages = [
 	"index.html",
 	"about/index.html",
+	"attributions/index.html",
 	"brand/index.html",
 	"colors/index.html",
+	"compatibility/index.html",
 	"contributions/index.html",
 	"customization/index.html",
-	"deploy/index.html",
+	"delivery/index.html",
 	"examples/index.html",
-	"get-started/index.html",
+	"framework-guides/index.html",
+	"guides/accessibility/index.html",
+	"guides/existing-css/index.html",
+	"installation/index.html",
+	"installation/vite/index.html",
+	"installation/laravel/index.html",
+	"markup-comparison/index.html",
+	"package/index.html",
+	"presets/index.html",
+	"themes/index.html",
+	"tokens/index.html",
+	"why-cirth/index.html",
 	"components/accordion/index.html",
 	"components/card/index.html",
 	"components/dropdown/index.html",
@@ -56,7 +70,12 @@ const visualPages = [
 	"forms/input-file/index.html",
 	"forms/input-range/index.html",
 	"forms/input-search/index.html",
+	"forms/select/index.html",
+	"forms/text-inputs/index.html",
+	"forms/textarea/index.html",
+	"forms/validation/index.html",
 	"layout/container/index.html",
+	"layout/document/index.html",
 	"layout/grid/index.html",
 	"layout/landmarks/index.html",
 	"layout/overflow-auto/index.html",
@@ -64,6 +83,7 @@ const visualPages = [
 	"layout/section/index.html",
 	"utilities/breakout/index.html",
 	"utilities/sr-only/index.html",
+	"utilities/print/index.html",
 	"utilities/truncate/index.html",
 	"upgrading/index.html",
 ];
@@ -72,11 +92,11 @@ const representativePresetPages = [
 	"colors/index.html",
 	"components/meter/index.html",
 	"content/button/index.html",
-	"forms/index.html",
+	"forms/validation/index.html",
 ];
 
 // No docs shell or logo: the public theme has to carry the family resemblance.
-const frameworkSpecimens = ["default", "plain", "playroom", "blue"];
+const frameworkSpecimens = ["default", ...listPresetNames(), "blue"];
 
 /**
  * @type {{
@@ -165,6 +185,28 @@ const capture = async (page, pagePath, theme, prepare) => {
 	await page.goto(`${origin}/${pagePath}`, { waitUntil: "networkidle" });
 	await waitForTheme(page, theme);
 	await page.evaluate(() => document.fonts.ready);
+	// Lazy images, the home page's cover among them in a shadow root, are
+	// loaded before any capture, so a full-page screenshot never races them.
+	await page.evaluate(async () => {
+		const roots = [document, ...[...document.querySelectorAll("*")].flatMap((element) => (element.shadowRoot ? [element.shadowRoot] : []))];
+		const images = roots.flatMap((root) => [...root.querySelectorAll("img")]);
+		for (const image of images) image.loading = "eager";
+		await Promise.all(
+			images.map((image) =>
+				image.complete
+					? null
+					: new Promise((done) => {
+							image.addEventListener("load", done, { once: true });
+							image.addEventListener("error", done, { once: true });
+						}),
+			),
+		);
+		// Loaded is not painted: an image marked decoding="async" can first
+		// show a frame later, which on a slow runner is after the first
+		// capture. The dark WordPress mark, a PNG in the home page's orbit,
+		// made two consecutive captures differ that way.
+		await Promise.all(images.map((image) => image.decode().catch(() => undefined)));
+	});
 	if (pagePath === "forms/input-date/index.html") {
 		// Empty date segments in WebKit use today's date as their visual
 		// placeholder, making the snapshot drift over time. Fixed values keep
@@ -225,9 +267,10 @@ const expectDocsScreenshot = async (page, name, splitLongPage = false) => {
 	}
 
 	// Firefox cannot capture an image taller than 32,767 pixels. The
-	// customization guide crosses that limit on a mobile viewport, so keep
-	// complete coverage as four deterministic document-space slices instead
-	// of dropping the tail of the page or excluding the guide again (gh#99).
+	// Long references and indexes can cross that limit on a mobile viewport,
+	// so keep complete
+	// coverage as four deterministic document-space slices instead of
+	// dropping the tail of the page or excluding it again (gh#99).
 	const parts = 4;
 	for (let part = 0; part < parts; part += 1) {
 		const y = region.y + Math.floor((region.height * part) / parts);
@@ -240,6 +283,15 @@ const expectDocsScreenshot = async (page, name, splitLongPage = false) => {
 		});
 	}
 };
+
+// Pages taller than Firefox can capture in one image on a phone.
+const longPages = new Set([
+	"attributions/index.html",
+	"brand/index.html",
+	"customization/index.html",
+	"framework-guides/index.html",
+	"tokens/index.html",
+]);
 
 const defaultTheme = themeVariants.find((theme) => theme.name === "default");
 if (!defaultTheme) throw new Error("visual.spec: default theme is missing");
@@ -255,7 +307,7 @@ for (const pagePath of visualPages) {
 		await expectDocsScreenshot(
 			page,
 			name,
-			pagePath === "customization/index.html",
+			longPages.has(pagePath),
 		);
 	});
 }
@@ -283,6 +335,128 @@ for (const theme of themeVariants) {
 	}
 }
 
+// The home page's held scenes, at fixed points of their scroll. A scene's
+// state is a function of the scroll position alone, so each point is a
+// scrollY computed from the section's geometry: no inertia, no delay, the
+// same frame every run. Motion has to be welcome for a scene to be held,
+// so these captures, unlike the rest, run with it.
+test.describe("home scenes", () => {
+	test.use({ contextOptions: { reducedMotion: "no-preference" } });
+
+	// The scenes are drawn at an eased scroll position that follows the
+	// window's; `data-animating` is on the page until the two meet.
+	/** @param {import("@playwright/test").Page} page */
+	const settle = async (page) => {
+		await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+		await page.waitForFunction(() => !document.querySelector(".docs-home")?.hasAttribute("data-animating"));
+	};
+
+	/**
+	 * @param {import("@playwright/test").Page} page
+	 * @param {string} selector
+	 * @param {number} progress
+	 */
+	const goTo = async (page, selector, progress) => {
+		await page.locator(selector).evaluate((section, p) => {
+			const element = /** @type {HTMLElement} */ (section);
+			const top = element.getBoundingClientRect().top + window.scrollY;
+			window.scrollTo(0, top + p * (element.offsetHeight - window.innerHeight));
+		}, progress);
+		await settle(page);
+	};
+	/** @type {[string, string, number][]} */
+	const points = [
+		["story-typing", "[data-docs-story]", 0.15],
+		["story-markup", "[data-docs-story]", 0.34],
+		["story-browser", "[data-docs-story]", 0.52],
+		["story-cirth", "[data-docs-story]", 0.85],
+		["bench-composing", "[data-docs-bench]", 0.35],
+		["bench", "[data-docs-bench]", 1],
+		["theme-start", "[data-docs-theme]", 0.05],
+		["theme-accent", "[data-docs-theme]", 0.3],
+		["theme-corners", "[data-docs-theme]", 0.52],
+		["theme-canvas", "[data-docs-theme]", 0.85],
+	];
+	for (const [name, selector, progress] of points) {
+		test(`home-${name}`, async ({ page }, testInfo) => {
+			test.skip(!testInfo.project.name.includes("-desktop"), "a scene is held only where the window can hold it");
+			await capture(page, "index.html", defaultTheme);
+			await expect(page.locator(".docs-home")).toHaveAttribute("data-stage", "held");
+			await goTo(page, selector, progress);
+			await expect(page).toHaveScreenshot(`home-${name}.png`, {
+				fullPage: false,
+				mask: [page.locator('[aria-busy="true"]')],
+			});
+		});
+	}
+
+	for (const split of [20, 50, 80]) {
+		test(`home-presets-${split}`, async ({ page }, testInfo) => {
+			test.skip(!testInfo.project.name.includes("-desktop"), "one width shows the divider");
+			await capture(page, "index.html", defaultTheme);
+			const range = page.locator("[data-docs-compare-range]");
+			await range.evaluate((element, value) => {
+				const input = /** @type {HTMLInputElement} */ (element);
+				input.value = String(value);
+				input.dispatchEvent(new Event("input", { bubbles: true }));
+			}, split);
+			await expect(range).toHaveValue(String(split));
+			const comparison = page.locator(".docs-compare");
+			// Element screenshots scroll their subject into view, but the home
+			// controller paints this block from the resulting scroll position on
+			// the next frame. Land there explicitly so WebKit never captures the
+			// reveal at opacity zero.
+			await comparison.scrollIntoViewIfNeeded();
+			await settle(page);
+			await expect(comparison).toHaveScreenshot(`home-presets-${split}.png`);
+		});
+	}
+
+	// The close, a frame under the header, every piece of it arrived.
+	test("home-close", async ({ page }, testInfo) => {
+		test.skip(!testInfo.project.name.includes("-desktop"), "a frame is a window tall only on a wide screen");
+		await capture(page, "index.html", defaultTheme);
+		await page.locator(".docs-pure").evaluate((section) => {
+			const header = document.querySelector(".docs-header")?.getBoundingClientRect().height ?? 0;
+			window.scrollTo(0, section.getBoundingClientRect().top + window.scrollY - header);
+		});
+		await settle(page);
+		await expect(page).toHaveScreenshot("home-close.png", { fullPage: false });
+	});
+
+	test("home-orbit", async ({ page }, testInfo) => {
+		test.skip(!testInfo.project.name.includes("-desktop"), "the orbit turns only on a wide screen");
+		await capture(page, "index.html", defaultTheme);
+		await page.locator(".docs-agnostic").evaluate((band) => {
+			const element = /** @type {HTMLElement} */ (band);
+			window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY + element.offsetHeight / 2 - window.innerHeight / 2);
+		});
+		await settle(page);
+		await expect(page).toHaveScreenshot("home-orbit.png", {
+			fullPage: false,
+			// WebKit can rasterize a few edge pixels of one transformed SVG
+			// differently at the same settled angle. Keep the allowance below
+			// one tenth of a small mark, so any position or layout change fails.
+			maxDiffPixels: 64,
+		});
+	});
+});
+
+// The story on a phone: three blocks in order, each complete, still. The
+// story is taller than the window, and an element capture scrolls through
+// it with the sticky header painted over its middle, so this is the whole
+// page, clipped to the story's box: the header stays at the page's top.
+test("home-story-column", async ({ page }, testInfo) => {
+	test.skip(!testInfo.project.name.includes("-mobile"), "the story is a column on a phone");
+	await capture(page, "index.html", defaultTheme);
+	await expect(page.locator(".docs-home")).toHaveAttribute("data-stage", "column");
+	const clip = await page.locator("[data-docs-story]").evaluate((story) => {
+		const box = story.getBoundingClientRect();
+		return { x: box.left + window.scrollX, y: box.top + window.scrollY, width: box.width, height: box.height };
+	});
+	await expect(page).toHaveScreenshot("home-story-column.png", { fullPage: true, clip });
+});
+
 test("documentation chrome", async ({ page }) => {
 	await capture(page, "colors/index.html", defaultTheme);
 	await expect(page).toHaveScreenshot("docs-chrome.png", { fullPage: false });
@@ -294,7 +468,7 @@ test("readonly number input affordance", async ({ page }, testInfo) => {
 		"one focused light capture per engine covers the native affordance",
 	);
 
-	await capture(page, "forms/index.html", defaultTheme);
+	await capture(page, "forms/validation/index.html", defaultTheme);
 	await expect(
 		page.locator("[data-readonly-number-example]"),
 	).toHaveScreenshot("readonly-number-inputs.png");
@@ -309,6 +483,21 @@ for (const specimen of frameworkSpecimens) {
 		await expect(page).toHaveScreenshot(`specimen-${specimen}.png`, {
 			fullPage: true,
 			mask: [page.locator('[aria-busy="true"]')],
+		});
+	});
+}
+
+// The surface matrix (specs/surface-depth.md): every level side by side,
+// a form in and out of a card, and a dropdown, a popover and a dialog open
+// at once, for the default theme, each preset and the probe accent.
+for (const variant of ["default", ...listPresetNames(), "probe"]) {
+	test(`surfaces-${variant}`, async ({ page }) => {
+		await page.goto(`${origin}/specimen/surfaces/${variant}/`, {
+			waitUntil: "networkidle",
+		});
+		await page.evaluate(() => document.fonts.ready);
+		await expect(page).toHaveScreenshot(`surfaces-${variant}.png`, {
+			fullPage: true,
 		});
 	});
 }
@@ -335,6 +524,9 @@ test("mobile navigation open", async ({ page }, testInfo) => {
 // Behavior parity remains multi-engine in framework-specimen.spec.js while
 // this representative Chromium board avoids 192 near-duplicate baselines.
 test("framework interactive state matrix", async ({ page }, testInfo) => {
+	// Four controls, four states, every theme, both schemes: well over the
+	// default 30s once the radio row is in.
+	test.setTimeout(180_000);
 	test.skip(
 		testInfo.project.name !== "light-desktop",
 		"one representative Chromium board covers all themes and schemes",
@@ -452,6 +644,33 @@ test("framework interactive state matrix", async ({ page }, testInfo) => {
 				label,
 			});
 
+			// A radio as a reader meets it: unchecked, under the pointer
+			// (its label counts), with the keyboard's ring (a group takes
+			// focus on its checked radio), and checked. The label is in the
+			// capture, so the mark's alignment with its text is too.
+			const radioImages = [];
+			await page.goto(url);
+			target = page.locator("[data-state-radio]");
+			const radioClip = await clipForTarget(target, 6);
+			radioImages.push(await captureTarget(target, 6, radioClip));
+			await target.hover();
+			await page.waitForTimeout(transitionDuration);
+			radioImages.push(await captureTarget(target, 6, radioClip));
+			await page.goto(url);
+			target = page.locator("[data-state-radio-checked]");
+			await keyboardFocus(target.locator("input"));
+			await page.waitForTimeout(transitionDuration);
+			radioImages.push(await captureTarget(target, 6));
+			await page.goto(url);
+			radioImages.push(await captureTarget(page.locator("[data-state-radio-checked]"), 6));
+			rows.push({
+				component: "Radio",
+				images: radioImages.map(
+					(image) => `data:image/png;base64,${image.toString("base64")}`,
+				),
+				label,
+			});
+
 			const accordionImages = [];
 			await page.goto(url);
 			let details = page.locator("[data-state-accordion]");
@@ -511,7 +730,7 @@ test("framework interactive state matrix", async ({ page }, testInfo) => {
 			img { display: block; max-width: 100%; height: auto; }
 		</style>
 		<h1>Cirth interactive state matrix</h1>
-		<p>Real browser states · Default, Plain, Playroom and custom blue · light and dark</p>
+		<p>Real browser states · Default, ${listPresetNames().map(presetLabel).join(", ")} and custom blue · light and dark</p>
 		<div class="matrix">${cells}</div>`);
 	await expect(page).toHaveScreenshot(
 		"framework-interactive-state-matrix.png",

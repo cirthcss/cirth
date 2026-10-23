@@ -66,12 +66,15 @@ const resolveDocRoute = (targetPath) => {
 	const withoutFragment = targetPath.split("#")[0].split("?")[0];
 	const pagesRoot = path.join(projectRoot, "docs/src/pages");
 
-	const candidates =
+	// A route can be written in Markdown or as a Nunjucks template (the
+	// examples showcase is one), and both build to the same URL.
+	const stems =
 		withoutFragment === "" || withoutFragment === "/"
-			? ["index.md"]
+			? ["index"]
 			: withoutFragment.endsWith("/")
-				? [`${withoutFragment}index.md`]
-				: [`${withoutFragment}.md`];
+				? [`${withoutFragment}index`]
+				: [withoutFragment];
+	const candidates = stems.flatMap((stem) => [`${stem}.md`, `${stem}.njk`]);
 
 	const resolved = candidates.map((candidate) => path.join(pagesRoot, candidate));
 	return resolved.find((candidate) => fs.existsSync(candidate)) ?? resolved[0];

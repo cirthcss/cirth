@@ -1,0 +1,178 @@
+<!doctype html>
+<!-- The cover of the "Atlas 2.0 launch" card on the home page: an imaginary
+     relief map in contour bands, drawn here and nowhere else. Open this file
+     in a browser to see it; the files in docs/public/images/home/ are this
+     canvas, exported at 1500 x 500 and encoded as AVIF and WebP. The seed
+     is fixed, so the drawing is the same every time. Apache-2.0, as the
+     rest of the repository. -->
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Atlas cover</title>
+	<style>
+		body { margin: 0; background: #111; }
+		canvas { display: block; max-inline-size: 100%; }
+	</style>
+</head>
+<body>
+	<canvas id="atlas" width="1500" height="500"></canvas>
+	<script>
+		const canvas = document.getElementById("atlas");
+		const context = canvas.getContext("2d");
+		const { width, height } = canvas;
+
+		// Seeded, so every export is the same picture.
+		let seed = 20261008;
+		const random = () => {
+			seed = (seed + 0x6d2b79f5) | 0;
+			let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+			t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+			return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+		};
+
+		// Value noise on a lattice, smoothed, summed over octaves.
+		const lattice = Array.from({ length: 64 * 64 }, random);
+		const at = (x, y) => lattice[(((y % 64) + 64) % 64) * 64 + (((x % 64) + 64) % 64)];
+		const smooth = (t) => t * t * (3 - 2 * t);
+		const noise = (x, y) => {
+			const x0 = Math.floor(x);
+			const y0 = Math.floor(y);
+			const sx = smooth(x - x0);
+			const sy = smooth(y - y0);
+			const top = at(x0, y0) + (at(x0 + 1, y0) - at(x0, y0)) * sx;
+			const bottom = at(x0, y0 + 1) + (at(x0 + 1, y0 + 1) - at(x0, y0 + 1)) * sx;
+			return top + (bottom - top) * sy;
+		};
+		const fbm = (x, y) => {
+			let sum = 0;
+			let amplitude = 0.5;
+			let frequency = 1;
+			for (let octave = 0; octave < 5; octave += 1) {
+				sum += amplitude * noise(x * frequency, y * frequency);
+				amplitude *= 0.5;
+				frequency *= 2;
+			}
+			return sum;
+		};
+
+		// Three landmasses, a long one and two islands, on a field of noise.
+		const masses = [
+			{ x: 0.3, y: 0.58, rx: 0.3, ry: 0.42, lift: 0.5 },
+			{ x: 0.72, y: 0.34, rx: 0.17, ry: 0.3, lift: 0.42 },
+			{ x: 0.9, y: 0.82, rx: 0.1, ry: 0.18, lift: 0.3 },
+		];
+		const heightAt = (px, py) => {
+			const u = px / width;
+			const v = py / height;
+			let land = 0;
+			for (const mass of masses) {
+				const dx = (u - mass.x) / mass.rx;
+				const dy = (v - mass.y) / mass.ry;
+				land += mass.lift * Math.exp(-(dx * dx + dy * dy) * 1.6);
+			}
+			return land + fbm(u * 6, v * 2.4) * 0.7 - 0.47;
+		};
+
+		// Water to summit, in contained, slightly cool tones: sixteen bands,
+		// each coloured at its middle height along these stops.
+		const step = 0.045;
+		const stops = [
+			[-0.3, [26, 39, 54]],
+			[-0.01, [76, 105, 120]],
+			[0, [204, 195, 168]],
+			[0.16, [165, 170, 142]],
+			[0.32, [124, 139, 121]],
+			[0.48, [156, 151, 134]],
+			[0.62, [226, 222, 208]],
+		];
+		const colourAt = (h) => {
+			if (h <= stops[0][0]) return stops[0][1];
+			for (let index = 1; index < stops.length; index += 1) {
+				const [to, end] = stops[index];
+				const [from, start] = stops[index - 1];
+				if (h <= to) return start.map((channel, c) => channel + ((end[c] - channel) * (h - from)) / (to - from));
+			}
+			return stops.at(-1)[1];
+		};
+		const level = (h) => Math.floor(h / step);
+		const palette = (band) => colourAt((band + 0.5) * step);
+
+		const heights = new Float32Array(width * height);
+		const bands = new Int16Array(width * height);
+		for (let y = 0; y < height; y += 1) {
+			for (let x = 0; x < width; x += 1) {
+				const h = heightAt(x, y);
+				heights[y * width + x] = h;
+				bands[y * width + x] = level(h);
+			}
+		}
+
+		const image = context.createImageData(width, height);
+		for (let y = 0; y < height; y += 1) {
+			for (let x = 0; x < width; x += 1) {
+				const index = y * width + x;
+				const band = bands[index];
+				let [r, g, b] = palette(band);
+				// Relief: light from the north-west, a few per cent either way.
+				const east = heights[index + (x < width - 1 ? 1 : 0)];
+				const south = heights[index + (y < height - 1 ? width : 0)];
+				const shade = 1 + Math.max(-0.08, Math.min(0.08, (heights[index] - east + heights[index] - south) * 40));
+				r *= shade;
+				g *= shade;
+				b *= shade;
+				// Contour lines where the band changes.
+				const edge =
+					(x > 0 && bands[index - 1] !== band) ||
+					(y > 0 && bands[index - width] !== band);
+				if (edge) {
+					const ink = band >= 0 ? 0.86 : 1.14;
+					r *= ink;
+					g *= ink;
+					b *= ink;
+				}
+				// Grain.
+				const grain = (random() - 0.5) * 7;
+				image.data[index * 4] = r + grain;
+				image.data[index * 4 + 1] = g + grain;
+				image.data[index * 4 + 2] = b + grain;
+				image.data[index * 4 + 3] = 255;
+			}
+		}
+		context.putImageData(image, 0, 0);
+
+		// A faint graticule.
+		context.strokeStyle = "rgba(255, 255, 255, 0.08)";
+		context.lineWidth = 1.5;
+		for (let x = width / 16; x < width; x += width / 8) {
+			context.beginPath();
+			context.moveTo(x, 0);
+			context.lineTo(x, height);
+			context.stroke();
+		}
+		for (let y = height / 8; y < height; y += height / 4) {
+			context.beginPath();
+			context.moveTo(0, y);
+			context.lineTo(width, y);
+			context.stroke();
+		}
+
+		// One route between two places, dashed, with a ring at each end.
+		context.strokeStyle = "rgba(196, 104, 72, 0.9)";
+		context.lineWidth = 4;
+		context.setLineDash([14, 12]);
+		context.beginPath();
+		const route = [[0.24, 0.73], [0.39, 0.56], [0.54, 0.73], [0.71, 0.36]].map(([u, v]) => [u * width, v * height]);
+		context.moveTo(...route[0]);
+		context.bezierCurveTo(...route[1], ...route[2], ...route[3]);
+		context.stroke();
+		context.setLineDash([]);
+		for (const [x, y] of [route[0], route[3]]) {
+			context.beginPath();
+			context.arc(x, y, 13, 0, Math.PI * 2);
+			context.lineWidth = 5;
+			context.stroke();
+		}
+		document.documentElement.dataset.drawn = "";
+	</script>
+</body>
+</html>

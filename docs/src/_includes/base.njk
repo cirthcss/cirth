@@ -1,24 +1,33 @@
+{#- A page is titled by its own <h1> unless front matter names one, so
+    every tab and every navigation announces the page (WCAG 2.4.2). -#}
+{%- set pageTitle = title or (content | firstHeading if page.url != "/" else "") -%}
 <!doctype html>
 <html lang="en" data-base="{{ '/' | htmlBaseUrl }}">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>{% if title %}{{ title }} — {{ nav.siteTitle }}{% else %}{{ nav.siteTitle }}{% endif %}</title>
+		<title>{% if pageTitle %}{{ pageTitle }} — {{ nav.siteTitle }}{% else %}{{ nav.siteTitle }}{% endif %}</title>
 		<meta name="description" content="{{ description or nav.siteDescription }}" />
+		{%- if moved %}
+		<meta name="robots" content="noindex" />
+		<link rel="canonical" href="{{ moved.to }}" />
+		<meta http-equiv="refresh" content="0; url={{ moved.to | htmlBaseUrl }}" />
+		{%- endif %}
 		<meta property="og:type" content="website" />
-		<meta property="og:title" content="{% if title %}{{ title }} — {{ nav.siteTitle }}{% else %}{{ nav.siteTitle }}{% endif %}" />
+		<meta property="og:title" content="{% if pageTitle %}{{ pageTitle }} — {{ nav.siteTitle }}{% else %}{{ nav.siteTitle }}{% endif %}" />
 		<meta property="og:description" content="{{ description or nav.siteDescription }}" />
 		<meta property="og:image" content="https://cirthcss.github.io/cirth/social-preview.png" />
 		<meta property="og:image:width" content="1200" />
 		<meta property="og:image:height" content="630" />
 		<meta property="og:image:alt" content="Cirth: production-ready UI from semantic HTML, with a verified proof ledger." />
 		<meta name="twitter:card" content="summary_large_image" />
-		<link rel="icon" href="/favicon.svg" media="(prefers-color-scheme: light)" />
-		<link rel="icon" href="/favicon_dark.svg" media="(prefers-color-scheme: dark)" />
-		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="icon" href="{{ brandIcons.ico }}" sizes="32x32" />
+		<link rel="icon" href="{{ brandIcons.svg }}" type="image/svg+xml" />
+		<link rel="apple-touch-icon" href="{{ brandIcons.touch }}" />
 		<link rel="manifest" href="/site.webmanifest" />
 		<link rel="stylesheet" href="/styles/style.css" />
-		{% if usesClassless %}<link rel="stylesheet" href="/styles/generated/cirth-docs-classless.css" />{% endif %}
+		{#- Page-specific stylesheets, loaded after the shared shell. -#}
+		{% for sheet in stylesheets %}<link rel="stylesheet" href="/styles/{{ sheet }}" />{% endfor %}
 		<script>
 			// Set data-theme before first paint to avoid a light-mode flash.
 			(function () {
@@ -29,12 +38,7 @@
 				document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
 			})();
 
-			// Same idea for the preset switcher (gh#80): apply a
-			// session-remembered preset before first paint, so returning to
-			// a page (or following a link) after picking one doesn't flash
-			// the default theme first. sessionStorage, not localStorage:
-			// the issue asks for "the current session", not a permanent
-			// choice that'd survive a closed tab into someone's next visit.
+			// The session's preset, before first paint (gh#80).
 			(function () {
 				var preset = sessionStorage.getItem("cirth-preset");
 				if (!preset || preset === "default") return;
@@ -50,10 +54,8 @@
 	<body{% if bodyClass %} class="{{ bodyClass }}"{% endif %}>
 		<a href="#main-content" class="sr-only sr-only-focusable docs-skip-link">Skip to main content</a>
 		{%- if versions.isNext %}
-			{#- Only ever rendered on the /next/ preview build. Not a
-			    decoration: someone arriving from a search result has no
-			    other way to know that what they are reading has not
-			    shipped. -#}
+			{#- Only on the /next/ preview build: a reader arriving from a
+			    search result has no other sign that it has not shipped. -#}
 			<aside class="docs-next-banner">
 				<p>
 					<strong>Unreleased documentation.</strong> This is the
@@ -69,10 +71,9 @@
 		{% include "search-dialog.njk" %}
 		<div class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-copy-status></div>
 		<script>
-			// Copy-to-clipboard for fenced code blocks: the markdown pipeline
-			// only highlights, it doesn't add a button, so one is injected for
-			// every `pre > code` on the page (prose fences and Demo's
-			// "Show HTML" source alike).
+			// A copy button for every code block the shell owns, announced in
+			// the live region above. It copies what is on screen (innerText),
+			// so a listing with hidden lines hands over only the visible ones.
 			const copyStatus = document.querySelector("[data-copy-status]");
 			const announceCopyStatus = (message) => {
 				if (!copyStatus) return;
@@ -82,11 +83,7 @@
 				});
 			};
 
-			// Every code block the shell owns, and no others: a <pre> inside a
-			// live example is the example. Injecting a control into it would
-			// put a <button> in the reader's specimen that Cirth never ships,
-			// and the caption on every demo says the opposite. The disclosure
-			// under the demo keeps its button: that listing is the shell's.
+			// A <pre> inside a live example is part of the example: no button.
 			for (const pre of document.querySelectorAll("pre")) {
 				if (pre.closest(".docs-demo-preview")) continue;
 				if (pre.querySelector(":scope > button.copy")) continue;
@@ -101,7 +98,7 @@
 
 				button.addEventListener("click", async () => {
 					try {
-						await navigator.clipboard.writeText(code.textContent ?? "");
+						await navigator.clipboard.writeText(code.innerText);
 						button.classList.add("copied");
 						setTimeout(() => button.classList.remove("copied"), 2000);
 						announceCopyStatus("Code copied to clipboard.");
@@ -111,27 +108,34 @@
 				});
 			}
 
-			// The scoped classless build reads data-theme from its own root
-			// element (.cirth-classless demos), so mirror the site theme onto
-			// every such wrapper whenever it changes.
-			const classlessRoots = document.querySelectorAll(".cirth-classless");
-			if (classlessRoots.length > 0) {
-				const sync = () => {
-					const theme = document.documentElement.getAttribute("data-theme");
-					for (const root of classlessRoots) root.setAttribute("data-theme", theme ?? "light");
+			// The package manager switch (install.njk) works in CSS alone; this
+			// remembers the choice across switches and pages.
+			if (document.querySelector("[data-docs-install]")) {
+				const applyManager = (value) => {
+					for (const input of document.querySelectorAll(
+						`[data-docs-install] input[value="${value}"]`,
+					)) {
+						input.checked = true;
+					}
 				};
-				sync();
-				new MutationObserver(sync).observe(document.documentElement, {
-					attributeFilter: ["data-theme"],
+				try {
+					const stored = localStorage.getItem("cirth-package-manager");
+					if (stored && /^(npm|pnpm|yarn|bun)$/.test(stored)) applyManager(stored);
+				} catch {}
+				document.addEventListener("change", (event) => {
+					const input = event.target;
+					if (!(input instanceof HTMLInputElement)) return;
+					if (!input.closest("[data-docs-install]")) return;
+					applyManager(input.value);
+					try {
+						localStorage.setItem("cirth-package-manager", input.value);
+					} catch {}
 				});
 			}
 
-			// Live preset switcher (gh#80): the <head> script above already
-			// applied a remembered choice before first paint; this wires up
-			// the header <select> for changes after load. Swapping the
-			// stylesheet's href (rather than always keeping one <link> per
-			// preset and toggling disabled) means an unvisited preset is
-			// never fetched at all.
+			// Header preset switcher (gh#80). The <head> script applies a
+			// remembered preset before first paint; one <link> is swapped, so
+			// an unvisited preset is never fetched.
 			const presetSelect = document.querySelector("[data-cirth-preset-select]");
 			if (presetSelect) {
 				const base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
@@ -153,7 +157,6 @@
 					applyPreset(presetSelect.value);
 				});
 			}
-
 		</script>
 	</body>
 </html>

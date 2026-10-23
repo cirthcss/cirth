@@ -1,98 +1,77 @@
 ---
 layout: docs.njk
+description: Load Cirth's optional print stylesheet, understand its paper-specific behavior, and customize the print color roles.
 ---
 
 # Print
 
-Cirth ships a `@media print` pass as its own stylesheet. Add it once,
-with `media="print"`, and any page built from semantic HTML prints as a
-readable document in either color scheme: there is nothing to configure
-and no print-only markup to maintain.
+Cirth's print rules are a separate stylesheet. Load the sheet that matches the
+main build after that build:
 
 ```html
-<link rel="stylesheet" href="dist/cirth.min.css">
-<link rel="stylesheet" href="dist/cirth.print.min.css" media="print">
+<link rel="stylesheet" href="/cirth.min.css">
+<link rel="stylesheet" href="/cirth.print.min.css" media="print">
 ```
 
-Load it **after** the main build: the pass wins over the component rules it
-has to outrank by source order, exactly as it did when it lived inside the
-bundle. Both sit in the same [cascade layer](/customization#cascade-layers),
-so that order still decides between them, while your own print rules beat
-both. Each build has its matching sheet: `cirth.print.min.css`,
-`cirth.print.classless.min.css`, `cirth.print.scoped.min.css`,
-`cirth.print.classless.scoped.min.css`, or, from npm,
-`@cirthcss/cirth/print` and its `classless`/`scoped` variants.
+The browser applies a stylesheet with `media="print"` to printed output and
+print preview, not to the screen presentation. No print-only HTML is required.
 
-### Why it is a separate file
-
-Print styling is around 900 B gzipped, and it is never needed to paint the
-screen. Kept inside the main bundle it was charged to every visitor on the
-first round trip, including the ones who never print. As a separate sheet
-whose media query does not match the display, the browser fetches it at low
-priority and it never competes with the first paint.
-
-The trade is that it is now opt-in: **a page that links only the main build
-prints with no pass at all.** If you upgraded from a version before this
-split and printing regressed, the missing `<link>` above is why.
-
-## Behavior
-
-Paper is not a screen: there is no elevation, no hover, no color scheme to
-follow, and toner is not free. Under `@media print` Cirth:
-
-* **Resets the surface pair.** The page goes to a transparent background
-  and black ink, and `color-scheme` is forced to `light`. This is the one
-  that matters most: browsers drop author *backgrounds* when printing but
-  keep author *text color*, so a page printed while the dark scheme is
-  active would otherwise come out near-white on white.
-* **Flattens surfaces.** Card, dropdown, code, `<kbd>`, form field, striped
-  row, and modal overlay backgrounds go transparent, and every box shadow
-  is dropped.
-* **Prints links as ink plus their underline.** A mid-tone accent is a
-  screen affordance; out of a monochrome printer it is gray mush. Links
-  keep their underline, which reads either way. After an absolute
-  (`http…`) link that is not navigation or a button, the URL is printed in
-  parentheses: paper cannot resolve an `href` on its own.
-* **Outlines controls.** A button's label is `--cirth-primary-on-surface`
-  (white) on a fill the browser is about to discard, so buttons print as an
-  outlined label instead of as nothing at all.
-* **Keeps color that carries meaning.** `<mark>`, `<progress>`, checkboxes
-  and radios opt back in with `print-color-adjust: exact`: a checked box
-  without its tick, or a progress bar without its fill, is not a style
-  detail but missing content.
-* **Doesn't break tables.** `<thead>` repeats on every page a table spans,
-  `<tfoot>` lands after the last row, and rows are not torn in half by the
-  fold.
-* **Stops clipping content.** `<pre>` wraps instead of scrolling, and
-  `.overflow-auto` spills instead of hiding what is past the edge: what
-  scrolls sideways on screen would simply be cut off on paper.
-* **Prints an open `<dialog>` in the flow** rather than pinned over the
-  first page.
-* **Controls page breaks.** Headings do not end a page on their own,
-  figures and images stay whole, and paragraphs, list items, and quotes
-  keep at least three lines on either side of a break.
-
-## Customization
-
-Three tokens drive the whole pass:
-
-| Variable | Default | Used for |
-| --- | --- | --- |
-| `--cirth-print-color` | black | Body text, headings, links, control labels |
-| `--cirth-print-muted-color` | 6.5:1 gray | Captions, attributions, placeholders, printed URLs |
-| `--cirth-print-border-color` | 3.8:1 gray | Table rules, card and field borders, `<hr>` |
-
-Override them like any other token, from a stylesheet of your own:
+With a package manager, import the matching default-build entry:
 
 ```css
-:root {
-  /* Softer ink, heavier rules */
-  --cirth-print-color: #1a1a1a;
-  --cirth-print-border-color: #767676;
-}
+@import "@cirthcss/cirth";
+@import "@cirthcss/cirth/print" print;
 ```
 
-To drop the printed URLs after external links:
+Classless and scoped builds have corresponding print entries. Keep the build
+and print variants paired. [Package and builds](/package#print-stylesheets)
+lists every print entry point and compiled file.
+
+## Why a print stylesheet is needed
+
+Browsers can omit author backgrounds while retaining author text colors. A
+page viewed in a dark theme could therefore produce pale text on white paper.
+Screen-only behaviors such as horizontal scrolling also have no useful paper
+equivalent.
+
+Cirth's print sheet resolves those framework-level issues. It does not decide
+which application regions are navigation, advertising, or other screen-only
+content.
+
+## What Cirth changes for print
+
+Under `@media print`, Cirth:
+
+- sets the page to transparent paper with dark ink and a light native color
+  scheme;
+- removes surface fills and box shadows from cards, code blocks, menus,
+  fields, and overlays;
+- prints links as underlined ink and appends the destination of absolute web
+  links outside navigation and button treatments;
+- turns filled buttons into outlined labels so their text remains visible
+  when backgrounds are omitted;
+- asks the browser to preserve color on `<mark>`, `<meter>`, `<progress>`,
+  checkboxes, and radios because their fill can carry meaning;
+- repeats `<thead>` on multi-page tables, places `<tfoot>` at the end, and
+  avoids splitting a row;
+- lets preformatted blocks wrap and lets `.overflow-auto` content escape its
+  screen scroll box instead of being clipped;
+- places an open `<dialog>` in document flow rather than fixing it over the
+  first printed page;
+- avoids leaving a heading alone at the bottom of a page and tries to keep
+  figures, images, and several lines of prose together.
+
+These are CSS requests to the browser's print engine. Exact pagination still
+depends on the browser, paper size, margins, font metrics, and the user's print
+settings.
+
+## Printed link destinations
+
+Cirth appends an absolute `http` or `https` destination because paper cannot
+activate a link. Relative and fragment links are not printed after their
+labels. Navigation links and links styled as buttons are also excluded.
+
+Remove the generated destination when a document does not need it:
 
 ```css
 @media print {
@@ -102,20 +81,63 @@ To drop the printed URLs after external links:
 }
 ```
 
-## What Cirth deliberately doesn't do
+## Customization
 
-* **No `@page` rule.** Margins, page size, and orientation belong to your
-  document, not to a component library.
-* **Nothing is hidden.** Which parts of *your* layout are chrome (a
-  sticky header, a cookie banner, a sidebar) is something only your
-  application knows. Add your own `@media print { … { display: none } }`
-  for those.
+Three tokens define the print palette:
 
-## A note on browser settings
+| Variable | Default role |
+| --- | --- |
+| `--cirth-print-color` | Body text, headings, links, and control labels |
+| `--cirth-print-muted-color` | Captions, attributions, placeholders, and printed URLs |
+| `--cirth-print-border-color` | Table rules, field and card borders, and `<hr>` |
 
-Browsers print without background graphics unless the user turns them on
-("Background graphics" in Chrome's print dialog, "Print backgrounds" in
-Firefox's). Cirth's pass is written for that default: everything it needs
-to stay legible is carried by ink, borders, and underlines, and the
-elements that genuinely need their fill are marked
-`print-color-adjust: exact` so they survive either setting.
+Override them in a stylesheet loaded after Cirth:
+
+```css
+:root {
+  --cirth-print-color: #1a1a1a;
+  --cirth-print-border-color: #767676;
+}
+```
+
+Unlayered application rules override Cirth's `cirth` cascade layer. Put
+project-specific print changes inside `@media print` so they do not affect the
+screen.
+
+## Application responsibilities
+
+Cirth intentionally does not add an `@page` rule. Page size, orientation, and
+margins depend on the document being printed.
+
+It also does not hide any application content. Hide screen-only interface
+chrome explicitly:
+
+```css
+@media print {
+  .app-sidebar,
+  .cookie-banner {
+    display: none;
+  }
+}
+```
+
+Review the result in print preview and with the backgrounds setting both on
+and off. Check page breaks, link destinations, tables, form state, and any
+content hidden by the application.
+
+## Common mistakes
+
+- Do not load a print sheet for a different build variant.
+- Do not omit `media="print"` from the print `<link>`.
+- Do not assume screen scrolling will expose clipped content on paper.
+- Do not hide navigation or sidebars globally when they should disappear only
+  from printed output.
+- Do not rely on color as the only printed indication of state.
+
+## Related pages
+
+- [Installation](/installation/)
+- [Package and builds](/package#print-stylesheets)
+- [Table](/content/table)
+- [Code](/content/code)
+- [Customization](/customization#cascade-layers)

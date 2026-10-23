@@ -12,47 +12,32 @@
 
 // ––––––––––––––––––––
 
-@if $parent-selector == "" {
-  // 1. Remove the margin in all browsers (opinionated)
-  body {
-    width: 100%;
-    margin: 0; // 1
-  }
-
-  // Render the `main` element consistently in IE
-  main {
-    display: block;
-  }
-}
-
-@if $parent-selector != "" {
-  #{$parent-selector} {
-    width: 100%;
-    margin: 0; // 1
-  }
-
-  #{$parent-selector} main {
-    display: block;
-  }
-}
-
-// Cirth
-
-// ––––––––––––––––––––
-
+// The document body, or the wrapper in the scoped builds.
 $container-root-selector: "body";
 
 @if $parent-selector != "" {
   $container-root-selector: $parent-selector;
 }
 
+// 1. Remove the margin in all browsers (opinionated)
+
+#{$container-root-selector} {
+  width: 100%;
+  margin: 0; // 1
+}
+
+// Cirth
+
+// ––––––––––––––––––––
+
 #{$container-root-selector} {
   > header,
   > main,
   > footer {
-    // <header>, <main>, <footer> as containers: same three-track grid
-    // as `.container` (layout/_container.scss): two gutter tracks that
-    // never drop out, center track capped at the reading measure.
+    padding-block: var(--cirth-block-spacing-vertical);
+
+    // The classless build has no `.container`, so the landmarks take its
+    // three-track grid (layout/_container.scss).
     @if not $enable-classes {
       display: grid;
       grid-template-columns:
@@ -60,16 +45,10 @@ $container-root-selector: "body";
         [content-start] minmax(0, var(--cirth-container-max-width))
         [content-end]
         minmax(var(--cirth-container-gutter), 1fr) [full-end];
-      padding-block: var(--cirth-block-spacing-vertical);
 
       & > * {
         grid-column: content;
       }
-    }
-
-    // Regular vertical spacings for <header>, <main>, <footer>
-    @else {
-      padding-block: var(--cirth-block-spacing-vertical);
     }
   }
 }

@@ -3,13 +3,13 @@ const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 const { chromium } = require("playwright");
 const { createServer, startServer } = require("./lib/docs-site");
+const { iconSource, icons } = require("./build-brand");
 
 const projectRoot = path.join(__dirname, "..");
 const captures = [
 	{ page: "social-preview", file: "social-preview.png", width: 1200, height: 630 },
 	{ page: "readme-preview-light", file: "readme-native-baseline.png", width: 960, height: 240 },
 	{ page: "readme-preview-dark", file: "readme-native-baseline-dark.png", width: 960, height: 240 },
-	{ page: "favicon-preview", file: "apple-touch-icon.png", width: 180, height: 180 },
 ];
 
 // Every capture below freezes animations. The homepage writes its source
@@ -23,17 +23,44 @@ const captures = [
 // places that cannot take an SVG (slides, print, some package registries).
 // Rendered from the generated SVG itself rather than re-laid-out here, so
 // the two can never disagree, and at 4x so the raster survives a retina
-// README. The mono variant is deliberately vector-only: it paints with
-// `currentColor`, which a raster cannot carry.
+// README.
 const lockupCaptures = [
 	{ source: "wordmark.svg", file: "wordmark.png" },
 	{ source: "wordmark_dark.svg", file: "wordmark_dark.png" },
 ];
 
+// The mark's raster, at 1024px, rendered from the generated SVG for the
+// same reason as the lockups: a PNG exported by hand falls behind its SVG
+// without anything noticing.
+const logoCaptures = ["logo_brand"];
+
+// An .ico file of PNG images, the form every browser that reads .ico
+// accepts: a six-byte header, a sixteen-byte entry per image, the images.
+/** @param {Array<{ size: number, png: Buffer }>} images */
+const ico = (images) => {
+	const header = Buffer.alloc(6);
+	header.writeUInt16LE(1, 2);
+	header.writeUInt16LE(images.length, 4);
+	let offset = header.length + 16 * images.length;
+	const entries = images.map(({ size, png }) => {
+		const entry = Buffer.alloc(16);
+		entry.writeUInt8(size >= 256 ? 0 : size, 0);
+		entry.writeUInt8(size >= 256 ? 0 : size, 1);
+		entry.writeUInt16LE(1, 4);
+		entry.writeUInt16LE(32, 6);
+		entry.writeUInt32LE(png.length, 8);
+		entry.writeUInt32LE(offset, 12);
+		offset += png.length;
+		return entry;
+	});
+	return Buffer.concat([header, ...entries, ...images.map(({ png }) => png)]);
+};
+
 // The set a brand reviewer needs, rendered from the site rather than mocked
-// up beside it. The two specimen captures are the application screen: copper
-// on small surfaces, graphite dark surfaces, and a primary sitting next to a
-// destructive action: the adjacency the palette was hardest to settle.
+// up beside it. The two specimen captures are the application screen: the
+// 324deg accent on small surfaces, dark surfaces on the 132deg neutrals, and a
+// primary sitting next to a destructive action: the adjacency the palette was
+// hardest to settle.
 /** @type {Array<{file: string, width: number, height: number, theme: "light" | "dark", path?: string}>} */
 const reviewCaptures = [
 	{ file: "home-desktop-light.png", width: 1440, height: 900, theme: "light" },
@@ -94,6 +121,42 @@ const reviewCaptures = [
 				omitBackground: true,
 			});
 			await page.close();
+		}
+
+		for (const name of logoCaptures) {
+			const page = await browser.newPage({
+				viewport: { width: 512, height: 512 },
+				deviceScaleFactor: 2,
+			});
+			await page.goto(pathToFileURL(path.join(projectRoot, "docs/public", `${name}.svg`)).href, {
+				waitUntil: "load",
+			});
+			await page.screenshot({
+				animations: "disabled",
+				path: path.join(projectRoot, "docs/public", `${name}.png`),
+				omitBackground: true,
+			});
+			await page.close();
+		}
+
+		// Each icon at each of its sizes, rendered from its SVG at that size
+		// rather than scaled from a larger raster. Those on the paper canvas
+		// are opaque; the others keep a transparent ground.
+		for (const icon of icons) {
+			/** @type {Array<{ size: number, png: Buffer }>} */
+			const images = [];
+			for (const size of icon.sizes) {
+				const page = await browser.newPage({ viewport: { width: size, height: size }, deviceScaleFactor: 1 });
+				const source = Buffer.from(iconSource(icon, size)).toString("base64");
+				await page.setContent(
+					`<!doctype html><style>html,body{margin:0;background:transparent}img{display:block}</style><img src="data:image/svg+xml;base64,${source}" width="${size}" height="${size}" alt="">`,
+				);
+				await page.locator("img").evaluate((img) => /** @type {HTMLImageElement} */ (img).decode());
+				images.push({ size, png: await page.screenshot({ animations: "disabled", omitBackground: !icon.ground }) });
+				await page.close();
+			}
+			const target = path.join(projectRoot, "docs/public", icon.file);
+			fs.writeFileSync(target, icon.file.endsWith(".ico") ? ico(images) : images[0].png);
 		}
 
 		const screenshotFolder = path.join(

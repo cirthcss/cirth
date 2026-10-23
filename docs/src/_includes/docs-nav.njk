@@ -1,0 +1,77 @@
+{#- Both indexes (sidebar tree and page outline), drawn in the rails on
+    wide screens and in the compact disclosures on narrow ones. Everything
+    that folds is a native <details>, opened in the markup where the page
+    is, so it works without a script. -#}
+
+{#- A branch (Installation) is its own link plus a disclosure whose summary
+    is only the toggle: a link inside a summary would be two controls in
+    one. A branch's pages may be grouped in named categories. -#}
+{%- macro navTree(sidebar, url) -%}
+{%- for group in sidebar %}
+{%- set groupOpen = group.items | hasActiveItem(url) %}
+<details class="docs-nav-group" data-docs-nav-group="{{ group.text | slugify }}"{% if groupOpen %} open{% endif %}>
+	<summary>{{ group.text }}</summary>
+	<ul>
+		{%- for item in group.items %}
+			{%- if item.items %}
+			{%- set branchOpen = [item] | hasActiveItem(url) %}
+			<li class="docs-nav-branch">
+				<a href="{{ item.link }}"{% if url == (item.link | withSlash) %} aria-current="page"{% endif %}>{{ item.text }}</a>
+				<details data-docs-nav-group="{{ item.text | slugify }}"{% if branchOpen %} open{% endif %}>
+					<summary><span class="sr-only">{{ item.text }} pages</span></summary>
+					<ul>
+						{%- for child in item.items %}
+						{%- if child.items %}
+						{#- A category: a named disclosure with no page of its own. #}
+						{%- set categoryOpen = child.items | hasActiveItem(url) %}
+						<li class="docs-nav-category">
+							<details data-docs-nav-group="{{ item.text | slugify }}-{{ child.text | slugify }}"{% if categoryOpen %} open{% endif %}>
+								<summary>{{ child.text }}</summary>
+								<ul>
+									{%- for page in child.items %}
+									<li><a href="{{ page.link }}"{% if url == (page.link | withSlash) %} aria-current="page"{% endif %}>{{ page.text }}</a></li>
+									{%- endfor %}
+								</ul>
+							</details>
+						</li>
+						{%- else %}
+						<li><a href="{{ child.link }}"{% if url == (child.link | withSlash) %} aria-current="page"{% endif %}>{{ child.text }}</a></li>
+						{%- endif %}
+						{%- endfor %}
+					</ul>
+				</details>
+			</li>
+			{%- else %}
+			<li><a href="{{ item.link }}"{% if url == (item.link | withSlash) %} aria-current="page"{% endif %}>{{ item.text }}</a></li>
+			{%- endif %}
+		{%- endfor %}
+	</ul>
+</details>
+{%- endfor %}
+{%- endmacro -%}
+
+{#- On a long page the subsections fold; docs.njk's scroll-spy opens the
+    one being read in the copy marked `spy` (the rail). -#}
+{%- macro pageOutline(outline, spy = false) -%}
+<ul>
+	{%- for section in outline.sections %}
+	<li{% if section.children.length %} class="docs-toc-branch"{% endif %}>
+		<a href="#{{ section.slug }}"{% if spy %} data-toc-link data-slug="{{ section.slug }}"{% if loop.first %} aria-current="true"{% endif %}{% endif %}>{{ section.text }}</a>
+		{%- if section.children.length %}
+		{%- if outline.collapsible %}
+		<details data-toc-group>
+			<summary><span class="sr-only">Subsections of {{ section.text }}</span></summary>
+		{%- endif %}
+			<ul>
+				{%- for child in section.children %}
+				<li><a href="#{{ child.slug }}"{% if spy %} data-toc-link data-slug="{{ child.slug }}"{% endif %}>{{ child.text }}</a></li>
+				{%- endfor %}
+			</ul>
+		{%- if outline.collapsible %}
+		</details>
+		{%- endif %}
+		{%- endif %}
+	</li>
+	{%- endfor %}
+</ul>
+{%- endmacro -%}

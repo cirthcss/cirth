@@ -1,0 +1,58 @@
+<article>
+  <header>
+    <form role="search">
+      <input type="search" name="member" placeholder="Filter members" aria-label="Filter members">
+      <button type="submit">Filter</button>
+    </form>
+  </header>
+  <div class="overflow-auto" tabindex="0" role="region" aria-labelledby="ex-members-caption">
+    <table class="striped">
+      <caption id="ex-members-caption">Team members</caption>
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Role</th>
+          <th scope="col">Last active</th>
+          <th scope="col">Seats</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">Ada Lovelace</th>
+          <td>Owner</td>
+          <td><time datetime="2026-09-27">Today</time></td>
+          <td>12</td>
+        </tr>
+        <tr>
+          <th scope="row">Grace Hopper</th>
+          <td>Admin</td>
+          <td><time datetime="2026-09-25">2 days ago</time></td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <th scope="row">Alan Turing</th>
+          <td>Member</td>
+          <td><time datetime="2026-09-12">2 weeks ago</time></td>
+          <td>1</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th scope="row">Total</th>
+          <td></td>
+          <td></td>
+          <td>17</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  <footer>
+    <nav aria-label="Pagination">
+      <ul>
+        <li><a href="#" aria-current="page">1</a></li>
+        <li><a href="#">2</a></li>
+        <li><a href="#">Next</a></li>
+      </ul>
+    </nav>
+  </footer>
+</article>

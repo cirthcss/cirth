@@ -31,34 +31,21 @@
 
 /* cirth-component:start */
 
-// Caption
-
-// The one part of a table that disagreed with the rest of it. `grep
-// caption src/` returned nothing, so a <caption> arrived with the user
-// agent's `text-align: center` above cells this framework deliberately
-// aligns to `start`, in body ink, with no space between it and the header
-// row it names.
-
-// It is worth finishing twice over: <caption> is the native way to give a
-// table an accessible name, and the one WCAG guidance prefers over a
-// heading outside the table. A framework claiming a verified WCAG 2.2 AA
-// baseline should make the element that baseline recommends pleasant to
-// use. Same three decisions content/_figure.scss already makes for
-// figcaption, which is the same problem one element over.
+// Caption: the native accessible name for a table, set in the meta role and
+// aligned to the start like the cells, as figcaption is.
 
 #{$parent-selector} caption {
   padding-block-end: calc(var(--cirth-spacing) * 0.5);
   color: var(--cirth-muted-color);
-  font-size: var(--cirth-font-size-sm);
+  font-weight: var(--cirth-font-weight-medium);
+  font-size: var(--cirth-meta-font-size);
+  letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
   line-height: var(--cirth-line-height-normal);
   text-align: start;
 }
 
-// Cells
-
-// Cells stay transparent so tables inherit the surface they sit on:
-// painting var(--cirth-background-color) here showed the *page* background
-// inside cards (upstream #497)
+// Cells stay transparent so a table inherits the surface it sits on
+// (upstream #497).
 
 #{$parent-selector} th,
 #{$parent-selector} td {
@@ -67,6 +54,14 @@
   font-weight: var(--cirth-font-weight);
   font-variant-numeric: tabular-nums;
   text-align: start;
+}
+
+// Column heads and footers: the meta role, in the muted ink.
+
+#{$parent-selector} :is(thead, tfoot) :is(th, td) {
+  color: var(--cirth-muted-color);
+  font-size: var(--cirth-meta-font-size);
+  letter-spacing: calc(var(--cirth-tracking-optical) * (1rem - 1em));
 }
 
 // Footer
@@ -79,17 +74,10 @@
   }
 }
 
-// Controls
-
-// Form controls placed directly in cells (gh#108). A cell's padding plus a
-// full 44px bordered control reads as a box inside a box; this variant
-// hands most of the cell's padding to the control instead, so a row of
-// fields reads as one surface. The controls themselves are untouched:
-// their borders, states, focus ring and target size are the ones every
-// form uses, because the border is what identifies a field as a field
-// (WCAG 1.4.11). Headers are not a substitute for a label: name each
-// control, e.g. with aria-labelledby pointing at its row and column
-// headers.
+// Form controls placed directly in cells (gh#108): the cell hands most of
+// its padding to the control, so a row of fields reads as one surface. The
+// controls keep their borders, states, focus ring and target size. Name
+// each control, e.g. with aria-labelledby pointing at its headers.
 
 $cell-control: 'input:not([type="checkbox"], [type="radio"], [type="hidden"]), select, textarea, button';
 
@@ -103,9 +91,8 @@ $cell-control: 'input:not([type="checkbox"], [type="radio"], [type="hidden"]), s
       margin: 0;
     }
 
-    // Auto table layout squeezes a select below its own value before it
-    // lets the table overflow, so a narrow screen showed an empty select.
-    // Holding it at its content width makes the table scroll instead.
+    // Auto table layout would squeeze a select below its own value; held at
+    // its content width, the table scrolls instead.
     :is(th, td) > select {
       min-inline-size: max-content;
     }

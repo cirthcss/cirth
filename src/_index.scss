@@ -1,11 +1,9 @@
 @use "sass:meta";
 @use "helpers/cascade";
 
-// Everything the main builds emit, inside `@layer cirth` (see
-// helpers/_cascade.scss). A @use cannot be nested, so the module list in
-// _modules.scss is loaded with meta.load-css() instead: the same modules,
-// with the same configuration and in the same order, so the rules inside
-// the layer are exactly the ones the unlayered build emitted.
+// Everything the main builds emit, inside `@layer cirth`
+// (helpers/_cascade.scss). A @use cannot be nested, so the module list is
+// loaded with meta.load-css(), with the same configuration and order.
 @include cascade.layer {
   @include meta.load-css("modules");
 }

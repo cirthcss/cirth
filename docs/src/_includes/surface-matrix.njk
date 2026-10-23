@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{{ specimenTitle }} surfaces — Cirth</title>
+		<link rel="stylesheet" href="/styles/generated/cirth-lab-default.css" />
+		{% if specimenPreset %}<link rel="stylesheet" href="/styles/generated/presets/{{ specimenPreset }}.css" />{% endif %}
+		{% if specimenPrimary %}<style>:root { --cirth-primary: {{ specimenPrimary }}; }</style>{% endif %}
+		<style>
+			/* Staging only: where each specimen sits on the page. Every colour,
+			   edge and shadow below is the library's. */
+			.matrix-levels { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--cirth-flow-element); }
+			.matrix-levels > div { min-block-size: 6rem; padding: var(--cirth-flow-element); border-radius: var(--cirth-card-border-radius); }
+			.matrix-levels small { display: block; color: var(--cirth-muted-color); }
+			.matrix-stage { position: relative; min-block-size: 20rem; overflow: hidden; }
+			.matrix-stage > dialog:not(:modal) { position: absolute; min-block-size: 100%; }
+			.matrix-dropdown-stage { min-block-size: 14rem; }
+			#matrix-popover:popover-open { position: absolute; inset: auto; margin: 0; }
+			@media (width < 48rem) { .matrix-levels { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+		</style>
+	</head>
+	<body>
+		<header class="container">
+			<h1>Surface matrix</h1>
+			<p>{{ specimenTitle }} · public default stylesheet only · no documentation shell</p>
+		</header>
+		<main class="container">
+			<section aria-labelledby="levels-title">
+				<h2 id="levels-title">Four levels, no edges</h2>
+				<div class="matrix-levels" data-matrix-levels>
+					<div style="background-color: var(--cirth-surface-recessed)"><strong>Recessed</strong><small>code, wells</small></div>
+					<div style="background-color: var(--cirth-canvas)"><strong>Canvas</strong><small>the page</small></div>
+					<div style="background-color: var(--cirth-surface-raised)"><strong>Raised</strong><small>cards</small></div>
+					<div style="background-color: var(--cirth-surface-overlay); box-shadow: var(--cirth-box-shadow)"><strong>Overlay</strong><small>menus, dialogs</small></div>
+				</div>
+			</section>
+
+			<div class="grid">
+				<section aria-labelledby="canvas-title">
+					<h2 id="canvas-title">On the canvas</h2>
+					<p>Running text with <code>inline code</code>, a <a href="#canvas-title">link</a>, <kbd>Ctrl</kbd> + <kbd>K</kbd>, and <mark>a highlighted phrase</mark>.</p>
+					<table>
+						<thead><tr><th scope="col">Request</th><th scope="col">Owner</th><th scope="col">State</th></tr></thead>
+						<tbody>
+							<tr><td>RQ-184</td><td>Marta Costa</td><td>Review</td></tr>
+							<tr><td>RQ-185</td><td>Ilan Weiss</td><td>Queued</td></tr>
+						</tbody>
+					</table>
+					<hr />
+					<blockquote><p>A separator, a table rule and a quote bar share the weakest edge.</p><footer>Edge roles</footer></blockquote>
+					<form>
+						<label>Owner<input name="owner-outside" value="Marta Costa" /></label>
+						<label>Environment<select name="environment-outside"><option>Staging</option><option>Production</option></select></label>
+						<label>Approval code<input name="approval-outside" value="19" aria-invalid="true" /><small>Enter the six-digit code.</small></label>
+						<label>Reference<input name="reference-outside" value="RQ-184" aria-invalid="false" /><small>Reference verified.</small></label>
+						<label>Disabled<input name="disabled-outside" value="Unavailable" disabled /></label>
+						<fieldset>
+							<legend>Checks</legend>
+							<label><input type="checkbox" checked /> Run automated checks</label>
+							<label><input type="radio" name="window-outside" checked /> Current window</label>
+							<label><input type="checkbox" role="switch" /> Notify maintainers</label>
+						</fieldset>
+						<p>
+							<button type="button" data-matrix-primary>Approve</button>
+							<button type="button" class="secondary">Assign</button>
+							<button type="button" class="outline" data-matrix-outline>Export</button>
+							<button type="button" class="contrast">Escalate</button>
+							<button type="button" disabled>Disabled</button>
+						</p>
+					</form>
+				</section>
+
+				<section aria-labelledby="raised-title">
+					<h2 id="raised-title">Raised and recessed</h2>
+					<article data-matrix-card>
+						<header><strong>Request RQ-184</strong><br /><small>Awaiting review</small></header>
+						<label>Owner<input name="owner" value="Marta Costa" data-matrix-field /></label>
+						<label>Environment<select name="environment"><option>Staging</option><option>Production</option></select></label>
+						<label>Change summary<textarea name="summary" rows="2">Update the billing reconciliation worker.</textarea></label>
+						<label>Approval code<input name="approval" value="19" aria-invalid="true" /><small>Enter the six-digit code.</small></label>
+						<label><input type="checkbox" role="switch" checked /> Notify maintainers</label>
+						<footer>
+							<button type="button" class="secondary">Cancel</button>
+							<button type="button">Approve</button>
+						</footer>
+					</article>
+					<pre data-matrix-code><code>&lt;article&gt;
+  &lt;header&gt;Request RQ-184&lt;/header&gt;
+  &lt;label&gt;Owner &lt;input value="Marta Costa"&gt;&lt;/label&gt;
+&lt;/article&gt;</code></pre>
+					<details>
+						<summary>Accordion</summary>
+						<p>Disclosure content sits on the canvas.</p>
+					</details>
+				</section>
+			</div>
+
+			<section aria-labelledby="overlay-title">
+				<h2 id="overlay-title">Overlays</h2>
+				<div class="grid">
+					<div class="matrix-dropdown-stage">
+						<details class="dropdown" open data-matrix-dropdown>
+							<summary>Actions</summary>
+							<ul>
+								<li><a href="#overlay-title">Approve</a></li>
+								<li><a href="#overlay-title">Assign</a></li>
+								<li><a href="#overlay-title">Export</a></li>
+							</ul>
+						</details>
+					</div>
+					<div class="matrix-dropdown-stage" data-matrix-popover-anchor>
+						<button type="button" popovertarget="matrix-popover" class="outline">Command popover</button>
+					</div>
+				</div>
+				<div id="matrix-popover" popover data-matrix-popover>
+					<strong>Command</strong>
+					<p>A popover shares the overlay level with the dropdown and the dialog.</p>
+				</div>
+				<div class="matrix-stage" data-matrix-dialog-stage>
+					<article>
+						<h3>Behind the dialog</h3>
+						<p>The backdrop dims whatever the dialog opens over.</p>
+					</article>
+					<dialog open aria-labelledby="matrix-dialog-title" data-matrix-dialog>
+						<article>
+							<h2 id="matrix-dialog-title">Confirm approval</h2>
+							<p>Approving publishes RQ-184 to production.</p>
+							<label>Reason<input name="reason" value="Scheduled window" /></label>
+							<footer><button type="button" class="secondary">Cancel</button> <button type="button">Confirm</button></footer>
+						</article>
+					</dialog>
+				</div>
+			</section>
+		</main>
+		<script>
+			// Open the popover beside its trigger, in document coordinates, so a
+			// full-page capture shows it where it belongs.
+			const popover = document.getElementById("matrix-popover");
+			const anchor = document.querySelector("[data-matrix-popover-anchor]");
+			const place = () => {
+				const box = anchor.getBoundingClientRect();
+				popover.style.top = `${box.top + window.scrollY + 56}px`;
+				popover.style.left = `${box.left + window.scrollX}px`;
+				popover.style.maxWidth = `${Math.min(box.width, 360)}px`;
+			};
+			place();
+			popover.showPopover();
+			window.addEventListener("resize", place);
+		</script>
+	</body>
+</html>

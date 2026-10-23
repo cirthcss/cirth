@@ -644,7 +644,7 @@ const walkSite = async ({ concurrency = 4, label, onPage, pages }) => {
  * The engine and the preset are parameters because the audit's two blind
  * spots are exactly those two axes: Chromium's intrinsic sizing is not
  * Gecko's, and a declaration that resolves to the same value as its
- * neighbour under the default theme need not under `playroom`. The second
+ * neighbour under the default theme need not under `material`. The second
  * pass (`verify-dead-css.js`) reopens this same corpus in another engine
  * or under a preset, over the handful of pages that can see the
  * candidates, which is why they are options here rather than a fork of

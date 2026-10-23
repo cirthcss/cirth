@@ -336,3 +336,48 @@ test("the close button is a full-size target around a small icon", async ({
 	// with negative margins, so the target grew without moving anything.
 	expect(header.height).toBeLessThan(44);
 });
+
+test("the footer sits its buttons in the middle of its band", async ({
+	page,
+}) => {
+	// Two buttons, typed as the documentation types them. [type="button"]
+	// carries a flow margin of its own, and a footer reset written against a
+	// bare `button` lost to it: 13px above the row and 28px below.
+	await setContent(page,
+		`<style>${css}</style>
+		<dialog id="sheet" open>
+			<article>
+				<header><strong>Confirm</strong></header>
+				<p>Body copy.</p>
+				<footer id="footer">
+					<button type="button" class="secondary">Cancel</button>
+					<button type="button">Confirm</button>
+				</footer>
+			</article>
+		</dialog>`,
+	);
+
+	const { above, below } = await page.evaluate(() => {
+		const footer = document.getElementById("footer");
+		if (!footer) {
+			throw new Error("missing footer");
+		}
+		const band = footer.getBoundingClientRect();
+		const style = getComputedStyle(footer);
+		const buttons = [...footer.querySelectorAll("button")].map((button) =>
+			button.getBoundingClientRect(),
+		);
+		return {
+			above:
+				Math.min(...buttons.map((box) => box.top)) -
+				band.top -
+				Number.parseFloat(style.borderTopWidth),
+			below:
+				band.bottom -
+				Math.max(...buttons.map((box) => box.bottom)) -
+				Number.parseFloat(style.borderBottomWidth),
+		};
+	});
+
+	expect(Math.abs(above - below)).toBeLessThanOrEqual(1);
+});

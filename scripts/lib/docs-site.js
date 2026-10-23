@@ -164,13 +164,17 @@ const snapshotDocs = ({ attempts = 3, label, source = docsDist }) => {
 // re-audit whatever the toolchain thought a year ago, and any finding
 // would be unfixable by definition. The /next/ preview is excluded for the
 // opposite reason: it is this site, built twice.
-// Share-card/icon routes are deterministic rasterization sources, not
+// Share-card routes are deterministic rasterization sources, not
 // navigable documentation. The lab routes are isolated iframe targets and
 // intentionally omit the docs preset controls that generic page audits wait
 // for; their real form markup and builds are covered by the home comparison
 // and the underlying component suites.
 const excludedTopLevel =
-	/^(v\d+\.\d+|next|lab|specimen|social-preview|readme-preview-light|readme-preview-dark|favicon-preview)$/;
+	/^(v\d+\.\d+|next|lab|specimen|social-preview|readme-preview-light|readme-preview-dark)$/;
+
+/** @param {string} file */
+const isForwardingPage = (file) =>
+	/<meta http-equiv="refresh"/.test(fs.readFileSync(file, "utf8").slice(0, 4096));
 
 /**
  * @param {string} [dir]
@@ -191,7 +195,11 @@ const listPages = (dir = docsDist, prefix = "") => {
 			entry.name.endsWith(".html") &&
 			// Skip macOS/iCloud "name 2.html" duplicates that can appear in
 			// local gitignored build output.
-			!/ \d+\.html$/.test(entry.name)
+			!/ \d+\.html$/.test(entry.name) &&
+			// A page kept only to forward an old address (docs/src/pages/
+			// moved.njk) navigates away as it loads, so an audit would measure
+			// whichever page it lands on, twice, and race the navigation.
+			!isForwardingPage(path.join(dir, entry.name))
 		) {
 			pages.push(relative);
 		}

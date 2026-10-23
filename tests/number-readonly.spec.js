@@ -70,8 +70,10 @@ test("hiding the readonly stepper preserves the field state and geometry", async
 		};
 	});
 
+	// Read-only is the dashed edge alone: a field paints the surface it sits
+	// on, read-only or not (specs/surface-and-edge-model.md).
 	expect(beforeFocus.borderStyle).toBe("dashed");
-	expect(beforeFocus.backgroundColor).not.toBe(editable.backgroundColor);
+	expect(beforeFocus.backgroundColor).toBe(editable.backgroundColor);
 	expect(beforeFocus.height).toBeGreaterThanOrEqual(44);
 	expect(beforeFocus.height).toBeCloseTo(editable.height, 1);
 	expect(beforeFocus.width).toBeCloseTo(editable.width, 1);

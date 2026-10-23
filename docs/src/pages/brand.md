@@ -1,373 +1,215 @@
 ---
 layout: docs.njk
+description: Practical guidance for Cirth's current identity, logo files, colour, typography, voice, usage rules and brand terms.
 ---
 
 # Brand
 
-Assets and guidelines for representing Cirth in articles, talks,
-integrations, and anywhere else the project is named.
+Use this page when referring to Cirth in documentation, an article, a talk or
+an integration. It provides the current assets and the rules that keep the
+project identifiable.
 
-<section class="docs-brand-spec" aria-labelledby="signature-title">
-  <header class="docs-brand-spec-header">
-    <h2 id="signature-title">The part that survives a retheme.</h2>
-    <p>Cirth's identity is not the copper. The accent is the first token any
-    adopter replaces, and a framework whose character lives entirely in one
-    hue has no character left the moment it is adopted. What stays is
-    below: proportions, strokes and target sizes that hold in every preset,
-    every scheme and every build. Compare
-    <a href="/specimen/default/">the default specimen</a> with
-    <a href="/specimen/plain/">the plain one</a>: same six measurements,
-    different pigment.</p>
-  </header>
-  <dl class="grid docs-brand-measures">
-    <div><dt>Container corner</dt><dd>{% if proof.radius and proof.radius.container %}<code>{{ proof.radius.container }}</code> · {% endif %}<code>--cirth-card-border-radius</code></dd></div>
-    <div><dt>Control corner</dt><dd>{% if proof.radius and proof.radius.control %}<code>{{ proof.radius.control }}</code> · {% endif %}<code>--cirth-border-radius</code></dd></div>
-    <div><dt>Resting edge</dt><dd><code>1px</code>, all four sides, every button variant</dd></div>
-    <div><dt>Target floor</dt><dd><code>44px</code> controls · <code>40px</code> in a nav</dd></div>
-    <div><dt>Card contract</dt><dd>Tinted header band · <code>12/20px</code> · padded body</dd></div>
-    <div><dt>Spacing unit</dt><dd><code>4px</code> scale · <code>16px</code> default step</dd></div>
-  </dl>
+<section class="docs-brand-hero" aria-label="The Cirth lockup">
+  <img class="docs-logo-light" src="/wordmark.svg" alt="Cirth" width="{{ brandLockup.width | round }}" height="{{ brandLockup.height }}" />
+  <img class="docs-logo-dark" src="/wordmark_dark.svg" alt="Cirth" width="{{ brandLockup.width | round }}" height="{{ brandLockup.height }}" />
+  <p class="docs-brand-hero-line">A semantic-first CSS framework for the HTML the browser already understands.</p>
+  <p class="docs-brand-hero-actions">
+    <a href="/logo_brand.svg" download role="button">Download the mark<span class="sr-only">, SVG</span></a>
+    <a href="/wordmark.svg" download role="button" class="secondary outline">Download the lockup<span class="sr-only">, SVG for light backgrounds</span></a>
+    <a href="#downloads">Every variant</a>
+  </p>
 </section>
 
-The pairing is the recognisable part. A container is one radius step softer
-than the controls inside it, so a card reads as a sheet holding buttons
-rather than as a big button. Every resting edge is the same single hairline:
-a filled button, an outline button, a field, a card and a popover all draw
-the same 1px on all four sides, and none of them fakes relief on one edge.
-Interactive targets sit on a 44px floor (WCAG 2.5.5), except inside a
-`<nav>`, which opts down to a 40px band while staying above the 24px WCAG
-2.5.8 minimum.
+## Identity
 
-Those are the marks to preserve when Cirth is restyled. Replacing
-`--cirth-primary` is expected and supported; flattening the radius pair to a
-single value, thickening one edge of a control, or dropping the target floor
-takes the interface out of the system.
+The identity has two primary forms:
 
-## The mark
+- **Mark:** a round badge, a figure playing a flute over a magenta disc.
+  Use it where nearby text already names Cirth or where the available area
+  is square.
+- **Lockup:** the badge followed by the outlined name, set in lowercase as
+  “cirth”. Use it when the asset must carry the project name by itself.
 
-Cirth's name comes from a writing system, and the mark is the project's
-own sign rather than a letter borrowed from one. It carries the copper the
-interface uses for action and position, and it is built to hold at the
-sizes technical work actually puts it in: a README header, an npm listing,
-a favicon, a tab strip.
+Both forms use one drawing at every size, from a browser tab to a printed
+page.
 
-The mark is being redrawn. The files in the grid below are the current
-ones and remain the assets to use until they are replaced; the geometry
-that describes them (construction grid, clearspace, minimum size,
-alignment in the lockup) is not published here, because a rule measured
-against the outgoing drawing would be wrong about the incoming one.
+The name refers to the Cirth writing system invented by J. R. R. Tolkien.
+[About](/about#origin-of-the-name) explains that reference and the project's
+non-affiliation statement. The project mark and lockup are original Cirth
+assets and do not depict a character from Tolkien's works.
 
-<section class="docs-brand-spec" aria-labelledby="mark-pending-title">
-  <header class="docs-brand-spec-header">
-    <h2 id="mark-pending-title">Measured on the mark, not before it.</h2>
-    <p>Everything in this list is a number, and a number about a drawing
-    can only be taken off that drawing. Each one is specified here once the
-    definitive mark is in the repository, and not sooner. What the rest of
-    this page documents does not depend on the drawing and is current:
-    the colour roles, the typographic voice, the proportions of the
-    interface, the terms of use.</p>
-  </header>
-  <dl class="grid docs-brand-measures">
-    <div><dt>Clearspace</dt><dd>Pending the definitive mark</dd></div>
-    <div><dt>Minimum size</dt><dd>Pending the definitive mark</dd></div>
-    <div><dt>Construction grid</dt><dd>Pending the definitive mark</dd></div>
-    <div><dt>Size thresholds</dt><dd>Pending the definitive mark</dd></div>
-    <div><dt>Lockup alignment</dt><dd>Pending the definitive mark</dd></div>
-    <div><dt>Reduced variant</dt><dd>Pending the definitive mark</dd></div>
-  </dl>
-</section>
+Write the project name as **Cirth**, with an initial capital. The lowercase
+“cirth” belongs to the lockup artwork only; do not copy it into running text.
+The package name is `@cirthcss/cirth`.
 
-Cirth is not affiliated with, endorsed by, or associated with the
-Tolkien estate, the Tolkien Society, Amazon's Middle-earth adaptations,
-or any other rights holder. The Cirth is a script Tolkien devised, and
-naming a stylesheet after it is a reference, not a claim of license or
-partnership. The mark and the wordmark are the project's own work.
+## Downloads
 
 <div class="docs-brand-grid">
   <figure class="docs-brand-tile" data-theme="light">
-    <img src="/logo_brand.svg" alt="Cirth brand mark, copper on light" width="96" height="96" />
-    <figcaption>Brand · light</figcaption>
+    <img src="/logo_brand.svg" alt="Cirth mark on a light background" width="96" height="96" />
+    <figcaption><strong>Mark</strong><span>Light backgrounds</span></figcaption>
     <p class="docs-brand-downloads">
-      <a class="secondary" href="/logo_brand.svg" download>SVG</a>
-      <a class="secondary" href="/logo_brand.png" download>PNG</a>
-    </p>
-  </figure>
-  <figure class="docs-brand-tile" data-theme="light">
-    <img src="/logo_mono.svg" alt="Cirth monochrome mark, black on light" width="96" height="96" />
-    <figcaption>Mono · light</figcaption>
-    <p class="docs-brand-downloads">
-      <a class="secondary" href="/logo_mono.svg" download>SVG</a>
-      <a class="secondary" href="/logo_mono.png" download>PNG</a>
-    </p>
-  </figure>
-  <figure class="docs-brand-tile" data-theme="light">
-    <img src="/logo_brand_app.svg" alt="Cirth icon on its background tile, light" width="96" height="96" />
-    <figcaption>Icon · light</figcaption>
-    <p class="docs-brand-downloads">
-      <a class="secondary" href="/logo_brand_app.svg" download>SVG</a>
-      <a class="secondary" href="/logo_brand_app.png" download>PNG</a>
+      <a class="secondary" href="/logo_brand.svg" download>SVG<span class="sr-only">, mark</span></a>
+      <a class="secondary" href="/logo_brand.png" download>PNG<span class="sr-only">, mark</span></a>
     </p>
   </figure>
   <figure class="docs-brand-tile" data-theme="dark">
-    <img src="/logo_brand_dark.svg" alt="Cirth brand mark, copper on dark" width="96" height="96" />
-    <figcaption>Brand · dark</figcaption>
+    <img src="/logo_brand.svg" alt="Cirth mark on a dark background" width="96" height="96" />
+    <figcaption><strong>Mark</strong><span>Dark backgrounds, same file</span></figcaption>
     <p class="docs-brand-downloads">
-      <a class="secondary" href="/logo_brand_dark.svg" download>SVG</a>
-      <a class="secondary" href="/logo_brand_dark.png" download>PNG</a>
-    </p>
-  </figure>
-  <figure class="docs-brand-tile" data-theme="dark">
-    <img src="/logo_mono_dark.svg" alt="Cirth monochrome mark, white on dark" width="96" height="96" />
-    <figcaption>Mono · dark</figcaption>
-    <p class="docs-brand-downloads">
-      <a class="secondary" href="/logo_mono_dark.svg" download>SVG</a>
-      <a class="secondary" href="/logo_mono_dark.png" download>PNG</a>
-    </p>
-  </figure>
-  <figure class="docs-brand-tile" data-theme="dark">
-    <img src="/logo_brand_app_dark.svg" alt="Cirth icon on its background tile, dark" width="96" height="96" />
-    <figcaption>Icon · dark</figcaption>
-    <p class="docs-brand-downloads">
-      <a class="secondary" href="/logo_brand_app_dark.svg" download>SVG</a>
-      <a class="secondary" href="/logo_brand_app_dark.png" download>PNG</a>
+      <a class="secondary" href="/logo_brand.svg" download>SVG<span class="sr-only">, mark</span></a>
+      <a class="secondary" href="/logo_brand.png" download>PNG<span class="sr-only">, mark</span></a>
     </p>
   </figure>
 </div>
-
-Each variant above is downloadable as SVG (preferred) or PNG. The full set
-lives in
-[`docs/public/`](https://github.com/cirthcss/cirth/tree/master/docs/public)
-and is catalogued in
-[`docs/BRAND_ASSETS.md`](https://github.com/cirthcss/cirth/blob/master/docs/BRAND_ASSETS.md),
-including the two combinations this grid does not show: the mono mark on
-its own background tile, light and dark, for square containers that have to
-stay one colour.
-
-Use the **brand** (copper) mark wherever color is available, matching the
-variant to the background. Use **mono** in one color contexts such as print,
-badges, embossing. The **icon** variants sit on their own background
-tile; use them where the mark needs to fill a square: favicons, social
-avatars, bookmark icons. Not for inline use next to text.
-
-## Operational rules
-
-Pick the variant by what the surface can carry, not by taste: **brand**
-wherever colour is available, **mono** wherever one flat ink is preferable
-or required, the **icon tile** wherever the mark has to fill a square. Give
-the mark a margin of clear space on every side and keep other elements out
-of it. How much, exactly, is one of the numbers waiting on the definitive
-mark; until it is measured, err generous.
-
-The mark is a sign, not a pattern. It marks the project once on a surface:
-in a header, on a card, at the foot of a page. It is not a texture, a
-watermark, a bullet, or a shape to repeat behind content.
-
-### Incorrect use
-
-Do not stretch it, rotate it, outline it, add a glow or a shadow, recolour
-it outside the variants published here, place it on a surface it has no
-contrast against, repeat it as wallpaper, or pair it with fantasy imagery.
-
-## Color
-
-The brand color is copper, and in an interface it has exactly two jobs:
-**action** and **current position**. A primary button, a focus ring and a
-link in running prose are actions. The rail beside the page you are on, the
-edge on an active in-page nav item and a selected control are position.
-Header navbars are quieter chrome: they use ink and weight rather than an
-accent edge. Nothing else in a Cirth interface is copper.
-
-Editorial typography is the one place outside those two, and it is a
-deliberate exception rather than a leak: a word or phrase set in the accent
-inside a heading, the way this site's home page sets *semantic HTML*. It is
-a single named class, applied by hand, in prose, not a component state.
-
-It used to do five. Navigation links carried the accent at rest, which meant
-a menu of eight entries was eight brand-coloured words next to one button
-that also wanted the colour, and the accent stopped meaning "act on this"
-and started meaning "this is a Cirth screen". Navigation now takes the ink
-of whatever it sits in and the accent marks only where you are, so the one
-thing copper still says, it says alone.
-
-The light theme's base surface is a mineral paper rather than white, and the
-card sheet carries the same temperature: the page is not neutral, but the
-warmth is a surface property, not a wash of the accent. In dark the base is
-a graphite carrying the same stone tint as the neutral scale. Neither scheme
-paints the brand hue across backgrounds.
-
-The mark's hue, **44°** in oklch, is the exact hue the framework's entire
-copper scale is generated from; the logo sits brighter and more saturated
-than the UI tokens because it is an identity color, not a text color. The
-scale holds the accent at 70% of its own gamut ceiling so it can cover whole
-surfaces without shouting; the mark, which covers a monogram, is free to sit
-at 85%.
-
-| Role | Value |
-| --- | --- |
-| Mark, light backgrounds | `#BD5928` (`oklch(58% 0.143 44deg)`) |
-| Mark, dark backgrounds | `#E16B31` (`oklch(66% 0.163 44deg)`) |
-| UI primary (light theme) | `oklch(52.7% 0.107 44deg)`, from `$copper-550` |
-| UI primary (dark theme) | `oklch(65.7% 0.134 44deg)`, from `$copper-400` |
-
-The dark UI primary is one ladder step deeper than a mirror of the light one
-would be. Copper's gamut ceiling climbs steeply past 65% lightness, so the
-mirroring step comes out an orange; a step down keeps it reading as metal
-and still clears AA on every surface in the scheme.
-
-In interfaces, always use the `--cirth-primary*` tokens rather than the
-logo hexes: the tokens are variants verified for WCAG. See
-[Colors](/colors) for the full system.
-
-## The lockup
-
-The horizontal lockup is the mark with the name beside it: "Cirth" in the
-sans voice, bold, with the mark sized to the cap height and sitting on the
-same baseline. Use it where the name has to travel with the mark and there
-is room for both: a third-party README, a talk slide, a conference badge,
-a social post.
 
 <div class="docs-brand-grid docs-lockup-grid">
   <figure class="docs-brand-tile" data-theme="light">
-    <img src="/wordmark.svg" alt="Cirth horizontal lockup, copper mark and graphite name on light" width="240" height="57" />
-    <figcaption>Lockup · light</figcaption>
+    <img src="/wordmark.svg" alt="Cirth lockup with dark name" width="{{ brandLockup.width | round }}" height="{{ brandLockup.height }}" />
+    <figcaption><strong>Lockup</strong><span>Light backgrounds</span></figcaption>
     <p class="docs-brand-downloads">
-      <a class="secondary" href="/wordmark.svg" download>SVG</a>
-      <a class="secondary" href="/wordmark.png" download>PNG</a>
+      <a class="secondary" href="/wordmark.svg" download>SVG<span class="sr-only">, lockup for light backgrounds</span></a>
+      <a class="secondary" href="/wordmark.png" download>PNG<span class="sr-only">, lockup for light backgrounds</span></a>
     </p>
   </figure>
   <figure class="docs-brand-tile" data-theme="dark">
-    <img src="/wordmark_dark.svg" alt="Cirth horizontal lockup, copper mark and paper name on dark" width="240" height="57" />
-    <figcaption>Lockup · dark</figcaption>
+    <img src="/wordmark_dark.svg" alt="Cirth lockup with light name" width="{{ brandLockup.width | round }}" height="{{ brandLockup.height }}" />
+    <figcaption><strong>Lockup</strong><span>Dark backgrounds</span></figcaption>
     <p class="docs-brand-downloads">
-      <a class="secondary" href="/wordmark_dark.svg" download>SVG</a>
-      <a class="secondary" href="/wordmark_dark.png" download>PNG</a>
+      <a class="secondary" href="/wordmark_dark.svg" download>SVG<span class="sr-only">, lockup for dark backgrounds</span></a>
+      <a class="secondary" href="/wordmark_dark.png" download>PNG<span class="sr-only">, lockup for dark backgrounds</span></a>
     </p>
   </figure>
 </div>
 
-<p>A one-colour lockup is available as
-<a class="secondary" href="/wordmark_mono.svg" download><code>wordmark_mono.svg</code></a>
-for print, badges and embossing. It paints with <code>currentColor</code>, so
-inline it to give it your own ink; loaded through <code>&lt;img&gt;</code> it
-falls back to black, the same as the mono mark.</p>
+Prefer SVG when the destination accepts it. SVG stays sharp at different
+sizes. The PNG marks are 1024 by 1024 pixels; lockup PNGs are rendered at
+four times the SVG dimensions.
 
-**The name is live text, not outlines.** The lockup carries `<text>` in the
-system sans stack the framework itself ships, which is the whole of the
-typographic claim: there is no font to install, and nothing to license. The
-cost is that the word's width moves a little between platforms: SF Pro sets
-it narrowest, Helvetica and Arial about 2.5% wider, so the box reserves
-room for the widest face in the stack and a narrower one leaves a little air
-on the right. That is the intended behaviour, not a mis-export.
+One mark file serves light and dark backgrounds. On a dark one the
+figure's dark ink meets the page at the foot of the badge, and the magenta
+disc draws the rest of its edge. The lockups come in a light and a dark
+file only because the name's ink changes.
 
-### Which asset, for which context
+The generated inventory and source relationship are recorded in
+[`docs/BRAND_ASSETS.md`](https://github.com/cirthcss/cirth/blob/master/docs/BRAND_ASSETS.md).
 
-| Context | Asset | Why |
+## Choose a variant
+
+| Context | Use |
+| --- | --- |
+| Nearby text already says Cirth | Mark |
+| README header, slide or partner page that must carry the name | Lockup |
+| Avatar or square profile image | Mark |
+| Navigation bar, toolbar or footer | Lockup |
+| Browser tab or app icon | Mark; the site serves `favicon.svg`, `favicon.ico` for browsers without SVG icons, and touch and app icons drawn from the same file |
+| Light background | Mark, or the lockup for light backgrounds |
+| Dark background | Mark, or the lockup for dark backgrounds |
+| One-colour printing, engraving or embossing | No file yet: the badge is drawn in several inks. Open an issue to ask for one |
+
+Do not shrink the lockup until its name becomes unreadable. Switch to the
+mark and write “Cirth” in nearby text. Preview raster output at its final
+display size.
+
+## Colour
+
+The badge is painted from the same scales as the default interface. The
+disc is the colour of a primary button; the figure is drawn in the darkest
+and the lightest neutral the interface sets its strongest text in. The files
+are generated from the theme source, so the recorded values remain aligned
+with the build.
+
+| Role | Source step | Value |
 | --- | --- | --- |
-| Name and mark together, with room for both | Lockup | Carries the name where the surrounding text does not |
-| Square container: favicon, avatar, app tile | Icon tile | The mark fills the square; the lockup cannot |
-| Beside text that already names the project | Mark | The name is in the sentence; the mark identifies it |
-| One flat ink: print, badges, embossing | Mono mark or mono lockup | No second colour to lose |
+| Disc | `{{ brandMark.disc.step }}` | `{{ brandMark.disc.hex }}` (`{{ brandMark.disc.oklch }}`) |
+| Figure, dark ink | `{{ brandMark.dark.step }}` | `{{ brandMark.dark.hex }}` (`{{ brandMark.dark.oklch }}`) |
+| Figure, light ink | `{{ brandMark.light.step }}` | `{{ brandMark.light.hex }}` (`{{ brandMark.light.oklch }}`) |
 
-The lockup does not replace the mark at small sizes. Shrinking it until the
-name is legible makes the mark illegible first; at that point the mark alone
-is the correct asset and the name belongs in the text next to it. The size
-each asset stops working at is a measurement, and it is
-[waiting on the definitive mark](#the-mark).
+Use the supplied file rather than sampling and recreating these colours. In a
+Cirth interface, use the `--cirth-primary*` tokens instead of brand-file
+hex values. [Colors](/colors) owns the interface colour system.
+
+Do not recolour the mark, apply gradients, outlines, shadows or transparency,
+or place it on a background where it loses definition.
 
 ## Typography
 
-Sans-serif is the primary typographic voice for product surfaces, headings,
-and UI chrome, and it is the voice the lockup is set in. Monospace is
-reserved for code, size metrics, and proof points (`13.6 KB`,
-`--cirth-primary`), and for the site's own chrome, where the name appears as
-a navigational label rather than as the wordmark. Serif remains available as
-a primitive token for an author to opt into, but is not part of Cirth's
-product voice. There is no custom font to install: the brand uses the same
-system stacks the framework ships, on purpose.
+The name inside the lockup is outlined artwork derived from Onest at weight
+650, with softened corners. It is not live text and requires no font
+download. Do not typeset a substitute lockup.
 
-Write the name as **Cirth** (capitalized, never uppercase); the npm scope
-is `@cirthcss/cirth`.
+Onest was chosen because its proportions stay close to the platform system
+stacks the interface uses, so the name reads as part of the same family.
 
-## Using the mark in technical contexts
+Cirth interfaces and documentation use platform system stacks by default.
+Use monospace only for code, commands, token names, filenames and data. The
+brand does not require adopters to use a particular product font.
 
-The mark is built to survive small, high-contrast, low-color placements:
-READMEs, npm listings, CI badges, terminal output headers, favicons. Use
-the **mono** variant wherever a single flat color is preferable to copper
-(badges, print, embossing, low-color terminals), and the **icon** tile
-wherever the mark needs to fill a square container. Keep what surrounds it
-contemporary and technical: no fantasy illustration, no parchment or stone
-texture, no medieval lettering. Cirth is named after a writing system, and
-a page that dresses up the reference reads as a theme rather than as a
-tool.
+The letterform source and license are recorded on
+[Attributions](/attributions#cirth-lockup-lettering).
 
-## Voice
+## Tone of voice
 
-Cirth's writing is technical but accessible, precise, and evidence-led:
-assertive about what is verified, transparent about trade-offs, and never
-ideological. Prefer *claim → mechanism → proof*. State what the framework
-does, explain how it does it, then point at something checkable: a script,
-a number, a source file.
+Cirth documentation is direct, technical and evidence-led:
 
-The subject is a language and what it is made of, so the vocabulary is
-too. Favour **semantics**, **structure**, **syntax**, **vocabulary**,
-**grammar**, **relation**, **scope**, **token**, **runtime**, **source**,
-**output**, **native**, **integrate**, **baseline**, **verify** and
-**transformation**.
+- Show a concrete example before explaining the abstraction.
+- Use plain verbs such as “sets”, “keeps”, “loads” and “checks”.
+- Explain a technical term the first time it appears on a page.
+- State the boundary of a test or measurement.
+- Describe tradeoffs without criticizing a different workflow.
+- Prefer one main idea per sentence when the subject is complex.
 
-Two habits to avoid. The first is the workshop register: **carving**,
-**forging**, **craft**, **tooling**, **hardness**, **purity**, **metal**
-and engineering as a metaphor for manual labour. Cirth is named after a
-writing system, not a trade, and a page that reaches for the anvil is
-describing an atmosphere instead of a mechanism. The material reading of
-the name belongs in the origin story, once, and nowhere else.
+Avoid unsupported claims such as “fully accessible”, “works everywhere” or
+“nothing can break”. Avoid fantasy, workshop and musical metaphors in normal
+product copy. The origin of the name belongs on the About page, not in every
+feature description.
 
-The second is the unfalsifiable claim: **timeless**, **philosophy**,
-"nothing to break", "fully accessible", "always delivered in one round
-trip". If a sentence cannot be checked against a script, a measurement or
-a source file, it is not doing the work this voice is for.
+## Using the mark
 
-Example headlines:
+Do:
 
-- "Production-ready UI from semantic HTML."
-- "One stylesheet. Runtime tokens. No JavaScript runtime."
-- "A size budget on every bundle, checked on every build."
+- match the light or dark asset to the background;
+- keep the transparent margin built into the asset;
+- add more clear space when nearby content feels crowded;
+- preserve the aspect ratio;
+- use the asset once in a visual region;
+- include nearby text when the mark alone would not identify the project.
 
-Example one-line descriptions:
+Do not:
 
-- "Cirth turns native HTML elements into accessible, themeable
-  interfaces, with zero shipped JavaScript."
-- "An HTML-native CSS framework with a runtime design token system and a
-  monitored gzipped size budget."
+- crop, stretch, rotate, redraw or animate the mark;
+- change the lockup's lettering;
+- add effects or place the mark inside another logo;
+- repeat it as a pattern, watermark, bullet or generic icon;
+- turn the figure into a character with new poses or props;
+- pair it with runes, parchment, stone or other fantasy decoration;
+- imply that Cirth endorses an external product.
 
-## Usage agreement
+## Terms
 
-The Cirth code is released under the Apache License 2.0; the name and logo are brand assets with
-their own terms:
+<span id="usage-agreement"></span>
 
-1. **Naming projects.** You may use the Cirth name as part of a
-   noncommercial open source project's name, for example
-   "cirth-react" or "cirth-starter", as long as it's clear the project
-   is built *for* Cirth, not *by* Cirth. Using the name in a commercial
-   product or service requires prior written permission.
-2. **Using the logo.** The mark may be used in articles, talks,
-   tutorials, and documentation that reference Cirth, with attribution.
-   It may not be used as (or inside) the logo of another project,
-   product, or company, whether open source or commercial.
-3. **Merchandise.** Using the Cirth name or logo on merchandise
-   (shirts, stickers, and similar) requires explicit written consent.
-4. **No implied endorsement.** Neither the name nor the mark may be used
-   in a way that suggests Cirth endorses, certifies, or maintains an
-   external product.
+The Apache 2.0 license covers Cirth code. The Cirth name and logo are brand
+assets with separate terms:
 
-For permissions, open an issue on
-[GitHub](https://github.com/cirthcss/cirth/issues).
+1. You may use the name in a noncommercial open-source project name, such as
+   “cirth-starter”, when the project clearly says it is for Cirth and is not
+   maintained by Cirth.
+2. Use of the name in a commercial product or service requires prior written
+   permission.
+3. The mark may appear with attribution in articles, talks, tutorials and
+   documentation that refer to Cirth.
+4. The mark may not be used as, or inside, the logo of another project,
+   product or company.
+5. Merchandise using the name or mark requires explicit written consent.
+6. No use may imply endorsement, certification or maintenance by Cirth.
 
-### Keeping the mark intact
+For permissions, open an
+[issue](https://github.com/cirthcss/cirth/issues).
 
-When you do use the mark:
+## Framework logos
 
-* keep a generous margin of clear space around it on every side;
-* pick the brand or mono variant that keeps contrast on your background;
-* don't recolor, outline, rotate, add effects, or redraw the strokes,
-  and don't set the wordmark in another typeface; use
-  [the lockup](#the-lockup) rather than re-typesetting the name.
+This page governs Cirth's own identity. Third-party logos shown in the
+integration guides have separate owners and terms. The complete source,
+policy and decision inventory is on
+[Attributions](/attributions#framework-logos).

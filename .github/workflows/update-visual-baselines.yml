@@ -1,6 +1,8 @@
-# Generates and commits the Linux visual-regression baselines that CI
-# compares against (screenshot baselines are platform-specific and live
-# in Git LFS — see playwright.config.js). Runs unconditionally on every
+# Generates, uploads and pins the Linux visual-regression baselines that
+# CI compares against. Screenshot baselines are platform-specific and live
+# outside Git, as assets of the visual-baselines pre-release, with
+# tests/visual-baselines.json pinning the set each commit uses (see
+# scripts/visual-baselines.js). Runs unconditionally on every
 # push that touches something able to change rendered output, and
 # commits only if the regenerated screenshots actually differ — so it
 # self-heals both a first-time bootstrap (no Linux baselines yet) and
@@ -33,6 +35,8 @@ on:
       - "scripts/process-css.js"
       - "scripts/lib/**"
       - "tests/visual.spec.js"
+      - "tests/visual-baselines.json"
+      - "scripts/visual-baselines.js"
       # visual.spec.js composes its one setContent document through the
       # shared helper, so the helper is part of what it renders.
       - "tests/helpers/**"
@@ -42,6 +46,8 @@ on:
   workflow_dispatch:
 
 permissions:
+  # Writes the manifest commit, and uploads and prunes the release's
+  # baseline archives.
   contents: write
   # Only for the master case below, where the baselines arrive as a pull
   # request because master refuses a direct push.
@@ -59,8 +65,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          lfs: true
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
@@ -79,6 +83,24 @@ jobs:
 
       - name: Build docs
         run: npm run docs:build
+
+      # The current set first: --update-snapshots then rewrites only the
+      # screenshots that changed, so a folder whose images all still match
+      # keeps its digest and is not uploaded again.
+      - name: Key the Linux visual baselines
+        run: |
+          mkdir -p .cache
+          node scripts/visual-baselines.js key --platform linux > .cache/visual-baselines.key
+
+      - name: Cache Linux visual baselines
+        uses: actions/cache@v4
+        with:
+          path: tests/__screenshots__
+          key: visual-baselines-linux-${{ hashFiles('.cache/visual-baselines.key') }}
+          restore-keys: visual-baselines-linux-
+
+      - name: Pull Linux visual baselines
+        run: node scripts/visual-baselines.js pull --platform linux --force
 
       # --retries, because this step is a *writer*, not a gate. A single
       # flaky rendering — a WebKit page closing under the screencast, which
@@ -133,15 +155,21 @@ jobs:
       # -X theirs resolves against the commit being replayed, which during a
       # rebase is ours: two runs racing means the later regeneration wins,
       # which is the one that saw the newer content.
+      # Before the commit that pins them, so a manifest on the branch never
+      # names an archive the release does not hold.
+      - name: Upload changed baselines
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/visual-baselines.js push --platform linux
+
       - name: Commit and push baselines
         env:
           BRANCH: ${{ github.ref_name }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          git lfs install --local
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tests/__screenshots__
+          git add tests/visual-baselines.json
 
           if git diff --cached --quiet; then
             echo "Baselines unchanged — nothing to commit."
@@ -188,3 +216,12 @@ jobs:
 
           echo "::error::Still could not push after three attempts."
           exit 1
+
+      # Keeps the release under its 1000 assets. Best effort: an archive
+      # left over costs nothing, and a failure here must not hide that the
+      # baselines above were pinned.
+      - name: Prune unreferenced baseline archives
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/visual-baselines.js prune
