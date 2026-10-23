@@ -15,16 +15,25 @@ working the way it already does.
 
 ## Next release, from v0.16.x
 
-Not released yet: this section describes the development line. The class
-and selector changes are listed below, together with the defaults that move.
-Surfaces and edges come from four named levels and three named edges, type
-comes from roles, the primary is always the heaviest action, every corner
-takes one of two radii by what it is, and space between elements comes from
-their relation rather than from margins they carry. Containers size
-continuously, `.grid` wraps intrinsically, `.row` owns the fixed-row pattern,
-and visual groups opt in with `.group`. The `playroom` preset is replaced by
-`material`. Each observable change has a spec in the repository's `specs/`
-directory.
+Not released yet: this section describes the development line. No class
+or selector is renamed; the defaults move. The accent turns magenta and the
+neutrals near grey, the page is near white or near black, surfaces and edges
+come from four named levels and three named edges, type comes from roles, the
+primary is always the heaviest action, every corner takes one of two radii by
+what it is, space between elements comes from their relation rather than from
+margins they carry, and a checkbox or radio draws its mark inside its target.
+The `playroom` preset is replaced by `material`, and `metro` is added. Each
+observable change has a spec in the repository's `specs/` directory.
+
+### Colour
+
+| If you | Then |
+| --- | --- |
+| Relied on the default copper accent | The default accent is magenta, hue 324°: `#b431c1` in light, `#c638d4` in dark. To keep the v0.16 accent, set `--cirth-primary: light-dark(oklch(52.7% 0.107 44), oklch(65.7% 0.134 44))` on `:root` |
+| Set `--cirth-primary` yourself | Nothing: every accent role derives from it, under `prefers-contrast: more` too, where four of them used to return to the default accent's hue |
+| Relied on the default status colours | Success, warning and error moved hue and step. To keep the v0.16 values, set `--cirth-success: light-dark(oklch(52.7% 0.115 153), oklch(65.7% 0.144 153))`, `--cirth-warning: light-dark(oklch(48.3% 0.084 89.5), oklch(70% 0.122 89.5))` and `--cirth-error: light-dark(oklch(44% 0.151 22), oklch(74.3% 0.133 22))` |
+| Relied on the warm canvas | The canvas takes the neutral hue, 132°, and its ends move (see Surfaces and edges). For the v0.16 tint, set `--cirth-canvas: light-dark(oklch(97.3% 0.006 44), oklch(20.15% 0.0225 280))`; every level and edge follows it |
+| Matched the neutral inks by value | The inks are compiled near-greys at hue 132°, with no single input. Read `--cirth-ink`, `--cirth-ink-strong` or `--cirth-muted-color` rather than copying a value |
 
 ### Surfaces and edges
 
@@ -93,69 +102,6 @@ directory.
 | Set `--cirth-typography-spacing-top` on a heading | Removed. Set `margin-block-start` on the heading, or change `--cirth-flow-section` or `--cirth-flow-group` |
 | Relied on 4px between list items | Items are a line apart (`--cirth-flow-line`, 8px at the default) |
 | Set `--cirth-spacing` | Nothing: every step of the flow follows it |
-
-### Layout and grouping selectors
-
-#### Container width
-
-`.container` uses one continuously resizing content track capped by
-`--cirth-container-max-width`, which defaults to `60rem`. It does not step
-through fixed maximum widths at viewport breakpoints. `.container-fluid` uses
-the same three-track structure without the content cap.
-
-If a layout depended on one of the fixed widths from v0.16.x, set the new
-maximum explicitly on that container:
-
-```css
-.docs-shell {
-  --cirth-container-max-width: 76rem;
-}
-```
-
-The gutter has its own `--cirth-container-gutter` token. See
-[Container](/layout/container) for the current layout contract.
-
-#### Grid and row
-
-`.grid` is an intrinsic wrapping layout in this line. It creates as many
-columns as fit at `--cirth-grid-min-column` and moves extra items to another
-row. The equal-width layout that stacks below `768px` and stays on one row
-above it is named `.row`.
-
-Rename existing fixed-row uses:
-
-```html
-<!-- v0.16.x -->
-<div class="grid">...</div>
-
-<!-- current development line -->
-<div class="row">...</div>
-```
-
-Keep `.grid` where wrapping is intended, then tune
-`--cirth-grid-min-column` if the default `12rem` minimum does not fit the
-content. The [Grid](/layout/grid) and [Row](/layout/row) pages compare the two
-current contracts.
-
-#### Visual groups
-
-In a class-enabled build, `[role="group"]` no longer triggers the joined
-control layout by itself. Add `.group` for the visual component and retain the
-role only when it correctly describes the relationship between the controls:
-
-```html
-<!-- v0.16.x -->
-<div role="group">...</div>
-
-<!-- current development line -->
-<div class="group" role="group">...</div>
-```
-
-This separates an ARIA semantic from a presentation choice. In the classless
-build, a non-`fieldset` element with `role="group"` remains the visual trigger
-because no component class is available. A `fieldset` uses its native
-`legend` pattern and does not opt into the joined layout. See
-[Group](/components/group) for current markup.
 
 ### Presets
 
