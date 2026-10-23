@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="en" data-base="/cirth/v0.16/">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Cirth</title>
+		<meta name="description" content="HTML-native CSS framework. Production-ready UI from semantic HTML — no class vocabulary to learn, 0 JavaScript.">
+		<meta property="og:type" content="website">
+		<meta property="og:title" content="Cirth">
+		<meta property="og:description" content="HTML-native CSS framework. Production-ready UI from semantic HTML — no class vocabulary to learn, 0 JavaScript.">
+		<meta property="og:image" content="https://cirthcss.github.io/cirth/social-preview.png">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta property="og:image:alt" content="Cirth: production-ready UI from semantic HTML, with a verified proof ledger.">
+		<meta name="twitter:card" content="summary_large_image">
+		<link rel="icon" href="/cirth/v0.16/favicon.svg" media="(prefers-color-scheme: light)">
+		<link rel="icon" href="/cirth/v0.16/favicon_dark.svg" media="(prefers-color-scheme: dark)">
+		<link rel="apple-touch-icon" href="/cirth/v0.16/apple-touch-icon.png">
+		<link rel="manifest" href="/cirth/v0.16/site.webmanifest">
+		<link rel="stylesheet" href="/cirth/v0.16/styles/style.css">
+		
+		<script>
+			// Set data-theme before first paint to avoid a light-mode flash.
+			(function () {
+				var stored = localStorage.getItem("cirth-theme");
+				var dark = stored
+					? stored === "dark"
+					: window.matchMedia("(prefers-color-scheme: dark)").matches;
+				document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+			})();
+
+			// Same idea for the preset switcher (gh#80): apply a
+			// session-remembered preset before first paint, so returning to
+			// a page (or following a link) after picking one doesn't flash
+			// the default theme first. sessionStorage, not localStorage —
+			// the issue asks for "the current session", not a permanent
+			// choice that'd survive a closed tab into someone's next visit.
+			(function () {
+				var preset = sessionStorage.getItem("cirth-preset");
+				if (!preset || preset === "default") return;
+				var base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
+				var link = document.createElement("link");
+				link.rel = "stylesheet";
+				link.id = "cirth-preset-stylesheet";
+				link.href = base + "/styles/generated/presets/" + preset + ".css";
+				document.head.appendChild(link);
+			})();
+		</script>
+	</head>
+	<body><aside style="border-bottom:1px solid #8884;padding:.5rem 1rem;text-align:center;font-size:.875rem">Archived documentation for v0.16.0 and earlier. <a href="/cirth/">Read the current documentation</a>.</aside>
+		<a href="#main-content" class="sr-only sr-only-focusable docs-skip-link">Skip to main content</a>
+		<header class="container docs-header">
+	<nav aria-label="main navigation">
+		<ul class="docs-header-start-group">
+			<li>
+				<a href="/cirth/v0.16/" class="contrast docs-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.16/logo_brand.svg" alt="" width="48" height="48">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.16/logo_brand_dark.svg" alt="" width="48" height="48">
+					<strong>Cirth</strong>
+				</a>
+			</li>
+			
+				<li class="docs-nav-item">
+					<a href="/cirth/v0.16/get-started">Docs</a>
+				</li>
+			
+				<li class="docs-nav-item">
+					<a href="/cirth/v0.16/examples">Examples</a>
+				</li>
+			
+		</ul>
+		<div class="docs-header-actions">
+			<div class="docs-header-search">
+				<button type="button" class="docs-search-trigger" aria-haspopup="dialog" aria-controls="docs-search-dialog" aria-expanded="false" aria-label="Search documentation" data-docs-search-trigger="" hidden="">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg><span class="truncate">Search documentation</span>
+					<kbd><span data-docs-search-modifier="">Ctrl</span> K</kbd>
+				</button>
+			</div><button type="button" class="ghost contrast docs-menu-toggle" aria-haspopup="dialog" aria-controls="docs-mobile-menu-panel" aria-expanded="false" data-docs-menu-trigger="">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M100,48a28,28,0,1,0,56,0a28,28,0,1,0-56,0ZM100,128a28,28,0,1,0,56,0a28,28,0,1,0-56,0ZM100,208a28,28,0,1,0,56,0a28,28,0,1,0-56,0Z"></path></svg><span class="sr-only">Menu</span>
+			</button>
+		</div>
+		<ul class="docs-header-controls-group">
+			<li class="docs-header-github">
+				<a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+			</li><li data-docs-header-control="">
+				<span class="docs-control-label" aria-hidden="true">Version</span>
+				<select class="docs-version-select" aria-label="Documentation version" data-docs-version-select="">
+					
+						<option value="/cirth/" selected="">v0.13</option>
+					
+						<option value="/cirth/v0.12/">v0.12</option>
+					
+						<option value="/cirth/v0.10/">v0.10</option>
+					
+					
+				</select>
+				<script>
+					(() => {
+					// Navigating between documentation lines is a page load, not
+					// a preference: each line is a separate build with its own
+					// pages, so there is nothing to remember or restore.
+						const versionSelect = document.querySelector("[data-docs-version-select]");
+						versionSelect?.addEventListener("change", () => {
+							if (versionSelect.value) window.location.assign(versionSelect.value);
+						});
+					})();
+				</script>
+			</li><li data-docs-header-control="">
+				<span class="docs-control-label" aria-hidden="true">Preset</span>
+				<select class="docs-preset-select" aria-label="Color preset" data-cirth-preset-select="">
+					<option value="default">Default</option>
+					
+						<option value="plain">Plain</option>
+					
+						<option value="playroom">Playroom</option>
+					
+				</select>
+			</li>
+			<li data-docs-header-control="">
+				<span class="docs-control-label" aria-hidden="true">Theme</span>
+				<button type="button" class="ghost contrast docs-theme-toggle" aria-label="Dark color scheme" aria-pressed="false">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="18" height="18" fill="currentColor" aria-hidden="true" class="docs-theme-icon-sun"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"></path></svg>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="18" height="18" fill="currentColor" aria-hidden="true" class="docs-theme-icon-moon"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"></path></svg>
+				</button>
+				<script>
+					(() => {
+					// Which icon is visible is driven entirely by CSS
+					// ([data-theme="dark"] .docs-theme-icon-*, see styles/style.css)
+					// — this script is only the click handler.
+						const themeToggle = document.querySelector(".docs-theme-toggle");
+						const syncThemeToggle = () => {
+						themeToggle?.setAttribute(
+							"aria-pressed",
+							document.documentElement.getAttribute("data-theme") === "dark" ? "true" : "false",
+						);
+						};
+						syncThemeToggle();
+						themeToggle?.addEventListener("click", () => {
+						const next =
+							document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+						document.documentElement.setAttribute("data-theme", next);
+						localStorage.setItem("cirth-theme", next);
+							syncThemeToggle();
+						});
+					})();
+				</script>
+			</li>
+		</ul>
+	</nav><dialog id="docs-mobile-menu-panel" class="docs-drawer" aria-label="Site menu" data-docs-menu-drawer="">
+		<article>
+			<header>
+				<span class="docs-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.16/logo_brand.svg" alt="" width="48" height="48">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.16/logo_brand_dark.svg" alt="" width="48" height="48">
+					<strong>Cirth</strong>
+				</span>
+				<button type="button" class="close" aria-label="Close menu" data-docs-menu-close=""></button>
+			</header>
+			<nav aria-label="Site">
+				<ul>
+					
+						<li><a href="/cirth/v0.16/get-started">Docs</a></li>
+					
+						<li><a href="/cirth/v0.16/examples">Examples</a></li>
+					
+					<li><a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub ↗<span class="sr-only"> (opens in a new tab)</span></a></li>
+				</ul>
+			</nav>
+			<section class="docs-mobile-controls">
+				<strong>Display</strong>
+				<ul data-docs-mobile-controls=""></ul>
+			</section>
+		</article>
+	</dialog>
+	<script>
+		(() => {
+			const header = document.currentScript?.closest(".docs-header");
+			const drawer = header?.querySelector("[data-docs-menu-drawer]");
+			const trigger = header?.querySelector("[data-docs-menu-trigger]");
+			const closeButton = drawer?.querySelector("[data-docs-menu-close]");
+			const desktopControls = header?.querySelector(".docs-header-controls-group");
+			const mobileControls = drawer?.querySelector("[data-docs-mobile-controls]");
+			// The one query that decides collapsed vs expanded. It is the same
+			// width the stylesheet uses to show this toggler, hide the in-header
+			// nav items and hide the sidebar: read from one place so the
+			// transfer and the toggler's visibility cannot drift apart.
+			const compact = window.matchMedia("(max-width: 1023px)");
+			const controls = desktopControls
+				? Array.from(desktopControls.querySelectorAll(":scope > [data-docs-header-control]"))
+				: [];
+
+			const syncMenuState = () => {
+				trigger?.setAttribute("aria-expanded", drawer?.open ? "true" : "false");
+			};
+			const closeDrawer = () => {
+				if (drawer?.open) drawer.close();
+			};
+			// Moving a node blurs whatever inside it had focus, so only move
+			// what is not already where it belongs, and hand focus back if the
+			// element that had it travelled. Crossing the breakpoint with the
+			// preset select focused should not drop the reader at the top of
+			// the document.
+			const placeControls = () => {
+				const target = compact.matches ? mobileControls : desktopControls;
+				if (target) {
+					const active = document.activeElement;
+					let refocus = null;
+					for (const control of controls) {
+						if (control.parentElement === target) continue;
+						if (active instanceof HTMLElement && control.contains(active)) {
+							refocus = active;
+						}
+						target.append(control);
+					}
+					refocus?.focus();
+				}
+				if (!compact.matches) closeDrawer();
+				syncMenuState();
+			};
+
+			trigger?.addEventListener("click", () => {
+				if (!drawer?.open) drawer?.showModal();
+				syncMenuState();
+			});
+			closeButton?.addEventListener("click", closeDrawer);
+			// Clicking the backdrop: the event target is the dialog itself
+			// only when the pointer misses the panel inside it.
+			drawer?.addEventListener("click", (event) => {
+				if (event.target === drawer) closeDrawer();
+			});
+			// Fires for the close button, for the backdrop, and for Escape,
+			// which the element handles on its own. Returning focus to the
+			// trigger explicitly rather than relying on the element's own
+			// restoration keeps this identical to the search dialog next to
+			// it, and correct when the drawer is closed by a resize.
+			drawer?.addEventListener("close", () => {
+				syncMenuState();
+				if (compact.matches) trigger?.focus();
+			});
+			compact.addEventListener?.("change", placeControls);
+			placeControls();
+		})();
+	</script>
+</header>
+
+		
+
+<main id="main-content" class="container docs-page-shell">
+	<div class="docs-mobile-tools">
+		<details class="docs-mobile-nav">
+			<summary>Browse documentation</summary>
+			<nav aria-label="Mobile documentation navigation">
+				
+					<section>
+						<strong>Introduction</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.16/get-started">Get Started</a></li>
+							
+								<li><a href="/cirth/v0.16/customization">Customization</a></li>
+							
+								<li><a href="/cirth/v0.16/colors">Colors</a></li>
+							
+								<li><a href="/cirth/v0.16/deploy" aria-current="page">Deploy</a></li>
+							
+								<li><a href="/cirth/v0.16/about">About Cirth</a></li>
+							
+								<li><a href="/cirth/v0.16/upgrading">Upgrading</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Layout</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.16/layout/document">Document</a></li>
+							
+								<li><a href="/cirth/v0.16/layout/landmarks">Landmarks</a></li>
+							
+								<li><a href="/cirth/v0.16/layout/section">Section</a></li>
+							
+								<li><a href="/cirth/v0.16/layout/container">Container</a></li>
+							
+								<li><a href="/cirth/v0.16/layout/row">Row</a></li>
+							
+								<li><a href="/cirth/v0.16/layout/grid">Grid</a></li>
+							
+								<li><a href="/cirth/v0.16/layout/overflow-auto">Overflow auto</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Content</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.16/content/typography">Typography</a></li>
+							
+								<li><a href="/cirth/v0.16/content/description-list">Description list</a></li>
+							
+								<li><a href="/cirth/v0.16/content/link">Link</a></li>
+							
+								<li><a href="/cirth/v0.16/content/button">Button</a></li>
+							
+								<li><a href="/cirth/v0.16/content/table">Table</a></li>
+							
+								<li><a href="/cirth/v0.16/content/code">Code</a></li>
+							
+								<li><a href="/cirth/v0.16/content/figure">Figure</a></li>
+							
+								<li><a href="/cirth/v0.16/content/embedded">Embedded content</a></li>
+							
+								<li><a href="/cirth/v0.16/content/misc">Misc</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Forms</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.16/forms/">Overview</a></li>
+							
+								<li><a href="/cirth/v0.16/forms/checkbox-radio-switch">Checkbox, radio, switch</a></li>
+							
+								<li><a href="/cirth/v0.16/forms/input-color">Input color</a></li>
+							
+								<li><a href="/cirth/v0.16/forms/input-date">Input date</a></li>
+							
+								<li><a href="/cirth/v0.16/forms/input-file">Input file</a></li>
+							
+								<li><a href="/cirth/v0.16/forms/input-range">Input range</a></li>
+							
+								<li><a href="/cirth/v0.16/forms/input-search">Input search</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Components</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.16/components/accordion">Accordion</a></li>
+							
+								<li><a href="/cirth/v0.16/components/card">Card</a></li>
+							
+								<li><a href="/cirth/v0.16/components/dropdown">Dropdown</a></li>
+							
+								<li><a href="/cirth/v0.16/components/group">Group</a></li>
+							
+								<li><a href="/cirth/v0.16/components/loading">Loading</a></li>
+							
+								<li><a href="/cirth/v0.16/components/meter">Meter</a></li>
+							
+								<li><a href="/cirth/v0.16/components/modal">Modal</a></li>
+							
+								<li><a href="/cirth/v0.16/components/nav">Nav</a></li>
+							
+								<li><a href="/cirth/v0.16/components/popover">Popover</a></li>
+							
+								<li><a href="/cirth/v0.16/components/progress">Progress</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Utilities</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.16/utilities/accessibility">Accessibility</a></li>
+							
+								<li><a href="/cirth/v0.16/utilities/high-contrast">High contrast</a></li>
+							
+								<li><a href="/cirth/v0.16/utilities/reduce-motion">Reduce motion</a></li>
+							
+								<li><a href="/cirth/v0.16/utilities/sr-only">Screen-reader only</a></li>
+							
+								<li><a href="/cirth/v0.16/utilities/truncate">Truncate</a></li>
+							
+								<li><a href="/cirth/v0.16/utilities/breakout">Breakout</a></li>
+							
+								<li><a href="/cirth/v0.16/utilities/print">Print</a></li>
+							
+						</ul>
+					</section>
+				
+					<section>
+						<strong>Project</strong>
+						<ul>
+							
+								<li><a href="/cirth/v0.16/examples">Examples</a></li>
+							
+								<li><a href="/cirth/v0.16/contributions">Contributions</a></li>
+							
+								<li><a href="/cirth/v0.16/brand">Brand</a></li>
+							
+						</ul>
+					</section>
+				
+			</nav>
+		</details>
+		
+			<details class="docs-toc-top">
+				<summary>On this page</summary>
+				<nav aria-label="On this page">
+					<ul>
+						
+							<li class="docs-toc-level-2">
+								<a href="#where-the-file-comes-from">Where the file comes from</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#a-cdn">A CDN</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#your-own-origin">Your own origin</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#compression">Compression</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#check-what-your-delivery-actually-sends">Check what your delivery actually sends</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#precompress-if-you-serve-the-file-yourself">Precompress, if you serve the file yourself</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#if-you-bundle-cirth-with-your-own-css">If you bundle Cirth with your own CSS</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#what-a-smaller-stylesheet-actually-buys">What a smaller stylesheet actually buys</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#caching">Caching</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#integrity">Integrity</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#the-print-stylesheet">The print stylesheet</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#next-steps">Next steps</a>
+							</li>
+						
+					</ul>
+				</nav>
+			</details>
+		
+	</div>
+	<div class="docs-layout">
+		<aside class="docs-sidebar">
+			<nav aria-label="docs navigation">
+				
+					<details open="">
+						<summary>Introduction</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.16/get-started">Get Started</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/customization">Customization</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/colors">Colors</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/deploy" aria-current="page">Deploy</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/about">About Cirth</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/upgrading">Upgrading</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Layout</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.16/layout/document">Document</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/layout/landmarks">Landmarks</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/layout/section">Section</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/layout/container">Container</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/layout/row">Row</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/layout/grid">Grid</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/layout/overflow-auto">Overflow auto</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Content</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.16/content/typography">Typography</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/content/description-list">Description list</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/content/link">Link</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/content/button">Button</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/content/table">Table</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/content/code">Code</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/content/figure">Figure</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/content/embedded">Embedded content</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/content/misc">Misc</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Forms</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.16/forms/">Overview</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/forms/checkbox-radio-switch">Checkbox, radio, switch</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/forms/input-color">Input color</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/forms/input-date">Input date</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/forms/input-file">Input file</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/forms/input-range">Input range</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/forms/input-search">Input search</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Components</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.16/components/accordion">Accordion</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/components/card">Card</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/components/dropdown">Dropdown</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/components/group">Group</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/components/loading">Loading</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/components/meter">Meter</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/components/modal">Modal</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/components/nav">Nav</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/components/popover">Popover</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/components/progress">Progress</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Utilities</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.16/utilities/accessibility">Accessibility</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/utilities/high-contrast">High contrast</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/utilities/reduce-motion">Reduce motion</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/utilities/sr-only">Screen-reader only</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/utilities/truncate">Truncate</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/utilities/breakout">Breakout</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/utilities/print">Print</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+					<details>
+						<summary>Project</summary>
+						<ul>
+							
+								<li>
+									<a href="/cirth/v0.16/examples">Examples</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/contributions">Contributions</a>
+								</li>
+							
+								<li>
+									<a href="/cirth/v0.16/brand">Brand</a>
+								</li>
+							
+						</ul>
+					</details>
+				
+			</nav>
+		</aside>
+		<div class="docs-content" data-pagefind-body="">
+			<h1>Deploy</h1>
+<p>Cirth is one static stylesheet. This page is about how that file reaches a
+browser: which path it travels, how many bytes arrive, and what your server
+has to say about it. None of it changes the CSS, and none of it is required
+to use Cirth — the snippet in <a href="/cirth/v0.16/get-started">Get Started</a> works as it
+stands.</p>
+<h2 id="where-the-file-comes-from" tabindex="-1">Where the file comes from <a class="header-anchor" href="#where-the-file-comes-from">#</a></h2>
+<h3 id="a-cdn" tabindex="-1">A CDN <a class="header-anchor" href="#a-cdn">#</a></h3>
+<p>The <a href="/cirth/v0.16/get-started#cdn">Get Started</a> snippet points at jsDelivr. Nothing to
+build and nothing to host, and the file is probably already cached at an
+edge near your visitor.</p>
+<p>What it costs is a second connection. The stylesheet lives on another
+origin, so the browser resolves a new hostname, opens a new TCP connection
+and completes a new TLS handshake before the first byte of CSS arrives — and
+a stylesheet in the <code>&lt;head&gt;</code> blocks rendering until it does. That setup is
+usually worth more milliseconds than any compression choice further down
+this page will win back.</p>
+<h3 id="your-own-origin" tabindex="-1">Your own origin <a class="header-anchor" href="#your-own-origin">#</a></h3>
+<p>Serving Cirth from the same origin as your HTML skips all of that. The
+connection is already open and warmed by the document request, so the
+stylesheet is a request on a connection that exists rather than a new one.</p>
+<p>It also puts compression under your control, which is the rest of this
+page.</p>
+<h2 id="compression" tabindex="-1">Compression <a class="header-anchor" href="#compression">#</a></h2>
+<p>The sizes quoted across this site are gzip: the default build is
+<strong>14.7 KB</strong>, measured from <code>dist/cirth.min.css</code> on the build
+this site was made from. Gzip is the figure because it is what ordinary
+hosting sends without being asked.</p>
+<h3 id="check-what-your-delivery-actually-sends" tabindex="-1">Check what your delivery actually sends <a class="header-anchor" href="#check-what-your-delivery-actually-sends">#</a></h3>
+<p>Whatever a compression figure says, the number that matters is the one your
+host puts on the wire. Ask it:</p>
+<pre tabindex="0"><code class="hljs language-sh">curl -s -o /dev/null -D - -H <span class="hljs-string">&#x27;Accept-Encoding: br, gzip&#x27;</span> \
+  https://example.com/cirth.min.css \
+  | grep -i <span class="hljs-string">&#x27;content-encoding\|content-length&#x27;</span>
+</code></pre>
+<p>That makes a real request and throws the body away. A <code>HEAD</code> request is
+shorter to type, but some origins skip compression for it and report the
+uncompressed length, which is the one number you are not asking about.</p>
+<p>Two answers are worth expecting. Some hosts never negotiate Brotli at all
+and reply <code>content-encoding: gzip</code> whatever you ask for. Others do negotiate
+it, but compress on the fly, which trades ratio for encoder speed — no CDN
+can afford to spend a second per file.</p>
+<p>That second case has a result people rarely expect: at a low enough quality
+setting, Brotli output can land <em>above</em> the same file's gzip, so a browser
+that advertises Brotli downloads more than one that does not. Brotli is not
+automatically the smaller answer. On a path you do not control, measure it.</p>
+<h3 id="precompress-if-you-serve-the-file-yourself" tabindex="-1">Precompress, if you serve the file yourself <a class="header-anchor" href="#precompress-if-you-serve-the-file-yourself">#</a></h3>
+<p>Compression at maximum quality is only affordable when it happens once, at
+deploy time, rather than per request. If you host the file, do it there:</p>
+<pre tabindex="0"><code class="hljs language-sh">brotli -k -q 11 cirth.min.css     <span class="hljs-comment"># writes cirth.min.css.br</span>
+</code></pre>
+<p>That brings the default build to <strong>12.6 KB</strong>. The same
+step suits every stylesheet you ship, so in practice Cirth is one more input
+to a precompression pass you already run for your own CSS and JavaScript.</p>
+<p>Servers with static-precompression support find the neighbouring file on
+their own and set the response headers for you:</p>
+<pre tabindex="0"><code class="hljs language-nginx"><span class="hljs-comment"># nginx, with the ngx_brotli module</span>
+<span class="hljs-attribute">brotli_static</span> <span class="hljs-literal">on</span>;
+<span class="hljs-attribute">gzip_static</span> <span class="hljs-literal">on</span>;
+</code></pre>
+<p>Caddy does the same with <code>precompressed br gzip</code> inside its <code>file_server</code>
+block. Apache has no equivalent switch: there you rewrite onto the <code>.br</code>
+file and set the response headers yourself — the three listed below.</p>
+<p><strong>Keep the <code>.css</code> URL in your markup.</strong> A <code>.br</code> file is an HTTP
+representation, not a stylesheet. Linking it directly hands the browser
+compressed bytes with no <code>Content-Encoding</code> header to explain them, and the
+page loads unstyled. If you are wiring the negotiation by hand rather than
+with one of the servers above, the response to the <code>.css</code> request needs all
+three of:</p>
+<pre tabindex="0"><code class="hljs language-http"><span class="hljs-attribute">Content-Encoding</span><span class="hljs-punctuation">: </span>br
+<span class="hljs-attribute">Content-Type</span><span class="hljs-punctuation">: </span>text/css
+<span class="hljs-attribute">Vary</span><span class="hljs-punctuation">: </span>Accept-Encoding
+</code></pre>
+<p><code>Vary</code> is the one that is easy to forget and the one that breaks other
+people: without it a shared cache can hand compressed bytes to a client that
+never asked for them.</p>
+<h3 id="if-you-bundle-cirth-with-your-own-css" tabindex="-1">If you bundle Cirth with your own CSS <a class="header-anchor" href="#if-you-bundle-cirth-with-your-own-css">#</a></h3>
+<p>A bundler concatenates Cirth into an output file of its own, so a
+precompressed copy of <code>cirth.min.css</code> no longer describes anything you
+serve. Precompress the bundler's output instead, and let Cirth be an input
+like any other.</p>
+<p>Bundling also decides cascade order. <a href="/cirth/v0.16/customization#cascade-layers">Customization</a>
+covers how the <code>cirth</code> layer sorts against your own.</p>
+<h2 id="what-a-smaller-stylesheet-actually-buys" tabindex="-1">What a smaller stylesheet actually buys <a class="header-anchor" href="#what-a-smaller-stylesheet-actually-buys">#</a></h2>
+<p>Around 14 KiB is the figure people quote, and it is worth understanding
+rather than aiming at.</p>
+<p>It approximates the
+<a href="https://datatracker.ietf.org/doc/html/rfc6928">initial congestion window</a>
+that TCP and <a href="https://www.rfc-editor.org/rfc/rfc9002.html#section-7.2">QUIC</a>
+use for a new connection: the data a server may send before it has to stop
+and wait for the client's first acknowledgment. A response that fits inside
+that first flight saves a round trip of waiting.</p>
+<p>Three things stop that from being a line you can design against.</p>
+<p><strong>The window belongs to the connection, not to your stylesheet.</strong> On a
+connection that has already carried the HTML document it has grown past its
+initial size, so by the time the stylesheet is requested the threshold has
+moved.</p>
+<p><strong>A cross-origin stylesheet never gets a warm connection.</strong> It pays DNS, TCP
+and TLS first, and that setup costs more than the round trip the threshold
+is about. Trimming bytes to cross a line you are already paying past several
+times over is the wrong lever; moving the file to your own origin is the
+right one.</p>
+<p><strong>The first flight is usually spent on the document.</strong> The HTML is fetched
+before the browser knows the stylesheet exists, so it is the response that
+actually competes for that first window.</p>
+<p>None of which makes a smaller stylesheet worthless — fewer bytes are fewer
+bytes on a slow link, and the budgets in
+<a href="https://github.com/cirthcss/cirth/blob/master/scripts/check-css-size.js"><code>check-css-size.js</code></a>
+exist so growth is noticed. It makes the threshold a reason the project
+keeps Cirth small rather than a promise about any one request.
+<a href="/cirth/v0.16/about#why-it-is-a-guard-and-not-a-promise">About</a> covers why that number
+is a per-bundle regression guard and not a ceiling.</p>
+<h2 id="caching" tabindex="-1">Caching <a class="header-anchor" href="#caching">#</a></h2>
+<p>A version-pinned URL names bytes that will never change, so it can be cached
+for as long as you like:</p>
+<pre tabindex="0"><code class="hljs language-http"><span class="hljs-attribute">Cache-Control</span><span class="hljs-punctuation">: </span>public, max-age=31536000, immutable
+</code></pre>
+<p>That applies to a CDN URL with an exact version in it, and to a self-hosted
+copy under a versioned or content-hashed path. It does <strong>not</strong> apply to a
+URL that tracks a moving target, such as a version range or a file you
+overwrite on each deploy: cache one of those for a year and you have no way
+to ship a fix.</p>
+<h2 id="integrity" tabindex="-1">Integrity <a class="header-anchor" href="#integrity">#</a></h2>
+<p>The CDN snippet in <a href="/cirth/v0.16/get-started#cdn">Get Started</a> carries a Subresource
+Integrity hash, and it is worth keeping. The digest is taken over the
+decoded stylesheet, not over the transferred bytes, so it is unaffected by
+whether the response arrives gzipped, Brotli-compressed or plain — but it is
+tied to the exact version in the URL. Change the version and take that
+release's hash with it.</p>
+<h2 id="the-print-stylesheet" tabindex="-1">The print stylesheet <a class="header-anchor" href="#the-print-stylesheet">#</a></h2>
+<p>Print styling ships as a separate file that no screen request needs. Loading
+it is a deliberate step, and <a href="/cirth/v0.16/utilities/print">Print</a> covers which sheet
+pairs with which build and what happens if you skip it.</p>
+<h2 id="next-steps" tabindex="-1">Next steps <a class="header-anchor" href="#next-steps">#</a></h2>
+<ul>
+<li><a href="/cirth/v0.16/get-started">Get Started</a>: the install snippets and the four builds.</li>
+<li><a href="/cirth/v0.16/customization">Customization</a>: the custom property surface and cascade
+layers.</li>
+<li><a href="/cirth/v0.16/about">About Cirth</a>: what the size budget is a budget for.</li>
+</ul>
+
+			
+				
+				
+				
+					<footer class="docs-prev-next">
+						
+							<a href="/cirth/v0.16/colors" class="secondary">← Colors</a>
+						
+						
+							<a href="/cirth/v0.16/about" class="secondary">About Cirth →</a>
+						
+					</footer>
+				
+			
+		</div>
+		
+			<aside class="docs-toc">
+				<nav aria-label="On this page" id="docs-toc-nav">
+					<strong>On this page</strong>
+					<ul>
+						
+							<li class="docs-toc-level-2">
+								<a href="#where-the-file-comes-from" data-toc-link="" data-slug="where-the-file-comes-from">Where the file comes from</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#a-cdn" data-toc-link="" data-slug="a-cdn">A CDN</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#your-own-origin" data-toc-link="" data-slug="your-own-origin">Your own origin</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#compression" data-toc-link="" data-slug="compression">Compression</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#check-what-your-delivery-actually-sends" data-toc-link="" data-slug="check-what-your-delivery-actually-sends">Check what your delivery actually sends</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#precompress-if-you-serve-the-file-yourself" data-toc-link="" data-slug="precompress-if-you-serve-the-file-yourself">Precompress, if you serve the file yourself</a>
+							</li>
+						
+							<li class="docs-toc-level-3">
+								<a href="#if-you-bundle-cirth-with-your-own-css" data-toc-link="" data-slug="if-you-bundle-cirth-with-your-own-css">If you bundle Cirth with your own CSS</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#what-a-smaller-stylesheet-actually-buys" data-toc-link="" data-slug="what-a-smaller-stylesheet-actually-buys">What a smaller stylesheet actually buys</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#caching" data-toc-link="" data-slug="caching">Caching</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#integrity" data-toc-link="" data-slug="integrity">Integrity</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#the-print-stylesheet" data-toc-link="" data-slug="the-print-stylesheet">The print stylesheet</a>
+							</li>
+						
+							<li class="docs-toc-level-2">
+								<a href="#next-steps" data-toc-link="" data-slug="next-steps">Next steps</a>
+							</li>
+						
+					</ul>
+				</nav>
+			</aside>
+		
+	</div>
+</main>
+<script>
+	// Scroll-spy for the "On this page" aside: highlight whichever heading
+	// was most recently scrolled past. Purely additive — the TOC works
+	// (and its links navigate) without this script.
+	const links = Array.from(document.querySelectorAll("[data-toc-link]"));
+	if (links.length > 0) {
+		const headings = Array.from(
+			document.querySelectorAll(".docs-content :is(h2, h3)[id]"),
+		);
+
+		const update = () => {
+			// 96px offset: the heading counts as "reached" slightly before it
+			// touches the top edge, matching where the eye lands after a jump.
+			let current = "";
+			for (const heading of headings) {
+				if (heading.getBoundingClientRect().top <= 96) current = heading.id;
+				else break;
+			}
+			const activeSlug = current || (headings[0] ? headings[0].id : "");
+			// aria-current only: the framework paints its one registered
+			// edge on the inline-start rail from it, and the stylesheet
+			// deliberately adds no second marker of its own.
+			for (const link of links) {
+				if (link.dataset.slug === activeSlug) {
+					link.setAttribute("aria-current", "true");
+				} else {
+					link.removeAttribute("aria-current");
+				}
+			}
+		};
+
+		window.addEventListener("scroll", update, { passive: true });
+		update();
+	}
+</script>
+
+		<footer class="docs-footer">
+	<div class="container">
+		<div class="docs-footer-top">
+			<div class="docs-footer-brand-block">
+				<a href="/cirth/v0.16/" class="contrast docs-brand docs-footer-brand">
+					<img class="docs-logo docs-logo-light" src="/cirth/v0.16/logo_brand.svg" alt="" width="36" height="36">
+					<img class="docs-logo docs-logo-dark" src="/cirth/v0.16/logo_brand_dark.svg" alt="" width="36" height="36">
+					<strong>Cirth</strong>
+				</a>
+				<p class="docs-footer-credit">
+					Designed and built by Riccardo Pastori, with help from the
+					<a href="https://github.com/cirthcss/cirth/graphs/contributors" target="_blank" rel="noreferrer">contributors<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>.
+				</p>
+				<ul class="docs-footer-social">
+					<li><a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+					<li><a href="https://www.npmjs.com/package/@cirthcss/cirth" target="_blank" rel="noreferrer">npm<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+					<li><a href="https://github.com/cirthcss/cirth/blob/master/CHANGELOG.md" target="_blank" rel="noreferrer">Changelog<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>
+				</ul>
+			</div>
+			<div class="docs-footer-columns">
+				
+					<div class="docs-footer-column">
+						<strong>Docs</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="/cirth/v0.16/get-started">Get Started</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.16/customization">Customization</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.16/colors">Colors</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.16/deploy">Deploy</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.16/components/card">Components</a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+					<div class="docs-footer-column">
+						<strong>Project</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="/cirth/v0.16/about">About Cirth</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.16/upgrading">Upgrading</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.16/brand">Brand</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.16/examples">Examples</a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="/cirth/v0.16/contributions">Contributions</a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+					<div class="docs-footer-column">
+						<strong>Community</strong>
+						<ul>
+							
+								<li>
+									
+										<a href="https://github.com/cirthcss/cirth" target="_blank" rel="noreferrer">GitHub<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+									
+								</li>
+							
+								<li>
+									
+										<a href="https://github.com/cirthcss/cirth/issues" target="_blank" rel="noreferrer">Issues<span class="docs-external-mark" aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+									
+								</li>
+							
+						</ul>
+					</div>
+				
+			</div>
+		</div>
+		<hr>
+		<small>
+			<span>Released under the Apache License 2.0.</span>
+			<span>Copyright © 2025-present Riccardo Pastori</span>
+		</small>
+	</div>
+</footer>
+
+		<dialog id="docs-search-dialog" class="docs-search-dialog" aria-labelledby="docs-search-title" data-docs-search-dialog="">
+	<article>
+		<header>
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
+			<h2 id="docs-search-title" class="sr-only">Search documentation</h2>
+			<input id="docs-search-input" type="text" role="searchbox" aria-label="Search documentation" placeholder="Search the Cirth documentation…" autocomplete="off" enterkeyhint="search" aria-controls="docs-search-results" aria-describedby="docs-search-status" data-docs-search-input="">
+			<button type="button" class="close" aria-label="Close search" data-docs-search-close=""></button>
+		</header>
+		<p id="docs-search-status" class="docs-search-status" role="status" aria-live="polite" data-docs-search-status="">
+			Type at least two characters to search.
+		</p>
+		<ol id="docs-search-results" class="docs-search-results" data-docs-search-results=""></ol>
+		<footer class="docs-search-help" aria-hidden="true">
+			<span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+			<span><kbd>↵</kbd> open</span>
+			<span><kbd>esc</kbd> close</span>
+			<small>Search by Pagefind</small>
+		</footer>
+	</article>
+</dialog>
+<script type="module" src="/cirth/v0.16/search.js"></script>
+
+		<div class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-copy-status=""></div>
+		<script>
+			// Copy-to-clipboard for fenced code blocks: the markdown pipeline
+			// only highlights, it doesn't add a button, so one is injected for
+			// every `pre > code` on the page (prose fences and Demo's
+			// "Show HTML" source alike).
+			const copyStatus = document.querySelector("[data-copy-status]");
+			const announceCopyStatus = (message) => {
+				if (!copyStatus) return;
+				copyStatus.textContent = "";
+				requestAnimationFrame(() => {
+					copyStatus.textContent = message;
+				});
+			};
+
+			// Every code block the shell owns, and no others: a <pre> inside a
+			// live example is the example. Injecting a control into it would
+			// put a <button> in the reader's specimen that Cirth never ships,
+			// and the caption on every demo says the opposite. The disclosure
+			// under the demo keeps its button — that listing is the shell's.
+			for (const pre of document.querySelectorAll("pre")) {
+				if (pre.closest(".docs-demo-preview")) continue;
+				if (pre.querySelector(":scope > button.copy")) continue;
+				const code = pre.querySelector("code");
+				if (!code?.textContent) continue;
+
+				const button = document.createElement("button");
+				button.type = "button";
+				button.className = "copy";
+				button.setAttribute("aria-label", "Copy to clipboard");
+				pre.append(button);
+
+				button.addEventListener("click", async () => {
+					try {
+						await navigator.clipboard.writeText(code.textContent ?? "");
+						button.classList.add("copied");
+						setTimeout(() => button.classList.remove("copied"), 2000);
+						announceCopyStatus("Code copied to clipboard.");
+					} catch {
+						announceCopyStatus("Code could not be copied.");
+					}
+				});
+			}
+
+			// The scoped classless build reads data-theme from its own root
+			// element (.cirth-classless demos), so mirror the site theme onto
+			// every such wrapper whenever it changes.
+			const classlessRoots = document.querySelectorAll(".cirth-classless");
+			if (classlessRoots.length > 0) {
+				const sync = () => {
+					const theme = document.documentElement.getAttribute("data-theme");
+					for (const root of classlessRoots) root.setAttribute("data-theme", theme ?? "light");
+				};
+				sync();
+				new MutationObserver(sync).observe(document.documentElement, {
+					attributeFilter: ["data-theme"],
+				});
+			}
+
+			// Live preset switcher (gh#80): the <head> script above already
+			// applied a remembered choice before first paint; this wires up
+			// the header <select> for changes after load. Swapping the
+			// stylesheet's href (rather than always keeping one <link> per
+			// preset and toggling disabled) means an unvisited preset is
+			// never fetched at all.
+			const presetSelect = document.querySelector("[data-cirth-preset-select]");
+			if (presetSelect) {
+				const base = (document.documentElement.getAttribute("data-base") || "/").replace(/\/$/, "");
+				const applyPreset = (preset) => {
+					const existing = document.getElementById("cirth-preset-stylesheet");
+					if (preset === "default") {
+						existing?.remove();
+						return;
+					}
+					const link = existing ?? document.createElement("link");
+					link.rel = "stylesheet";
+					link.id = "cirth-preset-stylesheet";
+					link.href = `${base}/styles/generated/presets/${preset}.css`;
+					if (!existing) document.head.appendChild(link);
+				};
+				presetSelect.value = sessionStorage.getItem("cirth-preset") || "default";
+				presetSelect.addEventListener("change", () => {
+					sessionStorage.setItem("cirth-preset", presetSelect.value);
+					applyPreset(presetSelect.value);
+				});
+			}
+
+		</script>
+	</body>
+</html>

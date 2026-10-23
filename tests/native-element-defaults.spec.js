@@ -1357,8 +1357,6 @@ for (const build of themeBuilds) {
 // role's size, weight, leading and ink, in every build. Help text after a
 // field rendered at 14px, a bare small's size, because the small rule came
 // later in the layer at the same weight as the help text's meta role.
-// `pre` is left out: the table gives it relaxed leading, which the library
-// has never set.
 
 /** @type {Record<string, [string, string, number | null, string]>} */
 const roleTable = {
@@ -1382,6 +1380,7 @@ const roleTable = {
 	attribution: ["13px", "500", 1.5, "muted"],
 	help: ["13px", "500", 1.5, "muted"],
 	code: ["14px", "400", null, "ink"],
+	block: ["14px", "400", 1.5, "ink"],
 };
 
 for (const build of themeBuilds) {
@@ -1389,6 +1388,7 @@ for (const build of themeBuilds) {
 		const content = `<h1 id="h1">One</h1><h2 id="h2">Two</h2><h3 id="h3">Three</h3>
 			<h4 id="h4">Four</h4><h5 id="h5">Five</h5><h6 id="h6">Six</h6>
 			<p id="paragraph">Body <code id="code">code</code></p>
+			<pre><code id="block">block</code></pre>
 			<form>
 				<label for="field" id="label">Name</label>
 				<input id="field" aria-describedby="help">

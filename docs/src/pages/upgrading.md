@@ -13,10 +13,9 @@ documentation: the selector in the header switches between them.
 After 1.0 the same boundary becomes a major release, and this page keeps
 working the way it already does.
 
-## Next release, from v0.16.x
+## To v0.17.0, from v0.16.x
 
-Not released yet: this section describes the development line. No class
-or selector is renamed; the defaults move. The accent turns magenta and the
+No class or selector is renamed; the defaults move. The accent turns magenta and the
 neutrals near grey, the page is near white or near black, surfaces and edges
 come from four named levels and three named edges, type comes from roles, the
 primary is always the heaviest action, every corner takes one of two radii by
