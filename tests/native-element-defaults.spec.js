@@ -1350,3 +1350,161 @@ for (const build of themeBuilds) {
 		});
 	}
 }
+
+// --- Type roles ----------------------------------------------------------
+
+// Every element in the role table of specs/typographic-roles.md takes its
+// role's size, weight, leading and ink, in every build. Help text after a
+// field rendered at 14px, a bare small's size, because the small rule came
+// later in the layer at the same weight as the help text's meta role.
+// `pre` is left out: the table gives it relaxed leading, which the library
+// has never set.
+
+/** @type {Record<string, [string, string, number | null, string]>} */
+const roleTable = {
+	h1: ["28px", "600", 1.125, "strong"],
+	h2: ["24px", "600", 1.125, "strong"],
+	h3: ["20px", "600", 1.25, "strong"],
+	h4: ["18px", "600", 1.25, "strong"],
+	h5: ["16px", "600", 1.25, "ink"],
+	h6: ["14px", "600", 1.25, "ink"],
+	paragraph: ["16px", "400", 1.5, "ink"],
+	cell: ["16px", "400", 1.5, "ink"],
+	definition: ["16px", "400", 1.5, "ink"],
+	option: ["16px", "400", 1.5, "ink"],
+	label: ["14px", "500", 1.5, "ink"],
+	summary: ["16px", "500", 1.5, "ink"],
+	term: ["16px", "500", 1.5, "ink"],
+	legend: ["16px", "600", 1.5, "strong"],
+	head: ["13px", "500", 1.5, "muted"],
+	foot: ["13px", "500", 1.5, "muted"],
+	caption: ["13px", "500", 1.5, "muted"],
+	attribution: ["13px", "500", 1.5, "muted"],
+	help: ["13px", "500", 1.5, "muted"],
+	code: ["14px", "400", null, "ink"],
+};
+
+for (const build of themeBuilds) {
+	test(`${build.name}: every element takes its type role`, async ({ page }) => {
+		const content = `<h1 id="h1">One</h1><h2 id="h2">Two</h2><h3 id="h3">Three</h3>
+			<h4 id="h4">Four</h4><h5 id="h5">Five</h5><h6 id="h6">Six</h6>
+			<p id="paragraph">Body <code id="code">code</code></p>
+			<form>
+				<label for="field" id="label">Name</label>
+				<input id="field" aria-describedby="help">
+				<small id="help">Help text</small>
+				<label id="option"><input type="checkbox"> Option</label>
+				<fieldset><legend id="legend">Group</legend></fieldset>
+			</form>
+			<details><summary id="summary">Summary</summary><p>Panel</p></details>
+			<dl><dt id="term">Term</dt><dd id="definition">Definition</dd></dl>
+			<table>
+				<thead><tr><th id="head">Head</th></tr></thead>
+				<tbody><tr><td id="cell">Cell</td></tr></tbody>
+				<tfoot><tr><td id="foot">Foot</td></tr></tfoot>
+			</table>
+			<figure><figcaption id="caption">Caption</figcaption></figure>
+			<blockquote><p>Quote</p><footer id="attribution">Who</footer></blockquote>
+			<span id="ink-strong" style="color: var(--cirth-ink-strong)"></span>
+			<span id="ink" style="color: var(--cirth-ink)"></span>
+			<span id="ink-muted" style="color: var(--cirth-muted-color)"></span>`;
+		await setContent(
+			page,
+			`<style>${build.css}</style>${
+				build.scope ? `<main class="${build.scope}">${content}</main>` : `<main>${content}</main>`
+			}`,
+		);
+
+		const measured = await page.evaluate((ids) => {
+			/** @param {string} id */
+			const style = (id) =>
+				getComputedStyle(/** @type {Element} */ (document.getElementById(id)));
+			const inks = {
+				strong: style("ink-strong").color,
+				ink: style("ink").color,
+				muted: style("ink-muted").color,
+			};
+			return Object.fromEntries(
+				ids.map((id) => {
+					const element = style(id);
+					const ink = Object.entries(inks).find(([, value]) => value === element.color);
+					return [
+						id,
+						/** @type {[string, string, number, string]} */ ([
+							element.fontSize,
+							element.fontWeight,
+							Number.parseFloat(element.lineHeight) / Number.parseFloat(element.fontSize),
+							ink ? ink[0] : element.color,
+						]),
+					];
+				}),
+			);
+		}, Object.keys(roleTable));
+
+		for (const [id, [size, weight, leading, ink]] of Object.entries(roleTable)) {
+			const [gotSize, gotWeight, gotLeading, gotInk] = measured[id];
+			expect([gotSize, gotWeight, gotInk], id).toEqual([size, weight, ink]);
+			if (leading !== null) expect(gotLeading, `${id} leading`).toBeCloseTo(leading, 2);
+		}
+	});
+}
+
+// --- Disabled, however a control is disabled -----------------------------
+
+// specs/control-emphasis.md: a disabled control takes the neutral wash and
+// is never drawn at an opacity. A checked switch disabled by its fieldset
+// kept the accent, because the fieldset's branch of the disabled rule
+// weighed less than the switch's own paint; Chromium's user agent drew a
+// disabled select at 0.7.
+
+const disabledControls = {
+	text: "<input>",
+	select: "<select><option>One</option></select>",
+	textarea: "<textarea></textarea>",
+	checkbox: '<input type="checkbox" checked>',
+	radio: '<input type="radio" checked>',
+	switch: '<input type="checkbox" role="switch" checked>',
+	switchOff: '<input type="checkbox" role="switch">',
+};
+
+for (const [name, css] of builds) {
+	test(`${name}: a control disabled by its fieldset looks like one disabled itself`, async ({
+		page,
+	}) => {
+		const own = Object.entries(disabledControls)
+			.map(([id, html]) => html.replace(/^<(\w+)/, `<$1 id="own-${id}" disabled`))
+			.join("");
+		const inherited = Object.entries(disabledControls)
+			.map(([id, html]) => html.replace(/^<(\w+)/, `<$1 id="fieldset-${id}"`))
+			.join("");
+		await render(
+			page,
+			css,
+			`<p>${own}</p><fieldset disabled>${inherited}</fieldset>
+			<span id="wash" style="background-color: var(--cirth-disabled-surface)"></span>`,
+		);
+
+		const measured = await page.evaluate((ids) => {
+			/** @param {string} id @param {string | null} [pseudo] */
+			const style = (id, pseudo = null) =>
+				getComputedStyle(/** @type {Element} */ (document.getElementById(id)), pseudo);
+			/** @param {string} id */
+			const paint = (id) => ({
+				background: style(id).backgroundColor,
+				border: style(id).borderTopColor,
+				mark: style(id, "::before").backgroundColor,
+				opacity: style(id).opacity,
+			});
+			return {
+				wash: style("wash").backgroundColor,
+				controls: ids.map((id) => ({ id, own: paint(`own-${id}`), fieldset: paint(`fieldset-${id}`) })),
+			};
+		}, Object.keys(disabledControls));
+
+		for (const { id, own, fieldset } of measured.controls) {
+			expect(fieldset, `${id}: disabled by its fieldset`).toEqual(own);
+			expect(own.opacity, `${id}: opacity`).toBe("1");
+			expect(own.background, `${id}: the disabled wash`).toBe(measured.wash);
+		}
+	});
+}

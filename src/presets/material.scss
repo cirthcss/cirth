@@ -70,8 +70,9 @@ $level3:
     // M3 has no visited role. Cirth's is the accent drained to grey; this
     // grey is darker than the violet accent in light, so the two stay
     // apart under tritanopia, where a violet and a grey at one lightness
-    // merge.
-    --cirth-link-visited-color: light-dark(#545454, #919191);
+    // merge. In dark it is light enough to read 4.5:1 on the overlay level
+    // (4.66:1; #919191 read 4.37:1).
+    --cirth-link-visited-color: light-dark(#545454, #969696);
 
     // Typography
     // Roboto for every role, as M3's brand and plain typefaces, with the

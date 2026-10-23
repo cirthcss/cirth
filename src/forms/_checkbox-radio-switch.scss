@@ -231,7 +231,7 @@
 
   // The track takes the disabled wash (forms/_basics.scss) and the thumb
   // the disabled ink, since a white thumb would vanish on it.
-  &[disabled]::before {
+  &:disabled::before {
     background-color: var(--cirth-disabled-color);
   }
 }
