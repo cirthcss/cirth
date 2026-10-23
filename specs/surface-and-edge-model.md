@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | None yet: technical-language foundations, `design/technical-language-system` |
-| Status | Implementing |
+| Status | Landed on `develop`, with its tuning superseded in part by [surface-depth](surface-depth.md) and [default-palette](default-palette.md) |
 | Baseline | `806fea7a` on `design/technical-language-system` (token values identical to `94f7c669`) |
 | Breaking | Yes: custom property defaults redefined, two removed, four added |
 | Decisions | 2026-09-27, maintainer: nothing frozen except accent hues; size budget not a constraint |
@@ -225,6 +225,8 @@ bug below; with it fixed the pass's own copper-250 applies.
 | The two-layer shadow keeps the dark elevation contract | Not measured | Implementation acceptance | Reported |
 | The prototype's upper-bound byte cost | Appending the whole override, which in the real change replaces existing declarations, adds 718 B gzip | Same | Verified |
 | Under `prefers-contrast: more` an author's accent loses its hue on four roles | With the probe accent (hue 200deg) set at the root: `--cirth-primary-active` `#4a2514` in light; `--cirth-primary-active` `#f3cbbb`, `--cirth-primary-surface` `#7b4026` and `-surface-active` `#6a3720` in dark, all the default accent's hue. The contrast pass pinned them to `$accent-*` steps | `dist/cirth.css` at `ede35b65`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5 | Verified; fixed on 2026-09-28 by deriving them from `--cirth-primary`. The default accent's roles are byte-identical before and after in every scheme and preference; with the probe, white on the dark fill reads 7.13:1. `tests/prefers-contrast.spec.js` holds every accent role within 15deg of an author's hue |
+| The same holds in Firefox and WebKit, as built | `tests/surface-depth.spec.js` and `tests/surface-derivation.spec.js` pass in three engines; accent text worst 4.66:1 on every level | `dist/cirth.css` built from `4065210c4`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Verified |
+| The shared shadow keeps the dark elevation contract | It has three layers since surface-depth; `tests/box-shadow.spec.js` passes in three engines | Same | Verified |
 
 The captures and the JSON behind every row are in
 `~/crithcss/cirth-captures/technical-language-system/` (outside the
@@ -252,26 +254,44 @@ repository, by design): `before/`, `prototype/`, `evidence/`,
 
 ## Acceptance
 
-- [ ] With every border made transparent, canvas, recessed, raised and overlay
+- [x] With every border made transparent, canvas, recessed, raised and overlay
       are told apart in grayscale in both schemes at 1440 and 390px
       (default, plain, playroom, probe).
-- [ ] Control border ≥ 3:1 on every level, separator < container ≤ control on
+      Checked by its successor in [surface-depth](surface-depth.md)
+      (`tests/surface-depth.spec.js`: default, plain, material, metro and the
+      probe; playroom is gone), which passes in three engines, 2026-10-23.
+- [x] Control border ≥ 3:1 on every level, separator < container ≤ control on
       every level, in both schemes, with and without `more`, for the four
       accents, in Chromium, Firefox and WebKit:
       `tests/surface-derivation.spec.js`, extended.
-- [ ] Canvas hue within 44° ± 5° (light) and 280° ± 2° (dark);
+      Same: `tests/surface-depth.spec.js` asserts the order and the floor on
+      every level, with and without `more`, and passes in three engines.
+- [x] ~~Canvas hue within 44° ± 5° (light) and 280° ± 2° (dark);
       `--cirth-primary` computed value identical to `806fea7a` in light, dark
-      and `more`.
-- [ ] Accent text ≥ 4.5:1 on every level for the four accents.
-- [ ] `prefers-contrast: more` applies under a root `data-theme="dark"`:
+      and `more`.~~
+      Superseded: surface-depth moved the canvas to 120° and default-palette
+      to 132°, and the palette moved `--cirth-primary`.
+- [x] Accent text ≥ 4.5:1 on every level for the four accents.
+      Verified 2026-10-23: `--cirth-primary-text` worst 4.66:1 over the four
+      levels, five accents, both schemes, with and without `more`, three
+      engines.
+- [x] `prefers-contrast: more` applies under a root `data-theme="dark"`:
       `tests/prefers-contrast.spec.js`.
-- [ ] `tests/box-shadow.spec.js` asserts two layers and passes the dark
+      `tests/prefers-contrast.spec.js` passes in three engines, 2026-10-23.
+- [x] `tests/box-shadow.spec.js` asserts two layers and passes the dark
       elevation ratio in three engines; `specs/dark-elevation-shadow.md` gets a
       row pointing here.
-- [ ] `npm run check:size` reported (not gated; see Open questions, 3);
+      Superseded in part: surface-depth added a top highlight, so the shared
+      shadow has three layers. The dark elevation contract passes in three
+      engines, and [dark-elevation-shadow](dark-elevation-shadow.md) points
+      to surface-depth.
+- [x] `npm run check:size` reported (not gated; see Open questions, 3);
       `npm run check:tokens` green with the token export regenerated.
-- [ ] `docs/src/pages/colors.md` (Surfaces) and `docs/src/pages/upgrading.md`
+      2026-10-23: `cirth.min.css` 16443 B of 16700 B gzip; `check:tokens`
+      green, 717 colour comparisons in three engines.
+- [x] `docs/src/pages/colors.md` (Surfaces) and `docs/src/pages/upgrading.md`
       (migration) updated.
+      Colors (Surface levels) and Upgrading (Surfaces and edges).
 
 ## Migration
 

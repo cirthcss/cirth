@@ -276,7 +276,11 @@ $helper-previous-tags: "input, select, textarea, fieldset";
 
 // Disabled: the state a disabled button takes, painted directly so it wins
 // over any state slot. A range is excluded: its box is not what it paints
-// (forms/_input-range.scss).
+// (forms/_input-range.scss). :disabled, so a field disabled by its fieldset
+// takes the weight of one disabled by its own attribute (a checked switch
+// outweighed the fieldset's branch and kept the accent). The opacity
+// undoes Chromium's user agent 0.7 on a disabled select: disabled is a
+// state, not a transparency.
 
 #{$parent-selector}
   input:not(
@@ -284,19 +288,13 @@ $helper-previous-tags: "input, select, textarea, fieldset";
     [type="button"],
     [type="reset"],
     [type="range"]
-  )[disabled],
-#{$parent-selector} select[disabled],
-#{$parent-selector} textarea[disabled],
-#{$parent-selector}
-  :where(fieldset[disabled])
-  :is(
-    input:not([type="submit"], [type="button"], [type="reset"], [type="range"]),
-    select,
-    textarea
-  ) {
+  ):disabled,
+#{$parent-selector} select:disabled,
+#{$parent-selector} textarea:disabled {
   border-color: var(--cirth-muted-border-color);
   background-color: var(--cirth-disabled-surface);
   color: var(--cirth-disabled-color);
+  opacity: 1;
   pointer-events: none;
 }
 

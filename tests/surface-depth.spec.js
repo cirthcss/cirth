@@ -168,6 +168,92 @@ for (const variant of variants) {
 	}
 }
 
+// Every text role reads 4.5:1 on every level a text can sit on, in every
+// variant, scheme and contrast mode (specs/typographic-roles.md). Material's
+// visited link read 4.37:1 on its dark overlay before it was lightened.
+const textRoles = [
+	"--cirth-ink",
+	"--cirth-ink-strong",
+	"--cirth-muted-color",
+	"--cirth-secondary-text",
+	"--cirth-primary-text",
+	"--cirth-code-color",
+	"--cirth-error-text",
+	"--cirth-success-text",
+	"--cirth-warning-text",
+	"--cirth-form-element-placeholder-color",
+	"--cirth-link-visited-color",
+];
+const textLevels = /** @type {const} */ (["recessed", "canvas", "raised", "overlay"]);
+
+for (const variant of variants) {
+	for (const scheme of /** @type {const} */ (["light", "dark"])) {
+		for (const more of [false, true]) {
+			test(`${variant.name}, ${scheme}${more ? ", more" : ""}: every text role reads 4.5:1 on every level`, async ({
+				page,
+			}) => {
+				if (more) {
+					test.skip(!(await reportsPreference(page)), "this engine does not expose prefers-contrast to automation");
+				}
+				await render(page, { more, scheme, variant });
+				// Each text painted over each level, so a translucent role is
+				// measured as it composites.
+				const painted = await page.evaluate(
+					([roles, levels]) => {
+						const canvas = document.createElement("canvas");
+						canvas.width = canvas.height = 1;
+						const context = /** @type {CanvasRenderingContext2D} */ (
+							canvas.getContext("2d", { willReadFrequently: true })
+						);
+						const probe = document.createElement("div");
+						document.body.append(probe);
+						/** @param {string} property @param {string} token */
+						const resolve = (property, token) => {
+							probe.style.setProperty(property, `var(${token})`);
+							return getComputedStyle(probe).getPropertyValue(property);
+						};
+						/** @param {string[]} layers */
+						const fill = (layers) => {
+							context.clearRect(0, 0, 1, 1);
+							for (const layer of layers) {
+								context.fillStyle = layer;
+								context.fillRect(0, 0, 1, 1);
+							}
+							const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
+							return /** @type {[number, number, number]} */ ([r, g, b]);
+						};
+						return Object.fromEntries(
+							Object.entries(levels).map(([level, token]) => {
+								const ground = resolve("background-color", token);
+								return [
+									level,
+									{
+										ground: fill([ground]),
+										texts: roles.map(
+											(role) =>
+												/** @type {[string, [number, number, number]]} */ ([
+													role,
+													fill([ground, resolve("color", role)]),
+												]),
+										),
+									},
+								];
+							}),
+						);
+					},
+					/** @type {const} */ ([textRoles, Object.fromEntries(textLevels.map((level) => [level, tokens[level]]))]),
+				);
+
+				for (const level of textLevels) {
+					for (const [role, text] of painted[level].texts) {
+						expect(ratio(text, painted[level].ground), `${role} on ${level}`).toBeGreaterThanOrEqual(4.5);
+					}
+				}
+			});
+		}
+	}
+}
+
 // The default theme and plain share their ends: a page near white in
 // light and near black in dark. The presets that set their own canvas to a
 // design language's values (material, metro) keep them.

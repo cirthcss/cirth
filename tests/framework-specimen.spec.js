@@ -644,6 +644,96 @@ for (const specimen of specimens) {
 	}
 }
 
+// In a group of actions the primary is the heaviest (specs/control-emphasis.md):
+// its fill, composited over what the group sits on, stands further from it
+// in luminance contrast than any secondary, outline or ghost beside it, for
+// every accent, in both schemes and under prefers-contrast: more. `.danger`
+// and `.contrast` are alternative primaries and are not compared.
+for (const specimen of specimens) {
+	for (const scheme of /** @type {const} */ (["light", "dark"])) {
+		for (const more of [false, true]) {
+			test(`${specimen} ${scheme}${more ? " more" : ""}: the primary is the heaviest action in its group`, async ({
+				page,
+			}) => {
+				if (more) {
+					await page.emulateMedia({ contrast: "more" });
+					await page.setContent(
+						"<style>#s{color:rgb(255,0,0)}@media (prefers-contrast: more){#s{color:rgb(0,255,0)}}</style><p id=s>s</p>",
+					);
+					const reported = await page
+						.locator("#s")
+						.evaluate((element) => getComputedStyle(element).color === "rgb(0, 255, 0)");
+					test.skip(!reported, "this engine does not expose prefers-contrast to automation");
+				}
+				await page.emulateMedia({ colorScheme: scheme, contrast: more ? "more" : "no-preference" });
+				await page.goto(`${origin}/specimen/${specimen}/`);
+
+				const groups = await page.evaluate(() => {
+					const canvas = document.createElement("canvas");
+					canvas.width = canvas.height = 1;
+					const context = /** @type {CanvasRenderingContext2D} */ (
+						canvas.getContext("2d", { willReadFrequently: true })
+					);
+					/** @param {string[]} layers */
+					const fill = (layers) => {
+						context.clearRect(0, 0, 1, 1);
+						for (const layer of layers) {
+							context.fillStyle = layer;
+							context.fillRect(0, 0, 1, 1);
+						}
+						const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
+						return /** @type {[number, number, number]} */ ([r, g, b]);
+					};
+					/** @param {Element} element */
+					const ground = (element) => {
+						const layers = [];
+						for (let node = element.parentElement; node; node = node.parentElement) {
+							layers.unshift(getComputedStyle(node).backgroundColor);
+						}
+						return layers;
+					};
+					return [...document.querySelectorAll('[role="group"], footer')]
+						.map((group) => {
+							const buttons = [...group.querySelectorAll(":scope > button, :scope > * > button")].filter(
+								(button) => !button.matches(".danger, .contrast"),
+							);
+							if (!buttons.some((button) => button.classList.length === 0)) return null;
+							const under = ground(buttons[0]);
+							return {
+								name: group.getAttribute("aria-label") ?? group.tagName.toLowerCase(),
+								ground: fill(under),
+								buttons: buttons.map((button) => ({
+									label: (button.textContent ?? "").trim(),
+									primary: button.classList.length === 0,
+									fill: fill([...under, getComputedStyle(button).backgroundColor]),
+								})),
+							};
+						})
+						.filter((group) => group !== null);
+				});
+
+				/** @param {[number, number, number]} rgb */
+				const color = ([r, g, b]) => ({ r: r / 255, g: g / 255, b: b / 255, alpha: 1 });
+				expect(groups.length, "groups with a primary action").toBeGreaterThan(0);
+				for (const group of groups) {
+					const weight = group.buttons.map((button) => ({
+						...button,
+						contrast: contrastColors(color(button.fill), color(group.ground)),
+					}));
+					const primary = weight.filter((button) => button.primary);
+					const others = weight.filter((button) => !button.primary);
+					const line = weight.map((button) => `${button.label} ${button.contrast.toFixed(2)}`).join(", ");
+					for (const button of primary) {
+						for (const other of others) {
+							expect(button.contrast, `${group.name}: ${line}`).toBeGreaterThan(other.contrast);
+						}
+					}
+				}
+			});
+		}
+	}
+}
+
 test("multiline accordion keeps its full target at 320px", async ({ page }) => {
 	await page.setViewportSize({ width: 320, height: 720 });
 	await page.goto(`${origin}/specimen/states/default/`);

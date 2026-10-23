@@ -206,7 +206,10 @@
   }
 
   // Typography
-  small {
+  // Zero weight, so a role that names a small (help text after a field is
+  // the meta role, forms/_basics.scss) sets its size wherever it sits in
+  // the sheet.
+  :where(small) {
     --cirth-font-size: 0.875em;
 
     font-size: var(--cirth-font-size);

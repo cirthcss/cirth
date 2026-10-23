@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | None yet; related to gh#96 (the explicit on-surface role). Prerequisite of `specs/material-preset.md` |
-| Status | Implementing |
+| Status | Landed on `develop` |
 | Baseline | `f1caa145` on `design/technical-language-system` |
 | Breaking | No: one custom property added; a chevron colour changes on filled `summary` elements |
 

@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | None yet: technical-language foundations, `design/technical-language-system` |
-| Status | Implementing |
+| Status | Landed on `develop`: every acceptance check passes (2026-10-23) |
 | Baseline | `806fea7a` on `design/technical-language-system` |
 | Breaking | Yes: the secondary variant, disabled state, focus ring, submit width, status borders and inline code change by default |
 
@@ -169,6 +169,13 @@ matrix is in [surface-and-edge-model](surface-and-edge-model.md).
 | With the proposal the primary is the heaviest action in every variant, scheme and contrast mode | Table above | Prototype `prototype-source/prototype.css`, Chromium 149 | Verified |
 | Outline follows `border-radius` and is repainted under forced colors in the browser floor | Chromium 94, Firefox 88 and Safari 16.4 shipped rounded outlines, all below the floor | Release notes, not reproduced here | Reported |
 | The ring keeps 3:1 in Firefox and WebKit | Not measured for the prototype | Implementation acceptance | Reported |
+| The primary is the heaviest action, as built | Fill composited over the canvas against the canvas: primary ≥ 2.04:1, secondary ≤ 1.26:1, outline and ghost 1:1, in 60 cases (default, the probe, plain, material, metro; both schemes; with and without `more`; three engines). An outline's accent edge is not counted, as in the Measurements above | `dist/cirth.css` built from `4065210c4` and `dist/presets/*.css`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Verified |
+| The ring keeps 3:1 in Firefox and WebKit, as built | Worst ratio over the four levels 4.66:1, every control focus-visible, gap ≥ 2px (outline offset, plus the band for checkbox and radio), in the same 60 cases | Same | Verified |
+| No disabled control keeps its accent | A checked `role="switch"` inside `<fieldset disabled>` keeps the accent track and edge (`oklch(0.57 0.228 324)`); with its own `disabled` attribute it takes the wash. The track's disabled rule matches `[disabled]`, not `:disabled` | `dist/cirth.css` built from `4065210c4`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Invalid: a defect, fixed in `b3e8fc46e` (row below) |
+| No disabled control is drawn at an opacity | A disabled `select` computes `opacity: 0.7` in Chromium, from the user agent stylesheet, whether disabled itself or through its fieldset; 1 in Firefox and WebKit | Same | Invalid: a defect, fixed in `b3e8fc46e` (row below) |
+| A submit button sizes to its label | Its width equals its `max-content` width within 0.5px in the same 60 cases | Same | Verified |
+| No disabled control keeps its accent or an opacity, after the fix | The disabled field rule is `input:not(…):disabled, select:disabled, textarea:disabled` with `opacity: 1`, and the switch thumb `:disabled::before`: a checked switch in `<fieldset disabled>` takes the wash, and a disabled `select` computes opacity 1 in Chromium; the new test fails on the unfixed source | `dist/cirth.css` built from `b3e8fc46e`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Verified |
+| The primary is the heaviest action in every specimen group | `tests/framework-specimen.spec.js` (the primary is the heaviest action in its group) | Docs built from `b3e8fc46e`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Verified |
 
 ## Decisions
 
@@ -188,22 +195,40 @@ matrix is in [surface-and-edge-model](surface-and-edge-model.md).
 
 ## Acceptance
 
-- [ ] In every group of the button demo the primary has the highest
+- [x] In every group of the button demo the primary has the highest
       luminance contrast against the surface, four accents, both schemes,
       with and without `more`: a new case in `tests/framework-specimen.spec.js`.
-- [ ] Focus ring ≥ 3:1 against every surface level and not touching the fill
+      The case is written (the primary is the heaviest action in its group):
+      every group of the specimen with a primary, for default, plain,
+      material, metro and blue, both schemes, with and without `more`, three
+      engines, since `b3e8fc46e`.
+- [x] Focus ring ≥ 3:1 against every surface level and not touching the fill
       (outline offset ≥ 2px), for buttons, fields, checkbox, radio, switch,
       link and summary, in three engines.
-- [ ] A disabled control's fill has chroma ≤ 0.03 and its hue family is the
+      Verified 2026-10-23 for the four button variants, a text field,
+      checkbox, radio, switch, link and summary: worst ring 4.66:1 over the
+      four levels, gap ≥ 2px, in three engines (ledger).
+- [x] A disabled control's fill has chroma ≤ 0.03 and its hue family is the
       neutral one; no computed opacity below 1 on any disabled control.
-- [ ] A focused valid or invalid field: border and ring in its status colour
+      Fixed in `b3e8fc46e` (ledger): the disabled field rule matches `:disabled`
+      and sets `opacity: 1`. `tests/native-element-defaults.spec.js` (a control
+      disabled by its fieldset looks like one disabled itself) holds seven
+      controls to the wash and opacity 1, by attribute and by fieldset.
+- [x] A focused valid or invalid field: border and ring in its status colour
       (already covered for fields by `b86e7899`).
-- [ ] A submit button's width equals its content width in a form.
-- [ ] `tests/button-overflow.spec.js`, `tests/prefers-contrast.spec.js` and
+      `tests/forms-validity.spec.js` (a focused field keeps the colour of its
+      explicit state) passes in three engines, 2026-10-23.
+- [x] A submit button's width equals its content width in a form.
+      Verified 2026-10-23: equal to its `max-content` width within 0.5px in
+      60 cases (ledger).
+- [x] `tests/button-overflow.spec.js`, `tests/prefers-contrast.spec.js` and
       `tests/accessibility-resilience.spec.js` updated where they encoded the
       old values, each change explained in the commit.
-- [ ] `docs/src/pages/content/button.md`, `forms/validation.md` and
+      The three pass unchanged on the new values, 2026-10-23; the tests that
+      did encode them changed in `689c2fb05`.
+- [x] `docs/src/pages/content/button.md`, `forms/validation.md` and
       `docs/src/pages/upgrading.md` updated.
+      Changed in `689c2fb05`; the migration is in Upgrading (Controls).
 
 ## Migration
 

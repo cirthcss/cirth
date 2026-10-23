@@ -3,12 +3,12 @@
 | | |
 | --- | --- |
 | Issue | None yet: local work on `design/technical-language-system` |
-| Status | Implementing |
+| Status | Landed on `develop` |
 | Baseline | `ed959bcf9e5d4d90d99a9e26cc70d91bafc72385` on `design/technical-language-system` |
 | Breaking | Yes: default heading sizes and weight, default radii, and interactive motion change; no public selector or token is removed or renamed |
 
-Implementation and local verification are complete. The status remains
-`Implementing` because the work has not been integrated.
+Implementation and local verification are complete, and the work is
+integrated on `develop`.
 
 Cirth already has the right structural language for a quiet technical UI:
 semantic elements, thin edges, inherited surface roles, restrained elevation,
