@@ -50,6 +50,9 @@ every build.
 Use an accessible name such as `aria-label` when the page has more than one
 search landmark. The visually hidden label still names the field itself.
 
+A search group is shaped like any other group: its outer corners take the
+control radius, and the field inside it matches them.
+
 ## Behavior
 
 Cirth lays visible children out with inline flexbox, removes adjoining corner

@@ -69,6 +69,32 @@ Relevant tokens include `--cirth-h1-color` through `--cirth-h6-color`,
 `--cirth-heading-font-weight`, `--cirth-title-font-weight`, and the heading
 font-size roles.
 
+## Type roles
+
+Cirth sets type by role rather than by element. Each role differs from its
+neighbours in at least two of size, weight, ink and tracking, so a legend
+reads above the labels in its fieldset and a column head reads as data about
+its cells.
+
+| Role | Elements | Size | Weight | Ink |
+| --- | --- | --- | --- | --- |
+| Heading | `h1`, `h2` | 28px, 24px | 600 | strong |
+| Title | `h3` to `h6` | 20px, 18px, 16px, 14px | 600 | strong for `h3` and `h4`, body for `h5` and `h6` |
+| Body | running text, table cells, `dd`, the label of a checkbox or radio | 16px | 400 | body |
+| Label | a field's `label` | 14px | 500 | body |
+| Control text | buttons, `summary`, `dt` | 16px | 500 | body |
+| Group | a fieldset's `legend` | 16px | 600 | strong |
+| Meta | `thead` and `tfoot` cells, `figcaption`, a quotation's `footer` | 13px | 500 | muted |
+| Code | `code`, `kbd`, `samp`, `var`, `pre` | 0.875em | 400 | body |
+
+Headings keep these sizes at every viewport width. A hero that needs a
+larger, fluid size uses `--cirth-display-font-size` and
+`--cirth-display-font-weight`, which no element takes by default.
+
+Tracking follows size through one relation, `--cirth-tracking-optical`: none
+at the body size, slightly positive below it and slightly negative above it.
+Set it to `0` to turn the correction off.
+
 ## Heading groups
 
 `<hgroup>` groups one heading with related secondary text such as a subtitle,

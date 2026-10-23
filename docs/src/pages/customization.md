@@ -168,6 +168,22 @@ remove the control-size floor. Adjust
 `--cirth-form-element-spacing-horizontal` deliberately when controls need
 different proportions.
 
+No element carries an outer margin of its own. The second of two siblings
+takes one step of the flow scale, chosen by what the two are to each other:
+
+| Step | Default | Between |
+| --- | --- | --- |
+| `--cirth-flow-line` | 8px | a label and its field, a field and its help text, two list items, a heading and what follows it |
+| `--cirth-flow-element` | 16px | two blocks: paragraphs, lists, tables, fields |
+| `--cirth-flow-group` | 32px | a block and an `h3` to `h6`; a fieldset and its neighbours; two articles |
+| `--cirth-flow-section` | 48px | a block and an `h1` or `h2`; two sections |
+| `--cirth-flow-chapter` | 80px | two top-level sections of `main` |
+
+Every step is a multiple of `--cirth-spacing`, so changing it retimes all
+five; set one step to change a single relation. The flow rules have zero
+specificity, so any margin rule of your own wins. Containers own the space
+inside them: a card or dialog its padding, `.grid` and `.row` their gap.
+
 ### Borders and radius
 
 ```css

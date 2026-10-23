@@ -22,6 +22,9 @@ control.
 placeholder gives example topics; the label remains the field's accessible
 name.
 
+A search field has the same corners as every other field, the control
+radius. It is not drawn as a pill.
+
 ## Search forms
 
 Wrap a site or application search in `<form role="search">` to create a search
