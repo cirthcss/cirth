@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | None yet: technical-language foundations, `design/technical-language-system` |
-| Status | Implementing: the relation model was accepted on 2026-09-27 (Open questions, 1) |
+| Status | Landed on `develop`: every acceptance check passes (2026-10-23) |
 | Baseline | `806fea7a` on `design/technical-language-system` |
 | Breaking | 💥 Yes: every flow element loses its own outer margin |
 
@@ -130,6 +130,8 @@ larger than the one below it.
 | The table of "before" values | Measured as described above | Same | Verified |
 | The "after" values hold on a rendered page | Not prototyped | Implementation acceptance | Reported |
 | A relation margin misaligns a consumer flex row of Cirth blocks | Follows from `margin-block-start` on the second item; not reproduced here | Implementation: a fixture in `tests/flow-spacing.spec.js` pins the documented behaviour | Reported |
+| The "after" values hold on a rendered page | `tests/flow-spacing.spec.js` passes in three engines; headings measure 48px above and 8px below at `h1` and `h2`, 32px and 8px at `h3` to `h6` | `dist/cirth.css` built from `4065210c4`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Verified |
+| A card, a dialog's article and a popover hold their content at the padding | First child's top and last child's bottom within 0.1px of the padding edge, three engines | Same | Verified |
 
 ## Decisions
 
@@ -146,21 +148,36 @@ larger than the one below it.
 
 ## Acceptance
 
-- [ ] On a rendered page the five steps measure strictly increasing, and
+- [x] On a rendered page the five steps measure strictly increasing, and
       every relation in the table measures its step to ±1px:
       `tests/flow-spacing.spec.js`, rewritten around the relation table.
-- [ ] Stacked fields at 390px equal to ±1px, in and out of `.grid`; group
+      `tests/flow-spacing.spec.js` (every relation measures its step, and the
+      steps rise) passes in three engines, 2026-10-23.
+- [x] Stacked fields at 390px equal to ±1px, in and out of `.grid`; group
       step > element step in a form.
-- [ ] Card, dialog and popover: first child at the padding, last child at the
+      Asserted by the same test, at 390px, in and out of `.grid`.
+- [x] Card, dialog and popover: first child at the padding, last child at the
       padding, with no trailing-margin rule left in the source.
-- [ ] Headings keep more space above than below at every level.
-- [ ] `tests/native-element-defaults.spec.js`, `tests/list-nesting.spec.js` and
+      Verified 2026-10-23: first and last child within 0.1px of the padding
+      edge in all three, three engines; no `:last-child` margin rule in
+      `src/` (ledger).
+- [x] Headings keep more space above than below at every level.
+      Verified 2026-10-23: 48px above and 8px below `h1` and `h2`, 32px and
+      8px for `h3` to `h6`, three engines (ledger).
+- [x] `tests/native-element-defaults.spec.js`, `tests/list-nesting.spec.js` and
       `tests/layout.spec.js` updated where they encoded margins, each change
       explained.
-- [ ] `npm run check:visual` differences reviewed page by page before any
+      The first two changed in `9009e8f91`; `tests/layout.spec.js` needed no
+      change and passes.
+- [x] `npm run check:visual` differences reviewed page by page before any
       baseline is regenerated.
-- [ ] `docs/src/pages/upgrading.md` carries the migration below;
+      Reported: `f1caa1454` records the review across page types, schemes,
+      widths, presets and engines before the macOS baselines were
+      regenerated.
+- [x] `docs/src/pages/upgrading.md` carries the migration below;
       `docs/src/pages/customization.md` documents the scale.
+      Upgrading (Space between elements); the scale is in Customization
+      (Spacing and layout) since 2026-10-23.
 
 ## Migration
 

@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | None yet: technical-language foundations, `design/technical-language-system` |
-| Status | Implementing |
+| Status | Implementing: merged into `develop`; two acceptance checks fail and one is not re-run, see Acceptance |
 | Baseline | `806fea7a` on `design/technical-language-system` |
 | Breaking | Yes: default weights, sizes and inks of headings, labels, legends, table headers and code change; two tracking tokens are replaced |
 
@@ -48,6 +48,11 @@ see new weights and a slightly smaller heading ladder; a consumer who set
 | Group | `fieldset > legend` | 1rem | 600 | normal | strong |
 | Meta | `thead`/`tfoot` cells, `figcaption`, help text after a field, a blockquote's `footer` | 0.8125rem | 500 | normal | muted |
 | Code and data | `pre`, `code`, `kbd`, `samp`, `var` | 0.875em | 400 | inherited; relaxed inside `pre` | ink |
+
+Heading sizes and weight are superseded by
+[elena-informed-theme-refresh](elena-informed-theme-refresh.md): 28, 24, 20,
+18, 16 and 14px from `h1` to `h6`, at 600, at every width. The rest of the
+table stands.
 
 Channels per neighbouring pair: heading/title differ by size, weight and
 tracking; title/body by size, weight and ink; label/body by size and
@@ -145,6 +150,12 @@ work that follows these specs brings onto the same roles.
 | The census after the prototype | Table above | `prototype-source/census.js`, Chromium 149 | Verified |
 | 650 falls back to 700 on static families | CSS Fonts 4 font-matching for weights above 500 | Specification text, not reproduced on a static-font machine here | Reported |
 | At 0.04 the 64px display line sets glyphs touching in the default face | "Semantic HTML in." at 64px/650: `n`–`t` and `i`–`c` meet at 0.04 and nearly at 0.03; clear at 0.025 and 0.02 | Docs home at `cf4c9ae3`, `--cirth-tracking-optical` overridden on the root, system-ui resolving to SF Pro, Chromium 149 and WebKit 26.5, macOS 26.7 | Verified |
+| The role table holds on the built CSS | Size, weight, leading and ink of every element in the table equal in the default, classless and scoped builds and in three engines, with the two exceptions below; headings follow the superseding ladder | `dist/cirth.css` built from `4065210c4`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Verified |
+| Help text after a field is the meta role, 13px | It renders at 14px/500, muted. `:where(input, select, textarea, fieldset, .row) + small` sets 0.8125rem, but the `small` rule's own `font-size: var(--cirth-font-size)` (0.875em) comes later in the layer at the same specificity and wins | `dist/cirth.css` built from `4065210c4`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Invalid: open defect |
+| Code inside `pre` takes relaxed leading | `pre > code` takes `--cirth-line-height` (1.5); `--cirth-line-height-relaxed` has no consumer in the library | `dist/cirth.css` built from `4065210c4`, 2026-10-23 | Invalid: the table's leading column is not implemented for `pre` |
+| Tracking follows the relation | `letter-spacing` 0.075px, normal, −0.3px, −0.6px, −1.2px at 13, 16, 28, 40, 64px: `0.025 × (16px − size)` | `dist/cirth.css` built from `4065210c4`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Verified |
+| A field's value never renders under 16px | With `--cirth-font-size-md: 14px` at the root, input, select and textarea compute 16px | `dist/cirth.css` built from `4065210c4`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Verified |
+| No text under 4.5:1 on any level | Worst ratio of 14 text tokens over the recessed, canvas, raised and overlay levels; default, the probe, plain, material, metro; both schemes, with and without `more`: ink 8.80, muted 5.29, secondary 5.47, accent text 4.66, status texts ≥ 6.96; `--cirth-link-visited-color` 4.37 in material, dark, on the overlay only (`#919191` on the overlay surface) | `dist/cirth.css` built from `4065210c4` and `dist/presets/*.css`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Verified: one failure, open |
 
 ## Decisions
 
@@ -167,14 +178,28 @@ work that follows these specs brings onto the same roles.
 - [ ] The role table holds on the built CSS: sizes, weights, leading and ink
       per element, in the default, classless and scoped builds:
       `tests/native-element-defaults.spec.js`, extended.
-- [ ] Tracking measured at 13, 16, 28, 40 and 64px equals the relation.
-- [ ] Field value font-size ≥ 16px with `--cirth-font-size-md` set to 14px.
+      Measured on 2026-10-23 (ledger): holds in the three builds and engines
+      except help text after a field, which renders at 14px, and `pre`, which
+      keeps normal leading. The test is not extended.
+- [x] Tracking measured at 13, 16, 28, 40 and 64px equals the relation.
+      Verified 2026-10-23: 0.075px at 13px, none at 16px, −0.3px at 28px,
+      −0.6px at 40px, −1.2px at 64px, in three engines (ledger).
+- [x] Field value font-size ≥ 16px with `--cirth-font-size-md` set to 14px.
+      Verified 2026-10-23: input, select and textarea compute 16px in three
+      engines (ledger).
 - [ ] No text below 4.5:1 on any level, four accents, both schemes, with and
       without `more`.
+      Measured on 2026-10-23 (ledger): every text token clears 4.5:1 on every
+      level except `--cirth-link-visited-color` in `material`, dark, on the
+      overlay level, at 4.37:1.
 - [ ] Every docs page at most about 10 pairs by the census above, after the
       shell work.
-- [ ] `docs/src/pages/content/typography.md` documents the roles;
+      Not re-run: the census script lives with the evidence files, outside
+      the repository.
+- [x] `docs/src/pages/content/typography.md` documents the roles;
       `docs/src/pages/upgrading.md` carries the migration.
+      The role table is in Typography (Type roles) since 2026-10-23; the
+      migration is in Upgrading (Type).
 
 ## Migration
 

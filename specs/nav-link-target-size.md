@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | Documentation redesign, `docs/documentation-redesign` |
-| Status | Implementing |
+| Status | Landed on `develop` |
 | Baseline | `204e0319` on `develop` |
 | Breaking | No |
 

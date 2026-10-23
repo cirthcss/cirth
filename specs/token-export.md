@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | gh#93 |
-| Status | Implementing |
+| Status | Landed in v0.16.0 |
 | Baseline | `c4dcd4c5` on `master`, branch `feat/issue-93-dtcg-tokens` |
 | Breaking | No — two files are added to the package; no stylesheet changes |
 

@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | Documentation dogfooding, `design/technical-language-system` |
-| Status | Implementing |
+| Status | Landed on `develop` |
 | Baseline | `66d8a9cf0` on `design/technical-language-system` |
 | Breaking | No |
 

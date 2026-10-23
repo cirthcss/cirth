@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | None yet: technical-language refinement, `design/technical-language-system` |
-| Status | Implementing |
+| Status | Landed on `develop`: every acceptance check passes (2026-10-23) |
 | Baseline | `cf4c9ae3` on `design/technical-language-system` |
 | Breaking | Yes: search fields lose the pill shape, and popovers take the container radius |
 
@@ -61,6 +61,7 @@ Not promised:
 | The container radius is never below the control radius | `article` = 1.5 × the text field in all three presets | Same run | Verified |
 | Checkbox and `kbd` stay small marks | 4px in `playroom`, where the control radius is 8px | Same run | Verified |
 | A search field in a generic group kept pill corners against the group's square ones | gh#69, fixed then by rebinding the radius to `inherit` inside a group | Not reproduced: the fix is in place at the baseline | Reported |
+| The kind table and the "never rounder" rule hold in every build and preset | `tests/radius-relations.spec.js` and `tests/group-search-radius.spec.js` pass | `dist/cirth.css` built from `4065210c4`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Verified |
 
 ## Decisions
 
@@ -76,14 +77,19 @@ Not promised:
 
 ## Acceptance
 
-- [ ] `tests/radius-relations.spec.js`: the kind table and the "never
+- [x] `tests/radius-relations.spec.js`: the kind table and the "never
       rounder" rule, measured on the built CSS in the default, classless and
       scoped builds with each preset, in three engines.
-- [ ] `tests/group-search-radius.spec.js`: a search field in a generic group
+      Passes in three engines, 2026-10-23.
+- [x] `tests/group-search-radius.spec.js`: a search field in a generic group
       still matches the group, and the search group matches a text group.
-- [ ] `docs/src/pages/forms/input-search.md`, `docs/src/pages/components/group.md`
+      Passes in three engines, 2026-10-23.
+- [x] `docs/src/pages/forms/input-search.md`, `docs/src/pages/components/group.md`
       and `docs/src/pages/components/popover.md` describe the new shapes;
       `docs/src/pages/upgrading.md` carries the migration.
+      Popover described the container radius already; the search field and
+      the search group say their shape since 2026-10-23; the migration is in
+      Upgrading (Radii).
 
 ## Migration
 

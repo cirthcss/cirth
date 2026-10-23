@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | None yet: documentation redesign, `design/technical-language-system` |
-| Status | Implemented: every acceptance check passes on this tree (2026-10-03); lands with the branch |
+| Status | Landed on `develop` |
 | Baseline | `a0c077e5` on `design/technical-language-system` |
 | Breaking | Yes: the drawing of every checkbox and radio changes, and a wrapping label gains a hanging indent; no token renamed, removed or added |
 | Decisions | 2026-10-01, maintainer: radios look oversized, empty and set down at random beside their label, and inside `.segmented` they read as stray circles |

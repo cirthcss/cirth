@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | gh#125 |
-| Status | Implementing |
+| Status | Landed in v0.16.0 |
 | Baseline | `66aae745` on `develop` |
 | Breaking | No — new opt-out class; existing markup without it is unchanged |
 

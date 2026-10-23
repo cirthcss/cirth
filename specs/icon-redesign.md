@@ -63,8 +63,11 @@ functional behavior at each use site.
 - [x] The macOS visual baselines that contain affected controls are
       regenerated from the integrated branch rather than inherited from the
       older icon branch.
-- [ ] The repository's Update visual baselines workflow regenerates the Linux
+- [x] The repository's Update visual baselines workflow regenerates the Linux
       set after this branch is pushed.
+      Done: the workflow regenerated the Linux set (latest `a324c38c4`,
+      2026-10-22), and CI run 39861460667 on `ee5e5d343` passed 1294 visual
+      captures against it.
 
 ## Open questions
 
