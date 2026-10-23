@@ -84,7 +84,7 @@ its cells.
 | Label | a field's `label` | 14px | 500 | body |
 | Control text | buttons, `summary`, `dt` | 16px | 500 | body |
 | Group | a fieldset's `legend` | 16px | 600 | strong |
-| Meta | `thead` and `tfoot` cells, `figcaption`, a quotation's `footer` | 13px | 500 | muted |
+| Meta | `thead` and `tfoot` cells, `figcaption`, a quotation's `footer`, help text after a field | 13px | 500 | muted |
 | Code | `code`, `kbd`, `samp`, `var`, `pre` | 0.875em | 400 | body |
 
 Headings keep these sizes at every viewport width. A hero that needs a

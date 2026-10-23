@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | None yet: technical-language foundations, `design/technical-language-system` |
-| Status | Implementing: merged into `develop`; two acceptance checks fail and one is not re-run, see Acceptance |
+| Status | Implementing: merged into `develop`; the census is not re-run, and the leading of `pre` is open (Open questions, 3) |
 | Baseline | `806fea7a` on `design/technical-language-system` |
 | Breaking | Yes: default weights, sizes and inks of headings, labels, legends, table headers and code change; two tracking tokens are replaced |
 
@@ -151,11 +151,13 @@ work that follows these specs brings onto the same roles.
 | 650 falls back to 700 on static families | CSS Fonts 4 font-matching for weights above 500 | Specification text, not reproduced on a static-font machine here | Reported |
 | At 0.04 the 64px display line sets glyphs touching in the default face | "Semantic HTML in." at 64px/650: `n`–`t` and `i`–`c` meet at 0.04 and nearly at 0.03; clear at 0.025 and 0.02 | Docs home at `cf4c9ae3`, `--cirth-tracking-optical` overridden on the root, system-ui resolving to SF Pro, Chromium 149 and WebKit 26.5, macOS 26.7 | Verified |
 | The role table holds on the built CSS | Size, weight, leading and ink of every element in the table equal in the default, classless and scoped builds and in three engines, with the two exceptions below; headings follow the superseding ladder | `dist/cirth.css` built from `4065210c4`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Verified |
-| Help text after a field is the meta role, 13px | It renders at 14px/500, muted. `:where(input, select, textarea, fieldset, .row) + small` sets 0.8125rem, but the `small` rule's own `font-size: var(--cirth-font-size)` (0.875em) comes later in the layer at the same specificity and wins | `dist/cirth.css` built from `4065210c4`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Invalid: open defect |
+| Help text after a field is the meta role, 13px | It renders at 14px/500, muted. `:where(input, select, textarea, fieldset, .row) + small` sets 0.8125rem, but the `small` rule's own `font-size: var(--cirth-font-size)` (0.875em) comes later in the layer at the same specificity and wins | `dist/cirth.css` built from `4065210c4`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Invalid: a defect, fixed in `b3e8fc46e` (row below) |
 | Code inside `pre` takes relaxed leading | `pre > code` takes `--cirth-line-height` (1.5); `--cirth-line-height-relaxed` has no consumer in the library | `dist/cirth.css` built from `4065210c4`, 2026-10-23 | Invalid: the table's leading column is not implemented for `pre` |
 | Tracking follows the relation | `letter-spacing` 0.075px, normal, −0.3px, −0.6px, −1.2px at 13, 16, 28, 40, 64px: `0.025 × (16px − size)` | `dist/cirth.css` built from `4065210c4`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Verified |
 | A field's value never renders under 16px | With `--cirth-font-size-md: 14px` at the root, input, select and textarea compute 16px | `dist/cirth.css` built from `4065210c4`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Verified |
-| No text under 4.5:1 on any level | Worst ratio of 14 text tokens over the recessed, canvas, raised and overlay levels; default, the probe, plain, material, metro; both schemes, with and without `more`: ink 8.80, muted 5.29, secondary 5.47, accent text 4.66, status texts ≥ 6.96; `--cirth-link-visited-color` 4.37 in material, dark, on the overlay only (`#919191` on the overlay surface) | `dist/cirth.css` built from `4065210c4` and `dist/presets/*.css`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Verified: one failure, open |
+| No text under 4.5:1 on any level | Worst ratio of 14 text tokens over the recessed, canvas, raised and overlay levels; default, the probe, plain, material, metro; both schemes, with and without `more`: ink 8.80, muted 5.29, secondary 5.47, accent text 4.66, status texts ≥ 6.96; `--cirth-link-visited-color` 4.37 in material, dark, on the overlay only (`#919191` on the overlay surface) | `dist/cirth.css` built from `4065210c4` and `dist/presets/*.css`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Verified: one failure, fixed in `b3e8fc46e` (row below) |
+| Help text after a field is the meta role, 13px, after the fix | The `small` rule is `:where(small)`, so the help text's meta size wins at any position in the layer: 13px/500, muted, in the default, classless, scoped and classless scoped builds; `tests/native-element-defaults.spec.js` fails on the unfixed source | `dist/cirth.css` built from `b3e8fc46e`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Verified |
+| No text under 4.5:1 on any level, after the fix | Material's dark visited link is `#969696`: 4.66:1 on the overlay, and at least 0.12 Oklab from every other text role in normal vision and the three dichromacies; `tests/surface-depth.spec.js` fails with `#919191` | `dist/cirth.css` built from `b3e8fc46e` and `dist/presets/material.css`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, macOS, 2026-10-23 | Verified |
 
 ## Decisions
 
@@ -175,23 +177,25 @@ work that follows these specs brings onto the same roles.
 
 ## Acceptance
 
-- [ ] The role table holds on the built CSS: sizes, weights, leading and ink
+- [x] The role table holds on the built CSS: sizes, weights, leading and ink
       per element, in the default, classless and scoped builds:
       `tests/native-element-defaults.spec.js`, extended.
-      Measured on 2026-10-23 (ledger): holds in the three builds and engines
-      except help text after a field, which renders at 14px, and `pre`, which
-      keeps normal leading. The test is not extended.
+      `tests/native-element-defaults.spec.js` (every element takes its type
+      role) pins it in the four builds and three engines since `b3e8fc46e`,
+      which brought help text to 13px. The leading of `pre` is left out
+      (Open questions, 3).
 - [x] Tracking measured at 13, 16, 28, 40 and 64px equals the relation.
       Verified 2026-10-23: 0.075px at 13px, none at 16px, −0.3px at 28px,
       −0.6px at 40px, −1.2px at 64px, in three engines (ledger).
 - [x] Field value font-size ≥ 16px with `--cirth-font-size-md` set to 14px.
       Verified 2026-10-23: input, select and textarea compute 16px in three
       engines (ledger).
-- [ ] No text below 4.5:1 on any level, four accents, both schemes, with and
+- [x] No text below 4.5:1 on any level, four accents, both schemes, with and
       without `more`.
-      Measured on 2026-10-23 (ledger): every text token clears 4.5:1 on every
-      level except `--cirth-link-visited-color` in `material`, dark, on the
-      overlay level, at 4.37:1.
+      `tests/surface-depth.spec.js` (every text role reads 4.5:1 on every
+      level) holds 11 text roles on four levels for the default theme, the
+      probe and the three presets, since `b3e8fc46e` lightened material's dark
+      visited link.
 - [ ] Every docs page at most about 10 pairs by the census above, after the
       shell work.
       Not re-run: the census script lives with the evidence files, outside
@@ -220,3 +224,8 @@ work that follows these specs brings onto the same roles.
 2. **Field labels at 14px.** Smaller than the value they name, which is the
    usual hierarchy, but a reader who scales text only through `rem` gets
    both larger. Settled if the label role's size is in `rem` (proposed).
+3. **Leading inside `pre`.** The role table gives code in a `pre` relaxed
+   leading (1.625); the library sets `--cirth-line-height` (1.5) on
+   `pre > code`, and `--cirth-line-height-relaxed` has no consumer. Either
+   every code block grows by an eighth of a line, or the table drops the
+   word. Found on 2026-10-23; not decided.

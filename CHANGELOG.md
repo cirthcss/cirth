@@ -37,11 +37,11 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   does not grow with the viewport: 28, 24, 20, 18, 16 and 14px from `h1` to
   `h6`, with `--cirth-display-font-size` for a hero. `h1` to `h4` take
   `--cirth-ink-strong` and `h5` and `h6` the body ink, instead of a fade. A
-  field's label is 14px at 500, a legend outranks it, column heads, captions
-  and a quotation's attribution are metadata (13px, medium, muted), and
-  buttons, summaries and terms are set at 500. Tracking is one relation of size,
-  `--cirth-tracking-optical`: none at the body size, positive below it,
-  negative above it. A field's value never renders under 16px.
+  field's label is 14px at 500, a legend outranks it, column heads, captions,
+  a quotation's attribution and help text are metadata (13px, medium, muted),
+  and buttons, summaries and terms are set at 500. Tracking is one relation
+  of size, `--cirth-tracking-optical`: none at the body size, positive below
+  it, negative above it. A field's value never renders under 16px.
   **Breaking** — see the Upgrading page.
 
 - **The primary is the heaviest action, and focus is one ring.** `.secondary`
@@ -51,9 +51,11 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   edge keeps its colour on focus, a validation state recolours the ring and
   the edge together, and a group draws one ring round the row. Disabled is a
   state rather than a transparency, `--cirth-disabled-surface` and
-  `--cirth-disabled-color` for every variant. A pressed button moves down by
-  `--cirth-control-press-offset` (1px) when motion is allowed. A submit button sizes to its label,
-  and inline `code` and `samp` are text in the code face, without a chip.
+  `--cirth-disabled-color` for every variant and every field, whether it is
+  disabled itself or by its fieldset. A pressed button moves down by
+  `--cirth-control-press-offset` (1px) when motion is allowed. A submit
+  button sizes to its label, and inline `code` and `samp` are text in the
+  code face, without a chip.
   **Breaking** — see the Upgrading page.
 
 - **Space between elements comes from their relation.** No element carries
