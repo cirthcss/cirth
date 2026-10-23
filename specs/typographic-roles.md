@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | None yet: technical-language foundations, `design/technical-language-system` |
-| Status | Implementing: merged into `develop`; the census is not re-run, and the leading of `pre` is open (Open questions, 3) |
+| Status | Implementing: merged into `develop`; the census is not re-run |
 | Baseline | `806fea7a` on `design/technical-language-system` |
 | Breaking | Yes: default weights, sizes and inks of headings, labels, legends, table headers and code change; two tracking tokens are replaced |
 
@@ -47,7 +47,7 @@ see new weights and a slightly smaller heading ladder; a consumer who set
 | Label | field `label`, buttons, `summary`, `dt`, the current nav item | 0.875rem for field labels; 1rem for control text | 500 | normal | ink |
 | Group | `fieldset > legend` | 1rem | 600 | normal | strong |
 | Meta | `thead`/`tfoot` cells, `figcaption`, help text after a field, a blockquote's `footer` | 0.8125rem | 500 | normal | muted |
-| Code and data | `pre`, `code`, `kbd`, `samp`, `var` | 0.875em | 400 | inherited; relaxed inside `pre` | ink |
+| Code and data | `pre`, `code`, `kbd`, `samp`, `var` | 0.875em | 400 | inherited; normal inside `pre` | ink |
 
 Heading sizes and weight are superseded by
 [elena-informed-theme-refresh](elena-informed-theme-refresh.md): 28, 24, 20,
@@ -174,6 +174,7 @@ work that follows these specs brings onto the same roles.
 | Code in body ink | Design | Code is content; the muted ink told the reader it mattered less than the sentence around it |
 | Rejected: a monospace label or annotation voice | Design | Monospace is for code and data; a voice made of capitals and a code face is decoration |
 | h5 and h6 in body ink | Design | At body size a strong ink is the only thing separating them from bold text |
+| Code inside `pre` at normal leading, not relaxed | Maintainer, 2026-10-23 | The table asked for relaxed leading (1.625) and the library never set it: `pre > code` takes `--cirth-line-height` (1.5). The table now says what ships, so every code block keeps its height |
 
 ## Acceptance
 
@@ -182,8 +183,8 @@ work that follows these specs brings onto the same roles.
       `tests/native-element-defaults.spec.js`, extended.
       `tests/native-element-defaults.spec.js` (every element takes its type
       role) pins it in the four builds and three engines since `b3e8fc46e`,
-      which brought help text to 13px. The leading of `pre` is left out
-      (Open questions, 3).
+      which brought help text to 13px, including normal leading for code
+      inside `pre` (Decisions).
 - [x] Tracking measured at 13, 16, 28, 40 and 64px equals the relation.
       Verified 2026-10-23: 0.075px at 13px, none at 16px, −0.3px at 28px,
       −0.6px at 40px, −1.2px at 64px, in three engines (ledger).
@@ -224,8 +225,3 @@ work that follows these specs brings onto the same roles.
 2. **Field labels at 14px.** Smaller than the value they name, which is the
    usual hierarchy, but a reader who scales text only through `rem` gets
    both larger. Settled if the label role's size is in `rem` (proposed).
-3. **Leading inside `pre`.** The role table gives code in a `pre` relaxed
-   leading (1.625); the library sets `--cirth-line-height` (1.5) on
-   `pre > code`, and `--cirth-line-height-relaxed` has no consumer. Either
-   every code block grows by an eighth of a line, or the table drops the
-   word. Found on 2026-10-23; not decided.
