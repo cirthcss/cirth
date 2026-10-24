@@ -44,7 +44,7 @@ cryptographic digest before applying a cross-origin stylesheet:
 <link
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.min.css"
-  integrity="sha384-53LU4r3+obTw7a8xZbgzbJxpTHvqBizlnFrXEzhKxAdyyCzI4VcUZxfEFDpiLL8q"
+  integrity="sha384-lI8cp0vEMgtcAMV0HDytp7C+rad0hVfW/yXmsl87XmnuvTiMsx7O7ADf2lg5IQZq"
   crossorigin="anonymous">
 ```
 
@@ -71,7 +71,7 @@ screen build, then optionally its matching print stylesheet and one preset.
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.min.css"
   crossorigin="anonymous"
-  integrity="sha384-53LU4r3+obTw7a8xZbgzbJxpTHvqBizlnFrXEzhKxAdyyCzI4VcUZxfEFDpiLL8q">
+  integrity="sha384-lI8cp0vEMgtcAMV0HDytp7C+rad0hVfW/yXmsl87XmnuvTiMsx7O7ADf2lg5IQZq">
 ```
 
 **Classless**
@@ -81,7 +81,7 @@ screen build, then optionally its matching print stylesheet and one preset.
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.classless.min.css"
   crossorigin="anonymous"
-  integrity="sha384-5fK+0+TfGS2uhr/YeVY5N8oPPjL1H0AfZ/yza9jcN1BfhN6aZjSWGolImda0cQxS">
+  integrity="sha384-GZZdP20mqrkcypnIg17t08a5FoGdAKJ49eU1GBK8aXcaT+BwFnqIn5vK52i0gIQm">
 ```
 
 **Scoped**
@@ -91,7 +91,7 @@ screen build, then optionally its matching print stylesheet and one preset.
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.scoped.min.css"
   crossorigin="anonymous"
-  integrity="sha384-ZrhnotQGcohDjEOTVhfsUndEJCdF6y+VdGj9UVYwiwi2vnFgAMDFRTrkBqVY69xb">
+  integrity="sha384-yFHmovn3OOvzinHeO2HC8iG31iDb+lzxgD4N1MlNchcoGDoFtCB07aY2FOyH/pPD">
 ```
 
 **Classless scoped**
@@ -101,7 +101,7 @@ screen build, then optionally its matching print stylesheet and one preset.
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.classless.scoped.min.css"
   crossorigin="anonymous"
-  integrity="sha384-S9Z2uWGAigdp+jxPfzeCW2Yn8BDWq3bOB+q9Fnl9sX6ZOPWnV1n2zgSgecCV7r39">
+  integrity="sha384-pmLwIliHSNEo//m1i4cVpTDvwB8TWoXibgRIsG/pCjCS1CjZWI+xzd9xPL27iDal">
 ```
 
 </details>
@@ -120,7 +120,7 @@ printed output. Match the print variant to the screen build.
   href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.print.min.css"
   crossorigin="anonymous"
   media="print"
-  integrity="sha384-H6MrzXDWYEYbcEv7/qM5QT2JddmDsGurftKS/cGcdQxq4M9sPwlZ22kRdUJQH32C">
+  integrity="sha384-YN/sJVAjTOf20mXWrLlQ2XLbgm3EzefQEiFukKfZstkH6fR92hz6dP7eQQTXQE6I">
 ```
 
 **Classless**
@@ -131,7 +131,7 @@ printed output. Match the print variant to the screen build.
   href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.print.classless.min.css"
   crossorigin="anonymous"
   media="print"
-  integrity="sha384-WK9aOXA6H7tjim3lGtDb8QPf+607rmsX1LCMmFuyOjeIQlWfHUSvmFiswMMcaPyo">
+  integrity="sha384-KlGh53ZQjfQ7JhOLWWItAN1ObJxoGarjln25jr0g1tAXzHgBCIF+T865QmXCLfGC">
 ```
 
 **Scoped**
@@ -142,7 +142,7 @@ printed output. Match the print variant to the screen build.
   href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.print.scoped.min.css"
   crossorigin="anonymous"
   media="print"
-  integrity="sha384-P7bICrpqvxRdlqYFJc12IrWSKWoEjq5bGSsWA7trtcoQz7yOKAlwVr5d+8HZk4Hm">
+  integrity="sha384-LNN/khfIDlAUi/AyGX/87XGJGa0ld1fhRoSq9I2q1/8upiZeHZcKXKtzaONxHmyA">
 ```
 
 **Classless scoped**
@@ -153,7 +153,7 @@ printed output. Match the print variant to the screen build.
   href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.print.classless.scoped.min.css"
   crossorigin="anonymous"
   media="print"
-  integrity="sha384-U7OIIROFvc6mFUa21sxxa7ZkKGUdmSft9aZhY47ZZDUN567q8YcBNVpmaDVmD0Mn">
+  integrity="sha384-mKNyK6vZhzN8WFVteBa3vLghpScnwxS1lqZ1XI9U1dztIU+VOhHmdJvOTwo/jpVX">
 ```
 
 </details>
@@ -171,28 +171,20 @@ same cascade layer.
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/presets/plain.min.css"
   crossorigin="anonymous"
-  integrity="sha384-okpjel3OpaU3vAINebVVlnSfp2mxHjNDxsCZXPEeIgAlRmlYWImyGIgehXWshT4d">
+  integrity="sha384-kcc0qmhEMFGjevUPPKQe8HsvALQEf5WLYgSB0GDaiwpnVkdOQ3FdmeCj7K8GgIA2">
 ```
 
-**Material**
+**Material and Metro**
 
-```html
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/presets/material.min.css"
-  crossorigin="anonymous"
-  integrity="sha384-QVsEYI2iOafZxKZScZIt+2tPLNOS3SRGP+RlNPRHLVKEmSjVIGYBrC97UdweTYC1">
-```
+<!-- Material and Metro first ship in 0.17.0. The snippets pin the last
+stable release, which does not have them during the 0.17 beta series:
+restore their two snippets when 0.17.0 is stable, and `npm run sri` writes
+the pin and the hash. -->
 
-**Metro**
-
-```html
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/presets/metro.min.css"
-  crossorigin="anonymous"
-  integrity="sha384-qQi6ftZk/KlgpDp5fDo2uwT1dTbqQHKY4iux6RXo2DPISvEAWtUOmtk3lbDjRdAP">
-```
+These two presets first ship in v0.17.0, which is in beta. The snippets on
+this page pin the last stable release, so their jsDelivr links appear here
+when v0.17.0 is stable. To try them now, install the beta from npm:
+`npm install @cirthcss/cirth@beta`.
 
 </details>
 
