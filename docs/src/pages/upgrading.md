@@ -21,8 +21,9 @@ come from four named levels and three named edges, type comes from roles, the
 primary is always the heaviest action, every corner takes one of two radii by
 what it is, space between elements comes from their relation rather than from
 margins they carry, and a checkbox or radio draws its mark inside its target.
-The `playroom` preset is replaced by `material`, and `metro` is added. Each
-observable change has a spec in the repository's `specs/` directory.
+The `playroom` preset is replaced by `material`, `metro` is added, and the
+print rules are back inside every build. Each observable change has a spec
+in the repository's `specs/` directory.
 
 ### Colour
 
@@ -120,6 +121,27 @@ is Material Design 3's baseline scheme, not a recolouring of `playroom`.
 
 <!-- after -->
 <link rel="stylesheet" href="dist/presets/material.min.css">
+```
+
+### Print is part of every build
+
+The print rules are back inside every build, last, under `@media print`. A
+page that links only the build now prints with them: black ink on white in
+either colour scheme, flat surfaces, link destinations spelled out.
+
+| If you | Then |
+| --- | --- |
+| Load `cirth.print.min.css`, or import `@cirthcss/cirth/print`, after the build | Remove it. It still ships through 0.17, deprecated, and changes nothing printed; it is removed in v0.18.0 |
+| Print with your own `@media print` rules | Nothing to do: rules outside Cirth's layer still win over its print rules |
+| Relied on a page printing without any of Cirth's print rules | Override the ones you do not want in your own `@media print` rules |
+
+```html
+<!-- before -->
+<link rel="stylesheet" href="cirth.min.css">
+<link rel="stylesheet" href="cirth.print.min.css" media="print">
+
+<!-- after -->
+<link rel="stylesheet" href="cirth.min.css">
 ```
 
 ## To v0.16.0, from v0.14.x

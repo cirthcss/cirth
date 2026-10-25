@@ -1,12 +1,14 @@
-// Cirth print stylesheet
-// Load after the matching main build, with media="print":
-//   <link rel="stylesheet" href="cirth.min.css">
-//   <link rel="stylesheet" href="cirth.print.min.css" media="print">
-// Loaded after the build, the print pass wins over the component rules it
-// has to outrank by source order, and the browser fetches it at low
-// priority because its media query does not match the screen.
+// Cirth print stylesheet, deprecated: every main build carries the print
+// pass since 0.17.0 (specs/print-in-main-build.md). This entry still emits
+// the same pass on its own, so a page that loads it after the build prints
+// exactly as without it. Removed in 0.18.0.
 
 @use "config" with (
   $parent-selector: ".cirth"
 );
-@use "utilities/print";
+@use "sass:meta";
+@use "helpers/cascade";
+
+@include cascade.layer {
+  @include meta.load-css("utilities/print");
+}

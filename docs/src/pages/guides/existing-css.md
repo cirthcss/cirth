@@ -100,7 +100,7 @@ reset and not complete isolation. The subtree may still receive:
 - theme custom properties;
 - layout and utility rules;
 - accessibility and reduced-motion rules;
-- the separately loaded print stylesheet.
+- the print rules every build carries.
 
 A selector whose subject is outside the boundary may also react to an
 excluded descendant through `:has()`, or to an excluded sibling. Inspect

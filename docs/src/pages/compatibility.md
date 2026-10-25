@@ -151,8 +151,8 @@ deployment guidance.
 
 ### Print
 
-Browser support for the separate print stylesheets is documented with their
-behavior on the [Print](/utilities/print) page.
+Browser support for the print rules is documented with their behavior on
+the [Print](/utilities/print) page.
 
 ## Before adopting Cirth
 

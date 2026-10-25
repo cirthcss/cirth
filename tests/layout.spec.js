@@ -181,3 +181,93 @@ test("the scoped build keeps the same layout contract inside its root", async ({
 	expect(content.left - container.left).toBe(120);
 	expect(full.width).toBe(container.width);
 });
+
+// --- .span-full (specs/grid-span-full.md) ---------------------------------
+
+// A direct child of .grid crosses every column, however many the container
+// fits, and nothing else changes: not its siblings, not a grid nested in it,
+// not a .row, not an element outside a grid.
+for (const [label, width, dir] of /** @type {const} */ ([
+	["wide", 1200, "ltr"],
+	["wide, right to left", 1200, "rtl"],
+	["narrow", 300, "ltr"],
+])) {
+	test(`span-full crosses every column of a .grid (${label})`, async ({
+		page,
+	}) => {
+		await render(
+			page,
+			`<div dir="${dir}">
+				<div id="grid" class="grid" style="width: ${width}px">
+					<label id="first">First<input></label>
+					<label id="second">Second<input></label>
+					<label id="full" class="span-full">Notes<textarea></textarea></label>
+					<p id="after">After</p>
+				</div>
+			</div>`,
+		);
+		const box = await boxes(page, ["grid", "first", "second", "full", "after"]);
+
+		expect(box.full.left).toBeCloseTo(box.grid.left, 0);
+		expect(box.full.width).toBeCloseTo(box.grid.width, 0);
+		// The short fields keep equal columns. The spanning child holds every
+		// column open, so in a grid that fits more than two, the rest of
+		// their row stays empty rather than being shared out.
+		if (width > 600) {
+			expect(box.first.width + box.second.width).toBeLessThan(box.grid.width);
+			expect(box.first.width).toBeCloseTo(box.second.width, 0);
+		}
+	});
+}
+
+test("span-full does not overflow the grid with long content", async ({
+	page,
+}) => {
+	await render(
+		page,
+		`<div id="grid" class="grid" style="width: 320px">
+			<p id="full" class="span-full">${"unbroken".repeat(40)}</p>
+		</div>`,
+	);
+	const measured = await page.evaluate(() => {
+		const grid = /** @type {HTMLElement} */ (document.getElementById("grid"));
+		const full = /** @type {HTMLElement} */ (document.getElementById("full"));
+		return {
+			gridWidth: grid.getBoundingClientRect().width,
+			fullWidth: full.getBoundingClientRect().width,
+		};
+	});
+	expect(measured.fullWidth).toBeLessThanOrEqual(measured.gridWidth + 0.5);
+});
+
+test("span-full means nothing outside a direct child of .grid", async ({
+	page,
+}) => {
+	await render(
+		page,
+		`<div id="grid" class="grid" style="width: 1200px">
+			<div id="cell"><div class="grid"><p id="nested" class="span-full">Nested</p><p>Sibling</p></div></div>
+			<p>Two</p><p>Three</p>
+		</div>
+		<div id="row" class="row" style="width: 1200px"><p id="in-row" class="span-full">Row</p><p>Two</p></div>
+		<p id="loose" class="span-full">Loose</p>`,
+	);
+	const columns = await page.evaluate(() =>
+		["nested", "in-row", "loose"].map(
+			(id) =>
+				getComputedStyle(/** @type {Element} */ (document.getElementById(id)))
+					.gridColumnStart,
+		),
+	);
+	// A grandchild in its own .grid does span that grid; the outer one never
+	// sees it. A .row and a block outside any grid keep the default.
+	const box = await boxes(page, ["cell", "nested"]);
+	expect(box.nested.width).toBeCloseTo(box.cell.width, 0);
+	expect(columns[1]).toBe("auto");
+	expect(columns[2]).toBe("auto");
+});
+
+test("span-full is a class, so the classless build has no such rule", () => {
+	expect(read("dist/cirth.classless.css")).not.toContain("span-full");
+	expect(read("dist/cirth.scoped.css")).toContain(".cirth .grid > .span-full");
+});

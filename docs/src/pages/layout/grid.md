@@ -40,6 +40,30 @@ The grid also:
 - removes direct-child flow margins because the grid gap owns the space
   between cells.
 
+## A child across every column
+
+Add `.span-full` to a direct child of `.grid` when it has to cross every
+column: a notes field after short fields, a validation summary, an action
+row. It spans however many columns the grid fits. The other children keep
+their columns: if they do not fill a row, the rest of that row stays empty,
+because the spanning child holds every column open.
+
+{% demo "grid-span-full" %}
+
+```html
+<div class="grid">
+  <label>First name<input name="given-name"></label>
+  <label>Last name<input name="family-name"></label>
+  <label>Email<input name="email" type="email"></label>
+  <label class="span-full">Notes<textarea name="notes" rows="3"></textarea></label>
+</div>
+```
+
+The class only acts on a direct child of `.grid`. It does nothing in a
+`.row`, on a grandchild, or outside a grid, and there is no class for
+spanning two or three columns: how many columns a grid has depends on its
+width, so a fixed count belongs in your own CSS.
+
 ## Grid or row
 
 | Choose | When the layout should |
