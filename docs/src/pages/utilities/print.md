@@ -1,40 +1,33 @@
 ---
 layout: docs.njk
-description: Load Cirth's optional print stylesheet, understand its paper-specific behavior, and customize the print color roles.
+description: How every Cirth build treats print, what it changes on paper, and how to customize the print color roles.
 ---
 
 # Print
 
-Cirth's print rules are a separate stylesheet. Load the sheet that matches the
-main build after that build:
+Every Cirth build carries its print rules, at the end of the stylesheet and
+under `@media print`. The one `<link>` that styles the screen also prepares
+the page for paper, and nothing in it changes what the screen shows:
 
 ```html
 <link rel="stylesheet" href="/cirth.min.css">
-<link rel="stylesheet" href="/cirth.print.min.css" media="print">
 ```
 
-The browser applies a stylesheet with `media="print"` to printed output and
-print preview, not to the screen presentation. No print-only HTML is required.
+No print-only HTML is required.
 
-With a package manager, import the matching default-build entry:
+Up to v0.16, the print rules were a separate stylesheet. Those files still
+ship through the 0.17 line, deprecated: loading one after its build changes
+nothing printed, and they are removed in v0.18.0.
+[Package and builds](/package#print-stylesheets) lists them.
 
-```css
-@import "@cirthcss/cirth";
-@import "@cirthcss/cirth/print" print;
-```
-
-Classless and scoped builds have corresponding print entries. Keep the build
-and print variants paired. [Package and builds](/package#print-stylesheets)
-lists every print entry point and compiled file.
-
-## Why a print stylesheet is needed
+## Why print needs its own rules
 
 Browsers can omit author backgrounds while retaining author text colors. A
 page viewed in a dark theme could therefore produce pale text on white paper.
 Screen-only behaviors such as horizontal scrolling also have no useful paper
 equivalent.
 
-Cirth's print sheet resolves those framework-level issues. It does not decide
+Cirth's print rules resolve those framework-level issues. It does not decide
 which application regions are navigation, advertising, or other screen-only
 content.
 
@@ -125,8 +118,7 @@ the opposite: the element appears only on paper.
 </main>
 ```
 
-Both are in the class builds, in the main stylesheet, so they work whether
-or not the print stylesheet is loaded. They nest as you would expect: a
+Both are in the class builds, beside the rest of the print rules. They nest as you would expect: a
 `.print-only` element inside a `.no-print` one is never shown, and
 `hidden` keeps a `.print-only` element hidden on paper too.
 
@@ -146,8 +138,6 @@ content hidden by the application.
 
 ## Common mistakes
 
-- Do not load a print sheet for a different build variant.
-- Do not omit `media="print"` from the print `<link>`.
 - Do not assume screen scrolling will expose clipped content on paper.
 - Do not hide navigation or sidebars globally when they should disappear only
   from printed output: give them `.no-print`.

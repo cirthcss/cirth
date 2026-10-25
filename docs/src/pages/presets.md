@@ -34,15 +34,9 @@ Swap `material` for `plain` or `metro`. Load one preset at a time: they
 restate some of the same tokens, and the later one would win on each of
 those alone.
 
-The order is the build, then the print stylesheet if you use one, then the
-preset. The preset restates tokens the build declares, so it has to come
-after the build:
-
-```html
-<link rel="stylesheet" href="dist/cirth.min.css">
-<link rel="stylesheet" href="dist/cirth.print.min.css" media="print">
-<link rel="stylesheet" href="dist/presets/material.min.css">
-```
+The preset restates tokens the build declares, so it has to come after the
+build. The build's print rules keep printing black ink on white with any
+preset.
 
 Every preset sets both colour schemes and its own increased-contrast pass,
 so `data-theme` and `prefers-contrast: more` keep working with it.

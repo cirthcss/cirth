@@ -54,13 +54,13 @@ These are the public paths declared by the package manifest:
 | Export | Resolves to |
 | --- | --- |
 | `@cirthcss/cirth` | `dist/cirth.min.css` |
-| `@cirthcss/cirth/print` | `dist/cirth.print.min.css` |
+| `@cirthcss/cirth/print` | `dist/cirth.print.min.css`, deprecated |
 | `@cirthcss/cirth/classless` | `dist/cirth.classless.min.css` |
-| `@cirthcss/cirth/classless/print` | `dist/cirth.print.classless.min.css` |
+| `@cirthcss/cirth/classless/print` | `dist/cirth.print.classless.min.css`, deprecated |
 | `@cirthcss/cirth/scoped` | `dist/cirth.scoped.min.css` |
-| `@cirthcss/cirth/scoped/print` | `dist/cirth.print.scoped.min.css` |
+| `@cirthcss/cirth/scoped/print` | `dist/cirth.print.scoped.min.css`, deprecated |
 | `@cirthcss/cirth/classless/scoped` | `dist/cirth.classless.scoped.min.css` |
-| `@cirthcss/cirth/classless/scoped/print` | `dist/cirth.print.classless.scoped.min.css` |
+| `@cirthcss/cirth/classless/scoped/print` | `dist/cirth.print.classless.scoped.min.css`, deprecated |
 | `@cirthcss/cirth/presets/plain` | `dist/presets/plain.min.css` |
 | `@cirthcss/cirth/presets/material` | `dist/presets/material.min.css` |
 | `@cirthcss/cirth/presets/metro` | `dist/presets/metro.min.css` |
@@ -78,7 +78,10 @@ convention.
 
 ### Print stylesheets
 
-Each screen build has a matching print entry:
+Every build carries its print rules since v0.17.0. The separate print
+entries below still ship through the 0.17 line, deprecated, so existing
+imports keep resolving: loading one after its build changes nothing
+printed. They are removed in v0.18.0.
 
 | Screen build | Print import |
 | --- | --- |
@@ -87,9 +90,7 @@ Each screen build has a matching print entry:
 | Scoped | `@cirthcss/cirth/scoped/print` |
 | Classless scoped | `@cirthcss/cirth/classless/scoped/print` |
 
-The print file is separate so screen-only projects do not receive it
-implicitly. The [Print](/utilities/print) page shows how to load it with the
-correct media condition and documents what it changes.
+The [Print](/utilities/print) page documents what the print rules change.
 
 ### Presets
 
@@ -119,8 +120,8 @@ The published `dist/` directory contains 24 generated files:
 
 | Directory | Files |
 | --- | --- |
-| `dist/` screen CSS | `cirth.css`, `cirth.classless.css`, `cirth.scoped.css`, `cirth.classless.scoped.css`, plus each `.min.css` counterpart |
-| `dist/` print CSS | `cirth.print.css`, `cirth.print.classless.css`, `cirth.print.scoped.css`, `cirth.print.classless.scoped.css`, plus each `.min.css` counterpart |
+| `dist/` builds, print rules included | `cirth.css`, `cirth.classless.css`, `cirth.scoped.css`, `cirth.classless.scoped.css`, plus each `.min.css` counterpart |
+| `dist/` print CSS, deprecated | `cirth.print.css`, `cirth.print.classless.css`, `cirth.print.scoped.css`, `cirth.print.classless.scoped.css`, plus each `.min.css` counterpart |
 | `dist/presets/` | `plain.css`, `material.css`, `metro.css`, plus each `.min.css` counterpart |
 | `dist/tokens/` | `light.tokens.json`, `dark.tokens.json` |
 

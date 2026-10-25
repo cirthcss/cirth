@@ -7,6 +7,22 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Changed
+
+- **Every build carries the print rules again.** The print pass is the last
+  part of every main build, under `@media print`, so a page that links only
+  the build prints black ink on white in either scheme, with flat surfaces
+  and link destinations spelled out. It adds about 0.7 KB gzip to each
+  build. Your own `@media print` rules still win. **Breaking** — see the
+  Upgrading page.
+
+### Deprecated
+
+- **The print stylesheets** (`cirth.print*.css` and the `./print`,
+  `./classless/print`, `./scoped/print` and `./classless/scoped/print`
+  exports). They still ship and change nothing printed when loaded after
+  their build; they are removed in 0.18.0.
+
 ### Added
 
 - **`.span-full` lets a `.grid` child cross every column** (gh#152). A

@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | None: maintainer decision, 2026-10-25, while landing gh#151 |
-| Status | Draft |
+| Status | Implementing: every acceptance check passes (2026-10-25); lands with its pull request |
 | Baseline | `74c65f46f` on `feat/v0.17-finish` |
 | Breaking | Yes: a page that links only the main build now prints with the print pass |
 
@@ -56,6 +56,13 @@ It does **not** promise:
 | --- | --- | --- | --- |
 | Linking only the main build prints with no pass today | The 0.13.0 changelog says so, and `tests/print.spec.js` concatenates each build with its print sheet to test the pass | `CHANGELOG.md`, `tests/print.spec.js` at `74c65f46f` | Reported |
 | The pass is about 0.9 KB gzip per build | `cirth.print.min.css` 939 B, `cirth.print.scoped.min.css` 929 B, the classless pair 917 B and 908 B | `npm run check:size` at `74c65f46f`, Node 24.18.0 | Verified |
+| Every main build carries the pass, verbatim and last | The body of each `cirth.print*.css` occurs byte for byte in its main build, and the main build ends with it | `dist/` built from `8c2f230ca`, 2026-10-25 | Verified |
+| A page that links only the main build prints with the pass | `tests/print.spec.js` now loads each build alone: ink, flattened surfaces, link destinations and the fold, both schemes, 63 passed | Same build, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5 | Verified |
+| The deprecated print sheet changes nothing printed | Computed colour, background, border, display and `::after` content of ten elements, both schemes, identical with and without the sheet after the build, in the default, classless and scoped builds | Same run | Verified |
+| A preset after the build keeps the print ink | Body, heading and link print `oklch(0 0 0)` in light and dark with material, plain or metro after the build, and with the old order build, print sheet, material | Same build, Chromium 149.0.7827.55 | Verified |
+| The pass still outranks the build and loses to an author print rule | `tests/cascade-layers.spec.js` (the print pass outranks the rest of the build), with the build alone | Same run, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5 | Verified |
+| The pass adds about 0.7 KB gzip once it compresses with the build | `cirth.min.css` 16481 B → 17175 B, `cirth.scoped.min.css` 16733 B → 17430 B, the classless pair 15070 B and 15236 B | `npm run check:size`, Node 24.18.0 | Verified |
+| The package keeps every entry point | `check:package`: 28 files, 16 entry points resolve; `check:consumer` finds `@media print` in every main build and in every deprecated print entry | Same build | Verified |
 
 ## Decisions
 
@@ -67,12 +74,22 @@ It does **not** promise:
 
 ## Acceptance
 
-- [ ] `tests/print.spec.js` tests each main build alone, and shows that
+- [x] `tests/print.spec.js` tests each main build alone, and shows that
       adding its deprecated print sheet changes nothing printed.
-- [ ] A preset loaded after the main build does not change the printed ink.
-- [ ] `npm run check:consumer` expects `@media print` in every main build.
-- [ ] The documentation site loads one stylesheet; Print, Delivery, Package
+      Done: every paint test loads the build alone, plus the identity check
+      with the deprecated sheet.
+- [x] A preset loaded after the main build does not change the printed ink.
+      `tests/print.spec.js` (a preset loaded after the build still prints
+      black ink).
+- [x] `npm run check:consumer` expects `@media print` in every main build.
+      Done in `scripts/smoke-consumer.js`.
+- [x] The documentation site loads one stylesheet; Print, Delivery, Package
       and Presets describe one `<link>`; Upgrading and `CHANGELOG.md` carry
       the change and the deprecation.
-- [ ] `npm run check:size` budgets are raised by what the pass measures, and
+      `scripts/build-docs.js` builds `cirth-docs.css` from the build alone;
+      Print, Delivery, Package, Presets, Compatibility, About and the
+      existing-CSS guide describe one `<link>`; Upgrading and the changelog
+      carry the change and the deprecation.
+- [x] `npm run check:size` budgets are raised by what the pass measures, and
       said so in the commit.
+      By 700 to 800 B each, in `8c2f230ca`.
