@@ -285,6 +285,17 @@ const oklchToOklab = ({ l, c, h }) => {
  */
 const srgbToOklch = (red, green, blue, alpha) => {
   const [r, g, b] = [red, green, blue].map(toLinear);
+  return linearToOklch(r, g, b, alpha);
+};
+
+/**
+ * @param {number} r linear sRGB
+ * @param {number} g linear sRGB
+ * @param {number} b linear sRGB
+ * @param {number} alpha
+ * @returns {OklchColor}
+ */
+const linearToOklch = (r, g, b, alpha) => {
   const long = Math.cbrt(
     0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b,
   );
@@ -302,6 +313,24 @@ const srgbToOklch = (red, green, blue, alpha) => {
     },
     alpha,
   );
+};
+
+/**
+ * Linear sRGB channels, unclamped: what a relative `color(from … srgb-linear …)`
+ * reads its r, g and b keywords as.
+ *
+ * @param {OklchColor} color
+ */
+const oklchToLinear = (color) => {
+  const { l, a, b } = oklchToOklab(color);
+  const long = (l + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+  const medium = (l - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+  const short = (l - 0.0894841775 * a - 1.291485548 * b) ** 3;
+  return {
+    r: 4.0767416621 * long - 3.3077115913 * medium + 0.2309699292 * short,
+    g: -1.2684380046 * long + 2.6097574011 * medium - 0.3413193965 * short,
+    b: -0.0041960863 * long - 0.7034186147 * medium + 1.707614701 * short,
+  };
 };
 
 /** @param {string} hex */
@@ -340,8 +369,14 @@ const parseNumber = (token, percentScale) => {
  */
 const evaluateCalc = (expression, channels) => {
   const tokens =
-    expression.match(/-?(?:\d+\.?\d*|\.\d+)|[a-z]+|[-+*/()]/g) ?? [];
+    expression.match(/-?(?:\d+\.?\d*|\.\d+)|[a-z]+|[-+*/(),]/g) ?? [];
   let position = 0;
+  /** @type {Record<string, (...values: number[]) => number>} */
+  const functions = {
+    clamp: (low, value, high) => Math.min(Math.max(value, low), high),
+    max: Math.max,
+    min: Math.min,
+  };
 
   /** @returns {number} */
   const primary = () => {
@@ -350,6 +385,18 @@ const evaluateCalc = (expression, channels) => {
       const value = sum();
       position += 1; // ")"
       return value;
+    }
+    // min(), max() and clamp() inside a calc: the luminance caps of the
+    // accent's text role are written with them.
+    if (token !== undefined && token in functions && tokens[position] === "(") {
+      position += 1; // "("
+      const values = [sum()];
+      while (tokens[position] === ",") {
+        position += 1;
+        values.push(sum());
+      }
+      position += 1; // ")"
+      return functions[token](...values);
     }
     if (token !== undefined && token in channels) return channels[token];
     const number = Number.parseFloat(token ?? "");
@@ -462,6 +509,31 @@ const evaluateOklch = (args, env) => {
 };
 
 /**
+ * A relative colour in linear sRGB, `color(from <origin> srgb-linear r g b)`,
+ * each channel a keyword, a number or a `calc()`: how the accent's text role
+ * caps its luminance (specs/accent-text-contrast.md).
+ *
+ * @param {string} args
+ * @param {Environment} env
+ * @returns {OklchColor}
+ */
+const evaluateRelativeLinear = (args, env) => {
+  const parts = splitTopLevel(args, " ");
+  if (parts.length !== 6 || parts[0] !== "from" || parts[2] !== "srgb-linear")
+    throw new Unsupported(`color(${args})`);
+  const origin = evaluateColor(parts[1], env);
+  /** @type {Record<string, number>} */
+  const channels = { ...oklchToLinear(origin), alpha: origin.alpha };
+  const [r, g, b] = parts.slice(3).map((part) => {
+    const call = functionCall(part);
+    if (call?.name === "calc") return evaluateCalc(call.args, channels);
+    if (part in channels) return channels[part];
+    return parseNumber(part, 1);
+  });
+  return linearToOklch(r, g, b, origin.alpha);
+};
+
+/**
  * `color-mix()` in oklch or oklab, with premultiplied alpha and the
  * shorter hue arc, following CSS Color 5.
  *
@@ -550,6 +622,7 @@ const evaluateColor = (value, env) => {
   if (call?.name === "var") return env.color(env.variable(call.args));
   if (call?.name === "oklch") return evaluateOklch(call.args, env);
   if (call?.name === "color-mix") return evaluateColorMix(call.args, env);
+  if (call?.name === "color") return evaluateRelativeLinear(call.args, env);
   throw new Unsupported(`not a colour this export can resolve: ${trimmed}`);
 };
 

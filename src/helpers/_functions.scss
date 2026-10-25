@@ -67,3 +67,35 @@ $shadow-dark-opacity-factor: 10;
 @function raised-shadow($light, $dark) {
   @return shadow-layer(0.0625rem, 0.125rem, 0, 0.06, $light, $dark);
 }
+
+// A colour whose relative luminance (WCAG's, in linear light) is held at or
+// under $max, or at or over $min, at run time: the origin's channels,
+// clamped to sRGB as the browser paints them, are scaled toward black, or
+// mixed toward white, by exactly as much as it takes. Scaling linear
+// channels keeps their ratio, so the hue does not move and the result never
+// leaves the gamut. A colour already inside the bound is returned as it is
+// (specs/accent-text-contrast.md).
+$-linear-r: "clamp(0, r, 1)";
+$-linear-g: "clamp(0, g, 1)";
+$-linear-b: "clamp(0, b, 1)";
+$-luminance: "(0.2126 * #{$-linear-r} + 0.7152 * #{$-linear-g} + 0.0722 * #{$-linear-b})";
+
+@function luminance-at-most($origin, $max) {
+  $scale: "min(1, #{$max} / #{$-luminance})";
+
+  @return string.unquote(
+    "color(from #{$origin} srgb-linear " + "calc(#{$-linear-r} * #{$scale}) " +
+      "calc(#{$-linear-g} * #{$scale}) " + "calc(#{$-linear-b} * #{$scale}))"
+  );
+}
+
+@function luminance-at-least($origin, $min) {
+  $mix: "max(0, (#{$min} - #{$-luminance}) / (1 - #{$-luminance}))";
+
+  @return string.unquote(
+    "color(from #{$origin} srgb-linear " +
+      "calc(#{$-linear-r} + (1 - #{$-linear-r}) * #{$mix}) " +
+      "calc(#{$-linear-g} + (1 - #{$-linear-g}) * #{$mix}) " +
+      "calc(#{$-linear-b} + (1 - #{$-linear-b}) * #{$mix}))"
+  );
+}

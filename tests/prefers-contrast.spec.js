@@ -251,7 +251,18 @@ for (const scheme of /** @type {const} */ (["light", "dark"])) {
 					await styleOf(page, "field", "border-top-color"),
 					background,
 				),
-				focus: parseColor(await styleOf(page, "field", "--cirth-primary-focus")),
+				// Resolved through a colour property: the custom property's own
+				// value is the unresolved derivation.
+				focus: parseColor(
+					await page.locator("#field").evaluate((field) => {
+						const probe = document.createElement("span");
+						probe.style.color = "var(--cirth-primary-focus)";
+						field.after(probe);
+						const color = getComputedStyle(probe).color;
+						probe.remove();
+						return color;
+					}),
+				),
 				rule: contrastRatio(
 					await styleOf(page, "rule", "border-top-color"),
 					background,
@@ -281,7 +292,14 @@ for (const scheme of /** @type {const} */ (["light", "dark"])) {
 
 		// The underline drops its half-alpha tint for the link color itself.
 		expect(parseColor(base.underline).alpha).toBeLessThan(1);
-		expect(more.underline).toBe(more.linkColor);
+		// Compared as colours: the link colour serialises as color(srgb-linear)
+		// since its luminance is capped (specs/accent-text-contrast.md).
+		const underline = parseColor(more.underline);
+		const link = parseColor(more.linkColor);
+		expect(underline.alpha).toBe(1);
+		for (const channel of /** @type {const} */ (["r", "g", "b"])) {
+			expect(underline[channel], channel).toBeCloseTo(link[channel], 2);
+		}
 	});
 }
 

@@ -144,9 +144,13 @@ const parseComputed = (value) => {
 	/** @type {string[]} */
 	let parts;
 	let alpha = 1;
+	let linear = false;
 	if (kind === "color") {
 		const [space, ...rest] = body.trim().split(/\s+/);
-		if (space !== "srgb") throw new Error(`unrecognised computed colour: ${value}`);
+		// srgb-linear: the accent's text role, whose luminance is capped in
+		// linear light (specs/accent-text-contrast.md).
+		if (space !== "srgb" && space !== "srgb-linear") throw new Error(`unrecognised computed colour: ${value}`);
+		linear = space === "srgb-linear";
 		kind = "rgb";
 		body = rest.join(" ");
 	}
@@ -170,6 +174,7 @@ const parseComputed = (value) => {
 	const scale = match[1] === "color" ? 1 : 255;
 	const [r, g, b] = parts.map((part) => {
 		const channel = number(part) / scale;
+		if (linear) return channel;
 		return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
 	});
 	const long = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
