@@ -20,12 +20,12 @@ After this lands:
 
 - `.grid > .span-full` sets `grid-column: 1 / -1`, in the class builds
   (default and scoped). The classless builds have no such rule.
-- The child spans every column `.grid` creates. When the grid fits more
-  columns than it has children, the empty ones collapse (`auto-fit`), so the
-  child still meets both edges of the grid. In one column it is as wide as
-  the grid.
-- The siblings keep the columns: two short fields beside a `.span-full`
-  child share the row it does not take, at equal widths.
+- The child spans every column `.grid` creates, so it meets both edges of
+  the grid at any width. In one column it is as wide as the grid.
+- Its siblings keep their columns, at equal widths. Because the spanning
+  child occupies every column, none of them collapses: two short fields in
+  a grid that fits three take two columns, and the third stays empty on
+  their row. Fill the row, or use `.row`, when the fields have to.
 - The span follows the inline direction: in right-to-left text it starts at
   the right edge, because grid lines are logical.
 - Long content does not widen the grid: every `.grid` child already has
@@ -48,7 +48,7 @@ It does **not** promise:
 | Claim | Evidence | Where | Verdict |
 | --- | --- | --- | --- |
 | Without the rule, a child cannot cross the columns | With the declaration removed from the build, the child is one track wide in a 1200px grid and the two wide-layout cases of `tests/layout.spec.js` fail | `dist/cirth.css` from this change, Chromium 149.0.7827.55, 2026-10-25 | Verified |
-| The child meets both edges, wide, narrow and right to left | `tests/layout.spec.js` (span-full crosses every column of a .grid): left edge and width equal to the grid's within half a pixel at 1200px LTR and RTL and at 300px; the two siblings share the rest of the row at equal widths | Same build, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5 | Verified |
+| The child meets both edges, wide, narrow and right to left | `tests/layout.spec.js` (span-full crosses every column of a .grid): left edge and width equal to the grid's within half a pixel at 1200px LTR and RTL and at 300px; the two siblings keep equal widths | Same build, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5 | Verified |
 | Long content does not overflow | A 320-character unbroken word in a `.span-full` child of a 320px grid stays inside it | Same run | Verified |
 | No effect outside a direct child of `.grid` | `grid-column-start` stays `auto` on a `.row` child and on a loose element; a grandchild in a nested `.grid` spans only that grid | Same run | Verified |
 | Class builds only | The classless build contains no `span-full`; the scoped build emits `.cirth .grid > .span-full` | Same build | Verified |
@@ -62,6 +62,7 @@ It does **not** promise:
 | `.span-full`, scoped to `.grid >` | Design | The name says what it does to the grid; the selector keeps it from promising anything elsewhere, as `.breakout` does for `.container` |
 | Rejected: `.full-width` | Design | `width: 100%` only fills the child's own track; it does not cross the others |
 | Rejected: a classless contract | Constraint | Without a class, the classless build has no way to say which child should span |
+| Short fields that do not fill a row leave the rest of it empty | Constraint | With `auto-fit`, only a column no item occupies collapses, and the spanning child occupies all of them. Found in the documentation's own example on 2026-10-25, where two fields took two of three columns; the example now has three |
 
 ## Acceptance
 

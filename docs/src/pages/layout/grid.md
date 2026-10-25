@@ -44,8 +44,9 @@ The grid also:
 
 Add `.span-full` to a direct child of `.grid` when it has to cross every
 column: a notes field after short fields, a validation summary, an action
-row. It spans however many columns the grid fits, and the other children
-share the row it leaves.
+row. It spans however many columns the grid fits. The other children keep
+their columns: if they do not fill a row, the rest of that row stays empty,
+because the spanning child holds every column open.
 
 {% demo "grid-span-full" %}
 
@@ -53,6 +54,7 @@ share the row it leaves.
 <div class="grid">
   <label>First name<input name="given-name"></label>
   <label>Last name<input name="family-name"></label>
+  <label>Email<input name="email" type="email"></label>
   <label class="span-full">Notes<textarea name="notes" rows="3"></textarea></label>
 </div>
 ```

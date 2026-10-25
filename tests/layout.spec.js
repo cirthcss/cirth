@@ -210,7 +210,9 @@ for (const [label, width, dir] of /** @type {const} */ ([
 
 		expect(box.full.left).toBeCloseTo(box.grid.left, 0);
 		expect(box.full.width).toBeCloseTo(box.grid.width, 0);
-		// The short fields share the row the full child does not take.
+		// The short fields keep equal columns. The spanning child holds every
+		// column open, so in a grid that fits more than two, the rest of
+		// their row stays empty rather than being shared out.
 		if (width > 600) {
 			expect(box.first.width + box.second.width).toBeLessThan(box.grid.width);
 			expect(box.first.width).toBeCloseTo(box.second.width, 0);
