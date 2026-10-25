@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | Known defect 1 in [default-palette](default-palette.md); measured again for gh#89 |
-| Status | Draft |
+| Status | Implementing: every acceptance check passes (2026-10-26); lands with its pull request |
 | Baseline | `395698bda` on `feat/v0.17-finish` |
 | Breaking | No: the default theme and every preset paint the same accent text; only accents that failed 4.5:1 get darker (light) or lighter (dark) text |
 
@@ -58,6 +58,10 @@ It does **not** promise:
 | The dark clamp fails too | `oklch(0.25 0.28 30)` reads 3.70:1 at `max(l, 0.72)` | Same build, Chromium 149.0.7827.55 | Verified |
 | A luminance cap holds for every accent | 288 accents per scheme (24 hues; lightness 0.45 to 0.9 in light, 0.25 to 0.85 in dark; chroma 0.05 to 0.28, many out of gamut): worst 4.57:1 in light and 4.59:1 in dark, in all three engines | Prototype over the same build, same engines, 2026-10-26 | Verified |
 | The default and the presets are unchanged | Painted accent text before the change: default `163,27,176` / `235,95,249`, plain `28,101,200` / `112,166,245`, material `103,80,164` / `208,188,255`, metro `0,80,239` / `117,163,252`, and under `more` `109,26,118` / `241,170,247` and the presets' own | Same build, Chromium 149.0.7827.55 | Verified |
+| The luminance caps hold, as built | `tests/surface-depth.spec.js` (accent text reads 4.5:1 on every level for any accent): nine accents chosen to break the lightness caps, both schemes; it fails in both with the lightness caps alone | `dist/cirth.css` from this change, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, 2026-10-26 | Verified |
+| Nothing the default or a preset paints changes | Painted `--cirth-primary-text`, old derivation injected against new: identical in 48 cases (three engines, two schemes, with and without `more`, default and three presets) | Same build, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5 | Verified |
+| The token export resolves the new value | `npm run check:tokens`: 717 colour comparisons within ΔOklab 0.002 of the three engines, with `primary-text`, `primary-focus`, `form-element-focus-color` and dark `progress-color` exported rather than listed | Same build | Verified |
+| The size budgets hold | `cirth.min.css` within 17500 B gzip | Same build | Verified |
 
 ## Decisions
 
@@ -70,11 +74,17 @@ It does **not** promise:
 
 ## Acceptance
 
-- [ ] A test holds `--cirth-primary-text` at 4.5:1 or more on every level for
+- [x] A test holds `--cirth-primary-text` at 4.5:1 or more on every level for
       a set of accents that includes luminous and out-of-gamut ones, in both
       schemes and three engines, and fails with the lightness caps alone.
-- [ ] The default and the three presets paint the same accent text as
+      `tests/surface-depth.spec.js`, 2026-10-26.
+- [x] The default and the three presets paint the same accent text as
       before, in both schemes and under `prefers-contrast: more`.
-- [ ] `npm run check:tokens` and `npm run check:size` pass.
-- [ ] Colors, Customization and [default-palette](default-palette.md)
+      48 of 48 identical (ledger).
+- [x] `npm run check:tokens` and `npm run check:size` pass.
+      Both pass; the exporter, `check-tokens.js` and `scripts/lib/color.js`
+      read `color(srgb-linear …)` now.
+- [x] Colors, Customization and [default-palette](default-palette.md)
       describe the new guarantee; `CHANGELOG.md` records the fix.
+      Colors, Customization and Upgrading describe it; default-palette's
+      known defect 1 is closed; the changelog has it under Fixed.

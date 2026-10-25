@@ -264,7 +264,8 @@ own error.
 Found while modelling the palette. None depends on the choice of palette,
 and each is left for its own change.
 
-1. The accent text clamp at 0.52 in light does not hold 4.5:1 for every
+1. **Closed by [accent-text-contrast](accent-text-contrast.md), 2026-10-26.**
+   The accent text clamp at 0.52 in light does not hold 4.5:1 for every
    accent, as `src/theme/_light.scss` says. For an accent anchored at the
    500 step and at 85% of its chroma ceiling, the text role falls below
    4.5:1 on the recessed level of today's canvas for hues from about 115° to

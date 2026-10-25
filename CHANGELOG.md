@@ -7,6 +7,16 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Accent text reads 4.5:1 for any accent.** `--cirth-primary-text` capped
+  only the accent's OKLab lightness, which is not what WCAG measures: a teal
+  accent's links read 3.8:1 in light, and a deep red one 3.7:1 in dark. The
+  text role now also caps its luminance in linear light, so it reads 4.5:1 on
+  every surface level of the default ladder whatever the hue or chroma. The
+  default and every preset paint exactly the same text as before; the
+  computed value is now a `color(srgb-linear …)`.
+
 ### Changed
 
 - **Every build carries the print rules again.** The print pass is the last
