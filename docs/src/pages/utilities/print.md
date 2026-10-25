@@ -27,7 +27,7 @@ page viewed in a dark theme could therefore produce pale text on white paper.
 Screen-only behaviors such as horizontal scrolling also have no useful paper
 equivalent.
 
-Cirth's print rules resolve those framework-level issues. It does not decide
+Cirth's print rules resolve those framework-level issues. They do not decide
 which application regions are navigation, advertising, or other screen-only
 content.
 
