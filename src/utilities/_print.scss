@@ -1,5 +1,4 @@
 @use "../config" as *;
-@use "../helpers/cascade";
 @use "../helpers/selectors";
 @use "../theme/colors" as *;
 
@@ -25,201 +24,200 @@ $print-root-selector: "body";
 
 // The scheme overrides land on the body (the wrapper, scoped), not :root:
 // a declaration on an element beats an inherited one, so they win over the
-// schemes and over presets loaded after this sheet. The pass adds itself to
-// Cirth's layer and wins over the component rules by source order.
-@include cascade.layer {
-  @media print {
-    @include selectors.root {
-      // Solid black text, 6.5:1 secondary ink and 3.8:1 hairlines on white
-      // paper, which survive a monochrome printer.
-      --cirth-print-color: #{$black};
-      --cirth-print-muted-color: #{$neutral-600};
-      --cirth-print-border-color: #{$neutral-450};
-    }
+// schemes and over presets loaded after the build. The pass comes last in
+// every main build (src/_modules.scss), inside Cirth's layer, and wins over
+// the component rules by source order (specs/print-in-main-build.md).
+@media print {
+  @include selectors.root {
+    // Solid black text, 6.5:1 secondary ink and 3.8:1 hairlines on white
+    // paper, which survive a monochrome printer.
+    --cirth-print-color: #{$black};
+    --cirth-print-muted-color: #{$neutral-600};
+    --cirth-print-border-color: #{$neutral-450};
+  }
 
-    // Browsers drop author backgrounds when printing but keep text colour,
-    // so a dark page would print pale grey: reset the pair and the scheme.
-    @if $parent-selector == "" {
-      html {
-        background: none;
-        color-scheme: light;
-      }
-    }
-
-    #{$print-root-selector} {
+  // Browsers drop author backgrounds when printing but keep text colour,
+  // so a dark page would print pale grey: reset the pair and the scheme.
+  @if $parent-selector == "" {
+    html {
       background: none;
-      color: var(--cirth-print-color);
       color-scheme: light;
-
-      // Every ink role collapses onto the print ink. --cirth-ink first: the
-      // tokens that mean body ink read it, not the --cirth-color slot.
-      --cirth-ink: var(--cirth-print-color);
-      --cirth-color: var(--cirth-print-color);
-      --cirth-h1-color: var(--cirth-print-color);
-      --cirth-h2-color: var(--cirth-print-color);
-      --cirth-h3-color: var(--cirth-print-color);
-      --cirth-h4-color: var(--cirth-print-color);
-      --cirth-h5-color: var(--cirth-print-color);
-      --cirth-h6-color: var(--cirth-print-color);
-      --cirth-code-color: var(--cirth-print-color);
-      --cirth-code-kbd-color: var(--cirth-print-color);
-      --cirth-form-element-color: var(--cirth-print-color);
-
-      // Muted stays muted, one rung up.
-      --cirth-muted-color: var(--cirth-print-muted-color);
-      --cirth-form-element-placeholder-color: var(--cirth-print-muted-color);
-
-      // Links keep their underline and lose their accent, which a monochrome
-      // printer turns to grey.
-      --cirth-primary: var(--cirth-print-color);
-      --cirth-primary-text: var(--cirth-print-color);
-      --cirth-primary-active: var(--cirth-print-color);
-      --cirth-primary-underline: var(--cirth-print-color);
-      --cirth-secondary-text: var(--cirth-print-color);
-      --cirth-secondary-underline: var(--cirth-print-color);
-      --cirth-contrast-text: var(--cirth-print-color);
-      --cirth-contrast-underline: var(--cirth-print-color);
-      --cirth-link-visited-color: var(--cirth-print-color);
-
-      // Every hairline and field edge derives from these two.
-      --cirth-muted-border-color: var(--cirth-print-border-color);
-      --cirth-form-element-border-color: var(--cirth-print-border-color);
-
-      // Surfaces flatten.
-      --cirth-box-shadow: none;
-      --cirth-card-box-shadow: none;
-      --cirth-modal-box-shadow: none;
-      --cirth-surface-recessed: transparent;
-      --cirth-surface-raised: transparent;
-      --cirth-surface-overlay: transparent;
-      --cirth-card-background-color: transparent;
-      --cirth-modal-background-color: transparent;
-      --cirth-card-sectioning-background-color: transparent;
-      --cirth-code-background-color: transparent;
-      --cirth-code-kbd-background-color: transparent;
-      --cirth-form-element-background-color: transparent;
-      --cirth-table-row-stripped-background-color: transparent;
-      --cirth-modal-overlay-background-color: transparent;
-
-      // A conventional pale highlight, so relevance survives on paper.
-      --cirth-mark-background-color: #{$warning-100};
-      --cirth-mark-color: var(--cirth-print-color);
-
-      @if $enable-classes {
-        --cirth-dropdown-background-color: transparent;
-        --cirth-dropdown-box-shadow: none;
-      }
-
-      // Insertions, deletions and meter readings keep the light scheme's
-      // inks: the hue is the meaning, and the dark scheme's pale variants
-      // barely register on paper.
-      --cirth-ins-color: #{$success-750};
-      --cirth-del-color: #{$error-750};
-      --cirth-meter-optimum-color: #{$success-550};
-      --cirth-meter-suboptimum-color: #{$warning-600};
-      --cirth-meter-even-less-good-color: #{$error-650};
     }
+  }
 
-    // <kbd> loses its fill, so a border keeps it reading as a key.
+  #{$print-root-selector} {
+    background: none;
+    color: var(--cirth-print-color);
+    color-scheme: light;
 
-    #{$parent-selector} kbd {
-      border: var(--cirth-border-width) solid var(--cirth-print-border-color);
-    }
+    // Every ink role collapses onto the print ink. --cirth-ink first: the
+    // tokens that mean body ink read it, not the --cirth-color slot.
+    --cirth-ink: var(--cirth-print-color);
+    --cirth-color: var(--cirth-print-color);
+    --cirth-h1-color: var(--cirth-print-color);
+    --cirth-h2-color: var(--cirth-print-color);
+    --cirth-h3-color: var(--cirth-print-color);
+    --cirth-h4-color: var(--cirth-print-color);
+    --cirth-h5-color: var(--cirth-print-color);
+    --cirth-h6-color: var(--cirth-print-color);
+    --cirth-code-color: var(--cirth-print-color);
+    --cirth-code-kbd-color: var(--cirth-print-color);
+    --cirth-form-element-color: var(--cirth-print-color);
 
-    // Controls print as outlined labels: the browser drops their fill, and
-    // the white label would leave nothing. A rule rather than the primary
-    // tokens, which also fill checkboxes and progress bars.
+    // Muted stays muted, one rung up.
+    --cirth-muted-color: var(--cirth-print-muted-color);
+    --cirth-form-element-placeholder-color: var(--cirth-print-muted-color);
 
-    #{$parent-selector}
-      :is(
-        button,
-        [type="submit"],
-        [type="reset"],
-        [type="button"],
-        [role="button"]
-      ),
-    #{$parent-selector} [type="file"]::file-selector-button {
-      border-color: var(--cirth-print-border-color);
-      background: none;
-      box-shadow: none;
-      color: var(--cirth-print-color);
-    }
+    // Links keep their underline and lose their accent, which a monochrome
+    // printer turns to grey.
+    --cirth-primary: var(--cirth-print-color);
+    --cirth-primary-text: var(--cirth-print-color);
+    --cirth-primary-active: var(--cirth-print-color);
+    --cirth-primary-underline: var(--cirth-print-color);
+    --cirth-secondary-text: var(--cirth-print-color);
+    --cirth-secondary-underline: var(--cirth-print-color);
+    --cirth-contrast-text: var(--cirth-print-color);
+    --cirth-contrast-underline: var(--cirth-print-color);
+    --cirth-link-visited-color: var(--cirth-print-color);
 
-    // Paint that is the content opts back in: a checked box, a switch, a
-    // meter or progress fill, a highlight.
+    // Every hairline and field edge derives from these two.
+    --cirth-muted-border-color: var(--cirth-print-border-color);
+    --cirth-form-element-border-color: var(--cirth-print-border-color);
 
-    #{$parent-selector}
-      :is(mark, meter, progress, [type="checkbox"], [type="radio"]) {
-      print-color-adjust: exact;
-    }
+    // Surfaces flatten.
+    --cirth-box-shadow: none;
+    --cirth-card-box-shadow: none;
+    --cirth-modal-box-shadow: none;
+    --cirth-surface-recessed: transparent;
+    --cirth-surface-raised: transparent;
+    --cirth-surface-overlay: transparent;
+    --cirth-card-background-color: transparent;
+    --cirth-modal-background-color: transparent;
+    --cirth-card-sectioning-background-color: transparent;
+    --cirth-code-background-color: transparent;
+    --cirth-code-kbd-background-color: transparent;
+    --cirth-form-element-background-color: transparent;
+    --cirth-table-row-stripped-background-color: transparent;
+    --cirth-modal-overlay-background-color: transparent;
 
-    // Absolute link targets are printed after the link, except in
-    // navigation and on controls, where the label is the point.
-
-    #{$parent-selector} a[href^="http"]:not([role="button"], nav a)::after {
-      content: " (" attr(href) ")";
-      color: var(--cirth-print-muted-color);
-      font-size: var(--cirth-font-size-sm);
-      word-break: break-all;
-    }
-
-    // Table headers repeat on every page, footers follow the last row, and
-    // no row is split.
-
-    #{$parent-selector} thead {
-      display: table-header-group;
-    }
-
-    #{$parent-selector} tfoot {
-      display: table-footer-group;
-    }
-
-    #{$parent-selector} tr {
-      break-inside: avoid;
-    }
-
-    // What scrolls sideways on screen wraps or spills on paper.
-
-    #{$parent-selector} pre {
-      overflow: visible;
-      white-space: pre-wrap;
-    }
+    // A conventional pale highlight, so relevance survives on paper.
+    --cirth-mark-background-color: #{$warning-100};
+    --cirth-mark-color: var(--cirth-print-color);
 
     @if $enable-classes {
-      #{$parent-selector} .overflow-auto {
-        overflow: visible;
-      }
+      --cirth-dropdown-background-color: transparent;
+      --cirth-dropdown-box-shadow: none;
     }
 
-    // An open dialog prints where it sits in the flow instead of covering
-    // the first page.
+    // Insertions, deletions and meter readings keep the light scheme's
+    // inks: the hue is the meaning, and the dark scheme's pale variants
+    // barely register on paper.
+    --cirth-ins-color: #{$success-750};
+    --cirth-del-color: #{$error-750};
+    --cirth-meter-optimum-color: #{$success-550};
+    --cirth-meter-suboptimum-color: #{$warning-600};
+    --cirth-meter-even-less-good-color: #{$error-650};
+  }
 
-    #{$parent-selector} dialog {
-      position: static;
-      min-width: 0;
-      min-height: 0;
-      backdrop-filter: none;
+  // <kbd> loses its fill, so a border keeps it reading as a key.
 
-      > article {
-        max-height: none;
-        overflow: visible;
-      }
+  #{$parent-selector} kbd {
+    border: var(--cirth-border-width) solid var(--cirth-print-border-color);
+  }
+
+  // Controls print as outlined labels: the browser drops their fill, and
+  // the white label would leave nothing. A rule rather than the primary
+  // tokens, which also fill checkboxes and progress bars.
+
+  #{$parent-selector}
+    :is(
+      button,
+      [type="submit"],
+      [type="reset"],
+      [type="button"],
+      [role="button"]
+    ),
+  #{$parent-selector} [type="file"]::file-selector-button {
+    border-color: var(--cirth-print-border-color);
+    background: none;
+    box-shadow: none;
+    color: var(--cirth-print-color);
+  }
+
+  // Paint that is the content opts back in: a checked box, a switch, a
+  // meter or progress fill, a highlight.
+
+  #{$parent-selector}
+    :is(mark, meter, progress, [type="checkbox"], [type="radio"]) {
+    print-color-adjust: exact;
+  }
+
+  // Absolute link targets are printed after the link, except in
+  // navigation and on controls, where the label is the point.
+
+  #{$parent-selector} a[href^="http"]:not([role="button"], nav a)::after {
+    content: " (" attr(href) ")";
+    color: var(--cirth-print-muted-color);
+    font-size: var(--cirth-font-size-sm);
+    word-break: break-all;
+  }
+
+  // Table headers repeat on every page, footers follow the last row, and
+  // no row is split.
+
+  #{$parent-selector} thead {
+    display: table-header-group;
+  }
+
+  #{$parent-selector} tfoot {
+    display: table-footer-group;
+  }
+
+  #{$parent-selector} tr {
+    break-inside: avoid;
+  }
+
+  // What scrolls sideways on screen wraps or spills on paper.
+
+  #{$parent-selector} pre {
+    overflow: visible;
+    white-space: pre-wrap;
+  }
+
+  @if $enable-classes {
+    #{$parent-selector} .overflow-auto {
+      overflow: visible;
     }
+  }
 
-    // A heading never ends a page, figures and images stay whole, and a
-    // paragraph keeps three lines on either side of a break.
+  // An open dialog prints where it sits in the flow instead of covering
+  // the first page.
 
-    #{$parent-selector} :is(h1, h2, h3, h4, h5, h6) {
-      break-after: avoid;
+  #{$parent-selector} dialog {
+    position: static;
+    min-width: 0;
+    min-height: 0;
+    backdrop-filter: none;
+
+    > article {
+      max-height: none;
+      overflow: visible;
     }
+  }
 
-    #{$parent-selector} :is(figure, img) {
-      break-inside: avoid;
-    }
+  // A heading never ends a page, figures and images stay whole, and a
+  // paragraph keeps three lines on either side of a break.
 
-    #{$parent-selector} :is(blockquote, li, p) {
-      orphans: 3;
-      widows: 3;
-    }
+  #{$parent-selector} :is(h1, h2, h3, h4, h5, h6) {
+    break-after: avoid;
+  }
+
+  #{$parent-selector} :is(figure, img) {
+    break-inside: avoid;
+  }
+
+  #{$parent-selector} :is(blockquote, li, p) {
+    orphans: 3;
+    widows: 3;
   }
 }

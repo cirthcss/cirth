@@ -32,28 +32,29 @@ const layerOpening = new RegExp(
 /**
  * Every documented entry point, with something only the right file could
  * contain. The sentinels are deliberately about the *promise the subpath
- * makes*: a print sheet is print-only, a classless build has no component
+ * makes*: every main build carries the print pass (the print sheets are
+ * deprecated copies of it), a classless build has no component
  * or utility classes, a scoped build lives under the wrapper, so a mapping that pointed a
  * subpath at the wrong build would be caught, which byte-size alone cannot.
  *
  * @type {{ subpath: string, must: string[], mustNot: string[], layered?: boolean }[]}
  */
 const entryPoints = [
-	{ subpath: ".", must: ["--cirth-", ".container"], mustNot: ["@media print"] },
+	{ subpath: ".", must: ["--cirth-", ".container", "@media print"], mustNot: [] },
 	{
 		subpath: "./classless",
-		must: ["--cirth-"],
-		mustNot: [".container", "@media print"],
+		must: ["--cirth-", "@media print"],
+		mustNot: [".container"],
 	},
 	{
 		subpath: "./scoped",
-		must: ["--cirth-", ".cirth", ".container"],
-		mustNot: ["@media print"],
+		must: ["--cirth-", ".cirth", ".container", "@media print"],
+		mustNot: [],
 	},
 	{
 		subpath: "./classless/scoped",
-		must: ["--cirth-", ".cirth"],
-		mustNot: [".container", "@media print"],
+		must: ["--cirth-", ".cirth", "@media print"],
+		mustNot: [".container"],
 	},
 	{ subpath: "./print", must: ["@media print"], mustNot: [] },
 	{

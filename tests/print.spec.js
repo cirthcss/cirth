@@ -16,11 +16,11 @@ const { setContent } = require("./helpers/render");
 // against the docs site: the pass is a property of dist/, and setContent
 // keeps the fixtures small enough to read.
 //
-// The pass ships as its own stylesheet (dist/cirth.print*.css) rather than
-// inside the main bundle, so each fixture loads the pair in the order a
-// consumer would: the build first, its print sheet after. Concatenating
-// them here reproduces that order exactly, which is what the pass needs,
-// since it wins over component rules by source position.
+// Every main build carries the pass, last, so it wins over component rules
+// by source position (specs/print-in-main-build.md). Each fixture loads the
+// main build alone, as a page with one <link> does. The print sheets
+// (dist/cirth.print*.css) are deprecated copies of the pass, and are checked
+// to change nothing printed when loaded after the build.
 
 const projectRoot = path.join(__dirname, "..");
 
@@ -58,7 +58,7 @@ const read = (file) => {
 	return fs.readFileSync(stylesheet, "utf8");
 };
 
-const css = read("dist/cirth.css") + read("dist/cirth.print.css");
+const css = read("dist/cirth.css");
 const externalHref = "https://example.com/deep/link";
 
 const markup = `
@@ -113,7 +113,7 @@ const styleOf = (page, id, property, pseudo) =>
 
 for (const build of builds) {
 	test(`the print pass ships in the ${build.name} build`, () => {
-		const source = read(build.file) + read(build.print);
+		const source = read(build.file);
 
 		expect(source).toContain("@media print");
 
@@ -128,12 +128,70 @@ for (const build of builds) {
 		// The scheme overrides have to land on the element that inherits to
 		// the document, not on :root: that is what lets them outrank the
 		// color schemes and any preset loaded afterwards.
-		const printBlock = source.slice(source.indexOf("@media print"));
+		// The pass's own block, not the .no-print utility's earlier one.
+		const printBlock = source.slice(
+			source.lastIndexOf("@media print", source.indexOf("--cirth-print-color:")),
+		);
 		const root = build.scope || "body";
 
 		expect(printBlock).toContain(`${root} {`);
 	});
 }
+
+// The deprecated print sheet restates the pass: loaded after its build it
+// changes nothing printed, in either scheme.
+for (const build of builds) {
+	test(`${build.name} build: its deprecated print sheet changes nothing printed`, async ({
+		page,
+	}) => {
+		const body = build.scope ? `<div class="${build.scope.slice(1)}">${markup}</div>` : markup;
+		/** @param {string} stylesheet */
+		const printed = async (stylesheet) => {
+			const result = [];
+			for (const scheme of /** @type {const} */ (["light", "dark"])) {
+				await page.emulateMedia({ colorScheme: scheme, media: "print" });
+				await setContent(page, `<style>${stylesheet}</style>${body}`);
+				result.push(
+					await page.evaluate(() =>
+						["heading", "text", "mark", "link", "caption", "head", "code", "button", "box", "field"].map(
+							(id) => {
+								const element = /** @type {Element} */ (document.getElementById(id));
+								const style = getComputedStyle(element);
+								const after = getComputedStyle(element, "::after");
+								return [
+									id,
+									style.color,
+									style.backgroundColor,
+									style.borderTopColor,
+									style.display,
+									after.content,
+								].join(" ");
+							},
+						),
+					),
+				);
+			}
+			return result;
+		};
+		const alone = await printed(read(build.file));
+		expect(alone.flat().join("\n")).not.toBe("");
+		expect(await printed(read(build.file) + read(build.print))).toEqual(alone);
+	});
+}
+
+// A preset loaded after the build cannot undo the print ink: the pass
+// declares it on the body, which beats a token inherited from :root.
+test("a preset loaded after the build still prints black ink", async ({ page }) => {
+	for (const scheme of /** @type {const} */ (["light", "dark"])) {
+		await page.emulateMedia({ colorScheme: scheme, media: "print" });
+		await setContent(
+			page,
+			`<style>${css}</style><style>${read("dist/presets/material.css")}</style>${markup}`,
+		);
+		const ink = parseColor(await styleOf(page, "text", "color"));
+		expect([ink.r, ink.g, ink.b], scheme).toEqual([0, 0, 0]);
+	}
+});
 
 // --- What actually gets painted ---------------------------------------
 

@@ -48,17 +48,19 @@ const budgets = {
 	// The filled icon family adds nine compact vector drawings. The four
 	// bundles grow by 1,228 to 1,266 B gzip against 66c30160e; keep a few
 	// hundred bytes of useful headroom after that deliberate default.
-	"cirth.classless.min.css": 14_600,
-	"cirth.classless.scoped.min.css": 14_800,
+	// Every main build then takes the print pass, about 690 B gzip once it
+	// compresses with the rest (specs/print-in-main-build.md).
+	"cirth.classless.min.css": 15_400,
+	"cirth.classless.scoped.min.css": 15_550,
 	// The Elena-informed refresh adds one public press role and transform
 	// states for buttons and overlays. The filled icon family then adds the
-	// vector paths described above.
-	"cirth.min.css": 16_700,
+	// vector paths described above, and the print pass its 690 B.
+	"cirth.min.css": 17_500,
 	"cirth.print.classless.min.css": 1_024,
 	"cirth.print.classless.scoped.min.css": 1_024,
 	"cirth.print.min.css": 1_024,
 	"cirth.print.scoped.min.css": 1_024,
-	"cirth.scoped.min.css": 17_000,
+	"cirth.scoped.min.css": 17_750,
 	"presets/plain.min.css": 400,
 	"presets/material.min.css": 1_000,
 	"presets/metro.min.css": 1_000,

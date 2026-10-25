@@ -523,25 +523,25 @@ test.describe("@import … layer(cirth), as gh#110 described it", () => {
 	});
 });
 
-// --- Print sheets share the layer -------------------------------------
+// --- The print pass shares the layer -----------------------------------
 
-test("the print pass still outranks the build, and an author print rule outranks both", async ({
+test("the print pass outranks the rest of the build, and an author print rule outranks it", async ({
 	page,
 }) => {
+	// The pass comes last in the build (specs/print-in-main-build.md).
 	const build = read("dist/cirth.css");
-	const print = read("dist/cirth.print.css");
 	const markup = `<article id="target"><p>Card</p></article>`;
 	await page.emulateMedia({ media: "print" });
 
 	// Cirth's own order, inside the layer: the pass flattens the card.
-	await setContent(page, `<style>${build}</style><style>${print}</style>${markup}`);
+	await setContent(page, `<style>${build}</style>${markup}`);
 	expect(await styleOf(page, "target", "box-shadow")).toBe("none");
 
-	// A consumer's print rule, even one loaded before both, wins over it.
+	// A consumer's print rule, even one loaded before the build, wins over it.
 	await setContent(
 		page,
 		`<style>@media print { article { box-shadow: 0 0 0 1px ${ink}; } }</style>` +
-			`<style>${build}</style><style>${print}</style>${markup}`,
+			`<style>${build}</style>${markup}`,
 	);
 	expect(await styleOf(page, "target", "box-shadow")).toBe(`${ink} 0px 0px 0px 1px`);
 });
