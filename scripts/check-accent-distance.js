@@ -154,6 +154,12 @@ const underMoreContrast = (decl) =>
 		(node) => node.type === "atrule" && /prefers-contrast:\s*more/.test(node.params),
 	);
 
+// The print pass, last in every main build (specs/print-in-main-build.md),
+// repaints for paper; the distinction this checks is the screen's.
+/** @param {import("postcss").Declaration} decl */
+const underPrint = (decl) =>
+	ancestors(decl).some((node) => node.type === "atrule" && /^print\b/.test(node.params.trim()));
+
 const NAMES = ["--cirth-primary", "--cirth-error"];
 
 /**
@@ -172,7 +178,7 @@ const applyInputs = (css, base, moreContrast) => {
 	/** @type {import("postcss").Declaration[]} */
 	const ordered = [];
 	postcss.parse(css).walkDecls((decl) => {
-		if (NAMES.includes(decl.prop)) ordered.push(decl);
+		if (NAMES.includes(decl.prop) && !underPrint(decl)) ordered.push(decl);
 	});
 	// Base declarations first, then the contrast pass, as the cascade does.
 	const passes = moreContrast
