@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | gh#151 |
-| Status | Implementing |
+| Status | Implementing: every acceptance check passes (2026-10-25); lands with its pull request |
 | Baseline | `3857cfea3` on `develop` |
 | Breaking | No: two classes are added; existing print and screen output is unchanged without them |
 
@@ -71,10 +71,14 @@ It does **not** promise:
 
 ## Acceptance
 
-- [ ] `tests/print.spec.js` passes in Chromium, Firefox and WebKit and fails
+- [x] `tests/print.spec.js` passes in Chromium, Firefox and WebKit and fails
       without the rules.
-- [ ] `docs/src/pages/utilities/print.md` documents both classes, the
+      Six cases in three engines, 18 passed; five fail with the rules renamed (2026-10-25).
+- [x] `docs/src/pages/utilities/print.md` documents both classes, the
       accessibility rule for `.print-only`, and that content absent from the
       DOM cannot be recovered by CSS.
-- [ ] `CHANGELOG.md` records them under Unreleased.
-- [ ] `npm run build` stays inside every size budget.
+      Print has "Leaving things off the paper".
+- [x] `CHANGELOG.md` records them under Unreleased.
+      Under Unreleased, Added.
+- [x] `npm run build` stays inside every size budget.
+      `cirth.min.css` 16481 B of 16700 B; `cirth.scoped.min.css` 16733 B of 17000 B.

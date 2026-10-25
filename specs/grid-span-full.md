@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | gh#152 |
-| Status | Implementing |
+| Status | Implementing: every acceptance check passes (2026-10-25); lands with its pull request |
 | Baseline | `3857cfea3` on `develop` |
 | Breaking | No: one class is added; no existing rule changes |
 
@@ -65,9 +65,13 @@ It does **not** promise:
 
 ## Acceptance
 
-- [ ] `tests/layout.spec.js` passes in Chromium, Firefox and WebKit and its
+- [x] `tests/layout.spec.js` passes in Chromium, Firefox and WebKit and its
       wide cases fail without the rule.
-- [ ] `docs/src/pages/layout/grid.md` documents the class with a live
+      Six cases in three engines, 18 passed; the two wide cases fail with the rule removed (2026-10-25).
+- [x] `docs/src/pages/layout/grid.md` documents the class with a live
       example; `CHANGELOG.md` records it under Unreleased.
-- [ ] gh#111 records the exception.
-- [ ] `npm run build` stays inside every size budget.
+      Grid has "A child across every column" with the `grid-span-full` demo; the changelog entry is under Unreleased.
+- [x] gh#111 records the exception.
+      Commented on gh#111, 2026-10-25.
+- [x] `npm run build` stays inside every size budget.
+      `cirth.min.css` 16481 B gzip of 16700 B with both new utilities.
