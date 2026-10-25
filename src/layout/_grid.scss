@@ -24,5 +24,13 @@
       min-width: 0;
       margin-block: 0;
     }
+
+    // A child that has to cross every column, such as notes after short
+    // fields or an action row, spans all of them. Only a direct child of
+    // .grid: the class names a grid operation, not a width
+    // (specs/grid-span-full.md).
+    & > .span-full {
+      grid-column: 1 / -1;
+    }
   }
 }
