@@ -7,6 +7,21 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Added
+
+- **`.span-full` lets a `.grid` child cross every column** (gh#152). A
+  notes field after short fields, a validation summary or an action row
+  spans however many columns the grid fits, and the other children share
+  the row it leaves. It acts only on a direct child of `.grid`, in the
+  class builds.
+
+- **`.no-print` and `.print-only`** (gh#151). `.no-print` leaves an element
+  off the paper and `.print-only` shows one only on paper, so marking an
+  application's chrome takes a class instead of a `@media print` rule. Both
+  are in the class builds' main stylesheet and work with or without the
+  print stylesheet. A `.print-only` element is hidden from screen readers on
+  screen, so it should repeat what the screen says, never replace it.
+
 ## [0.17.0-beta.1] - 2026-10-23
 
 ### Changed
