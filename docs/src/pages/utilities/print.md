@@ -109,17 +109,36 @@ screen.
 Cirth intentionally does not add an `@page` rule. Page size, orientation, and
 margins depend on the document being printed.
 
-It also does not hide any application content. Hide screen-only interface
-chrome explicitly:
+It also does not hide any application content: only the application knows
+which regions are chrome. Mark them with a class.
 
-```css
-@media print {
-  .app-sidebar,
-  .cookie-banner {
-    display: none;
-  }
-}
+## Leaving things off the paper
+
+`.no-print` hides an element when the page is printed. `.print-only` does
+the opposite: the element appears only on paper.
+
+```html
+<header class="no-print"><!-- application navigation --></header>
+<main>
+  <p class="print-only">Printed from example.com/orders/1042</p>
+  <!-- the record or the table to print -->
+</main>
 ```
+
+Both are in the class builds, in the main stylesheet, so they work whether
+or not the print stylesheet is loaded. They nest as you would expect: a
+`.print-only` element inside a `.no-print` one is never shown, and
+`hidden` keeps a `.print-only` element hidden on paper too.
+
+A `.print-only` element is `display: none` on screen, so screen readers do
+not reach it either. Use it to repeat what the screen already says (a
+heading, a URL spelled out), never for information that exists nowhere
+else.
+
+The classes sit in Cirth's cascade layer: a `display` your own CSS sets on
+the same element wins. Print also shows only what the page holds when it is
+printed. Rows a virtualised table has not rendered, or a panel that loads on
+demand, are not in the document, and no class can bring them back.
 
 Review the result in print preview and with the backgrounds setting both on
 and off. Check page breaks, link destinations, tables, form state, and any
@@ -131,7 +150,7 @@ content hidden by the application.
 - Do not omit `media="print"` from the print `<link>`.
 - Do not assume screen scrolling will expose clipped content on paper.
 - Do not hide navigation or sidebars globally when they should disappear only
-  from printed output.
+  from printed output: give them `.no-print`.
 - Do not rely on color as the only printed indication of state.
 
 ## Related pages

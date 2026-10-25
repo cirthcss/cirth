@@ -233,3 +233,95 @@ test("none of it applies on screen", async ({ page }) => {
 	);
 	expect(await styleOf(page, "link", "content", "::after")).toBe("none");
 });
+
+// --- .no-print and .print-only (specs/print-visibility.md) ----------------
+
+// Each class hides an element on one medium only, nested or not, in the
+// class builds, with or without the print stylesheet; [hidden] still wins,
+// and so does a display rule of the page's own.
+// On screen a .print-only element is out of the accessibility tree, and a
+// .no-print one is in it.
+const visibilityMarkup = `
+	<header id="chrome" class="no-print"><nav><ul><li><a href="#x">Home</a></li></ul></nav></header>
+	<main>
+		<p id="print-heading" class="print-only">Printed from example.com</p>
+		<section id="content"><p>Body</p><aside id="nested-chrome" class="no-print">Tools</aside></section>
+		<div class="no-print"><p id="inside-no-print" class="print-only">Never shown</p></div>
+		<p id="hidden-print-only" class="print-only" hidden>Hidden</p>
+		<nav id="flex-chrome" class="no-print" style="display: flex">Inline display wins</nav>
+	</main>`;
+
+/** @param {import("@playwright/test").Page} page */
+const visible = (page) =>
+	page.evaluate(() =>
+		Object.fromEntries(
+			[
+				"chrome",
+				"print-heading",
+				"content",
+				"nested-chrome",
+				"inside-no-print",
+				"hidden-print-only",
+			].map((id) => {
+				const element = /** @type {HTMLElement} */ (document.getElementById(id));
+				return [id, element.checkVisibility()];
+			}),
+		),
+	);
+
+for (const build of builds.filter((entry) => entry.name !== "classless")) {
+	for (const withPrintSheet of [true, false]) {
+		test(`${build.name} build${withPrintSheet ? "" : ", no print sheet"}: .no-print and .print-only each hide on one medium`, async ({
+			page,
+		}) => {
+			const stylesheet = read(build.file) + (withPrintSheet ? read(build.print) : "");
+			const body = build.scope
+				? `<div class="${build.scope.slice(1)}">${visibilityMarkup}</div>`
+				: visibilityMarkup;
+			await setContent(page, `<style>${stylesheet}</style>${body}`);
+
+			await page.emulateMedia({ media: "screen" });
+			expect(await visible(page)).toEqual({
+				chrome: true,
+				"print-heading": false,
+				content: true,
+				"nested-chrome": true,
+				"inside-no-print": false,
+				"hidden-print-only": false,
+			});
+
+			await page.emulateMedia({ media: "print" });
+			expect(await visible(page)).toEqual({
+				chrome: false,
+				"print-heading": true,
+				content: true,
+				"nested-chrome": false,
+				"inside-no-print": false,
+				"hidden-print-only": false,
+			});
+			// The classes sit in Cirth's layer: a display of the page's own,
+			// here inline, beats them, as it beats every Cirth rule.
+			expect(
+				await page.locator("#flex-chrome").evaluate((element) => element.checkVisibility()),
+			).toBe(true);
+		});
+	}
+}
+
+test("on screen, .print-only is out of the accessibility tree and .no-print is in it", async ({
+	page,
+}) => {
+	await setContent(page, `<style>${css}</style>${visibilityMarkup}`);
+	await page.emulateMedia({ media: "screen" });
+	const tree = await page.locator("body").ariaSnapshot();
+	expect(tree).toContain("Home");
+	expect(tree).toContain("Tools");
+	expect(tree).not.toContain("Printed from example.com");
+});
+
+test("the print visibility classes are class-build utilities only", () => {
+	for (const file of ["dist/cirth.classless.css", "dist/cirth.classless.scoped.css", "dist/cirth.print.css"]) {
+		expect(read(file), file).not.toMatch(/\.no-print|\.print-only/);
+	}
+	expect(read("dist/cirth.scoped.css")).toContain(".cirth .print-only");
+});

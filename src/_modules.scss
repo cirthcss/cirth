@@ -48,6 +48,7 @@
 @use "utilities/reduce-motion"; // prefers-reduced-motion
 @use "utilities/sr-only"; // .sr-only, .sr-only-focusable
 @use "utilities/truncate"; // .truncate
+@use "utilities/print-visibility"; // .no-print, .print-only
 
 // Theme
 // src/theme/ is the single source of the design tokens. Presets
