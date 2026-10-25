@@ -320,6 +320,7 @@ WebKit 26.5, as installed for Playwright 1.61.
 | At 85% the accent moves away from every CSS tool | Sass 0.096 → 0.133 (its site's action colour), Emotion 0.077 → 0.103, Linaria 0.056 → 0.084, StyleX 0.079 → 0.103, Milligram 0.045 → 0.060 (0.061 from its published `#9b4dca`) | Same | Verified |
 | At 85% two logo gradients come closer | The centre of Angular's logo gradient (`#ba10b2`, interpolated, not a declared colour) 0.064 → 0.037 from the light accent; Angular's declared colours stay at 0.071 or more. The magenta stop of Kotlin's logo (`#d212ec`) 0.090 → 0.049 from the dark accent | Same | Verified |
 | Moving the hue would not escape them | Swept 306° to 342° at 85%: the nearest system weighted 0.70 or more sits between 0.029 and 0.051 at every hue, always Angular or Kotlin. 324° is 6% above the band's minimum (W3 3.86 at 316° to 318°), against 4% at 70% | Same | Verified |
+| Known defect 1 still holds, measured again | For an accent at 85% of its chroma ceiling, the light accent text (clamped at 0.52) reads 4.33:1 to 4.49:1 on the recessed level for hues 120° to 220°; the largest light lightness that keeps 4.5:1 there is 0.51 to 0.555 by hue, and 0.51 at its lowest (near 150°). The dark clamp at 0.72 holds for every hue. Customization now tells consumers to keep a green, teal or cyan accent at 0.51 or darker | `dist/cirth.css` built from `3857cfea3`, Chromium 149.0.7827.55, 36 hues at 10° steps, 2026-10-25 (gh#89) | Verified |
 
 ### Reported: the maintainer's palette research
 
