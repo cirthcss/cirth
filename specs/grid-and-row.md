@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | gh#152, gh#111 |
-| Status | Draft |
+| Status | Implementing: every acceptance check passes (2026-10-26); lands with its pull request |
 | Baseline | `e53192ce3` on `feat/v0.17-finish` |
 | Breaking | Yes: `.grid` columns are wider and at most three; `.row` wraps by the width of its items instead of switching at 768px |
 
@@ -72,6 +72,10 @@ It does **not** promise:
 | The proposed `.grid` keeps cards between about 225 and 345px and at most three to a row | Prototype in a `.container`, 3 cards: 1 column at 360px, 268+268 / 268 at 600px, 345+345 / 345 at 768px, 303 × 3 at 1024px, 309 × 3 at 1440px; with 18rem the 600px case stayed one 552px column | Prototype over `dist/cirth.css` at `e53192ce3`, Chromium 149.0.7827.55, 2026-10-26 | Verified |
 | The proposed `.row` fills every line | Two fields and `.span-full`: stacked at 360px, 268+268 / 552 at 600px, 463+463 / 942 at 1024px; three fields: 225 × 3 at 768px, 268+268 / 552 at 600px | Same prototype | Verified |
 | `.row` is the wrong tool for aligned tiles | Six tiles in the prototype `.row` at 1024px: four at 224px and two at 463px; in a `.grid` with six columns at most and a 10rem minimum, five and one, aligned | Same prototype | Verified |
+| `.grid` as built: at most three columns of at least 16rem | `tests/layout.spec.js`: five cards in a 300px grid stack; 292+292 / 292+292 / 292 at 600px; 309 × 3 / 309 × 2 at 960px; 456 × 3 / 456 × 2 at 1400px; two cards share a 960px row at 472px; a grid with an 8rem minimum and six columns at most holds six at 147px | `dist/cirth.css` from this change, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, 2026-10-26 | Verified |
+| `.row` as built: lines that fill, and `.span-full` on its own line | Same file, left to right and right to left: two fields and notes 472+472 / 960; three fields 309 × 3 / 960 wide, 242+242 / 500 / 500 at 500px, one per line at 300px; seven controls 228 × 4 / 309 × 3; the first child starts at the inline start; long content stays inside | Same build and engines | Verified |
+| The field rows of the specimen and the state matrix look as before | Moved from `.grid` to `.row`, they matched their earlier baselines exactly: 61 captures, no difference | `npx playwright test tests/visual.spec.js`, macOS, three engines | Verified |
+| Nothing in the classless builds | Neither `.grid`, `.row` nor `span-full` appears in them; the scoped build emits `.cirth .row > .span-full` | Same build | Verified |
 
 ## Decisions
 
@@ -86,14 +90,21 @@ It does **not** promise:
 
 ## Acceptance
 
-- [ ] `tests/layout.spec.js`: `.grid` column counts and widths at several
+- [x] `tests/layout.spec.js`: `.grid` column counts and widths at several
       container widths, the three-column cap, a per-grid override, and one
       column on a phone; `.row` filling, wrapping, stacking and
       `.span-full`, in left-to-right and right-to-left text; nothing in the
       classless builds; three engines.
-- [ ] The examples and demos that lay out form fields with `.grid` use
+      26 cases, three engines, 2026-10-26 (ledger).
+- [x] The examples and demos that lay out form fields with `.grid` use
       `.row`; card collections keep `.grid`.
-- [ ] Grid, Row, Customization, Tokens, Upgrading and `CHANGELOG.md`
+      Checkout, settings, the text-input and validation demos, the specimen's
+      and the state matrix's field rows and the order-facts list use `.row`;
+      the dashboard, pricing, checkout panels, sections and swatches keep
+      `.grid`.
+- [x] Grid, Row, Customization, Tokens, Upgrading and `CHANGELOG.md`
       describe the change.
-- [ ] `npm run check:tokens` exports the two new tokens; `npm run check:size`
+      All six, 2026-10-26.
+- [x] `npm run check:tokens` exports the two new tokens; `npm run check:size`
       passes.
+      Both pass.
