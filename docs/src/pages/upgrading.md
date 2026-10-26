@@ -21,8 +21,9 @@ come from four named levels and three named edges, type comes from roles, the
 primary is always the heaviest action, every corner takes one of two radii by
 what it is, space between elements comes from their relation rather than from
 margins they carry, and a checkbox or radio draws its mark inside its target.
-The `playroom` preset is replaced by `material`, `metro` is added, and the
-print rules are back inside every build. Each observable change has a spec
+The `playroom` preset is replaced by `material`, `metro` is added, `.grid`
+and `.row` divide the layout work between card collections and lines that
+fill, and the print rules are back inside every build. Each observable change has a spec
 in the repository's `specs/` directory.
 
 ### Colour
@@ -121,6 +122,34 @@ is Material Design 3's baseline scheme, not a recolouring of `playroom`.
 
 <!-- after -->
 <link rel="stylesheet" href="dist/presets/material.min.css">
+```
+
+### Grid and row
+
+`.grid` now lays out collections of cards: aligned columns at least `16rem`
+wide (was `12rem`) and never more than three. `.row` lays out lines that
+fill: its children wrap by their own width, from `12rem`, instead of
+switching at `768px`.
+
+| If you | Then |
+| --- | --- |
+| Lay out cards with `.grid` | Nothing to do: they come out wider, at most three to a row. For more, smaller columns, set `--cirth-grid-min-column` and `--cirth-grid-max-columns` on that grid |
+| Lay out form fields or controls with `.grid` | Use `.row`: its lines fill, and `.span-full` gives one field a line of its own |
+| Relied on `.row` keeping every child on one line from `768px` up | It wraps when a child would get less than `12rem`; set `--cirth-row-min-column` lower to keep more on one line |
+| Relied on `.row` stacking its children below `768px` | It stacks when the row is narrower than two children at `12rem` plus a gap; set `--cirth-row-min-column` higher to stack sooner |
+
+```html
+<!-- before: fields in a grid -->
+<div class="grid">
+  <label>City<input name="city"></label>
+  <label>Postcode<input name="postcode"></label>
+</div>
+
+<!-- after -->
+<div class="row">
+  <label>City<input name="city"></label>
+  <label>Postcode<input name="postcode"></label>
+</div>
 ```
 
 ### Print is part of every build

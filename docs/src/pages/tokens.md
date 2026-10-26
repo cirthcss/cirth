@@ -207,6 +207,7 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-flow-line` | scale |
 | `--cirth-flow-section` | scale |
 | `--cirth-grid-column-gap` | role |
+| `--cirth-grid-max-columns` | role |
 | `--cirth-grid-min-column` | role |
 | `--cirth-grid-row-gap` | role |
 | `--cirth-nav-breadcrumb-divider` | role |
@@ -214,6 +215,7 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-nav-element-spacing-vertical` | role |
 | `--cirth-nav-link-spacing-horizontal` | role |
 | `--cirth-nav-link-spacing-vertical` | role |
+| `--cirth-row-min-column` | role |
 | `--cirth-space-0` | scale |
 | `--cirth-space-1` | scale |
 | `--cirth-space-10` | scale |

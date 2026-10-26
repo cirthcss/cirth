@@ -1,21 +1,22 @@
 ---
 layout: docs.njk
-description: Arrange a known set of peers as equal-width columns above 768px and stack them on narrower screens.
+description: Lay out fields and controls in lines that always fill, wrapping by the width of their items, with one child across the whole width when needed.
 ---
 
 # Row
 
-Use `.row` for a small, known set of peers that should stack on narrow screens
-and share one equal-width row on wider screens. Common examples are form
-fields, stat tiles, and short action groups.
+Use `.row` for the fields of a form, a line of controls or any short set of
+peers that should fill the line they sit on. The children share each line at
+equal widths and wrap when the line has no room for another one.
 
 {% demo "row" %}
 
 ```html
 <div class="row">
-  <article>Column one</article>
-  <article>Column two</article>
-  <article>Column three</article>
+  <label>First name<input name="given-name"></label>
+  <label>Last name<input name="family-name"></label>
+  <label>Email<input name="email" type="email"></label>
+  <label class="span-full">Notes<textarea name="notes" rows="3"></textarea></label>
 </div>
 ```
 
@@ -24,42 +25,58 @@ meaning.
 
 ## Behavior
 
-Below `768px`, the row has one column. At `768px` and above, CSS Grid gives
-every direct child an equal share of one row. The items do not wrap onto a
-second row, even when the row has many children.
+Every direct child starts from `12rem` and grows by the same amount, so a
+line holds as many children as fit at `12rem` and they share it equally. The
+next child wraps to a new line, and a child left alone fills its line. A row
+narrower than `12rem` per child stacks them, one to a line. The row's own
+width decides, not the viewport's, so a row inside a card or a sidebar
+behaves the same way.
 
-Spacing comes from `--cirth-grid-column-gap` and
-`--cirth-grid-row-gap`. Direct children receive `min-width: 0`, allowing long
-text or an inner scroll container to shrink within the assigned column.
+| Row width | Three fields |
+| --- | --- |
+| Under about 25rem | One per line |
+| From about 25rem | Two, then the third across the line |
+| From about 38rem | Three on one line |
+
+Spacing comes from `--cirth-grid-column-gap` and `--cirth-grid-row-gap`.
+Direct children receive `min-width: 0`, allowing long text or an inner
+scroll container to shrink within its share.
 
 `.row` is available only in class-enabled builds.
 
+## A child across the whole width
+
+Add `.span-full` to a direct child of `.row` to give it a line of its own:
+notes after short fields, a validation summary, the line of actions at the
+end of a form. The children before it fill their line, so nothing is left
+empty beside them.
+
 ## Row or grid
 
-Use [`.grid`](/layout/grid) when items should wrap based on available space or
-when their number can grow. A grid protects a minimum column width and moves
-extra items to another line. A row always keeps its wide-screen items on one
-line.
+Use [`.grid`](/layout/grid) for a collection of cards that should stay in
+aligned columns. A row fills every line instead, so its items can be
+different widths on different lines: three fields on one line and two on
+the next are a third and a half wide.
 
-## Customizing the gaps
+## Changing the width items start from
 
 ```css
-.profile-fields {
-  --cirth-grid-column-gap: var(--cirth-space-4);
-  --cirth-grid-row-gap: var(--cirth-space-3);
+.address-fields {
+  --cirth-row-min-column: 9rem;
 }
 ```
 
-The breakpoint and the equal-column behavior are part of `.row`'s contract.
-Use a local layout instead when those decisions do not fit the content.
+A smaller value keeps more children on one line before they wrap; a larger
+one wraps sooner. Change the gaps with `--cirth-grid-column-gap` and
+`--cirth-grid-row-gap`.
 
 ## Common mistakes
 
-- Do not use `.row` for an unknown number of cards. They can become too narrow
-  on a wide-screen row.
-- Do not set widths on every child just to make them equal. The grid tracks
-  already do that.
-- Do not combine `.row` with another grid-owning class on the same element.
+- Do not use `.row` for a collection of cards that should line up. Use
+  `.grid`.
+- Do not set widths on every child just to make them equal. The row already
+  shares each line equally.
+- Do not combine `.row` with another layout class on the same element.
 
 ## Related pages
 

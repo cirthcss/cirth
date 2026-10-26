@@ -175,9 +175,14 @@ heading number. [Typography](/content/typography) explains that distinction.
 :root {
   --cirth-spacing: 0.75rem;
   --cirth-container-max-width: 72rem;
-  --cirth-grid-min-column: 16rem;
+  --cirth-grid-max-columns: 4;
 }
 ```
+
+`--cirth-grid-min-column` and `--cirth-grid-max-columns` set how narrow and
+how many the columns of a `.grid` can be, and `--cirth-row-min-column` the
+width the children of a `.row` grow from ([Grid](/layout/grid),
+[Row](/layout/row)).
 
 `--cirth-spacing` changes the flow rhythm and values derived from it. Form
 control padding remains separate so a density change does not silently

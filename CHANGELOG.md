@@ -18,6 +18,14 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Changed
 
+- **`.grid` lays out card collections; `.row` lays out lines that fill.**
+  `.grid` keeps aligned columns, now at least 16rem wide (was 12rem) and never
+  more than three, set by the new `--cirth-grid-max-columns`. `.row` becomes
+  a wrapping row: its children grow equally from the new
+  `--cirth-row-min-column` (12rem), so every line fills and a narrow row
+  stacks them, decided by the row's width instead of a 768px breakpoint.
+  **Breaking** — see the Upgrading page.
+
 - **Every build carries the print rules again.** The print pass is the last
   part of every main build, under `@media print`, so a page that links only
   the build prints black ink on white in either scheme, with flat surfaces
@@ -34,11 +42,10 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Added
 
-- **`.span-full` lets a `.grid` child cross every column** (gh#152). A
-  notes field after short fields, a validation summary or an action row
-  spans however many columns the grid fits, while the other children keep
-  their columns. It acts only on a direct child of `.grid`, in the class
-  builds.
+- **`.span-full` gives a `.row` child a line of its own** (gh#152). Notes
+  after short fields, a validation summary or the actions of a form take
+  the whole width, and the fields before them fill their line. It acts only
+  on a direct child of `.row`, in the class builds.
 
 - **`.no-print` and `.print-only`** (gh#151). `.no-print` leaves an element
   off the paper and `.print-only` shows one only on paper, so marking an
