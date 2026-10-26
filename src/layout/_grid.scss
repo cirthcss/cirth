@@ -3,10 +3,12 @@
 @if $enable-classes {
   /**
    * Grid
-   * Intrinsically responsive wrapping grid: columns follow available
-   * space, wrapping into a new row once children no longer fit at
-   * --cirth-grid-min-column. min(100%, …) collapses to one column on
-   * narrow viewports for free, so no breakpoint is needed.
+   * A collection of peers, cards above all, in aligned columns: as many as
+   * fit at --cirth-grid-min-column, never more than
+   * --cirth-grid-max-columns. Each column is at least 1/max of the width,
+   * so no more fit; min(100%, …) collapses to one column on a narrow
+   * container, so no breakpoint is needed. A line that has to fill belongs
+   * to .row (specs/grid-and-row.md).
    */
 
   #{$parent-selector} .grid {
@@ -14,7 +16,20 @@
     display: grid;
     grid-template-columns: repeat(
       auto-fit,
-      minmax(min(100%, var(--cirth-grid-min-column)), 1fr)
+      minmax(
+        max(
+          min(100%, var(--cirth-grid-min-column)),
+          calc(
+            (
+                100% -
+                  (var(--cirth-grid-max-columns) - 1) *
+                  var(--cirth-grid-column-gap)
+              ) /
+              var(--cirth-grid-max-columns)
+          )
+        ),
+        1fr
+      )
     );
 
     // Cells shrink below their content instead of overflowing, and the
@@ -23,14 +38,6 @@
     & > * {
       min-width: 0;
       margin-block: 0;
-    }
-
-    // A child that has to cross every column, such as notes after short
-    // fields or an action row, spans all of them. Only a direct child of
-    // .grid: the class names a grid operation, not a width
-    // (specs/grid-span-full.md).
-    & > .span-full {
-      grid-column: 1 / -1;
     }
   }
 }

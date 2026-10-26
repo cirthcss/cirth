@@ -182,92 +182,116 @@ test("the scoped build keeps the same layout contract inside its root", async ({
 	expect(full.width).toBe(container.width);
 });
 
-// --- .span-full (specs/grid-span-full.md) ---------------------------------
+// --- .grid and .row (specs/grid-and-row.md) -----------------------------
 
-// A direct child of .grid crosses every column, however many the container
-// fits, and nothing else changes: not its siblings, not a grid nested in it,
-// not a .row, not an element outside a grid.
-for (const [label, width, dir] of /** @type {const} */ ([
-	["wide", 1200, "ltr"],
-	["wide, right to left", 1200, "rtl"],
-	["narrow", 300, "ltr"],
-])) {
-	test(`span-full crosses every column of a .grid (${label})`, async ({
-		page,
-	}) => {
-		await render(
-			page,
-			`<div dir="${dir}">
-				<div id="grid" class="grid" style="width: ${width}px">
-					<label id="first">First<input></label>
-					<label id="second">Second<input></label>
-					<label id="full" class="span-full">Notes<textarea></textarea></label>
-					<p id="after">After</p>
-				</div>
-			</div>`,
-		);
-		const box = await boxes(page, ["grid", "first", "second", "full", "after"]);
-
-		expect(box.full.left).toBeCloseTo(box.grid.left, 0);
-		expect(box.full.width).toBeCloseTo(box.grid.width, 0);
-		// The short fields keep equal columns. The spanning child holds every
-		// column open, so in a grid that fits more than two, the rest of
-		// their row stays empty rather than being shared out.
-		if (width > 600) {
-			expect(box.first.width + box.second.width).toBeLessThan(box.grid.width);
-			expect(box.first.width).toBeCloseTo(box.second.width, 0);
+/**
+ * The children of #layout, grouped by line: the width of each child, line by
+ * line, rounded to the pixel.
+ *
+ * @param {import("@playwright/test").Page} page
+ */
+const lines = (page) =>
+	page.evaluate(() => {
+		const layout = /** @type {HTMLElement} */ (document.getElementById("layout"));
+		/** @type {Map<number, number[]>} */
+		const byTop = new Map();
+		for (const child of layout.children) {
+			const box = child.getBoundingClientRect();
+			const top = Math.round(box.top);
+			byTop.set(top, [...(byTop.get(top) ?? []), Math.round(box.width)]);
 		}
+		return [...byTop.values()];
+	});
+
+/** @param {number} count */
+const cards = (count) => "<article>Card</article>".repeat(count);
+
+// A collection of cards: columns of at least 16rem (256px), never more than
+// three, aligned from row to row. Widths are the layout's own, so the
+// container's gutters do not enter the numbers.
+for (const [width, expected] of /** @type {const} */ ([
+	[300, [[300], [300], [300], [300], [300]]],
+	[600, [[292, 292], [292, 292], [292]]],
+	[960, [[309, 309, 309], [309, 309]]],
+	[1400, [[456, 456, 456], [456, 456]]],
+])) {
+	test(`grid: five cards at ${width}px, at most three columns of at least 16rem`, async ({ page }) => {
+		await render(page, `<div id="layout" class="grid" style="width: ${width}px">${cards(5)}</div>`);
+		expect(await lines(page)).toEqual(expected);
 	});
 }
 
-test("span-full does not overflow the grid with long content", async ({
-	page,
-}) => {
+test("grid: fewer cards than columns share the row", async ({ page }) => {
+	await render(page, `<div id="layout" class="grid" style="width: 960px">${cards(2)}</div>`);
+	expect(await lines(page)).toEqual([[472, 472]]);
+});
+
+test("grid: one grid can take a smaller minimum and more columns", async ({ page }) => {
 	await render(
 		page,
-		`<div id="grid" class="grid" style="width: 320px">
-			<p id="full" class="span-full">${"unbroken".repeat(40)}</p>
-		</div>`,
+		`<div id="layout" class="grid" style="width: 960px; --cirth-grid-min-column: 8rem; --cirth-grid-max-columns: 6">${cards(6)}</div>`,
 	);
-	const measured = await page.evaluate(() => {
-		const grid = /** @type {HTMLElement} */ (document.getElementById("grid"));
-		const full = /** @type {HTMLElement} */ (document.getElementById("full"));
-		return {
-			gridWidth: grid.getBoundingClientRect().width,
-			fullWidth: full.getBoundingClientRect().width,
-		};
+	expect(await lines(page)).toEqual([[147, 147, 147, 147, 147, 147]]);
+});
+
+test("grid: span-full means nothing in a grid", async ({ page }) => {
+	await render(
+		page,
+		`<div id="layout" class="grid" style="width: 960px"><article>One</article><article class="span-full">Two</article><article>Three</article></div>`,
+	);
+	expect(await lines(page)).toEqual([[309, 309, 309]]);
+});
+
+// A line of fields or controls: every child grows from 12rem (192px), all
+// equally, the line always fills, and .span-full takes a line of its own.
+/** @param {number} count */
+const fields = (count) =>
+	Array.from({ length: count }, (_, index) => `<label>Field ${index + 1}<input></label>`).join("");
+const notes = `<label class="span-full">Notes<textarea></textarea></label>`;
+
+for (const dir of /** @type {const} */ (["ltr", "rtl"])) {
+	for (const [label, markup, width, expected] of /** @type {const} */ ([
+		["two fields and notes, wide", fields(2) + notes, 960, [[472, 472], [960]]],
+		["three fields and notes, wide", fields(3) + notes, 960, [[309, 309, 309], [960]]],
+		["three fields and notes, medium", fields(3) + notes, 500, [[242, 242], [500], [500]]],
+		["three fields and notes, narrow", fields(3) + notes, 300, [[300], [300], [300], [300]]],
+		["seven controls, wide", fields(7), 960, [[228, 228, 228, 228], [309, 309, 309]]],
+	])) {
+		test(`row (${dir}): ${label} fill every line`, async ({ page }) => {
+			await render(page, `<div dir="${dir}"><div id="layout" class="row" style="width: ${width}px">${markup}</div></div>`);
+			expect(await lines(page)).toEqual(expected);
+		});
+	}
+}
+
+test("row: a line starts at the inline start, also right to left", async ({ page }) => {
+	await render(
+		page,
+		`<div dir="rtl"><div id="layout" class="row" style="width: 960px">${fields(2)}</div></div>`,
+	);
+	const edges = await page.evaluate(() => {
+		const layout = /** @type {HTMLElement} */ (document.getElementById("layout"));
+		const first = /** @type {HTMLElement} */ (layout.firstElementChild);
+		return { layout: layout.getBoundingClientRect().right, first: first.getBoundingClientRect().right };
 	});
-	expect(measured.fullWidth).toBeLessThanOrEqual(measured.gridWidth + 0.5);
+	expect(edges.first).toBeCloseTo(edges.layout, 0);
 });
 
-test("span-full means nothing outside a direct child of .grid", async ({
-	page,
-}) => {
+test("row: long content does not widen its line", async ({ page }) => {
 	await render(
 		page,
-		`<div id="grid" class="grid" style="width: 1200px">
-			<div id="cell"><div class="grid"><p id="nested" class="span-full">Nested</p><p>Sibling</p></div></div>
-			<p>Two</p><p>Three</p>
-		</div>
-		<div id="row" class="row" style="width: 1200px"><p id="in-row" class="span-full">Row</p><p>Two</p></div>
-		<p id="loose" class="span-full">Loose</p>`,
+		`<div id="layout" class="row" style="width: 320px"><p>${"unbroken".repeat(40)}</p><p>Short</p></div>`,
 	);
-	const columns = await page.evaluate(() =>
-		["nested", "in-row", "loose"].map(
-			(id) =>
-				getComputedStyle(/** @type {Element} */ (document.getElementById(id)))
-					.gridColumnStart,
-		),
-	);
-	// A grandchild in its own .grid does span that grid; the outer one never
-	// sees it. A .row and a block outside any grid keep the default.
-	const box = await boxes(page, ["cell", "nested"]);
-	expect(box.nested.width).toBeCloseTo(box.cell.width, 0);
-	expect(columns[1]).toBe("auto");
-	expect(columns[2]).toBe("auto");
+	const widths = await lines(page);
+	for (const line of widths) {
+		for (const width of line) expect(width).toBeLessThanOrEqual(320);
+	}
 });
 
-test("span-full is a class, so the classless build has no such rule", () => {
-	expect(read("dist/cirth.classless.css")).not.toContain("span-full");
-	expect(read("dist/cirth.scoped.css")).toContain(".cirth .grid > .span-full");
+test("grid and row are classes, so the classless builds have neither", () => {
+	for (const file of ["dist/cirth.classless.css", "dist/cirth.classless.scoped.css"]) {
+		const source = read(file);
+		expect(source, file).not.toMatch(/\.grid\b|\.row\b|span-full/);
+	}
+	expect(read("dist/cirth.scoped.css")).toContain(".cirth .row > .span-full");
 });

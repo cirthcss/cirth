@@ -1,29 +1,34 @@
-@use "../breakpoints" as *;
 @use "../config" as *;
 
 @if $enable-classes {
   /**
    * Row
-   * Single-row, equal-width columns: stacked below md, one row of
-   * equal columns from md up. Main use case is form rows and stat
-   * groups, where stacking on mobile is the right default.
+   * A line of fields or controls that always fills: every child grows from
+   * --cirth-row-min-column, all equally, and wraps when the line has no room
+   * for its basis. A child left alone fills its line, and on a container
+   * narrower than one basis every child takes a line: the stacked layout,
+   * decided by the row's own width rather than the viewport's
+   * (specs/grid-and-row.md).
    */
 
   #{$parent-selector} .row {
     gap: var(--cirth-grid-row-gap) var(--cirth-grid-column-gap);
-    display: grid;
-    grid-template-columns: 1fr;
-
-    @media (min-width: $row-breakpoint) {
-      grid-template-columns: repeat(auto-fit, minmax(0%, 1fr));
-    }
+    display: flex;
+    flex-wrap: wrap;
 
     // Cells shrink below their content instead of overflowing, and the
     // container owns the space between them: a flow relation would offset
     // every cell after the first (upstream #738).
     & > * {
+      flex: 1 1 var(--cirth-row-min-column);
       min-width: 0;
       margin-block: 0;
+    }
+
+    // A child that needs the whole width, such as notes after short fields
+    // or an action line, takes a line of its own.
+    & > .span-full {
+      flex-basis: 100%;
     }
   }
 }
