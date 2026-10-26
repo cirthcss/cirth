@@ -48,6 +48,7 @@ module.exports = defineConfig({
 		"print.spec.js",
 		"radius-relations.spec.js",
 		"segmented.spec.js",
+		"shadow-host-theme.spec.js",
 		"surface-depth.spec.js",
 		"surface-derivation.spec.js",
 		"table-controls.spec.js",

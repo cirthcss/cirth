@@ -51,7 +51,10 @@ const BASE_ROOT = ":root, :host";
 const LIGHT_ROOT =
   ':where([data-theme="light"]), :root:where(:not([data-theme="dark"])), ' +
   ':host(:where(:not([data-theme="dark"])))';
-const DARK_ROOT = ':where([data-theme="dark"])';
+// The forced dark block also names a themed shadow host
+// (specs/shadow-host-theme.md).
+const DARK_ROOT =
+  ':where([data-theme="dark"]), :host(:where([data-theme="dark"]))';
 const AUTO_DARK_ROOT =
   ":root:where(:not([data-theme])), :host(:where(:not([data-theme])))";
 const AUTO_DARK_MEDIA = "only screen and (prefers-color-scheme: dark)";

@@ -30,9 +30,14 @@
       @include meta.apply($light);
     }
   } @else {
+    // A themed shadow host themes the wrappers in its tree that set no
+    // scheme of their own (specs/shadow-host-theme.md). At (0,2,0) the
+    // branch beats the wrapper's system-preference block below.
     #{$parent-selector}:where([data-theme="light"]),
     #{$parent-selector} :where([data-theme="light"]),
-    #{$parent-selector}:where(:not([data-theme="dark"])) {
+    #{$parent-selector}:where(:not([data-theme="dark"])),
+    :host(:where([data-theme="light"]))
+      #{$parent-selector}:where(:not([data-theme])) {
       @include meta.apply($light);
     }
   }
@@ -56,15 +61,20 @@
 
   // Dark color scheme (Forced)
 
-  // Enabled if forced with data-theme="dark"
+  // Enabled if forced with data-theme="dark". A shadow host is reached from
+  // inside its tree only through :host(), so a themed host has its own
+  // branch (specs/shadow-host-theme.md).
 
   @if $parent-selector == "" {
-    :where([data-theme="dark"]) {
+    :where([data-theme="dark"]),
+    :host(:where([data-theme="dark"])) {
       @include meta.apply($dark);
     }
   } @else {
     #{$parent-selector}:where([data-theme="dark"]),
-    #{$parent-selector} :where([data-theme="dark"]) {
+    #{$parent-selector} :where([data-theme="dark"]),
+    :host(:where([data-theme="dark"]))
+      #{$parent-selector}:where(:not([data-theme])) {
       @include meta.apply($dark);
     }
   }
