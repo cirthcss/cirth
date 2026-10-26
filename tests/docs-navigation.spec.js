@@ -594,13 +594,27 @@ test("the outline marker follows aria-current from start through hash, resize, a
 	// semantic current link, rather than the old hash, remains authoritative.
 	const afterResizeCurrent = toc.locator('[data-toc-link][aria-current="true"]');
 	await expect(afterResizeCurrent).toHaveCount(1);
-	// ResizeObserver and scroll callbacks settle on animation frames. Wait for
-	// the decorative geometry to catch up with the semantic state before taking
-	// a single sample, instead of comparing reads that may straddle two frames.
+	// ResizeObserver and scroll callbacks settle on animation frames, and the
+	// reflow can move the reading position for a few of them (scroll
+	// anchoring, then the spy's own scroll callback), so the current link
+	// itself may change after a first sample that already looked aligned.
+	// Wait until two samples two frames apart agree on the current link and
+	// the marker sits on it, then compare against that settled state.
+	const twoFrames = () =>
+		page.evaluate(
+			() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+		);
+	/** @type {Awaited<ReturnType<typeof markerState>> | undefined} */
+	let settled;
 	await expect
-		.poll(async () => Math.abs((await markerState()).alignment))
-		.toBeLessThanOrEqual(0.5);
-	const afterResize = await markerState();
+		.poll(async () => {
+			const before = await markerState();
+			await twoFrames();
+			settled = await markerState();
+			return before.active === settled.active && Math.abs(settled.alignment) <= 0.5;
+		})
+		.toBe(true);
+	const afterResize = /** @type {Awaited<ReturnType<typeof markerState>>} */ (settled);
 	await expect(
 		toc.locator(
 			`[data-toc-link][data-slug="${afterResize.active}"][aria-current="true"]`,
