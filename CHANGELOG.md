@@ -9,6 +9,14 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Fixed
 
+- **`data-theme` on a shadow host themes its tree.** A component that loads
+  Cirth into its shadow root and sets `data-theme="dark"` on its own element
+  got no derived tokens in the default and classless builds, so its cards
+  and buttons came out transparent, and the scoped builds ignored the
+  attribute. Every build now reads a themed shadow host; an attribute inside
+  the shadow root still wins for its subtree. **Breaking** in selector
+  structure only — see the Upgrading page.
+
 - **Accent text reads 4.5:1 for any accent.** `--cirth-primary-text` capped
   only the accent's OKLab lightness, which is not what WCAG measures: a teal
   accent's links read 3.8:1 in light, and a deep red one 3.7:1 in dark. The

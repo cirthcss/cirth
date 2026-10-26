@@ -66,10 +66,16 @@ export default defineConfig({
 
 ## 4. Check it
 
-A shadow root takes its scheme from the system, not from the page around
-it: a `data-theme` on an ancestor, or on the component's own element, does
-not reach Cirth inside it. To force a scheme, put the attribute on an
-element in the component's template:
+A shadow root takes its scheme from the system unless the component says
+otherwise. A `data-theme` on the page around the component does not reach
+inside, but one on the component's own element does: Cirth reads the
+shadow host's attribute from within the shadow root.
+
+```html
+<order-panel data-theme="dark"></order-panel>
+```
+
+An attribute on an element in the template themes just that part:
 
 ```js
 render() {
@@ -81,7 +87,7 @@ render() {
 }
 ```
 
-Build for production: that article is dark on a light page. If it is not,
+Build for production: the component is dark on a light page. If it is not,
 check the CSS target above.
 
 {{ nextSteps("in the component's own css after Cirth's, or as custom properties set on its element") }}

@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | None: a known issue since 2026-10-03, found while building the home page's isolated copies |
-| Status | Draft |
+| Status | Implementing: every acceptance check passes (2026-10-26); lands with its pull request |
 | Baseline | `9666e8537` on `feat/v0.17-finish` |
 | Breaking | Yes, in selector structure: every build gains `:host()` branches. A themed shadow host now themes its tree; nothing else renders differently |
 
@@ -57,6 +57,9 @@ It does **not** promise:
 | A dark shadow host empties the tokens in the default and classless builds | Host `data-theme="dark"`, build loaded in its shadow root: `color-scheme: normal`, `--cirth-primary-text` empty, `<article>` and `<button>` transparent, under a light and a dark system scheme | `dist/cirth.css` and `dist/cirth.classless.css` at `9666e8537`, Chromium 149.0.7827.55, 2026-10-26; the same in 0.16.0 and in Firefox 151.0 and WebKit 26.5 on 2026-10-07 | Verified |
 | The scoped builds ignore the host's attribute | Host `data-theme="dark"` under a light system scheme renders light; `data-theme="light"` under a dark one renders dark | `dist/cirth.scoped.css` and `dist/cirth.classless.scoped.css` at `9666e8537`, Chromium 149.0.7827.55, 2026-10-26 | Verified |
 | `:host()` cannot be reached by `:where([data-theme="dark"])` from inside the tree | Selectors Level 4 and CSS Scoping: a shadow tree's rules reach its host only through `:host`, `:host()` and `:host-context()` | Specifications, not reproduced beyond the measurements above | Reported |
+| Every build reads a themed shadow host | `tests/shadow-host-theme.spec.js`: four builds, host light, dark and unthemed, light and dark system: `color-scheme`, the accent text, the card and the button equal the same markup themed in the light DOM; an inner `data-theme` wins over the host; a preset follows a dark host. 87 cases | `dist/` built from this change, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, 2026-10-26 | Verified |
+| The test catches the defect | With the new `:host()` selectors removed from the default and scoped builds, exactly the four cases they serve fail: a dark host in the default build under either system scheme, and in the scoped build a dark host under a light system and a light host under a dark one | Same build, Chromium 149.0.7827.55 | Verified |
+| Folding the host branches into the existing blocks keeps the size | Separate blocks repeated both scheme mixins and put the scoped builds 219 and 248 B over budget; as extra selectors in the existing lists, `cirth.scoped.min.css` is 17646 B of 17750 B and `cirth.classless.scoped.min.css` 15420 B of 15550 B | `npm run check:size`, Node 24.18.0 | Verified |
 
 ## Decisions
 
@@ -68,11 +71,14 @@ It does **not** promise:
 
 ## Acceptance
 
-- [ ] A behavior test mounts every build in a shadow root with `data-theme`
+- [x] A behavior test mounts every build in a shadow root with `data-theme`
       on the host (light, dark, none) under both system schemes, and checks
       `color-scheme`, a derived token, and the card and button backgrounds
       against the same markup themed in the light DOM, in Chromium, Firefox
       and WebKit. It also checks an inner `data-theme` and a preset.
-- [ ] `check:dist` accepts the new selectors; `check:size` passes.
-- [ ] Themes documents theming a shadow host; the Lit guide, which loads
+      `tests/shadow-host-theme.spec.js`, 87 cases in three engines (ledger).
+- [x] `check:dist` accepts the new selectors; `check:size` passes.
+      Both pass; the token export reads the forced dark block's new selector.
+- [x] Themes documents theming a shadow host; the Lit guide, which loads
       Cirth into a shadow root, says so; `CHANGELOG.md` records the fix.
+      Themes, the Lit guide and Upgrading; the changelog under Fixed.

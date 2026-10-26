@@ -152,6 +152,18 @@ switching at `768px`.
 </div>
 ```
 
+### A themed shadow host themes its tree
+
+`data-theme` on a shadow host now themes the Cirth stylesheet loaded inside
+its shadow root, in every build. Before, a dark host left the default and
+classless builds without their derived tokens, and the scoped builds
+ignored it.
+
+| If you | Then |
+| --- | --- |
+| Put `data-theme` on an element inside the shadow root to work around this | Nothing to change: it still wins for its subtree. You can move it to the host |
+| Relied on a scoped build ignoring a `data-theme` on its shadow host | Remove the attribute from the host, or set the scheme you want on the `.cirth` wrapper, which wins |
+
 ### Print is part of every build
 
 The print rules are back inside every build, last, under `@media print`. A
