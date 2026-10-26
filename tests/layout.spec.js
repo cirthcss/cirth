@@ -288,6 +288,52 @@ test("row: long content does not widen its line", async ({ page }) => {
 	}
 });
 
+// gh#152 asked for nested layouts and the documented parent to be checked:
+// .full-line acts on a direct child of the .row it sits in, and on nothing
+// else.
+test("row: a nested row's full-line takes a line of that row only", async ({ page }) => {
+	await render(
+		page,
+		`<div id="layout" class="row" style="width: 960px">
+			<div id="cell"><div id="inner" class="row">${fields(1)}<label id="notes" class="full-line">Notes<textarea></textarea></label></div></div>
+			<label>Beside<input></label>
+		</div>`,
+	);
+	// The outer line holds the cell and its sibling, unaffected.
+	expect(await lines(page)).toEqual([[472, 472]]);
+	const inner = await page.evaluate(() => {
+		const width = (/** @type {string} */ id) =>
+			Math.round(/** @type {HTMLElement} */ (document.getElementById(id)).getBoundingClientRect().width);
+		const fieldWidths = [.../** @type {HTMLElement} */ (document.getElementById("inner")).children]
+			.slice(0, 1)
+			.map((child) => Math.round(child.getBoundingClientRect().width));
+		return { cell: width("cell"), notes: width("notes"), fields: fieldWidths };
+	});
+	// One field and the notes would share a line; the notes take their own,
+	// and the field fills the line it is left on.
+	expect(inner.notes).toBe(inner.cell);
+	expect(inner.fields).toEqual([inner.cell]);
+});
+
+test("row: full-line means nothing on a grandchild or outside a row", async ({ page }) => {
+	await render(
+		page,
+		`<div id="layout" class="row" style="width: 960px">
+			<div><label id="grandchild" class="full-line">Notes<textarea></textarea></label></div>
+			<label>Beside<input></label>
+		</div>
+		<p id="loose" class="full-line">Loose</p>`,
+	);
+	// The grandchild does not force its wrapper onto a line of its own.
+	expect(await lines(page)).toEqual([[472, 472]]);
+	const bases = await page.evaluate(() =>
+		["grandchild", "loose"].map(
+			(id) => getComputedStyle(/** @type {Element} */ (document.getElementById(id))).flexBasis,
+		),
+	);
+	expect(bases).toEqual(["auto", "auto"]);
+});
+
 test("grid and row are classes, so the classless builds have neither", () => {
 	for (const file of ["dist/cirth.classless.css", "dist/cirth.classless.scoped.css"]) {
 		const source = read(file);

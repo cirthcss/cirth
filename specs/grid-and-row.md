@@ -76,6 +76,7 @@ It does **not** promise:
 | `.row` as built: lines that fill, and `.full-line` on its own line | Same file, left to right and right to left: two fields and notes 472+472 / 960; three fields 309 × 3 / 960 wide, 242+242 / 500 / 500 at 500px, one per line at 300px; seven controls 228 × 4 / 309 × 3; the first child starts at the inline start; long content stays inside | Same build and engines | Verified |
 | The field rows of the specimen and the state matrix look as before | Moved from `.grid` to `.row`, they matched their earlier baselines exactly: 61 captures, no difference | `npx playwright test tests/visual.spec.js`, macOS, three engines | Verified |
 | Nothing in the classless builds | Neither `.grid`, `.row` nor `full-line` appears in them; the scoped build emits `.cirth .row > .full-line` | Same build | Verified |
+| `.full-line` acts only on a direct child of the `.row` it sits in (gh#152's nested and parent checks) | `tests/layout.spec.js`: a `.full-line` in a row nested inside a row child takes a line of the inner row only, and the field before it fills its own; on a grandchild of `.row` and on an element outside any row it computes `flex-basis: auto` and the outer line stays two equal items. With the rule removed the first fails; with it unscoped the second fails | `dist/cirth.css` at `85c0f8066`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, 2026-10-26 | Verified |
 
 ## Decisions
 
