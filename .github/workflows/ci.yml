@@ -68,16 +68,31 @@ jobs:
       # green while something in it is unreliable hides the unreliability,
       # so every test that needed a retry is named and annotated on its own
       # file and line.
+      #
+      # A retry also records a trace, so a test that fails on the runner
+      # and nowhere else leaves the page behind it: on-first-retry costs
+      # nothing for a test that passes the first time.
       - name: Browser interaction regression tests
         run: >
           npx playwright test --config=playwright.behavior.config.js
-          --retries=2 --reporter=list,json
+          --retries=2 --trace=on-first-retry --reporter=list,json
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: .cache/behavior-report.json
 
       - name: Name any test that needed a retry
         if: always()
         run: node scripts/report-flaky.js .cache/behavior-report.json
+
+      # The error context and the trace of every test that failed or needed
+      # a retry. Without them a runner-only failure is a guess.
+      - name: Upload the behavior test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: behavior-test-results
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Check all themes accessibility (axe, WCAG 2.0–2.2 A/AA)
         run: npm run check:a11y
