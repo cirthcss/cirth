@@ -29,8 +29,11 @@ jobs:
           node-version: "24.18"
           cache: npm
 
+      # npm does not retry a download the registry drops halfway
+      # (ECONNRESET: "Invalid response body"); one more attempt after
+      # a pause does, and costs nothing when the first one works.
       - name: Install dependencies
-        run: npm ci
+        run: npm ci || (sleep 20 && npm ci)
 
       - name: Lint SCSS
         run: npm run lint
