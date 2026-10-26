@@ -100,8 +100,7 @@ const ink = "rgb(1, 2, 3)";
 // from. What these tests assert is the colour, not its notation.
 /** @param {string} value */
 const asRgb = (value) => {
-	// color(srgb-linear): the accent's text role, since its luminance is
-	// capped in linear light (specs/accent-text-contrast.md).
+	// color(srgb …) as well: an engine may serialise a relative colour in it.
 	if (!/^(oklch|oklab|rgb|color\(srgb)/.test(value)) return value;
 	const { r, g, b } = parseColor(value);
 	return `rgb(${[r, g, b].map((channel) => Math.round(channel * 255)).join(", ")})`;

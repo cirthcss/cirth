@@ -50,7 +50,7 @@ in the repository's `specs/` directory.
 | Rely on cards having no shadow | A card casts one faint contact layer; set `--cirth-card-box-shadow: none` |
 | Set `--cirth-box-shadow: none` to flatten the page | Set `--cirth-card-box-shadow: none` too |
 | Matched your own surfaces to the canvas by value | The light canvas is near white (L 0.978) and the dark one near black (L 0.165); read `--cirth-canvas` or a level token rather than a colour |
-| Read `--cirth-primary-text` as exactly `--cirth-primary` | It is the accent held within what every surface level can carry: lightness at most 0.52 in light and at least 0.72 in dark, then luminance capped for 4.5:1. Its computed value is a `color(srgb-linear …)` |
+| Read `--cirth-primary-text` as exactly `--cirth-primary` | It is the accent held within what every surface level can carry: lightness at most 0.52 in light and at least 0.72 in dark, then luminance capped for 4.5:1 |
 
 ### Type
 

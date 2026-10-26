@@ -292,8 +292,8 @@ for (const scheme of /** @type {const} */ (["light", "dark"])) {
 
 		// The underline drops its half-alpha tint for the link color itself.
 		expect(parseColor(base.underline).alpha).toBeLessThan(1);
-		// Compared as colours: the link colour serialises as color(srgb-linear)
-		// since its luminance is capped (specs/accent-text-contrast.md).
+		// Compared as colours, not as their serialisations: the link colour is
+		// a relative colour (specs/accent-text-contrast.md).
 		const underline = parseColor(more.underline);
 		const link = parseColor(more.linkColor);
 		expect(underline.alpha).toBe(1);

@@ -39,6 +39,9 @@ After this lands:
   `prefers-contrast: more`: none of them reaches the cap.
 - `--cirth-primary-focus` and every role that reads `--cirth-primary-text`
   follow it.
+- The token computes to `oklch()`, as before: the capped colour is read back
+  into OKLCH, so `getComputedStyle` returns the same notation as for every
+  other colour, and the same numbers for the default and the presets.
 
 It does **not** promise:
 
@@ -46,9 +49,7 @@ It does **not** promise:
   numbers measured on the default levels, because a colour derivation in CSS
   cannot read the luminance of a second colour. A much darker light canvas,
   or a lighter dark one, needs its own check, as
-  [surface-and-edge-model](surface-and-edge-model.md) already says;
-- that the computed value keeps its `oklch()` form. It is now a
-  `color(srgb-linear …)` value, which is what `getComputedStyle` returns.
+  [surface-and-edge-model](surface-and-edge-model.md) already says.
 
 ## Evidence ledger
 
@@ -62,6 +63,7 @@ It does **not** promise:
 | Nothing the default or a preset paints changes | Painted `--cirth-primary-text`, old derivation injected against new: identical in 48 cases (three engines, two schemes, with and without `more`, default and three presets) | Same build, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5 | Verified |
 | The token export resolves the new value | `npm run check:tokens`: 717 colour comparisons within ΔOklab 0.002 of the three engines, with `primary-text`, `primary-focus`, `form-element-focus-color` and dark `progress-color` exported rather than listed | Same build | Verified |
 | The size budgets hold | `cirth.min.css` within 17500 B gzip | Same build | Verified |
+| The token computes to `oklch()` with the same numbers | Wrapped in `oklch(from … l c h)`, a link computes to `oklch(0.52 0.228 324)` in light and `oklch(0.72 0.245 324)` in dark in all three engines, and the painted text is identical to the old derivation in 48 of 48 cases; `check:tokens` 717 comparisons within ΔOklab 0.002 | `dist/cirth.css` from this change, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, 2026-10-26 | Verified |
 
 ## Decisions
 
@@ -70,6 +72,7 @@ It does **not** promise:
 | Cap the luminance, after the lightness cap | Constraint | The lightness cap alone fails for luminous hues and clips out of gamut. Keeping it first leaves every accent that passed today unchanged, so the default and the presets paint the same text |
 | Rejected: lowering the lightness cap to 0.51 or 0.505 | Evidence | Measured above: not enough at full chroma, and nowhere near enough once the browser clips. It would also darken the default's links for nothing |
 | Rejected: capping chroma | Design | The chroma ceiling depends on hue and lightness and cannot be computed in CSS; any fixed cap dulls the default magenta |
+| Read back into `oklch()` | Maintainer, 2026-10-26 | A first version returned the `color(srgb-linear …)` itself, and the token computed to that notation; wrapping it in `oklch(from … l c h)` costs nothing and keeps every colour token in one notation. The default reads back `oklch(0.52 0.228 324)` in light and `oklch(0.72 0.245 324)` in dark, as before |
 | 4.6:1, not 4.5:1 | Constraint | The painted colour is rounded to 8 bits per channel; the margin keeps every measured accent above 4.5:1 after rounding |
 
 ## Acceptance
@@ -82,8 +85,8 @@ It does **not** promise:
       before, in both schemes and under `prefers-contrast: more`.
       48 of 48 identical (ledger).
 - [x] `npm run check:tokens` and `npm run check:size` pass.
-      Both pass; the exporter, `check-tokens.js` and `scripts/lib/color.js`
-      read `color(srgb-linear …)` now.
+      Both pass; the token export resolves the linear relative colour inside
+      the `oklch()`.
 - [x] Colors, Customization and [default-palette](default-palette.md)
       describe the new guarantee; `CHANGELOG.md` records the fix.
       Colors, Customization and Upgrading describe it; default-palette's

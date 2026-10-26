@@ -147,8 +147,7 @@ const parseComputed = (value) => {
 	let linear = false;
 	if (kind === "color") {
 		const [space, ...rest] = body.trim().split(/\s+/);
-		// srgb-linear: the accent's text role, whose luminance is capped in
-		// linear light (specs/accent-text-contrast.md).
+		// srgb-linear: channels already in linear light.
 		if (space !== "srgb" && space !== "srgb-linear") throw new Error(`unrecognised computed colour: ${value}`);
 		linear = space === "srgb-linear";
 		kind = "rgb";
