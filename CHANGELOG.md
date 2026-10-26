@@ -42,7 +42,7 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ### Added
 
-- **`.span-full` gives a `.row` child a line of its own** (gh#152). Notes
+- **`.full-line` gives a `.row` child a line of its own** (gh#152). Notes
   after short fields, a validation summary or the actions of a form take
   the whole width, and the fields before them fill their line. It acts only
   on a direct child of `.row`, in the class builds.

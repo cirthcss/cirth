@@ -84,7 +84,7 @@ any release. Its own documentation example showed the cost the contract
 above already admitted: a spanning child holds every column of the grid
 open, so short fields that do not fill a row leave the rest of it empty,
 and whether they do depends on the container's width. The maintainer moved
-`.span-full` to `.row`, which became a wrapping flex row that fills every
-line, and kept `.grid` for collections of cards
+the class to `.row`, which became a wrapping flex row that fills every
+line, renamed it `.full-line`, and kept `.grid` for collections of cards
 ([grid-and-row](grid-and-row.md)). The ledger above stays as the record of
 what a full-span grid child does.

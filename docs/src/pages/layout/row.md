@@ -16,7 +16,7 @@ equal widths and wrap when the line has no room for another one.
   <label>First name<input name="given-name"></label>
   <label>Last name<input name="family-name"></label>
   <label>Email<input name="email" type="email"></label>
-  <label class="span-full">Notes<textarea name="notes" rows="3"></textarea></label>
+  <label class="full-line">Notes<textarea name="notes" rows="3"></textarea></label>
 </div>
 ```
 
@@ -46,7 +46,7 @@ scroll container to shrink within its share.
 
 ## A child across the whole width
 
-Add `.span-full` to a direct child of `.row` to give it a line of its own:
+Add `.full-line` to a direct child of `.row` to give it a line of its own:
 notes after short fields, a validation summary, the line of actions at the
 end of a form. The children before it fill their line, so nothing is left
 empty beside them.

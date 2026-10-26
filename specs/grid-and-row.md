@@ -16,7 +16,7 @@ there were, and stacked them below. After this change each does one thing.
 `.grid` lays out a collection of peers, cards above all, in aligned columns
 at least 16rem wide and never more than three. `.row` lays out a line of
 fields or controls that always fills: its children wrap by their own width,
-share each line equally, and `.span-full` gives one child a line of its own.
+share each line equally, and `.full-line` gives one child a line of its own.
 
 ## Contract
 
@@ -46,7 +46,7 @@ After this lands, in the class builds (default and scoped):
 - A child that wraps alone fills its line; on a container narrower than one
   basis every child takes a line, which is the stacked layout. No viewport
   breakpoint decides it.
-- `.row > .span-full` takes a line of its own (`flex-basis: 100%`), so two
+- `.row > .full-line` takes a line of its own (`flex-basis: 100%`), so two
   or three fields and a notes field below them never leave a hole.
 - Gaps come from `--cirth-grid-column-gap` and `--cirth-grid-row-gap`;
   direct children keep `min-width: 0` and lose their flow margin, as before.
@@ -58,7 +58,7 @@ It does **not** promise:
 - that a `.row` keeps all its children on one line. A `.row` with many
   children wraps; set `--cirth-row-min-column` lower when they should stay
   together;
-- `.span-full` anywhere but on a direct child of `.row`. In a card grid a
+- `.full-line` anywhere but on a direct child of `.row`. In a card grid a
   full-width child holds every column open and leaves holes, which is why
   it is not offered there;
 - a numerical span or a fixed column count class. gh#111 keeps those as
@@ -68,14 +68,14 @@ It does **not** promise:
 
 | Claim | Evidence | Where | Verdict |
 | --- | --- | --- | --- |
-| A `.grid` child spanning every column leaves holes on a partial row | Two fields and a `.span-full` child in a grid that fits three take two columns and leave the third empty; the spanning child occupies every column, so `auto-fit` collapses none | `docs/src/content/demos/grid-span-full.html` at `e53192ce3`, Chromium 149.0.7827.55 | Verified |
+| A `.grid` child spanning every column leaves holes on a partial row | Two fields and a `.span-full` child, as the class was then named, in a grid that fits three take two columns and leave the third empty; the spanning child occupies every column, so `auto-fit` collapses none | `docs/src/content/demos/grid-span-full.html` at `e53192ce3`, Chromium 149.0.7827.55 | Verified |
 | The proposed `.grid` keeps cards between about 225 and 345px and at most three to a row | Prototype in a `.container`, 3 cards: 1 column at 360px, 268+268 / 268 at 600px, 345+345 / 345 at 768px, 303 × 3 at 1024px, 309 × 3 at 1440px; with 18rem the 600px case stayed one 552px column | Prototype over `dist/cirth.css` at `e53192ce3`, Chromium 149.0.7827.55, 2026-10-26 | Verified |
-| The proposed `.row` fills every line | Two fields and `.span-full`: stacked at 360px, 268+268 / 552 at 600px, 463+463 / 942 at 1024px; three fields: 225 × 3 at 768px, 268+268 / 552 at 600px | Same prototype | Verified |
+| The proposed `.row` fills every line | Two fields and `.full-line`: stacked at 360px, 268+268 / 552 at 600px, 463+463 / 942 at 1024px; three fields: 225 × 3 at 768px, 268+268 / 552 at 600px | Same prototype | Verified |
 | `.row` is the wrong tool for aligned tiles | Six tiles in the prototype `.row` at 1024px: four at 224px and two at 463px; in a `.grid` with six columns at most and a 10rem minimum, five and one, aligned | Same prototype | Verified |
 | `.grid` as built: at most three columns of at least 16rem | `tests/layout.spec.js`: five cards in a 300px grid stack; 292+292 / 292+292 / 292 at 600px; 309 × 3 / 309 × 2 at 960px; 456 × 3 / 456 × 2 at 1400px; two cards share a 960px row at 472px; a grid with an 8rem minimum and six columns at most holds six at 147px | `dist/cirth.css` from this change, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, 2026-10-26 | Verified |
-| `.row` as built: lines that fill, and `.span-full` on its own line | Same file, left to right and right to left: two fields and notes 472+472 / 960; three fields 309 × 3 / 960 wide, 242+242 / 500 / 500 at 500px, one per line at 300px; seven controls 228 × 4 / 309 × 3; the first child starts at the inline start; long content stays inside | Same build and engines | Verified |
+| `.row` as built: lines that fill, and `.full-line` on its own line | Same file, left to right and right to left: two fields and notes 472+472 / 960; three fields 309 × 3 / 960 wide, 242+242 / 500 / 500 at 500px, one per line at 300px; seven controls 228 × 4 / 309 × 3; the first child starts at the inline start; long content stays inside | Same build and engines | Verified |
 | The field rows of the specimen and the state matrix look as before | Moved from `.grid` to `.row`, they matched their earlier baselines exactly: 61 captures, no difference | `npx playwright test tests/visual.spec.js`, macOS, three engines | Verified |
-| Nothing in the classless builds | Neither `.grid`, `.row` nor `span-full` appears in them; the scoped build emits `.cirth .row > .span-full` | Same build | Verified |
+| Nothing in the classless builds | Neither `.grid`, `.row` nor `full-line` appears in them; the scoped build emits `.cirth .row > .full-line` | Same build | Verified |
 
 ## Decisions
 
@@ -84,7 +84,8 @@ It does **not** promise:
 | `.grid` for collections, `.row` for lines that fill | Maintainer, 2026-10-26 | No CSS layout keeps columns aligned across rows and also fills a partial row; the two needs are different, so each class takes one |
 | 16rem minimum, three columns at most | Maintainer, 2026-10-26 | Cards narrower than about 256px rarely work. At 18rem a 600px page kept one 552px card per row; above 768px the cap decides and the two values agree |
 | 12rem basis for `.row` | Maintainer, 2026-10-26 | Fields and controls are narrower than cards: three fields share a line from about 610px |
-| `.span-full` only in `.row` | Maintainer, 2026-10-26 | In a grid it cannot avoid holes (the earlier [grid-span-full](grid-span-full.md), withdrawn); in a row it can |
+| `.full-line` only in `.row` | Maintainer, 2026-10-26 | In a grid it cannot avoid holes (the earlier [grid-span-full](grid-span-full.md), withdrawn); in a row it can |
+| Named `.full-line`, not `.span-full` | Maintainer, 2026-10-26 | In markup `span-full` reads as the `<span>` element, and in a flex row nothing spans: the child takes a line of its own, which the name now says. It promises no width outside `.row`, where it does nothing |
 | Rejected: `auto-fill` for `.grid` | Design | Two cards would take two thirds of the row and leave the last third empty |
 | Rejected: keeping the 768px breakpoint in `.row` | Design | The width that decides is the row's own, not the viewport's: a row inside a card or a sidebar would switch at the wrong moment |
 
@@ -93,7 +94,7 @@ It does **not** promise:
 - [x] `tests/layout.spec.js`: `.grid` column counts and widths at several
       container widths, the three-column cap, a per-grid override, and one
       column on a phone; `.row` filling, wrapping, stacking and
-      `.span-full`, in left-to-right and right-to-left text; nothing in the
+      `.full-line`, in left-to-right and right-to-left text; nothing in the
       classless builds; three engines.
       26 cases, three engines, 2026-10-26 (ledger).
 - [x] The examples and demos that lay out form fields with `.grid` use

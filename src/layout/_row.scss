@@ -27,7 +27,7 @@
 
     // A child that needs the whole width, such as notes after short fields
     // or an action line, takes a line of its own.
-    & > .span-full {
+    & > .full-line {
       flex-basis: 100%;
     }
   }

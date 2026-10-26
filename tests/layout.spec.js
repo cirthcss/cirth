@@ -234,20 +234,20 @@ test("grid: one grid can take a smaller minimum and more columns", async ({ page
 	expect(await lines(page)).toEqual([[147, 147, 147, 147, 147, 147]]);
 });
 
-test("grid: span-full means nothing in a grid", async ({ page }) => {
+test("grid: full-line means nothing in a grid", async ({ page }) => {
 	await render(
 		page,
-		`<div id="layout" class="grid" style="width: 960px"><article>One</article><article class="span-full">Two</article><article>Three</article></div>`,
+		`<div id="layout" class="grid" style="width: 960px"><article>One</article><article class="full-line">Two</article><article>Three</article></div>`,
 	);
 	expect(await lines(page)).toEqual([[309, 309, 309]]);
 });
 
 // A line of fields or controls: every child grows from 12rem (192px), all
-// equally, the line always fills, and .span-full takes a line of its own.
+// equally, the line always fills, and .full-line takes a line of its own.
 /** @param {number} count */
 const fields = (count) =>
 	Array.from({ length: count }, (_, index) => `<label>Field ${index + 1}<input></label>`).join("");
-const notes = `<label class="span-full">Notes<textarea></textarea></label>`;
+const notes = `<label class="full-line">Notes<textarea></textarea></label>`;
 
 for (const dir of /** @type {const} */ (["ltr", "rtl"])) {
 	for (const [label, markup, width, expected] of /** @type {const} */ ([
@@ -291,7 +291,7 @@ test("row: long content does not widen its line", async ({ page }) => {
 test("grid and row are classes, so the classless builds have neither", () => {
 	for (const file of ["dist/cirth.classless.css", "dist/cirth.classless.scoped.css"]) {
 		const source = read(file);
-		expect(source, file).not.toMatch(/\.grid\b|\.row\b|span-full/);
+		expect(source, file).not.toMatch(/\.grid\b|\.row\b|full-line/);
 	}
-	expect(read("dist/cirth.scoped.css")).toContain(".cirth .row > .span-full");
+	expect(read("dist/cirth.scoped.css")).toContain(".cirth .row > .full-line");
 });

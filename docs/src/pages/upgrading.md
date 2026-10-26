@@ -134,7 +134,7 @@ switching at `768px`.
 | If you | Then |
 | --- | --- |
 | Lay out cards with `.grid` | Nothing to do: they come out wider, at most three to a row. For more, smaller columns, set `--cirth-grid-min-column` and `--cirth-grid-max-columns` on that grid |
-| Lay out form fields or controls with `.grid` | Use `.row`: its lines fill, and `.span-full` gives one field a line of its own |
+| Lay out form fields or controls with `.grid` | Use `.row`: its lines fill, and `.full-line` gives one field a line of its own |
 | Relied on `.row` keeping every child on one line from `768px` up | It wraps when a child would get less than `12rem`; set `--cirth-row-min-column` lower to keep more on one line |
 | Relied on `.row` stacking its children below `768px` | It stacks when the row is narrower than two children at `12rem` plus a gap; set `--cirth-row-min-column` higher to stack sooner |
 
