@@ -23,7 +23,8 @@ what it is, space between elements comes from their relation rather than from
 margins they carry, and a checkbox or radio draws its mark inside its target.
 The `playroom` preset is replaced by `material`, `metro` is added, `.grid`
 and `.row` divide the layout work between card collections and lines that
-fill, and the print rules are back inside every build. Each observable change has a spec
+fill, and the print rules are back inside every build, which removes the
+separate print stylesheets. Each observable change has a spec
 in the repository's `specs/` directory.
 
 ### Colour
@@ -164,15 +165,42 @@ ignored it.
 | Put `data-theme` on an element inside the shadow root to work around this | Nothing to change: it still wins for its subtree. You can move it to the host |
 | Relied on a scoped build ignoring a `data-theme` on its shadow host | Remove the attribute from the host, or set the scheme you want on the `.cirth` wrapper, which wins |
 
-### Print is part of every build
+### Print is part of every build; the print stylesheets are removed
 
 The print rules are back inside every build, last, under `@media print`. A
 page that links only the build now prints with them: black ink on white in
 either colour scheme, flat surfaces, link destinations spelled out.
 
+The separate print stylesheets are **removed** in v0.17.0, with no
+deprecation release. Four files and their minified copies are gone, and so
+are four package exports:
+
+| Removed export | Removed files |
+| --- | --- |
+| `@cirthcss/cirth/print` | `dist/cirth.print.css`, `dist/cirth.print.min.css` |
+| `@cirthcss/cirth/classless/print` | `dist/cirth.print.classless.css`, `dist/cirth.print.classless.min.css` |
+| `@cirthcss/cirth/scoped/print` | `dist/cirth.print.scoped.css`, `dist/cirth.print.scoped.min.css` |
+| `@cirthcss/cirth/classless/scoped/print` | `dist/cirth.print.classless.scoped.css`, `dist/cirth.print.classless.scoped.min.css` |
+
+How each use fails after the upgrade:
+
+- **An import through the package** (`@import "@cirthcss/cirth/print"` or
+  `import "@cirthcss/cirth/print"`) stops resolving. Your bundler or Sass
+  reports that the package does not export `./print`, and the build stops.
+- **A `<link>` to a CDN or a copied file** answers 404 for any version from
+  v0.17.0. Nothing reports it on screen: a `media="print"` stylesheet that
+  fails to load is skipped quietly. Printing still works, because the build
+  carries the same rules.
+- **A copy you vendored** from an earlier version keeps loading. It restates
+  rules the build now has, so it changes nothing printed; delete it anyway
+  so it cannot drift from the build.
+
+The migration is to delete that one line:
+
 | If you | Then |
 | --- | --- |
-| Load `cirth.print.min.css`, or import `@cirthcss/cirth/print`, after the build | Remove it. It still ships through 0.17, deprecated, and changes nothing printed; it is removed in v0.18.0 |
+| Import `@cirthcss/cirth/print`, `/classless/print`, `/scoped/print` or `/classless/scoped/print` | Delete the import. The build you already import prints the same |
+| Link `cirth.print.min.css` or another `cirth.print*` file | Delete the `<link>`, and its SRI digest if you keep them together |
 | Print with your own `@media print` rules | Nothing to do: rules outside Cirth's layer still win over its print rules |
 | Relied on a page printing without any of Cirth's print rules | Override the ones you do not want in your own `@media print` rules |
 

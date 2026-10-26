@@ -41,12 +41,14 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
   build. Your own `@media print` rules still win. **Breaking** — see the
   Upgrading page.
 
-### Deprecated
+### Removed
 
-- **The print stylesheets** (`cirth.print*.css` and the `./print`,
-  `./classless/print`, `./scoped/print` and `./classless/scoped/print`
-  exports). They still ship and change nothing printed when loaded after
-  their build; they are removed in 0.18.0.
+- **The print stylesheets.** `cirth.print*.css` and `cirth.print*.min.css`
+  and the `./print`, `./classless/print`, `./scoped/print` and
+  `./classless/scoped/print` exports are gone: every build carries the same
+  print rules. Delete the import or the `<link>`; an import of `./print`
+  no longer resolves, and a CDN link to it answers 404. **Breaking**: see
+  the Upgrading page.
 
 ### Added
 

@@ -22,8 +22,10 @@ After this lands:
 - `.print-only` sets `display: none` under `@media not print`. In print,
   nothing in Cirth hides it, so it takes its normal display.
 - Both are in the class builds (default and scoped), not in the classless
-  builds or the print stylesheets. They live in the main build, so they
-  work whether or not `cirth.print.css` is loaded.
+  builds. They live in the main build, which since
+  [print-in-main-build](print-in-main-build.md) also carries the print
+  pass; the separate print stylesheets they once had to work without are
+  removed.
 - They compose by nesting: `.print-only` inside `.no-print` is never shown;
   `.no-print` inside other content hides only itself.
 - `[hidden]` wins over `.print-only`: a hidden element stays hidden on paper.

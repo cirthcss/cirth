@@ -18,28 +18,23 @@ const { setContent } = require("./helpers/render");
 //
 // Every main build carries the pass, last, so it wins over component rules
 // by source position (specs/print-in-main-build.md). Each fixture loads the
-// main build alone, as a page with one <link> does. The print sheets
-// (dist/cirth.print*.css) are deprecated copies of the pass, and are checked
-// to change nothing printed when loaded after the build.
+// main build alone, as a page with one <link> does.
 
 const projectRoot = path.join(__dirname, "..");
 
 const builds = [
 	{
 		file: "dist/cirth.css",
-		print: "dist/cirth.print.css",
 		name: "default",
 		scope: "",
 	},
 	{
 		file: "dist/cirth.classless.css",
-		print: "dist/cirth.print.classless.css",
 		name: "classless",
 		scope: "",
 	},
 	{
 		file: "dist/cirth.scoped.css",
-		print: "dist/cirth.print.scoped.css",
 		name: "scoped",
 		scope: ".cirth",
 	},
@@ -135,47 +130,6 @@ for (const build of builds) {
 		const root = build.scope || "body";
 
 		expect(printBlock).toContain(`${root} {`);
-	});
-}
-
-// The deprecated print sheet restates the pass: loaded after its build it
-// changes nothing printed, in either scheme.
-for (const build of builds) {
-	test(`${build.name} build: its deprecated print sheet changes nothing printed`, async ({
-		page,
-	}) => {
-		const body = build.scope ? `<div class="${build.scope.slice(1)}">${markup}</div>` : markup;
-		/** @param {string} stylesheet */
-		const printed = async (stylesheet) => {
-			const result = [];
-			for (const scheme of /** @type {const} */ (["light", "dark"])) {
-				await page.emulateMedia({ colorScheme: scheme, media: "print" });
-				await setContent(page, `<style>${stylesheet}</style>${body}`);
-				result.push(
-					await page.evaluate(() =>
-						["heading", "text", "mark", "link", "caption", "head", "code", "button", "box", "field"].map(
-							(id) => {
-								const element = /** @type {Element} */ (document.getElementById(id));
-								const style = getComputedStyle(element);
-								const after = getComputedStyle(element, "::after");
-								return [
-									id,
-									style.color,
-									style.backgroundColor,
-									style.borderTopColor,
-									style.display,
-									after.content,
-								].join(" ");
-							},
-						),
-					),
-				);
-			}
-			return result;
-		};
-		const alone = await printed(read(build.file));
-		expect(alone.flat().join("\n")).not.toBe("");
-		expect(await printed(read(build.file) + read(build.print))).toEqual(alone);
 	});
 }
 
@@ -328,42 +282,40 @@ const visible = (page) =>
 	);
 
 for (const build of builds.filter((entry) => entry.name !== "classless")) {
-	for (const withPrintSheet of [true, false]) {
-		test(`${build.name} build${withPrintSheet ? "" : ", no print sheet"}: .no-print and .print-only each hide on one medium`, async ({
-			page,
-		}) => {
-			const stylesheet = read(build.file) + (withPrintSheet ? read(build.print) : "");
-			const body = build.scope
-				? `<div class="${build.scope.slice(1)}">${visibilityMarkup}</div>`
-				: visibilityMarkup;
-			await setContent(page, `<style>${stylesheet}</style>${body}`);
+	test(`${build.name} build: .no-print and .print-only each hide on one medium`, async ({
+		page,
+	}) => {
+		const stylesheet = read(build.file);
+		const body = build.scope
+			? `<div class="${build.scope.slice(1)}">${visibilityMarkup}</div>`
+			: visibilityMarkup;
+		await setContent(page, `<style>${stylesheet}</style>${body}`);
 
-			await page.emulateMedia({ media: "screen" });
-			expect(await visible(page)).toEqual({
-				chrome: true,
-				"print-heading": false,
-				content: true,
-				"nested-chrome": true,
-				"inside-no-print": false,
-				"hidden-print-only": false,
-			});
-
-			await page.emulateMedia({ media: "print" });
-			expect(await visible(page)).toEqual({
-				chrome: false,
-				"print-heading": true,
-				content: true,
-				"nested-chrome": false,
-				"inside-no-print": false,
-				"hidden-print-only": false,
-			});
-			// The classes sit in Cirth's layer: a display of the page's own,
-			// here inline, beats them, as it beats every Cirth rule.
-			expect(
-				await page.locator("#flex-chrome").evaluate((element) => element.checkVisibility()),
-			).toBe(true);
+		await page.emulateMedia({ media: "screen" });
+		expect(await visible(page)).toEqual({
+			chrome: true,
+			"print-heading": false,
+			content: true,
+			"nested-chrome": true,
+			"inside-no-print": false,
+			"hidden-print-only": false,
 		});
-	}
+
+		await page.emulateMedia({ media: "print" });
+		expect(await visible(page)).toEqual({
+			chrome: false,
+			"print-heading": true,
+			content: true,
+			"nested-chrome": false,
+			"inside-no-print": false,
+			"hidden-print-only": false,
+		});
+		// The classes sit in Cirth's layer: a display of the page's own,
+		// here inline, beats them, as it beats every Cirth rule.
+		expect(
+			await page.locator("#flex-chrome").evaluate((element) => element.checkVisibility()),
+		).toBe(true);
+	});
 }
 
 test("on screen, .print-only is out of the accessibility tree and .no-print is in it", async ({
@@ -378,7 +330,7 @@ test("on screen, .print-only is out of the accessibility tree and .no-print is i
 });
 
 test("the print visibility classes are class-build utilities only", () => {
-	for (const file of ["dist/cirth.classless.css", "dist/cirth.classless.scoped.css", "dist/cirth.print.css"]) {
+	for (const file of ["dist/cirth.classless.css", "dist/cirth.classless.scoped.css"]) {
 		expect(read(file), file).not.toMatch(/\.no-print|\.print-only/);
 	}
 	expect(read("dist/cirth.scoped.css")).toContain(".cirth .print-only");

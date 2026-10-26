@@ -53,9 +53,8 @@ const unlayered = (css) => {
 	return root.toString();
 };
 
-// The four screen builds. Print sheets are covered at the end.
+// The four main builds.
 const builds = rootBuilds
-	.filter(({ name }) => !name.includes(".print"))
 	.map(({ classless, name, scoped }) => ({
 		classless,
 		css: read(`dist/${name}.css`),

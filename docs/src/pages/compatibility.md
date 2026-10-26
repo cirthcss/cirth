@@ -131,7 +131,7 @@ instead of treating them as requirements for every Cirth page.
 ## What the package contains
 
 [Package and builds](/package) is the authoritative inventory of exports,
-physical files, presets, token JSON and print companions.
+physical files, presets and token JSON.
 
 ## Delivering the stylesheet
 

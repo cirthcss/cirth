@@ -6,7 +6,7 @@ description: Complete reference for Cirth's public CSS custom properties and gen
 # Token reference
 
 This page is the authoritative inventory of the public `--cirth-*` custom
-properties in Cirth's screen and print builds. Start with
+properties in Cirth's builds. Start with
 [Customization](/customization) if you need to learn which level to
 override and where to place the rule.
 

@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | None: maintainer decision, 2026-10-25, while landing gh#151 |
-| Status | Implementing: the print stylesheets are removed instead of deprecated (maintainer, 2026-10-26) |
+| Status | Implementing: every acceptance check passes (2026-10-26), the print stylesheets removed instead of deprecated; lands with its pull request |
 | Baseline | `74c65f46f` on `feat/v0.17-finish` |
 | Breaking | Yes: a page that links only the main build now prints with the print pass, and the print stylesheets and their four exports are removed |
 
@@ -65,6 +65,7 @@ It does **not** promise:
 | The pass adds about 0.7 KB gzip once it compresses with the build | `cirth.min.css` 16481 B → 17175 B, `cirth.scoped.min.css` 16733 B → 17430 B, the classless pair 15070 B and 15236 B | `npm run check:size`, Node 24.18.0 | Verified |
 | The package keeps every entry point | `check:package`: 28 files, 16 entry points resolve; `check:consumer` finds `@media print` in every main build and in every deprecated print entry | Same build | Verified |
 | Removing the print sheets changes nothing a page that loaded one prints | Follows from the row "The deprecated print sheet changes nothing printed": the sheet restated the pass the build already carries, so without it the page keeps exactly the rules it printed with | Reasoning on the verified row above, not a new measurement | Reported |
+| The print entries are gone from the package | `check:package`: 20 files, 16 build outputs, 12 entry points, none of them `./print`; `dist/` holds no `cirth.print*` file; `check:consumer`, `check:dist` and `check:size` pass without them | `dist/` built from this change, Node 24.18.0, 2026-10-26 | Verified |
 
 ## Decisions
 
@@ -79,13 +80,17 @@ It does **not** promise:
 
 - [x] `tests/print.spec.js` tests each main build alone.
       Every paint test loads the build alone.
-- [ ] The print entries, files and exports are gone: `check:package` lists
+- [x] The print entries, files and exports are gone: `check:package` lists
       12 entry points and no `cirth.print*`; the build, the size guard, the
       dist manifest, the consumer smoke test and the tests no longer name
       them.
-- [ ] Upgrading names the removal and the one-line migration, Package and
+      Done (ledger).
+- [x] Upgrading names the removal and the one-line migration, Package and
       Print no longer offer the sheets, and `CHANGELOG.md` moves them from
       Deprecated to Removed.
+      Upgrading lists the removed exports and files, how each use fails and
+      what to delete; Package, Print, About, Delivery, Compatibility and
+      Tokens no longer mention the sheets.
 - [x] A preset loaded after the main build does not change the printed ink.
       `tests/print.spec.js` (a preset loaded after the build still prints
       black ink).
