@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | Known defect 1 in [default-palette](default-palette.md); measured again for gh#89 |
-| Status | Implementing: every acceptance check passes (2026-10-26); lands with its pull request |
+| Status | Landed in v0.17.0: every acceptance check passed (2026-10-26) |
 | Baseline | `395698bda` on `feat/v0.17-finish` |
 | Breaking | No: the default theme and every preset paint the same accent text; only accents that failed 4.5:1 get darker (light) or lighter (dark) text |
 

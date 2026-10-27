@@ -27,8 +27,8 @@ Add the stylesheet from a CDN:
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.min.css"
-  integrity="sha384-lI8cp0vEMgtcAMV0HDytp7C+rad0hVfW/yXmsl87XmnuvTiMsx7O7ADf2lg5IQZq"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.17.0/dist/cirth.min.css"
+  integrity="sha384-nOepR3J7MR5xFmRtPzlbl5vNrfR0CoY/J3mmieajPP1SOI0GHzrZsEpGymO0avwr"
   crossorigin="anonymous">
 ```
 

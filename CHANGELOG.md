@@ -7,6 +7,8 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-10-27
+
 ### Fixed
 
 - **`data-theme` on a shadow host themes its tree.** A component that loads
@@ -60,8 +62,8 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 - **`.no-print` and `.print-only`** (gh#151). `.no-print` leaves an element
   off the paper and `.print-only` shows one only on paper, so marking an
   application's chrome takes a class instead of a `@media print` rule. Both
-  are in the class builds' main stylesheet and work with or without the
-  print stylesheet. A `.print-only` element is hidden from screen readers on
+  are in the class builds, next to the print rules every build now
+  carries. A `.print-only` element is hidden from screen readers on
   screen, so it should repeat what the screen says, never replace it.
 
 ## [0.17.0-beta.1] - 2026-10-23
@@ -2021,6 +2023,7 @@ Initial public release under the `@cirthcss/cirth` npm scope.
   workflow.
 - CDN link documentation and contribution guidance.
 
+[0.17.0]: https://github.com/cirthcss/cirth/compare/v0.17.0-beta.1...v0.17.0
 [0.17.0-beta.1]: https://github.com/cirthcss/cirth/compare/v0.16.0...v0.17.0-beta.1
 [0.16.0]: https://github.com/cirthcss/cirth/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/cirthcss/cirth/compare/v0.15.0-beta.2...v0.15.0
