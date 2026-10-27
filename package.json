@@ -7,13 +7,9 @@
 	"style": "dist/cirth.min.css",
 	"exports": {
 		".": "./dist/cirth.min.css",
-		"./print": "./dist/cirth.print.min.css",
 		"./classless": "./dist/cirth.classless.min.css",
-		"./classless/print": "./dist/cirth.print.classless.min.css",
 		"./scoped": "./dist/cirth.scoped.min.css",
-		"./scoped/print": "./dist/cirth.print.scoped.min.css",
 		"./classless/scoped": "./dist/cirth.classless.scoped.min.css",
-		"./classless/scoped/print": "./dist/cirth.print.classless.scoped.min.css",
 		"./presets/plain": "./dist/presets/plain.min.css",
 		"./presets/material": "./dist/presets/material.min.css",
 		"./presets/metro": "./dist/presets/metro.min.css",

@@ -39,9 +39,13 @@
   // the Plain preset's or the documented custom blue, which are lighter
   // than the default and darken less for the same ratio; a round ratio
   // drops Plain's label to 4.36:1. The text role holds the accent's
-  // lightness at 0.72 or above, which keeps 4.5:1 on the overlay, the
-  // lightest level here, for any accent.
-  --cirth-primary-text: oklch(from var(--cirth-primary) max(l, 0.72) c h);
+  // lightness at 0.72 or above, then its luminance at 0.2766 or above: 4.6:1
+  // against the overlay, the lightest level here, for any accent
+  // (specs/accent-text-contrast.md).
+  --cirth-primary-text: #{functions.luminance-at-least(
+      "oklch(from var(--cirth-primary) max(l, 0.72) c h)",
+      0.2766
+    )};
   --cirth-primary-surface: color-mix(
     in oklch,
     var(--cirth-primary) 75.2%,

@@ -34,6 +34,44 @@ Swap `material` for `plain` or `metro`. Load one preset at a time: they
 restate some of the same tokens, and the later one would win on each of
 those alone.
 
+The preset restates tokens the build declares, so it has to come after the
+build. The build's print rules keep printing black ink on white with any
+preset.
+
+Every preset sets both colour schemes and its own increased-contrast pass,
+so `data-theme` and `prefers-contrast: more` keep working with it.
+
+### From a CDN or a download
+
+[CDN files](/delivery#cdn-files) has a version-pinned jsDelivr snippet, with
+its integrity hash, for each preset. Without a package manager or a CDN,
+download `cirth-dist-<version>.tar.gz` from
+[GitHub Releases](https://github.com/cirthcss/cirth/releases): the presets
+are in its `dist/presets/` folder, next to the builds.
+
+### Starting from a preset
+
+A preset is a starting point, not a lock. Load it, then set the few tokens
+you want to change in your own stylesheet:
+
+```html
+<link rel="stylesheet" href="dist/cirth.min.css">
+<link rel="stylesheet" href="dist/presets/material.min.css">
+<link rel="stylesheet" href="theme.css">
+```
+
+```css
+/* theme.css */
+:root {
+  --cirth-primary: light-dark(#006a6a, #4cdada);
+  --cirth-border-radius: var(--cirth-radius-sm);
+}
+```
+
+Your rules are outside Cirth's cascade layer, so they win over the preset
+wherever they load, and every role derived from the accent follows the new
+one: links, the primary button, focus rings, the selected state.
+
 A preset makes no network request. It names its typeface and lets the
 platform supply it, so a preset's face shows only where it is installed:
 see [Fonts](#fonts) for how to load one yourself.

@@ -217,10 +217,6 @@ test("the public token reference is exact", () => {
 		"dist/cirth.classless.css",
 		"dist/cirth.scoped.css",
 		"dist/cirth.classless.scoped.css",
-		"dist/cirth.print.css",
-		"dist/cirth.print.classless.css",
-		"dist/cirth.print.scoped.css",
-		"dist/cirth.print.classless.scoped.css",
 	];
 	const publicTokens = [
 		...new Set(

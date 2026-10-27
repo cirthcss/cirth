@@ -7,6 +7,63 @@ Cirth is pre-1.0 and the custom property surface is not yet stable.
 
 ## [Unreleased]
 
+### Fixed
+
+- **`data-theme` on a shadow host themes its tree.** A component that loads
+  Cirth into its shadow root and sets `data-theme="dark"` on its own element
+  got no derived tokens in the default and classless builds, so its cards
+  and buttons came out transparent, and the scoped builds ignored the
+  attribute. Every build now reads a themed shadow host; an attribute inside
+  the shadow root still wins for its subtree. **Breaking** in selector
+  structure only — see the Upgrading page.
+
+- **Accent text reads 4.5:1 for any accent.** `--cirth-primary-text` capped
+  only the accent's OKLab lightness, which is not what WCAG measures: a teal
+  accent's links read 3.8:1 in light, and a deep red one 3.7:1 in dark. The
+  text role now also caps its luminance in linear light, so it reads 4.5:1 on
+  every surface level of the default ladder whatever the hue or chroma. The
+  default and every preset paint exactly the same text as before.
+
+### Changed
+
+- **`.grid` lays out card collections; `.row` lays out lines that fill.**
+  `.grid` keeps aligned columns, now at least 16rem wide (was 12rem) and never
+  more than three, set by the new `--cirth-grid-max-columns`. `.row` becomes
+  a wrapping row: its children grow equally from the new
+  `--cirth-row-min-column` (12rem), so every line fills and a narrow row
+  stacks them, decided by the row's width instead of a 768px breakpoint.
+  **Breaking** — see the Upgrading page.
+
+- **Every build carries the print rules again.** The print pass is the last
+  part of every main build, under `@media print`, so a page that links only
+  the build prints black ink on white in either scheme, with flat surfaces
+  and link destinations spelled out. It adds about 0.7 KB gzip to each
+  build. Your own `@media print` rules still win. **Breaking** — see the
+  Upgrading page.
+
+### Removed
+
+- **The print stylesheets.** `cirth.print*.css` and `cirth.print*.min.css`
+  and the `./print`, `./classless/print`, `./scoped/print` and
+  `./classless/scoped/print` exports are gone: every build carries the same
+  print rules. Delete the import or the `<link>`; an import of `./print`
+  no longer resolves, and a CDN link to it answers 404. **Breaking**: see
+  the Upgrading page.
+
+### Added
+
+- **`.full-line` gives a `.row` child a line of its own** (gh#152). Notes
+  after short fields, a validation summary or the actions of a form take
+  the whole width, and the fields before them fill their line. It acts only
+  on a direct child of `.row`, in the class builds.
+
+- **`.no-print` and `.print-only`** (gh#151). `.no-print` leaves an element
+  off the paper and `.print-only` shows one only on paper, so marking an
+  application's chrome takes a class instead of a `@media print` rule. Both
+  are in the class builds' main stylesheet and work with or without the
+  print stylesheet. A `.print-only` element is hidden from screen readers on
+  screen, so it should repeat what the screen says, never replace it.
+
 ## [0.17.0-beta.1] - 2026-10-23
 
 ### Changed

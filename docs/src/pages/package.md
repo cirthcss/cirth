@@ -1,6 +1,6 @@
 ---
 layout: docs.njk
-description: Reference for every published Cirth build, package export, generated file, preset, print stylesheet and token JSON document.
+description: Reference for every published Cirth build, package export, generated file, preset and token JSON document.
 ---
 
 # Package and builds
@@ -54,13 +54,9 @@ These are the public paths declared by the package manifest:
 | Export | Resolves to |
 | --- | --- |
 | `@cirthcss/cirth` | `dist/cirth.min.css` |
-| `@cirthcss/cirth/print` | `dist/cirth.print.min.css` |
 | `@cirthcss/cirth/classless` | `dist/cirth.classless.min.css` |
-| `@cirthcss/cirth/classless/print` | `dist/cirth.print.classless.min.css` |
 | `@cirthcss/cirth/scoped` | `dist/cirth.scoped.min.css` |
-| `@cirthcss/cirth/scoped/print` | `dist/cirth.print.scoped.min.css` |
 | `@cirthcss/cirth/classless/scoped` | `dist/cirth.classless.scoped.min.css` |
-| `@cirthcss/cirth/classless/scoped/print` | `dist/cirth.print.classless.scoped.min.css` |
 | `@cirthcss/cirth/presets/plain` | `dist/presets/plain.min.css` |
 | `@cirthcss/cirth/presets/material` | `dist/presets/material.min.css` |
 | `@cirthcss/cirth/presets/metro` | `dist/presets/metro.min.css` |
@@ -76,20 +72,13 @@ convention.
 
 ## Companion files
 
-### Print stylesheets
+### Print
 
-Each screen build has a matching print entry:
-
-| Screen build | Print import |
-| --- | --- |
-| Default | `@cirthcss/cirth/print` |
-| Classless | `@cirthcss/cirth/classless/print` |
-| Scoped | `@cirthcss/cirth/scoped/print` |
-| Classless scoped | `@cirthcss/cirth/classless/scoped/print` |
-
-The print file is separate so screen-only projects do not receive it
-implicitly. The [Print](/utilities/print) page shows how to load it with the
-correct media condition and documents what it changes.
+There is no print stylesheet to add: every build carries its print rules
+since v0.17.0. The `./print` exports and the `cirth.print*` files were
+removed in that version; [Upgrading](/upgrading#print-is-part-of-every-build-the-print-stylesheets-are-removed)
+says what to delete. The [Print](/utilities/print) page documents what the
+print rules change.
 
 ### Presets
 
@@ -115,12 +104,11 @@ shape and safe uses.
 
 ## Physical files
 
-The published `dist/` directory contains 24 generated files:
+The published `dist/` directory contains 16 generated files:
 
 | Directory | Files |
 | --- | --- |
-| `dist/` screen CSS | `cirth.css`, `cirth.classless.css`, `cirth.scoped.css`, `cirth.classless.scoped.css`, plus each `.min.css` counterpart |
-| `dist/` print CSS | `cirth.print.css`, `cirth.print.classless.css`, `cirth.print.scoped.css`, `cirth.print.classless.scoped.css`, plus each `.min.css` counterpart |
+| `dist/` builds, print rules included | `cirth.css`, `cirth.classless.css`, `cirth.scoped.css`, `cirth.classless.scoped.css`, plus each `.min.css` counterpart |
 | `dist/presets/` | `plain.css`, `material.css`, `metro.css`, plus each `.min.css` counterpart |
 | `dist/tokens/` | `light.tokens.json`, `dark.tokens.json` |
 

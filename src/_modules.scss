@@ -48,6 +48,7 @@
 @use "utilities/reduce-motion"; // prefers-reduced-motion
 @use "utilities/sr-only"; // .sr-only, .sr-only-focusable
 @use "utilities/truncate"; // .truncate
+@use "utilities/print-visibility"; // .no-print, .print-only
 
 // Theme
 // src/theme/ is the single source of the design tokens. Presets
@@ -55,5 +56,7 @@
 // properties, loaded after this one into the same cascade layer.
 @use "theme";
 
-// Print ships as its own stylesheet (src/cirth.print*.scss), loaded with
-// media="print", so its bytes stay out of the first round trip.
+// Print, last: under @media print, after every rule it has to outrank by
+// source order, so one <link> prints correctly
+// (specs/print-in-main-build.md).
+@use "utilities/print";

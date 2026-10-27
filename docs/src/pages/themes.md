@@ -85,6 +85,21 @@ the wrapper:
 [Using Cirth with existing CSS](/guides/existing-css) owns the full scoped
 boundary and token-inheritance rules.
 
+### `data-theme` on a shadow host
+
+A web component that loads Cirth into its shadow root is themed on its own
+element, the shadow host. `data-theme` there themes everything inside the
+shadow root, in every build: in a scoped build it themes each `.cirth`
+wrapper that sets no `data-theme` of its own.
+
+```html
+<order-panel data-theme="dark"></order-panel>
+```
+
+An element inside the shadow root with its own `data-theme` still wins for
+its subtree. A `data-theme` on the page around the component does not reach
+inside: CSS does not cross a shadow boundary that way.
+
 ## Presets
 
 Cirth ships three optional, token-only preset stylesheets: `plain`,

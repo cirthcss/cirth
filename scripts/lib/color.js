@@ -77,8 +77,9 @@ const number = (token, scale = 1) =>
 
 /**
  * Parses the color notations getComputedStyle actually returns for Cirth's
- * tokens: oklch() (the source notation, preserved by every engine we test)
- * and rgb()/rgba() (what engines resolve hex and named colors to).
+ * tokens: oklch() (the source notation, preserved by every engine we test),
+ * color(srgb) and color(srgb-linear), and rgb()/rgba() (what engines
+ * resolve hex and named colors to).
  *
  * @param {string} value
  * @returns {Color}
@@ -119,6 +120,20 @@ const parseColor = (value) => {
 			),
 			alpha,
 		};
+	}
+
+	// color(srgb …) and color(srgb-linear …), the second already linear.
+	if (input.startsWith("color(")) {
+		const [space, red, green, blue] = parts;
+		if (space === "srgb" || space === "srgb-linear") {
+			const encode = space === "srgb" ? (/** @type {number} */ value) => value : toGamma;
+			return {
+				r: encode(clamp01(Number.parseFloat(red))),
+				g: encode(clamp01(Number.parseFloat(green))),
+				b: encode(clamp01(Number.parseFloat(blue))),
+				alpha,
+			};
+		}
 	}
 
 	if (input.startsWith("rgb(") || input.startsWith("rgba(")) {

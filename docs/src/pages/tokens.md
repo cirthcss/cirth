@@ -6,7 +6,7 @@ description: Complete reference for Cirth's public CSS custom properties and gen
 # Token reference
 
 This page is the authoritative inventory of the public `--cirth-*` custom
-properties in Cirth's screen and print builds. Start with
+properties in Cirth's builds. Start with
 [Customization](/customization) if you need to learn which level to
 override and where to place the rule.
 
@@ -207,6 +207,7 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-flow-line` | scale |
 | `--cirth-flow-section` | scale |
 | `--cirth-grid-column-gap` | role |
+| `--cirth-grid-max-columns` | role |
 | `--cirth-grid-min-column` | role |
 | `--cirth-grid-row-gap` | role |
 | `--cirth-nav-breadcrumb-divider` | role |
@@ -214,6 +215,7 @@ Every `--cirth-*` token Cirth declares, grouped by what it affects. The
 | `--cirth-nav-element-spacing-vertical` | role |
 | `--cirth-nav-link-spacing-horizontal` | role |
 | `--cirth-nav-link-spacing-vertical` | role |
+| `--cirth-row-min-column` | role |
 | `--cirth-space-0` | scale |
 | `--cirth-space-1` | scale |
 | `--cirth-space-10` | scale |

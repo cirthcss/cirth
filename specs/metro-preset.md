@@ -129,8 +129,8 @@ palette and material changes applied, not yet committed. Engines: Chromium
 | Claim | What happened | Verdict |
 | --- | --- | --- |
 | The Windows Phone 8 palette includes taupe `#87794E` | The official table lists sienna `#A0522D` as its twentieth accent and no taupe | Invalid |
-| Cobalt can be the dark input | `check:a11y` failed the metro states specimen in dark: an accordion summary's active text, derived from the input (`l × 1.124`), stayed under 4.5:1 on black | `npm run check:a11y`, first run with metro | Invalid |
-| The customization example's link failed target size because of metro | It failed only under metro because this machine has Open Sans installed, whose taller line box put the link 11.5px from the button above it; the default face left exactly 12.0px, the threshold. The example set its buttons as bare inline children of a `div`, so the paragraph after them took no flow space; they now sit in a paragraph, and the link is 28px clear | `npm run check:a11y`; `docs/src/content/demos/customization.html` | Invalid |
+|  Cobalt can be the dark input | `check:a11y` failed the metro states specimen in dark: an accordion summary's active text, derived from the input (`l × 1.124`), stayed under 4.5:1 on black. Where: `npm run check:a11y`, first run with metro. | Invalid  |
+|  The customization example's link failed target size because of metro | It failed only under metro because this machine has Open Sans installed, whose taller line box put the link 11.5px from the button above it; the default face left exactly 12.0px, the threshold. The example set its buttons as bare inline children of a `div`, so the paragraph after them took no flow space; they now sit in a paragraph, and the link is 28px clear. Where: `npm run check:a11y`; `docs/src/content/demos/customization.html`. | Invalid  |
 
 ## Decisions
 

@@ -43,7 +43,7 @@ set them:
 
 | Token | Role |
 | --- | --- |
-| `--cirth-primary-text` | The accent as text: links and the current position. Its lightness is held at or under 0.52 in light and at or over 0.72 in dark, the range every surface level can carry text in |
+| `--cirth-primary-text` | The accent as text: links and the current position. Its lightness is held at or under 0.52 in light and at or over 0.72 in dark, then its luminance capped so it reads 4.5:1 on every surface level for any accent. The default's and every preset's text stop at the first step |
 | `--cirth-primary-surface` | The fill of a primary button. The accent itself in light; a deeper step in dark, so a white label keeps 4.5:1 |
 | `--cirth-primary-border` | The edge of that fill |
 | `--cirth-primary-active` | Text while active; darker in light, lighter in dark |

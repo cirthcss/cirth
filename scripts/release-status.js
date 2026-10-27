@@ -245,9 +245,13 @@ const main = () => {
 			"or re-run it. A release does not proceed without it.",
 		]);
 	} else if (!taggedCommit) {
+		// On the remote, at the named master commit: a tag pushed from a
+		// clone points wherever that clone's history puts it, and the
+		// pre-push guard refuses a local v* push for that reason
+		// (RELEASING.md, Phase C).
 		next([
-			`  git tag ${tag} ${masterCommit.slice(0, 10)}`,
-			`  git push origin ${tag}`,
+			`  gh api repos/${repository}/git/refs \\`,
+			`    -f ref=refs/tags/${tag} -f sha=${masterCommit}`,
 		]);
 	} else if (!hasRelease) {
 		next([`  gh workflow run package.yml --ref master -f tag=${tag}`]);

@@ -131,7 +131,7 @@ instead of treating them as requirements for every Cirth page.
 ## What the package contains
 
 [Package and builds](/package) is the authoritative inventory of exports,
-physical files, presets, token JSON and print companions.
+physical files, presets and token JSON.
 
 ## Delivering the stylesheet
 
@@ -151,8 +151,8 @@ deployment guidance.
 
 ### Print
 
-Browser support for the separate print stylesheets is documented with their
-behavior on the [Print](/utilities/print) page.
+Browser support for the print rules is documented with their behavior on
+the [Print](/utilities/print) page.
 
 ## Before adopting Cirth
 

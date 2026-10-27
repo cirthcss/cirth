@@ -59,7 +59,7 @@ untrusted stylesheet safe to use, and it does not replace HTTPS.
 
 The [package inventory](/package) explains which build to choose. The
 snippets below are the authoritative version-pinned CDN forms. Load one
-screen build, then optionally its matching print stylesheet and one preset.
+build, then optionally one preset. Every build carries its print rules.
 
 <details>
 <summary>Screen builds</summary>
@@ -102,58 +102,6 @@ screen build, then optionally its matching print stylesheet and one preset.
   href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.classless.scoped.min.css"
   crossorigin="anonymous"
   integrity="sha384-pmLwIliHSNEo//m1i4cVpTDvwB8TWoXibgRIsG/pCjCS1CjZWI+xzd9xPL27iDal">
-```
-
-</details>
-
-<details>
-<summary>Print stylesheets</summary>
-
-The `media="print"` attribute tells the browser that these rules are for
-printed output. Match the print variant to the screen build.
-
-**Default**
-
-```html
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.print.min.css"
-  crossorigin="anonymous"
-  media="print"
-  integrity="sha384-YN/sJVAjTOf20mXWrLlQ2XLbgm3EzefQEiFukKfZstkH6fR92hz6dP7eQQTXQE6I">
-```
-
-**Classless**
-
-```html
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.print.classless.min.css"
-  crossorigin="anonymous"
-  media="print"
-  integrity="sha384-KlGh53ZQjfQ7JhOLWWItAN1ObJxoGarjln25jr0g1tAXzHgBCIF+T865QmXCLfGC">
-```
-
-**Scoped**
-
-```html
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.print.scoped.min.css"
-  crossorigin="anonymous"
-  media="print"
-  integrity="sha384-LNN/khfIDlAUi/AyGX/87XGJGa0ld1fhRoSq9I2q1/8upiZeHZcKXKtzaONxHmyA">
-```
-
-**Classless scoped**
-
-```html
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.print.classless.scoped.min.css"
-  crossorigin="anonymous"
-  media="print"
-  integrity="sha384-mKNyK6vZhzN8WFVteBa3vLghpScnwxS1lqZ1XI9U1dztIU+VOhHmdJvOTwo/jpVX">
 ```
 
 </details>
@@ -256,7 +204,6 @@ bytes; the policy controls which sources the page may load.
 - Load exactly one screen build.
 - Pin an immutable URL.
 - Keep the CDN version and SRI digest together.
-- Match the print file to the selected screen build.
 - Load a preset after the screen build.
 - Confirm the production response's status, content type, cache policy and
   compression.

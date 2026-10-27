@@ -167,6 +167,7 @@ canvas in the engine, the worst of the four surface levels.
 | An isolated Cirth instance keeps its own theme | The site's classless examples (`.cirth-classless[data-theme]`, their own accent): white on their own fill, `oklch(0.461 0.152 324)`, exactly as without the preset | This build, the Installation page, Chromium | Verified |
 | The preset is 822 bytes gzipped | `npm run check:size` | This build | Verified |
 | Roboto is the default face on Android and ChromeOS | "It is the default font used in Android and Chrome OS, and is the recommended font for … Material Design" (Roozbeh Pournader, 2015-05-26) | Google Open Source Blog, "Roboto: Google's signature font is now open source". Not checked on a device | Verified |
+| The dark visited link reads 4.5:1 on every level | `#919191` read 4.37:1 on the dark overlay level; `#969696` reads 4.66:1, and stays at least 0.12 Oklab from every other text role in normal vision and the three dichromacies. `tests/surface-depth.spec.js` now holds every text role on every level | `dist/presets/material.css` built from `b3e8fc46e`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, 2026-10-23 | Verified; fixed in `b3e8fc46e` |
 
 ### Reported
 
@@ -181,8 +182,7 @@ canvas in the engine, the worst of the four surface levels.
 | --- | --- | --- |
 | The scoped build ignores the preset in nested subtrees | The first harness put the probes outside any `.cirth` wrapper, so no scheme applied at all and every mode read light. Inside a wrapper the scoped build follows the preset as the unscoped one does | Invalid |
 | Chromium failures in the first `check:behavior` run (seven `docs-stack` tests, three `framework-specimen` tests) | Timeouts while the machine was loaded, including a `blue` specimen this change does not touch; all pass on a rerun of the same files | Invalid |
-| A bare `[data-theme]` in `scheme-roots` is safe | `check:a11y` found the dark label `#381e72` on the default accent inside an isolated example on the Installation page: `[data-theme]` at (0,1,0) reached a separate Cirth instance and overrode its own derived tokens. Replaced by the two weighted branches above | `npm run check:a11y`, this build | Invalid |
-| The dark visited link reads 4.5:1 on every level | `#919191` read 4.37:1 on the dark overlay level; `#969696` reads 4.66:1, and stays at least 0.12 Oklab from every other text role in normal vision and the three dichromacies. `tests/surface-depth.spec.js` now holds every text role on every level | `dist/presets/material.css` built from `b3e8fc46e`, Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5, 2026-10-23 | Verified; fixed in `b3e8fc46e` |
+|  A bare `[data-theme]` in `scheme-roots` is safe | `check:a11y` found the dark label `#381e72` on the default accent inside an isolated example on the Installation page: `[data-theme]` at (0,1,0) reached a separate Cirth instance and overrode its own derived tokens. Replaced by the two weighted branches above. Where: `npm run check:a11y`, this build. | Invalid  |
 
 ## Decisions
 

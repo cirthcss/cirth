@@ -1,0 +1,28 @@
+@use "../config" as *;
+
+@if $enable-classes {
+  /**
+   * Print visibility
+   */
+
+  // Only the application knows which regions are chrome, so the print
+  // stylesheet hides nothing. These two say it without custom CSS. They
+  // live in the main build, under a media query each, so they work with or
+  // without the print stylesheet (specs/print-visibility.md).
+
+  // Left off the paper: navigation, commands, anything meaningless printed.
+  @media print {
+    #{$parent-selector} .no-print {
+      display: none;
+    }
+  }
+
+  // Only on paper: a printed heading or a URL spelled out. Hidden on screen
+  // with display: none, so it is out of the accessibility tree there too:
+  // it can repeat what the screen says, never replace it.
+  @media not print {
+    #{$parent-selector} .print-only {
+      display: none;
+    }
+  }
+}

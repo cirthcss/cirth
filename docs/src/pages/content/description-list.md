@@ -52,12 +52,14 @@ the presentation:
 
 HTML allows a `<div>` around each term/description group, which gives the
 group a box that can participate in a layout. Combine it with
-[`.grid`](/layout/grid) and the pairs become cells.
+[`.row`](/layout/row) and the pairs share a line, wrapping when it is full.
+Use [`.grid`](/layout/grid) instead when many pairs should line up in
+columns.
 
-{% demo "description-list-grid" %}
+{% demo "description-list-row" %}
 
 ```html
-<dl class="grid">
+<dl class="row">
   <div>
     <dt>Order</dt>
     <dd>#1042</dd>
@@ -70,8 +72,8 @@ group a box that can participate in a layout. Combine it with
 ```
 
 Cirth deliberately puts **no** margin on that wrapper. A framework margin
-there would land on grid items and pull every cell after the first out of
-line with the first, so it would have to be undone before the wrapper could
+there would land on the row's items and pull every pair after the first out
+of line with the first, so it would have to be undone before the wrapper could
 do the one job it exists for. The elements inside it are styled either way;
 the box is yours.
 
@@ -88,8 +90,8 @@ that page's design, not the framework's.
 - Do not use a two-column table when the information is a simple list of
   names and values. Use a table only when row and column relationships both
   matter.
-- Do not add margins to every pair wrapper before using `.grid`; the grid gap
-  already owns the space between cells.
+- Do not add margins to every pair wrapper before using `.row` or `.grid`;
+  the gap already owns the space between pairs.
 
 ## Related pages
 

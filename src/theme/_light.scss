@@ -26,9 +26,15 @@
   );
   --cirth-warning-surface: oklch(from var(--cirth-warning) 93% 0.05 h);
 
-  // The text role is the accent with its lightness capped at 0.52, so every
-  // surface level keeps 4.5:1 against it for any accent.
-  --cirth-primary-text: oklch(from var(--cirth-primary) min(l, 0.52) c h);
+  // The text role is the accent with its lightness capped at 0.52, which
+  // leaves the default's and every preset's text as they were, then its
+  // luminance capped at 0.1409: 4.6:1 on the recessed level, the darkest of
+  // the default ladder, for any accent. Lightness alone was not enough: a
+  // teal accent's links read 3.83:1 (specs/accent-text-contrast.md).
+  --cirth-primary-text: #{functions.luminance-at-most(
+      "oklch(from var(--cirth-primary) min(l, 0.52) c h)",
+      0.1409
+    )};
   --cirth-primary-surface: var(--cirth-primary);
   --cirth-primary-border: var(--cirth-primary-surface);
   --cirth-primary-underline: oklch(from var(--cirth-primary) l c h / 50%);

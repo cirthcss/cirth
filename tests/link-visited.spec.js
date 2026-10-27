@@ -110,7 +110,7 @@ for (const build of builds) {
 		// neutral in *both* schemes, and the two neutrals are not the same
 		// colour, so this asserts the pair rather than counting declarations.
 		// Only the base pair: the preference passes that follow
-		// (prefers-contrast: more, then the print stylesheet) deliberately
+		// (prefers-contrast: more, then the print pass) deliberately
 		// redefine the token, and are asserted in their own specs.
 		const preferences = css.indexOf("@media (prefers-contrast: more)");
 
