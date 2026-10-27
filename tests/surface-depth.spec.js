@@ -254,6 +254,59 @@ for (const variant of variants) {
 	}
 }
 
+// Accent text reads 4.5:1 on every level for any accent, the ones a
+// lightness cap alone failed included: luminous greens and teals, and light,
+// saturated accents that leave the gamut when darkened and come back
+// lighter once the browser clips them (specs/accent-text-contrast.md).
+const hardAccents = [
+	"oklch(0.8 0.268 143)",
+	"oklch(0.75 0.2 160)",
+	"oklch(0.7 0.17 200)",
+	"oklch(0.6 0.169 144)",
+	"oklch(0.9 0.19 110)",
+	"oklch(0.52 0.05 255)",
+	"oklch(0.25 0.28 30)",
+	"oklch(0.35 0.25 264)",
+	"oklch(0.72 0.3 330)",
+];
+
+for (const scheme of /** @type {const} */ (["light", "dark"])) {
+	test(`${scheme}: accent text reads 4.5:1 on every level for any accent`, async ({ page }) => {
+		await page.emulateMedia({ colorScheme: scheme });
+		for (const accent of hardAccents) {
+			await setContent(
+				page,
+				`<style>${css}</style><style>:root { --cirth-primary: ${accent}; }</style>${markup}`,
+			);
+			const painted = await page.evaluate(
+				([levels]) => {
+					const canvas = document.createElement("canvas");
+					canvas.width = canvas.height = 1;
+					const context = /** @type {CanvasRenderingContext2D} */ (
+						canvas.getContext("2d", { willReadFrequently: true })
+					);
+					const probe = document.createElement("span");
+					document.body.append(probe);
+					/** @param {string} token */
+					const paint = (token) => {
+						probe.style.color = `var(${token})`;
+						context.clearRect(0, 0, 1, 1);
+						context.fillStyle = getComputedStyle(probe).color;
+						context.fillRect(0, 0, 1, 1);
+						const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
+						return /** @type {[number, number, number]} */ ([r, g, b]);
+					};
+					return { text: paint("--cirth-primary-text"), levels: levels.map(paint) };
+				},
+				[textLevels.map((level) => tokens[level])],
+			);
+			for (const [index, level] of painted.levels.entries()) {
+				expect(ratio(painted.text, level), `${accent} on ${textLevels[index]}`).toBeGreaterThanOrEqual(4.5);
+			}
+		}
+	});
+}
+
 // The default theme and plain share their ends: a page near white in
 // light and near black in dark. The presets that set their own canvas to a
 // design language's values (material, metro) keep them.

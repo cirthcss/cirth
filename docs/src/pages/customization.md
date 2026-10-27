@@ -131,8 +131,8 @@ scheme. Check the filled-control label token,
 pair still needs contrast testing in every state.
 
 To move the accent to another hue, write it in OKLCH, where the lightness
-is the first number, and keep the light accent dark enough for the roles
-that derive from it:
+is the first number, and keep the light accent dark enough for a white label
+on the filled button:
 
 ```css
 :root {
@@ -142,9 +142,8 @@ that derive from it:
 
 - A white label reads 4.5:1 on the filled button up to a lightness of 0.55,
   whatever the hue.
-- Accent text is held at 0.52 or darker, which reads 4.5:1 on every surface
-  level for most hues. Greens, teals and cyans, from about 115° to 235°,
-  need 0.51 or darker.
+- Accent text takes care of itself: Cirth darkens it in light, and lightens
+  it in dark, until it reads 4.5:1 on every surface level, for any accent.
 - A hue close to a status colour, such as a red near the error colour or a
   green near the success colour, makes a link read like a status message.
   Compare them side by side.
@@ -176,9 +175,14 @@ heading number. [Typography](/content/typography) explains that distinction.
 :root {
   --cirth-spacing: 0.75rem;
   --cirth-container-max-width: 72rem;
-  --cirth-grid-min-column: 16rem;
+  --cirth-grid-max-columns: 4;
 }
 ```
+
+`--cirth-grid-min-column` and `--cirth-grid-max-columns` set how narrow and
+how many the columns of a `.grid` can be, and `--cirth-row-min-column` the
+width the children of a `.row` grow from ([Grid](/layout/grid),
+[Row](/layout/row)).
 
 `--cirth-spacing` changes the flow rhythm and values derived from it. Form
 control padding remains separate so a density change does not silently

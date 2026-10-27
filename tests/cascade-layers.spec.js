@@ -53,9 +53,8 @@ const unlayered = (css) => {
 	return root.toString();
 };
 
-// The four screen builds. Print sheets are covered at the end.
+// The four main builds.
 const builds = rootBuilds
-	.filter(({ name }) => !name.includes(".print"))
 	.map(({ classless, name, scoped }) => ({
 		classless,
 		css: read(`dist/${name}.css`),
@@ -100,7 +99,8 @@ const ink = "rgb(1, 2, 3)";
 // from. What these tests assert is the colour, not its notation.
 /** @param {string} value */
 const asRgb = (value) => {
-	if (!/^(oklch|oklab|rgb)/.test(value)) return value;
+	// color(srgb …) as well: an engine may serialise a relative colour in it.
+	if (!/^(oklch|oklab|rgb|color\(srgb)/.test(value)) return value;
 	const { r, g, b } = parseColor(value);
 	return `rgb(${[r, g, b].map((channel) => Math.round(channel * 255)).join(", ")})`;
 };

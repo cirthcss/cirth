@@ -38,12 +38,17 @@ test.afterAll(() => {
  * Press the search shortcut the trigger declares for this platform:
  * Command+K on Apple platforms, Ctrl+K elsewhere. Read from the page rather than
  * written here, so the suite runs the same on macOS and on Linux.
+ *
+ * search.js sets the attribute when it runs, so it is waited for, not read
+ * once: a one-off read on a page whose script had not run yet returned
+ * null, and pressed "null", in WebKit on Linux. A script that never runs
+ * now fails here, by name.
  * @param {import("@playwright/test").Page} page
  */
 const pressSearchShortcut = async (page) => {
-	const declared = await page
-		.locator("[data-docs-search-trigger]")
-		.getAttribute("aria-keyshortcuts");
+	const trigger = page.locator("[data-docs-search-trigger]");
+	await expect(trigger, "search.js declared no shortcut").toHaveAttribute("aria-keyshortcuts", /\S/);
+	const declared = await trigger.getAttribute("aria-keyshortcuts");
 	const [shortcut] = String(declared).split(" ");
 	await page.keyboard.press(shortcut.replace(/K$/, "k"));
 };

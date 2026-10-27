@@ -17,9 +17,9 @@ const distDir = path.join(projectRoot, "dist");
 // This used to be one number (14 * 1024) applied to every file in dist/.
 // It was doing two jobs badly.
 //
-// As a *guard* it only ever watched one bundle. The print sheets are around
-// 900 B, so a shared 14 KB ceiling let them grow to sixteen times their size
-// without a word; the classless builds had two kilobytes of silent room.
+// As a *guard* it only ever watched one bundle. The print sheets of the
+// time were around 900 B, so a shared 14 KB ceiling let them grow to sixteen
+// times their size without a word; the classless builds had two kilobytes of silent room.
 // Only the scoped build was ever close enough to the line for the line to
 // mean anything, and by the end it was 305 B away, which is not headroom,
 // it is a tripwire in front of the next legitimate default.
@@ -56,10 +56,6 @@ const budgets = {
 	// states for buttons and overlays. The filled icon family then adds the
 	// vector paths described above, and the print pass its 690 B.
 	"cirth.min.css": 17_500,
-	"cirth.print.classless.min.css": 1_024,
-	"cirth.print.classless.scoped.min.css": 1_024,
-	"cirth.print.min.css": 1_024,
-	"cirth.print.scoped.min.css": 1_024,
 	"cirth.scoped.min.css": 17_750,
 	"presets/plain.min.css": 400,
 	"presets/material.min.css": 1_000,

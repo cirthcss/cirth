@@ -1069,7 +1069,16 @@ test("the marks orbit Cirth's behind no line, stay upright, and turn only with t
 				};
 			}),
 		);
+	// Two animation frames: a scroll event is dispatched before the frame's
+	// callbacks, so after two the home page has seen the scroll and run its
+	// update. Without them the waits below could pass on the state left by
+	// the page load (the orbit already has a style; nothing is animating
+	// yet), and on a slow runner the scroll then landed after the "still"
+	// sample: "the orbit moved on its own" in WebKit on Linux.
+	const frames = () =>
+		page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
 	await band.evaluate((element) => window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY - 200));
+	await frames();
 	await page.waitForFunction(() => document.querySelector(".docs-agnostic-orbit")?.getAttribute("style")?.includes("--docs-orbit"));
 	const at = await read();
 	for (const mark of at) expect(Math.abs(mark.turn), "a mark is turned").toBeLessThanOrEqual(0);
@@ -1116,6 +1125,8 @@ test("the marks orbit Cirth's behind no line, stay upright, and turn only with t
 	// The rings turn with the scroll, never on their own, and hold still
 	// under the pointer. The scenes follow the scroll with a short ease, so
 	// "on their own" is once that has landed.
+	await page.waitForFunction(() => !document.querySelector(".docs-home")?.hasAttribute("data-animating"));
+	await frames();
 	await page.waitForFunction(() => !document.querySelector(".docs-home")?.hasAttribute("data-animating"));
 	const still = await read();
 	await page.waitForTimeout(600);

@@ -119,8 +119,14 @@
     --cirth-grid-column-gap: var(--cirth-spacing);
     --cirth-grid-row-gap: var(--cirth-spacing);
 
-    // `.grid` minimum column width before wrapping to a new row.
-    --cirth-grid-min-column: 12rem;
+    // `.grid`: columns at least this wide, and never more than this many
+    // (specs/grid-and-row.md).
+    --cirth-grid-min-column: 16rem;
+    --cirth-grid-max-columns: 3;
+
+    // `.row`: the width each child grows from; the line wraps when it has
+    // no room for the next one.
+    --cirth-row-min-column: 12rem;
   }
 
   // Spacings for form elements and buttons. The one-line control height,

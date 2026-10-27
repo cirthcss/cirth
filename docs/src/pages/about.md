@@ -93,8 +93,7 @@ terms are on the [Brand](/brand) page.
 ## What the project includes
 
 - SCSS source used by the maintainers to produce the package;
-- four compiled builds, each carrying its print rules, and four deprecated
-  print stylesheets;
+- four compiled builds, each carrying its print rules;
 - maintained token presets;
 - light and dark token JSON;
 - this versioned documentation and its rendered examples;

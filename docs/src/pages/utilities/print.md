@@ -15,10 +15,10 @@ the page for paper, and nothing in it changes what the screen shows:
 
 No print-only HTML is required.
 
-Up to v0.16, the print rules were a separate stylesheet. Those files still
-ship through the 0.17 line, deprecated: loading one after its build changes
-nothing printed, and they are removed in v0.18.0.
-[Package and builds](/package#print-stylesheets) lists them.
+Up to v0.16, the print rules were a separate stylesheet. Those files were
+removed in v0.17.0; if a page still loads one,
+[Upgrading](/upgrading#print-is-part-of-every-build-the-print-stylesheets-are-removed)
+says what to delete.
 
 ## Why print needs its own rules
 
@@ -146,7 +146,7 @@ content hidden by the application.
 ## Related pages
 
 - [Installation](/installation/)
-- [Package and builds](/package#print-stylesheets)
+- [Package and builds](/package#print)
 - [Table](/content/table)
 - [Code](/content/code)
 - [Customization](/customization#cascade-layers)

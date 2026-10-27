@@ -204,7 +204,6 @@ bytes; the policy controls which sources the page may load.
 - Load exactly one screen build.
 - Pin an immutable URL.
 - Keep the CDN version and SRI digest together.
-- Match the print file to the selected screen build.
 - Load a preset after the screen build.
 - Confirm the production response's status, content type, cache policy and
   compression.

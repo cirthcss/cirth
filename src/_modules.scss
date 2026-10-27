@@ -57,7 +57,6 @@
 @use "theme";
 
 // Print, last: under @media print, after every rule it has to outrank by
-// source order, so one <link> prints correctly. The cirth.print*.scss
-// entries still emit it on its own through 0.17, deprecated
+// source order, so one <link> prints correctly
 // (specs/print-in-main-build.md).
 @use "utilities/print";

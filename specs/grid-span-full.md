@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | gh#152 |
-| Status | Implementing: every acceptance check passes (2026-10-25); lands with its pull request |
+| Status | Withdrawn: superseded by [grid-and-row](grid-and-row.md) before v0.17.0 shipped. See Outcome. |
 | Baseline | `3857cfea3` on `develop` |
 | Breaking | No: one class is added; no existing rule changes |
 
@@ -76,3 +76,15 @@ It does **not** promise:
       Commented on gh#111, 2026-10-25.
 - [x] `npm run build` stays inside every size budget.
       `cirth.min.css` 16481 B gzip of 16700 B with both new utilities.
+
+## Outcome
+
+Built, documented and tested on `feat/v0.17-finish`, then withdrawn before
+any release. Its own documentation example showed the cost the contract
+above already admitted: a spanning child holds every column of the grid
+open, so short fields that do not fill a row leave the rest of it empty,
+and whether they do depends on the container's width. The maintainer moved
+the class to `.row`, which became a wrapping flex row that fills every
+line, renamed it `.full-line`, and kept `.grid` for collections of cards
+([grid-and-row](grid-and-row.md)). The ledger above stays as the record of
+what a full-span grid child does.
