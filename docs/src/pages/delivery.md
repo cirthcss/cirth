@@ -43,8 +43,8 @@ cryptographic digest before applying a cross-origin stylesheet:
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.min.css"
-  integrity="sha384-lI8cp0vEMgtcAMV0HDytp7C+rad0hVfW/yXmsl87XmnuvTiMsx7O7ADf2lg5IQZq"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.17.0/dist/cirth.min.css"
+  integrity="sha384-nOepR3J7MR5xFmRtPzlbl5vNrfR0CoY/J3mmieajPP1SOI0GHzrZsEpGymO0avwr"
   crossorigin="anonymous">
 ```
 
@@ -69,9 +69,9 @@ build, then optionally one preset. Every build carries its print rules.
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.min.css"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.17.0/dist/cirth.min.css"
   crossorigin="anonymous"
-  integrity="sha384-lI8cp0vEMgtcAMV0HDytp7C+rad0hVfW/yXmsl87XmnuvTiMsx7O7ADf2lg5IQZq">
+  integrity="sha384-nOepR3J7MR5xFmRtPzlbl5vNrfR0CoY/J3mmieajPP1SOI0GHzrZsEpGymO0avwr">
 ```
 
 **Classless**
@@ -79,9 +79,9 @@ build, then optionally one preset. Every build carries its print rules.
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.classless.min.css"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.17.0/dist/cirth.classless.min.css"
   crossorigin="anonymous"
-  integrity="sha384-GZZdP20mqrkcypnIg17t08a5FoGdAKJ49eU1GBK8aXcaT+BwFnqIn5vK52i0gIQm">
+  integrity="sha384-7OQdGQBi4ZtkG2Wo07BmzWL8oNtQXvRVR43Qu9IhRXgEF9GFSobP2z6NAZHhGjvg">
 ```
 
 **Scoped**
@@ -89,9 +89,9 @@ build, then optionally one preset. Every build carries its print rules.
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.scoped.min.css"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.17.0/dist/cirth.scoped.min.css"
   crossorigin="anonymous"
-  integrity="sha384-yFHmovn3OOvzinHeO2HC8iG31iDb+lzxgD4N1MlNchcoGDoFtCB07aY2FOyH/pPD">
+  integrity="sha384-0MRFO1rV4IxTwU5PtMS/ZAF5quKVI2+US5Kg6i+ybhIv85RAgdP1shYcWvL/ZcBb">
 ```
 
 **Classless scoped**
@@ -99,9 +99,9 @@ build, then optionally one preset. Every build carries its print rules.
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/cirth.classless.scoped.min.css"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.17.0/dist/cirth.classless.scoped.min.css"
   crossorigin="anonymous"
-  integrity="sha384-pmLwIliHSNEo//m1i4cVpTDvwB8TWoXibgRIsG/pCjCS1CjZWI+xzd9xPL27iDal">
+  integrity="sha384-eTZSYYbOpXKPcTUR5LgOofbkZwRNK0SLxKfAvbta3c4bJWOa6TyZUGe20LMHxRKI">
 ```
 
 </details>
@@ -117,22 +117,30 @@ same cascade layer.
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.16.0/dist/presets/plain.min.css"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.17.0/dist/presets/plain.min.css"
   crossorigin="anonymous"
-  integrity="sha384-kcc0qmhEMFGjevUPPKQe8HsvALQEf5WLYgSB0GDaiwpnVkdOQ3FdmeCj7K8GgIA2">
+  integrity="sha384-okpjel3OpaU3vAINebVVlnSfp2mxHjNDxsCZXPEeIgAlRmlYWImyGIgehXWshT4d">
 ```
 
-**Material and Metro**
+**Material**
 
-<!-- Material and Metro first ship in 0.17.0. The snippets pin the last
-stable release, which does not have them during the 0.17 beta series:
-restore their two snippets when 0.17.0 is stable, and `npm run sri` writes
-the pin and the hash. -->
+```html
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.17.0/dist/presets/material.min.css"
+  crossorigin="anonymous"
+  integrity="sha384-oSPHt5KpPCwXpW0EJzOppl5GVisIsbqn+6DfhoAIHzIVNjNHtETip4m/TLsPHtOX">
+```
 
-These two presets first ship in v0.17.0, which is in beta. The snippets on
-this page pin the last stable release, so their jsDelivr links appear here
-when v0.17.0 is stable. To try them now, install the beta from npm:
-`npm install @cirthcss/cirth@beta`.
+**Metro**
+
+```html
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@cirthcss/cirth@0.17.0/dist/presets/metro.min.css"
+  crossorigin="anonymous"
+  integrity="sha384-qQi6ftZk/KlgpDp5fDo2uwT1dTbqQHKY4iux6RXo2DPISvEAWtUOmtk3lbDjRdAP">
+```
 
 </details>
 

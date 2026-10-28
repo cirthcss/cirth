@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | gh#152, gh#111 |
-| Status | Implementing: every acceptance check passes (2026-10-26); lands with its pull request |
+| Status | Landed in v0.17.0: every acceptance check passed (2026-10-26) |
 | Baseline | `e53192ce3` on `feat/v0.17-finish` |
 | Breaking | Yes: `.grid` columns are wider and at most three; `.row` wraps by the width of its items instead of switching at 768px |
 
