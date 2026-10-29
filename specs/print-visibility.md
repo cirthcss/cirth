@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | gh#151 |
-| Status | Implementing: every acceptance check passes (2026-10-25); lands with its pull request |
+| Status | Landed in v0.17.0: every acceptance check passed (2026-10-25) |
 | Baseline | `3857cfea3` on `develop` |
 | Breaking | No: two classes are added; existing print and screen output is unchanged without them |
 

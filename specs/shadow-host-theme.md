@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | None: a known issue since 2026-10-03, found while building the home page's isolated copies |
-| Status | Implementing: every acceptance check passes (2026-10-26); lands with its pull request |
+| Status | Landed in v0.17.0: every acceptance check passed (2026-10-26) |
 | Baseline | `9666e8537` on `feat/v0.17-finish` |
 | Breaking | Yes, in selector structure: every build gains `:host()` branches. A themed shadow host now themes its tree; nothing else renders differently |
 

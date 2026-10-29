@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Issue | None: maintainer decision, 2026-10-25, while landing gh#151 |
-| Status | Implementing: every acceptance check passes (2026-10-26), the print stylesheets removed instead of deprecated; lands with its pull request |
+| Status | Landed in v0.17.0: every acceptance check passed (2026-10-26), the print stylesheets removed instead of deprecated |
 | Baseline | `74c65f46f` on `feat/v0.17-finish` |
 | Breaking | Yes: a page that links only the main build now prints with the print pass, and the print stylesheets and their four exports are removed |
 
